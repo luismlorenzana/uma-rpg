@@ -11,6 +11,11 @@
 // Classes v3 (engine v19, D240; H126) adds 210 nodes on new ids, so no older def moves: the Tome Spellblade's and the Arms
 // Summoner's ten trees of eight line nodes each (`addLineTree`), and the five Tier 0 classes' ten trees of one node each
 // (`addTier0Tree`). 960 in all; the live list stays 750 until H134.
+// Engine v19's weapon shapes (CV12–CV14; H128) play new data on old ids, kept apart in `skill19` as v16 did: Katana and
+// Light are a double and Bow and Dark a volley (`RPG_VOLLEY`), on the Brawler's Bow, the Sorcerer's Light and Dark, the
+// Spell Blade's Light and Dark cores and the Summoner's Bow, Dark and Light summons; the Brawler's Bow B becomes Barrage, the
+// Sorcerer's Light B Pierce and her Dark B Barrage (`RPG_LINE_B_POWER_V19`). The two new hybrids' trees play v19's shapes
+// in their `skill`: they have no older generation.
 import {
   isRpgTome, RPG_CLASSES, RPG_TIER0_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
   type RpgClass, type RpgDamageKind, type RpgElement, type RpgStatusKind, type RpgTier0Class, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
@@ -24,6 +29,16 @@ export { RPG_SKILL_MP, RPG_SKILL_POWER } from './node-identity'
 /** Every-foe skills deal this share of single-target power to each foe; random multi-hits get a small bonus. */
 export const RPG_AOE_SHARE = 0.55
 export const RPG_RANDOM_BONUS = 1.05
+/** v19's volley (CV12; H128): the tapped foe takes `target` of the depth's power in her hits, then one splash hit at `splash`
+ * of it strikes every other living foe, plain (no rider or special). The Bow and Dark trees and Halls v2's volley seats
+ * (H129) read it, so the balance (H131, S6) tunes one place: the splash within 0.30–0.40, then the target. */
+export const RPG_VOLLEY = { target: 0.8, splash: 0.35 } as const
+/** v19: a volley costs this much more MP than its depth's base. */
+export const RPG_VOLLEY_MP = 2
+/** v16 (CP42): Pierce's one hit at this × the depth's power, through the unbroken halving (`special: 'pierce'`), +2 MP: the
+ * Spell Blade's branch B (on v15's Flurry ids, depths 3–5; on an Arms tree her extra hit still lands, and pierces), and from
+ * v19 the Tome Spellblade's and the Sorcerer's Light B (CV14). */
+export const RPG_PIERCE_SCALE = 1.15
 /** v12 (D141): a mend's or a Barrier's share of the target's max HP by depth, before her Heal; on every Uma it is ×0.4. */
 export const RPG_SUPPORT_SHARE = [0.14, 0.16, 0.18, 0.2, 0.22] as const
 export const RPG_SUPPORT_ALL = 0.4
@@ -102,6 +117,9 @@ export interface RpgNode {
   /** The def engine v16 plays where it differs (H65): Pierce on the Spell Blade's B line, the Paladin's revive on her Light
    * tree. A fight reads a node's def through `rpgNodeSkill(node, version)`, never `skill` directly. */
   skill16?: RpgSkillDef
+  /** The def engine v19 plays where it differs from v16–v18's (H128): the weapon shapes (CV12) and the moved B lines (CV14).
+   * The two new hybrids' nodes have none: their `skill` is v19's. */
+  skill19?: RpgSkillDef
   /** One line for the tree screen: the live generation's def. */
   summary: string
 }
@@ -114,6 +132,11 @@ const round = (n: number) => Math.round(n * 1000) / 1000
 const pure = (n: number, total: number, kind: RpgDamageKind): RpgHit[] =>
   Array.from({ length: n }, () => ({ power: round(total / n), parts: [{ kind, share: 1 }] }))
 const plus = (def: RpgSkillDef, more: Partial<RpgSkillDef>): RpgSkillDef => ({ ...def, ...more })
+/** v19's volley (CV12): one foe takes `n` hits sharing `RPG_VOLLEY.target` × `p`, then one splash hit at `RPG_VOLLEY.splash`
+ * × `p` strikes every other living foe; `RPG_VOLLEY_MP` over `baseMp`. A capstone rides on top. */
+const volley = (n: number, p: number, kind: RpgDamageKind, baseMp: number): RpgSkillDef =>
+  ({ target: 'one', hits: pure(n, RPG_VOLLEY.target * p, kind), splash: pure(1, RPG_VOLLEY.splash * p, kind)[0]!, mp: baseMp + RPG_VOLLEY_MP, primary: kind })
+const sameDef = (a: RpgSkillDef, b: RpgSkillDef): boolean => JSON.stringify(a) === JSON.stringify(b)
 
 const STATUS_TEXT: Readonly<Record<RpgStatusKey, string>> = {
   'armor-break': 'Armor Break', 'mind-break': 'Mind Break', enfeeble: 'Enfeeble', shatter: 'Shatter', hex: 'Hex',
@@ -124,6 +147,8 @@ function describe(skill: RpgSkillDef): string {
   const n = skill.hits.length
   const total = skill.hits.reduce((s, h) => s + h.power, 0)
   const parts = [`${per} · ${n} hit${n === 1 ? '' : 's'} · ${round(total)}`]
+  // From v19 (H128) a volley's splash is half its shape, so the live summary names it; older summaries stay as they were.
+  if (skill.splash && LIVE19) parts.push(`${round(skill.splash.power)} on every other foe`)
   if (skill.status) parts.push(`${STATUS_TEXT[skill.status.key]} ${skill.status.stacks} ${skill.status.to === 'allies' ? 'on every ally' : skill.status.to === 'foes' ? 'on every foe' : 'on the foe'}`)
   if (skill.summon) parts.push(`lingers at ${skill.summon.linger}`)
   // The live generation's support (D179): the summaries move at the switch.
@@ -146,6 +171,8 @@ function describe(skill: RpgSkillDef): string {
 
 /** Whether the live generation is the Tier rework's fight (v16): the names and summaries it shows. */
 const LIVE16 = rpgRework('fight')
+/** Whether the live generation is Classes v3's (v19, H128): the weapon shapes' names and summaries. */
+const LIVE19 = rpgRework('classes')
 const NODES: RpgNode[] = []
 interface TreeSpec {
   classId: RpgClass
@@ -158,7 +185,16 @@ interface TreeSpec {
   sideB: (d: number) => RpgSkillDef
   /** Engine v16's def for a side B node where it differs (H65), and its name, shown while v16 is live. */
   sideB16?: (d: number) => { skill: RpgSkillDef; name: string } | undefined
+  /** Engine v19's def for a core (CV12, H128), and its name where it changes, shown while v19 is live. A node keeps it
+   * (`skill19`) only where it differs from v16–v18's. */
+  core19?: (d: number) => Gen19
+  /** Engine v19's def for a line B node (`RPG_BRANCH_B`'s side, depths 3–5; CV12, CV14), before `RPG_LINE_B_POWER_V19`. */
+  lineB19?: (d: number) => Gen19
 }
+/** A generation's def and name for a node. */
+interface Gen { skill: RpgSkillDef; name: string }
+/** v19's def, and its name where it changes. */
+interface Gen19 { skill: RpgSkillDef; name?: string }
 /**
  * v16 (H71): a B line's power factor where R1's fight simulation tuned it (CP15: a B line 10–20% ahead of A in its
  * context; ±0.05 a step): from v16 its depth 3–5 nodes play their def × this on every hit's power and a healer's mend and
@@ -171,28 +207,66 @@ export const RPG_LINE_B_POWER_V16: Readonly<Partial<Record<RpgClass, Readonly<Pa
   brawler: { lance: 0.95, katana: 0.9 },
   mage: { 'tome-dark': 0.9, 'tome-ice': 1.1 },
 }
+/**
+ * v19 (CV14, H128): the B lines' power factor, read from v19 as `RPG_LINE_B_POWER_V16` is v16–v18. The Sorcerer's Pierce
+ * moves from her Dark tree to her Light tree with its measured 0.9; the three moved lines (the Brawler's Bow Barrage, the
+ * Sorcerer's Light Pierce and Dark Barrage) are the balance's knobs (H131, within 0.85–1.15), the Barrages starting at 1.
+ */
+export const RPG_LINE_B_POWER_V19: Readonly<Partial<Record<RpgClass, Readonly<Partial<Record<RpgWeapon, number>>>>>> = {
+  brawler: { lance: 0.95, katana: 0.9, bow: 1 },
+  mage: { 'tome-light': 0.9, 'tome-ice': 1.1, 'tome-dark': 1 },
+}
+/** A node of three generations: `skill` (v6–v15), `skill16` where v16–v18 play another def, `skill19` where v19 plays
+ * another than v16–v18; its name and summary the live generation's. */
+function pushNode(base: Omit<RpgNode, 'id' | 'variant' | 'name' | 'skill' | 'summary'>, id: string, variant: RpgNode['variant'], own: Gen,
+  v16?: Gen, v19?: Gen19): void {
+  const played16 = v16?.skill ?? own.skill
+  const skill19 = v19 && !sameDef(v19.skill, played16) ? v19.skill : undefined
+  const live16 = LIVE16 && v16 ? v16 : own
+  const live = LIVE19 && v19 ? { skill: v19.skill, name: v19.name ?? live16.name } : live16
+  NODES.push({ ...base, id, variant, name: live.name, skill: own.skill, ...(v16 ? { skill16: v16.skill } : {}), ...(skill19 ? { skill19 } : {}),
+    summary: describe(live.skill) })
+}
 function addTree(spec: TreeSpec): void {
   const tree = rpgTreeOf(spec.classId, spec.weapon)
   const lineB = RPG_BRANCH_B[spec.classId][spec.weapon]
   for (let d = 1; d <= 5; d += 1) {
     const base = { tree, classId: spec.classId, weapon: spec.weapon, depth: d, cost: d }
-    const core = spec.core(d)
-    NODES.push({ ...base, id: `${tree}.${d}`, variant: null, name: at(spec.names, d), skill: core, summary: describe(core) })
+    pushNode(base, `${tree}.${d}`, null, { skill: spec.core(d), name: at(spec.names, d) }, undefined, spec.core19?.(d))
     for (const side of ['a', 'b'] as const) {
       const skill = side === 'a' ? spec.sideA(d) : spec.sideB(d)
+      const name = at(side === 'a' ? spec.a : spec.b, d)
       const own = side === 'b' ? spec.sideB16?.(d) : undefined
-      const factor = side === lineB && d >= 3 ? RPG_LINE_B_POWER_V16[spec.classId]?.[spec.weapon] ?? 1 : 1
-      const v16 = factor === 1 ? own
-        : { skill: rpgRankedSkill(own?.skill ?? skill, factor), name: own?.name ?? at(side === 'a' ? spec.a : spec.b, d) }
-      const live = LIVE16 && v16 ? v16 : { skill, name: at(side === 'a' ? spec.a : spec.b, d) }
-      NODES.push({ ...base, id: `${tree}.${d}${side}`, variant: side, name: live.name, skill, ...(v16 ? { skill16: v16.skill } : {}),
-        summary: describe(live.skill) })
+      const onB = side === lineB && d >= 3
+      const factor = onB ? RPG_LINE_B_POWER_V16[spec.classId]?.[spec.weapon] ?? 1 : 1
+      const v16 = factor === 1 ? own : { skill: rpgRankedSkill(own?.skill ?? skill, factor), name: own?.name ?? name }
+      // v19 (H128): line B's own def where the tree's B changes, at v19's factor; else v16's def where the factor moved.
+      const factor19 = onB ? RPG_LINE_B_POWER_V19[spec.classId]?.[spec.weapon] ?? 1 : 1
+      const own19 = onB ? spec.lineB19?.(d) : undefined
+      const v19 = own19 || factor19 !== factor ? { skill: rpgRankedSkill(own19?.skill ?? own?.skill ?? skill, factor19), name: own19?.name } : undefined
+      pushNode(base, `${tree}.${d}${side}`, side, { skill, name }, v16, v19)
     }
   }
 }
 
 const GH = [1, 1, 2, 2, 3], SH = [2, 2, 4, 4, 6], LH = [2, 2, 3, 3, 4]
 const half = (d: number) => Math.max(1, at(SH, d) / 2)
+/** A Barrage (the Bow's core to v18; from v19 the Brawler's Bow B and the Sorcerer's Dark B, CV14): one foe, 2 · 2 · 4 · 4 · 6
+ * hits at the depth's power, base MP; at depth 5 her kind's own, Armor Break 2 on the Bow, ×1.3 below half HP on Dark. */
+const barrage = (d: number, kind: 'bow' | 'dark'): RpgSkillDef => ({ target: 'one', hits: pure(at(SH, d), power(d), kind), mp: mp(d), primary: kind,
+  ...(d === 5 ? (kind === 'bow' ? { rider: { status: 'armor-break', stacks: 2, per: 'foe' } } : { special: 'vs-wounded' }) : {}) })
+/** v19's line A volley on the Bow and Dark (CV12): 1 · 1 · 2 · 2 · 3 hits on the tapped foe, the splash on the rest; at
+ * depth 5, on the tapped foe, Armor Break 2 on the Bow, ×1.3 below half HP on Dark. */
+const volleyCore = (d: number, kind: 'bow' | 'dark'): RpgSkillDef => ({ ...volley(at(GH, d), power(d), kind, mp(d)),
+  ...(d === 5 ? (kind === 'bow' ? { rider: { status: 'armor-break', stacks: 2, per: 'foe' } } : { special: 'vs-wounded' }) : {}) })
+/** v19's double on Light (CV12), the Katana's: one foe, two hits at the depth's power at every depth, ×1.3 on a Broken foe
+ * at depth 5. */
+const doubleCore = (d: number, kind: 'katana' | 'light'): RpgSkillDef =>
+  ({ target: 'one', hits: pure(2, power(d), kind), mp: mp(d), primary: kind, ...(d === 5 ? { special: 'vs-broken' } : {}) })
+/** v19's Pierce on the Sorcerer's Light B (CV14), the Brawler's Katana Draw on Light: one hit at `RPG_PIERCE_SCALE` × the
+ * depth's power through the unbroken halving, +2 MP. */
+const pierce = (d: number, kind: RpgDamageKind): RpgSkillDef =>
+  ({ target: 'one', hits: pure(1, RPG_PIERCE_SCALE * power(d), kind), mp: mp(d) + 2, primary: kind, special: 'pierce' })
 
 // --- Brawler: the five Arms at full power -----------------------------------------------------------------------------
 
@@ -229,10 +303,12 @@ const BRAWLER: Readonly<Record<RpgWeaponKind, Omit<TreeSpec, 'classId' | 'weapon
     names: ['Twin Arrows', 'Triple Shot', 'Quiver Volley', 'Arrow Storm', 'Starfall Barrage'],
     a: ['Power Shot', 'Piercing Arrow', 'Ballista Shot', 'Comet Arrow', 'Sunpiercer'],
     b: ['Spread Shot', 'Scatter Volley', 'Rain of Arrows', 'Arrow Hail', 'Starfall Rain'],
-    core: (d) => ({ target: 'one', hits: pure(at(SH, d), power(d), 'bow'), mp: mp(d), primary: 'bow',
-      ...(d === 5 ? { rider: { status: 'armor-break', stacks: 2, per: 'foe' } } : {}) }),
+    core: (d) => barrage(d, 'bow'),
     sideA: (d) => ({ target: 'one', hits: pure(half(d), 1.15 * power(d), 'bow'), mp: mp(d) + 2, primary: 'bow' }),
     sideB: (d) => ({ target: 'one', hits: pure(at(SH, d), power(d), 'bow'), splash: pure(1, 0.2 * power(d), 'bow')[0], mp: mp(d) + 4, primary: 'bow' }),
+    // v19 (CV12, CV14): line A a volley, its capstone Starfall Volley; line B Barrage, the old core (was Rain).
+    core19: (d) => ({ skill: volleyCore(d, 'bow'), ...(d === 5 ? { name: 'Starfall Volley' } : {}) }),
+    lineB19: (d) => ({ skill: barrage(d, 'bow'), name: at(['', '', 'Quiver Barrage', 'Storm Barrage', 'Starfall Barrage'], d) }),
   },
   katana: {
     names: ['Double Slash', 'Crossing Cut', 'Twin Moon', 'Iai Storm', 'Moonfall'],
@@ -281,6 +357,9 @@ const MAGE: Readonly<Record<string, Omit<TreeSpec, 'classId' | 'weapon'>>> = {
     core: (d) => ({ target: 'one', hits: pure(at(SH, d), power(d), 'light'), mp: mp(d), primary: 'light', ...(d === 5 ? { special: 'vs-broken' } : {}) }),
     sideA: (d) => ({ target: 'one', hits: pure(half(d), 1.15 * power(d), 'light'), mp: mp(d) + 2, primary: 'light' }),
     sideB: (d) => ({ target: 'all', hits: pure(2, 0.5 * power(d), 'light'), mp: mp(d) + 6, primary: 'light' }),
+    // v19 (CV12, CV14): a double, the Katana's twin; line B Pierce (was Cascade), the Brawler's Draw on Light.
+    core19: (d) => ({ skill: doubleCore(d, 'light') }),
+    lineB19: (d) => ({ skill: pierce(d, 'light'), name: at(['', '', 'Luxaga Pierce', 'Luxaja Pierce', 'Holy Pierce'], d) }),
   },
   'tome-dark': {
     names: ['Nox', 'Noxra', 'Noxaga', 'Noxaja', 'Black Hole'],
@@ -289,6 +368,9 @@ const MAGE: Readonly<Record<string, Omit<TreeSpec, 'classId' | 'weapon'>>> = {
     core: (d) => ({ target: 'one', hits: pure(2, power(d), 'dark'), mp: mp(d), primary: 'dark', ...(d === 5 ? { special: 'vs-wounded' } : {}) }),
     sideA: (d) => ({ target: 'one', hits: pure(1, 1.15 * power(d), 'dark'), mp: mp(d) + 2, primary: 'dark', special: 'pierce' }),
     sideB: (d) => ({ target: 'all', hits: pure(2, 0.5 * power(d), 'dark'), mp: mp(d) + 6, primary: 'dark' }),
+    // v19 (CV12, CV14): a volley, the Bow's twin; line B (her `a`) Barrage (was Pierce).
+    core19: (d) => ({ skill: volleyCore(d, 'dark') }),
+    lineB19: (d) => ({ skill: barrage(d, 'dark'), name: at(['', '', 'Noxaga Barrage', 'Noxaja Barrage', 'Void Barrage'], d) }),
   },
 }
 for (const weapon of RPG_TOMES) addTree({ classId: 'mage', weapon, ...MAGE[weapon]! })
@@ -327,13 +409,23 @@ function summonSupport(kind: RpgDamageKind, d: number): RpgSupport | undefined {
     default: return undefined
   }
 }
-/** A summon by its kind's shape, `extra` hits more and `scale` times the power, with its depth-5 capstone. */
-function summon(weapon: RpgWeapon, d: number, extra = 0, scale = 1): RpgSkillDef {
+/** A summon by its kind's shape, `extra` hits more and `scale` times the power, with its depth-5 capstone. `v19` (CV12, H128):
+ * the weapon shapes, the Bow's and Dark's summons volleys (the extra hit on the tapped foe, never the splash; the capstone
+ * on her) and Light's a double. */
+function summon(weapon: RpgWeapon, d: number, extra = 0, scale = 1, v19 = false): RpgSkillDef {
   const kind = rpgWeaponKind(weapon)
   const p = scale * power(d)
   const capstone = d === 5
   const support = summonSupport(kind, d)
   const base: Omit<RpgSkillDef, 'target' | 'hits'> = { mp: mp(d), primary: kind, summon: { linger: LINGER }, ...(support ? { support } : {}) }
+  if (v19 && (kind === 'bow' || kind === 'dark')) {
+    const { hits, splash, mp: cost } = volley(at(GH, d) + extra, p, kind, mp(d))
+    return { ...base, target: 'one', hits, splash, mp: cost,
+      ...(capstone ? { rider: { status: kind === 'bow' ? 'armor-break' : 'enfeeble', stacks: 2, per: 'foe' } } : {}) }
+  }
+  if (v19 && kind === 'light') {
+    return { ...base, target: 'one', hits: pure(2 + extra, p, kind), ...(capstone ? { allies: { status: 'barrier', stacks: 1 } } : {}) }
+  }
   switch (kind) {
     case 'fire': case 'greatsword':
       return { ...base, target: 'one', hits: pure(at(GH, d) + extra, p, kind),
@@ -352,12 +444,18 @@ function summon(weapon: RpgWeapon, d: number, extra = 0, scale = 1): RpgSkillDef
         ...(capstone ? (kind === 'dark' ? { rider: { status: 'enfeeble', stacks: 2, per: 'foe' } } : { special: 'vs-broken' }) : {}) }
   }
 }
+/** Bonded: the summon lingers at 0.4, for 2 MP more. */
+const bonded = (def: RpgSkillDef): RpgSkillDef => plus(def, { summon: { linger: 0.4 }, mp: def.mp + 2 })
 for (const weapon of RPG_WEAPONS) {
   const names = SUMMONS[weapon]
+  // v19 (CV12): her Bow and Dark summons volley, her Light summons double, on her core and her line B (Pack on her Arms,
+  // Bonded on her Tomes); a node keeps v19's def only where it differs.
   addTree({ classId: 'summoner', weapon, names, a: names.map((n) => `${n} Pack`), b: names.map((n) => `Bonded ${n}`),
     core: (d) => summon(weapon, d),
     sideA: (d) => summon(weapon, d, 1, 0.95),
-    sideB: (d) => plus(summon(weapon, d), { summon: { linger: 0.4 }, mp: summon(weapon, d).mp + 2 }) })
+    sideB: (d) => bonded(summon(weapon, d)),
+    core19: (d) => ({ skill: summon(weapon, d, 0, 1, true) }),
+    lineB19: (d) => ({ skill: isRpgTome(weapon) ? bonded(summon(weapon, d, 0, 1, true)) : summon(weapon, d, 1, 0.95, true) }) })
 }
 
 // --- Spell Blade: single-target halves, an Arm and a Tome every act (D86) ----------------------------------------------
@@ -366,6 +464,8 @@ const BLADE_HITS: Readonly<Record<RpgDamageKind, readonly number[]>> = {
   greatsword: [1, 1, 1, 2, 2], fire: [1, 1, 1, 2, 2], axe: [1, 1, 2, 2, 2], ice: [1, 1, 2, 2, 2],
   lance: [2, 2, 2, 3, 3], lightning: [2, 2, 2, 3, 3], bow: [2, 2, 3, 3, 4], light: [2, 2, 3, 3, 4], katana: [2, 2, 2, 2, 2], dark: [2, 2, 2, 2, 2],
 }
+/** v19 (CV12, §4.2; H128): the twins re-paired, so Light lands the Katana's 2 hits and Dark the Bow's 2 · 2 · 3 · 3 · 4. */
+const BLADE_HITS_V19: Readonly<Record<RpgDamageKind, readonly number[]>> = { ...BLADE_HITS, light: BLADE_HITS.katana, dark: BLADE_HITS.bow }
 const BLADE_NOUN: Readonly<Record<RpgDamageKind, string>> = {
   greatsword: 'Cleave', axe: 'Hew', lance: 'Thrust', bow: 'Shot', katana: 'Draw', fire: 'Brand', ice: 'Rime', lightning: 'Bolt', light: 'Ray', dark: 'Shade',
 }
@@ -376,9 +476,6 @@ function bladeCapstone(kind: RpgDamageKind): Partial<RpgSkillDef> {
   const status: RpgStatusKind = kind === 'fire' ? 'burn' : kind === 'ice' ? 'enfeeble' : kind === 'lightning' ? 'shock' : 'armor-break'
   return { rider: { status, stacks: 1, per: 'foe' } }
 }
-/** v16 (CP42): the Spell Blade's branch B, Pierce, on v15's Flurry ids (depths 3–5): one hit at this × the depth's power
- * that ignores the unbroken halving (`special: 'pierce'`), +2 MP. On an Arms tree her extra hit still lands, and pierces. */
-export const RPG_PIERCE_SCALE = 1.15
 for (const weapon of RPG_WEAPONS) {
   const kind = rpgWeaponKind(weapon)
   const names = TIERS.map((t) => `${t} ${BLADE_NOUN[kind]}`)
@@ -386,6 +483,7 @@ for (const weapon of RPG_WEAPONS) {
     ({ target: 'one', hits: pure(n, scale * power(d), kind), mp: mp(d) + extraMp, primary: kind })
   addTree({ classId: 'spellblade', weapon, names, a: names.map((n) => `Focused ${n}`), b: names.map((n) => `${n} Flurry`),
     core: (d) => ({ ...one(d, at(BLADE_HITS[kind], d), 1), ...(d === 5 ? bladeCapstone(kind) : {}) }),
+    core19: (d) => ({ skill: { ...one(d, at(BLADE_HITS_V19[kind], d), 1), ...(d === 5 ? bladeCapstone(kind) : {}) } }),
     sideA: (d) => one(d, Math.max(1, at(BLADE_HITS[kind], d) - 1), 1.1, 2),
     sideB: (d) => one(d, at(BLADE_HITS[kind], d) + 1, 0.95, 2),
     sideB16: (d) => (d >= 3 ? { skill: { ...one(d, 1, RPG_PIERCE_SCALE, 2), special: 'pierce' }, name: `Piercing ${at(names, d)}` } : undefined) })
@@ -477,8 +575,8 @@ for (const weapon of RPG_WEAPONS) {
 // --- Classes v3's new trees (engine v19, CV6, CV17; H126) ---------------------------------------------------------------
 
 /** A tree of the lines only (the two new hybrids: no older generation, so no unused side node): depths 1–2 the trunk's
- * cores, 3–5 line A's cores and line B's side (`RPG_BRANCH_B`'s letter), eight nodes. Their `skill` is v19's def: H128
- * changes it in place for the new weapon shapes. */
+ * cores, 3–5 line A's cores and line B's side (`RPG_BRANCH_B`'s letter), eight nodes. Their `skill` is v19's def, in v19's
+ * weapon shapes (H128). */
 interface LineTreeSpec {
   classId: RpgClass
   weapon: RpgWeapon
@@ -506,8 +604,9 @@ function addLineTree(spec: LineTreeSpec): void {
  * (the Spell Blade's blade nouns on her Arms trees). None matches a master-data string. */
 export const RPG_TOMEBLADE_DEPTHS = ['Edged', 'Honed', 'Whetted', 'Gleaming', 'Sovereign'] as const
 export const RPG_TOMEBLADE_SPELLS: Readonly<Record<RpgElement, string>> = { fire: 'Pyre', ice: 'Frost', lightning: 'Volt', light: 'Lumen', dark: 'Umbra' }
-// The Tome Spellblade (CV15, CV17): the Spell Blade's rule (one foe, hits by kind, the same depth riders), her own names;
-// line B Pierce on every tree (one hit at `RPG_PIERCE_SCALE` × the depth's power, +2 MP, through the unbroken halving).
+// The Tome Spellblade (CV15, CV17): the Spell Blade's rule at v19 (one foe, hits by kind as `BLADE_HITS_V19`, the same depth
+// riders; H128), her own names; line B Pierce on every tree (one hit at `RPG_PIERCE_SCALE` × the depth's power, +2 MP,
+// through the unbroken halving).
 for (const weapon of RPG_WEAPONS) {
   const kind = rpgWeaponKind(weapon)
   const word = isRpgTome(weapon) ? RPG_TOMEBLADE_SPELLS[kind as RpgElement] : BLADE_NOUN[kind]
@@ -515,17 +614,17 @@ for (const weapon of RPG_WEAPONS) {
   const one = (d: number, n: number, scale: number, extraMp = 0): RpgSkillDef =>
     ({ target: 'one', hits: pure(n, scale * power(d), kind), mp: mp(d) + extraMp, primary: kind })
   addLineTree({ classId: 'tomeblade', weapon, names, b: names.map((n) => `Piercing ${n}`),
-    core: (d) => ({ ...one(d, at(BLADE_HITS[kind], d), 1), ...(d === 5 ? bladeCapstone(kind) : {}) }),
+    core: (d) => ({ ...one(d, at(BLADE_HITS_V19[kind], d), 1), ...(d === 5 ? bladeCapstone(kind) : {}) }),
     lineB: (d) => ({ ...one(d, 1, RPG_PIERCE_SCALE, 2), special: 'pierce' }) })
 }
-// The Arms Summoner (CV15, CV17): the Summoner's summons and riders on every kind, her lines mirrored: Bonded on her Arms
-// trees (the lingering summon at 0.4, +2 MP), Pack on her Tome trees (one more hit at ×0.95).
+// The Arms Summoner (CV15, CV17): the Summoner's summons and riders on every kind in v19's shapes (H128), her lines
+// mirrored: Bonded on her Arms trees (the lingering summon at 0.4, +2 MP), Pack on her Tome trees (one more hit at ×0.95).
 for (const weapon of RPG_WEAPONS) {
   const names = SUMMONS[weapon]
   const tome = isRpgTome(weapon)
   addLineTree({ classId: 'armsummoner', weapon, names, b: names.map((n) => (tome ? `${n} Pack` : `Bonded ${n}`)),
-    core: (d) => summon(weapon, d),
-    lineB: (d) => (tome ? summon(weapon, d, 1, 0.95) : plus(summon(weapon, d), { summon: { linger: 0.4 }, mp: summon(weapon, d).mp + 2 })) })
+    core: (d) => summon(weapon, d, 0, 1, true),
+    lineB: (d) => (tome ? summon(weapon, d, 1, 0.95, true) : bonded(summon(weapon, d, 0, 1, true))) })
 }
 
 /** A Tier 0 tree (CV6): her class's one skill on one weapon, its one node at depth 1. One foe, one hit of the weapon's kind
@@ -546,10 +645,12 @@ export const RPG_NODES: readonly RpgNode[] = NODES.filter((n) => RPG_CLASSES.inc
 const BY_ID = new Map(NODES.map((n) => [n.id, n]))
 export const rpgNode = (id: string): RpgNode | undefined => BY_ID.get(id)
 export const rpgTreeNodes = (tree: RpgTreeId): RpgNode[] => NODES.filter((n) => n.tree === tree)
-/** The def a node plays in a fight of an engine's version (H65): from v16 its `skill16` where it has one, else `skill`. The
- * engine, Limit Breaks, Auto and a summon's farewell read nodes through this, with the fight's version. */
+/** The def a node plays in a fight of an engine's version (H65, H128): from v19 its `skill19` where it has one, then from
+ * v16 its `skill16`, else `skill`. The engine, Limit Breaks, Auto and a summon's farewell read nodes through this, with the
+ * fight's version. */
 export const rpgNodeSkill = (node: RpgNode, version: number): RpgSkillDef =>
-  (rpgRework('fight', version) && node.skill16 ? node.skill16 : node.skill)
+  (rpgRework('classes', version) && node.skill19 ? node.skill19
+    : rpgRework('fight', version) && node.skill16 ? node.skill16 : node.skill)
 /** A skill at a Skill Rank's multiplier (v16, CP32): every hit's power (`hits`, `focus`, `splash`, `other`) and its
  * support's mend and Barrier shares (`support15`'s `share` and `shieldShare`) × `factor`. Its MP, hit count, targets,
  * riders, statuses, drain and revive stay. */

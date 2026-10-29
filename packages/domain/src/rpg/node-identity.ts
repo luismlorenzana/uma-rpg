@@ -1,4 +1,5 @@
 // Save/profile validation needs ids and gates, not skill names, hit definitions or the full generated catalog (H16).
+import { BATTLE_ENGINE_VERSION, rpgRework } from './battle/caps'
 import { isRpgTome, isRpgWeapon, RPG_ALL_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgIsTier0, type RpgClass, type RpgTreeId, type RpgWeapon } from './kinds'
 
 export interface RpgNodeIdentity {
@@ -48,8 +49,9 @@ export const RPG_BRANCH_B: Readonly<Record<RpgClass, Readonly<Partial<Record<Rpg
   armsummoner: byChannel('b', 'a'),
   tomeblade: every('b'),
 }
-/** Branch B's name, by class and kind, for the branch sheet (§6.5). */
-export const RPG_BRANCH_B_NAME: Readonly<Record<RpgClass, Readonly<Partial<Record<RpgWeapon, string>>>>> = {
+type BranchNames = Readonly<Record<RpgClass, Readonly<Partial<Record<RpgWeapon, string>>>>>
+/** Branch B's name, by class and kind, for the branch sheet (§6.5): engines v16–v18's. */
+const RPG_BRANCH_B_NAME_V16: BranchNames = {
   brawler: { greatsword: 'Combo', axe: 'Reap', lance: 'Impale', bow: 'Rain', katana: 'Draw' },
   mage: { 'tome-fire': 'Wave', 'tome-ice': 'Spike', 'tome-lightning': 'Bolt', 'tome-light': 'Cascade', 'tome-dark': 'Pierce' },
   spellblade: Object.fromEntries(RPG_WEAPONS.map((w) => [w, 'Pierce'])),
@@ -60,6 +62,18 @@ export const RPG_BRANCH_B_NAME: Readonly<Record<RpgClass, Readonly<Partial<Recor
   armsummoner: Object.fromEntries(RPG_WEAPONS.map((w) => [w, isRpgTome(w) ? 'Pack' : 'Bonded'])),
   tomeblade: Object.fromEntries(RPG_WEAPONS.map((w) => [w, 'Pierce'])),
 }
+/** Classes v3's (CV14; engine v19, H128): the Brawler's Bow B is Barrage, the Sorcerer's Light B Pierce and her Dark B
+ * Barrage, so the twins' B lines mirror. The side letters stay (`RPG_BRANCH_B`). */
+const RPG_BRANCH_B_NAME_V19: BranchNames = {
+  ...RPG_BRANCH_B_NAME_V16,
+  brawler: { ...RPG_BRANCH_B_NAME_V16.brawler, bow: 'Barrage' },
+  mage: { ...RPG_BRANCH_B_NAME_V16.mage, 'tome-light': 'Pierce', 'tome-dark': 'Barrage' },
+}
+/** Branch B's name on a class's tree in an engine's generation; none for a tree her class lacks or a Tier 0's. */
+export const rpgBranchBName = (classId: RpgClass, weapon: RpgWeapon, engine: number = BATTLE_ENGINE_VERSION): string | undefined =>
+  (rpgRework('classes', engine) ? RPG_BRANCH_B_NAME_V19 : RPG_BRANCH_B_NAME_V16)[classId][weapon]
+/** The live generation's branch B names, which the tree view and the manual read (names are presentation). */
+export const RPG_BRANCH_B_NAME: BranchNames = rpgRework('classes') ? RPG_BRANCH_B_NAME_V19 : RPG_BRANCH_B_NAME_V16
 /** The two hybrids Classes v3 adds (CV15): no older generation, so their trees hold only their lines' eight nodes. */
 const LINE_ONLY: readonly RpgClass[] = ['armsummoner', 'tomeblade']
 /** Whether a class's trees hold only their lines (the trunk and the fork's two lines: eight nodes a tree). */

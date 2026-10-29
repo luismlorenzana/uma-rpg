@@ -72,16 +72,19 @@ const canonical = <T extends string>(list: readonly T[], all: readonly T[]): T[]
 
 /** The five twin sets the Rift draws from v16 (CP7): each an element and its twin Arm; Twilight is the world's alone. */
 const RIFT_TWIN_SETS: readonly RpgElement[] = RPG_ELEMENTS
-/** Twin sets as one foe's weaknesses: their Arms and their elements, in canonical order (the pairs share it). */
-const twinSets = (sets: readonly RpgElement[]): BattleWeaknesses => {
-  const each = canonical(sets, RIFT_TWIN_SETS).map(rpgTwinWeaknesses)
-  return { weapons: each.flatMap((w) => w.weapons), elements: each.flatMap((w) => w.elements) }
+/** Twin sets as one foe's weaknesses in the fight's engine (from v19 the Light set Katana + Light and the Dark set Bow +
+ * Dark, CV13): their Arms and their elements, each in canonical order (to v18 the pairs share it; from v19 Light's Katana
+ * comes after Dark's Bow, as the Arms' order has it). */
+const twinSets = (sets: readonly RpgElement[], engine: number): BattleWeaknesses => {
+  const each = canonical(sets, RIFT_TWIN_SETS).map((set) => rpgTwinWeaknesses(set, engine))
+  return { weapons: canonical(each.flatMap((w) => w.weapons), RPG_WEAPON_KINDS), elements: each.flatMap((w) => w.elements) }
 }
 
 /** One wave's weaknesses (§5), from the front, never the face: Iron Arms only and Arcane elements only, by rank, a pair's
  * differing; the Duel both, by stage; the Horde one of each, dealt from the 25 pairs so no two foes of a wave share one.
  * From v16 (CP7, D202) the Duel draws `duel.sets` twin sets, and the Horde deals each foe a twin set, a wave repeating
- * none until all five are dealt (a champion pair's partners, dealt first, differ); Iron and Arcane draw as before. */
+ * none until all five are dealt (a champion pair's partners, dealt first, differ); Iron and Arcane draw as before. A set's
+ * kinds are the fight's engine's (H128: re-paired from v19), so an older fight regenerates with its own. */
 function waveWeaknesses(front: RiftFront, stage: number, wave: readonly RiftSlot[], keyOf: (k: number) => string,
   tuning: RiftTuning, engine: number): BattleWeaknesses[] {
   const t = tuning.weak
@@ -103,14 +106,14 @@ function waveWeaknesses(front: RiftFront, stage: number, wave: readonly RiftSlot
       case 'arcane': return { weapons: [], elements: draw(RPG_ELEMENTS, t.arcane[slot.rank], slot, `${key}:elements`) }
       case 'duel': {
         const sets = twins ? t.duel.sets?.[stage - 1] : undefined
-        if (sets !== undefined) return twinSets(draw(RIFT_TWIN_SETS, sets, slot, `${key}:sets`))
+        if (sets !== undefined) return twinSets(draw(RIFT_TWIN_SETS, sets, slot, `${key}:sets`), engine)
         return { weapons: draw(RPG_WEAPON_KINDS, t.duel.weapons[stage - 1]!, slot, `${key}:arms`),
           elements: draw(RPG_ELEMENTS, t.duel.elements[stage - 1]!, slot, `${key}:elements`) }
       }
       case 'horde': {
         if (twins) {
           if (!deck.length) deck.push(...RIFT_TWIN_SETS)
-          return twinSets(deck.splice(riftSeed(`${key}:set`) % deck.length, 1))
+          return twinSets(deck.splice(riftSeed(`${key}:set`) % deck.length, 1), engine)
         }
         const [weapon, element] = deal.splice(riftSeed(`${key}:pair`) % deal.length, 1)[0]!
         return { weapons: [weapon], elements: [element] }
