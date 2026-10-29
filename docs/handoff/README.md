@@ -49,7 +49,7 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H136](tasks/H136-entry-budget.md) | Main JS headroom before Classes v3: the save's migration chain lazy again and the v1 economy's tables out of the entry (F36), with a size guard | Claude | S–M | — | Ready |
+| [H136](tasks/H136-entry-budget.md) | Main JS headroom before Classes v3: the save's migration chain lazy again and the v1 economy's tables out of the entry (F36), with a size guard | Claude | S–M | — | In progress (main session) |
 | [H126](tasks/H126-classes-v3-domain.md) | Classes v3 (D240) in the domain, dark at engine v19: 13 classes and the tree, Tier 0, promotion and reclass, the two new hybrids, the calling by running style, trades, templates 5 × 3, the Rift's builds; v18 replays pinned | Claude | L | H136 | Waiting |
 | [H128](tasks/H128-weapon-shapes-v19.md) | Classes v3: Katana and Light doubles, Bow and Dark volleys, the twins re-paired, three line B changes, every twin reader | Claude | M | H126 | Waiting |
 | [H130](tasks/H130-save-v32-class-reset.md) | Save v32, dark: the class reset and refund as Class Marks, trade moves, the healer seats' merge; `toV32` not chained | Claude | M–L | H126, H129, H136 | Waiting |
