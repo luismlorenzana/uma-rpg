@@ -955,7 +955,16 @@ function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSki
     }
   }
   for (const hit of def.focus ?? []) if (tapped.hp > 0) { const r = strike(s, actor, tapped, hit, scale, cues, false, options); note(r.receiver, hit, r.weak) }
-  if (def.splash) for (const foe of living(s, 'enemy')) if (foe !== tapped) { const r = strike(s, actor, foe, def.splash, scale, cues, false, options); note(r.receiver, def.splash, r.weak) }
+  if (def.splash) {
+    // From v19 (CV12, H128) the splash is plain: no special, and no rider lands on a foe only it struck (the volley's riders
+    // and specials are the tapped foe's). A weak splash still chips a shield and breaks a lock, as any hit.
+    const plain = rpgRework('classes', s.engineVersion)
+    for (const foe of living(s, 'enemy')) if (foe !== tapped) {
+      const r = strike(s, actor, foe, def.splash, scale, cues, false, plain ? { orbs, best } : options)
+      if (!plain) note(r.receiver, def.splash, r.weak)
+      else { log.hitFoes.push(r.receiver); log.weak ||= r.weak }
+    }
+  }
   if (def.other) {
     const others = living(s, 'enemy').filter((foe) => foe !== tapped)
     const foe = others[hashNumber(`${s.input.seed}:${s.round}:${actor.id}:${s.acted.length}:${salt}:other`) % Math.max(1, others.length)]

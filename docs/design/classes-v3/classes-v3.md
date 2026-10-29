@@ -450,6 +450,8 @@ defaults holds all ten.
 
 ### 4.1 Five shapes, ten kinds
 
+Built in H128 (D246), live from H134.
+
 The owner: "Light Tome to mirror Katana with double hits, and Dark Tome to mirror Bow with AoE hits." So the Bow is an
 area kind too, the twins re-pair to **Katana–Light** and **Bow–Dark**, and each of the five pairs gets a shape no other
 pair has (CV12):
@@ -481,6 +483,8 @@ shape that pushes the tapped foe toward her Break: three weak hits on her and on
 
 ### 4.2 What it does to every class's trees
 
+Built in H128 (D246), live from H134.
+
 | Class | Bow | Katana | Light | Dark |
 |---|---|---|---|---|
 | Brawler | A: **volley** (Twin Arrows … **Starfall Volley**, renamed from Starfall Barrage); B: **Barrage** (Quiver Barrage, Storm Barrage, Starfall Barrage: one foe 4 · 4 · 6 hits, the old line A; was Rain) | Same | — | — |
@@ -497,6 +501,8 @@ shape that pushes the tapped foe toward her Break: three weak hits on her and on
   fights before v19 replay with theirs.
 
 ### 4.3 The twins, re-paired
+
+Built in H128 (D246), live from H134.
 
 | | Today | v3 (engine v19) |
 |---|---|---|

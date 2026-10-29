@@ -11,11 +11,13 @@ import type { BattleAction, BattleAlly, BattleChannel, BattleHalf, BattleState, 
 
 /** How good a skill or Attack is against a foe now: power, weakness, every-foe reach and a small status premium. From
  * v14 (D169) a foe's ward discounts it by the share of its power in the channel she wards, so a party prefers the other
- * channel and still acts when it has only the warded one. */
+ * channel and still acts when it has only the warded one. From v19 (H128) a splash counts once on each other living foe,
+ * so she aims a volley at a crowd. */
 function score(state: BattleState, def: RpgSkillDef, foe: BattleUnit, foes: readonly BattleUnit[]): number {
   const enemy = battleFoe(state, foe.id)!
   const weak = def.hits.some((hit) => hit.parts.some((part) => battleHitIsWeak(enemy, foe, part.kind)))
-  const total = def.hits.reduce((sum, hit) => sum + hit.power, 0)
+  const splash = def.splash && rpgRework('classes', state.engineVersion) ? def.splash.power * (foes.length - 1) : 0
+  const total = def.hits.reduce((sum, hit) => sum + hit.power, 0) + splash
   const raw = total * (weak ? 1.6 : 1) * (def.target === 'all' ? foes.length * 0.55 : 1) /
     (foe.shield > 0 ? 1 : 0.6) + (def.status ? 0.5 : 0)
   if (state.engineVersion < 14 || !enemy.ward) return raw

@@ -135,4 +135,16 @@ describe.skipIf(!HAS_RELEASE)('Classes v3\'s calling and templates against the l
     console.log(`v19 words checked: ${ours.length} against ${taken.size} master-data strings; clashes: ${clashes.length}`)
     expect(clashes.length, 'a Classes v3 word equals a master-data string').toBe(0)
   })
+
+  it('uses no master-data string for the weapon shapes\' new names (H128), exactly or as a word inside', () => {
+    const taken = new Set<string>()
+    for (const set of ['characters', 'outfits', 'support-cards', 'skills', 'scenarios', 'races', 'tracks', 'courses', 'objectives']) strings(load(set), taken)
+    const ours = ['Starfall Volley', 'Quiver Barrage', 'Storm Barrage', 'Starfall Barrage', 'Luxaga Pierce', 'Luxaja Pierce', 'Holy Pierce',
+      'Noxaga Barrage', 'Noxaja Barrage', 'Void Barrage']
+    const exact = ours.filter((n) => taken.has(n.toLowerCase()))
+    const word = (n: string) => new RegExp(`(^|[^a-z])${n.toLowerCase()}([^a-z]|$)`)
+    const inside = ours.filter((n) => [...taken].some((t) => t !== n.toLowerCase() && word(n).test(t)))
+    console.log(`H128 names checked: ${ours.length} against ${taken.size} master-data strings; exact ${exact.length}, as a word inside ${inside.length}`)
+    expect([exact.length, inside.length], 'a weapon shape name is in master data').toEqual([0, 0])
+  })
 })

@@ -25,7 +25,7 @@ import { RPG_TIER0_MAX_RANK, rpgTier0ExpToNext, rpgTier0Power } from './class-tr
 export * from './kinds'
 export * from './class-tree'
 export {
-  RPG_BRANCH_B, RPG_BRANCH_B_NAME, rpgBranchNode, rpgClassWeapons, rpgLineOf, rpgLineOnlyClass, rpgNodeLine, validRpgLines, type RpgBranch,
+  RPG_BRANCH_B, RPG_BRANCH_B_NAME, rpgBranchBName, rpgBranchNode, rpgClassWeapons, rpgLineOf, rpgLineOnlyClass, rpgNodeLine, validRpgLines, type RpgBranch,
   type RpgLines,
 } from './node-identity'
 

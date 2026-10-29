@@ -102,9 +102,10 @@ export function classPresetV3(classId: RpgClass, engine: number = BATTLE_ENGINE_
 }
 
 /** Where a single-kind form (an Orb, a Bell) she is given sits (UT8 with the main session's ruling, SB10): a hybrid's on
- * her lead half (her hand's `lead`, H126), on the kind that twins her lone weapon (the Spell Blade's Lance for her Thunder
- * Tome, the Summoner's Light for her Bow; her lead half's first when none does); anyone else's on her lead kind, her first
- * slot's. A Tier 0 (v19) by the child she models (`RPG_TIER0_MODEL`). */
+ * her lead half (her hand's `lead`, H126), on the kind that twins her lone weapon in the engine's pairs (the Spell Blade's
+ * Lance for her Thunder Tome, the Summoner's Light for her Bow; from v19, CV13, the Tome Summoner's Blizzard for her Axe,
+ * the Tome Spellblade's Light for her Katana, the Arms Summoner's Bow for her Dark; her lead half's first when none does);
+ * anyone else's on her lead kind, her first slot's. A Tier 0 (v19) by the child she models (`RPG_TIER0_MODEL`). */
 export function presetKind(classId: RpgClass, weapons: readonly RpgWeapon[], engine: number = BATTLE_ENGINE_VERSION): RpgDamageKind {
   const model = rpgRework('classes', engine) && rpgIsTier0(classId) ? RPG_TIER0_MODEL[classId] : classId
   const hand = rpgHand({ classId: model }, engine)
@@ -113,7 +114,7 @@ export function presetKind(classId: RpgClass, weapons: readonly RpgWeapon[], eng
   const tomeLeads = hand.lead === 'tome'
   const lead = weapons.filter((w) => isRpgTome(w) === tomeLeads).map(rpgWeaponKind)
   const lone = weapons.find((w) => isRpgTome(w) !== tomeLeads)
-  const twin = lone ? rpgTwinKind(rpgWeaponKind(lone)) : undefined
+  const twin = lone ? rpgTwinKind(rpgWeaponKind(lone), engine) : undefined
   return twin && lead.includes(twin) ? twin : lead[0] ?? first
 }
 

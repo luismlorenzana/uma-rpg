@@ -66,15 +66,18 @@ describe('the two new hybrids\' trees (CV17)', () => {
   it('casts the Summoner\'s summons on the Arms Summoner\'s trees, Bonded on her Arms and Pack on her Tomes', () => {
     expect(rpgNode('armsummoner-axe.3b')!.name).toBe('Bonded Axe Ogre')
     expect(rpgNode('armsummoner-tome-dark.3a')!.name).toBe('Vampire Knight Pack')
+    // Her summons are the Tome Summoner's as v19 plays them (H128: the Bow's and Dark's volleys, Light's doubles).
     for (const w of RPG_WEAPONS) for (let d = 1; d <= 5; d++) {
-      expect(rpgNode(`armsummoner-${w}.${d}`)!.skill, `${w}.${d}`).toEqual(rpgNode(`summoner-${w}.${d}`)!.skill)
+      expect(rpgNode(`armsummoner-${w}.${d}`)!.skill, `${w}.${d}`).toEqual(rpgNodeSkill(rpgNode(`summoner-${w}.${d}`)!, V19))
       expect(rpgNode(`armsummoner-${w}.${d}`)!.name).toBe(rpgNode(`summoner-${w}.${d}`)!.name)
     }
     // Her lines mirror the Tome Summoner's: Bonded (`b`, linger 0.4, +2 MP) where hers is Pack, Pack (`a`) where hers is Bonded.
     for (const d of [3, 4, 5]) {
-      expect(rpgNode(`armsummoner-bow.${d}b`)!.skill).toEqual(rpgNode(`summoner-bow.${d}b`)!.skill)
-      expect(rpgNode(`armsummoner-bow.${d}b`)!.skill.summon).toEqual({ linger: 0.4 })
+      const core = rpgNode(`armsummoner-bow.${d}`)!.skill
+      expect(rpgNode(`armsummoner-bow.${d}b`)!.skill).toEqual({ ...core, summon: { linger: 0.4 }, mp: core.mp + 2 })
+      expect(rpgNode(`armsummoner-axe.${d}b`)!.skill).toEqual(rpgNode(`summoner-axe.${d}b`)!.skill)
       expect(rpgNode(`armsummoner-tome-fire.${d}a`)!.skill).toEqual(rpgNode(`summoner-tome-fire.${d}a`)!.skill)
+      expect(rpgNode(`armsummoner-tome-dark.${d}b`)).toBeUndefined()
     }
   })
 })
