@@ -45,7 +45,7 @@
 | [H124](tasks/H124-profile-doors-back-stepper.md) | Uma profile v2: every door opens a tab, Back returns to it, ‹ n/N › next and previous Uma | Claude | S–M | H119 | Waiting |
 | [H125](tasks/H125-profile-measure-close.md) | Uma profile v2: the built screens measured against B1–B4, the phone check, profile-ux.md superseded, the manual read through | Claude | S | H117, H118, H119, H121, H122, H124 | Waiting |
 
-**Classes v3** (D240; Claude implements it in four phases, each a group to pick up whole):
+**Classes v3** (D240; Claude implements it in four phases, each a group to pick up whole; within a phase, packets start on the branch they need as soon as its pull request is reviewed, and merge in dependency order):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -60,8 +60,8 @@
 | Phase | Packets | What it leaves on main | Needs from other groups |
 |---|---|---|---|
 | 1. Foundation | H136 → H126 | Main JS back to ~215 KB; the 13 classes, the tree, Tier 0 and promotion in the domain, dark at engine v19 | — |
-| 2. Rules and save | H128 → H129 → H130, then H131 | Weapon shapes, the twenty Limit Breaks, save v32 and the reset written, balance measured; all dark | H129 is the Halls group's domain packet: Phase 2 builds it, since H130 migrates the healer seats with the classes |
-| 3. The reset's screens | H132 | "The classes are rebuilt" sheet and the Exchange's Manual sheet, inert | — |
+| 2. Rules and save | H128 ∥ H130 (both start on H126's reviewed branch; H130's healer-seat step waits for H129) → H129 (on H128's branch) → H131 | Weapon shapes, the twenty Limit Breaks, save v32 and the reset written, balance measured; all dark | H129 is the Halls group's domain packet: Phase 2 builds it, since H130 migrates the healer seats with the classes. H133 (ChatGPT) can start once H128 and H129 merge |
+| 3. The reset's screens | H132 (starts once H130's pull request is up) | "The classes are rebuilt" sheet and the Exchange's Manual sheet, inert | — |
 | 4. The switch | H134 | Engine v19 and save v32 live, the manual rewritten | H120 and H123 (Uma profile v2: the Class tab's promotion and the Template tab), H133 (Halls), H127 (Art) merged |
 
 **Halls of Heroes v2** (D241):
