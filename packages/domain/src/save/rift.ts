@@ -15,7 +15,8 @@ import { applyBattleAction, createBattle, replayBattle } from '../rpg/battle/eng
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../rpg/battle/types'
 import { rpgBattleExp } from '../rpg/campaign/rewards'
 import { RPG_MAX_BATTLE_ACTIONS, rpgCarriedMp, rpgMemberLevel, rpgPartyAllies, RPG_REFUSED } from '../rpg/campaign/run'
-import { RPG_TIER_MAX_LEVEL, type RpgWeapon } from '../rpg/rules'
+import { rpgRework } from '../rpg/battle/caps'
+import { RPG_TIER_MAX_LEVEL, rpgIsTier0, type RpgWeapon } from '../rpg/rules'
 import type { EnemyRoster } from '../world/roster'
 import {
   activeClass, callingConfirmed, classOf, fillRanks, healerBlock, openFightOf, partyMembers, usedWeapons, type BattleOutfit, type Entrant, type MemberGain,
@@ -182,7 +183,7 @@ export function riftFightBlock(save: Save, ref: RiftFightRef, party: number | nu
   const clean = cleanRef(ref)
   if (!clean) return 'No such fight'
   if (world.rift.battle) return 'Finish the open Rift fight first'
-  const healers = (ids: readonly string[]) => (outfits ? healerBlock(world, ids, outfits) : null)
+  const healers = (ids: readonly string[]) => (outfits ? healerBlock(world, ids, outfits, undefined, tier) : null)
   const worldParty = (each: (id: string) => string | null) => partyBlock(world, party, each) ?? healers(world.parties[party!]!.slots as string[])
   if (clean.kind === 'echo') {
     if (!riftOpen(world, Number(tier))) return openWords(Number(tier))
@@ -374,7 +375,7 @@ export function convergenceBlock(save: Save, parties: readonly number[], tier = 
   }
   const members = parties.flatMap((p) => world.parties[p]!.slots as string[])
   if (members.some((id) => !run.roster.includes(id)) || run.roster.some((id) => !members.includes(id))) return 'The four parties must be the run’s twenty'
-  const healers = outfits ? parties.map((p) => healerBlock(world, world.parties[p]!.slots as string[], outfits)) : []
+  const healers = outfits ? parties.map((p) => healerBlock(world, world.parties[p]!.slots as string[], outfits, undefined, tier)) : []
   return healers.find((block) => block !== null) ?? null
 }
 
@@ -457,7 +458,7 @@ export function sweepEcho(save: Save, front: RiftFront, level: EchoLevel, party:
     const entrants: Entrant[] = (world.parties[party]!.slots as string[]).map((id) => {
       const outfit = outfits.get(id)
       if (!outfit) throw new SaveRuleError('cannot-fight', `outfit ${id} isn't in the game data`)
-      const classId = activeClass(outfit, world.umas[id]!)
+      const classId = activeClass(outfit, world.umas[id]!, tier)
       return { outfitId: id, classId, weapons: classOf(world.umas[id]!, classId).weapons, used: new Set<never>() }
     })
     const one = payEcho(world, entrants, echoFoeLevel(Number(tier), level), tier)
@@ -589,13 +590,16 @@ export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; 
     world: { ...world.world, run: { ...world.world.run, mp } },
     rift: withLastRun(world.rift, { ...run, ascendedAt: now }),
   }
-  // The new world: each at Lv 1 with her class, armor halves and calling pick; the purse and the banked EXP's Marks.
+  // The new world: each at Lv 1 with her class, armor halves and calling pick; the purse and the banked EXP's Marks. From
+  // v19 (Classes v3, CV10; H126) a Tier 0 arrives with no class, her suggested promotion there (`activeClass`); a Tier 1
+  // class arrives as it is; no Tier 0 track or setup goes up.
   const base = save.tierWorlds[toKey] ?? newTierWorld(now, 0)
   const arrivals = Object.fromEntries(run.roster.map((id) => {
     const uma = world.umas[id]!
     const fresh = newOwnedUma(uma.unlockedAt)
     const gearOut = isGrades(uma.gear) ? arrivingGrades(uma, to) : { ...gearV1(fresh), kinds: { ...gearV1(uma).kinds } }
-    return [id, { ...fresh, classId: uma.classId, gear: gearOut, ...(uma.calling ? { calling: { ...uma.calling } } : {}) }]
+    const classId = rpgRework('classes') && uma.classId !== null && rpgIsTier0(uma.classId) ? null : uma.classId
+    return [id, { ...fresh, classId, gear: gearOut, ...(uma.calling ? { calling: { ...uma.calling } } : {}) }]
   }))
   const n = run.roster.length
   const laurels = ASCEND_PURSE.laurels * n, speedTickets = ASCEND_PURSE.speedTickets * n

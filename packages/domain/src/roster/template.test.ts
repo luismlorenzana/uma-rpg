@@ -3,7 +3,7 @@
 import type { AptitudeGrade, Aptitudes, Stats } from '@luismlorenzana/uma-data'
 import { describe, expect, it } from 'vitest'
 import type { RosterOutfit } from '../master/roster'
-import { RPG_ALL_CLASSES } from '../rpg/kinds'
+import { RPG_V2_CLASSES } from '../rpg/kinds'
 import {
   CALLING_NO_PICK, CALLING_SET, FLOURISH_NAMES, KNACK_FAMILY, KNACK_LABEL, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_FAMILIES, UMA_KNACK_WORDS,
   UMA_KNACKS, UMA_STRIDES, UMA_TYPE_NAMES, umaCalling, umaCallingPick, umaCallingPickBlock, umaCallingRow, umaFlourishActive, umaKnack, umaStride,
@@ -138,11 +138,12 @@ describe('the stride and the knack (UT3)', () => {
 
 describe('the catalog (UT5)', () => {
   it('names 18 types and 90 templates, all different', () => {
-    const types = Object.values(UMA_TYPE_NAMES).flatMap((t) => UMA_STRIDES.map((s) => t[s]))
+    const types = RPG_V2_CLASSES.map((c) => UMA_TYPE_NAMES[c]).flatMap((t) => UMA_STRIDES.map((s) => t[s]))
     const names = types.flatMap((t) => UMA_KNACKS.map((k) => `${UMA_KNACK_WORDS[k]} ${t}`))
     expect(new Set(types).size).toBe(18)
     expect(new Set(names).size).toBe(90)
-    expect(Object.keys(UMA_TYPE_NAMES).sort()).toEqual(['brawler', 'cleric', 'mage', 'paladin', 'spellblade', 'summoner'])
+    // Classes v3's five Tier 0 callings join (H126), each with her model's three words: `template-v19.test.ts`.
+    expect(Object.keys(UMA_TYPE_NAMES).sort()).toEqual(['acolyte', 'apprentice', 'brawler', 'caller', 'cleric', 'duelist', 'mage', 'paladin', 'recruit', 'spellblade', 'summoner'])
   })
 
   it('keeps the tables the screens read', () => {
@@ -242,7 +243,7 @@ describe('the calling pick (UT4, CP29)', () => {
 describe('what her class gates and what the Stable reads (UT12, UT15)', () => {
   it('works her Flourish only as her calling’s class', () => {
     const a = umaTemplate(WORKED.A)
-    expect(RPG_ALL_CLASSES.filter((c) => umaFlourishActive(a, c))).toEqual(['brawler'])
+    expect(RPG_V2_CLASSES.filter((c) => umaFlourishActive(a, c))).toEqual(['brawler'])
   })
 
   it('gives the facets her calling, stride, knack and name', () => {

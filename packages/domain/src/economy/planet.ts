@@ -13,15 +13,20 @@
 // - EP13: the core is rebuilt empty at every promotion (a fresh map in the new world). EP15: no new defensive values.
 // - EP14 with UT10, her moon: `template:1` (Lv 16, Moon Jewel II) +4 points × tier to her knack's stat (Tireless HP,
 //   Clever MP, Mighty DEF and M.DEF, Fleet 4 Speed points, Gritty 4 Limit points, the last two every tier);
-//   `template:2` (Lv 36, Moon Jewel IV) +8 × tier to her calling channel's defense, DEF if physical, M.DEF if magical.
+//   `template:2` (Lv 36, Moon Jewel IV) +8 × tier to her calling channel's defense, DEF if physical, M.DEF if magical;
+//   from v19 by her calling's root (CV21, H126): a Recruit DEF, an Apprentice M.DEF, an All-Rounder half each.
 //   Both count in every class, outside the foe budget.
+// - Classes v3 (CV7, H126): a Tier 0's Prowess splits by her slots instead, a third a slot to its channel.
 // - EP16: the foes' build budget × the tier's multiplier is `rpg/campaign/enemies.ts`' `rpgFoeTierBudget`; the balance
 //   party's on-curve map (the core her level opens) is `world/balance-party.ts`' `onCurveStars`.
 // - EP17, EP22: Planet Jewel I–V (`jewel-planet-1`…`5`, grades 1, 3, 5, 7, 9) and Moon Jewel I–V (`jewel-moon-1`…`5`,
 //   grades 2, 4, 6, 8, 10; any moon's node of its numeral, picked when set), H74's `items/made-id.ts` ids.
 import { jewelId } from '../items/made-id'
-import { RPG_CLASS_ARMOR, type RpgClass } from '../rpg/rules'
-import { umaCalling, umaKnack, type CallingOutfit, type TemplateOutfit, type UmaKnack } from '../roster/template'
+import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
+import {
+  isRpgTome, RPG_CLASS_ARMOR, RPG_TIER0_ROOT, rpgDefaultWeapons, rpgIsTier0, rpgThirdsSplit, type RpgClass, type RpgTier1Class, type RpgWeapon,
+} from '../rpg/rules'
+import { umaCalling, umaKnack, type CallingOutfit, type TemplateOutfit, type UmaCallingClass, type UmaKnack } from '../roster/template'
 import { noPoints, type Points } from './bonus'
 import { gradeGateLevel, tierScaled, type GearTier } from './grades'
 
@@ -72,8 +77,11 @@ export const MOON_T1 = [2, 4, 6, 8, 10] as const
 export const TEMPLATE_T1 = [4, 8] as const
 /** Fleet's and Gritty's node I: 4 points of Speed (2.4% evasion) or Limit (1.6 of the gauge) in every tier (EP7, UT10). */
 export const KNACK_SHARE_POINTS = 4
-/** Prowess's split (EP23): the percent of each node's points that goes to ATK, the rest to M.ATK. */
-export const PROWESS_SPLIT: Readonly<Record<RpgClass, number>> = { brawler: 100, mage: 0, spellblade: 70, summoner: 30, paladin: 80, cleric: 20 }
+/** Prowess's split (EP23): the percent of each node's points that goes to ATK, the rest to M.ATK. Classes v3's two new
+ * hybrids mirror their pair (CV18: the Arms Summoner 70, the Tome Spellblade 30); a Tier 0 splits by her slots. */
+export const PROWESS_SPLIT: Readonly<Record<RpgTier1Class, number>> = {
+  brawler: 100, mage: 0, spellblade: 70, summoner: 30, paladin: 80, cleric: 20, armsummoner: 70, tomeblade: 30,
+}
 
 /** A node's points at a tier (EP7): its Tier 1 value × the tier, rounded half up. */
 export function nodePoints(id: string, tier: GearTier): number {
@@ -83,30 +91,41 @@ export function nodePoints(id: string, tier: GearTier): number {
 }
 
 /** Prowess's node split by her class (EP23): the larger share rounded half up in whole numbers (`points × pct ÷ 100`),
- * the rest to the smaller, so the node keeps its total. */
-export function prowessSplit(points: number, classId: RpgClass): { atk: number; matk: number } {
+ * the rest to the smaller, so the node keeps its total. A Tier 0 by her `weapons` (CV7): a third a slot to its channel,
+ * half up to ATK (her class's defaults when none are named). */
+export function prowessSplit(points: number, classId: RpgClass, weapons?: readonly RpgWeapon[]): { atk: number; matk: number } {
+  if (rpgIsTier0(classId)) return rpgThirdsSplit(points, (weapons ?? rpgDefaultWeapons(classId)).filter((w) => !isRpgTome(w)).length)
   const atk = PROWESS_SPLIT[classId]
   const larger = Math.max(atk, 100 - atk)
   const lead = Math.floor((2 * points * larger + 100) / 200)
   return atk >= 50 ? { atk: lead, matk: points - lead } : { atk: points - lead, matk: lead }
 }
 
-/** What her moon reads (UT10): her knack (node I) and her calling's channel (node II's defense). */
-export interface MoonTemplate { knack: UmaKnack; channel: 'physical' | 'magical' }
+/** What her moon reads (UT10): her knack (node I) and her calling's channel (node II's defense). From v19 an All-Rounder
+ * calling's `both` (CV21): half on DEF, half on M.DEF. */
+export interface MoonTemplate { knack: UmaKnack; channel: 'physical' | 'magical' | 'both' }
+/** Her moon's node II channel by her calling (UT10): her calling's armor half; from v19 her Tier 0's root (CV21): the
+ * Warrior's Recruit physical, the Mage's Apprentice magical, the All-Rounder's Duelist, Caller and Acolyte both. */
+export function moonChannel(calling: UmaCallingClass, engine: number = BATTLE_ENGINE_VERSION): MoonTemplate['channel'] {
+  if (!rpgRework('classes', engine) || !rpgIsTier0(calling)) return RPG_CLASS_ARMOR[calling]
+  const root = RPG_TIER0_ROOT[calling]
+  return root === 'warrior' ? 'physical' : root === 'mage' ? 'magical' : 'both'
+}
 /** Her moon's template from her outfit and calling pick (H67, H69): `umaTemplate`'s knack and its calling's channel,
- * read from its parts so the template's name tables stay out of this module. */
-export function moonTemplate(outfit: Pick<TemplateOutfit, 'baseStats' | 'growthRatePercents'> & CallingOutfit, pick?: RpgClass | null): MoonTemplate {
-  return { knack: umaKnack(outfit), channel: RPG_CLASS_ARMOR[umaCalling(outfit, pick)] }
+ * read from its parts so the template's name tables stay out of this module. By generation (from v19 the pick is ignored). */
+export function moonTemplate(outfit: Pick<TemplateOutfit, 'baseStats' | 'growthRatePercents'> & CallingOutfit, pick?: RpgClass | null,
+  engine: number = BATTLE_ENGINE_VERSION): MoonTemplate {
+  return { knack: umaKnack(outfit), channel: moonChannel(umaCalling(outfit, pick, engine), engine) }
 }
 
 /**
  * Her map's points as `applyPoints` reads them (EP2–EP4, EP7, EP14, EP23): the Planet to all six core stats, Prowess
- * split by `classId` (her active class, read when a fight starts), Vigor to HP and MP, Guard to DEF and M.DEF and, with
- * `template`, her moon. HP in points (× `POINT_HP` in `applyPoints`), evasion as Speed points and Limit start as Limit
- * points, so the fight's stats come out as today's points do. Ids that aren't map nodes, and her moon without a
- * template, add nothing.
+ * split by `classId` (her active class, read when a fight starts; a Tier 0's by her `weapons`), Vigor to HP and MP, Guard
+ * to DEF and M.DEF and, with `template`, her moon (node II `both`: ⌊value ÷ 2⌋ to DEF, the rest to M.DEF). HP in points
+ * (× `POINT_HP` in `applyPoints`), evasion as Speed points and Limit start as Limit points, so the fight's stats come out
+ * as today's points do. Ids that aren't map nodes, and her moon without a template, add nothing.
  */
-export function mapPoints(open: readonly string[], classId: RpgClass, tier: GearTier, template?: MoonTemplate): Points {
+export function mapPoints(open: readonly string[], classId: RpgClass, tier: GearTier, template?: MoonTemplate, weapons?: readonly RpgWeapon[]): Points {
   const points = noPoints()
   for (const id of open) {
     if (!isMapNode(id)) continue
@@ -114,7 +133,7 @@ export function mapPoints(open: readonly string[], classId: RpgClass, tier: Gear
     if (body === 'planet') {
       points.hp += value; points.mp += value; points.atk += value; points.matk += value; points.def += value; points.mdef += value
     } else if (body === 'prowess') {
-      const split = prowessSplit(value, classId)
+      const split = prowessSplit(value, classId, weapons)
       points.atk += split.atk; points.matk += split.matk
     } else if (body === 'vigor') {
       points.hp += value; points.mp += value
@@ -127,6 +146,9 @@ export function mapPoints(open: readonly string[], classId: RpgClass, tier: Gear
       else if (knack === 'mighty') { points.def += value; points.mdef += value }
       else if (knack === 'fleet') points.speed += KNACK_SHARE_POINTS
       else points.limit += KNACK_SHARE_POINTS
+    } else if (template?.channel === 'both') {
+      const half = Math.floor(value / 2)
+      points.def += half; points.mdef += value - half
     } else if (template) {
       points[template.channel === 'physical' ? 'def' : 'mdef'] += value
     }

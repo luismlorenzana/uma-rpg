@@ -2,7 +2,7 @@
 // 2026-10-25: UT8 picks the family, SB10 picks the kind). Engine 17 passed explicitly; graded Umas from the v3 fixture.
 import { describe, expect, it } from 'vitest'
 import { newGrades, type AccessoryFamily, type UmaGrades } from '../economy/grades'
-import { RPG_ALL_CLASSES, RPG_CLASS_ARMOR, rpgDefaultWeapons, type RpgClass, type RpgWeapon } from '../rpg/rules'
+import { RPG_V2_CLASSES, RPG_CLASS_ARMOR, rpgDefaultWeapons, type RpgClass, type RpgWeapon } from '../rpg/rules'
 import { UMA_KNACKS, umaTemplate, type UmaKnack } from '../roster/template'
 import { classOf } from './battle'
 import { accessorySlot, ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld, TEMPLATE_CASES, templateOutfit } from './economy-v3.fixture'
@@ -23,7 +23,7 @@ const saveOf = (world: TierWorld): Save => ({
 
 describe('R2’s standard presets (WP25)', () => {
   it('has WP25’s six Tier 1 rows after SB10', () => {
-    expect(Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, classPresetV3(c, V17).accessory]))).toEqual({
+    expect(Object.fromEntries(RPG_V2_CLASSES.map((c) => [c, classPresetV3(c, V17).accessory]))).toEqual({
       brawler: { family: 'bell', kind: 'greatsword' },
       mage: { family: 'pendant' },
       spellblade: { family: 'pendant' },
@@ -31,7 +31,7 @@ describe('R2’s standard presets (WP25)', () => {
       paladin: { family: 'pendant' },
       cleric: { family: 'orb', kind: 'ice' },
     })
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       expect(classPresetV3(c, V17)).toMatchObject({ classId: c, weapons: rpgDefaultWeapons(c, V17), armor: RPG_CLASS_ARMOR[c] })
       // A single-kind form sits on one of her weapons' kinds (the Cleric's Blizzard Tome, the Summoner's Light Tome).
       const { kind } = CLASS_PRESET_ACCESSORY_V3[c]
@@ -63,7 +63,7 @@ describe('R2’s standard presets (WP25)', () => {
   })
 
   it('keeps WP25’s form with no template (the balance party)', () => {
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       expect(dressed(c)).toEqual(CLASS_PRESET_ACCESSORY_V3[c])
       expect(presetAccessory(c, rpgDefaultWeapons(c, V17), null, V17)).toEqual(CLASS_PRESET_ACCESSORY_V3[c])
     }

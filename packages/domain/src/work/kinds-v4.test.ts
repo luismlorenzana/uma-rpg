@@ -9,7 +9,7 @@ import { PLACE_IDS_V3, PROFESSIONS, tradeOfCalling, type TradeOf } from '../econ
 import { madeRecipeV4, madeNameV4, madeRefinedV4 } from '../items/made-v4'
 import { gradeItem, jewelId, MADE_IDENTITIES } from '../items/made-id'
 import { lineItem } from '../items/lines'
-import type { RpgClass } from '../rpg/kinds'
+import type { UmaCallingClass } from '../roster/template'
 import { gradedUma, gradedWorld } from '../save/economy-v3.fixture'
 import type { TierWorld } from '../save/save'
 import { refusalText } from '../save/work'
@@ -22,7 +22,7 @@ const SPEED = 1.25
 function worldOf(umas: Record<string, number>, items: Record<string, number> = {}): TierWorld {
   return gradedWorld({ items, umas: Object.fromEntries(Object.entries(umas).map(([id, level]) => [id, gradedUma({ craft: { level, exp: 0 } })])) })
 }
-const tradesOf = (callings: Record<string, RpgClass>): TradeOf => (id) => (callings[id] ? tradeOfCalling(callings[id]!) : null)
+const tradesOf = (callings: Record<string, UmaCallingClass>): TradeOf => (id) => (callings[id] ? tradeOfCalling(callings[id]!) : null)
 
 function plan(world: TierWorld, place: string, kind: string, item: string, opts: { tier?: number; count?: number; who?: string; context?: WorkContext } = {}):
   readonly PlannedItem[] | Refusal {

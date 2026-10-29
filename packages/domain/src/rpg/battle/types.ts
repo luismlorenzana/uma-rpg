@@ -10,7 +10,8 @@
 // v17 the Tier rework's economy, D209, live since H82 (D218): gear grades arrive as stats and Might, and the ten supports are refused;
 // her accessory's base form arrives as `flat`, `bell` or `insignia` and her signature as `signature` (H75, D212);
 // v18 makes weaknesses v2's generated foe lists live (D235–D237; the battle rules themselves stay v17's);
-// docs/archive/design/tier-rework/implementation.md). Older fights still replay unchanged.
+// docs/archive/design/tier-rework/implementation.md); v19 Classes v3 and Halls v2 (D240, D241; built dark from H126 until
+// H134): thirteen classes, Tier 0, the hands' lead half from data. Older fights still replay unchanged.
 import type { HeroLimitId } from '../hero-id'
 import type { RpgClass, RpgCoreStats, RpgDamageKind, RpgElement, RpgLines, RpgNodeRef, RpgStatusKind, RpgWeapon, RpgWeaponKind } from '../rules'
 
@@ -157,7 +158,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18
+  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -203,7 +204,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */

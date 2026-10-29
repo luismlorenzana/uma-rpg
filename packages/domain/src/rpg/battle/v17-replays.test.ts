@@ -1,7 +1,7 @@
 // v17 fights replay exactly after weaknesses v2 goes live (H116): the frozen fixture's fights were generated on the
 // live v17 engine before the switch. Their stored foes keep the twin lists and every R2 rule reads the fight's version.
 import { describe, expect, it } from 'vitest'
-import { RPG_ALL_CLASSES } from '../rules'
+import { RPG_V2_CLASSES } from '../rules'
 import { BATTLE_ENGINE_VERSION, rpgRework } from './engine'
 import { loadV17Replays, regenerateV17Replays, replayV17 } from './v17-replays.fixture'
 
@@ -23,7 +23,7 @@ describe('the frozen v17 replays (H116)', () => {
     expect(replays.every((r) => r.input.version === 17)).toBe(true)
     const allies = replays.flatMap((r) => r.input.allies)
     const foes = replays.flatMap((r) => [...r.input.enemies, ...(r.input.waves ?? []).flat()])
-    expect(new Set(allies.map((a) => a.classId))).toEqual(new Set(RPG_ALL_CLASSES))
+    expect(new Set(allies.map((a) => a.classId))).toEqual(new Set(RPG_V2_CLASSES))
     expect(allies.some((a) => a.inherits?.length)).toBe(true)
     expect(allies.every((a) => a.might && Object.keys(a.might).length > 0)).toBe(true)
     expect([foes.some((e) => e.ward), foes.some((e) => e.thrice), foes.some((e) => e.mixedLocks)]).toEqual([true, true, true])

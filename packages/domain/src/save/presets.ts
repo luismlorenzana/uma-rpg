@@ -8,9 +8,10 @@
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, armorKindFor, type AccessorySlot, type ArmorKind, type ArmorSlot } from '../economy/ranks'
 import { gearId, gearIdentity, gearLevel, type AmuletType, type EquipType, type GearSlot, type OrbType, type TalismanType } from '../economy/gear-id'
 import type { AccessoryFamily, AccessorySlotState, UmaGrades } from '../economy/grades'
-import { BATTLE_ENGINE_VERSION, rpgV2 } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import {
-  isRpgTome, RPG_CLASS_ARMOR, rpgClasses, rpgDefaultWeapons, rpgHand, rpgTwinKind, rpgWeaponKind, type RpgClass, type RpgDamageKind, type RpgWeapon,
+  isRpgTome, RPG_CLASS_ARMOR, RPG_TIER0_MODEL, rpgClasses, rpgDefaultWeapons, rpgHand, rpgIsTier0, rpgTwinKind, rpgWeaponKind, type RpgClass,
+  type RpgDamageKind, type RpgWeapon,
 } from '../rpg/rules'
 import { classOf, withClassWeapons } from './battle'
 import { ownGear } from './forge'
@@ -31,6 +32,14 @@ export const CLASS_PRESET_ACCESSORIES: Readonly<Record<RpgClass, { orb: OrbType;
   summoner: { orb: 'orb-axe', support: 'amulet-spring' },
   // Classes v2's Paladin (D179), on the rule above for the type; no v1 list shows her.
   paladin: { orb: 'orb-lightning', support: 'talisman-thorn' },
+  // Classes v3's seven (H126), no v1 list shows them: each her model's or mirror's row.
+  recruit: { orb: 'orb-fire', support: 'talisman-vampire' },
+  duelist: { orb: 'orb-dark', support: 'talisman-vampire' },
+  acolyte: { orb: 'orb-ice', support: 'amulet-spring' },
+  caller: { orb: 'orb-axe', support: 'amulet-spring' },
+  apprentice: { orb: 'orb-greatsword', support: 'amulet-siphon' },
+  armsummoner: { orb: 'orb-dark', support: 'talisman-vampire' },
+  tomeblade: { orb: 'orb-axe', support: 'amulet-spring' },
 }
 /**
  * Classes v2's preset accessories (C6, H57). The Orb, for the Damage slot, is her default spread's first weapon's kind: a
@@ -70,23 +79,38 @@ export const CLASS_PRESET_ACCESSORY_V3: Readonly<Record<RpgClass, PresetAccessor
   summoner: { family: 'orb', kind: 'light' },
   paladin: { family: 'pendant' },
   cleric: { family: 'orb', kind: 'ice' },
+  // Classes v3's seven (§3.8, H126), their v19 rows: a Tier 0 her model's form, the new hybrids by the same rule.
+  recruit: { family: 'bell', kind: 'greatsword' },
+  duelist: { family: 'pendant' },
+  acolyte: { family: 'orb', kind: 'ice' },
+  caller: { family: 'orb', kind: 'ice' },
+  apprentice: { family: 'pendant' },
+  armsummoner: { family: 'orb', kind: 'bow' },
+  tomeblade: { family: 'pendant' },
 }
+/** Classes v3's forms (§3.8, CV16): v18's, the Tome Summoner's Orb on her Blizzard Tome (the twin of her Axe; was Light). */
+const CLASS_PRESET_ACCESSORY_V19: Readonly<Record<RpgClass, PresetAccessory>> = { ...CLASS_PRESET_ACCESSORY_V3, summoner: { family: 'orb', kind: 'ice' } }
+/** A class's preset accessory form in an engine's generation (WP25; from v19 Classes v3's, H126). */
+export const classPresetAccessory = (classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): PresetAccessory =>
+  ({ ...(rpgRework('classes', engine) ? CLASS_PRESET_ACCESSORY_V19 : CLASS_PRESET_ACCESSORY_V3)[classId] })
 /** R2's standard preset (WP25): her class's three default weapons, its armor half (grades sit on slots, so no pieces) and
  * its accessory form. */
 export interface ClassPresetV3 { classId: RpgClass; weapons: RpgWeapon[]; armor: 'physical' | 'magical'; accessory: PresetAccessory }
 /** A class's R2 standard preset, WP25's row; `presetAccessory` dresses it in an Uma's signature family. */
 export function classPresetV3(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): ClassPresetV3 {
-  return { classId, weapons: rpgDefaultWeapons(classId, engine), armor: RPG_CLASS_ARMOR[classId], accessory: { ...CLASS_PRESET_ACCESSORY_V3[classId] } }
+  return { classId, weapons: rpgDefaultWeapons(classId, engine), armor: RPG_CLASS_ARMOR[classId], accessory: classPresetAccessory(classId, engine) }
 }
 
 /** Where a single-kind form (an Orb, a Bell) she is given sits (UT8 with the main session's ruling, SB10): a hybrid's on
- * her lead half, on the kind that twins her lone weapon (the Spell Blade's Lance for her Thunder Tome, the Summoner's
- * Light for her Bow; her lead half's first when none does); anyone else's on her lead kind, her first slot's. */
+ * her lead half (her hand's `lead`, H126), on the kind that twins her lone weapon (the Spell Blade's Lance for her Thunder
+ * Tome, the Summoner's Light for her Bow; her lead half's first when none does); anyone else's on her lead kind, her first
+ * slot's. A Tier 0 (v19) by the child she models (`RPG_TIER0_MODEL`). */
 export function presetKind(classId: RpgClass, weapons: readonly RpgWeapon[], engine: number = BATTLE_ENGINE_VERSION): RpgDamageKind {
-  const hand = rpgHand({ classId }, engine)
+  const model = rpgRework('classes', engine) && rpgIsTier0(classId) ? RPG_TIER0_MODEL[classId] : classId
+  const hand = rpgHand({ classId: model }, engine)
   const first = rpgWeaponKind(weapons[0]!)
   if (!hand.pair) return first
-  const tomeLeads = hand.tome > hand.arms
+  const tomeLeads = hand.lead === 'tome'
   const lead = weapons.filter((w) => isRpgTome(w) === tomeLeads).map(rpgWeaponKind)
   const lone = weapons.find((w) => isRpgTome(w) !== tomeLeads)
   const twin = lone ? rpgTwinKind(rpgWeaponKind(lone)) : undefined
@@ -101,8 +125,8 @@ export function presetKind(classId: RpgClass, weapons: readonly RpgWeapon[], eng
  */
 export function presetAccessory(classId: RpgClass, weapons: readonly RpgWeapon[], family?: AccessoryFamily | null,
   engine: number = BATTLE_ENGINE_VERSION): PresetAccessory {
-  const row = CLASS_PRESET_ACCESSORY_V3[classId]
-  if (!family || family === row.family) return { ...row }
+  const row = classPresetAccessory(classId, engine)
+  if (!family || family === row.family) return row
   return family === 'orb' || family === 'bell' ? { family, kind: presetKind(classId, weapons, engine) } : { family }
 }
 

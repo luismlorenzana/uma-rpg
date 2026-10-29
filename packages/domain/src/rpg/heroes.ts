@@ -14,7 +14,10 @@ export * from './hero-id'
  * Break deals (D311, D86). A Hero's Limit Break at 100% matches it; at Bond 0 it is half, about one turn's damage. From
  * v15 (§5) the hybrids' rise to 2.2×.
  */
-const POWER_V1: Readonly<Record<RpgClass, number>> = { brawler: 2, mage: 2.4, spellblade: 2, cleric: 1.5, summoner: 1.8, paladin: 1.5 }
+/** Classes v3's seven (H126): interim values, the new hybrids 2.2 and a Tier 0 2, never read by an older fight (no fight
+ * before v19 has her) and replaced at v19 by Halls v2's power on each Limit Break (H129). */
+const POWER_V19_NEW = { recruit: 2, duelist: 2, acolyte: 2, caller: 2, apprentice: 2, armsummoner: 2.2, tomeblade: 2.2 } as const
+const POWER_V1: Readonly<Record<RpgClass, number>> = { brawler: 2, mage: 2.4, spellblade: 2, cleric: 1.5, summoner: 1.8, paladin: 1.5, ...POWER_V19_NEW }
 const POWER_V2: Readonly<Record<RpgClass, number>> = { ...POWER_V1, spellblade: 2.2, summoner: 2.2 }
 /** The live generation's powers (the manual's tables); the engine reads `heroLimitPower(classId, version)`. */
 export const HERO_LIMIT_POWER: Readonly<Record<RpgClass, number>> = rpgV2() ? POWER_V2 : POWER_V1

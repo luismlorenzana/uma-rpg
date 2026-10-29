@@ -1,8 +1,8 @@
 // RPG vocabulary (D86, docs/archive/design/class-rework.md): ten weapons, ten damage kinds, five classes (six from classes v2,
-// D179). Arms deal their own kind; a Tome deals its element. Every kind has one shape in every class: Greatsword and Fire
-// hit one foe hard, Axe and Ice every foe, Lance and Lightning random foes, Bow and Light one foe many times, Katana and
-// Dark twice.
-import { BATTLE_ENGINE_VERSION, rpgV2 } from './battle/caps'
+// D179; thirteen from Classes v3, engine v19, D240). Arms deal their own kind; a Tome deals its element. Every kind has one
+// shape in every class: Greatsword and Fire hit one foe hard, Axe and Ice every foe, Lance and Lightning random foes, Bow
+// and Light one foe many times, Katana and Dark twice.
+import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from './battle/caps'
 import type { BattleWeaknesses } from './battle/types'
 
 /** Elements that can be weaknesses. Fire > Ice > Lightning > Fire; Light ↔ Dark. */
@@ -19,18 +19,35 @@ export type RpgWeapon = typeof RPG_WEAPONS[number]
 /** The ten kinds a hit can carry and a foe can be weak to. */
 export type RpgDamageKind = RpgWeaponKind | RpgElement
 export const RPG_DAMAGE_KINDS: readonly RpgDamageKind[] = [...RPG_WEAPON_KINDS, ...RPG_ELEMENTS]
-/** Every class of every generation (D179): classes v2 (engine v15) adds the Paladin, last, so no list's order moves. Ids,
- * trees, nodes and hero seats cover all six; what the game shows reads the live `RPG_CLASSES`. */
-export const RPG_ALL_CLASSES = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'paladin'] as const
+/** Classes v2's six (engine v15–v18, D179): the halls' classes, whose seats are the Limit Breaks' ids until Halls v2. */
+export const RPG_V2_CLASSES = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'paladin'] as const
+export type RpgV2Class = typeof RPG_V2_CLASSES[number]
+/** Classes v3's Tier 0 (CV3, CV5–CV7; engine v19): five introductory classes, in the tree's order (Warrior's Recruit, the
+ * All-Rounder's Duelist, Acolyte and Caller, the Mage's Apprentice). Each promotes at Class Rank 10. */
+export const RPG_TIER0_CLASSES = ['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'] as const
+export type RpgTier0Class = typeof RPG_TIER0_CLASSES[number]
+/** Every class of every generation (D179): classes v2 (engine v15) adds the Paladin, last, and Classes v3 (engine v19, D240)
+ * the five Tier 0 and its two new hybrids, the Arms Summoner and the Tome Spellblade, after her, so no list's order moves.
+ * Ids, trees and nodes cover all thirteen; what the game shows reads the live `RPG_CLASSES`. */
+export const RPG_ALL_CLASSES = [...RPG_V2_CLASSES, ...RPG_TIER0_CLASSES, 'armsummoner', 'tomeblade'] as const
 export type RpgClass = typeof RPG_ALL_CLASSES[number]
-const RPG_V1_CLASSES: readonly RpgClass[] = RPG_ALL_CLASSES.filter((c) => c !== 'paladin')
-/** The classes of an engine's generation: classes v1's five to v14, all six from v15 (D179). */
+/** Classes v3's Tier 1: the eight classes a Tier 0 promotes into (and every class of a Tier 2 or 3 world). */
+export type RpgTier1Class = Exclude<RpgClass, RpgTier0Class>
+const RPG_V1_CLASSES: readonly RpgClass[] = RPG_V2_CLASSES.filter((c) => c !== 'paladin')
+/** Classes v3's thirteen in the tree's order (§1): the Tier 0 left to right, then the Tier 1 left to right (Brawler, Arms
+ * Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer). */
+const RPG_V3_CLASSES: readonly RpgClass[] = [...RPG_TIER0_CLASSES, 'brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage']
+/** The classes of an engine's generation: classes v1's five to v14, classes v2's six v15–v18 (D179), Classes v3's thirteen
+ * from v19 (D240). */
 export function rpgClasses(engine: number = BATTLE_ENGINE_VERSION): readonly RpgClass[] {
-  return rpgV2(engine) ? RPG_ALL_CLASSES : RPG_V1_CLASSES
+  return rpgRework('classes', engine) ? RPG_V3_CLASSES : rpgV2(engine) ? RPG_V2_CLASSES : RPG_V1_CLASSES
 }
-/** The live classes: the five until the switch (H61), the six after. Every list, picker and parser reads this. */
+/** The live classes: the five until the switch (H61), the six after; thirteen from H134. Every list, picker and parser
+ * reads this. */
 export const RPG_CLASSES: readonly RpgClass[] = rpgClasses()
-/** Classes v2's healers (C7, C8): at most one fights in a party. */
+/** A Tier 0 class (Classes v3, CV5): the ids exist in every generation's tables, the class only from engine v19. */
+export const rpgIsTier0 = (classId: RpgClass): classId is RpgTier0Class => (RPG_TIER0_CLASSES as readonly RpgClass[]).includes(classId)
+/** Classes v2's healers (C7, C8): at most one fights in a party. Classes v3 keeps them (CV22): a Tier 0 is no healer. */
 export const RPG_HEALERS: readonly RpgClass[] = ['paladin', 'cleric']
 /** A healer of this generation: only from v15, since a v1 Cleric shares the support with the Summoner (D179). */
 export const rpgIsHealer = (classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): boolean => rpgV2(engine) && RPG_HEALERS.includes(classId)

@@ -2,8 +2,9 @@
 // fifteen professions, five each for gathering, processing and making. One trade is a row of three Wilds places chosen
 // by an Uma's calling (one Craft Level across all three, never her active class; UT19). The engine's job kinds stay four
 // (`gather`, `refine`, `craft`, `cut`); the player reads gather, process, make. Profession ids never reach a save.
+import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import type { RpgClass } from '../rpg/kinds'
-import { umaCalling, type CallingOutfit } from '../roster/template'
+import { umaCalling, type CallingOutfit, type UmaCallingClass } from '../roster/template'
 
 export const PROFESSION_IDS = [
   'mining', 'smelting', 'arms-crafting',
@@ -67,12 +68,15 @@ export const TRADES: readonly Trade[] = [
 ]
 const TRADE_BY_ID = new Map(TRADES.map((t) => [t.id, t]))
 
-const CALLING_TRADE: Readonly<Record<RpgClass, TradeId>> = {
+/** Her trade by calling (PP2); from v19 one a Tier 0 (CV20): the Recruit Metal, the Duelist Wood, the Acolyte Vegetables,
+ * the Caller Fish, the Apprentice Stone, the fight types' slots in the same order. The `TradeId`s keep their names. */
+const CALLING_TRADE: Readonly<Record<UmaCallingClass, TradeId>> = {
   brawler: 'physical', spellblade: 'physical-hybrid', paladin: 'healer', cleric: 'healer', summoner: 'magical-hybrid', mage: 'magical',
+  recruit: 'physical', duelist: 'physical-hybrid', acolyte: 'healer', caller: 'magical-hybrid', apprentice: 'magical',
 }
 /** Her trade by her calling's class (PP2): the calling pick (CP29) moves a Pace Uma between the physical hybrid and the
- * magical trades; a class switch moves no job. */
-export const tradeOfCalling = (calling: RpgClass): TradeId => CALLING_TRADE[calling]
+ * magical trades; a class switch moves no job, nor from v19 a promotion (CV20). */
+export const tradeOfCalling = (calling: UmaCallingClass): TradeId => CALLING_TRADE[calling]
 /** A trade's gathering, processing and crafting professions. */
 export const tradeProfessions = (trade: TradeId): readonly [ProfessionId, ProfessionId, ProfessionId] => {
   const t = TRADE_BY_ID.get(trade)!
@@ -84,8 +88,10 @@ export const tradePlaces = (trade: TradeId): readonly [PlaceIdV3, PlaceIdV3, Pla
   return [PROFESSION_BY_ID.get(gathering)!.place, PROFESSION_BY_ID.get(processing)!.place, PROFESSION_BY_ID.get(crafting)!.place]
 }
 
-/** Her trade from her outfit and her stored calling pick (`OwnedUma.calling.pick`). */
-export const umaTrade = (outfit: CallingOutfit, pick?: RpgClass | null): TradeId => tradeOfCalling(umaCalling(outfit, pick))
+/** Her trade from her outfit and her stored calling pick (`OwnedUma.calling.pick`), by generation: from v19 her Tier 0's,
+ * the pick ignored. */
+export const umaTrade = (outfit: CallingOutfit, pick?: RpgClass | null, engine: number = BATTLE_ENGINE_VERSION): TradeId =>
+  tradeOfCalling(umaCalling(outfit, pick, engine))
 
 /** What the work rules ask of the caller (D208: template-dependent rules take their template from the caller): each
  * owned Uma's trade, or null when it can't say. */
@@ -93,10 +99,10 @@ export type TradeOf = (outfitId: string) => TradeId | null
 /** A `TradeOf` over a world's Umas and the outfits the caller holds (the web's master data): an outfit it doesn't hold,
  * or an Uma the world doesn't own, is null. */
 export function tradeResolver(world: { umas: Readonly<Record<string, { calling: { pick: RpgClass | null } }>> },
-  outfitOf: (outfitId: string) => CallingOutfit | undefined): TradeOf {
+  outfitOf: (outfitId: string) => CallingOutfit | undefined, engine: number = BATTLE_ENGINE_VERSION): TradeOf {
   return (outfitId) => {
     const uma = world.umas[outfitId]
     const outfit = outfitOf(outfitId)
-    return uma && outfit ? umaTrade(outfit, uma.calling.pick) : null
+    return uma && outfit ? umaTrade(outfit, uma.calling.pick, engine) : null
   }
 }

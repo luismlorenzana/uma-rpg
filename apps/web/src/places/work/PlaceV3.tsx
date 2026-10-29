@@ -49,7 +49,7 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
   const who = whoAt(placeId, tradeOf, shop !== null)
   const classOf = (id: string) => {
     const outfit = view.roster.find((row) => row.outfitId === id)
-    return outfit && world.umas[id] ? activeClass(outfit, world.umas[id]) : 'brawler'
+    return outfit && world.umas[id] ? activeClass(outfit, world.umas[id], tier) : 'brawler'
   }
   // H79 makes the target plan R2's; until then its lines name no v3 place and the strip stays empty.
   const targets = world.targets.length === 0 ? [] : facilityTargets(targetPlan(world, classOf), placeId)

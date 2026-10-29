@@ -122,10 +122,11 @@ function FacilityBody({ view, world, now, placeId }: { view: MasterView; world: 
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const query = readJobQuery(params)
-  const rows = albumRows(view, world, [], now, useAlbumScope())
+  const scope = useAlbumScope()
+  const rows = albumRows(view, world, [], now, scope)
   const classOf = (id: string) => {
     const outfit = view.roster.find((row) => row.outfitId === id)
-    return outfit && world.umas[id] ? activeClass(outfit, world.umas[id]) : 'brawler'
+    return outfit && world.umas[id] ? activeClass(outfit, world.umas[id], scope.tier) : 'brawler'
   }
   const targets = world.targets.length === 0 ? [] : facilityTargets(targetPlan(world, classOf), placeId)
   const wanted = new Map(targets.map((target) => [target.key, target.short]))

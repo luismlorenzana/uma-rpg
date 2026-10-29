@@ -3,8 +3,9 @@
 // it (the domain's `healerBlock`). Nothing shows before classes v2.
 import { healerBlock, type BattleOutfit, type Party, type TierWorld } from '@rpg/domain'
 
-/** The note a party carries, "One healer a party", or null. `engine` defaults to the live generation. */
+/** The note a party carries, "One healer a party", or null. `engine` defaults to the live generation; `tier` is her
+ * world's (a null class reads it from Classes v3, H126). */
 export function healerNote(world: Pick<TierWorld, 'umas'>, party: Pick<Party, 'slots'>, outfits: ReadonlyMap<string, BattleOutfit>,
-  engine?: number): string | null {
-  return healerBlock(world, party.slots.filter((s): s is string => s !== null), outfits, engine)
+  engine?: number, tier = 1): string | null {
+  return healerBlock(world, party.slots.filter((s): s is string => s !== null), outfits, engine, tier)
 }

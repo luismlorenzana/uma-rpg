@@ -37,14 +37,14 @@ describe('the battle sheet on engine v16 (H70)', () => {
     const uma = mageAt(296)
     const mp = row(umaBattleSheet(MAGE, uma, 'mage', 1, 16), 'MP')
     expect(`${mp.value} · ${mp.note}`).toBe('296 · +13 a round')
-    expect(rpgBaseMpRegen(296, 40, 16)).toBe(13)
+    expect(rpgBaseMpRegen(296, { classId: 'mage', classRank: 40 }, 16)).toBe(13)
     const sprung = row(umaBattleSheet(MAGE, spring(uma), 'mage', 1, 16), 'MP')
     expect(`${sprung.value} · ${sprung.note}`).toBe('296 · +23 a round')
     expect(sustain(umaBattleSheet(MAGE, uma, 'mage', 1, 16)).map((r) => r.label))
       .toEqual(['HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Steal', '★ Flourish'])
     // The base regen follows her Class Rank: 0.9% a depth open (R1's balance, H71; SB18 drafted 0.8%).
     const low = { ...uma, ranks: withTrack(uma.ranks, { kind: 'class', id: 'mage' }, { rank: 10, exp: 0 }) }
-    expect(row(umaBattleSheet(MAGE, low, 'mage', 1, 16), 'MP').note).toBe(`+${rpgBaseMpRegen(296, 10, 16)} a round`)
+    expect(row(umaBattleSheet(MAGE, low, 'mage', 1, 16), 'MP').note).toBe(`+${rpgBaseMpRegen(296, { classId: 'mage', classRank: 10 }, 16)} a round`)
   })
 
   it('shows her Flourish as her calling, and no effect in another class', () => {

@@ -92,7 +92,8 @@ describe('classes v2\'s lines (H59)', () => {
   })
 
   it('has six blurbs, one line each', () => {
-    expect(classBlurbs(15)).toEqual({
+    // Classes v3's seven hold their v19 lines in every table (H126); the six of v15–v18 are these.
+    expect(Object.fromEntries(rpgClasses(15).map((c) => [c, classBlurbs(15)[c]]))).toEqual({
       brawler: 'Five Arms, one heavy act a turn.',
       mage: 'Five Tomes, one full cast a turn.',
       spellblade: 'Three Arms and two Tomes: a blade and a spell each turn, the blade striking twice.',

@@ -17,12 +17,16 @@
 // accessory's base form and her signature join the damage stack (H75, D212): `flat` and `signature` in a hit's offense,
 // the Insignia a factor after the weak step, and the Bell's follow-up after an act with an Attack (`ring`).
 // v18 changes generated world-foe weakness lists and the Summoner's Tome hand; the reducer otherwise keeps v17's rules.
+// v19 classes v3 (D240, D241), dark until H134: thirteen classes, Tier 0, hands' lead half from data; H128's shapes and
+// twins, H129's Limit Breaks. A Tier 0 fights only in Tier 1's world at Class Rank 1–10, a Tier 1 class there only from
+// Class Rank 10; her one skill's power is her Class Rank's (`rpgSkillFactor`), her open depth 1.
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).
 import { rpgNode, rpgNodeSkill, RPG_SUPPORT_ALL, type RpgHit, type RpgSkillDef, type RpgSupport } from '../catalog'
 import { BOND_MAX_LEVEL, isHeroLimitId, LEARNER_MAX_PARENTS } from '../hero-id'
 import {
-  isRpgDamageKind, isRpgTome, isRpgWeapon, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_WEAPON_KINDS, rpgActiveSlots, rpgBaseMpRegen, rpgClasses, rpgHand, rpgIsHealer, rpgNodeKey,
-  rpgWeaponKind, validRpgLines, validRpgTree, validRpgWeapons, type RpgDamageKind, type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
+  isRpgDamageKind, isRpgTome, isRpgWeapon, RPG_ELEMENTS, RPG_MAX_LEGACY_SLOTS, RPG_TIER0_MAX_RANK, RPG_WEAPON_KINDS, rpgActiveSlots, rpgBaseMpRegen,
+  rpgClasses, rpgHand, rpgIsHealer, rpgIsTier0, rpgNodeKey, rpgWeaponKind, validRpgLines, validRpgTree, validRpgWeapons, type RpgDamageKind,
+  type RpgNodeRef, type RpgStatusKind, type RpgWeapon,
 } from '../rules'
 import {
   BATTLE_BARRIER_CAP, BATTLE_BARRIER_PERCENT, BATTLE_BREAK_ROUNDS, BATTLE_BREATHER, BATTLE_BURN_PERCENT, BATTLE_CLARITY_PERCENT, BATTLE_COVER_CAP,
@@ -46,7 +50,7 @@ export { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, RPG_V2_ENGINE, rpgRework, rpg
 // v15's hands (H55, D183): the hybrids' per-half power, the Spell Blade's extra hit, the Summoner's farewell.
 import { BATTLE_FAREWELL_FACTOR } from './skills'
 import { rpgRework, rpgV2 } from './caps'
-const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] as const
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19] as const
 /** v16 (UT6): the three Flourishes, one by stride. */
 const FLOURISHES: readonly RpgFlourish[] = ['clean-break', 'even-pace', 'late-reserve']
 
@@ -129,12 +133,15 @@ function validMove(m: BattleEnemyMove, version: BattleInput['version']): boolean
  * Paladin only from v15. From v16 (the Tier rework's fight, D200) three weapons by channel and position, and no side
  * skills or legacy skills: `tree` and `legacy` are empty (CP14, CP31); her `lines` (H65) name only her weapons, each B,
  * and her loadout holds only her held skills, at most her generation's slots (seven by Lv 40, CP22); her `flourish` (H68)
- * is one of the three. From v17 her accessory and signature (H75, `validAccessory`). */
+ * is one of the three. From v17 her accessory and signature (H75, `validAccessory`). From v19 (Classes v3, H126) her class
+ * of the thirteen: a Tier 0 only in Tier 1's world at Class Rank 1–10, with no lines; a Tier 1 class in Tier 1's world only
+ * from Class Rank 10 (CV8, CV10). */
 function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const v8 = version >= 8
   const v16 = rpgRework('fight', version)
   if (v16 && (!Array.isArray(a.tree) || a.tree.length > 0 || !Array.isArray(a.legacy) || a.legacy.length > 0)) return false
-  if (a.lines !== undefined && (!v16 || !Array.isArray(a.weapons) || !validRpgLines(a.lines, a.weapons))) return false
+  if (a.lines !== undefined && (!v16 || !Array.isArray(a.weapons) || !validRpgLines(a.lines, a.weapons, a.classId))) return false
+  if (rpgRework('classes', version) && !validTierOfClass(a)) return false
   if (a.flourish !== undefined && (!v16 || !FLOURISHES.includes(a.flourish))) return false
   if (version < 9 ? a.hero !== undefined || a.inherits !== undefined : !validHeroes(a, version)) return false
   if (!validCharms(a, version)) return false
@@ -153,6 +160,12 @@ function validAlly(a: BattleAlly, version: BattleInput['version']): boolean {
   const keys = a.loadout.map(rpgNodeKey)
   return new Set(keys).size === keys.length && a.loadout.filter((r) => r.tier < a.tier).length <= RPG_MAX_LEGACY_SLOTS &&
     a.loadout.every((ref) => battleSkillFor(a, ref, version) !== null)
+}
+/** v19 (CV8, CV10): a Tier 0 fights only in Tier 1's world, at Class Rank 1–10; a Tier 1 class in Tier 1's world only from
+ * Class Rank 10 (she opens it at 10); in later worlds every Tier 1 class from Class Rank 1. */
+function validTierOfClass(a: BattleAlly): boolean {
+  if (rpgIsTier0(a.classId)) return a.tier === 1 && safeInt(a.classRank, 1, RPG_TIER0_MAX_RANK)
+  return a.tier !== 1 || safeInt(a.classRank, RPG_TIER0_MAX_RANK, 50)
 }
 /** v11 (D124): two Orbs' kinds instead of one, and the accessories' defensive effects, each within its bounds. From v15
  * (D179) no Orb kinds: an Orb's flat offense arrives in `might` (H57). */
@@ -214,7 +227,7 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8, 17: 8, 18: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8, 17: 8, 18: 8, 19: 8 } as const
 function validateInput(input: BattleInput): void {
   if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
@@ -834,8 +847,8 @@ function resolveEnemies(s: BattleState, cues: BattleCue[]): void {
     if (healed > 0) { u.hp += healed; cues.push({ kind: 'status', actorId: u.id, targetId: u.id, label: `Regen +${healed}`, amount: healed }) }
     // v16 (UT6): her Even pace or Late reserve, after armor's Regen.
     if (ally && u.flourish) flourishMend(s, u, ally, cues)
-    // v16 (SB18): the base MP regen joins the Spring's, one cue, never past her max MP.
-    const mpRegen = ally ? (ally.mpRegen ?? 0) + rpgBaseMpRegen(ally.stats.mp, battleClassRank(ally), s.engineVersion) : 0
+    // v16 (SB18): the base MP regen joins the Spring's, one cue, never past her max MP. From v19 by her class's open depth.
+    const mpRegen = ally ? (ally.mpRegen ?? 0) + rpgBaseMpRegen(ally.stats.mp, { classId: ally.classId, classRank: battleClassRank(ally) }, s.engineVersion) : 0
     const mp = Math.min(mpRegen, (ally?.stats.mp ?? 0) - u.mp)
     if (mp > 0) { u.mp += mp; cues.push({ kind: 'mp', actorId: u.id, targetId: u.id, amount: mp }) }
   }
@@ -1049,19 +1062,21 @@ function stay(s: BattleState, allyId: string, ref: RpgNodeRef, scale: number): v
 
 /** Resolves one half of her act at its power: a skill, or an Attack as a one-hit cast of its weapon's kind. v6–v14: a
  * summon lingers its previous one first, then stays. From v15 (D183) no half lingers (her farewell came before the pair),
- * a Spell Blade's Arms half gains one hit, and only a Tome-half summon stays. */
+ * her lead half (`hand.lead`, H126: the Spell Blade's Arms, the Summoner's Tome) gains one hit where her hand says
+ * (`hand.extra`, the Spellblades), and only a lead-half summon stays. */
 function resolveHalf(s: BattleState, actor: BattleUnit, ally: BattleAlly, target: BattleUnit, half: Half, scale: number, cues: BattleCue[], salt: string): void {
   const foes = living(s, 'enemy')
   if (!foes.length || actor.hp <= 0) return
   const tapped = target.hp > 0 ? target : [...foes].sort(byHpShare(s))[0]!
-  const v2 = rpgV2(s.engineVersion), tome = halfIsTome(half)
+  const v2 = rpgV2(s.engineVersion), hand = rpgHand(ally, s.engineVersion)
+  const lead = hand.lead !== null && halfIsTome(half) === (hand.lead === 'tome')
   const base = half.kind === 'skill' ? half.skill.def : battleAttackDef(half.weapon)
-  const def = v2 && !tome && ally.classId === 'spellblade' ? battleExtraHit(base) : base
+  const def = v2 && lead && hand.extra ? battleExtraHit(base) : base
   if (def.summon && !v2) linger(s, actor, ally, tapped, cues)
   const now = tapped.hp > 0 ? tapped : living(s, 'enemy').sort(byHpShare(s))[0]
   if (!now) return
   cast(s, actor, now, def, scale, cues, salt, orbsOf(ally))
-  if (half.kind === 'skill' && def.summon && (!v2 || tome)) stay(s, actor.id, half.skill.ref, def.summon.linger)
+  if (half.kind === 'skill' && def.summon && (!v2 || lead)) stay(s, actor.id, half.skill.ref, def.summon.linger)
 }
 
 /**
@@ -1144,9 +1159,9 @@ export function applyBattleAction(previous: BattleState, action: BattleAction): 
     if (actor.mp < mp) return invalid(previous, 'insufficient-mp')
     actor.mp -= mp
     if (hands15) {
-      // v15 (D183): the leading half (the stronger hand: a Spell Blade's Arms, a Summoner's Tome) resolves first, whatever
-      // order the action names, after her lingering summon's farewell.
-      if (halfIsTome(halves[0]!) !== hand.tome > hand.arms) halves.reverse()
+      // v15 (D183): the leading half (her hand's `lead`, H126: a Spell Blade's Arms, a Summoner's Tome) resolves first,
+      // whatever order the action names, after her lingering summon's farewell.
+      if (halfIsTome(halves[0]!) !== (hand.lead === 'tome')) halves.reverse()
       linger(s, actor, ally, target, cues)
     }
     // Each half at its own power (D179): `arms` or `tome`, both her `power` before v15.

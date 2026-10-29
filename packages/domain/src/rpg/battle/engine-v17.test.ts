@@ -80,7 +80,7 @@ describe('battle engine v17: R2’s economy, dark', () => {
       state = step.state
     }
     const unit = state.units.find((row) => row.id === ally.id)!
-    expect(unit.mp).toBe(1 + rpgBaseMpRegen(ally.stats.mp, 40, 17))
+    expect(unit.mp).toBe(1 + rpgBaseMpRegen(ally.stats.mp, { classId: ally.classId, classRank: 40 }, 17))
     expect(state.input.allies[0]!.mpRegen).toBeUndefined()
   })
 })

@@ -1,8 +1,8 @@
 // Limit Breaks (D311, reworked by D86), after Final Fantasy and Octopath Traveler: every attack and skill charges a bar,
 // and a full bar buys one whole turn worth about twice her usual damage, at 0 MP.
-import { RPG_SKILL_POWER, RPG_CLERIC_STATUS, rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
+import { RPG_CLERIC_STATUS, rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
 import { bondCapacity, heroLimitFor, heroLimitPower, heroLimitSkills, isHeroLimitId, type HeroLimitId } from '../heroes'
-import { RPG_ELEMENTS, isRpgTome, rpgHand, rpgOpenDepth, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
+import { RPG_ELEMENTS, isRpgTome, rpgHand, rpgOpenPower, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
 import { battleSkillFor } from './skills'
 import type { BattleAlly } from './types'
 
@@ -47,8 +47,9 @@ export const battleHasLimit = (ally: Pick<BattleAlly, 'hero' | 'inherits'>, vers
  * generation (D179). */
 export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice, version = 10): BattleLimitPlan | null {
   const hand = rpgHand(ally, version)
-  // v8: her Class Rank's open depth (D102); v6–v7 fights went by her level.
-  const level = RPG_SKILL_POWER[Math.max(1, rpgOpenDepth(ally.classRank ?? ally.level)) - 1]!
+  // v8: her Class Rank's open depth (D102); v6–v7 fights went by her level. From v19 her class's (H126, Halls v2 §3.1): a
+  // Tier 0's skill power at her Class Rank.
+  const level = rpgOpenPower({ classId: ally.classId, classRank: ally.classRank ?? ally.level }, version)
   const known = (ref: unknown) => ref && typeof ref === 'object' ? battleSkillFor(ally, ref as RpgNodeRef, version) : null
   const { skill, skills, weapon, hero } = choice
   // v9 (D106): a Hero has only her seat's Limit Break, at 100%; a Learner may name one she inherits, at 50% + 5% a Bond.
@@ -98,8 +99,9 @@ export function battleLimitPlan(ally: BattleAlly, choice: BattleLimitChoice, ver
       if (!k?.def.summon) return null
       return { name: BATTLE_LIMIT_NAMES.grand, casts: [{ def: k.def, scale: 2 * hand.power }], linger: { ref: k.ref, scale: 2 * k.def.summon.linger } }
     }
-    // She came with engine v15, long after the classes' own Limit Breaks retired (D112, D179).
-    case 'paladin': return null
+    // She came with engine v15, and Classes v3's seven with v19, long after the classes' own Limit Breaks retired (D112,
+    // D179, H126).
+    case 'paladin': case 'recruit': case 'duelist': case 'acolyte': case 'caller': case 'apprentice': case 'armsummoner': case 'tomeblade': return null
   }
 }
 

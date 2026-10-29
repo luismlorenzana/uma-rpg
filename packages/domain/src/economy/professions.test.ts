@@ -2,7 +2,7 @@
 // ten professions in two kinds, ten places each one line's, one trade an Uma by her calling, and the place a job runs at
 // by generation.
 import { describe, expect, it } from 'vitest'
-import { RPG_ALL_CLASSES } from '../rpg/kinds'
+import { RPG_V2_CLASSES } from '../rpg/kinds'
 import type { CallingOutfit } from '../roster/template'
 import { RPG_WORK_ENV } from '../work/env'
 import { liveWorkEnv } from '../work/env-v3'
@@ -55,7 +55,7 @@ describe('fifteen professions (FL25)', () => {
 
 describe('the trade (PP2, PP3)', () => {
   it('reads her calling\'s class, never anything else', () => {
-    expect(Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, tradeOfCalling(c)]))).toEqual({
+    expect(Object.fromEntries(RPG_V2_CLASSES.map((c) => [c, tradeOfCalling(c)]))).toEqual({
       brawler: 'physical', mage: 'magical', spellblade: 'physical-hybrid', summoner: 'magical-hybrid', paladin: 'healer', cleric: 'healer',
     })
   })

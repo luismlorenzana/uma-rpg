@@ -6,7 +6,7 @@ import type { BattleEnemy, BattleWeaknesses } from '../rpg/battle/types'
 import { rpgCampaignChapter, type RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { rpgStageWeaknesses, rpgWeakCounts, type WeakFoe } from '../rpg/campaign/weaknesses'
 import { RPG_ELEMENTS, RPG_WEAPON_KINDS, rpgElementWeakness, type RpgElement } from '../rpg/kinds'
-import { RPG_ALL_CLASSES, rpgHand } from '../rpg/rules'
+import { RPG_V2_CLASSES, rpgHand } from '../rpg/rules'
 import { capitalChapter } from './capital'
 import { regionChapter, worldContinent } from './world'
 
@@ -149,6 +149,6 @@ describe('the mirror’s knob on v18 (H115)', () => {
   it('raises the Summoner’s Tome 0.58 → 0.62 and moves no other hand', () => {
     expect([rpgHand({ classId: 'summoner' }, V17).tome, rpgHand({ classId: 'summoner' }, V18).tome]).toEqual([0.58, 0.62])
     expect(rpgHand({ classId: 'summoner' }, V18)).toEqual({ ...rpgHand({ classId: 'summoner' }, V17), power: 0.62, tome: 0.62 })
-    for (const c of RPG_ALL_CLASSES.filter((x) => x !== 'summoner')) expect(rpgHand({ classId: c }, V18), c).toEqual(rpgHand({ classId: c }, V17))
+    for (const c of RPG_V2_CLASSES.filter((x) => x !== 'summoner')) expect(rpgHand({ classId: c }, V18), c).toEqual(rpgHand({ classId: c }, V17))
   })
 })

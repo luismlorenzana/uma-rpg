@@ -117,6 +117,8 @@
 
 ## 1. The class tree
 
+Built in H126 (D245), live from H134.
+
 The owner's three roots are **columns**, left to right: the physical classes, the classes between, the magical ones.
 Tier 0 sits on top, Tier 1 below. A hybrid Tier 1 class has **two parents**: its own Tier 0 (in the middle column) and its
 channel's root class (Recruit for an Arms hybrid, Apprentice for a Tome hybrid). In the middle column each Tier 0's
@@ -166,6 +168,8 @@ each), and a hybrid is reached from either side: a front runner can become an Ar
 Caller, and a pure Pace Uma can become either Spellblade without the Warrior or Mage roots.
 
 ## 2. Tier 0
+
+Built in H126 (D245), live from H134.
 
 ### 2.1 Five classes, and their names
 
@@ -285,6 +289,8 @@ A campaign (Lv 1–50, 50,960 Class EXP) takes one Tier 0 to Rank 10 and **exact
 Rank 50** (3,600 + 2 × 23,680), as today's took two classes to Rank 50.
 
 ## 3. The eight Tier 1 classes
+
+Built in H126 (D245), live from H134.
 
 One table, then a sheet each. Hands, leans and splits for the four kept classes are today's; the two new ones mirror
 their pair (CV15). "What changes" lists what an owner of today's class would notice.
@@ -515,6 +521,8 @@ shape that pushes the tapped foe toward her Break: three weak hits on her and on
 
 ## 5. The calling
 
+Built in H126 (D245), live from H134.
+
 ### 5.1 The rule
 
 **Her calling is her Tier 0, read from her best running styles** (every style at her top grade) **alone**: no Power,
@@ -562,6 +570,8 @@ her style alone. Save v32 drops the stored picks ([§13](#13-engine-v19-and-save
 
 ## 6. Trades
 
+Built in H126 (D245), live from H134.
+
 **One trade a Tier 0, 1:1** (CV20); her calling names it, as today:
 
 | Tier 0 | Line | Gather · Process · Make | Outfits | Today (row defaults) |
@@ -578,6 +588,8 @@ open-shop rule (a trade with no Uma in the world takes everyone) still covers an
 never moves a trade.
 
 ## 7. Reclassing
+
+Built in H126 (D245), live from H134.
 
 **The owner: "visible in game, whenever I want to reclass."** The class tree is the reclass map, in her profile's
 Classes sheet ([§14.1](#141-the-class-tab-what-h120-now-builds)). The rules (CV9):
@@ -725,6 +737,8 @@ Pooled, the owner can also spend them where he fights first: A's 21 all on Recru
 
 ## 9. Uma Templates
 
+Built in H126 (D245), live from H134.
+
 | Piece | Today | v3 (CV21) |
 |---|---|---|
 | **Callings** | 6 (one per class) | **5, one per Tier 0** |
@@ -741,6 +755,8 @@ Types by stride, on today's release: Recruit 12 · 20 · 15; Duelist 17 · 31 ·
 20; Acolyte 8 · 19 · 19 (every type in use, the Lamplighter now too).
 
 ## 10. The Rift
+
+Built in H126 (D245), live from H134.
 
 ### 10.1 The fronts map to the families
 

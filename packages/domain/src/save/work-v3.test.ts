@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { jobExp, MINUTE, stepMinutes } from '../economy/pacing'
 import { tradeOfCalling } from '../economy/professions'
-import type { RpgClass } from '../rpg/kinds'
+import type { UmaCallingClass } from '../roster/template'
 import { ECONOMY_V3_NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { worldOf } from './rules'
 import type { Save } from './save'
@@ -29,7 +29,7 @@ function saveOf(umas: Record<string, number>, items: Record<string, number> = {}
     tierWorlds: { [tier]: world },
   }
 }
-const tradesOf = (callings: Record<string, RpgClass>) => ({ tradeOf: (id: string) => (callings[id] ? tradeOfCalling(callings[id]!) : null) })
+const tradesOf = (callings: Record<string, UmaCallingClass>) => ({ tradeOf: (id: string) => (callings[id] ? tradeOfCalling(callings[id]!) : null) })
 
 describe('the Wilds\' places over the save', () => {
   it('starts jobs in slots 0–3 of a place and refuses slot 4', () => {

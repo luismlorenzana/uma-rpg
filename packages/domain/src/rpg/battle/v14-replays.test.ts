@@ -5,7 +5,7 @@
 // replayed them with `caps.ts` mocked to 15, 16 and 17; this is now that case, live.)
 import { describe, expect, it } from 'vitest'
 import { HERO_LIMIT_IDS } from '../hero-id'
-import { RPG_ALL_CLASSES, RPG_CLASSES, rpgHand } from '../rules'
+import { RPG_CLASSES, rpgClasses, rpgHand } from '../rules'
 import { BATTLE_ENGINE_VERSION, replayBattle, rpgV2 } from './engine'
 import { loadV14Replays, regenerateV14Replays, replayV14 } from './v14-replays.fixture'
 
@@ -15,7 +15,7 @@ describe('the frozen v14 replays (H53)', () => {
   it('runs with classes v2 and the Tier rework’s fight and economy live (H61, H72, H82)', () => {
     expect(BATTLE_ENGINE_VERSION).toBe(18)
     expect(rpgV2()).toBe(true)
-    expect(RPG_CLASSES).toEqual(RPG_ALL_CLASSES)
+    expect(RPG_CLASSES).toEqual(rpgClasses(18))
     expect(HERO_LIMIT_IDS).toHaveLength(24)
     expect(rpgHand({ classId: 'spellblade' })).toMatchObject({ arms: 0.72, tome: 0.44 })
   })

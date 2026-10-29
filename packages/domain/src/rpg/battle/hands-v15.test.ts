@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'
 import { RPG_ALL_NODES, rpgNode, type RpgSkillDef } from '../catalog'
-import { learnRpgNode, projectRpgStats, rpgDefaultWeapons, rpgHand, type RpgClass, type RpgProfile, type RpgWeapon } from '../rules'
+import { learnRpgNode, projectRpgStats, rpgDefaultWeapons, rpgHand, type RpgClass, type RpgV2Class, type RpgProfile, type RpgWeapon } from '../rules'
 import { regionChapter, worldContinent } from '../../world/world'
 import { autoAction } from './auto'
 import { applyBattleAction, battleActionsLeft, battleDamage, battleExtraHit, createBattle } from './engine'
@@ -308,7 +308,7 @@ describe('engine v15: Auto with the hybrids’ hands (D183)', () => {
     const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
     const node = regionChapter(worldContinent({ name: 'Sim', order: 2 }).regions[0]!, cast).nodes.filter((n) => n.kind !== 'camp').at(-1)!
     const level = node.level
-    const learner = (classId: RpgClass) => ({ inherits: [{ limit: `${classId}-1` as const, bond: 5, from: `hero-${classId}` }] })
+    const learner = (classId: RpgV2Class) => ({ inherits: [{ limit: `${classId}-1` as const, bond: 5, from: `hero-${classId}` }] })
     const allies: BattleAlly[] = [
       { ...member('a1', 'brawler', 15, { level }), ...learner('brawler') },
       { ...member('a2', 'mage', 15, { level }), ...learner('mage') },

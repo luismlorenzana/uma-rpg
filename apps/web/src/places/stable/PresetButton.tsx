@@ -7,11 +7,11 @@ import { CLASS_LABEL } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
-import { wearPreset } from '../../save/game'
+import { useActiveTier, wearPreset } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 
 export function PresetButton({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
-  const classId = activeClass(outfit, uma)
+  const classId = activeClass(outfit, uma, useActiveTier())
   const graded = isGrades(uma.gear)
   const family = graded ? umaTemplate(outfit, uma.calling.pick).family : undefined
   const preset = graded ? classPresetV3(classId) : classPreset(classId)

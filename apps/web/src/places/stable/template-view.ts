@@ -5,7 +5,7 @@ import {
   BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, FLOURISH_NAMES, KEY_LABELS, KNACK_LABEL, KNACK_STAT, STRIDE_LABEL, tradeOfCalling,
   ACCESSORY_FAMILY_LABEL, isGrades, isStarMap, mapNodeGate, nodePoints, signatureBonus, signatureWorn,
   umaCallingPick, umaCallingRow, umaTemplate,
-  type GearTier, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type TradeId, type UmaCalling,
+  type GearTier, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type TradeId, type UmaCalling, type UmaCallingClass,
 } from '@rpg/domain'
 import type { AptitudeGrade } from '@luismlorenzana/uma-data'
 import { CLASS_LABEL } from '../../battle/labels'
@@ -163,7 +163,7 @@ export function templateTrade(outfit: TemplateOutfit, uma: Holder): string {
 /** A calling pick tile's trade (R2, uma-templates §2.3; H80): the trade the choice gives her and its head count in her
  * world, "Forest · Armorer · 8 Umas", so the owner can fill a short one. */
 export function callingTradeLine(classId: RpgClass, counts: Readonly<Record<TradeId, number>>): string {
-  const trade = tradeOfCalling(classId)
+  const trade = tradeOfCalling(classId as UmaCallingClass)
   const n = counts[trade]
   return `${tradeLabel(trade)} · ${n === 1 ? '1 Uma' : `${n} Umas`}`
 }

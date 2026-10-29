@@ -4,7 +4,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { orbKind } from '../economy/gear-id'
 import { BATTLE_HEAL_OFFENSE_SCALE } from '../rpg/battle/caps'
-import { RPG_ALL_CLASSES, RPG_CLASS_ARMOR, rpgWeaponKind, validRpgWeapons } from '../rpg/rules'
+import { RPG_V2_CLASSES, RPG_CLASS_ARMOR, rpgWeaponKind, validRpgWeapons } from '../rpg/rules'
 import type { BattleOutfit } from './battle'
 import { equipGear, wearAccessory } from './forge'
 import { CLASS_PRESET_ACCESSORIES, CLASS_PRESET_SUPPORT_V2, classPreset, classPresetPlan, wearClassPreset } from './presets'
@@ -75,12 +75,12 @@ describe('typed slots when she equips (classes v2 §6.1, C10)', () => {
 
 describe('six standard presets (classes v2 §7, C6)', () => {
   it('gives each class her v2 spread, her armor half, the Orb of her leading kind and a support', () => {
-    const rows = Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, [classPreset(c, 15).orb, classPreset(c, 15).support]]))
+    const rows = Object.fromEntries(RPG_V2_CLASSES.map((c) => [c, [classPreset(c, 15).orb, classPreset(c, 15).support]]))
     expect(rows).toEqual({
       brawler: ['orb-greatsword', 'talisman-vampire'], mage: ['orb-fire', 'amulet-siphon'], spellblade: ['orb-greatsword', 'talisman-vampire'],
       cleric: ['orb-light', 'amulet-spring'], summoner: ['orb-fire', 'amulet-siphon'], paladin: ['orb-greatsword', 'talisman-thorn'],
     })
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       const p = classPreset(c, 15)
       expect(validRpgWeapons(c, p.weapons, 15), c).toBe(true)
       expect(p.armor, c).toBe(RPG_CLASS_ARMOR[c])

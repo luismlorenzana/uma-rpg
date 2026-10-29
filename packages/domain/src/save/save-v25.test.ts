@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { replayV14 } from '../rpg/battle/v14-replays.fixture'
 import { HERO_LIMIT_IDS } from '../rpg/hero-id'
-import { RPG_ALL_CLASSES, RPG_CLASSES } from '../rpg/kinds'
+import { RPG_CLASSES, rpgClasses } from '../rpg/kinds'
 import { healerBlock, type BattleOutfit } from './battle'
 import { toV25 } from './migrations'
 import { gearV1, parseSave, SaveParseError } from './save'
@@ -19,7 +19,7 @@ const OUTFITS: ReadonlyMap<string, BattleOutfit> = new Map(Array.from({ length: 
 
 describe('save v25 with the switch on (H58)', () => {
   it('runs with classes v2’s live lists', () => {
-    expect(RPG_CLASSES).toEqual(RPG_ALL_CLASSES)
+    expect(RPG_CLASSES).toEqual(rpgClasses(18))
     expect(HERO_LIMIT_IDS).toHaveLength(24)
   })
 

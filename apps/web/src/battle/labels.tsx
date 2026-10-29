@@ -2,7 +2,8 @@
 // break shield. Shared by the region map, the fight and the skills page (D86: ten weapons, five classes; six from classes
 // v2, whose lines follow the generation, H59). In the main bundle: never import the engine here (H62).
 import {
-  BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, isRpgElement, isRpgWeaponKind, rpgHand, rpgRework, rpgTierLevel, rpgV2, type BattleWeaknesses,
+  BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, isRpgElement, isRpgWeaponKind, RPG_ALL_CLASSES, rpgClassName, rpgHand, rpgRework, rpgTierLevel, rpgV2,
+  type BattleWeaknesses,
   type RpgClass, type RpgDamageKind, type RpgElement, type RpgProfile, type RpgSkillDef, type RpgStatusKind, type RpgSupport,
   type RpgWeapon, type RpgWeaponKind,
 } from '@rpg/domain'
@@ -14,9 +15,17 @@ export const WEAPON_LABEL: Readonly<Record<RpgWeapon, string>> = {
   ...WEAPON_KIND_LABEL, 'tome-fire': 'Fire Tome', 'tome-ice': 'Blizzard Tome', 'tome-lightning': 'Thunder Tome', 'tome-light': 'Light Tome', 'tome-dark': 'Dark Tome',
 }
 const ELEMENT_LABEL: Readonly<Record<RpgElement, string>> = { fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark' }
-export const CLASS_LABEL: Readonly<Record<RpgClass, string>> = {
-  brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
-}
+/** Each class's name in the live generation, from the domain's one table (`rpgClassName`, H126): today's six until H134
+ * switches Classes v3 on and its names with it. */
+export const CLASS_LABEL: Readonly<Record<RpgClass, string>> =
+  Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, rpgClassName(c)])) as Record<RpgClass, string>
+/** Classes v3's seven (H126): their v19 lines, held by every older table (no older list shows them). */
+const TIER0_BLURB = 'Any three weapons, one act a turn. Promotes at Class Rank 10.'
+const BLURBS_V19_NEW = {
+  recruit: TIER0_BLURB, duelist: TIER0_BLURB, acolyte: TIER0_BLURB, caller: TIER0_BLURB, apprentice: TIER0_BLURB,
+  armsummoner: 'Two Arms and a Tome: an Arms summon that lingers and strikes every foe as it leaves, and a Tome summon.',
+  tomeblade: 'Two Tomes and an Arm: a spell and a blade each turn, the spell striking twice.',
+} as const
 const BLURBS_V1: Readonly<Record<RpgClass, string>> = {
   brawler: 'Pure physical damage: all five Arms, one heavy action a turn. An Elemental Orb adds an element to every hit.',
   mage: 'Pure magic: all five Tomes, one full cast a turn. An Arms Orb adds a weapon kind to every cast.',
@@ -25,6 +34,7 @@ const BLURBS_V1: Readonly<Record<RpgClass, string>> = {
   summoner: 'Three Tomes and two Arms: each summon strikes, stays, and strikes again when the next one comes.',
   // No v1 list shows her (D179).
   paladin: 'Three Arms and two Tomes: her blows shield the threatened, her spells bless the whole party.',
+  ...BLURBS_V19_NEW,
 }
 /** Classes v2 (H59, classes-v2 §3). */
 const BLURBS_V2: Readonly<Record<RpgClass, string>> = {
@@ -34,6 +44,7 @@ const BLURBS_V2: Readonly<Record<RpgClass, string>> = {
   summoner: 'Three Tomes and two Arms: a Tome summon that lingers and strikes every foe as it leaves, and an Arms summon.',
   paladin: 'Three Arms and two Tomes: Barriers and Aegis on the party, from her ATK.',
   cleric: 'Three Tomes and two Arms: mends, Regen and cleanses for the party, from her M.ATK.',
+  ...BLURBS_V19_NEW,
 }
 /** The Tier rework's fight (v16, H70): three weapons a class (CP2). */
 const BLURBS_V16: Readonly<Record<RpgClass, string>> = {
@@ -43,6 +54,7 @@ const BLURBS_V16: Readonly<Record<RpgClass, string>> = {
   summoner: 'Two Tomes and an Arm: a Tome summon that lingers and strikes every foe as it leaves, and an Arms summon.',
   paladin: 'Two Arms and a Tome: Barriers and Aegis on the party, from her ATK.',
   cleric: 'Two Tomes and an Arm: mends, Regen and cleanses for the party, from her M.ATK.',
+  ...BLURBS_V19_NEW,
 }
 /** Each class in one line, by generation. */
 export const classBlurbs = (engine: number = BATTLE_ENGINE_VERSION): Readonly<Record<RpgClass, string>> =>

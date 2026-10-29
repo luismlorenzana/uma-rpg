@@ -15,8 +15,8 @@ import { rpgFoe } from '../rpg/campaign/enemies'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgNode, rpgNodeSkill } from '../rpg/catalog'
 import {
-  isRpgTome, RPG_ALL_CLASSES, RPG_CLASS_ARMOR, rpgBaseMpRegen, rpgIsHealer, rpgDefaultWeapons, rpgHand, rpgHeldSkills, rpgOpenDepth, rpgWeaponKind,
-  type RpgClass, type RpgDamageKind,
+  isRpgTome, RPG_V2_CLASSES, RPG_CLASS_ARMOR, rpgBaseMpRegen, rpgIsHealer, rpgDefaultWeapons, rpgHand, rpgHeldSkills, rpgOpenDepth, rpgWeaponKind,
+  type RpgClass, type RpgV2Class, type RpgDamageKind,
 } from '../rpg/rules'
 import type { UmaKnack, UmaStride } from '../roster/template'
 import { classPresetV3, type PresetAccessory } from '../save/presets'
@@ -97,7 +97,7 @@ function deepActMp(a: BattleAlly, engine: number): number {
 }
 function refundAt(classId: RpgClass, level: number, tier = 1): { mp: number; regen: number; deep: number; share: number } {
   const a = balanceMember(classId, 0, level, { ...ON_CURVE, engine: V17, tier })
-  const regen = rpgBaseMpRegen(a.stats.mp, a.classRank!, V17)
+  const regen = rpgBaseMpRegen(a.stats.mp, { classId, classRank: a.classRank! }, V17)
   const deep = deepActMp(a, V17)
   return { mp: a.stats.mp, regen, deep, share: regen / deep }
 }
@@ -214,13 +214,13 @@ const familyOfLabel = (label: string) => label.split(' ')[0]!
 const KNACK_OF: Readonly<Record<string, UmaKnack>> = { bell: 'fleet', orb: 'mighty', pendant: 'tireless', insignia: 'gritty' }
 /** The five matched Umas of the party (her calling her class), one family each way: the Brawler's Bell (her preset's), the
  * Mage's Pendant (hers), the Spell Blade's Orb, the Cleric's Insignia and the Summoner's Insignia (Clever). */
-const MATCHED: Readonly<Record<RpgClass, BalanceTemplate>> = {
+const MATCHED: Readonly<Record<RpgV2Class, BalanceTemplate>> = {
   brawler: { knack: 'fleet', calling: 'brawler' }, mage: { knack: 'tireless', calling: 'mage' }, spellblade: { knack: 'mighty', calling: 'spellblade' },
   cleric: { knack: 'gritty', calling: 'cleric' }, summoner: { knack: 'clever', calling: 'summoner' }, paladin: { knack: 'gritty', calling: 'paladin' },
 }
 
 /** §8.2's Extra Stats part of each stat at each tier's Lv 50 (HP, MP, ATK, M.ATK, DEF, M.DEF), without her moon. */
-const SHEET_EXTRA: Readonly<Record<RpgClass, readonly (readonly number[])[]>> = {
+const SHEET_EXTRA: Readonly<Record<RpgV2Class, readonly (readonly number[])[]>> = {
   brawler: [[255, 51, 51, 21, 51, 51], [460, 92, 92, 38, 92, 92], [665, 133, 133, 55, 133, 133]],
   mage: [[255, 51, 21, 51, 51, 51], [460, 92, 38, 92, 92, 92], [665, 133, 55, 133, 133, 133]],
   spellblade: [[255, 51, 42, 30, 51, 51], [460, 92, 77, 53, 92, 92], [665, 133, 110, 78, 133, 133]],
@@ -232,7 +232,7 @@ const STAT_KEYS = ['hp', 'mp', 'atk', 'matk', 'pdef', 'mdef'] as const
 
 describe('R2\'s balance in the world on engine v17 (H81)', () => {
   it('builds the v17 member\'s Lv 50 sheet as extra-stats §8.2 and weapon-progression §4.4 do: armor, the map and Might to the point', () => {
-    for (const tier of [1, 2, 3] as const) for (const c of RPG_ALL_CLASSES) {
+    for (const tier of [1, 2, 3] as const) for (const c of RPG_V2_CLASSES) {
       const built = balanceMember(c, 0, 50, { ...ON_CURVE, engine: V17, tier })
       const bare = balanceMember(c, 0, 50, { heroes: true, engine: V17, tier })
       const half = RPG_CLASS_ARMOR[c]
@@ -247,7 +247,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
   })
 
   it('wears WP25\'s Tier 1 forms: `classPresetV3(c, 17)` is the harness\'s form for all six', () => {
-    for (const c of RPG_ALL_CLASSES) {
+    for (const c of RPG_V2_CLASSES) {
       const a = balanceMember(c, 0, 50, { ...ON_CURVE, engine: V17 })
       const form = classPresetV3(c, V17).accessory
       const parts = accessoryParts({ grade: 10, family: form.family, form: 'base', ...(form.kind ? { kind: form.kind } : {}) }, a.weapons, 1)
@@ -277,7 +277,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
   })
 
   it('never refunds a deep act by a round with the base regen alone, any class, Lv 1–50 (SB18)', () => {
-    for (const c of RPG_ALL_CLASSES) for (let level = 1; level <= 50; level++) {
+    for (const c of RPG_V2_CLASSES) for (let level = 1; level <= 50; level++) {
       const r = refundAt(c, level)
       expect(r.share, `${c} Lv ${level}: ${r.regen} of ${r.deep}`).toBeLessThan(1)
     }
@@ -335,7 +335,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
       // The build: each class's damage a turn on v17 ÷ v16, the same three weapons and twins (R2's gear against today's).
       rows.push('', 'Item 1, the build: class | her damage a turn, v17 ÷ v16, Lv 10 · 20 · 30 · 40 · 50 (every stage)')
       const buildLevels = levels ?? [10, 20, 30, 40, 50]
-      for (const c of RPG_ALL_CLASSES) {
+      for (const c of RPG_V2_CLASSES) {
         const swap = c === 'paladin' ? { cleric: 'paladin' as const } : {}
         const ratios: string[] = []
         for (const level of buildLevels) {
@@ -387,7 +387,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
         await tick()
       }
       rows.push('', 'Item 5, the refund: class | MP, regen a round, deepest act\'s MP, share at Lv 10 · 20 · 30 · 40 · 50 | the most, Lv 1–50')
-      for (const c of RPG_ALL_CLASSES) {
+      for (const c of RPG_V2_CLASSES) {
         const at = [10, 20, 30, 40, 50].map((l) => refundAt(c, l))
         const most = Array.from({ length: 50 }, (_, k) => ({ level: k + 1, ...refundAt(c, k + 1) })).reduce((m, x) => (x.share > m.share ? x : m))
         rows.push(`${c} | ${at.map((x) => `${x.mp}, +${x.regen}, ${x.deep}, ${pct(x.share)}`).join(' · ')} | ${pct(most.share)} at Lv ${most.level}`)
@@ -397,7 +397,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
     flush()
     if (want.has(6)) {
       rows.push('', 'Item 6: class | a regular\'s 100% hit, share of her HP at each tier\'s Lv 50 (no evasion: T1 · T2 · T3) | with her feet\'s evasion')
-      for (const c of RPG_ALL_CLASSES) {
+      for (const c of RPG_V2_CLASSES) {
         const share = (tier: number, ev: boolean) => regularHitShare(balanceMember(c, 0, 50, { ...ON_CURVE, engine: V17, tier }), lifetimeOf(50, tier), ev)
         rows.push(`${c} | ${[1, 2, 3].map((t) => p1(share(t, false))).join(' · ')} | ${[1, 2, 3].map((t) => p1(share(t, true))).join(' · ')}`)
       }
@@ -410,7 +410,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
         'the best kind for an Orb and a Bell | best')
       const best: Record<string, number> = { Pendant: 0, Orb: 0, Bell: 0, Insignia: 0 }
       const parity: Record<string, Record<string, { gain: number; perAttack: number }>> = {}
-      for (const c of RPG_ALL_CLASSES) {
+      for (const c of RPG_V2_CLASSES) {
         const swap = c === 'paladin' ? { cleric: 'paladin' as const } : {}
         const id = String(100 + BALANCE_PARTY.indexOf(c === 'paladin' ? 'cleric' : c))
         const forms = formsOf(c)
@@ -463,7 +463,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
     if (want.has(8)) {
       rows.push('', 'Item 8, the signature: class | matched in each family over a region run at Lv 50, MP carried (her damage a turn ÷ the ' +
         'template-less member − 1, net of the form she swapped out) | the preset\'s family alone')
-      for (const c of RPG_ALL_CLASSES) {
+      for (const c of RPG_V2_CLASSES) {
         const swap = c === 'paladin' ? { cleric: 'paladin' as const } : {}
         const id = String(100 + BALANCE_PARTY.indexOf(c === 'paladin' ? 'cleric' : c))
         const base = regionLogs(50, V17, seeds, swap)
@@ -478,7 +478,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
       rows.push('', 'Item 8, five matched: Lv | template-less | matched (the Brawler\'s Bell, the Mage\'s Pendant, the Spell Blade\'s Orb, the Cleric\'s and the Summoner\'s Insignias) | gap')
       for (const level of levels ?? [10, 30, 50]) {
         const base = await run(`1:${level}:17`, level, 1, V17, partyAt(level, V17))
-        const matched = await run(`1:${level}:17m`, level, 1, V17, partyAt(level, V17, {}, {}, (k) => ({ template: MATCHED[k] })))
+        const matched = await run(`1:${level}:17m`, level, 1, V17, partyAt(level, V17, {}, {}, (k) => ({ template: MATCHED[k as RpgV2Class] })))
         rows.push(`Lv${level} | ${cells(base)} | ${cells(matched)} | ${f1(100 * gap(matched, base))} pts`)
       }
       rows.push('', 'Item 8, the mirror with both hybrids matched (the world\'s regular stages): Lv | family | Summoner ÷ Spell Blade, splits')
@@ -491,7 +491,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
       }
       rows.push('', 'Item 8, the Flourish: stride | its mends a fight ÷ her max HP, as her calling (Lv 50, every class, every stage; Clean break a 4% Barrier at the start)')
       for (const stride of ['middle', 'stayer'] as UmaStride[]) {
-        const l = playInto(allStages(50, 1, V17), partyAt(50, V17, {}, {}, (k) => ({ template: { ...MATCHED[k], stride } })), V17, seeds)
+        const l = playInto(allStages(50, 1, V17), partyAt(50, V17, {}, {}, (k) => ({ template: { ...MATCHED[k as RpgV2Class], stride } })), V17, seeds)
         const party = partyAt(50, V17)
         const share = sumOf(Object.entries(l.umas).map(([pid, u]) => u.flourish / party.find((a) => a.id === pid)!.stats.hp)) / party.length / (l.fights)
         rows.push(`${stride} | ${p1(share)}`)
@@ -512,7 +512,7 @@ describe('R2\'s balance in the world on engine v17 (H81)', () => {
       }
       rows.push('', 'Item 9, SB1: class | stat | Tier 1 · 2 · 3 at Lv 50: base · armor · Extra Stats shares | the largest move from Tier 1, points')
       let worst = 0
-      for (const c of RPG_ALL_CLASSES) {
+      for (const c of RPG_V2_CLASSES) {
         for (const k of STAT_KEYS) {
           const shares = [1, 2, 3].map((tier) => {
             const bare = balanceMember(c, 0, 50, { heroes: true, engine: V17, tier }).stats[k]

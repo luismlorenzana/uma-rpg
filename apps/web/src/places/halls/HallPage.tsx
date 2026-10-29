@@ -126,7 +126,7 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
           renderChips={row => {
             if (!row.uma || pick.role !== 'learner') return undefined
             // CP28, §8.2: the sets this seat answers that her weapons miss.
-            const adds = learnerAdds(heroLimit(pick.seat), classOf(row.uma, activeClass(row.outfit, row.uma)).weapons)
+            const adds = learnerAdds(heroLimit(pick.seat), classOf(row.uma, activeClass(row.outfit, row.uma, scope.tier)).weapons)
             return <span className="text-[10px] text-ink-soft">
               Bond {bondOf(row.uma, pick.seat).level} · {parentsOf(world, row.id).length}/{LEARNER_MAX_PARENTS} Heroes
               {adds.length > 0 && <span className="block font-semibold text-ink">Adds {adds.map((t) => TWIN_SET_LABEL[t]).join(', ')}</span>}

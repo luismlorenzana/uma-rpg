@@ -6,20 +6,21 @@ import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import type { BattleAlly, BattleInput } from '../rpg/battle/types'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgNode } from '../rpg/catalog'
-import { rpgWeaponKind, type RpgDamageKind } from '../rpg/kinds'
+import { isRpgTome, rpgIsTier0, rpgWeaponKind, type RpgDamageKind } from '../rpg/kinds'
+import { heroHallClass } from '../rpg/hero-id'
 import type { RpgLines } from '../rpg/node-identity'
 import {
-  learnRpgNode, projectRpgStats, RPG_CLASS_ARMOR, rpgActiveSlots, rpgDefaultWeapons, rpgExpToNext, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees,
+  learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgExpToNext, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees,
   type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
 } from '../rpg/rules'
 import { applyPoints, addPoints, noPoints } from '../economy/bonus'
 import { starPoints } from '../economy/stars'
-import { CORE_NODES, mapNodeGate, mapPoints } from '../economy/planet'
+import { CORE_NODES, mapNodeGate, mapPoints, moonChannel } from '../economy/planet'
 import { armorHalf, gradeMight, gradePoints, newGrades, type GearTier, type UmaGrades } from '../economy/grades'
 import { accessoryParts, signatureBonus, signatureWorn } from '../economy/accessories'
 import { rpgPartyAllies, type RpgPartyMember } from '../rpg/campaign/run'
 import { classPresetV3, presetAccessory, type PresetAccessory } from '../save/presets'
-import { KNACK_FAMILY, STRIDE_FLOURISH, umaFlourishActive, type UmaKnack, type UmaStride } from '../roster/template'
+import { KNACK_FAMILY, STRIDE_FLOURISH, umaFlourishActive, type UmaCallingClass, type UmaKnack, type UmaStride } from '../roster/template'
 import { equippedAccessories, equippedMight, equippedPoints } from '../economy/gear'
 import { accessoryFightFields, type GearSlot } from '../economy/gear-id'
 import { ARMOR_SLOT_KINDS, ARMOR_SLOTS, CLASS_EXP_SHARE, CLASS_MAX_RANK, classExpToNext } from '../economy/ranks'
@@ -33,14 +34,24 @@ export const onCurveGrade = (level: number): number => Math.min(10, Math.floor((
 
 /** Each class's armor halves (physical or magical) and its two accessories: what an average player would choose. */
 export interface BalanceKit { magical: readonly boolean[]; accessories: readonly string[]; stats: readonly ItemEffect[] }
-const KIT: Readonly<Record<RpgClass, BalanceKit>> = {
+/** Classes v3's seven (H126) wear their mirror's kit: the Arms Summoner the Spell Blade's physical one, the Tome
+ * Spellblade the Summoner's magical one, each Tier 0 her model's (`RPG_TIER0_MODEL`). H131 measures them. */
+const mirrored = (kits: Readonly<Record<'brawler' | 'mage' | 'spellblade' | 'cleric' | 'summoner', BalanceKit>>) => ({
+  recruit: kits.brawler, duelist: kits.spellblade, acolyte: kits.cleric, caller: kits.summoner, apprentice: kits.mage,
+  armsummoner: kits.spellblade, tomeblade: kits.summoner,
+})
+const KIT_V1 = {
   brawler: { magical: [false, false, false, false, false], accessories: ['talisman-vampire', 'talisman-iron'], stats: ['atk', 'hp', 'def', 'mdef'] },
   mage: { magical: [true, true, true, true, true], accessories: ['amulet-siphon', 'amulet-ward'], stats: ['matk', 'hp', 'mdef', 'def'] },
   spellblade: { magical: [false, false, false, true, true], accessories: ['talisman-vampire', 'amulet-spring'], stats: ['atk', 'matk', 'hp', 'def'] },
   cleric: { magical: [true, true, true, true, true], accessories: ['amulet-spring', 'talisman-vital'], stats: ['matk', 'hp', 'mdef', 'def'] },
   summoner: { magical: [true, true, true, true, true], accessories: ['amulet-spring', 'amulet-veil'], stats: ['matk', 'hp', 'def', 'mdef'] },
+} satisfies Record<string, BalanceKit>
+const KIT: Readonly<Record<RpgClass, BalanceKit>> = {
+  ...KIT_V1,
   // Classes v2's Paladin (D179): no v1 fight has her; her v2 kit is below.
   paladin: { magical: [false, false, false, false, false], accessories: ['talisman-thorn', 'talisman-vital'], stats: ['atk', 'hp', 'def', 'mdef'] },
+  ...mirrored(KIT_V1),
 }
 const PHYSICAL: readonly boolean[] = [false, false, false, false, false]
 const MAGICAL: readonly boolean[] = [true, true, true, true, true]
@@ -49,13 +60,17 @@ const MAGICAL: readonly boolean[] = [true, true, true, true, true]
  * Orb in the Damage slot (her spread's first weapon's kind) and a support in the Support slot. Extra Stats as v1's (the
  * Paladin's ATK, HP, DEF and M.DEF). `classPreset(c, 15)` must agree: `rift/balance-v15.test.ts` checks it.
  */
-export const BALANCE_KIT_V2: Readonly<Record<RpgClass, BalanceKit>> = {
+const KIT_V2 = {
   brawler: { ...KIT.brawler, magical: PHYSICAL, accessories: ['orb-greatsword', 'talisman-vampire'] },
   mage: { ...KIT.mage, magical: MAGICAL, accessories: ['orb-fire', 'amulet-siphon'] },
   spellblade: { ...KIT.spellblade, magical: PHYSICAL, accessories: ['orb-greatsword', 'talisman-vampire'] },
   cleric: { ...KIT.cleric, magical: MAGICAL, accessories: ['orb-light', 'amulet-spring'] },
   summoner: { ...KIT.summoner, magical: MAGICAL, accessories: ['orb-fire', 'amulet-siphon'] },
+} satisfies Record<string, BalanceKit>
+export const BALANCE_KIT_V2: Readonly<Record<RpgClass, BalanceKit>> = {
+  ...KIT_V2,
   paladin: { ...KIT.paladin, magical: PHYSICAL, accessories: ['orb-greatsword', 'talisman-thorn'] },
+  ...mirrored(KIT_V2),
 }
 /**
  * The Tier rework's R1 kit (engine v16, H71; D199 point 2): today's gear, so v2's kit with her Orb on her **v16 first
@@ -63,13 +78,17 @@ export const BALANCE_KIT_V2: Readonly<Record<RpgClass, BalanceKit>> = {
  * agree: `world/balance-v16.test.ts` checks it. A member built on other weapons (a guided build's second copy) wears her
  * Orb on her own first slot's kind, the preset's rule (`balanceMember`).
  */
-export const BALANCE_KIT_V16: Readonly<Record<RpgClass, BalanceKit>> = {
+const KIT_V16 = {
   brawler: { ...BALANCE_KIT_V2.brawler, accessories: ['orb-greatsword', 'talisman-vampire'] },
   mage: { ...BALANCE_KIT_V2.mage, accessories: ['orb-fire', 'amulet-siphon'] },
   spellblade: { ...BALANCE_KIT_V2.spellblade, accessories: ['orb-katana', 'talisman-vampire'] },
   cleric: { ...BALANCE_KIT_V2.cleric, accessories: ['orb-light', 'amulet-spring'] },
   summoner: { ...BALANCE_KIT_V2.summoner, accessories: ['orb-dark', 'amulet-siphon'] },
+} satisfies Record<string, BalanceKit>
+export const BALANCE_KIT_V16: Readonly<Record<RpgClass, BalanceKit>> = {
+  ...KIT_V16,
   paladin: { ...BALANCE_KIT_V2.paladin, accessories: ['orb-greatsword', 'talisman-thorn'] },
+  ...mirrored(KIT_V16),
 }
 const kitOf = (classId: RpgClass, engine: number): BalanceKit =>
   (rpgRework('fight', engine) ? BALANCE_KIT_V16 : rpgV2(engine) ? BALANCE_KIT_V2 : KIT)[classId]
@@ -122,7 +141,7 @@ export interface BalanceOptions {
 /** An invented template for a matched member (UT3's three readings, chosen rather than read from an outfit): her knack
  * names her signature family (UT7) and her moon's node I; her calling her moon's node II (its channel's defense) and, while
  * she fights as it, her Flourish by her stride (UT6; Even pace by default). */
-export interface BalanceTemplate { knack: UmaKnack; calling: RpgClass; stride?: UmaStride }
+export interface BalanceTemplate { knack: UmaKnack; calling: UmaCallingClass; stride?: UmaStride }
 
 /** Her moon's nodes her level opens (UT10): node I at Lv 16, node II at Lv 36 (Moon Jewels II and IV). */
 const templateNodes = (level: number): string[] => ['template:1', 'template:2'].filter((id) => mapNodeGate(id) <= level)
@@ -150,11 +169,14 @@ function v17Member(classId: RpgClass, profile: RpgProfile, loadout: RpgNodeRef[]
     armor: Object.fromEntries(ARMOR_SLOTS.map((slot) => [slot, { grade }])),
     accessories: [{ grade, family: form?.family ?? null, form: 'base', ...(form?.kind ? { kind: form.kind } : {}) }],
   } : newGrades(tier)
-  const moon = template ? { knack: template.knack, channel: RPG_CLASS_ARMOR[template.calling] } : undefined
+  const moon = template ? { knack: template.knack, channel: moonChannel(template.calling, engine) } : undefined
   const open = options.stars ? [...onCurveStars(classId, level, engine), ...(template ? templateNodes(level) : [])] : []
-  const points = addPoints(options.gear ? gradePoints(grades, armorHalf(classId), tier) : noPoints(), mapPoints(open, classId, tier, moon))
+  // A Tier 0's armor offense and Prowess by her slots (CV7, H126).
+  const thirds = rpgIsTier0(classId) ? profile.weapons.filter((w) => !isRpgTome(w)).length : undefined
+  const points = addPoints(options.gear ? gradePoints(grades, armorHalf(classId), tier, thirds) : noPoints(),
+    mapPoints(open, classId, tier, moon, profile.weapons))
   const signature = family && signatureWorn(grades, family) ? signatureBonus(level, tier) : 0
-  const flourish = template && umaFlourishActive({ calling: template.calling }, classId) ? STRIDE_FLOURISH[template.stride ?? 'middle'] : undefined
+  const flourish = template && umaFlourishActive({ calling: template.calling }, classId, engine) ? STRIDE_FLOURISH[template.stride ?? 'middle'] : undefined
   const member: RpgPartyMember = {
     profile, loadout, points, might: options.gear ? gradeMight(grades, profile.weapons, tier) : {},
     accessory: accessoryParts(grades.accessories[0], profile.weapons, tier), ...(signature ? { signature } : {}),
@@ -193,9 +215,11 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
       if (next && loadout.length < slots) loadout.push(next)
     }
   }
-  // From Lv 5 she learns under her class's first Hero, her Bond growing with her level (a Learner bonds fully by about Lv 23).
+  // From Lv 5 she learns under her class's first Hero, her Bond growing with her level (a Learner bonds fully by about Lv 23);
+  // Classes v3's seven under their family hall's first (`heroHallClass`, H126).
   const bond = Math.min(10, Math.floor(level / 2.3))
-  const inherits = options.heroes && level >= 5 ? [{ limit: `${classId}-1` as const, bond, from: `hero-${classId}` }] : undefined
+  const hall = heroHallClass(classId)
+  const inherits = options.heroes && level >= 5 ? [{ limit: `${hall}-1` as const, bond, from: `hero-${hall}` }] : undefined
   if (rpgRework('economy', engine)) return v17Member(classId, profile, loadout, inherits, options, engine)
   const grade = onCurveGrade(level)
   const kit = kitOf(classId, engine)

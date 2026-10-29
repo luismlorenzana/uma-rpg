@@ -1,13 +1,13 @@
 // The place pages' picker rules (H80): who comes first with "Another trade" and the open shop. What each place lists is
 // `place-view-v4.test.ts`' (the farm by line, H111, live since H112).
-import { newOwnedUma, newTierWorld, openShop, tradeOfCalling, type RpgClass, type TierWorld } from '@rpg/domain'
+import { newOwnedUma, newTierWorld, openShop, tradeOfCalling, type TierWorld, type UmaCallingClass } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import { whoAt } from './place-view'
 
 const NOW = '2026-10-25T12:00:00.000Z'
 
 describe('who takes a slot', () => {
-  const world = (callings: Record<string, RpgClass>): { world: TierWorld; tradeOf: (id: string) => ReturnType<typeof tradeOfCalling> | null } => {
+  const world = (callings: Record<string, UmaCallingClass>): { world: TierWorld; tradeOf: (id: string) => ReturnType<typeof tradeOfCalling> | null } => {
     const base = newTierWorld(NOW, 0)
     return {
       world: { ...base, umas: Object.fromEntries(Object.keys(callings).map((id) => [id, newOwnedUma(NOW, callings[id]!)])) },

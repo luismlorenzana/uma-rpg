@@ -10,7 +10,7 @@ import type { Cast, CastMember } from '../../content/cast'
 import { CapitalMap } from './CapitalMap'
 
 let world = worldOf(newSave('Test', '2026-10-12T12:00:00.000Z'))
-vi.mock('../../save/game', () => ({ useWorld: () => world, beginFight: vi.fn(), sweep: vi.fn() }))
+vi.mock('../../save/game', () => ({ useWorld: () => world, useActiveTier: () => 1, beginFight: vi.fn(), sweep: vi.fn() }))
 // This test isolates the capital's choices and shared sheet; ActivePartyBar has its own game/store concerns.
 vi.mock('./ActiveParty', () => ({ ActivePartyBar: () => null }))
 vi.mock('../../content/cast', () => ({ castArtUrl: vi.fn(async () => 'blob:synthetic') }))

@@ -20,7 +20,8 @@ export function EchoSheet({ campaign, place, front, level, onClose }: {
 }) {
   const { save, world, tier, key } = useRift()
   const nav = useHubNavigation()
-  const [party, setParty] = useState<number | null>(() => (world ? bestParty(world, front, campaign.outfits, (i) => levelPartyBlock(world, i)) : null))
+  const [party, setParty] = useState<number | null>(() => (world ? bestParty(world, front, campaign.outfits, (i) => levelPartyBlock(world, i), undefined, undefined,
+    Number(tier)) : null))
   const [swept, setSwept] = useState<RiftFightResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const ref = useMemo(() => ({ kind: 'echo', front, level }) as const, [front, level])

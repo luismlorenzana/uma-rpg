@@ -148,7 +148,7 @@ export function EquipView({ outfit, uma, world, tier, onSkills }: { outfit: Rost
   const [error, setError] = useState<string | null>(null)
   if (!isGrades(uma.gear)) return null
   const grades = uma.gear
-  const active = activeClass(outfit, uma)
+  const active = activeClass(outfit, uma, tier)
   const weapons = classOf(uma, active).weapons
   const kinds = accessoryKinds(uma, active)
   const signature = umaTemplate(outfit, uma.calling.pick).family
@@ -220,7 +220,7 @@ export function UpgradeView({ outfit, uma, world, tier, upgrades }: { outfit: Ro
   const [open, setOpen] = useState<GradeTarget | null>(null)
   if (!isGrades(uma.gear)) return null
   const grades = uma.gear
-  const active = activeClass(outfit, uma)
+  const active = activeClass(outfit, uma, tier)
   const weapons = classOf(uma, active).weapons
   const template = umaTemplate(outfit, uma.calling.pick)
   const rows = upgradeRows(grades, weapons, active, uma.level, world.items, tier, template.family)

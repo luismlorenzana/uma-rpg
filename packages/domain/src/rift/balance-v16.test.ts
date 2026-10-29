@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 import { createBattle } from '../rpg/battle/engine'
 import type { BattleAlly, BattleInput } from '../rpg/battle/types'
-import { RPG_ALL_CLASSES, rpgIsHealer, validRpgWeapons, type RpgClass } from '../rpg/rules'
+import { RPG_V2_CLASSES, rpgIsHealer, validRpgWeapons, type RpgClass } from '../rpg/rules'
 import { BALANCE_PARTY, balanceMember, balanceStage, type BalanceOptions } from '../world/balance-party'
 import { play } from '../world/balance-play'
 import { byClass, fightLog, logFight, perTurn, physicalShare, type FightLog } from '../world/balance-measure'
@@ -86,7 +86,7 @@ describe('R1\'s balance in the Rift on engine v16 (H71)', () => {
 
   it('keeps all six classes\' best single act at Rank 5, Pierce included, below the Duel\'s lowest v16 shield (the guard rail)', () => {
     const lowest = Math.min(...duelShields(V16))
-    for (const classId of RPG_ALL_CLASSES) {
+    for (const classId of RPG_V2_CLASSES) {
       const rail = guardRail(classId, V16)
       expect(rail.own.chips, `${classId}: ${rail.own.act}`).toBeLessThan(lowest)
       expect(rail.limit.chips, `${classId}: ${rail.limit.act}`).toBeLessThan(lowest)
@@ -136,7 +136,7 @@ describe('R1\'s balance in the Rift on engine v16 (H71)', () => {
     }
     if (want.has(3)) {
       rows.push('', `Target 3, the guard rail: class | best own act (Rank 5, either line) | best Limit Break | Duel shields ${duelShields(V16).join(', ')}`)
-      for (const classId of RPG_ALL_CLASSES) {
+      for (const classId of RPG_V2_CLASSES) {
         const rail = guardRail(classId, V16)
         rows.push(`${classId} | ${rail.own.chips}: ${rail.own.act} | ${rail.limit.chips}: ${rail.limit.act}`)
       }

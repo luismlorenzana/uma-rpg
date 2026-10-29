@@ -150,7 +150,7 @@ function ManualSheet({ world, view, onClose }: { world: TierWorld; view: MasterV
       <li key={`${ref.kind}:${ref.id}`} className="flex items-center gap-2 rounded-sm bg-raised p-2">
         <div className="min-w-0 flex-1"><RankRow label={label} kind={ref.kind} track={track} /></div>
         {[1, 5].map((n) => (
-          <button key={n} type="button" disabled={!!manualBlock(world, outfitId!, ref, n) || n > most} onClick={() => void read(ref, n)}
+          <button key={n} type="button" disabled={!!manualBlock(world, outfitId!, ref, n, scope.tier) || n > most} onClick={() => void read(ref, n)}
             className="min-h-9 shrink-0 rounded-sm bg-accent/15 px-2 text-[12px] font-semibold text-accent disabled:opacity-35">×{n}</button>
         ))}
       </li>

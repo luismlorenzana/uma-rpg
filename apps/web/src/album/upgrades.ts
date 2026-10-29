@@ -14,7 +14,7 @@ export function umaUpgrades(world: TierWorld | null, outfit: BattleOutfit, tier 
   let found = byUma.get(outfit.outfitId)
   if (found === undefined) {
     const uma = world.umas[outfit.outfitId]
-    found = uma ? upgradesFor(world, outfit.outfitId, activeClass(outfit, uma), tier) : null
+    found = uma ? upgradesFor(world, outfit.outfitId, activeClass(outfit, uma, tier), tier) : null
     byUma.set(outfit.outfitId, found)
   }
   return found

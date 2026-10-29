@@ -10,7 +10,7 @@ export function SkillsPage({ outfit }: { outfit: BattleOutfit; name: string }) {
   const tier = useActiveTier()
   const uma = world?.umas[outfit.outfitId]
   if (!uma || !world) return <p className="p-4 text-ink-soft">Unlock her first.</p>
-  const classId = activeClass(outfit, uma)
+  const classId = activeClass(outfit, uma, tier)
   const profile = umaProfile(outfit, uma, tier, classId)
   const loadout = umaLoadout(outfit, uma, tier, classId)
   const view = rpgTreeView(profile, loadout)

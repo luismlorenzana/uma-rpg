@@ -77,7 +77,7 @@ describe('the Learning page by generation (H59, D178)', () => {
       page: 'learning', kind: 'class-hall', name: 'Paladin Bastion', slots: 4, opensIn: 'S7',
       blurb: 'The Paladin Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners.',
     })
-    expect(v2.filter((p) => p.kind === 'class-hall').map((p) => p.id).sort()).toEqual(Object.values(HERO_HALLS).sort())
+    expect(v2.filter((p) => p.kind === 'class-hall').map((p) => p.id).sort()).toEqual([...new Set(Object.values(HERO_HALLS))].sort())
     expect(v2.every((p) => p.page === 'learning' && !p.hidden)).toBe(true)
     expectSpaced(v2)
     // The places a v1 page holds keep every field but their spot.
