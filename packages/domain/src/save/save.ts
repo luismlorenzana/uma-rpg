@@ -53,7 +53,7 @@ import {
   CONVERGENCE_FIGHTS, ECHO_LEVELS, isAchievementId, newRiftState, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, RIFT_TRACES, riftRunId, type EchoLevel, type RiftAttempt,
   type RiftBattle, type RiftFightRef, type RiftFront, type RiftRun, type RiftState, type RiftTrace,
 } from '../rift/state'
-import { migrateWorld, toV26, type TierGrant } from './migrations'
+import { migrateWorld, type TierGrant } from './migrations'
 import { SAVE_SCHEMA_VERSION } from './version'
 
 export type { TierGrant } from './migrations'
@@ -936,6 +936,20 @@ function parseWorldState(value: unknown, path: string, check: CheckBattle): Worl
 }
 
 /**
+ * A pre-v10 world's parties gain each one's lead as `toV26` gives it (D190): a row with no `lead` and a slot list takes
+ * its first occupied slot, else null; anything malformed is left for the strict parse. A local copy of the rule, so a
+ * current save's boot never loads the migration chain (H136); `toV26` stays in the chain for v25 saves.
+ */
+function withLeads(parties: unknown): unknown {
+  if (!Array.isArray(parties)) return parties
+  return parties.map((party: unknown) => {
+    if (typeof party !== 'object' || party === null || Array.isArray(party) || 'lead' in party) return party
+    const slots = (party as Obj).slots
+    return Array.isArray(slots) ? { ...party, lead: slots.find((id): id is string => typeof id === 'string') ?? null } : party
+  })
+}
+
+/**
  * Saves before v10 start their progress over (D69, for the D65–D70 rebalance): the collection, parties and Unlock
  * Tickets stay; every level, rank, skill, Extra Stat, item, piece of gear, job, run and Laurel goes.
  */
@@ -951,7 +965,7 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
   const tickets = ((typeof w.wallet === 'object' && w.wallet !== null ? w.wallet : {}) as Obj).unlockTickets
   return {
     ...newTierWorld(createdAt, typeof tickets === 'number' && Number.isSafeInteger(tickets) && tickets >= 0 ? tickets : 0),
-    umas, parties: w.parties === undefined ? defaultParties() : parseParties((toV26({ parties: w.parties }) as Obj).parties, `${path}.parties`, umas),
+    umas, parties: w.parties === undefined ? defaultParties() : parseParties(withLeads(w.parties), `${path}.parties`, umas),
   }
 }
 
@@ -1329,8 +1343,9 @@ export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }
 
-/** Browser boot: all the same strict parsing and migrations, loading the engine only if a surviving fight needs replay.
- * No unchecked save escapes: every pending replay is validated before this promise resolves. The API stays synchronous. */
+/** Browser boot: all the same strict parsing and migrations, loading the migration chain only for an old save (H16, H136)
+ * and the engine only if a surviving fight needs replay. No unchecked save escapes: every pending replay is validated
+ * before this promise resolves. The API stays synchronous. */
 export async function parseSaveAsync(value: unknown, path = 'save'): Promise<Save> {
   const pending: { input: BattleInput; actions: BattleAction[]; path: string }[] = []
   const version = schemaVersionOf(value)

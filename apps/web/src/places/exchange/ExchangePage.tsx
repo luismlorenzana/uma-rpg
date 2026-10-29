@@ -6,7 +6,7 @@
 import { ExchangeRows, type ExchangeRow } from '@luismlorenzana/uma-kit/places'
 import { Tabs, UiMark } from '@luismlorenzana/uma-kit/ui'
 import {
-  ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, trackOf, ITEM_FAMILIES, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
+  ACCESSORY_KINDS, ACCESSORY_LABEL, ARMOR_KINDS, ARMOR_LABEL, trackOf, ITEM_FAMILIES, itemNameV1, MANUAL_EXP, MANUAL_PRICE, manualBlock, rawItemPrice, RPG_CLASSES, SaveRuleError,
   TIME_TICKET_PRICE, MATERIAL_LINES, rpgRework, stockedGrades, stockedTypes, SWEEP_TICKET_PRICE, WEAPON_TYPES, type MaterialLine, type RankRef,
   type TierWorld,
 } from '@rpg/domain'
@@ -45,7 +45,7 @@ function Exchange({ view }: { view: MasterView }) {
     { key: 'ticket:sweep', icon: <TicketIcon size={22} />, name: 'Sweep Ticket', detail: 'Instant replay of a cleared stage', price: laurels(SWEEP_TICKET_PRICE) },
   ]
   const raw: ExchangeRow[] = ITEM_FAMILIES.flatMap((f) => f.raw.filter((i) => stocked.includes(i.grade))).map((i) => ({
-    key: `item:${i.id}`, icon: <ItemIcon id={i.id} size={32} />, name: i.name, price: laurels(rawItemPrice(i.grade)),
+    key: `item:${i.id}`, icon: <ItemIcon id={i.id} size={32} />, name: itemNameV1(i.id)!, price: laurels(rawItemPrice(i.grade)),
     detail: (world.items[i.id] ?? 0) > 0 ? `have ${world.items[i.id]}` : undefined,
   }))
   const buy = (row: ExchangeRow, qty: number) => {

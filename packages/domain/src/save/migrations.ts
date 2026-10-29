@@ -1,4 +1,6 @@
-// Legacy migrations are needed only for old saves, not every current-save boot (H16).
+// Legacy migrations are needed only for old saves, not every current-save boot (H16). The device's `parseSaveAsync`
+// imports this chain only for a save older than the current version; only the API's sync `parseSave` imports it statically,
+// and the web never calls that, so it stays out of the main bundle (H136, scripts/check-size.mjs).
 import { FACILITY_SLOTS, grantProfessionExp, itemMinutes, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
 import { facilitySpec } from '../economy/jobs'
 import { gemIdentity, isStarNode, nodeGem } from '../economy/stars'

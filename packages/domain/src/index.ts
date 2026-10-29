@@ -30,6 +30,8 @@ export * from './economy/accessories'
 export * from './economy/planet'
 export * from './economy/stock'
 export * from './items/catalog'
+// The v1 economy's names load on demand (H136): the v1 screens and tests only.
+export * from './items/names-v1'
 export * from './items/made-id'
 export * from './items/made'
 export * from './items/made-v4'

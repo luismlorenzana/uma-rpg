@@ -13,6 +13,7 @@ import { MAP_NODES, nodeJewel } from '../economy/planet'
 import { isMakingPlaceV4, isProcessingPlaceV4, placeSpecV4 } from '../economy/places-v4'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, GEAR_MAX_RANK } from '../economy/ranks'
 import { itemById } from '../items/catalog'
+import { gemNameV1, itemNameV1 } from '../items/names-v1'
 import { madeIdentity } from '../items/made-id'
 import { madeName } from '../items/made'
 import { lineItem } from '../items/lines'
@@ -145,7 +146,7 @@ export function targetPlan(world: TierWorld, activeClassOf: (outfitId: string) =
         need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
     }
     const piece = gearById(r.id), gem = gemById(r.id), item = itemById(r.id)
-    const name = piece ? EQUIP_LABEL[piece.type] : gem?.name ?? item?.name ?? r.id
+    const name = piece ? EQUIP_LABEL[piece.type] : gemNameV1(r.id) ?? itemNameV1(r.id) ?? r.id
     return { key: r.id, icon: r.id, name, grade: piece?.grade ?? gem?.grade ?? item?.grade ?? 0,
       need: r.gross, have: r.onHand, coming: r.coming, short: r.net }
   }

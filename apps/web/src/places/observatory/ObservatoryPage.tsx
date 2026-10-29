@@ -1,7 +1,7 @@
 // The Observatory (S6, design §10, D58, D144): each Uma's Sun-and-planets map. Setting a Star Gem opens a node; up to
 // 5 + ⌊level / 2⌋ open nodes are active at once, each adding its grade's points to her stats in every fight.
 import {
-  activeClass, activeNodeSlots, BRIDGES, EFFECT_LABEL, gemById, gemStock, isStarMap, ITEM_EFFECTS, jewelNodes, KNACK_LABEL, madeName, mapNodeGate, mapPoints,
+  activeClass, activeNodeSlots, BRIDGES, EFFECT_LABEL, gemNameV1, gemStock, isStarMap, ITEM_EFFECTS, jewelNodes, KNACK_LABEL, madeName, mapNodeGate, mapPoints,
   MAP_NODES, moonTemplate, nodeBody, nodeFromGem, nodeGem, nodeJewel, nodeNumeral, nodePoints, prowessSplit, RING, SaveRuleError, starPoints, starsV1,
   umaTemplate, type GearTier, type OwnedUma,
 } from '@rpg/domain'
@@ -49,7 +49,7 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
   }
   const toggle = (node: string) => {
     if (!stars.unlocked.includes(node)) {
-      return setMessage(`${nodeLabel(node)}: set a ${gemById(nodeGem(node))!.name} (cut it at the Lapidary, in the Wilds)`)
+      return setMessage(`${nodeLabel(node)}: set a ${gemNameV1(nodeGem(node))} (cut it at the Lapidary, in the Wilds)`)
     }
     const on = stars.active.includes(node)
     if (!on && stars.active.length >= slots) return setMessage(`All ${slots} active slots are in use: switch one off first`)
@@ -86,14 +86,13 @@ function Observatory({ view, initial }: { view: MasterView; initial: string | nu
         ) : (
           <ul className="space-y-1.5">
             {settable.map(([gemId, n]) => {
-              const gem = gemById(gemId)!
               const node = nodeFromGem(uma, gemId)!
               return (
                 <li key={gemId}>
                   <button type="button" onClick={() => run(() => setStarGem(id, gemId), (r) => `Opened ${nodeLabel(String(r))}`)} className="flex w-full items-center gap-2 rounded-sm bg-raised p-2 text-left">
                     <ItemIcon id={outputView(gemId).icon} size={32} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[13px] font-semibold">{gem.name} ×{n}</span>
+                      <span className="block truncate text-[13px] font-semibold">{gemNameV1(gemId)} ×{n}</span>
                       <span className="block text-[11px] text-ink-soft">Opens {nodeLabel(node)} · {nodeValue(node)}</span>
                     </span>
                     <span className="shrink-0 rounded-sm bg-accent px-2.5 py-1 text-[12px] font-bold text-accent-ink">Set</span>
@@ -236,7 +235,7 @@ function StarMap({ uma, onToggle }: { uma: OwnedUma; onToggle: (node: string) =>
   const Node = ({ id, x, y, r, color }: { id: string; x: number; y: number; r: number; color: string }) => {
     const s = state(id)
     return (
-      <circle cx={x} cy={y} r={r} onClick={() => onToggle(id)} role="button" aria-label={`${nodeLabel(id)}, ${s === 'locked' ? `needs a ${gemById(nodeGem(id))!.name}` : s === 'on' ? 'active' : 'off'}`}
+      <circle cx={x} cy={y} r={r} onClick={() => onToggle(id)} role="button" aria-label={`${nodeLabel(id)}, ${s === 'locked' ? `needs a ${gemNameV1(nodeGem(id))}` : s === 'on' ? 'active' : 'off'}`}
         fill={s === 'on' ? color : s === 'off' ? 'rgb(255 255 255 / 0.35)' : 'transparent'} stroke={s === 'locked' ? 'rgb(255 255 255 / 0.22)' : color} strokeWidth={1.2}
         style={s === 'on' ? { filter: `drop-shadow(0 0 4px ${color})` } : undefined} className={s === 'locked' ? '' : 'cursor-pointer'} />
     )

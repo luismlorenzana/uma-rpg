@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { newSave, normalizeTrainerName, parseSave, parseSavePut, renameTrainer, resolveConflict, SaveParseError, STARTING_UNLOCK_TICKETS, SAVE_SCHEMA_VERSION } from './save'
+import { toV26 } from './migrations'
 import { convergenceSave, RIFT_TIMES, riftSave, TIER1_ROSTER, TIER2_ROSTER } from './rift.fixture'
 
 const NOW = '2026-10-10T12:00:00.000Z'
@@ -403,5 +404,36 @@ describe('the v24 migration (D171)', () => {
     const noDefeated = rift()
     delete noDefeated.account.defeated
     expect(() => parseSave(noDefeated)).toThrow(/save\.account\.defeated: expected an object/)
+  })
+})
+
+describe('a pre-v10 save\'s parties (D69, D190; H136)', () => {
+  const T = (m: number) => new Date(Date.UTC(2026, 5, 1, 0, m)).toISOString()
+  const empty = (i: number) => ({ name: `Party ${i + 1}`, slots: [null, null, null, null, null] })
+  const v9 = (parties: unknown[]) => ({ schemaVersion: 9, account: { trainerName: 'Luis', createdAt: T(0), updatedAt: T(0) },
+    tierWorlds: { '1': { createdAt: T(0), wallet: { unlockTickets: 16, shards: 0, laurels: 0 },
+      umas: Object.fromEntries(['101', '102', '103', '104'].map((id, i) => [id, { unlockedAt: T(i + 1), level: 3, exp: 0 }])),
+      parties: [...parties, ...Array.from({ length: 20 - parties.length }, (_, i) => empty(parties.length + i))] } } })
+
+  it('gives each party the lead toV26 gives: its first occupied slot, null when empty, a lead already set kept', () => {
+    const parties = [
+      { name: 'Party 1', slots: [null, '102', '101', null, null] },
+      empty(1),
+      { name: 'Party 3', slots: [null, '103', '104', null, null], lead: '104' },
+      { name: 'Party 4', slots: [null, null, null, null, null], lead: null },
+    ]
+    const parsed = parseSave(v9(parties)).tierWorlds['1']!.parties
+    const expected = (toV26({ parties: v9(parties).tierWorlds['1'].parties }).parties as { lead: string | null }[]).map((p) => p.lead)
+    expect(parsed.map((p) => p.lead)).toEqual(expected)
+    expect(expected.slice(0, 4)).toEqual(['102', null, '104', null])
+  })
+
+  it('leaves a malformed row to the strict parse, as toV26 does', () => {
+    const notARow = v9(['Party 1'])
+    expect((toV26({ parties: notARow.tierWorlds['1'].parties }).parties as unknown[])[0]).toBe('Party 1')
+    expect(() => parseSave(notARow)).toThrow(/save\.tierWorlds\.1\.parties\.0: expected an object/)
+    const noSlots = v9([{ name: 'Party 1', slots: 'x' }])
+    expect((toV26({ parties: noSlots.tierWorlds['1'].parties }).parties as unknown[])[0]).toEqual({ name: 'Party 1', slots: 'x' })
+    expect(() => parseSave(noSlots)).toThrow(/save\.tierWorlds\.1\.parties\.0\.slots: expected 5 slots/)
   })
 })

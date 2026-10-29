@@ -4,20 +4,15 @@
 //   from grade 8;
 // - a bridge gem (grades 3 and 7): one refined item of each of its two families, plus a side at grade 7;
 // - a Sun gem (grades 4, 6, 8, 10): one refined item of every family.
-// A gem is named for its grade's stone on the Crystal Cavern's ladder and its stat's virtue: "Garnet of Strength".
+// A gem is named for its grade's stone on the Crystal Cavern's ladder and its stat's virtue, "Garnet of Strength":
+// `gemNameV1` (items/names-v1.ts), which loads on demand (H136).
 import { ITEM_FAMILIES, type ItemEffect, type ItemFamily } from '../items/catalog'
 import { GEM_IDENTITIES, type GemIdentity } from './stars'
 export * from './stars'
 
 const familyOf = (effect: ItemEffect): ItemFamily => ITEM_FAMILIES.find((f) => f.effect === effect)!
-/** The grade's stone: Quartz, Amethyst … Philosopher's Stone. */
-const stoneOf = (grade: number): string => ITEM_FAMILIES.find((f) => f.id === 'crystals')!.raw[grade - 1]!.name
-export const VIRTUE: Readonly<Record<ItemEffect, string>> = {
-  hp: 'Vigor', mp: 'Spirit', atk: 'Strength', matk: 'Sorcery', def: 'Fortitude', mdef: 'Resolve', speed: 'Swiftness', limit: 'Valor',
-}
 
 export interface Gem extends GemIdentity {
-  name: string
   /** Refined items per gem. */
   inputs: Record<string, number>
 }
@@ -39,17 +34,16 @@ const add = (a: Record<string, number>, b: Record<string, number>): Record<strin
 }
 
 function recipe(gem: GemIdentity): Gem {
-  const g = gem.grade, stone = stoneOf(g)
+  const g = gem.grade
   if (gem.kind === 'moon') {
     const f = familyOf(gem.effects[0]!)
-    return { ...gem, name: `${stone} of ${VIRTUE[f.effect]}`, inputs: add({ [f.refined[g - 1]!.id]: 1 }, sides(f, g, g <= 3 ? 0 : g <= 7 ? 1 : 2)) }
+    return { ...gem, inputs: add({ [f.refined[g - 1]!.id]: 1 }, sides(f, g, g <= 3 ? 0 : g <= 7 ? 1 : 2)) }
   }
   if (gem.kind === 'bridge') {
     const [fa, fb] = gem.effects.map(familyOf) as [ItemFamily, ItemFamily]
-    return { ...gem, name: `${stone} of ${VIRTUE[fa.effect]} & ${VIRTUE[fb.effect]}`,
-      inputs: add({ [fa.refined[g - 1]!.id]: 1, [fb.refined[g - 1]!.id]: 1 }, sides(fa, g, g >= 7 ? 1 : 0)) }
+    return { ...gem, inputs: add({ [fa.refined[g - 1]!.id]: 1, [fb.refined[g - 1]!.id]: 1 }, sides(fa, g, g >= 7 ? 1 : 0)) }
   }
-  return { ...gem, name: `${stone} of the Sun`, inputs: Object.fromEntries(ITEM_FAMILIES.map((f) => [f.refined[g - 1]!.id, 1])) }
+  return { ...gem, inputs: Object.fromEntries(ITEM_FAMILIES.map((f) => [f.refined[g - 1]!.id, 1])) }
 }
 
 export const GEMS: readonly Gem[] = GEM_IDENTITIES.map(recipe)

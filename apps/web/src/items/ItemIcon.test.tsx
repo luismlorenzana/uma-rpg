@@ -1,6 +1,6 @@
 import atlas from '@luismlorenzana/uma-art/gear/atlas.json'
 import gems from '@luismlorenzana/uma-art/gems/atlas.json'
-import { EQUIP_TYPES, gearId, GEMS } from '@rpg/domain'
+import { EQUIP_TYPES, gearId, gemNameV1, GEMS } from '@rpg/domain'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { describe, expect, it, vi } from 'vitest'
@@ -35,7 +35,7 @@ describe('H28 gear icon rendering', () => {
 
 describe('H29 gem icon rendering', () => {
   it('renders all 100 own icons at picker/list sizes without planet badges', async () => {
-    const cases = GEMS.flatMap(g => [28, 32, 64].map(size => ({ id: g.id, name: g.name, size })))
+    const cases = GEMS.flatMap(g => [28, 32, 64].map(size => ({ id: g.id, name: gemNameV1(g.id)!, size })))
     const host = document.createElement('div'), root = createRoot(host)
     document.body.append(host); vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
     try {

@@ -1,7 +1,8 @@
 // Where an icon sits on the shared atlases (@luismlorenzana/uma-art, P37–P38), computed from the catalog's own order so
-// the indexes never ship in the main chunk; frames.test.ts pins every position against them.
+// the indexes never ship in the main chunk; frames.test.ts pins every position against them. Positions only: ids,
+// families and grades from the id-level catalog and `gearIdentity`, never a name (H136).
 import {
-  gearById, GEM_IDENTITIES, isRpgWeaponKind, ITEM_FAMILIES, lineItem, madeIdentity, itemById,
+  gearIdentity, GEM_IDENTITIES, isRpgWeaponKind, ITEM_FAMILIES, lineItem, madeIdentity, itemById,
   type AccessorySlotState, type EquipType, type RpgDamageKind,
 } from '@rpg/domain'
 
@@ -97,7 +98,7 @@ export function iconFrame(id: string): IconFrame | null {
     const row = ITEM_ROW.get(item.family)
     return row === undefined ? null : { sheet: 'items', x: (item.grade - 1) * ATLAS_CELL, y: (row + (item.refined ? 1 : 0)) * ATLAS_CELL }
   }
-  const piece = gearById(id)
+  const piece = gearIdentity(id)
   if (piece) {
     const art = gearArt(piece.type)
     return { sheet: 'gear', x: (piece.grade - 1) * ATLAS_CELL, y: GEAR_ART_ROWS.indexOf(art.row) * ATLAS_CELL, ...(art.kind ? { kind: art.kind } : {}) }
