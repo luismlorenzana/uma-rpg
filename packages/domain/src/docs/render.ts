@@ -83,7 +83,7 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
   brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
   // Classes v3's seven (H126), their v19 names: no list prints them until H134 makes them live.
-  recruit: 'Recruit', duelist: 'Duelist', acolyte: 'Acolyte', caller: 'Caller', apprentice: 'Apprentice', armsummoner: 'Arms Summoner',
+  recruit: 'Recruit', duelist: 'Duelist', acolyte: 'Acolyte', caller: 'Caller', apprentice: 'Initiate', armsummoner: 'Arms Summoner',
   tomeblade: 'Tome Spellblade',
 }
 const weaponName = (w: RpgWeapon): string => WEAPON_LABEL[w]

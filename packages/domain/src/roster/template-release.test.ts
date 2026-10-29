@@ -92,7 +92,7 @@ describe.skipIf(!HAS_RELEASE)('Classes v3\'s calling and templates against the l
   const roster: RosterOutfit[] = HAS_RELEASE ? buildRoster({ characters: load<Character>('characters'), outfits: load<Outfit>('outfits') }) : []
   const V19 = 19
 
-  it('gives §5\'s callings: Recruit 47 · Duelist 72 · Apprentice 72 · Caller 33 · Acolyte 46, by §5.2\'s combinations', () => {
+  it('gives §5\'s callings: Recruit 47 · Duelist 72 · Initiate 72 · Caller 33 · Acolyte 46, by §5.2\'s combinations', () => {
     const callings = tally(RPG_TIER0_CLASSES)
     const combos: Record<string, number> = {}
     for (const outfit of roster) {

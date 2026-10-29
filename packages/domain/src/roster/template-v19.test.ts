@@ -96,7 +96,7 @@ describe('templates 5 × 3 (CV21, §9)', () => {
     expect(rpgClasses(V18).filter((c) => umaFlourishActive({ calling: 'spellblade' }, c, V18))).toEqual(['spellblade'])
   })
 
-  it('puts her moon\'s node II on her calling\'s root: Recruit DEF +8, Apprentice M.DEF +8, the All-Rounders +4 and +4 a tier', () => {
+  it('puts her moon\'s node II on her calling\'s root: Recruit DEF +8, Initiate M.DEF +8, the All-Rounders +4 and +4 a tier', () => {
     const node2 = (calling: RpgTier0Class, tier: 1 | 2 | 3) => {
       const p = mapPoints(['template:2'], 'brawler', tier, { knack: 'fleet', channel: moonChannel(calling, V19) })
       return [p.def, p.mdef]

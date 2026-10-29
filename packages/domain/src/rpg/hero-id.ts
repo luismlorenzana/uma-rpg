@@ -31,7 +31,7 @@ export const bondCapacity = (level: number): number => Math.round((0.5 + 0.05 * 
 
 /** Each class's Hall of Heroes: the Learning District's halls (D106). The Paladin Bastion opens with classes v2 (D179).
  * Classes v3's seven (H126) each take her family hall's place, after the six so `hallClass` finds those first: the Recruit
- * the Dojo, the Apprentice the Tower, the Duelist and the Tome Spellblade the Salle, the Caller and the Arms Summoner the
+ * the Dojo, the Initiate the Tower, the Duelist and the Tome Spellblade the Salle, the Caller and the Arms Summoner the
  * Circle, the Acolyte the Bastion (Halls v2's H129 moves the halls to hall ids). */
 export const HERO_HALLS: Readonly<Record<RpgClass, string>> = {
   brawler: 'brawler-dojo', mage: 'mage-tower', spellblade: 'spell-blade-salle', cleric: 'cleric-chapel', summoner: 'summoner-circle',
