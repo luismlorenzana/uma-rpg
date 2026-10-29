@@ -15,7 +15,7 @@ import {
   highestGrade, KEY_LABELS, partyOf, placeById,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
   rpgExpToNext, rpgRework, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaProfile, umaTrade, slotJobOf,
-  type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades,
+  type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades, umaPick,
 } from '@rpg/domain'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
@@ -447,7 +447,7 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
           <section key="craft" className="rounded-sm bg-raised p-2">
             <div className="flex items-baseline justify-between">
               {rpgRework('economy')
-                ? <p className="text-[14px] font-semibold" data-craft-trade>Craft Lv <span className="font-display text-lg">{prof.level}</span> · {tradeLabel(umaTrade(outfit, uma.calling.pick))}</p>
+                ? <p className="text-[14px] font-semibold" data-craft-trade>Craft Lv <span className="font-display text-lg">{prof.level}</span> · {tradeLabel(umaTrade(outfit, umaPick(uma)))}</p>
                 : <p className="text-[14px] font-semibold">{CRAFT_LABEL} <span className="font-display text-lg">{prof.level}</span></p>}
               <span className="text-[11px] text-ink-faint">10 gathered in {formatDuration(10 * itemMinutes(prof.level) * MINUTE)}</span>
             </div>

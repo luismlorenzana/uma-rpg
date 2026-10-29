@@ -212,7 +212,8 @@ export function manualBlock(world: TierWorld, outfitId: string, ref: RankRef, co
 }
 
 /** Buys and reads `count` Manuals for one Uma's bar: each spends 1,000 Marks for 1,000 EXP. EXP past the top rank banks
- * back at half rate, like any other. Gear Marks buy Weapon and Armor Manuals, Class Marks Class Manuals. */
+ * back at half rate, like any other. Gear Marks buy Weapon and Armor Manuals, Class Marks Class Manuals. Class Manuals
+ * count her reset share down (save v32's "Her share", H130: `left`, never below 0), whichever class reads them. */
 export function readManuals(save: Save, outfitId: string, ref: RankRef, count: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   if (!Number.isInteger(count) || count < 1 || count > MAX_PURCHASE) throw new SaveRuleError('bad-count', `read 1–${MAX_PURCHASE}`)
@@ -224,9 +225,12 @@ export function readManuals(save: Save, outfitId: string, ref: RankRef, count: n
   const back = Math.floor(r.overflow * MARKS_SHARE)
   const key = ref.kind === 'class' ? 'classMarks' : 'gearMarks'
   const marks = world.wallet[key] ?? 0
+  const record = world.classesV3, line = record?.umas[outfitId]
+  const share = ref.kind === 'class' && record && line && line.left > 0
+    ? { classesV3: { ...record, umas: { ...record.umas, [outfitId]: { ...line, left: Math.max(0, line.left - count) } } } } : {}
   return withWorld(save, tier, {
     ...world, umas: { ...world.umas, [outfitId]: { ...uma, ranks: withTrack(uma.ranks, ref, r.track) } },
-    wallet: { ...world.wallet, [key]: marks - MANUAL_PRICE * count + back },
+    wallet: { ...world.wallet, [key]: marks - MANUAL_PRICE * count + back }, ...share,
   }, now)
 }
 

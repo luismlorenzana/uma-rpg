@@ -5,7 +5,7 @@ import {
   ARMOR_LABEL, ARMOR_SLOTS, ARMOR_SLOT_LABEL, accessoryKinds, activeClass, armorHalf, armorKindFor, armorValues, classOf, EFFECT_LABEL,
   gradeOf, ITEM_EFFECTS, isGrades, madeName, mightAt, raisePlan, starMapOf, umaPoints, umaTemplate, moonTemplate, WEAPON_LABEL,
   type AccessoryFamily, type ArmorSlot, type GearTier, type GradeTarget, type OwnedUma, type RosterOutfit, type RpgClass,
-  type RpgDamageKind, type TierWorld, type UmaUpgrades,
+  type RpgDamageKind, type TierWorld, type UmaUpgrades, umaPick,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -151,7 +151,7 @@ export function EquipView({ outfit, uma, world, tier, onSkills }: { outfit: Rost
   const active = activeClass(outfit, uma, tier)
   const weapons = classOf(uma, active).weapons
   const kinds = accessoryKinds(uma, active)
-  const signature = umaTemplate(outfit, uma.calling.pick).family
+  const signature = umaTemplate(outfit, umaPick(uma)).family
   const equip = (slot: number) => (family: AccessoryFamily, kind?: RpgDamageKind) => chooseAccessoryForm(outfit.outfitId, active, slot, family, kind)
     .then(() => setError(null), (err: unknown) => setError(err instanceof Error ? err.message : 'That didn’t work.'))
   return (
@@ -222,11 +222,11 @@ export function UpgradeView({ outfit, uma, world, tier, upgrades }: { outfit: Ro
   const grades = uma.gear
   const active = activeClass(outfit, uma, tier)
   const weapons = classOf(uma, active).weapons
-  const template = umaTemplate(outfit, uma.calling.pick)
+  const template = umaTemplate(outfit, umaPick(uma))
   const rows = upgradeRows(grades, weapons, active, uma.level, world.items, tier, template.family)
   const marked = upgrades?.grades ?? []
   const isMarked = (target: GradeTarget) => marked.some((m) => JSON.stringify(m) === JSON.stringify(target))
-  const points = umaPoints(uma, active, tier, moonTemplate(outfit, uma.calling.pick))
+  const points = umaPoints(uma, active, tier, moonTemplate(outfit, umaPick(uma)))
   const map = starMapOf(uma)
   const jewels = upgrades?.jewels.length ?? 0
   const icon = (row: UpgradeRow) => row.target.kind === 'accessory' && grades.accessories[row.target.slot]?.grade && grades.accessories[row.target.slot]?.family

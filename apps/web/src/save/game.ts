@@ -125,6 +125,18 @@ export async function repairCallingRule(roster: readonly CallingRepairOutfit[]):
   if (next !== save) await commit(next)
 }
 
+/** Save v32's class reset (H130, live from H134): the trades the new calling moved settle once the roster has loaded
+ * (`settleClassesV3Trades`, CV28). Its rules load only while a world's record waits for them; until H134 no save has one. */
+export async function settleClassResetTrades(roster: readonly CallingRepairOutfit[]): Promise<void> {
+  const waiting = (save: Save | null) => !!save && Object.values(save.tierWorlds).some((world) => world.classesV3 && !world.classesV3.traded)
+  if (!waiting(useGame.getState().save)) return
+  const { settleClassesV3Trades } = await import('@rpg/domain/battle')
+  const { save } = useGame.getState()
+  if (!save) return
+  const next = settleClassesV3Trades(save, roster, nowIso())
+  if (next !== save) await commit(next)
+}
+
 /** Throws SaveParseError when the name isn't 1–24 characters. The account is shared by every tier. */
 export async function renameAccount(trainerName: string): Promise<void> {
   const { save } = useGame.getState()

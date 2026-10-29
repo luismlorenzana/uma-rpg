@@ -16,7 +16,7 @@ import { classRankOf, WEAPON_LABEL } from '../economy/ranks'
 import { mapPoints, moonTemplate } from '../economy/planet'
 import { umaTemplate } from '../roster/template'
 import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, umaWeaponMight, type BattleOutfit } from './battle'
-import { gearV1, isGrades, starMapOf, type OwnedUma } from './save'
+import { gearV1, isGrades, starMapOf, umaPick, type OwnedUma } from './save'
 
 const pct = (share: number) => `${Math.round(share * 1000) / 10}%`
 /** A Flourish in a few words (UT6), from the engine's own numbers: "Even pace · 1% a round, up to 4%". */
@@ -58,7 +58,7 @@ export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId?: Rp
 function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tier: number, engine: number): SheetGroup[] {
   const v2 = rpgV2(engine)
   const base = projectRpgStats(umaProfile(outfit, uma, tier, classId), engine)
-  const parts = umaPointParts(uma, classId, tier as 1 | 2 | 3, moonTemplate(outfit, uma.calling.pick, engine))
+  const parts = umaPointParts(uma, classId, tier as 1 | 2 | 3, moonTemplate(outfit, umaPick(uma), engine))
   const boosted = applyPoints(base, addPoints(parts.extra, parts.gear))
   const geared = applyPoints(base, parts.gear).stats
   const core = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow =>
@@ -82,7 +82,7 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
   if (isGrades(uma.gear)) {
     const grades = uma.gear
     const gearTier = tier as GearTier
-    const template = moonTemplate(outfit, uma.calling.pick, engine)
+    const template = moonTemplate(outfit, umaPick(uma), engine)
     const map = starMapOf(uma)
     const sharedPoints = mapPoints(map.open.filter((id) => !id.startsWith('template:')), classId, gearTier, undefined, weapons)
     const sharedStats = applyPoints(base, addPoints(parts.gear, sharedPoints))
@@ -91,7 +91,7 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
       extra: boosted.stats[k] - geared[k], star: boosted.stats[k] - sharedStats.stats[k],
     })
     const slot = grades.accessories[0]
-    const family = umaTemplate(outfit, uma.calling.pick).family
+    const family = umaTemplate(outfit, umaPick(uma)).family
     const signature = signatureWorn(grades, family) ? signatureBonus(uma.level, gearTier) : 0
     const weaponRows: SheetRow[] = weapons.map((weapon) => ({
       label: 'Might', value: `${WEAPON_LABEL[weapon]} +${mightAt(gradeOf(grades, { kind: 'weapon', weapon }), gearTier)}`,

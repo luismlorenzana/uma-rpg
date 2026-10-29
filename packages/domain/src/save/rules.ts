@@ -89,6 +89,14 @@ export function markGrantSeen(save: Save, tier: string, now: string): Save {
   return withWorld(save, tier, { ...world, grant: { ...world.grant, seen: true } }, now)
 }
 
+/** "The classes are rebuilt" was seen (save v32, CV30; H132's two buttons): that world's class reset record is marked
+ * `seen`. A world with no record, or one seen already, is returned as it is (H130). */
+export function markClassesV3Seen(save: Save, tier: string, now: string): Save {
+  const world = worldOf(save, tier)
+  if (!world.classesV3 || world.classesV3.seen) return save
+  return withWorld(save, tier, { ...world, classesV3: { ...world.classesV3, seen: true } }, now)
+}
+
 /** Where an Uma sits, or null when she's in no party. */
 export function partyOf(world: TierWorld, outfitId: string): { party: number; slot: number } | null {
   for (let party = 0; party < world.parties.length; party++) {

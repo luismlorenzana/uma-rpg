@@ -5,7 +5,7 @@ import {
   BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, FLOURISH_NAMES, KEY_LABELS, KNACK_LABEL, KNACK_STAT, STRIDE_LABEL, tradeOfCalling,
   ACCESSORY_FAMILY_LABEL, isGrades, isStarMap, mapNodeGate, nodePoints, signatureBonus, signatureWorn,
   umaCallingPick, umaCallingRow, umaTemplate,
-  type GearTier, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type TradeId, type UmaCalling, type UmaCallingClass,
+  type GearTier, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, type TradeId, type UmaCalling, type UmaCallingClass, umaPick,
 } from '@rpg/domain'
 import type { AptitudeGrade } from '@luismlorenzana/uma-data'
 import { CLASS_LABEL } from '../../battle/labels'
@@ -23,7 +23,7 @@ type Holder = Pick<OwnedUma, 'calling'> | null
 
 /** Her stored pick, when it is one of her row's two (a master-data fix can move her out of them; UT4). */
 function pickOf(outfit: TemplateOutfit, uma: Holder): RpgClass | null {
-  const pick = uma?.calling.pick ?? null
+  const pick = uma ? umaPick(uma) : null
   return pick && umaCallingPick(outfit)?.options.includes(pick) ? pick : null
 }
 
@@ -79,7 +79,7 @@ export function rootFlourish(outfit: TemplateOutfit, uma: Holder, classId: RpgCl
 /** The chip after her rarity stars (UT14): "★ Clever Spellwright", with a dot while an owned Uma's calling can still be
  * picked. Locked outfits show it too (no dot). */
 export function templateChip(outfit: TemplateOutfit, uma: Holder): { name: string; dot: boolean } {
-  return { name: `★ ${umaTemplate(outfit, pickOf(outfit, uma)).name}`, dot: !!uma && !!umaCallingPick(outfit) && !uma.calling.confirmed }
+  return { name: `★ ${umaTemplate(outfit, pickOf(outfit, uma)).name}`, dot: !!uma && !!umaCallingPick(outfit) && !uma.calling?.confirmed }
 }
 
 export interface TemplateReading { label: 'Calling' | 'Stride' | 'Knack'; value: string; source: string }

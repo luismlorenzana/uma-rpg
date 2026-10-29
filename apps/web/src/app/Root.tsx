@@ -10,7 +10,7 @@ import { Outlet } from 'react-router'
 import { lastPage } from '../hub/start'
 import { TierVeil } from '../hub/TierVeil'
 import { useMaster } from '../master/master'
-import { boot, createAccount, repairCallingRule, startSyncTriggers, useGame } from '../save/game'
+import { boot, createAccount, repairCallingRule, settleClassResetTrades, startSyncTriggers, useGame } from '../save/game'
 import { TicketIcon } from '../ui/icons'
 import { signInEnabled } from './firebase-config'
 
@@ -57,12 +57,16 @@ async function bootFor({ uid }: { uid: string }): Promise<{ firstLaunch: boolean
   return { firstLaunch: useGame.getState().status === 'first-launch' }
 }
 
-/** The calling rule reads private master data, so its compatibility repair runs once both roster and save are ready. */
+/** The calling rule reads private master data, so its compatibility repair runs once both roster and save are ready; so
+ * does save v32's trade step (H130), after it. */
 function CallingRuleRepair() {
   const master = useMaster()
   const ready = useGame((state) => state.status === 'ready')
   useEffect(() => {
-    if (ready && master.status === 'ready') void repairCallingRule(master.view.roster)
+    if (ready && master.status === 'ready') {
+      const roster = master.view.roster
+      void repairCallingRule(roster).then(() => settleClassResetTrades(roster))
+    }
   }, [master, ready])
   return null
 }

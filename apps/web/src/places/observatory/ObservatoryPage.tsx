@@ -3,7 +3,7 @@
 import {
   activeClass, activeNodeSlots, BRIDGES, EFFECT_LABEL, gemNameV1, gemStock, isStarMap, ITEM_EFFECTS, jewelNodes, KNACK_LABEL, madeName, mapNodeGate, mapPoints,
   MAP_NODES, moonTemplate, nodeBody, nodeFromGem, nodeGem, nodeJewel, nodeNumeral, nodePoints, prowessSplit, RING, SaveRuleError, starPoints, starsV1,
-  umaTemplate, classOf, type GearTier, type MoonTemplate, type OwnedUma, type RpgClass, type RpgWeapon,
+  umaTemplate, classOf, type GearTier, type MoonTemplate, type OwnedUma, type RpgClass, type RpgWeapon, umaPick,
 } from '@rpg/domain'
 import { CLASS_LABEL } from '../../battle/labels'
 import { useState } from 'react'
@@ -120,8 +120,8 @@ function ObservatoryV3({ view, rows, owned, id, uma, tier, picking, setPicking, 
   const outfit = view.roster.find((o) => o.outfitId === id)!
   const classId = activeClass(outfit, uma, tier)
   const weapons = classOf(uma, classId).weapons
-  const template = umaTemplate(outfit, uma.calling.pick)
-  const moon = moonTemplate(outfit, uma.calling.pick)
+  const template = umaTemplate(outfit, umaPick(uma))
+  const moon = moonTemplate(outfit, umaPick(uma))
   const [nodeOpen, setNodeOpen] = useState<string | null>(null)
   const [jewelPick, setJewelPick] = useState<{ jewel: string; nodes: string[] } | null>(null)
   const sharedOpen = map.open.filter((node) => !node.startsWith('template:')).length
