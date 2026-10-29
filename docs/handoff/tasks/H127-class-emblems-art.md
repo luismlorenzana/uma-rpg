@@ -1,6 +1,6 @@
 # H127 — Art: seven class emblems for Classes v3 (uma-art 2.16.0)
 
-**uma-platform · ChatGPT draws, Claude publishes and pins · S · Needs: nothing · Unblocks: H120 (the Class tab's tree draws
+**uma-platform · ChatGPT draws and publishes · S · Needs: nothing · Unblocks: H120 (the Class tab's tree draws
 the emblems), H134 (checks the pin)**
 
 > **Where this lives:** the work and its pull request are in **uma-platform**; the packet sits in uma-rpg's
@@ -189,3 +189,11 @@ the class it becomes.
   request if a delegated agent does it), that also deletes this packet and adds an H127 Done row to
   `docs/handoff/README.md` with the uma-platform merge commit and the published version; set H120 Ready there if its
   other needs are done. Watch the deploy (`gh run watch <id> -R luismlorenzana/uma-rpg --exit-status`).
+
+## Publishing (the owner, 2026-10-29: supersedes every "Claude publishes" line above)
+
+Art is ChatGPT's end to end. **ChatGPT draws, merges, versions and publishes** the uma-art release itself (uma-platform's
+release workflow, P42), confirms it with `gh api /user/packages/npm/uma-art/versions --jq '.[].name'`, and sets this
+packet's row to Done in uma-rpg's `docs/handoff/README.md` with the merge commit and the version. Claude does none of it.
+**The uma-rpg pin** moves to the packet that first uses the art: H120 (the Class tab) pins uma-art at this version as its first step and drops H126's `ClassEmblem` fallback.
+

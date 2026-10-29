@@ -1,6 +1,6 @@
 # H132 — Classes v3: the sheet "The classes are rebuilt", its Account row, and the Exchange's Class Manual sheet
 
-**uma-rpg · ChatGPT · S–M · Needs: H130 (save v32: the reset, its record `TierWorld.classesV3`, Halls v2's merge in it),
+**uma-rpg · Claude · S–M · Needs: H130 (save v32: the reset, its record `TierWorld.classesV3`, Halls v2's merge in it),
 H126 (held classes, Tier 0 and its waiting EXP), H129 (the seats' names) · Unblocks: H134 (the switch)**
 
 ## Why

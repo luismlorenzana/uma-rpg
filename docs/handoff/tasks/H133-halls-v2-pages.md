@@ -189,3 +189,7 @@ reads the new pairs. Heroes, Learners, Bonds and the sheets are unchanged (HV22)
   and watch the deploy (rerun the web job on Vitest's `Timeout calling "onTaskUpdate"`).
 - **Flag it done:** delete this file, add a Done row in [README.md](../README.md) with the merge commit, and note on
   H135's row that the Sanctum's `frame: 'knights-bastion'` is in `learningPlaces` for it to remove.
+
+## Notes from the main session (2026-10-29)
+
+- **The Sanctum's art (owner, 2026-10-29):** if H135's uma-art release is out, pin it in `apps/web/package.json` and draw the Sanctum's own `healer-sanctum` frame instead of `knights-bastion`; if not, keep the borrowed frame and a later packet pins it.

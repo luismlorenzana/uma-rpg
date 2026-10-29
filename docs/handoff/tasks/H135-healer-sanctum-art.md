@@ -120,3 +120,11 @@ nothing else (lean assets). It is optional: nothing waits for it.
 - **uma-rpg (Claude):** one commit to `main`, `feat(web): pin uma-art <version>, the Healer Sanctum's own building (H135)`
   (a pull request if a delegated agent does it), that also deletes this packet and adds an H135 Done row to
   `docs/handoff/README.md` with the uma-platform merge commit and the version.
+
+## Publishing (the owner, 2026-10-29: supersedes every "Claude publishes" line above)
+
+Art is ChatGPT's end to end. **ChatGPT draws, merges, versions and publishes** the uma-art release itself (uma-platform's
+release workflow, P42), confirms it with `gh api /user/packages/npm/uma-art/versions --jq '.[].name'`, and sets this
+packet's row to Done in uma-rpg's `docs/handoff/README.md` with the merge commit and the version. Claude does none of it.
+**The uma-rpg pin** moves to the packet that first uses the art: H133 (the Halls pages) pins it and draws the Sanctum's own frame if it is out by then; otherwise the first later uma-rpg packet does, and until then the Sanctum wears the `knights-bastion` frame.
+

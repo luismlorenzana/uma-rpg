@@ -353,3 +353,7 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
 - **Flag it done:** delete this file, add a Done row in [README.md](../README.md) with the merge commit, set H123 to
   Ready when H121 and H122 are done too, and say in the delivery that the class row and the tree columns sit near the
   screen's edges, so the owner checks them on the phone after the switch.
+
+## Notes from the main session (2026-10-29)
+
+- **Pin uma-art first (owner, 2026-10-29):** ChatGPT publishes H127's release itself; this packet pins `@luismlorenzana/uma-art` at that version in `apps/web/package.json` as its first step and drops H126's `ClassEmblem` fallback.

@@ -19,8 +19,9 @@
 - **Claude commits and pushes to `main`** in Conventional Commits style (owner, 2026-10-10). Delegated agents use a branch and a pull request. Check `git status` before every commit: no original-game content.
 - **ChatGPT's pull requests:** ChatGPT may merge its own (owner, 2026-10-13), logging its packet's decisions. Before a
   push, fetch `main` so decision numbers don't collide. When Claude reviews one, send back only must-fixes (a broken
-  rule, original-game content, a failing check, a real bug). Claude still versions and publishes uma-art releases in
-  uma-platform.
+  rule, original-game content, a failing check, a real bug).
+- **Art is ChatGPT's end to end (owner, 2026-10-29):** every art packet goes to ChatGPT, which draws, merges, versions and
+  publishes the uma-art release. The uma-rpg packet that first uses the new art pins it. Claude never publishes uma-art.
 
 ## Building and running
 
