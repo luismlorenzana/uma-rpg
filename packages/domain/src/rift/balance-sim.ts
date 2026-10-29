@@ -7,7 +7,7 @@ import { applyBattleAction, createBattle } from '../rpg/battle/engine'
 import { BATTLE_LIMIT_MAX } from '../rpg/battle/limit'
 import type { BattleAction, BattleAlly, BattleCue, BattleEnemy, BattleHalf, BattleInput, BattleState } from '../rpg/battle/types'
 import { RPG_ALL_NODES, RPG_NODES, rpgNodeSkill, type RpgNode } from '../rpg/catalog'
-import { ALL_HERO_LIMIT_IDS, HERO_LIMIT_IDS, type HeroLimitId } from '../rpg/hero-id'
+import { heroLimitIds, type HeroLimitId } from '../rpg/hero-id'
 import { isRpgElement } from '../rpg/kinds'
 import { rpgNodeLine, type RpgLines } from '../rpg/node-identity'
 import { RPG_ELEMENTS, RPG_TIER_MAX_LEVEL, RPG_WEAPON_KINDS, isRpgTome, rpgAutoLoadout, rpgClassSlots, rpgClassTrees, rpgHand, validRpgWeapons,
@@ -144,8 +144,9 @@ const best = (list: readonly RailAct[]): RailAct => list.reduce((a, b) => (b.chi
  * Every class's best single act against the rail boss (H51; H60 for v15): every Attack and every skill of her class's
  * trees (any depth, either side, each with the weapons it needs; a pair class's two halves, an Arms half and a Tome half,
  * each measured beside a one-hit Attack of the other kind and the best of each added), a Summoner's summon with her own
- * best summon lingering, and every Limit Break she could carry with a full gauge: any of the hall's (20 to v14, 24 from
- * v15), since any Uma may learn under any Hero (D106), at full strength. No buffs from others.
+ * best summon lingering, and every Limit Break she could carry with a full gauge: any of her generation's seats (20 to
+ * v14, 24 v15–v18, Halls v2's 20 from v19: `heroLimitIds(engine)`, H129), since any Uma may learn under any Hero (D106),
+ * at full strength. No buffs from others.
  */
 export function guardRail(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): Rail {
   return rpgRework('fight', engine) ? guardRailV16(classId, engine) : rpgV2(engine) ? guardRailV2(classId, engine) : guardRailV1(classId)
@@ -199,7 +200,7 @@ function guardRailV1(classId: RpgClass): Rail {
       if (chips !== null && chips > own.chips) own = { chips, act: `${n.name} (${linger.node.name} lingering)` }
     }
   }
-  return { classId, own, limit: limitRail(base, HERO_LIMIT_IDS, railChips) }
+  return { classId, own, limit: limitRail(base, heroLimitIds(engine), railChips) }
 }
 
 /** Every Limit Break of the halls, fired by her as its Hero with a full gauge. */
@@ -266,7 +267,7 @@ function guardRailV2(classId: RpgClass, engine: number): Rail {
   }
   const railChips = (ally: BattleAlly, action: (id: string, target: string) => BattleAction, setup?: (s: BattleState) => void): number | null =>
     railFight(ally, action, engine, others, setup)?.chips ?? null
-  return { classId, own, limit: limitRail(base, ALL_HERO_LIMIT_IDS, railChips) }
+  return { classId, own, limit: limitRail(base, heroLimitIds(engine), railChips) }
 }
 /** Her on-curve self (v16) holding these skills on their lines and equipped, with the weapons they need: no side skills,
  * a B node's tree on B, the trunk and A on A. Null when her class's three slots can't hold them. */
@@ -331,7 +332,7 @@ function guardRailV16(classId: RpgClass, engine: number): Rail {
   }
   const railChips = (ally: BattleAlly, action: (id: string, target: string) => BattleAction, setup?: (s: BattleState) => void): number | null =>
     railFight(ally, action, engine, others, setup)?.chips ?? null
-  return { classId, own, limit: limitRail(base, ALL_HERO_LIMIT_IDS, railChips) }
+  return { classId, own, limit: limitRail(base, heroLimitIds(engine), railChips) }
 }
 
 /** The Duel's shields, stage 1 to 12, in an engine's tuning. */

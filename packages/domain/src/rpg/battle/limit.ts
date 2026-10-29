@@ -1,7 +1,8 @@
 // Limit Breaks (D311, reworked by D86), after Final Fantasy and Octopath Traveler: every attack and skill charges a bar,
 // and a full bar buys one whole turn worth about twice her usual damage, at 0 MP.
 import { RPG_CLERIC_STATUS, rpgNode, type RpgHit, type RpgSkillDef } from '../catalog'
-import { bondCapacity, heroLimitFor, heroLimitPower, heroLimitSkills, isHeroLimitId, type HeroLimitId } from '../heroes'
+import { bondCapacity, heroLimitFor, heroLimitPower, heroLimitScale, heroLimitSkills, isHeroLimitId, type HeroLimitId } from '../heroes'
+import { rpgRework } from './caps'
 import { RPG_ELEMENTS, isRpgTome, rpgHand, rpgOpenPower, rpgWeaponKind, type RpgNodeRef, type RpgWeapon } from '../rules'
 import { battleSkillFor } from './skills'
 import type { BattleAlly } from './types'
@@ -30,11 +31,13 @@ const round = (n: number) => Math.round(n * 1000) / 1000
 const single = (hits: RpgHit[], primary: RpgSkillDef['primary']): RpgSkillDef => ({ target: 'one', hits, mp: 0, primary })
 
 /** A hero Limit Break at `capacity` of her class's Limit Break power (D106, D107), both by the fight's generation (D179);
- * null for a seat its generation lacks. A Learner's names its Hero (`from`): from v15 it hits with her higher offense (C3). */
+ * null for a seat its generation lacks. A Learner's names its Hero (`from`): from v15 it hits with her higher offense (C3).
+ * From v19 (Halls v2, HV5; H129) the power is the Limit Break's own × her class's scale. */
 function heroPlan(ally: BattleAlly, id: HeroLimitId, level: number, capacity: number, version: number, from?: string): BattleLimitPlan | null {
   const limit = heroLimitFor(id, version)
   if (!limit) return null
-  return { name: limit.name, casts: heroLimitSkills(limit, heroLimitPower(ally.classId, version) * level).map((def) => ({ def, scale: capacity })),
+  const power = rpgRework('classes', version) ? limit.power! * heroLimitScale(ally.classId, version) : heroLimitPower(ally.classId, version)
+  return { name: limit.name, casts: heroLimitSkills(limit, power * level).map((def) => ({ def, scale: capacity })),
     capacity, ...(from ? { from } : {}) }
 }
 
