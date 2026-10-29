@@ -22,7 +22,7 @@ import { FACILITY_MAX_LEVEL, FACILITY_SLOTS, maxJobCount, PROFESSION_MAX_LEVEL }
 import { ACCESSORY_FAMILIES, accessorySlotCount, GRADE_MAX, gradeGateLevel, newGrades, type AccessorySlotState, type GearTier, type UmaGrades } from '../economy/grades'
 import { emptyStarMap, isMapNode, MAP_NODES, mapNodeGate, nodeBody, nodeNumeral, type StarMap } from '../economy/planet'
 import { facilitySpec, JOB_KINDS, type JobKind } from '../economy/jobs'
-import { PLACE_SLOTS_V3 } from '../economy/professions'
+import { PLACE_SLOTS_V3, TRADE_IDS, type TradeId } from '../economy/professions'
 import { jobKindV4, placeSpecV4 } from '../economy/places-v4'
 import { madeIdentity } from '../items/made-id'
 import { isStockItemId } from '../items/stock-id'
@@ -31,7 +31,8 @@ import {
   ACCESSORY_KINDS, ARMOR_KINDS, ARMOR_SLOT_KINDS, ARMOR_SLOTS, armorKindFor, CLASS_MAX_RANK, classExpToNext, GEAR_MAX_RANK, gearExpToNext, isArmorKind, newRanks,
   WEAPON_TYPES, type AccessoryKind, type ArmorKind, type ArmorSlot, type RankTrack, type Ranks,
 } from '../economy/ranks'
-import { RPG_CLASSES, RPG_DAMAGE_KINDS, type RpgDamageKind } from '../rpg/kinds'
+import { RPG_CLASSES, RPG_DAMAGE_KINDS, RPG_V2_CLASSES, rpgClasses, rpgIsTier0, type RpgDamageKind } from '../rpg/kinds'
+import { RPG_TIER0_BANK, RPG_TIER0_MAX_RANK, rpgClassGate, rpgTier0ExpToNext } from '../rpg/class-tree'
 import { BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, HERO_MAX_LEARNERS, isHeroLimitId, LEARNER_MAX_PARENTS, type HeroLimitId } from '../rpg/hero-id'
 import { isGemId, isStarNode } from '../economy/stars'
 import {
@@ -121,9 +122,13 @@ export interface OwnedUma {
   /** Her Bond with each Hero seat she has learned under (D106), kept when she leaves it. */
   bonds: Partial<Record<HeroLimitId, BondTrack>>
   /** Save v27 (H69; CP29, UT17): her calling pick and whether it is final; a null pick is the rule's calling, her
-   * pre-selection, and a pick outside her row is ignored (UT4). */
-  calling: UmaCalling
+   * pre-selection, and a pick outside her row is ignored (UT4). Save v32 drops it (Classes v3, CV19: no pick; H130, dark
+   * until H134): absent from the classes stage, required before it. Readers go through `umaPick`. */
+  calling?: UmaCalling
 }
+
+/** Her stored calling pick, or null (no pick, or save v32's Uma, who has none: H130). Every reader of `calling.pick`. */
+export const umaPick = (uma: Pick<OwnedUma, 'calling'>): RpgClass | null => uma.calling?.pick ?? null
 
 /** Bond Level 0–10 and the EXP toward the next (D106). */
 export interface BondTrack { level: number; exp: number }
@@ -189,6 +194,60 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
   /** Save v28 (H78, PP25): the Tier rework's grant, which the world's first launch shows, or null when it had nothing to
    * pay. Always present in v28. */
   grant?: TierGrant | null
+  /** Save v32 (H130, dark until H134): Classes v3's reset in this world, written once by `toV32`; absent in a world made
+   * after it. */
+  classesV3?: ClassesV3Record
+}
+
+/** A Paladin Bastion or Cleric Chapel seat (engines v15–v18), as save v31 stores it. */
+export type HealerSeatV18 = `${'paladin' | 'cleric'}-${1 | 2 | 3 | 4}`
+/** A Healer Sanctum seat (Halls v2, HV18–HV20; engine v19). H129 widens `HeroLimitId` with them. */
+export type HealerSeatId = `healer-${1 | 2 | 3 | 4}`
+
+/**
+ * Save v32's record of the class reset (H130, dark until H134; classes-v3.md §8, CV25–CV30; halls-v2.md §7, HV18–HV19):
+ * the refund, each Uma's line and the Healer Sanctum's merge, for the one-time sheet ("The classes are rebuilt", H132)
+ * and the Exchange's "Her share". `toV32` writes it once in each world that existed at v31.
+ */
+export interface ClassesV3Record {
+  /** The world's refund in Class Manuals: its Umas' shares summed. */
+  manuals: number
+  /** `manuals` × 1,000, paid into `wallet.classMarks`. */
+  marks: number
+  /** Every Uma the world had at v31, by outfit id. */
+  umas: Record<string, ClassesV3Line>
+  /** The Umas whose role the merge changed, in seat order: a displaced Hero, a Learner past the tenth place. */
+  halls: HallMergeLine[]
+  /** False until `settleClassesV3Trades` has run in this world. */
+  traded: boolean
+  /** The one-time sheet's (`markClassesV3Seen`). */
+  seen: boolean
+}
+/** One Uma's line in the record. */
+export interface ClassesV3Line {
+  /** Her v31 class (a v31 id), for "Summoner R50 · Mage R15 → Caller R1". */
+  classId: string | null
+  /** Her v31 Class Ranks, by v31 id. */
+  ranks: Partial<Record<string, { rank: number; exp: number }>>
+  /** Her v31 calling pick, for the trade step only. */
+  pick: 'spellblade' | 'mage' | 'paladin' | 'cleric' | null
+  /** Her share of the refund, in Manuals. */
+  manuals: number
+  /** Her share not read yet ("Her share" in the Exchange): a hint, not a reservation. */
+  left: number
+  /** Set by the trade step when the new calling moved her trade. */
+  trade?: { from: TradeId; to: TradeId }
+}
+/** One Uma whose role the Healer Sanctum's merge changed (HV19). */
+export interface HallMergeLine {
+  outfitId: string
+  /** Her v31 seat (a v18 id). */
+  from: HealerSeatV18
+  to: HealerSeatId
+  was: 'hero' | 'learner'
+  now: 'learner' | 'unseated'
+  /** Her Bond Level with the new seat. */
+  bond: number
 }
 
 /** A v27 world's gear stock, or none for a v28 world (WP27). */
@@ -272,13 +331,19 @@ export function startingArmorKinds(classId?: RpgClass): UmaGearV1['kinds'] {
  * style doesn't (a Late + End closer's Summoner, a Pace sprinter's Brawler, a Spell Blade; H67, D220), and her calling pick is
  * stored open, the pre-selection unconfirmed (save v27, H69). Once R2's economy is live she is v28's (H78): every grade
  * G0 and one accessory slot with no family (no armor kinds: the half is her class's, H74), an empty map and only Class
- * Ranks. `engine` (default the live one) builds her in another generation: an old save's fixtures ask for v16's. */
-export const newOwnedUma = (now: string, startClass?: RpgClass, engine: number = BATTLE_ENGINE_VERSION): OwnedUma => (rpgRework('economy', engine)
-  ? { unlockedAt: now, level: 1, exp: 0, classId: startClass ?? null, classes: {}, craft: { level: 1, exp: 0 }, ranks: { classes: {} },
-    stars: emptyStarMap(), gear: newGrades(1), bonds: {}, calling: { pick: null, confirmed: false } }
-  : { unlockedAt: now, level: 1, exp: 0, classId: startClass ?? null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
-    stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {},
-    calling: { pick: null, confirmed: false } })
+ * Ranks. From the classes stage (save v32, H130) she has no calling pick, and her start is her calling's Tier 0. `engine`
+ * (default the live one) builds her in another generation: an old save's fixtures ask for v16's. */
+export const newOwnedUma = (now: string, startClass?: RpgClass, engine: number = BATTLE_ENGINE_VERSION): OwnedUma => {
+  if (!rpgRework('economy', engine)) {
+    return { unlockedAt: now, level: 1, exp: 0, classId: startClass ?? null, classes: {}, craft: { level: 1, exp: 0 }, ranks: newRanks(),
+      stars: { unlocked: [], active: [] }, gear: { locker: [], equipped: {}, kinds: startingArmorKinds(startClass) }, bonds: {},
+      calling: { pick: null, confirmed: false } }
+  }
+  const uma: OwnedUma = { unlockedAt: now, level: 1, exp: 0, classId: startClass ?? null, classes: {}, craft: { level: 1, exp: 0 }, ranks: { classes: {} },
+    stars: emptyStarMap(), gear: newGrades(1), bonds: {} }
+  // Save v32 (H130): no calling pick from the classes stage.
+  return rpgRework('classes', engine) ? uma : { ...uma, calling: { pick: null, confirmed: false } }
+}
 
 /** The world's state (D66). */
 export interface WorldState {
@@ -730,11 +795,17 @@ function parseRanks(value: unknown, path: string): Ranks {
   return ranks
 }
 
+/** Halls v2's seat ids (HV20): the four halls that continue and the Healer Sanctum, four seats each, no Paladin or Cleric
+ * seat. A local literal while Halls v2's ids are dark (H130); H129's `heroLimitIds(19)` replaces it. */
+const V32_SEATS: ReadonlySet<string> = new Set(['brawler', 'mage', 'spellblade', 'summoner', 'healer'].flatMap((hall) => [1, 2, 3, 4].map((n) => `${hall}-${n}`)))
+/** A Hero seat of the save's generation: save v32's from the classes stage (H130), the live engine's before. */
+const isSeatId = (id: string): id is HeroLimitId => (rpgRework('classes') ? V32_SEATS.has(id) : isHeroLimitId(id))
+
 function parseBonds(value: unknown, path: string): Partial<Record<HeroLimitId, BondTrack>> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const bonds: Partial<Record<HeroLimitId, BondTrack>> = {}
   for (const [id, raw] of Object.entries(value)) {
-    if (!isHeroLimitId(id)) throw new SaveParseError(`${path}.${id}`, 'not a Hero seat')
+    if (!isSeatId(id)) throw new SaveParseError(`${path}.${id}`, 'not a Hero seat')
     const b = object(raw, `${path}.${id}`, ['level', 'exp'])
     const level = count(b.level, `${path}.${id}.level`)
     if (level > BOND_MAX_LEVEL) throw new SaveParseError(`${path}.${id}.level`, `expected 0–${BOND_MAX_LEVEL}`)
@@ -753,7 +824,7 @@ function parseHeroes(value: unknown, path: string, umas: Record<string, OwnedUma
   const parents = new Map<string, number>()
   for (const [id, raw] of Object.entries(value)) {
     const at = `${path}.${id}`
-    if (!isHeroLimitId(id)) throw new SaveParseError(at, 'not a Hero seat')
+    if (!isSeatId(id)) throw new SaveParseError(at, 'not a Hero seat')
     const seat = object(raw, at, ['hero', 'learners'])
     if (typeof seat.hero !== 'string' || !umas[seat.hero]) throw new SaveParseError(`${at}.hero`, 'expected an owned outfit')
     if (heroes.has(seat.hero)) throw new SaveParseError(`${at}.hero`, 'already a Hero in another seat')
@@ -781,7 +852,7 @@ function parseLoadout(value: unknown, path: string, classId: RpgClass, level: nu
   const weapons = ids(any.weapons, `${path}.weapons`, 5) as RpgWeapon[]
   if (!weapons.every(isRpgWeapon) || !validRpgWeapons(classId, weapons)) throw new SaveParseError(`${path}.weapons`, `not three weapons a ${classId} can wield`)
   const b = object(value, path, ['weapons', 'lines', 'loadout'])
-  if (!validRpgLines(b.lines, rpgClassWeapons(classId))) throw new SaveParseError(`${path}.lines`, `expected line B on ${classId} trees`)
+  if (!validRpgLines(b.lines, rpgClassWeapons(classId), classId)) throw new SaveParseError(`${path}.lines`, rpgIsTier0(classId) ? 'a Tier 0 has no lines' : `expected line B on ${classId} trees`)
   const lines: RpgLines = { ...b.lines }
   if (b.loadout === null) return { weapons, lines, loadout: null }
   const loadout = ids(b.loadout, `${path}.loadout`, rpgActiveSlots(level))
@@ -805,31 +876,68 @@ function parseCalling(value: unknown, path: string): UmaCalling {
 }
 
 const UMA_KEYS = ['unlockedAt', 'level', 'exp', 'classId', 'classes', 'craft', 'ranks', 'stars', 'gear', 'bonds', 'calling']
+/** Save v32's Uma (H130): no calling pick. */
+const UMA_KEYS_V32 = UMA_KEYS.filter((k) => k !== 'calling')
 
-/** Her world's shape: v27's, or v28's with the world's tier (its accessory slots). */
+/** A Tier 0's track (save v32, CV5, CV8): Class Rank 1–10 on her ladder, and at Rank 10 the EXP waiting for her next
+ * promotion, up to `RPG_TIER0_BANK`. */
+function parseTier0Track(value: unknown, path: string): RankTrack {
+  const o = object(value, path, ['rank', 'exp'])
+  const rank = count(o.rank, `${path}.rank`)
+  if (rank < 1 || rank > RPG_TIER0_MAX_RANK) throw new SaveParseError(`${path}.rank`, `expected 1–${RPG_TIER0_MAX_RANK}`)
+  const exp = count(o.exp, `${path}.exp`)
+  if (rank < RPG_TIER0_MAX_RANK ? exp >= rpgTier0ExpToNext(rank) : exp > RPG_TIER0_BANK) {
+    throw new SaveParseError(`${path}.exp`, rank < RPG_TIER0_MAX_RANK ? 'more than the rank needs' : `expected at most ${RPG_TIER0_BANK} waiting`)
+  }
+  return { rank, exp }
+}
+
+/** Save v32's Class Ranks (H130; CV8–CV10): the generation's classes; a Tier 0's track only in Tier 1's world; a Tier 1
+ * class's 1–50, and in Tier 1's world held from Rank 10 (promoted into). */
+function parseClassRanksV32(value: unknown, path: string, tier: number): Ranks {
+  const o = object(value, path, ['classes'])
+  const classes: Ranks['classes'] = {}
+  const keys = rpgClasses().filter((c) => tier === 1 || !rpgIsTier0(c))
+  for (const [c, t] of Object.entries(object(o.classes, `${path}.classes`, keys))) {
+    const at = `${path}.classes.${c}`
+    if (rpgIsTier0(c as RpgClass)) { classes[c as RpgClass] = parseTier0Track(t, at); continue }
+    const track = parseTrack(t, at, CLASS_MAX_RANK, classExpToNext)
+    if (tier === 1 && track.rank < RPG_TIER0_MAX_RANK) throw new SaveParseError(`${at}.rank`, `a Tier 1 class is held from Rank ${RPG_TIER0_MAX_RANK} in Tier 1's world`)
+    classes[c as RpgClass] = track
+  }
+  return { classes }
+}
+
+/** Her world's shape: v27's, or v28's with the world's tier (its accessory slots); from the classes stage save v32's
+ * (H130): the thirteen classes by world (a Tier 0 only in Tier 1's; her class one she may fight as there, `rpgClassGate`),
+ * Tier 0 tracks and no calling pick. */
 function parseUmas(value: unknown, path: string, v28?: { tier: number }): Record<string, OwnedUma> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const v32 = !!v28 && rpgRework('classes')
+  const classKeys = v32 ? rpgClasses().filter((c) => v28.tier === 1 || !rpgIsTier0(c)) : RPG_CLASSES
   const umas: Record<string, OwnedUma> = {}
   for (const [id, raw] of Object.entries(value)) {
     const at = `${path}.${id}`
     if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
-    const u = object(raw, at, UMA_KEYS)
+    const u = object(raw, at, v32 ? UMA_KEYS_V32 : UMA_KEYS)
     const level = count(u.level, `${at}.level`)
     if (level < 1 || level > MAX_UMA_LEVEL) throw new SaveParseError(`${at}.level`, `expected 1–${MAX_UMA_LEVEL}`)
-    const ranks = v28 ? parseClassRanks(u.ranks, `${at}.ranks`) : parseRanks(u.ranks, `${at}.ranks`)
-    const owned: Omit<OwnedUma, 'calling'> = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), classId: null,
+    const ranks = v32 ? parseClassRanksV32(u.ranks, `${at}.ranks`, v28.tier) : v28 ? parseClassRanks(u.ranks, `${at}.ranks`) : parseRanks(u.ranks, `${at}.ranks`)
+    const owned: OwnedUma = { unlockedAt: timestamp(u.unlockedAt, `${at}.unlockedAt`), level, exp: count(u.exp, `${at}.exp`), classId: null,
       classes: {}, craft: parseCraft(u.craft, `${at}.craft`), ranks,
       stars: v28 ? parseStarMap(u.stars, `${at}.stars`, level) : parseStars(u.stars, `${at}.stars`, level),
       gear: v28 ? parseGrades(u.gear, `${at}.gear`, level, v28.tier) : parseUmaGear(u.gear, `${at}.gear`, ranks), bonds: parseBonds(u.bonds, `${at}.bonds`) }
-    if (u.classId !== null && !RPG_CLASSES.includes(u.classId as RpgClass)) throw new SaveParseError(`${at}.classId`, 'expected null or a class')
+    if (u.classId !== null && !classKeys.includes(u.classId as RpgClass)) throw new SaveParseError(`${at}.classId`, 'expected null or a class')
+    const gate = v32 && u.classId !== null ? rpgClassGate(ranks, u.classId as RpgClass, v28.tier) : null
+    if (gate) throw new SaveParseError(`${at}.classId`, `not a class she may fight as here: ${gate}`)
     owned.classId = u.classId as RpgClass | null
-    const classes = object(u.classes, `${at}.classes`, RPG_CLASSES)
+    const classes = object(u.classes, `${at}.classes`, classKeys)
     for (const [key, loadout] of Object.entries(classes)) {
       const classId = key as RpgClass
       owned.classes[classId] = parseLoadout(loadout, `${at}.classes.${key}`, classId, level)
     }
     // Her classes first, so a v26 Uma that missed `toV27` fails on her five weapons.
-    umas[id] = { ...owned, calling: parseCalling(u.calling, `${at}.calling`) }
+    umas[id] = v32 ? owned : { ...owned, calling: parseCalling(u.calling, `${at}.calling`) }
   }
   return umas
 }
@@ -996,10 +1104,79 @@ function parseGrant(value: unknown, path: string): TierGrant | null {
   }
 }
 
+/** The class pick save v31 held (H130's record keeps it for the trade step). */
+const V31_PICKS: readonly string[] = ['spellblade', 'mage', 'paladin', 'cleric']
+/** The Healer Sanctum's seat for each old Paladin and Cleric seat (HV18). */
+const HEALER_OF: Readonly<Record<HealerSeatV18, HealerSeatId>> = {
+  'paladin-1': 'healer-1', 'paladin-4': 'healer-1', 'paladin-2': 'healer-2', 'paladin-3': 'healer-2',
+  'cleric-1': 'healer-3', 'cleric-3': 'healer-3', 'cleric-2': 'healer-4', 'cleric-4': 'healer-4',
+}
+/** The most merge lines a world can hold: per new seat a displaced Hero and the eleven past the tenth place (21 − 10). */
+const MAX_HALL_LINES = 4 * 12
+
+/** One Uma's line in save v32's record (H130): her v31 class, ranks (v31's curve) and pick, her share and what's left of
+ * it, and a moved trade. Her outfit need not be owned: an Uma may leave the world later. */
+function parseClassesV3Line(value: unknown, path: string): ClassesV3Line {
+  const l = object(value, path, ['classId', 'ranks', 'pick', 'manuals', 'left', 'trade'])
+  if (l.classId !== null && !(RPG_V2_CLASSES as readonly unknown[]).includes(l.classId)) throw new SaveParseError(`${path}.classId`, 'expected null or a v31 class')
+  const ranks: ClassesV3Line['ranks'] = {}
+  for (const [c, t] of Object.entries(object(l.ranks, `${path}.ranks`, RPG_V2_CLASSES))) ranks[c] = parseTrack(t, `${path}.ranks.${c}`, CLASS_MAX_RANK, classExpToNext)
+  if (l.pick !== null && !V31_PICKS.includes(l.pick as string)) throw new SaveParseError(`${path}.pick`, 'expected null, spellblade, mage, paladin or cleric')
+  const manuals = count(l.manuals, `${path}.manuals`), left = count(l.left, `${path}.left`)
+  if (left > manuals) throw new SaveParseError(`${path}.left`, 'more than her share')
+  const line: ClassesV3Line = { classId: l.classId as string | null, ranks, pick: l.pick as ClassesV3Line['pick'], manuals, left }
+  if (l.trade === undefined) return line
+  const t = object(l.trade, `${path}.trade`, ['from', 'to'])
+  const trade = (v: unknown, at: string): TradeId => {
+    if (!(TRADE_IDS as readonly unknown[]).includes(v)) throw new SaveParseError(at, `expected ${TRADE_IDS.join(', ')}`)
+    return v as TradeId
+  }
+  const from = trade(t.from, `${path}.trade.from`), to = trade(t.to, `${path}.trade.to`)
+  if (from === to) throw new SaveParseError(`${path}.trade`, 'a trade that moved')
+  return { ...line, trade: { from, to } }
+}
+
+/** One Healer Sanctum merge line (HV19): her old seat and its new one, a displaced Hero now a Learner or a Learner past
+ * the tenth place now unseated, and her Bond Level with the new seat. */
+function parseHallLine(value: unknown, path: string): HallMergeLine {
+  const h = object(value, path, ['outfitId', 'from', 'to', 'was', 'now', 'bond'])
+  if (typeof h.outfitId !== 'string' || !OUTFIT_ID.test(h.outfitId)) throw new SaveParseError(`${path}.outfitId`, 'outfit ids are positive integers')
+  if (typeof h.from !== 'string' || !(h.from in HEALER_OF)) throw new SaveParseError(`${path}.from`, 'expected a Paladin or Cleric seat')
+  const from = h.from as HealerSeatV18
+  if (h.to !== HEALER_OF[from]) throw new SaveParseError(`${path}.to`, `expected ${HEALER_OF[from]}`)
+  if (h.was === 'hero' ? h.now !== 'learner' : h.was !== 'learner' || h.now !== 'unseated') {
+    throw new SaveParseError(`${path}.now`, 'a displaced Hero is a Learner; a Learner past the tenth place is unseated')
+  }
+  const bond = count(h.bond, `${path}.bond`)
+  if (bond > BOND_MAX_LEVEL) throw new SaveParseError(`${path}.bond`, `expected 0–${BOND_MAX_LEVEL}`)
+  return { outfitId: h.outfitId, from, to: HEALER_OF[from], was: h.was as HallMergeLine['was'], now: h.now as HallMergeLine['now'], bond }
+}
+
+/** Save v32's record (H130): every count whole, `marks` its Manuals × 1,000 and `manuals` its Umas' shares summed. */
+function parseClassesV3(value: unknown, path: string): ClassesV3Record {
+  const r = object(value, path, ['manuals', 'marks', 'umas', 'halls', 'traded', 'seen'])
+  const manuals = count(r.manuals, `${path}.manuals`)
+  if (count(r.marks, `${path}.marks`) !== manuals * 1000) throw new SaveParseError(`${path}.marks`, 'expected its Manuals × 1,000')
+  if (typeof r.umas !== 'object' || r.umas === null || Array.isArray(r.umas)) throw new SaveParseError(`${path}.umas`, 'expected an object')
+  const umas: Record<string, ClassesV3Line> = {}
+  for (const [id, raw] of Object.entries(r.umas)) {
+    if (!OUTFIT_ID.test(id)) throw new SaveParseError(`${path}.umas.${id}`, 'outfit ids are positive integers')
+    umas[id] = parseClassesV3Line(raw, `${path}.umas.${id}`)
+  }
+  if (Object.values(umas).reduce((n, l) => n + l.manuals, 0) !== manuals) throw new SaveParseError(`${path}.manuals`, 'expected its Umas\' shares summed')
+  const halls = list(r.halls, `${path}.halls`, 0, MAX_HALL_LINES).map((h, i) => parseHallLine(h, `${path}.halls.${i}`))
+  if (typeof r.traded !== 'boolean') throw new SaveParseError(`${path}.traded`, 'expected true or false')
+  if (typeof r.seen !== 'boolean') throw new SaveParseError(`${path}.seen`, 'expected true or false')
+  return { manuals, marks: manuals * 1000, umas, halls, traded: r.traded, seen: r.seen }
+}
+
 /** v28's world (H78; R2's build decision 7): v27's without the gear and gem shelves, places with no levels, and the grant.
- * v31 (H114) keeps its shape; its work and stock read by the Wilds' trios. */
+ * v31 (H114) keeps its shape; its work and stock read by the Wilds' trios. From the classes stage (save v32, H130) its
+ * Umas, ranks and seats read v32's, and it may hold the class reset's record. */
 function parseTierWorldV28(value: unknown, path: string, tier: number, check: CheckBattle): TierWorld {
-  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'targets', 'heroes', 'rift', 'grant'])
+  const v32 = rpgRework('classes')
+  const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'targets', 'heroes', 'rift', 'grant',
+    ...(v32 ? ['classesV3'] : [])])
   const umas = parseUmas(w.umas, `${path}.umas`, { tier })
   object(w.buildings, `${path}.buildings`, [])
   return {
@@ -1008,6 +1185,7 @@ function parseTierWorldV28(value: unknown, path: string, tier: number, check: Ch
     items: parseStock(w.items, `${path}.items`), buildings: {}, work: parseWork(w.work, `${path}.work`, umas, v31Work(tier)),
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
     rift: parseRift(w.rift, `${path}.rift`, tier, umas, check), grant: parseGrant(w.grant, `${path}.grant`),
+    ...(w.classesV3 === undefined ? {} : { classesV3: parseClassesV3(w.classesV3, `${path}.classesV3`) }),
   }
 }
 

@@ -627,6 +627,8 @@ promotion) is in CV9.
 
 ## 8. The reset
 
+Built in H130 (D247), live from H134.
+
 ### 8.1 What happens
 
 The first time a save opens on save v32, in **every world, to every Uma** (CV25):
@@ -834,6 +836,8 @@ v18 and older replay on their own rules; every class rule below is a new generat
 | Twins | `RPG_KIND_PAIRS` by engine: Katana–Light, Bow–Dark from v19 |
 | Rift | The four builds (§10); fronts' foes tuned by S8 |
 | Halls | **[Halls v2](halls-v2.md) rides v19 and save v32** (HV24): five halls, twenty Limit Breaks with their own power, the class scale (1; healers 0.75), the healer seats' merge |
+
+Save v32 built in H130 (D247), live from H134.
 
 | Save v32 | |
 |---|---|

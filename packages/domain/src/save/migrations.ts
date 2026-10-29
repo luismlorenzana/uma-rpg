@@ -369,6 +369,152 @@ export function toV31(world: Record<string, unknown>): Record<string, unknown> {
   return { ...world, umas: isRecord(world.umas) ? umas : world.umas, items, work: {} }
 }
 
+// --- v31 → v32 (D240, D241): Classes v3's reset and the Healer Sanctum's merge. Written dark in H130, chained by H134 --
+
+/** v31's Class Rank curve (120 + 16 × rank, to Rank 50), as a literal: the EXP a class at Rank r with bar x had taken. */
+const V31_CLASS_MAX_RANK = 50
+const v31ClassExp = (rank: number, bar: number): number => 120 * (rank - 1) + 8 * (rank - 1) * rank + bar
+/** The Tier 0 ladder's first 1,800 again (CV26): its Ranks 1–10 cost twice v31's. */
+const V32_REFUND_DOUBLED = 1800
+const V32_MANUAL = 1000
+/** HV18's seat map, first seat then second: the Paladin Bastion's two pairs and the Cleric Chapel's into the Healer
+ * Sanctum. Literals: H129's seat ids aren't read. */
+const V32_HEALER_PAIRS = [
+  ['paladin-1', 'paladin-4', 'healer-1'], ['paladin-2', 'paladin-3', 'healer-2'], ['cleric-1', 'cleric-3', 'healer-3'], ['cleric-2', 'cleric-4', 'healer-4'],
+] as const
+const V32_MAX_LEARNERS = 10
+const V31_CLASSES: readonly string[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'paladin']
+const V31_PICKS: readonly unknown[] = ['spellblade', 'mage', 'paladin', 'cleric']
+
+interface Track { level: number; exp: number }
+const isTrack = (v: unknown): v is Track => isRecord(v) && Number.isSafeInteger(v.level) && Number.isSafeInteger(v.exp)
+const isClassTrack = (v: unknown): v is { rank: number; exp: number } => isRecord(v) && Number.isSafeInteger(v.rank) && Number.isSafeInteger(v.exp) &&
+  (v.rank as number) >= 1 && (v.rank as number) <= V31_CLASS_MAX_RANK && (v.exp as number) >= 0
+/** Bond a over Bond b: by level, then EXP. */
+const bondAbove = (a: Track, b: Track): boolean => a.level > b.level || (a.level === b.level && a.exp > b.exp)
+const NO_BOND: Track = { level: 0, exp: 0 }
+
+/** One Uma whose role the merge changed (save v32's `HallMergeLine`). */
+interface V32HallLine { outfitId: string; from: string; to: string; was: 'hero' | 'learner'; now: 'learner' | 'unseated'; bond: number }
+
+/**
+ * Halls v2's merge (HV18–HV19), per new seat from its two old ones (first, second):
+ * 1. Each Uma's Bond with it is the higher of her two (level, then EXP); the old two go.
+ * 2. One old Hero is its Hero; with two, the one with the lower Bond on her own old seat keeps it (a tie: the first
+ *    seat's) and the other becomes its first Learner.
+ * 3. With two old seats, their Learners are pooled, each once, after the displaced Hero by Bond with the new seat (a tie
+ *    keeps the first seat's order, then the second's); the first ten sit, and anyone past them keeps her Bond, unseated.
+ * 4. With one old seat, it moves whole: its Hero and its Learners in their order.
+ * Returns the role changes (a displaced Hero, an unseated Learner) in seat order. `umas` (the caller's copy) and `heroes`
+ * are updated in place; malformed tracks and seats are left for the strict parse.
+ */
+function mergeHealerSeats(umas: Record<string, unknown>, heroes: Record<string, unknown>): V32HallLine[] {
+  const lines: V32HallLine[] = []
+  const seatOf = (id: string): { hero: string; learners: string[] } | null => {
+    const seat = heroes[id]
+    return isRecord(seat) && typeof seat.hero === 'string' && isStrings(seat.learners) ? { hero: seat.hero, learners: seat.learners } : null
+  }
+  const bondsOf = (id: string): Record<string, unknown> => { const uma = umas[id]; return isRecord(uma) && isRecord(uma.bonds) ? uma.bonds : {} }
+  for (const [first, second, to] of V32_HEALER_PAIRS) {
+    const a = seatOf(first), b = seatOf(second)
+    // Each old Hero's Bond on her own seat, read before step 1 merges them.
+    const own = (hero: string, seat: string): Track => { const t = bondsOf(hero)[seat]; return isTrack(t) ? t : NO_BOND }
+    const keeps = a && b ? (bondAbove(own(a.hero, first), own(b.hero, second)) ? 'second' : 'first') : null
+    // 1. Bonds.
+    for (const [id, uma] of Object.entries(umas)) {
+      if (!isRecord(uma) || !isRecord(uma.bonds)) continue
+      const x = uma.bonds[first], y = uma.bonds[second]
+      if (!isTrack(x) && !isTrack(y)) continue
+      const bonds: Record<string, unknown> = { ...uma.bonds }
+      if (isTrack(x)) delete bonds[first]
+      if (isTrack(y)) delete bonds[second]
+      const higher = isTrack(x) && isTrack(y) ? (bondAbove(y, x) ? y : x) : isTrack(x) ? x : (y as Track)
+      bonds[to] = { level: higher.level, exp: higher.exp }
+      umas[id] = { ...uma, bonds }
+    }
+    const bondTo = (id: string): Track => { const t = bondsOf(id)[to]; return isTrack(t) ? t : NO_BOND }
+    if (a) delete heroes[first]
+    if (b) delete heroes[second]
+    // 2–4. The Hero and the Learners.
+    if (a && b) {
+      const [hero, displaced, displacedFrom] = keeps === 'first' ? [a.hero, b.hero, second] : [b.hero, a.hero, first]
+      const from = new Map<string, string>()
+      for (const id of a.learners) if (!from.has(id)) from.set(id, first)
+      for (const id of b.learners) if (!from.has(id)) from.set(id, second)
+      const pool = [...from.keys()].filter((id) => id !== hero && id !== displaced)
+      // A stable sort: a tie keeps the pool's order, the first seat's Learners before the second's.
+      const ranked = pool.map((id, i) => ({ id, i, bond: bondTo(id) }))
+        .sort((p, q) => (bondAbove(q.bond, p.bond) ? 1 : bondAbove(p.bond, q.bond) ? -1 : p.i - q.i))
+      const learners = [displaced, ...ranked.map((r) => r.id)]
+      heroes[to] = { hero, learners: learners.slice(0, V32_MAX_LEARNERS) }
+      lines.push({ outfitId: displaced, from: displacedFrom, to, was: 'hero', now: 'learner', bond: bondTo(displaced).level })
+      for (const id of learners.slice(V32_MAX_LEARNERS)) lines.push({ outfitId: id, from: from.get(id)!, to, was: 'learner', now: 'unseated', bond: bondTo(id).level })
+    } else if (a || b) {
+      const seat = (a ?? b)!
+      heroes[to] = { hero: seat.hero, learners: [...seat.learners] }
+    }
+  }
+  return lines
+}
+
+/**
+ * v31 → v32 (D240, D241, D247; classes-v3.md §8, CV25–CV30; halls-v2.md §7, HV18–HV19): **Classes v3's reset and the
+ * Healer Sanctum's merge.** Written dark in H130; H134 chains it with `SAVE_SCHEMA_VERSION` 32 and engine v19. Per world
+ * of `tier`, once:
+ * 1. **Each Uma's v31 class, Class Ranks and calling pick** are read for the record.
+ * 2. **The refund** (CV26), rounded up class by class, each class's EXP on v31's curve (its rank's and its bar): in Tier
+ *    1's world ⌈(EXP + min(EXP, 1,800)) ÷ 1,000⌉ Manuals, in a later one ⌈EXP ÷ 1,000⌉; a class with no EXP gives none.
+ * 3. **Each Uma resets** (CV25, CV29): in Tier 1's world her class null (from v19 her calling's Tier 0); in a later one her
+ *    class kept (every v31 id is a v19 Tier 1 id; a null stays null). Every class's setup and Class Rank go, and her
+ *    calling pick. Her level, EXP, Craft, grades, map and everything else stay.
+ * 4. **The wallet:** the Manuals × 1,000 into `classMarks`, beside the Marks already banked.
+ * 5. **The Healer Sanctum's merge** (`mergeHealerSeats`); the four other halls' seats and Bonds stay.
+ * 6. **The record** (`classesV3`): the refund, each Uma's line (`left` her whole share, no trade yet), the merge's role
+ *    changes, `traded` and `seen` false. The trades that move read master data, so `settleClassesV3Trades` settles them
+ *    after the parse.
+ * Literals only, as every step: v31's curve, the seat map and the ten places are its own; it reads no catalog or master
+ * data. Idempotent by shape (a world with `classesV3` is returned as it is). Anything malformed is left for the strict
+ * parse.
+ */
+export function toV32(world: Record<string, unknown>, tier = 1): Record<string, unknown> {
+  if ('classesV3' in world) return world
+  const tierOne = tier === 1
+  const umas: Record<string, unknown> = isRecord(world.umas) ? { ...world.umas } : {}
+  const lines: Record<string, { classId: string | null; ranks: Record<string, { rank: number; exp: number }>; pick: unknown; manuals: number; left: number }> = {}
+  let manuals = 0
+  for (const [id, uma] of Object.entries(umas)) {
+    if (!isRecord(uma)) continue
+    // 1–2. Her v31 classes, and her share.
+    const ranks: Record<string, { rank: number; exp: number }> = {}
+    let share = 0
+    const tracks = isRecord(uma.ranks) && isRecord(uma.ranks.classes) ? uma.ranks.classes : {}
+    for (const [classId, track] of Object.entries(tracks)) {
+      if (!V31_CLASSES.includes(classId) || !isClassTrack(track)) continue
+      ranks[classId] = { rank: track.rank, exp: track.exp }
+      const exp = v31ClassExp(track.rank, track.exp)
+      share += Math.ceil((tierOne ? exp + Math.min(exp, V32_REFUND_DOUBLED) : exp) / V32_MANUAL)
+    }
+    const pick = isRecord(uma.calling) && V31_PICKS.includes(uma.calling.pick) ? uma.calling.pick : null
+    lines[id] = { classId: typeof uma.classId === 'string' ? uma.classId : null, ranks, pick, manuals: share, left: share }
+    manuals += share
+    // 3. The reset.
+    const { calling: _calling, ...rest } = uma
+    umas[id] = { ...rest, ...(tierOne ? { classId: null } : {}), classes: {}, ...(isRecord(uma.ranks) ? { ranks: { ...uma.ranks, classes: {} } } : {}) }
+  }
+  // 4. The wallet.
+  const marks = manuals * V32_MANUAL
+  const wallet = isRecord(world.wallet) && typeof world.wallet.classMarks === 'number'
+    ? { ...world.wallet, classMarks: world.wallet.classMarks + marks } : world.wallet
+  // 5. The merge.
+  const heroes: Record<string, unknown> = isRecord(world.heroes) ? { ...world.heroes } : {}
+  const halls = mergeHealerSeats(umas, heroes)
+  // 6. The record.
+  return {
+    ...world, umas: isRecord(world.umas) ? umas : world.umas, wallet, heroes: isRecord(world.heroes) ? heroes : world.heroes,
+    classesV3: { manuals, marks, umas: lines, halls, traded: false, seen: false },
+  }
+}
+
 export interface TierGrant {
   /** Paid into `wallet.timeTickets`: the Umas' tickets summed, or the floor when higher. */
   tickets: number

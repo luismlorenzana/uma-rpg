@@ -3,7 +3,7 @@ import { type AlbumPreset, type AlbumPrefsSchema, type AlbumQuery, type FacetDef
 import {
   ACCESSORY_FAMILIES, ACCESSORY_FAMILY_LABEL, activeClass, availableWorkers, BATTLE_ENGINE_VERSION, KEY_LABELS, KNACK_LABEL, RPG_CLASSES, rpgRework, statTotal, STRIDE_LABEL,
   TRADE_IDS, UMA_KNACKS, UMA_STRIDES, umaTemplate, umaTemplateFacets, tradeOfCalling,
-  type OwnedUma, type RosterOutfit, type TierWorld, type UmaUpgrades,
+  type OwnedUma, type RosterOutfit, type TierWorld, type UmaUpgrades, umaPick,
 } from '@rpg/domain'
 import { CLASS_LABEL } from '../battle/labels'
 import type { MasterView } from '../master/master'
@@ -94,7 +94,7 @@ export function albumRows(view: MasterView, world: TierWorld | null, seen: reado
     const classId = uma ? activeClass(outfit, uma, scope.tier) : null
     const isNew = !known.has(base.id)
     const top = (grades: Record<string, string>) => Object.keys(grades).filter(k => grades[k] === 'A' || grades[k] === 'S')
-    const template = umaTemplateFacets(outfit, uma?.calling.pick ?? null)
+    const template = umaTemplateFacets(outfit, uma ? umaPick(uma) : null)
     return [{
       id: base.id, name: base.name, releasedAt: base.releasedAt, level: uma?.level ?? null,
       free: uma !== null && !busy, workLevel: uma?.craft.level ?? null,
@@ -103,7 +103,7 @@ export function albumRows(view: MasterView, world: TierWorld | null, seen: reado
         surface: top(base.aptitudes.surface), distance: top(base.aptitudes.distance), strategy: top(base.aptitudes.strategy),
         sex: [outfit.realHorseSex ?? 'unknown'], new: isNew, free: uma !== null && !busy, class: classId ? [classId] : [], upgrade: false,
         calling: [template.calling], stride: [template.stride], knack: [template.knack],
-        signature: [umaTemplate(outfit, uma?.calling.pick ?? null).family], trade: [tradeOfCalling(template.calling)] },
+        signature: [umaTemplate(outfit, uma ? umaPick(uma) : null).family], trade: [tradeOfCalling(template.calling)] },
       sorts: { level: uma?.level ?? null, release: base.releasedAt, name: base.name, rarity: base.rarity,
         statTotal: statTotal(outfit), craft: uma?.craft.level ?? null,
         classRank: uma ? Math.max(1, ...Object.values(uma.ranks.classes).map(track => track.rank)) : null },

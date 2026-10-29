@@ -97,12 +97,13 @@ export const umaTrade = (outfit: CallingOutfit, pick?: RpgClass | null, engine: 
  * owned Uma's trade, or null when it can't say. */
 export type TradeOf = (outfitId: string) => TradeId | null
 /** A `TradeOf` over a world's Umas and the outfits the caller holds (the web's master data): an outfit it doesn't hold,
- * or an Uma the world doesn't own, is null. */
-export function tradeResolver(world: { umas: Readonly<Record<string, { calling: { pick: RpgClass | null } }>> },
+ * or an Uma the world doesn't own, is null. Her pick as `umaPick` reads it (save v32's Uma has none, H130), here without
+ * the save module. */
+export function tradeResolver(world: { umas: Readonly<Record<string, { calling?: { pick: RpgClass | null } }>> },
   outfitOf: (outfitId: string) => CallingOutfit | undefined, engine: number = BATTLE_ENGINE_VERSION): TradeOf {
   return (outfitId) => {
     const uma = world.umas[outfitId]
     const outfit = outfitOf(outfitId)
-    return uma && outfit ? umaTrade(outfit, uma.calling.pick, engine) : null
+    return uma && outfit ? umaTrade(outfit, uma.calling?.pick ?? null, engine) : null
   }
 }

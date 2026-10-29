@@ -94,6 +94,6 @@ describe('the calling pick while she works (PP2)', () => {
     expect(callingPickBlock(worldOf(working), '101', later)).toBe(CALLING_WORKING)
     const collected = collectJob(working, 'forest', 0, later).save
     expect(callingPickBlock(worldOf(collected), '101', later)).toBeNull()
-    expect(worldOf(pickCalling(collected, pace, 'mage', later)).umas['101']!.calling.pick).toBe('mage')
+    expect(worldOf(pickCalling(collected, pace, 'mage', later)).umas['101']!.calling?.pick).toBe('mage')
   })
 })

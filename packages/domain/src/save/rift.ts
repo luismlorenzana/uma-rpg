@@ -15,7 +15,7 @@ import { applyBattleAction, createBattle, replayBattle } from '../rpg/battle/eng
 import type { BattleAction, BattleInput, BattleState, BattleStep } from '../rpg/battle/types'
 import { rpgBattleExp } from '../rpg/campaign/rewards'
 import { RPG_MAX_BATTLE_ACTIONS, rpgCarriedMp, rpgMemberLevel, rpgPartyAllies, RPG_REFUSED } from '../rpg/campaign/run'
-import { rpgRework } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { RPG_TIER_MAX_LEVEL, rpgIsTier0, type RpgWeapon } from '../rpg/rules'
 import type { EnemyRoster } from '../world/roster'
 import {
@@ -416,7 +416,7 @@ function payEcho(world: TierWorld, entrants: readonly Entrant[], foeLevel: numbe
     const uma = umas[e.outfitId]
     if (!uma) continue
     const exp = rpgBattleExp('fight', foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level }))
-    const filled = fillRanks(uma, e, exp, ECHO_RANK_PAY)
+    const filled = fillRanks(uma, e, exp, ECHO_RANK_PAY, BATTLE_ENGINE_VERSION, tier)
     umas[e.outfitId] = callingConfirmed({ ...uma, ranks: filled.ranks })
     gearMarks += filled.gearMarks
     classMarks += filled.classMarks

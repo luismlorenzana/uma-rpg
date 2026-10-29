@@ -1,7 +1,7 @@
 // The Gear tab's standard preset (H33, classes v2 §7, C6, D164): one tap puts on her active class's default weapons, its
 // armor half in all five slots, its Orb and its support accessory, with the best pieces she can wear. Binding from the
 // stock is for good, so a preset that binds lists those pieces first; the rest can be undone slot by slot.
-import { ACCESSORY_FAMILY_LABEL, activeClass, classPreset, classPresetPlan, classPresetV3, EQUIP_LABEL, isGrades, SaveRuleError, umaTemplate, type OwnedUma, type RosterOutfit, type TierWorld } from '@rpg/domain'
+import { ACCESSORY_FAMILY_LABEL, activeClass, classPreset, classPresetPlan, classPresetV3, EQUIP_LABEL, isGrades, SaveRuleError, umaTemplate, type OwnedUma, type RosterOutfit, type TierWorld, umaPick } from '@rpg/domain'
 import { useMemo, useState } from 'react'
 import { CLASS_LABEL } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
@@ -13,7 +13,7 @@ import { BottomSheet } from '../../ui/BottomSheet'
 export function PresetButton({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
   const classId = activeClass(outfit, uma, useActiveTier())
   const graded = isGrades(uma.gear)
-  const family = graded ? umaTemplate(outfit, uma.calling.pick).family : undefined
+  const family = graded ? umaTemplate(outfit, umaPick(uma)).family : undefined
   const preset = graded ? classPresetV3(classId) : classPreset(classId)
   const plan = useMemo(() => classPresetPlan(world, outfit.outfitId, classId, undefined, family), [world, outfit.outfitId, classId, family])
   const [confirm, setConfirm] = useState(false)

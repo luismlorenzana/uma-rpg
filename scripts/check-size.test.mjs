@@ -83,7 +83,7 @@ test('matches whole module paths only', () => {
   assert.equal(lazyInInitial({ a: [ENGINE] }, ['a']).length, 1)
   assert.throws(() => lazyInInitial({}, ['a']), /missing a/)
   assert.ok(LAZY_MODULES.includes('packages/domain/src/rpg/battle/engine.ts'))
-  for (const path of ['save/migrations.ts', 'items/families.ts', 'items/names-v1.ts']) assert.ok(LAZY_MODULES.includes(`packages/domain/src/${path}`), path)
+  for (const path of ['save/migrations.ts', 'save/classes-v3.ts', 'items/families.ts', 'items/names-v1.ts']) assert.ok(LAZY_MODULES.includes(`packages/domain/src/${path}`), path)
   // The id-level catalog stays in the entry: only its names left (H136).
   assert.deepEqual(lazyInInitial({ a: ['../../packages/domain/src/items/catalog.ts', '../../packages/domain/src/items/identity.ts'] }, ['a']), [])
 })

@@ -15,9 +15,9 @@ import {
 import { rpgNode } from '../rpg/catalog'
 import { isRpgTome, rpgWeaponKind } from '../rpg/kinds'
 import {
-  grantRpgExp, RPG_CLASS_CHILDREN, RPG_CLASS_SLOTS, RPG_CLASSES, RPG_TIER0_MAX_RANK, rpgActiveSlots, rpgAutoLoadout, rpgClassGate, rpgClassName,
+  grantRpgExp, RPG_CLASS_CHILDREN, RPG_CLASS_SLOTS, RPG_CLASSES, RPG_TIER0_MAX_RANK, rpgActiveSlots, rpgAutoLoadout, rpgClassGate, rpgClassName, rpgClassOpen,
   rpgClassWeapons, rpgIsTier0, rpgLineOf, rpgOpenDepth, rpgPicksWeapons, rpgSwapBranchLoadout, rpgUsableLoadout, TIER0_TIER1_ONLY,
-  validRpgWeapons, type RpgBranch, type RpgClass, type RpgLines, type RpgNodeRef, type RpgProfile, type RpgTier0Class, type RpgTier1Class,
+  validRpgWeapons, type RpgBranch, type RpgClass, type RpgLines, type RpgNodeRef, type RpgProfile, type RpgTier0Class, type RpgTier1Class, type RpgV2Class,
   type RpgWeapon,
 } from '../rpg/rules'
 import {
@@ -32,7 +32,7 @@ import { mapPoints, moonTemplate, type MoonTemplate } from '../economy/planet'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
 import {
-  gearV1, gradesOf, isGrades, isStarMap, PARTY_SIZE, SHARDS_PER_TICKET, slotKind, startingArmorKinds, starsV1, type ClassLoadout, type OwnedUma, type Save,
+  gearV1, gradesOf, isGrades, isStarMap, PARTY_SIZE, SHARDS_PER_TICKET, slotKind, startingArmorKinds, starsV1, umaPick, type ClassLoadout, type OwnedUma, type Save,
   type TierWorld,
 } from './save'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
@@ -41,6 +41,7 @@ import { callingPickBlock } from './status'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFlourishActive, umaStride, umaTemplate } from '../roster/template'
 import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit } from './class'
+import { RPG_RESET_TIER0 } from './classes-v3'
 
 // An Uma's class (H62) and one healer a party (H59): in `save/class.ts`, so the main bundle and the party screens read them
 // without this module and the engine. Classes v3's class tree (`umaClassTree`, `umaHeldClasses`, H126) isn't re-exported
@@ -48,6 +49,8 @@ import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit 
 export {
   activeClass, classOf, healerBlock, ONE_HEALER, startingClass, styleClass, withClassWeapons, type BattleOutfit, type StartingOutfit,
 } from './class'
+// Save v32's reset (H130): the Tier 0 a v31 class's share pays, and the trade step the web runs once a world's record waits.
+export { RPG_RESET_TIER0, settleClassesV3Trades } from './classes-v3'
 
 function withWorld(save: Save, tier: string, world: TierWorld, now: string): Save {
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: world } }
@@ -252,7 +255,7 @@ export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, no
   if (working) throw new SaveRuleError('busy', working)
   let next: OwnedUma = { ...uma, calling: { pick, confirmed: false } }
   if (uma.level === 1) {
-    if (uma.classId === null || activeClass(outfit, uma, tier) === umaCalling(outfit, uma.calling.pick)) next = { ...next, classId: pick }
+    if (uma.classId === null || activeClass(outfit, uma, tier) === umaCalling(outfit, umaPick(uma))) next = { ...next, classId: pick }
     const gear = gearV1(uma)
     if (!isGrades(uma.gear) && !ARMOR_SLOTS.some((slot) => gear.equipped[slot])) next = { ...next, gear: { ...gear, kinds: startingArmorKinds(pick) } }
   }
@@ -264,7 +267,7 @@ export function pickCalling(save: Save, outfit: BattleOutfit, pick: RpgClass, no
 export function confirmCalling(save: Save, outfitId: string, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = ownedOf(world, outfitId)
-  if (uma.calling.confirmed || rpgRework('classes')) return save
+  if (uma.calling?.confirmed || rpgRework('classes')) return save
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: callingConfirmed(uma) } }, now)
 }
 
@@ -272,7 +275,7 @@ export function confirmCalling(save: Save, outfitId: string, now: string, tier =
  * every Uma (a fixed row's confirmed calling changes nothing). From v19 she as she is: no pick to confirm (CV19; save v32
  * drops the field). */
 export function callingConfirmed(uma: OwnedUma, engine: number = BATTLE_ENGINE_VERSION): OwnedUma {
-  if (uma.calling.confirmed || rpgRework('classes', engine)) return uma
+  if (!uma.calling || uma.calling.confirmed || rpgRework('classes', engine)) return uma
   return { ...uma, calling: { pick: uma.calling.pick, confirmed: true } }
 }
 
@@ -352,7 +355,7 @@ export function useSpring(save: Save, springId: string, now: string, tier = TIER
  * stored one (save v27, H69) unless named; null is her row's calling. Read from the template's two parts
  * (`umaTemplate(outfit, pick)`'s `calling` and `flourish`), so its name tables stay out of the main bundle. */
 export function umaFlourish(outfit: BattleOutfit, uma: Pick<OwnedUma, 'classId' | 'calling'>, classId: RpgClass = activeClass(outfit, uma),
-  pick: RpgClass | null = uma.calling.pick, engine: number = BATTLE_ENGINE_VERSION): RpgFlourish | null {
+  pick: RpgClass | null = umaPick(uma), engine: number = BATTLE_ENGINE_VERSION): RpgFlourish | null {
   return umaFlourishActive({ calling: umaCalling(outfit, pick, engine) }, classId, engine) ? STRIDE_FLOURISH[umaStride(outfit)] : null
 }
 
@@ -370,15 +373,15 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     const uma = ownedOf(world, id)
     const classId = activeClass(outfit, uma, tier, engine)
     // Her Flourish by her stored calling pick (save v27, H69): a Pace Uma who picked the Spell Blade has it as one.
-    const flourish = rpgRework('fight', engine) ? umaFlourish(outfit, uma, classId, uma.calling.pick, engine) : null
+    const flourish = rpgRework('fight', engine) ? umaFlourish(outfit, uma, classId, umaPick(uma), engine) : null
     const gearTier = Number(tier) as GearTier
     const weapons = classOf(uma, classId).weapons
     const common = { profile: umaProfile(outfit, uma, Number(tier), classId), loadout: umaLoadout(outfit, uma, Number(tier), classId),
-      points: umaPoints(uma, classId, gearTier, moonTemplate(outfit, uma.calling.pick, engine)), might: isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, gearTier) : equippedMight(gearV1(uma).equipped, weapons),
+      points: umaPoints(uma, classId, gearTier, moonTemplate(outfit, umaPick(uma), engine)), might: isGrades(uma.gear) ? gradeMight(gradesOf(uma), weapons, gearTier) : equippedMight(gearV1(uma).equipped, weapons),
       ...heroFields(world, id), ...(flourish ? { flourish } : {}) }
     if (!isGrades(uma.gear)) return { ...common, accessories: equippedAccessories(gearV1(uma).equipped, engine) }
     const grades = gradesOf(uma)
-    const signature = signatureWorn(grades, umaTemplate(outfit, uma.calling.pick).family) ? signatureBonus(uma.level, gearTier) : 0
+    const signature = signatureWorn(grades, umaTemplate(outfit, umaPick(uma)).family) ? signatureBonus(uma.level, gearTier) : 0
     return { ...common, accessory: accessoryParts(grades.accessories[0], weapons, gearTier), ...(signature ? { signature } : {}) }
   })
 }
@@ -495,10 +498,12 @@ export interface RankFill { ranks: Ranks; gains: RankGain[]; gearMarks: number; 
  * fought as, 5E over her five weapons (double for each she used), E to each of her five armor kinds and E to the kind of
  * each accessory she wears. EXP past a max rank banks at half rate as Marks: Class Marks from her class, Gear Marks from
  * the rest. Her level, EXP and Bonds are the caller's. Her class's bar by its tier of class (`grantClassTrack`, H126): from
- * v19 a Tier 0's EXP past Rank 10 waits for her promotion, and only what passes her bank becomes Marks.
+ * v19 a Tier 0's EXP past Rank 10 waits for her promotion, and only what passes her bank becomes Marks. From the classes
+ * stage (save v32, H130), a class not open to her in her world (`tier`) pays its share to its family's Tier 0
+ * (`RPG_RESET_TIER0`): a fight open across the reset settles with her v31 class, which Tier 1's world no longer holds.
  */
 export function fillRanks(uma: OwnedUma, entrant: Pick<Entrant, 'classId' | 'weapons' | 'used'>, exp: number, scale = 1,
-  engine: number = BATTLE_ENGINE_VERSION): RankFill {
+  engine: number = BATTLE_ENGINE_VERSION, tier: number | string = TIER_ONE): RankFill {
   let ranks: Ranks = uma.ranks
   let gearMarks = 0, classMarks = 0
   const gains: RankGain[] = []
@@ -513,7 +518,9 @@ export function fillRanks(uma: OwnedUma, entrant: Pick<Entrant, 'classId' | 'wea
     else gearMarks += marks
     gains.push({ ref, exp: amount, before, after: r.track })
   }
-  fill({ kind: 'class', id: entrant.classId }, CLASS_EXP_SHARE * exp)
+  const reset = rpgRework('classes', engine) && !rpgClassOpen(uma.ranks, entrant.classId, tier, engine)
+    ? RPG_RESET_TIER0[entrant.classId as RpgV2Class] : undefined
+  fill({ kind: 'class', id: reset ?? entrant.classId }, CLASS_EXP_SHARE * exp)
   if (isGrades(uma.gear)) return { ranks, gains, gearMarks: 0, classMarks }
   for (const [w, n] of Object.entries(weaponExpShares(entrant.weapons, entrant.used, exp))) fill({ kind: 'weapon', id: w as RpgWeapon }, n ?? 0)
   const gear = gearV1(uma)
@@ -545,7 +552,7 @@ export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind
     const exp = Math.max(1, Math.round(rpgBattleExp(kind, foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level })) * share))
     const gained = grantRpgExp({ tier: Number(tier), level: uma.level, exp: uma.exp }, exp)
     const got = tier === TIER_ONE ? rpgShardsBetween(uma.level, gained.level) : 0
-    const filled = fillRanks(uma, e, exp)
+    const filled = fillRanks(uma, e, exp, 1, BATTLE_ENGINE_VERSION, tier)
     gearMarks += filled.gearMarks
     classMarks += filled.classMarks
     // Bonds (D106) pay by the stage alone: every won fight counts, replays and Sweeps too.

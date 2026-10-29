@@ -569,6 +569,8 @@ extras of the Tier 2 drafts ([tier2-classes §7.2](../../archive/design/tier2-cl
 
 ## 7. The migration (HV18–HV21, HV24)
 
+The merge built in H130 (D247), live from H134; the seat ids are H129's.
+
 ### 7.1 The seat map
 
 **Seat n stays seat n, id and all,** in the four halls that continue (HV18, HV20): `brawler-n`, `mage-n`,
