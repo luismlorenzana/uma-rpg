@@ -50,9 +50,9 @@
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | [H136](tasks/H136-entry-budget.md) | Main JS headroom before Classes v3: the save's migration chain lazy again and the v1 economy's tables out of the entry (F36), with a size guard | Claude | S–M | — | Done (`e0e5c92`) |
-| [H126](tasks/H126-classes-v3-domain.md) | Classes v3 (D240) in the domain, dark at engine v19: 13 classes and the tree, Tier 0, promotion and reclass, the two new hybrids, the calling by running style, trades, templates 5 × 3, the Rift's builds; v18 replays pinned | Claude | L | H136 | In progress (main session) |
-| [H128](tasks/H128-weapon-shapes-v19.md) | Classes v3: Katana and Light doubles, Bow and Dark volleys, the twins re-paired, three line B changes, every twin reader | Claude | M | H126 | Waiting |
-| [H130](tasks/H130-save-v32-class-reset.md) | Save v32, dark: the class reset and refund as Class Marks, trade moves, the healer seats' merge; `toV32` not chained | Claude | M–L | H126, H129, H136 | Waiting |
+| [H126](tasks/H126-classes-v3-domain.md) | Classes v3 (D240) in the domain, dark at engine v19: 13 classes and the tree, Tier 0, promotion and reclass, the two new hybrids, the calling by running style, trades, templates 5 × 3, the Rift's builds; v18 replays pinned | Claude | L | H136 | Done (`e209585`) |
+| [H128](tasks/H128-weapon-shapes-v19.md) | Classes v3: Katana and Light doubles, Bow and Dark volleys, the twins re-paired, three line B changes, every twin reader | Claude | M | H126 | In progress (main session) |
+| [H130](tasks/H130-save-v32-class-reset.md) | Save v32, dark: the class reset and refund as Class Marks, trade moves, the healer seats' merge; `toV32` not chained | Claude | M–L | H126, H129, H136 | In progress (main session) |
 | [H131](tasks/H131-classes-v3-balance.md) | Balance on engine v19: Classes v3's S1–S10 and Halls v2's targets, knobs as the designs name them | Claude | M–L | H126, H128, H129 | Waiting |
 | [H132](tasks/H132-classes-rebuilt-sheet-exchange.md) | "The classes are rebuilt" sheet and its Account row, the Exchange's Manual sheet | Claude | S–M | H126, H129, H130 | Waiting |
 | [H134](tasks/H134-classes-v3-switch.md) | **The switch:** engine v19 and save v32 live with `toV32` chained, the kind colours swapped, the manual rewritten | Claude | M | H120, H123, H127, H130, H131, H132, H133 | Waiting |
@@ -86,6 +86,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 | Id | Task | Commit |
 |---|---|---|
+| H126 | Classes v3 in the domain, dark at engine v19 (D244 build decisions, D245): the 13 classes and the tree, Tier 0 and promotion, the two new hybrids, the calling by running style, trades, templates 5 × 3, the Rift's builds; v14–v18 replay byte for byte live and at 19; the Tier 0 Mage shows as Initiate ("Apprentice" is Tier 1's name). Main JS 217.31 KB gzip on CI | `e209585` |
 | H136 | The entry's budget (D243): the save's migration chain loads only for an old save again (a local copy of `toV26`'s lead rule in `save.ts`), the v1 economy's names move to a lazy `items/names-v1.ts`, and `scripts/check-size.mjs` guards both. Main JS 224.34 → 214.93 KB gzip on CI; nothing on screen changes; checked with a v30 device copy (the chunk fetched once) and offline in headless Chrome | `e0e5c92` |
 
 ## How a packet reads
