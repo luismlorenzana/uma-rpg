@@ -26,6 +26,15 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
+| [H117](tasks/H117-profile-copy-cleanup.md) | Uma profile v2 (D239): the copy cleanup on today's tabs (the 54 strings, the 3 wrong texts, F5, F11–F15), three 44 pt targets, the wording list as `copy.ts` and the copy test, the dead v1 preset sheet | ChatGPT | S–M | — | Ready |
+| [H118](tasks/H118-kit-compact-profile-frame.md) | Both apps: a compact `ProfileFrame` header (`size`, `progress`) and a face door on `SlotRow` (`onFace`), uma-kit 0.16.0; uma-rpg pins it | Claude (uma-platform session) | S | — | Ready |
+| [H119](tasks/H119-profile-frame.md) | Uma profile v2: the frame, four tabs (Class, Gear, Stars, Template) as a skeleton, the compact header and facts row (Party · Work · Details), the Details sheet, routes `outfit/:id/:tab` and the tab key, locked | Claude | M | H117, H118 | Waiting |
+| H120 | Uma profile v2: the Class tab (proposal §4.1); packet written after the Classes v3 design; re-runs H125's measures | ChatGPT | M | H119; the Classes v3 design | Waiting: Classes v3 design |
+| [H121](tasks/H121-gear-tab.md) | Uma profile v2: the Gear tab, nine tiles, raise sheets with before → after, Raise all | ChatGPT | M | H119 | Waiting |
+| [H122](tasks/H122-stars-tab-observatory-door.md) | Uma profile v2: the Stars tab, Set all, and the Observatory as a door (its old route redirects) | ChatGPT | M | H119 | Waiting |
+| H123 | Uma profile v2: the Template tab (proposal §5); packet written after the Classes v3 design; re-runs H125's measures | Claude | M | H120, H121, H122; the Classes v3 design | Waiting: Classes v3 design |
+| [H124](tasks/H124-profile-doors-back-stepper.md) | Uma profile v2: every door opens a tab, Back returns to it, ‹ n/N › next and previous Uma | Claude | S–M | H119 | Waiting |
+| [H125](tasks/H125-profile-measure-close.md) | Uma profile v2: the built screens measured against B1–B4, the phone check, profile-ux.md superseded, the manual read through | Claude | S | H117, H118, H119, H121, H122, H124 | Waiting |
 
 **After hardening:** Tier 2 and Tier 3 are re-planned. Their approved drafts stay in
 [design/tier-rework/](../design/tier-rework/README.md) (Class, Weapon, Extra Stats and Profession Progression, stat
