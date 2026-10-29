@@ -67,7 +67,7 @@ The manual describes these correctly in hand-written notes, but each generated b
 
 | Id | What |
 |---|---|
-| F36 | **Main JS is 223.46 KB of 230.** The save's whole migration chain loads at boot (`save/save.ts:56` imports `migrateWorld` and `toV26` statically, cancelling the lazy import at `:1337`), and the v1 economy's names and recipes (`economy/gear.ts`, `items/families.ts`) ride in the entry too. Dexie's 32.49 KB chunk also loads on every boot (≈256 KB in all; known since H16). **Done in H136 (D242)** for the migration chain and the v1 names: main JS 214.42 KB, guarded by `scripts/check-size.mjs`; Dexie's boot chunk stays |
+| F36 | **Main JS is 223.46 KB of 230.** The save's whole migration chain loads at boot (`save/save.ts:56` imports `migrateWorld` and `toV26` statically, cancelling the lazy import at `:1337`), and the v1 economy's names and recipes (`economy/gear.ts`, `items/families.ts`) ride in the entry too. Dexie's 32.49 KB chunk also loads on every boot (≈256 KB in all; known since H16). **Done in H136 (D243)** for the migration chain and the v1 names: main JS 214.42 KB, guarded by `scripts/check-size.mjs`; Dexie's boot chunk stays |
 
 ## Dead code and stale comments
 
