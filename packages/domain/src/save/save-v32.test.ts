@@ -158,11 +158,12 @@ describe('save v32\'s rules (H130)', () => {
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })
 
-  // H129 makes `healer-*` the v19 seats the Bond rules read (`HERO_LIMIT_IDS` by generation); until then the world's merged
-  // seat isn't one the live seat list knows, and this waits.
-  it.skipIf(!(HERO_LIMIT_IDS as readonly string[]).includes('healer-2'))('pays the Brawler\'s Bond to healer-2, her merged seat (H129)', () => {
-    const before = worldOf(parsed()).umas[UMA.A]!.bonds as Record<string, { level: number; exp: number }>
-    const after = worldOf(finishWorldFight().save).umas[UMA.A]!.bonds as Record<string, { level: number; exp: number }>
-    expect(after['healer-2']).not.toEqual(before['healer-2'])
+  it('pays the Brawler\'s Bond to healer-2, her merged seat (H129\'s seats)', () => {
+    expect(HERO_LIMIT_IDS).toContain('healer-2')
+    expect(worldOf(parsed()).umas[UMA.A]!.bonds['healer-2']).toEqual({ level: 8, exp: 0 })
+    const { save, result } = finishWorldFight()
+    // A boss stage's Bond EXP (3) toward each of her two seats: the merged healer-2 and brawler-1.
+    expect(result.members.find((m) => m.outfitId === UMA.A)!.bonds.map((b) => [b.limit, b.exp])).toEqual([['brawler-1', 3], ['healer-2', 3]])
+    expect(worldOf(save).umas[UMA.A]!.bonds['healer-2']).toEqual({ level: 8, exp: 3 })
   })
 })
