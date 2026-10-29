@@ -311,8 +311,22 @@ Routes: `/town/party-hall` and `:n` (1–20); `PartyHallPage.tsx`.
   (G1–G5) or "After a win on continent 3" (G6–G10).
 - A row's sheet: ×1, ×5, ×10, ×25 or a typed amount, the total, and "Need N more" when the Laurels fall short.
 - **Manuals** (its (i): Class Marks bank past a max Class Rank, and a Manual's price and EXP): **Read a Class Manual**
-  with "Class Marks 3,000". It opens the shared picker (highest Uma Level first, locked Umas disabled), then "Which
-  bar?": her six classes' Class Rank bars, each with ×1 and ×5 (D102).
+  with "Class Marks 3,000". It opens the Class Manual sheet (`manual-view.ts`, D102, D250) at `/town/exchange/manual`:
+  the shared picker (highest Uma Level first, locked Umas disabled), then her bars at `/town/exchange/manual/:outfitId`
+  (a link may open it there; closing the sheet returns to `/town/exchange` and the place's Back still leads where it
+  came from). The head reads "Aster · Class Marks 78,000". Her six classes are one row each (emblem, name, "R34" and its
+  bar; "R50 · Max"), the class she fights as selected first; a tap selects another (its ring). The counts are chips, 1 ·
+  5 · 10 · "Max · 78" (as many as the Marks buy, up to 99); one the Marks can't buy is disabled. The footer shows before →
+  after from the class's own curve ("Brawler R34 → R36", and "+360 Class Marks back" for EXP past Rank 50) and **Read 2
+  · 2,000 Class Marks**, or the reason it can't ("Already at the top rank", "Needs 10,000 Class Marks"). After a read the
+  sheet stays open on the new state; "Choose another Uma" returns to the picker.
+- **From the switch (H134)**, Classes v3's rows: in Tier 1's world the bars are the five Tier 0s, her calling's first
+  ("R1/10 · Calling"), then the Tier 1 classes she holds in the tree's order (a closed one isn't listed); a later tier's
+  world lists the eight Tier 1 classes, her active class first. A Tier 0 at Rank 10 reads "R10 · +400 EXP waiting": its
+  EXP waits for her promotion up to 23,680, and its counts stop at that room ("Room for 4"). The chips add "To Rank 10 ·
+  4" on a Tier 0 below Rank 10 and "Her share · 21" (her reset Manuals not read yet, counting down on any bar she reads;
+  shown in the head too) while the reset's record lists one; the sheet starts on her share. The (i) adds the Tier 0's
+  bank and what her share is.
 
 ### Account
 
@@ -325,6 +339,8 @@ Reached from the top bar's initial (`/town/account`). `places/account/AccountPag
   blocked, unsupported), and **Send a test** while it is on.
 - **The Tier rework's grant**, only in a world migrated through save v28: "The Tier rework's grant · 63,800 Speed
   Tickets", which reopens "The Wilds are rebuilt".
+- **From the switch (H134), the classes' reset**, only in a world migrated through save v32: "The classes are rebuilt ·
+  78 Class Manuals", which reopens "The classes are rebuilt" (`?sheet=classes`).
 - **Achievements** (`achievements/AchievementList.tsx`, [loops](loops.md#achievements)): "3 of 14", the earned ones
   newest first with "21 Oct · Tier 1 run 2" (the Bestiary has no run), then the rest dimmed with how each is earned. It
   lists Tier 1's four seals and Rift Conquered, every other world's, and the nine titles; a seal reads "Iron Seal · Tier
@@ -337,6 +353,18 @@ Reached from the top bar's initial (`/town/account`). `places/account/AccountPag
 world-map fight), and from the Account's row (`?sheet=grant`). Its lead (still "Ten professions, each in its own
 place."), "+63,800 Speed Tickets" and the hours of work, then What went, What came back, What stays, and By Uma ("Craft
 Lv 30 → 1 · 1,470", with her trade). **To the Wilds** and **Later** both mark it seen.
+
+**"The classes are rebuilt"** (from the switch, H134; `grant/ClassesSheet.tsx`, `classes-lines.ts`, D250; the reset is
+classes-v3.md §8): it opens by itself once per world whose save v32 record is unseen, once the reset's trades have
+settled and never over a world-map fight, after "The Wilds are rebuilt" when both wait; and from the Account's row. "+78
+Class Manuals" and "78,000 Class Marks · Exchange"; "Every Uma starts her class tree at Rank 1 of her Tier 0." with the
+three roots and their Tier 0s; How to rebuild an Uma (Exchange → Read a Class Manual → her Tier 0 → Her share; Her
+profile → Class → Promote at Rank 10); At a glance: Reset, Stays, Weapons, Trades ("2 Umas moved trade · their running
+work finished into the Warehouse") and Halls (the Paladin Bastion and the Cleric Chapel into the Healer Sanctum, each Uma
+whose role moved, "Each Uma keeps her higher Bond"); then each Uma with a share or a moved trade, most Manuals first, with
+her face ("Spell Blade R26 · Mage R8 → Initiate R1 · trade Wood → Stone", her share on the right). A later tier's world
+reads "Every Uma starts again at Rank 1 of her class." with one step and no tree. **To the Exchange** (the Manual sheet's
+picker) and **Later** both mark it seen.
 
 ## Learning
 

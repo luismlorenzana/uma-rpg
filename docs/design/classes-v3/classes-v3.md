@@ -698,6 +698,8 @@ class is read (CV29, CV35):
 
 ### 8.6 The sheet: "The classes are rebuilt"
 
+Built in H132 (D250), live from H134.
+
 A one-time sheet the first time each world with the reset opens, like "The Wilds are rebuilt" (CV30):
 
 ```
@@ -890,6 +892,8 @@ Brawler R10   ·  depths 1–2  ·  6 skills  ·  + 400 EXP waiting
 - After: she fights as it; the tab redraws on its first weapon's tree.
 
 ### 14.3 The Exchange's Manual sheet
+
+Built in H132 (D250): its shape (a bar selected, a count, one footer) live; the v19 rows from H134.
 
 UP30 keeps Manuals at the Exchange. Its sheet (pick an Uma, a class, a count) changes in three small ways (CV30):
 

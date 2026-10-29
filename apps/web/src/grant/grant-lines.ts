@@ -2,7 +2,7 @@
 // (save v28, H78) turned into the sheet's lines. A part whose numbers are all zero is left out, and so is a zero inside a
 // part; the Umas are sorted by tickets, a banked Uma says her EXP past Lv 50, and the floor's line shows when it paid more
 // than the Umas did. Pure, so the Account's row and the tests read the same numbers.
-import { PROFESSION_MAX_LEVEL, type TierGrant } from '@rpg/domain'
+import { PROFESSION_MAX_LEVEL, type ClassesV3Record, type TierGrant } from '@rpg/domain'
 
 export interface GrantUma { outfitId: string; name: string; trade: string | null; line: string; tickets: number }
 
@@ -67,3 +67,10 @@ export function grantLines(grant: TierGrant, who: (outfitId: string) => { name: 
 /** The Account's row (PP25): "The Tier rework’s grant · 63,800 Speed Tickets". */
 export const grantRow = (grant: TierGrant): { label: string; value: string } =>
   ({ label: 'The Tier rework’s grant', value: `${num(grant.tickets)} Speed Tickets` })
+
+/** Classes v3's one-time sheet's title (H132; its words are `classes-lines.ts`'). */
+export const CLASSES_TITLE = 'The classes are rebuilt'
+/** The Account's row for Classes v3's reset (CV30, H132): "The classes are rebuilt · 78 Class Manuals". Here beside the
+ * grant's, so the Account's chunk doesn't load the sheet's words. */
+export const classesRow = (record: Pick<ClassesV3Record, 'manuals'>): { label: string; value: string } =>
+  ({ label: CLASSES_TITLE, value: `${num(record.manuals)} Class Manuals` })

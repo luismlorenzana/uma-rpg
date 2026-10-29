@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  BATTLE_ENGINE_VERSION, markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, repairCallingChoices, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingRepairOutfit, type FightResult, type RpgBranch, type RpgClass,
+  BATTLE_ENGINE_VERSION, markClassesV3Seen, markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, repairCallingChoices, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingRepairOutfit, type FightResult, type RpgBranch, type RpgClass,
   type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
@@ -149,6 +149,14 @@ export async function seeGrant(): Promise<void> {
   const { save } = useGame.getState()
   if (!save) return
   const next = markGrantSeen(save, activeKey(), nowIso())
+  if (next !== save) await commit(next)
+}
+
+/** "The classes are rebuilt" was seen (save v32, CV30; H132): it shows once per world; the Account reopens it. */
+export async function seeClassesRebuilt(): Promise<void> {
+  const { save } = useGame.getState()
+  if (!save) return
+  const next = markClassesV3Seen(save, activeKey(), nowIso())
   if (next !== save) await commit(next)
 }
 

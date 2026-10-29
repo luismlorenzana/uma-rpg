@@ -622,7 +622,9 @@ For each new seat and its two old seats ("first" as listed above, then "second")
 4. **A Learner who sat under both old seats** now has one Hero there, and her second place is free.
 5. **One line on Classes v3's one-time sheet** ("The classes are rebuilt", its §8.6) names every Uma who moved: "The
    Paladin Bastion and the Cleric Chapel are now the Healer Sanctum. Uma A, Hero of Rampart Charge, is now a Learner of
-   Archdemon's Toll at Bond 7."
+   Archdemon's Toll at Bond 7." Built in H132 (D250) as its Halls part, live from H134: "Paladin Bastion · Cleric Chapel
+   → Healer Sanctum", then "Uma A · Hero → Learner · Archdemon's Toll · Bond 7" for each Uma who moved, then "Each Uma
+   keeps her higher Bond".
 
 **Example:** the Paladin Bastion's seat 2 has Hero A (Bond 4) with six Learners; seat 3 has Hero B (Bond 10) with five,
 one of them also under seat 2. Healer 2: A stays Hero (lower Bond); B becomes its first Learner, at Bond 10, so she
