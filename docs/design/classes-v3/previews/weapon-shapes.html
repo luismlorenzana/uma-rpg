@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weapon Shapes</title>
+<!-- Classes v3 (docs/design/classes-v3/classes-v3.md §4): the ten weapon kinds' shapes before and after, the volley
+     against the other area shape, the twins re-paired, and every tree the rework touches. Self-contained: uma-kit's
+     tokens, light and dark. -->
+<style>
+  /* uma-kit's theme tokens (uma-platform/packages/kit/theme.css), as the Tier rework's and profile v2's previews copy
+     them: light is uma-racer's, dark is uma-rpg's. The page follows the system; the Light/Dark buttons pin one. */
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #b8770a; --info: #2f6fe0; --locked: #8a94a3;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --bad: #c23b33; --bad-wash: #fbe4e2; --good-wash: #e2f2e8;
+    --cl-recruit: #8f6a58; --cl-apprentice: #5c78aa; --cl-duelist: #9c8642; --cl-caller: #8873aa; --cl-acolyte: #4f907a;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-tomeblade: #1d8aa2; --cl-armsummoner: #6c7d1c;
+    --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --k-greatsword: #d9772b; --k-axe: #8a52c7; --k-lance: #2f9a4f; --k-bow: #3aa38f; --k-katana: #c4466e;
+    --k-fire: #d23a2f; --k-ice: #2f7fd6; --k-lightning: #c9a400; --k-light: #b89a3a; --k-dark: #6d48b8;
+    --f-pendant: #2a78d6; --f-orb: #eb6834; --f-bell: #1baf7a; --f-insignia: #6250d6;
+    --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+      --cl-recruit: #c09482; --cl-apprentice: #8ea8d8; --cl-duelist: #cdb672; --cl-caller: #b8a3da; --cl-acolyte: #7ec2aa;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-tomeblade: #45bad4; --cl-armsummoner: #a8bb46;
+      --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+      --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+      --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+      --scrim: rgb(0 0 0 / 0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+    --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+    --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+    --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+    --cl-recruit: #c09482; --cl-apprentice: #8ea8d8; --cl-duelist: #cdb672; --cl-caller: #b8a3da; --cl-acolyte: #7ec2aa;
+    --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-tomeblade: #45bad4; --cl-armsummoner: #a8bb46;
+    --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+    --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+    --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+    --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+    --scrim: rgb(0 0 0 / 0.55);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 6px; }
+  p { margin: 0; }
+  a { color: inherit; }
+  code { font-size: 12px; background: var(--raised); padding: 0 4px; border-radius: 4px; }
+  .lead { color: var(--ink-soft); max-width: 960px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  nav.top { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--hairline); }
+  nav.top a, nav.top button { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font: 600 13px system-ui, sans-serif;
+    box-shadow: 0 1px 0 var(--hairline-strong); border: 0; cursor: pointer; }
+  nav.top a:hover { background: var(--raised); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  nav.top .spacer { flex: 1; }
+  nav.top button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; font-size: 16px; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note b { color: var(--ink); }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pills button { font: 600 12.5px system-ui, sans-serif; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; min-height: 32px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 2px; }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 6px;
+    background: var(--raised); border: 1px solid var(--hairline-strong); color: var(--ink); white-space: nowrap; }
+  .tag.good { background: var(--good-wash); border-color: transparent; color: var(--success); }
+  .tag.bad { background: var(--bad-wash); border-color: transparent; color: var(--bad); }
+  .tag.acc { background: var(--accent-wash); border-color: transparent; color: var(--accent-strong); }
+  .tag.new { background: var(--accent); border-color: transparent; color: var(--accent-ink); }
+  .glyph { width: 30px; height: 30px; border-radius: 8px; display: inline-grid; place-items: center; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: -.02em; flex: none; }
+  .glyph.sm { width: 22px; height: 22px; font-size: 10px; border-radius: 6px; }
+  .kchip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 2px 8px 2px 3px; border-radius: 999px; background: var(--raised); white-space: nowrap; }
+  .kchip i { width: 16px; height: 16px; border-radius: 5px; display: inline-block; flex: none; }
+  #tip { position: fixed; z-index: 60; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  .split { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--sunken); min-width: 80px; }
+  .split i { display: block; height: 100%; }
+  .foot { margin-top: 48px; font-size: 12px; color: var(--ink-faint); }
+  @media (max-width: 900px) {
+    main { padding: 20px 16px 60px; }
+    nav.top { margin: 16px -16px 0; padding: 10px 16px; }
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .shapes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  .shape { background: var(--panel); border-radius: 14px; padding: 14px; box-shadow: 0 1px 0 var(--hairline-strong); display: flex; flex-direction: column; gap: 8px; min-width: 0; position: relative; }
+  .shape.chg { box-shadow: 0 0 0 2px var(--accent), 0 1px 0 var(--hairline-strong); }
+  .shape .nm { font-size: 16px; font-weight: 800; }
+  .shape .kinds { display: flex; gap: 6px; flex-wrap: wrap; }
+  .shape svg { display: block; width: 100%; height: auto; background: var(--raised); border-radius: 10px; }
+  .shape dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 8px; font-size: 12.5px; }
+  .shape dt { color: var(--ink-soft); font-weight: 600; }
+  .shape dd { margin: 0; }
+  .shape .flag { position: absolute; top: 12px; right: 12px; }
+  .twins { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .twins svg { display: block; width: 100%; height: auto; }
+  .chart svg { display: block; width: 100%; height: auto; }
+  .ctl { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--ink-soft); margin: 6px 0 4px; }
+  .ctl input[type=range] { width: 220px; accent-color: var(--accent); }
+  .ctl .pc { display: inline-flex; gap: 8px; align-items: center; white-space: nowrap; }
+  .ctl input[type=range] { width: 160px; }
+  .ctl output { font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .val { font-variant-numeric: tabular-nums; }
+  tr.chg td { background: var(--accent-wash); }
+  .nodes td { white-space: nowrap; }
+  .nodes td.w { white-space: normal; }
+  @media (max-width: 1100px) { .shapes { grid-template-columns: repeat(2, minmax(0, 1fr)); } .twins { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Weapon shapes: five pairs, two of them new</h1>
+  <p class="lead">Classes v3 (<a href="../classes-v3.md">classes-v3.md</a> §4). The owner: “Light Tome to mirror Katana with double hits, and Dark Tome to mirror Bow with AoE hits.”
+    So the Bow becomes an area kind too, the twins re-pair to <b>Katana–Light</b> and <b>Bow–Dark</b>, and each pair gets a shape no other pair has:
+    the Spellblades hold the multi-hit kinds, the Summoners the area kinds.</p>
+  <nav class="top" aria-label="Sections">
+    <a href="#shapes">Five shapes</a><a href="#kinds">Ten kinds</a><a href="#twins">Twins</a><a href="#worth">Volley vs sweep</a><a href="#trees">Trees touched</a><a href="#readers">Every reader</a>
+    <a class="out" href="class-tree.html">Class tree ›</a><a class="out" href="promotion.html">Promotion ›</a><a class="out" href="reset.html">Reset ›</a>
+    <span class="spacer"></span><span id="theme" style="display:flex;gap:6px"><button data-t="system">System</button><button data-t="light">Light</button><button data-t="dark">Dark</button></span>
+  </nav>
+  <div class="kpis">
+    <div class="kpi"><div class="label">Shapes</div><div class="value">5</div><div class="delta">one per twin pair</div></div>
+    <div class="kpi"><div class="label">Kinds reshaped</div><div class="value">3</div><div class="delta">Light (double), Bow and Dark (volley)</div></div>
+    <div class="kpi"><div class="label">Twins re-paired</div><div class="value">2</div><div class="delta">Katana–Light, Bow–Dark</div></div>
+    <div class="kpi"><div class="label">Volley’s best case</div><div class="value">2 foes</div><div class="delta">1.15 against the sweep’s 1.10</div></div>
+    <div class="kpi"><div class="label">B lines changed</div><div class="value">3</div><div class="delta">Brawler Bow · Sorcerer Light, Dark</div></div>
+    <div class="kpi"><div class="label">Pierce nodes</div><div class="value">66 <span class="was">36</span></div><div class="delta">both Spellblades, Katana B, Light B</div></div>
+  </div>
+
+  <section id="shapes">
+    <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap">
+      <div><h2>The five shapes</h2><p class="sub" style="margin:0">Line A on the Brawler’s and the Sorcerer’s trees and on the Summoners’ summons. The tapped foe is ringed; a dot is a hit, its size its share.</p></div>
+      <div class="pills" id="era" role="group" aria-label="Show"><span class="lbl">Show</span><button data-e="today" aria-pressed="false">Today (v18)</button><button data-e="v3" aria-pressed="true">Classes v3 (v19)</button></div>
+    </div>
+    <div class="shapes" id="shapegrid"></div>
+    <p class="note"><b>The Spellblades strike one foe with every skill</b>, so for them a shape is only its hits: Katana and Light 2 at every depth, Bow and Dark 2 → 4, Lance and Lightning 2 → 3, the rest 1 → 2, and her lead half one hit more. <b>The healers</b> strike one foe once; no shape change touches them.</p>
+  </section>
+
+  <section id="kinds">
+    <h2>Ten kinds, before and after</h2>
+    <div class="panel scroll"><table id="kindtable"></table></div>
+  </section>
+
+  <section id="twins">
+    <h2>The twins, re-paired</h2>
+    <p class="sub">An Arm and its element share a shape (D86), so the shapes move the pairs. Twilight, a Light + Dark foe’s Arms, is still the Bow and the Katana.</p>
+    <div class="twins">
+      <div class="panel"><h3>Today (engine v18)</h3><svg id="tw-old" viewBox="0 0 520 300" role="img" aria-label="Today's twin pairs"></svg></div>
+      <div class="panel"><h3>Classes v3 (engine v19)</h3><svg id="tw-new" viewBox="0 0 520 300" role="img" aria-label="Classes v3's twin pairs"></svg></div>
+    </div>
+  </section>
+
+  <section id="worth">
+    <h2>Why a volley, not a second sweep</h2>
+    <p class="sub">What one act is worth, in single-target units at its depth, by how many foes stand. The volley favours the foe she aims at: the best act on two foes, second to the sweep on a crowd, better than it on one.</p>
+    <div class="grid2">
+      <div class="panel chart">
+        <div class="ctl"><span class="pc"><label for="splash">Splash on each other foe</label><input id="splash" type="range" min="0.25" max="0.45" step="0.01" value="0.35"><output id="splashv">0.35</output></span>
+          <span class="pc"><label for="target">On the tapped foe</label><input id="target" type="range" min="0.6" max="1" step="0.05" value="0.8" style="width:120px"><output id="targetv">0.80</output></span></div>
+        <svg id="chart" viewBox="0 0 640 330" role="img" aria-label="Value of one act by foes standing"></svg>
+      </div>
+      <div class="panel"><table id="worthtable"></table><p class="note" id="worthnote"></p></div>
+    </div>
+  </section>
+
+  <section id="trees">
+    <h2>Every tree it touches</h2>
+    <div class="panel scroll"><table>
+      <tr><th>Class</th><th>Bow</th><th>Katana</th><th>Light</th><th>Dark</th></tr>
+      <tr><td><b>Brawler</b></td><td>A: <b>volley</b> (… Starfall Volley, renamed); B: <b>Barrage</b>, the old line A (was Rain)</td><td>Same</td><td>—</td><td>—</td></tr>
+      <tr><td><b>Sorcerer</b></td><td>—</td><td>—</td><td>A: <b>double</b>; B: <b>Pierce</b> (was Cascade)</td><td>A: <b>volley</b>; B: <b>Barrage</b> (was Pierce)</td></tr>
+      <tr><td><b>Arms and Tome Spellblade</b></td><td>Same (2 → 4 hits)</td><td>Same (2)</td><td><b>2 hits</b> (were 2 → 4)</td><td><b>2 → 4 hits</b> (were 2)</td></tr>
+      <tr><td><b>Arms and Tome Summoner</b></td><td>Summons are <b>volleys</b>; D5 Armor Break 2 on the tapped foe</td><td>Same</td><td>Summons <b>double</b></td><td>Summons are <b>volleys</b>; D5 Enfeeble 2 on the tapped foe</td></tr>
+      <tr><td><b>Paladin, Cleric</b></td><td colspan="4">Same: one foe once; Shatter, Hex, Faith, Clarity stay</td></tr>
+    </table></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="panel"><h3>Brawler · Bow</h3><div class="scroll"><table class="nodes" id="n-bow"></table></div></div>
+      <div class="panel"><h3>Sorcerer · Light and Dark</h3><div class="scroll"><table class="nodes" id="n-mage"></table></div></div>
+    </div>
+    <p class="note">Node ids stay (<code>brawler-bow.3b</code> is Barrage’s first node, as it was Rain’s); names and shapes are engine v19’s, and fights before v19 replay with theirs. <b>The twins’ B lines now mirror:</b> Katana B and Light B are both Pierce, Bow B and Dark B both Barrage. Riders and specials land on the tapped foe; the splash is plain.</p>
+  </section>
+
+  <section id="readers">
+    <h2>Every reader of the twins</h2>
+    <div class="panel scroll"><table>
+      <tr><th>Reader</th><th>What changes</th><th>What doesn’t</th></tr>
+      <tr><td><b>The Rift’s draws</b> (the Duel’s sets, the Horde’s)</td><td>The Light set is Katana + Light; the Dark set Bow + Dark</td><td>Counts, wards, shields; Iron and Arcane</td></tr>
+      <tr><td><b>A Hall seat’s label</b> (“Answers Fire · Light”)</td><td>Reads the new sets; Halls v2 owns the Limit Breaks’ kinds</td><td>—</td></tr>
+      <tr><td><b>Presets</b> (an Orb or a Bell on the lead half’s twin of her lone weapon)</td><td>Arms Summoner on her Bow, Tome Summoner on her Blizzard, Tome Spellblade on her Light</td><td>Arms Spellblade on her Lance</td></tr>
+      <tr><td><b>Weaknesses v2</b> (the world’s foes)</td><td><b>Nothing</b>: elements lead with the ring’s answer (Light ⇄ Dark), Arms come from a deck; no twin is read</td><td>Every world list</td></tr>
+      <tr><td><b>Engines v16–v17’s twins</b></td><td>Nothing: kept by engine for replays</td><td>—</td></tr>
+      <tr><td><b>The defaults’ rationale</b> (CP3, intake F33)</td><td>Defaults follow identity (multi-hit or area kinds); each hybrid holds one twin set in both halves</td><td>—</td></tr>
+      <tr><td><b>The manual’s shape table</b> (F19)</td><td>Five shapes; “Twice: the foe and one other” goes</td><td>—</td></tr>
+    </table></div>
+  </section>
+  <p class="foot">Classes v3 preview · for the owner’s review, 2026-10-29.</p>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+'use strict';
+// Classes v3's previews (docs/design/classes-v3/classes-v3.md). Self-contained. Every Uma here is made up; class, weapon,
+// skill and place names are the game's own or this doc's. Numbers follow the doc's tables.
+
+// ---------- Theme: follow the system, or pin Light / Dark ----------
+function initTheme() {
+  const bar = document.getElementById('theme');
+  if (!bar) return;
+  let saved = null;
+  try { saved = localStorage.getItem('umaClassesV3.theme'); } catch (e) { saved = null; }
+  const apply = (t) => {
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
+    bar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === (t || 'system'))));
+  };
+  apply(saved);
+  bar.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    const t = b.dataset.t === 'system' ? null : b.dataset.t;
+    try { if (t) localStorage.setItem('umaClassesV3.theme', t); else localStorage.removeItem('umaClassesV3.theme'); } catch (err) { /* per-viewer convenience only */ }
+    apply(t);
+  });
+}
+
+// ---------- Tooltip ----------
+const tipEl = () => document.getElementById('tip');
+function placeTip(x, y) { const t = tipEl(); const w = t.offsetWidth, h = t.offsetHeight; t.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; t.style.top = (y + 16 + h > innerHeight ? Math.max(8, y - h - 12) : y + 16) + 'px'; }
+function showTip(x, y, title, body) { const t = tipEl(); t.innerHTML = `<b>${title}</b>${body}`; t.style.opacity = 1; placeTip(x, y); }
+function hideTip() { const t = tipEl(); if (t) t.style.opacity = 0; }
+function bindTips(root) {
+  (root || document).querySelectorAll('[data-tip]').forEach((el) => {
+    if (el.dataset.tipBound) return; el.dataset.tipBound = '1';
+    if (!el.hasAttribute('tabindex') && el.tagName !== 'BUTTON') el.setAttribute('tabindex', '0');
+    el.addEventListener('mouseenter', (e) => { const [t, b] = el.dataset.tip.split('||'); showTip(e.clientX, e.clientY, t, b || ''); });
+    el.addEventListener('mousemove', (e) => placeTip(e.clientX, e.clientY));
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('focus', () => { const [t, b] = el.dataset.tip.split('||'); const r = el.getBoundingClientRect(); showTip(r.left, r.bottom, t, b || ''); });
+    el.addEventListener('blur', hideTip);
+  });
+}
+
+// ---------- Kinds ----------
+const KIND = {
+  greatsword: { n: 'Greatsword', a: 'GS', ch: 'arms' }, axe: { n: 'Axe', a: 'Ax', ch: 'arms' }, lance: { n: 'Lance', a: 'Ln', ch: 'arms' },
+  bow: { n: 'Bow', a: 'Bw', ch: 'arms' }, katana: { n: 'Katana', a: 'Kt', ch: 'arms' },
+  fire: { n: 'Fire Tome', a: 'Fi', ch: 'tome' }, ice: { n: 'Blizzard Tome', a: 'Ic', ch: 'tome' }, lightning: { n: 'Thunder Tome', a: 'Th', ch: 'tome' },
+  light: { n: 'Light Tome', a: 'Li', ch: 'tome' }, dark: { n: 'Dark Tome', a: 'Dk', ch: 'tome' },
+};
+const glyph = (k, cls = '') => `<span class="glyph ${cls}" style="background:var(--k-${k})" aria-label="${KIND[k].n}">${KIND[k].a}</span>`;
+const kchip = (k) => `<span class="kchip"><i style="background:var(--k-${k})"></i>${KIND[k].n}</span>`;
+
+// ---------- The thirteen classes ----------
+// tier 0: recruit, duelist, acolyte, caller, apprentice. tier 1: brawler, spellblade (Arms Spellblade), armsummoner, paladin,
+// cleric, summoner (Tome Summoner), tomeblade (Tome Spellblade), mage (Sorcerer).
+const C = {
+  recruit: { n: 'Recruit', ab: 'Re', tier: 0, root: 'warrior', was: 'the owner’s Fighter', calling: 'Front among her best styles', combos: 'Front 27 · Front + Pace 19 · Front + Late 1', count: 47,
+    trade: 'Metal: Mine · Mine Workbench · Weapon Forge', skill: 'Drill Strike', children: ['brawler', 'spellblade', 'armsummoner'], def: ['greatsword', 'axe', 'lance'], preset: 'Bell (Greatsword)',
+    id: 'A soldier in her first weeks. One skill, any weapon; at Rank 10 she promotes into the Warrior column’s classes or the Arms hybrids.' },
+  duelist: { n: 'Duelist', ab: 'Du', tier: 0, root: 'allrounder', was: 'the owner’s Spell Blade', calling: 'Pace alone', combos: 'Pace 72', count: 72,
+    trade: 'Wood: Forest · Forest Workbench · Armorer', skill: 'Feint', children: ['spellblade', 'tomeblade'], def: ['katana', 'lance', 'lightning'], preset: 'Pendant',
+    id: 'One foe at a time, steel and spark: the Spellblades’ start. Promotes into either Spellblade.' },
+  acolyte: { n: 'Acolyte', ab: 'Ac', tier: 0, root: 'allrounder', was: 'the owner’s Healer', calling: 'Late alone', combos: 'Late 46', count: 46,
+    trade: 'Vegetables: Fields · Fields Workbench · Tome Forge', skill: 'Vigil', children: ['paladin', 'cleric'], def: ['light', 'ice', 'bow'], preset: 'Orb (Blizzard Tome)',
+    id: 'She serves the rites before she heals: her skill deals damage like the others. Promotes into the Paladin or the Cleric.' },
+  caller: { n: 'Caller', ab: 'Ca', tier: 0, root: 'allrounder', was: 'the owner’s Summoner', calling: 'End among her best styles', combos: 'Late + End 20 · End 13', count: 33,
+    trade: 'Fish: Fishery · Fishery Workbench · Charm Forge', skill: 'Beckon', children: ['armsummoner', 'summoner'], def: ['dark', 'ice', 'axe'], preset: 'Orb (Blizzard Tome)',
+    id: 'She calls; she doesn’t summon yet. Promotes into either Summoner.' },
+  apprentice: { n: 'Apprentice', ab: 'Ap', tier: 0, root: 'mage', was: 'the owner’s Mage', calling: 'Pace with Late or End', combos: 'Pace + Late 68 · Pace + Late + End 3 · Pace + End 1', count: 72,
+    trade: 'Stone: Monster Den · Den Workbench · Lapidary', skill: 'Primer', children: ['mage', 'tomeblade', 'summoner'], def: ['fire', 'ice', 'lightning'], preset: 'Pendant',
+    id: 'The magic word for a beginner. Promotes into the Sorcerer or the Tome hybrids.' },
+
+  brawler: { n: 'Brawler', ab: 'Br', tier: 1, root: 'warrior', parents: ['recruit'], type: 'Physical', slots: '3 Arms', def: ['greatsword', 'axe', 'lance'],
+    hand: '×1 · MP ×1', split: [100, 0], lean: [1.15, 1.1, 0.9, 1.1, 0.9, 0.8], prowess: '100/0', armor: 'ATK', trees: 5,
+    lineB: 'Combo · Reap · Impale · Barrage (Bow, new) · Draw', preset: 'Bell (Greatsword)', lb: '2×', twin: '—', was: 'Brawler',
+    id: 'Pure physical. One full act a turn: one foe hard, every foe, random foes, the target and the rest, a double cut.',
+    changes: 'Her Bow tree’s line A is a volley; its line B is Barrage (the old Bow line). Opens at Class Rank 10.' },
+  spellblade: { n: 'Arms Spellblade', ab: 'AB', tier: 1, root: 'allrounder', parents: ['recruit', 'duelist'], type: 'Physical hybrid', slots: '2 Arms + 1 Tome', def: ['katana', 'lance', 'lightning'],
+    hand: 'Arms 0.72 + Tome 0.44 · MP ×0.5 a half · the Arms half one hit more', split: [70, 30], lean: [1, 1.1, 0.95, 1, 1, 1], prowess: '70/30', armor: 'ATK', trees: 10,
+    lineB: 'Pierce on every tree', preset: 'Pendant (an Orb or a Bell on her Lance)', lb: '2.2×', twin: 'Lightning (Lance + Thunder)', was: 'Spell Blade',
+    id: 'Physical-led multi-hit: every act an Arms half and a Tome half, the Arms half first and one hit more. The shield chipper.',
+    changes: 'Today’s Spell Blade, renamed. Her Light trees land 2 hits (were 2 → 4); her Dark trees 2 → 4 (were 2).' },
+  armsummoner: { n: 'Arms Summoner', ab: 'AS', tier: 1, root: 'allrounder', parents: ['recruit', 'caller'], type: 'Physical hybrid', slots: '2 Arms + 1 Tome', def: ['bow', 'axe', 'dark'],
+    hand: 'Arms 0.62 + Tome 0.50 · MP ×0.5 a half · the Arms summon lingers', split: [70, 30], lean: [1, 1.1, 0.95, 1, 1, 1], prowess: '70/30', armor: 'ATK', trees: 10,
+    lineB: 'Bonded on Arms trees · Pack on Tome trees', preset: 'Orb (Bow)', lb: '2.2×', twin: 'Dark (Bow + Dark)', was: 'New', isNew: true,
+    id: 'Physical-led area: the Arms summon first; it lingers and strikes every foe once in farewell when her next pair comes. No support.',
+    changes: 'New: the Tome Summoner’s mirror. The Summoner’s summons on each kind’s tree; her lines mirrored.' },
+  paladin: { n: 'Paladin', ab: 'Pa', tier: 1, root: 'allrounder', parents: ['acolyte'], type: 'Healer', slots: '2 Arms + 1 Tome', def: ['greatsword', 'axe', 'light'],
+    hand: '×0.5 · MP ×0.6 · heals from ATK', split: [50, 50], lean: [1, 1, 0.8, 1.15, 1, 1.3], prowess: '80/20', armor: 'ATK', trees: 10,
+    lineB: 'Heavy (Valkyrie’s Oath on Light D3)', preset: 'Pendant', lb: '1.5×', twin: '—', was: 'Paladin', healer: true,
+    id: 'A healer whose Barriers grow with her ATK: blows Barrier and debuff, spells mend, bless and cleanse; she raises the fallen.',
+    changes: 'As today. Opens at Class Rank 10, from an Acolyte.' },
+  cleric: { n: 'Cleric', ab: 'Cl', tier: 1, root: 'allrounder', parents: ['acolyte'], type: 'Healer', slots: '2 Tomes + 1 Arm', def: ['light', 'ice', 'bow'],
+    hand: '×0.5 · MP ×0.6 · heals from M.ATK', split: [50, 50], lean: [1, 0.8, 1, 1, 1.15, 1.3], prowess: '20/80', armor: 'M.ATK', trees: 10,
+    lineB: 'Heavy (Rebirth on Light D3)', preset: 'Orb (Blizzard Tome)', lb: '1.5×', twin: '—', was: 'Cleric', healer: true,
+    id: 'A healer whose mends grow with her M.ATK: Regen from Light, drain from Dark, Rebirth.',
+    changes: 'As today. Opens at Class Rank 10, from an Acolyte.' },
+  summoner: { n: 'Tome Summoner', ab: 'TS', tier: 1, root: 'allrounder', parents: ['caller', 'apprentice'], type: 'Magical hybrid', slots: '2 Tomes + 1 Arm', def: ['dark', 'ice', 'axe'],
+    hand: 'Tome 0.62 + Arms 0.50 · MP ×0.5 a half · the Tome summon lingers', split: [30, 70], lean: [1, 0.95, 1.1, 1, 1, 1], prowess: '30/70', armor: 'M.ATK', trees: 10,
+    lineB: 'Bonded on Tome trees · Pack on Arms trees', preset: 'Orb (Blizzard Tome)', lb: '2.2×', twin: 'Ice (Blizzard + Axe)', was: 'Summoner',
+    id: 'Magic-led area: the Tome summon first; it lingers and strikes every foe once in farewell. No support.',
+    changes: 'Today’s Summoner, renamed. New defaults (were Dark, Light, Bow); her Bow and Dark summons are volleys, her Light summons double.' },
+  tomeblade: { n: 'Tome Spellblade', ab: 'TB', tier: 1, root: 'allrounder', parents: ['duelist', 'apprentice'], type: 'Magical hybrid', slots: '2 Tomes + 1 Arm', def: ['light', 'lightning', 'katana'],
+    hand: 'Tome 0.72 + Arms 0.44 · MP ×0.5 a half · the Tome half one hit more', split: [30, 70], lean: [1, 0.95, 1.1, 1, 1, 1], prowess: '30/70', armor: 'M.ATK', trees: 10,
+    lineB: 'Pierce on every tree', preset: 'Pendant (an Orb or a Bell on her Light)', lb: '2.2×', twin: 'Light (Light + Katana)', was: 'New', isNew: true,
+    id: 'Magic-led multi-hit: every act a Tome half and an Arms half, the Tome half first and one hit more. Her own skill names: Edged, Honed, Whetted, Gleaming, Sovereign.',
+    changes: 'New: the Arms Spellblade’s mirror. The Spellblade’s trees with her own names (Edged Volt … Sovereign Volt).' },
+  mage: { n: 'Sorcerer', ab: 'So', tier: 1, root: 'mage', parents: ['apprentice'], type: 'Magical', slots: '3 Tomes', def: ['fire', 'ice', 'lightning'],
+    hand: '×1 · MP ×1', split: [0, 100], lean: [0.9, 0.9, 1.15, 0.9, 1.1, 1.3], prowess: '0/100', armor: 'M.ATK', trees: 5,
+    lineB: 'Wave · Spike · Bolt · Pierce (Light, was Cascade) · Barrage (Dark, was Pierce)', preset: 'Pendant', lb: '2.4×', twin: '—', was: 'Mage',
+    id: 'Pure magic, the element ring: a nuke, every foe, random bolts, the target and the rest, a double cast.',
+    changes: 'Today’s Mage, renamed (id stays mage). Light becomes double, Dark a volley; Light B and Dark B swap roles to mirror the Brawler’s.' },
+};
+const T0 = ['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'];
+const T1 = ['brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage'];
+const ROOT_NAME = { warrior: 'Warrior', allrounder: 'All-Rounder', mage: 'Mage' };
+/** A class emblem (mock): a shield, filled for Tier 1, outlined for Tier 0. */
+const emblem = (c, size = 22) => {
+  const t0 = C[c].tier === 0;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path d="M12 2 L21 5 V12 C21 17 17 21 12 22 C7 21 3 17 3 12 V5 Z" fill="${t0 ? 'var(--panel)' : `var(--cl-${c})`}" stroke="var(--cl-${c})" stroke-width="${t0 ? 2 : 0}"/><text x="12" y="15.5" text-anchor="middle" font-size="8.5" font-weight="800" fill="${t0 ? `var(--cl-${c})` : '#fff'}" font-family="system-ui">${C[c].ab}</text></svg>`;
+};
+const splitBar = (s) => `<span class="split" aria-label="${s[0]}% physical, ${s[1]}% magical"><i style="width:${s[0]}%;background:var(--phys)"></i><i style="width:${s[1]}%;background:var(--magic)"></i></span>`;
+
+// ---------- Shape diagrams ----------
+// A row of five foes; the middle one is tapped. `hits`: [foeIndex, share] pairs drawn as dots stacked above each foe.
+const SHAPES = {
+  heavy: { n: 'Heavy', kinds: ['greatsword', 'fire'], hits: [[2, 1]], text: { 'Line A': 'One foe; Greatsword 1 · 1 · 2 · 2 · 3 hits, Fire 1', MP: 'Base', 'Depth 5': 'Armor Break 2 · Burn 2', 'Best at': 'One foe, hard' } },
+  sweep: { n: 'Sweep', kinds: ['axe', 'ice'], hits: [[0, .55], [1, .55], [2, .55], [3, .55], [4, .55]], text: { 'Line A': 'Every foe evenly, ×0.55 a foe; Axe 1 → 3 hits, Ice 1 → 2', MP: '+4', 'Depth 5': 'Armor Break 1 · Enfeeble 1 on each', 'Best at': 'Three foes and more' } },
+  scatter: { n: 'Scatter', kinds: ['lance', 'lightning'], hits: [[0, .35], [2, .35], [2, .35], [4, .35], [1, .35], [3, .35]], text: { 'Line A': 'Random foes, Lance 2 → 6 hits, Lightning 2 → 4, ×1.05', MP: 'Base', 'Depth 5': 'Armor Break 1 · Shock 1 a hit', 'Best at': 'Chips spread at random' } },
+  double: { n: 'Double', kinds: ['katana', 'light'], hits: [[2, .5], [2, .5]], text: { 'Line A': 'One foe, two hits at every depth', MP: 'Base', 'Depth 5': '×1.3 on a Broken foe', 'Best at': 'Finishing a Broken foe' }, chg: 'Light was one foe, 2 → 6 hits' },
+  volley: { n: 'Volley', kinds: ['bow', 'dark'], hits: [[2, .45], [2, .45], [0, .35], [1, .35], [3, .35], [4, .35]], text: { 'Line A': 'The tapped foe 0.8 of the power (1 · 1 · 2 · 2 · 3 hits), then one splash hit at 0.35 on every other foe', MP: '+2', 'Depth 5': 'On the tapped foe: Armor Break 2 (Bow) · ×1.3 below half HP (Dark)', 'Best at': 'Two foes; aiming in a crowd' }, chg: 'Bow was one foe, 2 → 6 hits; Dark one foe, 2 hits' },
+  many: { n: 'Many hits', kinds: ['bow', 'light'], hits: [[2, .3], [2, .3], [2, .3], [2, .3], [2, .3], [2, .3]], text: { 'Line A': 'One foe, 2 · 2 · 4 · 4 · 6 hits', MP: 'Base', 'Depth 5': 'Bow Armor Break 2 · Light ×1.3 on a Broken foe', 'Best at': 'Shield chips on one foe' } },
+  twice: { n: 'Twice', kinds: ['katana', 'dark'], hits: [[2, .5], [2, .5]], text: { 'Line A': 'One foe, two hits (the kind table says “the foe and one other”; no Tier 1 skill does)', MP: 'Base', 'Depth 5': 'Katana ×1.3 on a Broken foe · Dark ×1.3 below half HP', 'Best at': 'Finishing' } },
+};
+function shapeSVG(s) {
+  const W = 240, H = 120, fx = (i) => 28 + i * 46, fy = 92;
+  const per = [0, 0, 0, 0, 0];
+  const dots = s.hits.map(([i, sh]) => { const y = fy - 26 - per[i] * 15; per[i] += 1; const r = 3 + sh * 8; return `<circle cx="${fx(i)}" cy="${y}" r="${r}" fill="var(--k-${s.kinds[0]})" opacity=".9"/>`; }).join('');
+  const foes = [0, 1, 2, 3, 4].map((i) => `<circle cx="${fx(i)}" cy="${fy}" r="13" fill="var(--panel)" stroke="${i === 2 ? 'var(--accent)' : 'var(--hairline-strong)'}" stroke-width="${i === 2 ? 3 : 1.5}"/>
+    <path d="M${fx(i) - 6} ${fy + 3} q6 -9 12 0" stroke="var(--ink-faint)" stroke-width="1.5" fill="none"/>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${foes}${dots}<text x="${fx(2)}" y="${H - 2}" text-anchor="middle" font-size="9.5" fill="var(--accent-strong)" font-weight="700" font-family="system-ui">tapped</text></svg>`;
+}
+function drawShapes(era) {
+  const keys = era === 'v3' ? ['heavy', 'sweep', 'scatter', 'double', 'volley'] : ['heavy', 'sweep', 'scatter', 'many', 'twice'];
+  document.getElementById('shapegrid').innerHTML = keys.map((k) => {
+    const s = SHAPES[k];
+    const chg = era === 'v3' && s.chg;
+    return `<div class="shape ${chg ? 'chg' : ''}">${chg ? '<span class="tag new flag">Changed</span>' : ''}<span class="nm">${s.n}</span><span class="kinds">${s.kinds.map(kchip).join('')}</span>${shapeSVG(s)}
+      <dl>${Object.entries(s.text).map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('')}${chg ? `<dt>Today</dt><dd class="muted">${s.chg}</dd>` : ''}</dl></div>`;
+  }).join('');
+}
+document.getElementById('era').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; document.querySelectorAll('#era button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawShapes(b.dataset.e); });
+
+// ---------- Ten kinds ----------
+(function () {
+  const OLD_T = { greatsword: 'fire', axe: 'ice', lance: 'lightning', bow: 'light', katana: 'dark', fire: 'greatsword', ice: 'axe', lightning: 'lance', light: 'bow', dark: 'katana' };
+  const NEW_T = { ...OLD_T, bow: 'dark', katana: 'light', light: 'katana', dark: 'bow' };
+  const OLD_S = { greatsword: 'Heavy', fire: 'Heavy', axe: 'Sweep', ice: 'Sweep', lance: 'Scatter', lightning: 'Scatter', bow: 'Many hits', light: 'Many hits', katana: 'Twice', dark: 'Twice' };
+  const NEW_S = { ...OLD_S, bow: 'Volley', dark: 'Volley', katana: 'Double', light: 'Double' };
+  const ORDER = ['greatsword', 'fire', 'axe', 'ice', 'lance', 'lightning', 'katana', 'light', 'bow', 'dark'];
+  document.getElementById('kindtable').innerHTML = `<tr><th>Kind</th><th>Channel</th><th>Twin today</th><th>Twin v3</th><th>Shape today</th><th>Shape v3</th><th>Who holds it on defaults (v3)</th></tr>` + ORDER.map((k) => {
+    const chg = OLD_T[k] !== NEW_T[k] || OLD_S[k] !== NEW_S[k];
+    const who = [...T0, ...T1].filter((c) => C[c].tier === 1 && C[c].def.includes(k)).map((c) => C[c].n).join(', ') || '—';
+    return `<tr class="${chg ? 'chg' : ''}"><td>${kchip(k)}</td><td>${KIND[k].ch === 'arms' ? 'Physical' : 'Magical'}</td><td>${KIND[OLD_T[k]].n}</td><td><b>${KIND[NEW_T[k]].n}</b></td><td>${OLD_S[k]}</td><td><b>${NEW_S[k]}</b></td><td>${who}</td></tr>`;
+  }).join('');
+})();
+
+// ---------- Twins ----------
+function twinsSVG(id, pairs, changed) {
+  const arms = ['greatsword', 'axe', 'lance', 'bow', 'katana'], els = ['fire', 'ice', 'lightning', 'light', 'dark'];
+  const y = (i) => 40 + i * 52, xa = 110, xe = 410;
+  const row = (k, x, i, anchor) => `<g><rect x="${x - 82}" y="${y(i) - 17}" width="164" height="34" rx="9" fill="var(--raised)" stroke="var(--k-${k})" stroke-width="1.5"/>
+    <rect x="${x - 74}" y="${y(i) - 9}" width="18" height="18" rx="5" fill="var(--k-${k})"/><text x="${x - 48}" y="${y(i) + 5}" font-size="13" font-weight="700" fill="var(--ink)" font-family="system-ui">${KIND[k].n}</text></g>`;
+  const lines = pairs.map(([a, e]) => {
+    const ch = changed.includes(a);
+    return `<path d="M${xa + 82} ${y(arms.indexOf(a))} C ${xa + 160} ${y(arms.indexOf(a))}, ${xe - 160} ${y(els.indexOf(e))}, ${xe - 82} ${y(els.indexOf(e))}" stroke="${ch ? 'var(--accent)' : 'var(--neutral-strong)'}" stroke-width="${ch ? 3.5 : 2}" fill="none"/>`;
+  }).join('');
+  document.getElementById(id).innerHTML = `<text x="${xa}" y="14" text-anchor="middle" font-size="11" font-weight="800" fill="var(--phys)" letter-spacing=".06em" font-family="system-ui">ARMS</text>
+    <text x="${xe}" y="14" text-anchor="middle" font-size="11" font-weight="800" fill="var(--magic)" letter-spacing=".06em" font-family="system-ui">ELEMENTS</text>${lines}${arms.map((k, i) => row(k, xa, i)).join('')}${els.map((k, i) => row(k, xe, i)).join('')}`;
+}
+twinsSVG('tw-old', [['greatsword', 'fire'], ['axe', 'ice'], ['lance', 'lightning'], ['bow', 'light'], ['katana', 'dark']], []);
+twinsSVG('tw-new', [['greatsword', 'fire'], ['axe', 'ice'], ['lance', 'lightning'], ['bow', 'dark'], ['katana', 'light']], ['bow', 'katana']);
+
+// ---------- Worth by foes ----------
+function drawWorth() {
+  const sp = Number(document.getElementById('splash').value), tg = Number(document.getElementById('target').value);
+  document.getElementById('splashv').textContent = sp.toFixed(2); document.getElementById('targetv').textContent = tg.toFixed(2);
+  const N = [1, 2, 3, 4, 5, 6];
+  const series = [
+    { n: 'Sweep · Axe, Ice', k: 'axe', f: (n) => 0.55 * n },
+    { n: 'Volley · Bow, Dark', k: 'bow', f: (n) => tg + sp * (n - 1), bold: true },
+    { n: 'Scatter · Lance, Lightning', k: 'lance', f: () => 1.05 },
+    { n: 'Heavy, Double', k: 'greatsword', f: () => 1 },
+  ];
+  const X0 = 52, X1 = 440, Y0 = 290, Y1 = 22, maxY = 3.4;
+  const x = (n) => X0 + ((n - 1) / 5) * (X1 - X0), yv = (v) => Y0 - (v / maxY) * (Y0 - Y1);
+  let g = '';
+  for (let v = 0; v <= 3; v += 0.5) g += `<path d="M${X0} ${yv(v)} H${X1}" stroke="var(--grid)" stroke-width="1"/><text x="${X0 - 8}" y="${yv(v) + 4}" text-anchor="end" font-size="11" fill="var(--ink-faint)" font-family="system-ui">${v.toFixed(1)}</text>`;
+  N.forEach((n) => { g += `<text x="${x(n)}" y="${Y0 + 18}" text-anchor="middle" font-size="11" fill="var(--ink-faint)" font-family="system-ui">${n}</text>`; });
+  g += `<text x="${(X0 + X1) / 2}" y="${Y0 + 36}" text-anchor="middle" font-size="11.5" fill="var(--ink-soft)" font-family="system-ui">Foes standing</text>`;
+  const ends = [];
+  series.forEach((s) => {
+    const pts = N.map((n) => `${x(n)},${yv(s.f(n))}`).join(' ');
+    g += `<polyline points="${pts}" fill="none" stroke="var(--k-${s.k})" stroke-width="${s.bold ? 3.5 : 2.2}" stroke-linejoin="round"/>`;
+    g += N.map((n) => `<circle cx="${x(n)}" cy="${yv(s.f(n))}" r="${s.bold ? 4.5 : 3.5}" fill="var(--k-${s.k})" stroke="var(--panel)" stroke-width="1.5" data-tip="${s.n}||${n} foe${n > 1 ? 's' : ''}: ${s.f(n).toFixed(2)}"/>`).join('');
+    ends.push({ y: yv(s.f(6)), s });
+  });
+  ends.sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 15) ends[i].y = ends[i - 1].y + 15;
+  ends.forEach(({ y, s }) => { g += `<text x="${X1 + 10}" y="${y + 4}" font-size="12" font-weight="${s.bold ? 800 : 600}" fill="var(--k-${s.k})" font-family="system-ui">${s.n}</text>`; });
+  const svg = document.getElementById('chart'); svg.innerHTML = g; bindTips(svg);
+  const rows = N.map((n) => `<tr><td class="num">${n}</td><td class="num">1.00</td><td class="num">1.05</td><td class="num">${(0.55 * n).toFixed(2)}</td><td class="num"><b>${(tg + sp * (n - 1)).toFixed(2)}</b></td></tr>`).join('');
+  document.getElementById('worthtable').innerHTML = `<tr><th class="num">Foes</th><th class="num">Heavy, Double</th><th class="num">Scatter</th><th class="num">Sweep</th><th class="num">Volley</th></tr>${rows}`;
+  const cross = N.find((n) => 0.55 * n > tg + sp * (n - 1));
+  document.getElementById('worthnote').innerHTML = `With the volley at <b>${tg.toFixed(2)} + ${sp.toFixed(2)}</b> a foe, it beats the sweep up to <b>${cross ? cross - 1 : 6} foe${cross === 2 ? '' : 's'}</b> and the single-target shapes from <b>${N.find((n) => tg + sp * (n - 1) > 1.05) ?? '—'} foes</b>. The balance packet’s knob (S6): the splash first, 0.30–0.40, then the target share.`;
+}
+document.getElementById('splash').addEventListener('input', drawWorth);
+document.getElementById('target').addEventListener('input', drawWorth);
+
+// ---------- Node tables ----------
+(function () {
+  const P = [1.6, 2.2, 2.9, 3.7, 4.6], MP = [10, 14, 18, 22, 26];
+  const vol = (d, h) => `${h} on the tapped foe · ${(0.8 * P[d - 1]).toFixed(2)} + ${(0.35 * P[d - 1]).toFixed(2)} on each other`;
+  const VH = [1, 1, 2, 2, 3];
+  const bow = [
+    ['1', 'Trunk', 'Twin Arrows', vol(1, VH[0]), MP[0] + 2], ['2', 'Trunk', 'Triple Shot', vol(2, VH[1]), MP[1] + 2],
+    ['3', 'A', 'Quiver Volley', vol(3, VH[2]), MP[2] + 2], ['4', 'A', 'Arrow Storm', vol(4, VH[3]), MP[3] + 2], ['5', 'A', 'Starfall Volley <span class="tag acc">renamed</span>', vol(5, VH[4]) + ' · Armor Break 2', MP[4] + 2],
+    ['3', 'B · Barrage', 'Quiver Barrage', 'one foe · 4 hits · 2.90', 18], ['4', 'B · Barrage', 'Storm Barrage', 'one foe · 4 hits · 3.70', 22], ['5', 'B · Barrage', 'Starfall Barrage', 'one foe · 6 hits · 4.60', 26],
+  ];
+  const mage = [
+    ['L1–2', 'Trunk', 'Lux · Luxra', 'one foe · 2 hits · 1.60 · 2.20', '10 · 14'], ['L3–5', 'A', 'Luxaga · Luxaja · Holy', 'one foe · <b>2 hits</b> · 2.90 · 3.70 · 4.60; Holy ×1.3 on a Broken foe', '18 · 22 · 26'],
+    ['L3–5', 'B · Pierce', 'Luxaga Pierce · Luxaja Pierce · Holy Pierce', 'one Pierce hit · 3.00 · 3.83 · 4.76', '20 · 24 · 28'],
+    ['D1–2', 'Trunk', 'Nox · Noxra', 'volley · 1 hit · 1.28 + 0.56 · 1.76 + 0.77', '12 · 16'], ['D3–5', 'A', 'Noxaga · Noxaja · Black Hole', 'volley · 2 · 2 · 3 hits · 2.32 + 1.02 · 2.96 + 1.30 · 3.68 + 1.61; Black Hole ×1.3 below half HP', '20 · 24 · 28'],
+    ['D3–5', 'B · Barrage', 'Noxaga Barrage · Noxaja Barrage · Void Barrage', 'one foe · 4 · 4 · 6 hits · 2.90 · 3.70 · 4.60', '18 · 22 · 26'],
+  ];
+  document.getElementById('n-bow').innerHTML = '<tr><th>Depth</th><th>Line</th><th>Name</th><th>What it does</th><th class="num">MP</th></tr>' + bow.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td><td class="w">${r[3]}</td><td class="num">${r[4]}</td></tr>`).join('');
+  document.getElementById('n-mage').innerHTML = '<tr><th>Tree · depths</th><th>Line</th><th>Names</th><th>What they do</th><th class="num">MP</th></tr>' + mage.map((r) => `<tr><td>${r[0].replace('L', 'Light ').replace('D', 'Dark ')}</td><td>${r[1]}</td><td class="w"><b>${r[2]}</b></td><td class="w">${r[3]}</td><td class="num">${r[4]}</td></tr>`).join('');
+})();
+
+initTheme();
+drawShapes('v3');
+drawWorth();
+bindTips(document);
+</script>
+</body>
+</html>

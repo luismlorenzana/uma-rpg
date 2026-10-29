@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Halls v2</title>
+<!-- Halls v2 (../halls-v2.md, HV1–HV25): the five Halls of Heroes, their twenty Limit Breaks, the damage order, coverage
+     and the migration from today's 24 seats. Every number is computed on this page from the Limit Breaks' data below,
+     by the doc's rules (power × the area share 0.55 or the random bonus 1.05; weak ×1.3 a hit). Every name is invented.
+     Self-contained: no external scripts, fonts or images. -->
+<style>
+  /* uma-kit's theme tokens (uma-platform/packages/kit/theme.css), as the Tier rework's previews copy them: light is
+     uma-racer's, dark is uma-rpg's. The page follows the system; the Light/Dark buttons pin one. */
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #b8770a; --info: #2f6fe0; --locked: #8a94a3;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef;
+    --k-greatsword: #d9772b; --k-axe: #8a52c7; --k-lance: #2f9a4f; --k-bow: #3aa38f; --k-katana: #c4466e;
+    --k-fire: #d23a2f; --k-ice: #2f7fd6; --k-lightning: #c9a400; --k-light: #b89a3a; --k-dark: #6d48b8;
+    /* Hall identity (validated: dataviz validate_palette.js, light on #fcfcfb and dark on #17202b, all checks pass). */
+    --h-brawler: #b9532f; --h-mage: #3466c9; --h-spellblade: #b97900; --h-summoner: #8a52c7; --h-healer: #2e8b57;
+    --good-wash: #e2f2e8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041;
+      --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+      --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+      --h-brawler: #d9683f; --h-mage: #5b84de; --h-spellblade: #b5851a; --h-summoner: #a378dc; --h-healer: #3fa56d;
+      --good-wash: #173023;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+    --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --grid: #243041;
+    --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+    --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+    --h-brawler: #d9683f; --h-mage: #5b84de; --h-spellblade: #b5851a; --h-summoner: #a378dc; --h-healer: #3fa56d;
+    --good-wash: #173023;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 15px; margin: 0; }
+  p { margin: 0; }
+  a { color: inherit; }
+  code { font-size: 12px; background: var(--raised); padding: 0 4px; border-radius: 4px; }
+  .lead { color: var(--ink-soft); max-width: 980px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 1000px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  nav.top { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--hairline); }
+  nav.top a, nav.top button { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font: 600 13px system-ui, sans-serif;
+    box-shadow: 0 1px 0 var(--hairline-strong); border: 0; cursor: pointer; }
+  nav.top a:hover { background: var(--raised); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  nav.top .spacer { flex: 1; }
+  nav.top button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; font-size: 15px; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note b { color: var(--ink); }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 6px;
+    background: var(--raised); border: 1px solid var(--hairline-strong); color: var(--ink); white-space: nowrap; }
+  .tag.acc { background: var(--accent-wash); border-color: transparent; color: var(--accent-strong); }
+  .tag.good { background: var(--good-wash); border-color: transparent; color: var(--success); }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pills button { font: 600 12.5px system-ui, sans-serif; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 2px; }
+
+  /* Kinds: a square for an Arm, a dot for an element, the kind's colour; the word in ink. */
+  .kind { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 1px 8px 1px 6px; border-radius: 999px;
+    background: var(--raised); border: 1px solid var(--hairline); white-space: nowrap; color: var(--ink); }
+  .kind i { width: 9px; height: 9px; display: inline-block; background: var(--kc); border-radius: 2px; }
+  .kind.el i { border-radius: 50%; }
+  .kind .pct { color: var(--ink-faint); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* Halls and their seats. */
+  .hall { margin-top: 18px; border-left: 4px solid var(--hc); }
+  .hall-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+  .hall-head .who { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .hall-head .lore { color: var(--ink-soft); margin-top: 6px; max-width: 860px; }
+  .hall-name { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .hall-name .fam { font-size: 12px; color: var(--ink-faint); font-weight: 600; }
+  .seats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  .seat { background: var(--raised); border-radius: 12px; padding: 12px 14px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .seat .top { display: flex; justify-content: space-between; gap: 6px; align-items: center; font-size: 11.5px; color: var(--ink-soft); font-weight: 600; }
+  .seat .name { font-size: 16px; font-weight: 700; line-height: 1.2; }
+  .seat .lore { font-size: 12px; color: var(--ink-soft); font-style: italic; }
+  .seat .kinds { display: flex; gap: 4px; flex-wrap: wrap; }
+  .seat svg { width: 100%; height: auto; display: block; background: var(--panel); border-radius: 8px; }
+  .seat .shape { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .stat { background: var(--panel); border-radius: 8px; padding: 5px 8px; min-width: 0; }
+  .stat .l { font-size: 10.5px; color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  .stat .v { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .meter { height: 6px; border-radius: 3px; background: var(--sunken); overflow: hidden; }
+  .meter > span { display: block; height: 100%; background: var(--hc); border-radius: 0 3px 3px 0; }
+  .seat .fx { font-size: 12px; color: var(--ink); }
+  .seat .fx b { font-weight: 700; }
+  .seat .from { font-size: 11.5px; color: var(--ink-faint); margin-top: auto; padding-top: 4px; border-top: 1px solid var(--hairline); }
+  .seat .gain { font-size: 11.5px; color: var(--ink-soft); }
+  .seat .from code { white-space: nowrap; }
+
+  /* The order chart: one row a Limit Break, a bar to its value, the two reference lines through every row. */
+  .chart { margin-top: 14px; }
+  .crow { display: grid; grid-template-columns: 230px minmax(0, 1fr) 64px; align-items: center; gap: 10px; height: 26px; cursor: default; }
+  .crow:hover .cname { color: var(--ink); text-decoration: underline; }
+  .cname { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; gap: 6px; align-items: center; }
+  .cname .sw { width: 8px; height: 8px; border-radius: 2px; background: var(--hc); flex: none; }
+  .track { position: relative; height: 26px; }
+  .track .bar { position: absolute; left: 0; top: 7px; height: 12px; border-radius: 0 4px 4px 0; background: var(--hc); }
+  .track .ref { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px dashed var(--ink-faint); }
+  .track .ref.today { border-left-style: dotted; border-left-color: var(--accent-strong); }
+  .cval { font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+  .axis { display: grid; grid-template-columns: 230px minmax(0, 1fr) 64px; gap: 10px; margin-top: 4px; font-size: 11px; color: var(--ink-faint); }
+  .axis .ticks { position: relative; height: 16px; border-top: 1px solid var(--hairline-strong); }
+  .axis .ticks span { position: absolute; top: 2px; transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin-top: 12px; align-items: center; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; background: var(--hc); margin-right: 5px; vertical-align: -1px; }
+  .legend .line { display: inline-block; width: 18px; border-top: 1.5px dashed var(--ink-faint); margin-right: 5px; vertical-align: 3px; }
+  .legend .line.today { border-top-style: dotted; border-top-color: var(--accent-strong); }
+  #tip { position: fixed; z-index: 60; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.45; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  .checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .check { background: var(--raised); border-radius: 10px; padding: 10px 14px; font-size: 13px; }
+  .check b { display: block; color: var(--ink); }
+  .check span { color: var(--ink-soft); }
+
+  /* Coverage. */
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  td.cell { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; border-radius: 6px; }
+  td.zero { color: var(--ink-faint); font-weight: 500; }
+  th.hall-th { text-align: center; }
+  th.hall-th .sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--hc); margin-right: 5px; }
+
+  /* Migration. */
+  .mig td.arrow { color: var(--ink-faint); text-align: center; }
+  .mig code { white-space: nowrap; }
+  .mig tr.merge td { background: color-mix(in srgb, var(--h-healer) 7%, transparent); }
+  .rules { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .rule { background: var(--raised); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; color: var(--ink-soft); }
+  .rule b { display: block; color: var(--ink); margin-bottom: 3px; }
+
+  /* Decisions. */
+  .dec { columns: 2; column-gap: 24px; font-size: 13px; }
+  .dec div { break-inside: avoid; padding: 5px 0; border-bottom: 1px solid var(--hairline); color: var(--ink-soft); }
+  .dec div b { color: var(--ink); margin-right: 6px; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 1100px) {
+    .seats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .rules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 760px) {
+    main { padding: 20px 16px 60px; }
+    nav.top { margin: 16px -16px 0; padding: 8px 16px; }
+    .seats, .grid2, .checks, .rules { grid-template-columns: minmax(0, 1fr); }
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .crow, .axis { grid-template-columns: 130px minmax(0, 1fr) 48px; }
+    .dec { columns: 1; }
+    .hall-head { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Halls v2: the Halls of Heroes' Limit Breaks</h1>
+  <p class="lead">The owner's Hall of Heroes request (2026-10-29), as <a href="../halls-v2.md">halls-v2.md</a> proposes it:
+    five halls, one per Classes v3 Tier 0 line, four seats each, every Limit Break with its own power, on Classes v3's
+    classes, twins and weapon shapes. Seats the owner named
+    carry the <span class="tag acc">Owner's</span> tag. Numbers are × her open depth's single-target power, at 100%, for
+    a damage class, on a Broken foe. Every name here is invented.</p>
+  <nav class="top" aria-label="Sections">
+    <a href="#halls">Halls and seats</a><a href="#order">Damage order</a><a href="#coverage">Coverage</a><a href="#migration">Migration</a><a href="#decisions">Decisions</a>
+    <a class="out" href="../halls-v2.md">The doc →</a>
+    <span class="spacer"></span><span id="theme" style="display:flex;gap:6px"><button data-t="system">System</button><button data-t="light">Light</button><button data-t="dark">Dark</button></span>
+  </nav>
+  <div class="kpis" id="kpis"></div>
+
+  <section id="halls">
+    <h2>Five halls, twenty seats</h2>
+    <p class="sub">Each hall's lore, its home classes, then its four Limit Breaks. The drawing shows three foes and every
+      hit of one cast: a bar's height is that hit's damage, its colour its kind; two bars joined are a double (a Katana or
+      Light strike landing twice). A volley (Classes v3's Bow and Dark) hits her foe, then every other foe; random casts
+      are drawn on one sample spread.</p>
+    <div id="hall-list"></div>
+  </section>
+
+  <section id="order">
+    <h2>The damage order</h2>
+    <p class="sub">All twenty on one scale. Pick the case: one unweak foe, one foe at the best weakness Tier 1 allows (two of
+      a tri attack's three kinds), or the total on a crowd. The dashed line is the Ultimate's unweak 2.9×, the dotted line
+      today's 2.2× (a hybrid's Limit Break). Hover a row for all four cases.</p>
+    <div class="panel">
+      <div class="pills" id="metric" role="group" aria-label="Case"><span class="lbl">Case</span></div>
+      <div class="chart" id="chart" role="img" aria-label="Bar chart of the twenty Limit Breaks' damage"></div>
+      <div class="axis" aria-hidden="true"><span></span><div class="ticks" id="ticks"></div><span></span></div>
+      <div class="legend" id="chart-legend"></div>
+      <details style="margin-top:12px"><summary class="muted" style="cursor:pointer;font-size:12.5px">Table view</summary>
+        <div class="scroll" style="margin-top:8px"><table id="order-table"></table></div></details>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section id="coverage">
+    <h2>Coverage</h2>
+    <p class="sub">Which halls hold which kinds and answer which twin sets (Classes v3's pairs: Greatsword–Fire, Axe–Ice,
+      Lance–Lightning, Katana–Light, Bow–Dark), and what each Tier 1 class's weapons miss. A cell is the number of seats;
+      a darker cell holds more.</p>
+    <div class="grid2">
+      <div class="panel"><h3 style="margin-bottom:8px">The ten kinds × the five halls</h3><div class="scroll"><table id="kinds-table"></table></div></div>
+      <div class="panel"><h3 style="margin-bottom:8px">Twin sets × the five halls</h3><div class="scroll"><table id="sets-table"></table></div>
+        <p class="note"><b>Three halls answer all five sets</b> (the Dojo, the Tower, the Sanctum); the Salle and the Circle answer
+          their classes' two, the owner's pairs. Twilight (Bow, Katana) is kept by Classes v3.</p></div>
+    </div>
+    <div class="panel" style="margin-top:16px"><h3 style="margin-bottom:8px">By class: what her weapons miss, and the Heroes that answer</h3>
+      <div class="scroll"><table id="class-table"></table></div>
+      <p class="note">Default weapons: the brief's for the four hybrids, today's for the Brawler, the Sorcerer (today's Mage),
+        the Paladin and the Cleric. A Learner has two Heroes: <b>pairs</b> counts the 190 two-seat picks that answer every
+        twin set she misses.</p></div>
+  </section>
+
+  <section id="migration">
+    <h2>The migration: 24 seats to 20</h2>
+    <p class="sub">Seat n stays seat n, id and all, in the four halls that continue: their Heroes, Learners and Bonds don't
+      move. The Paladin Bastion becomes the Healer Sanctum's seats 1–2 and the Cleric Chapel its seats 3–4, two old seats
+      into each new one (shaded): the only data that moves. Rides Classes v3's engine v19 and save v32.</p>
+    <div class="panel"><div class="scroll"><table class="mig" id="mig-table"></table></div></div>
+    <div class="rules">
+      <div class="rule"><b>1 · Bonds</b>Each Uma's Bond with the new seat is the higher of her two. Nothing is summed, nothing lost.</div>
+      <div class="rule"><b>2 · The Hero</b>If both old seats had one, the Hero with the <i>lower</i> Bond keeps the seat; the other becomes its first Learner at her Bond. Two Bond 10 Heroes lose nothing.</div>
+      <div class="rule"><b>3 · Learners</b>Both lists pooled, each Uma once: the displaced Hero first, then by Bond. Ten sit; anyone beyond keeps her Bond.</div>
+      <div class="rule"><b>4 · Shared Learners</b>A Learner under both old seats now has one Hero there, and a free place for another.</div>
+      <div class="rule"><b>5 · One line</b>On Classes v3’s one-time sheet, “The classes are rebuilt”: every Uma who moved.</div>
+    </div>
+    <p class="note"><b>Example.</b> Bastion 2 has Hero A (Bond 4) and six Learners; Bastion 3 has Hero B (Bond 10) and five, one
+      shared. Healer 2: A stays Hero; B becomes its first Learner at Bond 10, still casting at 100%; nine of the other ten
+      Learners sit by Bond, the tenth keeps her Bond; the shared Learner sits once and gains a free place.</p>
+  </section>
+
+  <section id="decisions">
+    <h2>Decisions</h2>
+    <p class="sub">Each call with its recommendation; alternatives and reasons are in the doc's §10.</p>
+    <div class="panel"><div class="dec" id="dec"></div></div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+
+<script>
+(() => {
+  // ---- The rules (halls-v2.md §3) ----------------------------------------------------------------------------------
+  const AREA = 0.55, RANDOM = 1.05, WEAK = 1.3, ULT = 2.9, TODAY = 2.2;
+  const ARMS = ['greatsword', 'axe', 'lance', 'bow', 'katana'];
+  const ELEMENTS = ['fire', 'ice', 'lightning', 'light', 'dark'];
+  const KINDS = [...ARMS, ...ELEMENTS];
+  const LABEL = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark' };
+  const phys = (k) => ARMS.includes(k);
+  const TWINS = { Fire: ['greatsword', 'fire'], Ice: ['axe', 'ice'], Lightning: ['lance', 'lightning'], Light: ['katana', 'light'], Dark: ['bow', 'dark'] };
+  const TWILIGHT = ['bow', 'katana'];
+  const DOUBLE = new Set(['katana', 'light']);
+  const s = (kind, share, double = false) => ({ kind, share, double });
+  const strikes = (pattern) => pattern.map((k) => s(k, 1 / pattern.length, DOUBLE.has(k)));
+
+  const HALLS = [
+    { id: 'brawler', name: 'Warrior Dojo', fam: 'The owner’s Fighter Hall · the Recruit’s line', homes: ['Brawler'], place: 'brawler-dojo (kept)',
+      lore: 'Power from self-training. Every Limit Break is a technique drilled until it became one motion: the five Arms, nothing else. “Fighter” is a master-data name, so the hall takes the Warrior root’s, as Classes v3 does.' },
+    { id: 'mage', name: 'Mage Tower', fam: 'The Mage Hall · the Apprentice’s line', homes: ['Sorcerer'], place: 'mage-tower (kept)',
+      lore: 'Power from self-study. The Dojo’s twin seat by seat: each Limit Break the element twinned with the Dojo’s Arm.' },
+    { id: 'spellblade', name: 'Spell Blade Salle', fam: 'The Spellblade Hall · the Duelist’s line', homes: ['Arms Spellblade · 1–2', 'Tome Spellblade · 3–4'], place: 'spell-blade-salle (kept)',
+      lore: 'Power from pacts with familiars that live in the blade. Five strikes at random foes, the lead kind three (60%); a Katana or Light strike lands twice.' },
+    { id: 'summoner', name: 'Summoner Circle', fam: 'The Summoner Hall · the Caller’s line', homes: ['Arms Summoner · 1–2', 'Tome Summoner · 3–4'], place: 'summoner-circle (kept)',
+      lore: 'Power from the familiars themselves: a pack of small ones that strike with weapons, or one great one that breathes magic. Three hits on every foe, the lead kind twice.' },
+    { id: 'healer', name: 'Healer Sanctum', fam: 'The Healer Hall · the Acolyte’s line', homes: ['Paladin · 1–2', 'Cleric · 3–4'], place: 'healer-sanctum (new)',
+      lore: 'Power from a followed deity, called down once to strike: one foe, four hits, the lead kind 60%. Angels bless every ally after; demons curse the foe before. No support.' },
+  ];
+
+  const LIMITS = [
+    { id: 'brawler-1', hall: 'brawler', seat: 1, name: 'Triad Onslaught', home: 'Brawler', given: true, P: 2.5, target: 'one',
+      strikes: [s('greatsword', 1 / 3), s('axe', 1 / 3), s('lance', 1 / 3)], lore: 'The first form every Recruit drills: the three heavy Arms in one motion.',
+      from: 'Brawler Dojo 1 · Arsenal Rush', gain: 'Sorcerer, Tome Spellblade, Cleric' },
+    { id: 'brawler-2', hall: 'brawler', seat: 2, name: 'Ten Thousand Swings', home: 'Brawler', given: true, P: 2.9, target: 'one',
+      strikes: [s('greatsword', 1)], lore: 'Every practice swing she ever made, in one blow.', from: 'Brawler Dojo 2 · Iaido Cleave', gain: 'Any class without a Greatsword' },
+    { id: 'brawler-3', hall: 'brawler', seat: 3, name: 'Echo Draw', home: 'Brawler', P: 2.2, target: 'one',
+      strikes: strikes(['katana', 'katana', 'katana']), lore: 'Drawn so fast that each cut lands twice.', from: 'Brawler Dojo 3 · Spear and Arrow Storm', gain: 'Any class without a Katana' },
+    { id: 'brawler-4', hall: 'brawler', seat: 4, name: 'Hundred-Arrow Rain', home: 'Brawler', P: 2.2, target: 'volley',
+      strikes: [s('bow', 0.2), s('bow', 0.2), s('bow', 0.2), s('bow', 0.2)], splash: { kind: 'bow', hits: 2, share: 0.35 },
+      lore: 'Two volleys: two arrows into her mark, one into every other foe.', from: 'Brawler Dojo 4 · Earthsplitter', gain: 'Any class without a Bow' },
+    { id: 'mage-1', hall: 'mage', seat: 1, name: 'Triad Tempest', home: 'Sorcerer', given: true, P: 2.5, target: 'one',
+      strikes: [s('fire', 1 / 3), s('ice', 1 / 3), s('lightning', 1 / 3)], lore: 'The first lesson every Apprentice copies out: the ring’s three elements in one breath.',
+      from: 'Mage Tower 1 · Elemental Cascade', gain: 'Brawler, Arms Summoner, Paladin' },
+    { id: 'mage-2', hall: 'mage', seat: 2, name: 'Ten Thousand Candles', home: 'Sorcerer', given: true, P: 2.9, target: 'one',
+      strikes: [s('fire', 1)], lore: 'Every candle burned down over a book, in one fire.', from: 'Mage Tower 2 · Twilight Eclipse', gain: 'Any class without Fire' },
+    { id: 'mage-3', hall: 'mage', seat: 3, name: 'Echo Ray', home: 'Sorcerer', P: 2.2, target: 'one',
+      strikes: strikes(['light', 'light', 'light']), lore: 'A ray read twice, so it strikes twice.', from: 'Mage Tower 3 · Trinity Storm', gain: 'Any class without Light' },
+    { id: 'mage-4', hall: 'mage', seat: 4, name: 'Hundred-Shadow Rain', home: 'Sorcerer', P: 2.2, target: 'volley',
+      strikes: [s('dark', 0.2), s('dark', 0.2), s('dark', 0.2), s('dark', 0.2)], splash: { kind: 'dark', hits: 2, share: 0.35 },
+      lore: 'Two downpours of shadow: the heaviest on her mark, the rest over the field.', from: 'Mage Tower 4 · Chaos Rain', gain: 'Any class without Dark' },
+    { id: 'spellblade-1', hall: 'spellblade', seat: 1, name: 'Shrike Pact', home: 'Arms Spellblade', given: true, P: 1.9, target: 'random',
+      strikes: strikes(['katana', 'lance', 'katana', 'lance', 'katana']), lore: 'The shrike pins its prey: her Lance throws fix them, her Katana cuts twice.',
+      from: 'Spell Blade Salle 1 · Sunfire Edge', gain: 'Sorcerer, both Summoners, Paladin, Cleric' },
+    { id: 'spellblade-2', hall: 'spellblade', seat: 2, name: 'Firefly Pact', home: 'Arms Spellblade', given: true, P: 1.9, target: 'random',
+      strikes: strikes(['katana', 'light', 'katana', 'light', 'katana']), lore: 'Fireflies light each target; her Katana and their light find it, twice each.',
+      from: 'Spell Blade Salle 2 · Rimefang Waltz', gain: 'Brawler, Sorcerer, both Summoners' },
+    { id: 'spellblade-3', hall: 'spellblade', seat: 3, name: 'Storm Heron Pact', home: 'Tome Spellblade', given: true, P: 1.9, target: 'random',
+      strikes: strikes(['light', 'lightning', 'light', 'lightning', 'light']), lore: 'The heron spears with lightning, and its plumes flash twice.',
+      from: 'Spell Blade Salle 3 · Thunder Javelin', gain: 'Brawler, both Summoners' },
+    { id: 'spellblade-4', hall: 'spellblade', seat: 4, name: 'Wisp Pact', home: 'Tome Spellblade', given: true, P: 1.9, target: 'random',
+      strikes: strikes(['light', 'katana', 'light', 'katana', 'light']), lore: 'Wisps lead her blade through the dark; their light and her Katana strike twice.',
+      from: 'Spell Blade Salle 4 · Eclipse Volley', gain: 'Brawler, Sorcerer, both Summoners' },
+    { id: 'summoner-1', hall: 'summoner', seat: 1, name: 'Centaur Warband', home: 'Arms Summoner', given: true, P: 2.2, target: 'all',
+      strikes: strikes(['axe', 'bow', 'axe']), lore: 'A warband of centaurs rides through every foe: axes, bows, axes.',
+      from: 'Summoner Circle 1 · Cinder Wyrm', gain: 'Sorcerer, both Spellblades' },
+    { id: 'summoner-2', hall: 'summoner', seat: 2, name: 'Gargoyle Flock', home: 'Arms Summoner', given: true, P: 2.2, target: 'all',
+      strikes: strikes(['axe', 'dark', 'axe']), lore: 'Stone wings dive on every foe, raking with axe-blades under a cloud of shadow.',
+      from: 'Summoner Circle 2 · Frost Behemoth', gain: 'Sorcerer, both Spellblades, Cleric' },
+    { id: 'summoner-3', hall: 'summoner', seat: 3, name: 'Frostshade Wyrm', home: 'Tome Summoner', given: true, P: 2.2, target: 'all',
+      strikes: strikes(['dark', 'ice', 'dark']), lore: 'One wyrm of night and rime breathes over the whole field.',
+      from: 'Summoner Circle 3 · Thunderbird', gain: 'Brawler, both Spellblades, Paladin' },
+    { id: 'summoner-4', hall: 'summoner', seat: 4, name: 'Night Colossus', home: 'Tome Summoner', given: true, P: 2.2, target: 'all',
+      strikes: strikes(['dark', 'axe', 'dark']), lore: 'A colossus of shadow strides through, swinging an axe the size of a gate.',
+      from: 'Summoner Circle 4 · Moon Fox', gain: 'Sorcerer, both Spellblades, Cleric' },
+    { id: 'healer-1', hall: 'healer', seat: 1, name: 'Archangel’s Judgment', home: 'Paladin', given: true, P: 2.0, target: 'one',
+      strikes: [s('lance', 0.3), s('lance', 0.3), s('light', 0.4, true)], status: { key: 'Brave 1', to: 'every ally', when: 'after' },
+      lore: 'The Archangel comes down lance first, and her judgment strikes twice.',
+      from: 'Paladin Bastion 1 · Archangel’s Verdict + 4 · Valkyrie Lances', gain: 'Sorcerer, both Summoners' },
+    { id: 'healer-2', hall: 'healer', seat: 2, name: 'Archdemon’s Toll', home: 'Paladin', given: true, P: 2.0, target: 'one',
+      strikes: [s('axe', 0.3), s('axe', 0.3), s('dark', 0.2), s('dark', 0.2)], status: { key: 'Armor Break 1', to: 'the foe', when: 'before' },
+      lore: 'The Archdemon names a price: the foe’s armor first, then the axes.',
+      from: 'Paladin Bastion 2 · Archdemon’s Pact + 3 · Rampart Charge', gain: 'Sorcerer, both Spellblades, Cleric' },
+    { id: 'healer-3', hall: 'healer', seat: 3, name: 'Seraph’s Pyre', home: 'Cleric', P: 2.0, target: 'one',
+      strikes: [s('fire', 0.3), s('fire', 0.3), s('greatsword', 0.2), s('greatsword', 0.2)], status: { key: 'Faith 1', to: 'every ally', when: 'after' },
+      lore: 'The burning Seraph sweeps her sword of fire.',
+      from: 'Cleric Chapel 1 · Choir of Angels + 3 · Dawn Hymn', gain: 'Both Spellblades, both Summoners, Cleric' },
+    { id: 'healer-4', hall: 'healer', seat: 4, name: 'Thunder Fiend’s Barrage', home: 'Cleric', P: 2.0, target: 'one',
+      strikes: [s('lightning', 0.3), s('lightning', 0.3), s('bow', 0.2), s('bow', 0.2)], status: { key: 'Mind Break 1', to: 'the foe', when: 'before' },
+      lore: 'The Thunder Fiend cracks the foe’s mind, then looses bolts and arrows.',
+      from: 'Cleric Chapel 2 · Legion of Demons + 4 · Frost Sanctuary', gain: 'Brawler, Tome Summoner, Paladin' },
+  ];
+  const DEFAULTS = {
+    Brawler: ['greatsword', 'axe', 'lance'], Sorcerer: ['fire', 'ice', 'lightning'],
+    'Arms Spellblade': ['lance', 'katana', 'lightning'], 'Tome Spellblade': ['lightning', 'light', 'katana'],
+    'Arms Summoner': ['axe', 'bow', 'dark'], 'Tome Summoner': ['dark', 'ice', 'axe'],
+    Paladin: ['greatsword', 'axe', 'light'], Cleric: ['light', 'ice', 'bow'],
+  };
+  const TODAY_SEATS = [
+    ['brawler-1', 'Arsenal Rush', 'Greatsword, Axe, Lance, Bow, Katana'], ['brawler-2', 'Iaido Cleave', 'Greatsword, Katana'], ['brawler-3', 'Spear and Arrow Storm', 'Lance, Bow'], ['brawler-4', 'Earthsplitter', 'Axe'],
+    ['mage-1', 'Elemental Cascade', 'all five elements'], ['mage-2', 'Twilight Eclipse', 'Light, Dark'], ['mage-3', 'Trinity Storm', 'Fire, Ice, Lightning'], ['mage-4', 'Chaos Rain', 'Light, Dark'],
+    ['spellblade-1', 'Sunfire Edge', 'Greatsword, Fire'], ['spellblade-2', 'Rimefang Waltz', 'Katana, Ice'], ['spellblade-3', 'Thunder Javelin', 'Lance, Lightning'], ['spellblade-4', 'Eclipse Volley', 'Bow, Light, Dark'],
+    ['summoner-1', 'Cinder Wyrm', 'Greatsword, Fire'], ['summoner-2', 'Frost Behemoth', 'Axe, Ice'], ['summoner-3', 'Thunderbird', 'Lance, Lightning'], ['summoner-4', 'Moon Fox', 'Katana, Dark, Bow, Light'],
+  ];
+  const MERGES = {
+    'healer-1': [['paladin-1', 'Archangel’s Verdict', 'Greatsword, Light', 'first'], ['paladin-4', 'Valkyrie Lances', 'Lance', 'second']],
+    'healer-2': [['paladin-2', 'Archdemon’s Pact', 'Katana, Dark', 'first'], ['paladin-3', 'Rampart Charge', 'Axe', 'second']],
+    'healer-3': [['cleric-1', 'Choir of Angels', 'Light, Lightning', 'first'], ['cleric-3', 'Dawn Hymn', 'Fire', 'second']],
+    'healer-4': [['cleric-2', 'Legion of Demons', 'Dark', 'first'], ['cleric-4', 'Frost Sanctuary', 'Ice', 'second']],
+  };
+  const DECISIONS = [
+    ['HV1', 'Five halls, one per Tier 0 line: Warrior Dojo (the owner’s Fighter Hall), Mage Tower, Spell Blade Salle, Summoner Circle, Healer Sanctum'],
+    ['HV2', 'Four seats a hall, 20 Limit Breaks: two per Tier 1 class in the shared halls, four for the Brawler and the Sorcerer'],
+    ['HV3', 'Seat order: the owner’s two first; Dojo and Tower tri, Ultimate, double, volley; shared halls Arms-led then Tome-led'],
+    ['HV4', 'Any Uma in any seat, Tier 0 included; no Tier 0 hall; each seat names its home class'],
+    ['HV5', 'Power: the Limit Break’s own × her class’s scale (1; the Paladin and the Cleric 0.75) × her open depth'],
+    ['HV6', 'The ladder: Ultimates 2.9×, tri 2.5×, standard 2.2×, Spell Blade 1.9× random (2.0×), healers 2.0× + a stack; mean 2.23×'],
+    ['HV7', 'The tri’s “a bit more” by the plain weak rule: 3.0× on two weaknesses, over the Ultimate’s 2.9×'],
+    ['HV8', 'Warrior Dojo: Triad Onslaught, Ten Thousand Swings, Echo Draw (Katana doubles), Hundred-Arrow Rain (Bow volleys)'],
+    ['HV9', 'Mage Tower, the Dojo’s twin: Triad Tempest, Ten Thousand Candles, Echo Ray (Light doubles), Hundred-Shadow Rain (Dark volleys)'],
+    ['HV10', 'Spell Blade Salle: familiar pacts, five strikes at random foes, lead 60%, Katana and Light strike twice'],
+    ['HV11', 'Summoner Circle: three hits on every foe, lead twice; packs (Arms), one great familiar (Tome); the crowd’s best from three foes'],
+    ['HV12', 'The Paladin’s two as the owner gave them: Archangel’s Judgment (Lance + Light), Archdemon’s Toll (Axe + Dark)'],
+    ['HV13', 'The Cleric’s two: Seraph’s Pyre (Fire + Greatsword), Thunder Fiend’s Barrage (Lightning + Bow)'],
+    ['HV14', 'Healer side effects: one stack, two rounds; angels bless after, demons curse before; no support'],
+    ['HV15', 'At most 10 hits on one foe a cast (the Duel guard rail; today 12)'],
+    ['HV16', 'Invented names in each hall’s lore, checked against every master-data string; none of today’s 24 reused'],
+    ['HV17', 'Coverage: every kind in ≥ 2 halls; three halls answer all five sets; two Heroes close any class’s gaps'],
+    ['HV18', 'Seat n → seat n, id and all; Paladin Bastion → Healer 1–2, Cleric Chapel → Healer 3–4'],
+    ['HV19', 'Merging: the higher Bond; the less-bonded Hero keeps the seat, the other is its first Learner; ten by Bond; one line on Classes v3’s sheet'],
+    ['HV20', 'Seat ids ${hall}-${n}: brawler, mage, spellblade, summoner kept, healer new; old ids kept for replays'],
+    ['HV21', 'Five halls on the Learning page; brawler-dojo kept (shown as the Warrior Dojo), healer-sanctum new; the Sanctum wears knights-bastion'],
+    ['HV22', 'Bonds and Learners unchanged: 10 Learners, 2 Heroes, 50% + 5% a Bond Level'],
+    ['HV23', 'LB+ (Tier 2, deferred): one rule, +20% at Bond 10'],
+    ['HV24', 'Rides Classes v3’s engine v19 and save v32, not v20; today’s 24 replay on v10–v18'],
+    ['HV25', 'Auto unchanged; the seat card adds home class, shape and power'],
+  ];
+
+  // ---- Numbers ---------------------------------------------------------------------------------------------------------
+  const hitsOf = (l) => l.strikes.flatMap((st, i) => st.double ? [{ kind: st.kind, share: st.share / 2, strike: i, pair: 0 }, { kind: st.kind, share: st.share / 2, strike: i, pair: 1 }] : [{ kind: st.kind, share: st.share, strike: i }]);
+  const kindsOf = (l) => [...new Set(l.strikes.map((st) => st.kind))];
+  const shareBy = (l) => { const m = {}; for (const h of hitsOf(l)) m[h.kind] = (m[h.kind] || 0) + h.share; return m; };
+  const factor = (t) => (t === 'all' ? AREA : t === 'random' ? RANDOM : 1); // a volley's tapped hits are plain; its splash is its own share
+  const amp = (l) => {
+    if (!l.status || l.status.when !== 'before') return 1;
+    const ch = l.status.key.startsWith('Armor') ? phys : (k) => !phys(k);
+    return 1 + 0.1 * Object.entries(shareBy(l)).filter(([k]) => ch(k)).reduce((a, [, v]) => a + v, 0);
+  };
+  // The weak factor over the cast's own hits (a volley's tapped hits share 0.8; others share 1).
+  const weakMult = (l, weak) => { const m = Object.entries(shareBy(l)); const all = m.reduce((a, [, v]) => a + v, 0);
+    return m.reduce((a, [k, v]) => a + v * (weak.includes(k) ? WEAK : 1), 0) / all; };
+  function numbers(l) {
+    const kinds = kindsOf(l), a = amp(l), f = factor(l.target);
+    const one = (l.target === 'volley' ? l.P * 0.8 : l.P * f) * a;
+    // The best weakness Tier 1 allows: two of a tri's three kinds, else all of its kinds.
+    const best = kinds.length === 3 ? weakMult(l, kinds.slice(1)) : weakMult(l, kinds);
+    const crowd = (n) => (l.target === 'all' ? l.P * AREA * n : l.target === 'random' ? l.P * RANDOM
+      : l.target === 'volley' ? l.P * (0.8 + l.splash.share * (n - 1)) : l.P) * a;
+    const hits = hitsOf(l);
+    return { kinds, hits: hits.length, one, weak: one * best, c3: crowd(3), c5: crowd(5), split: shareBy(l) };
+  }
+  for (const l of LIMITS) l.n = numbers(l);
+  const r2 = (x) => (Math.round((x + 1e-9) * 100) / 100).toFixed(2);
+  const hallOf = (id) => HALLS.find((h) => h.id === id);
+  const shapeLine = (l) => {
+    const dbl = l.strikes.some((st) => st.double);
+    if (l.target === 'all') return `Every foe · ${l.n.hits} hits on each`;
+    if (l.target === 'volley') return `Volley · ${l.n.hits} hits on her foe, ${l.splash.hits} on each other`;
+    if (l.target === 'random') return `Random foes · ${l.strikes.length} strikes, ${l.n.hits} hits`;
+    return `One foe · ${l.n.hits} hit${l.n.hits > 1 ? 's' : ''}${dbl ? ' (doubles)' : ''}`;
+  };
+  const kindChip = (k, pct) => `<span class="kind${phys(k) ? '' : ' el'}" style="--kc:var(--k-${k})"><i aria-hidden="true"></i>${LABEL[k]}${pct != null ? ` <span class="pct">${pct}%</span>` : ''}</span>`;
+  const answered = (kinds, twilight) => {
+    const out = Object.entries(TWINS).filter(([, ks]) => ks.some((k) => kinds.includes(k))).map(([n]) => n);
+    if (twilight && TWILIGHT.some((k) => kinds.includes(k))) out.push('Twilight');
+    return out;
+  };
+
+  // ---- KPIs -----------------------------------------------------------------------------------------------------------
+  const mean = LIMITS.reduce((a, l) => a + l.P * (l.target === 'random' ? RANDOM : 1) * amp(l), 0) / LIMITS.length;
+  const maxHits = Math.max(...LIMITS.map((l) => l.target === 'all' ? 0 : l.n.hits));
+  const kindHalls = KINDS.map((k) => new Set(LIMITS.filter((l) => l.n.kinds.includes(k)).map((l) => l.hall)).size);
+  const kpis = [
+    ['Halls', '5 <span class="was">6</span>', 'One per Classes v3 family'],
+    ['Seats', '20 <span class="was">24</span>', 'Four a hall; two old healer halls fold into one'],
+    ['Top power', '2.9× <span class="was">2.4×</span>', 'The Greatsword and Fire Ultimates, one hit'],
+    ['Mean power', `${mean.toFixed(2)}× <span class="was">2.2×</span>`, 'Over the twenty, at random ×1.05 and own Breaks'],
+    ['Most hits on one foe', `${maxHits} <span class="was">12</span>`, 'Firefly and Wisp Pact (the Duel guard rail)'],
+    ['Kinds in ≥ 2 halls', `${kindHalls.filter((n) => n >= 2).length} / 10`, 'Every kind; three halls answer all five sets'],
+  ];
+  document.getElementById('kpis').innerHTML = kpis.map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div><div class="delta">${d}</div></div>`).join('');
+
+  // ---- Shape drawing ----------------------------------------------------------------------------------------------------
+  const SAMPLE = [1, 0, 2, 2, 1, 0, 1, 2, 0, 1]; // a fixed spread for random strikes
+  function shapeSvg(l) {
+    const W = 260, H = 106, FX = [56, 130, 204], FY = 88, R = 12, BASE = 66;
+    const per = [[], [], []];
+    const f = factor(l.target);
+    const hits = hitsOf(l);
+    for (const h of hits) {
+      const dmg = h.share * l.P * f;
+      if (l.target === 'one' || l.target === 'volley') per[1].push({ ...h, dmg });
+      else if (l.target === 'all') for (const p of per) p.push({ ...h, dmg });
+      else per[SAMPLE[h.strike % SAMPLE.length]].push({ ...h, dmg });
+    }
+    if (l.target === 'volley') for (const i of [0, 2]) for (let k = 0; k < l.splash.hits; k++) per[i].push({ kind: l.splash.kind, dmg: l.P * l.splash.share / l.splash.hits });
+    let g = '';
+    FX.forEach((x, i) => {
+      const hot = per[i].length > 0;
+      g += `<circle cx="${x}" cy="${FY}" r="${R}" style="fill:var(--raised);stroke:${hot ? 'var(--ink-soft)' : 'var(--hairline-strong)'};stroke-width:${hot ? 1.5 : 1}"></circle>`;
+      if ((l.target === 'one' || l.target === 'volley') && i === 1) g += `<circle cx="${x}" cy="${FY}" r="${R + 4}" style="fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 3"></circle>`;
+      const list = per[i];
+      const w = 8, gap = 3;
+      // Doubles touch; other hits keep a gap.
+      let width = 0;
+      list.forEach((h, j) => { width += w + (j === 0 ? 0 : (h.pair === 1 ? 0 : gap)); });
+      let cx = x - width / 2;
+      list.forEach((h, j) => {
+        if (j > 0) cx += h.pair === 1 ? 0 : gap;
+        const ht = Math.max(5, 4 + h.dmg * 18);
+        g += `<rect x="${cx.toFixed(1)}" y="${(BASE - ht).toFixed(1)}" width="${w}" height="${ht.toFixed(1)}" rx="1.5" style="fill:var(--k-${h.kind})"></rect>`;
+        if (h.pair === 1) g += `<rect x="${(cx - w).toFixed(1)}" y="${BASE + 2}" width="${2 * w}" height="2" rx="1" style="fill:var(--ink-soft)"></rect>`;
+        cx += w;
+      });
+      if (l.status && l.status.when === 'before' && l.target === 'one' && i === 1) g += `<text x="${x}" y="${FY + 4}" text-anchor="middle" style="font:700 10px system-ui;fill:var(--danger)">−</text>`;
+    });
+    if (l.status && l.status.to === 'every ally') g += `<text x="${W - 6}" y="12" text-anchor="end" style="font:600 10px system-ui;fill:var(--success)">+ ${l.status.key} on every ally</text>`;
+    if (l.status && l.status.to === 'the foe') g += `<text x="${W - 6}" y="12" text-anchor="end" style="font:600 10px system-ui;fill:var(--danger)">${l.status.key} on the foe first</text>`;
+    if (l.target === 'random') g += `<text x="6" y="12" style="font:600 10px system-ui;fill:var(--ink-faint)">one sample spread</text>`;
+    const desc = `${shapeLine(l)}: ${hits.map((h) => LABEL[h.kind]).join(', ')}`;
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${desc}">${g}</svg>`;
+  }
+
+  // ---- Halls ------------------------------------------------------------------------------------------------------------
+  const pct = (x) => Math.round(100 * x);
+  document.getElementById('hall-list').innerHTML = HALLS.map((h) => {
+    const seats = LIMITS.filter((l) => l.hall === h.id).map((l) => {
+      const n = l.n;
+      const split = Object.entries(n.split);
+      const kinds = split.length === 1 ? kindChip(split[0][0]) : split.map(([k, v]) => kindChip(k, pct(v))).join('');
+      const fx = l.status ? `<div class="fx">${l.status.when === 'before' ? 'First' : 'Then'}: <b>${l.status.key}</b> on ${l.status.to}, 2 rounds</div>` : '';
+      return `<article class="seat" style="--hc:var(--h-${h.id})">
+        <div class="top"><span>Seat ${l.seat} · ${l.home}</span>${l.given ? '<span class="tag acc">Owner’s</span>' : '<span class="tag">Filled in</span>'}</div>
+        <div class="name">${l.name}</div>
+        <div class="lore">${l.lore}</div>
+        <div class="kinds">${kinds}</div>
+        ${shapeSvg(l)}
+        <div class="shape">${shapeLine(l)}</div>
+        <div class="stats">
+          <div class="stat"><div class="l">Power</div><div class="v">${l.P.toFixed(1)}×</div></div>
+          <div class="stat"><div class="l">One foe</div><div class="v">${r2(n.one)}</div></div>
+          <div class="stat"><div class="l">Weak (best)</div><div class="v">${r2(n.weak)}</div></div>
+          <div class="stat"><div class="l">3 foes</div><div class="v">${r2(n.c3)}</div></div>
+          <div class="stat"><div class="l">5 foes</div><div class="v">${r2(n.c5)}</div></div>
+          <div class="stat"><div class="l">% Ultimate</div><div class="v">${pct(n.one / ULT)}%</div></div>
+        </div>
+        <div class="meter" title="One foe against the Ultimate"><span style="width:${Math.min(100, pct(n.one / ULT))}%"></span></div>
+        ${fx}
+        <div class="gain"><b>Gains most:</b> ${l.gain}</div>
+        <div class="from">From ${l.from} · <code>${l.id}</code></div>
+      </article>`;
+    }).join('');
+    return `<div class="panel hall" style="--hc:var(--h-${h.id})">
+      <div class="hall-head"><div>
+        <div class="hall-name"><h3 style="font-size:18px">${h.name}</h3><span class="fam">${h.fam}</span></div>
+        <div class="who">${h.homes.map((x) => `<span class="tag">${x}</span>`).join('')}<span class="tag"><code style="background:none;padding:0">${h.place}</code></span></div>
+        <p class="lore">${h.lore}</p></div></div>
+      <div class="seats">${seats}</div></div>`;
+  }).join('');
+
+  // ---- The order chart ------------------------------------------------------------------------------------------------
+  const METRICS = [
+    ['one', 'One foe'], ['weak', 'One foe, weak (Tier 1 best)'], ['c3', 'Crowd of 3 (total)'], ['c5', 'Crowd of 5 (total)'],
+  ];
+  let metric = 'one';
+  const metricEl = document.getElementById('metric');
+  metricEl.insertAdjacentHTML('beforeend', METRICS.map(([k, label]) => `<button type="button" data-m="${k}" aria-pressed="${k === metric}">${label}</button>`).join(''));
+  metricEl.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-m]'); if (!b) return;
+    metric = b.dataset.m;
+    metricEl.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.m === metric)));
+    drawChart();
+  });
+  const tip = document.getElementById('tip');
+  function showTip(e, html) {
+    tip.innerHTML = html; tip.style.opacity = '1';
+    const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = e.clientX + pad, y = e.clientY + pad;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - pad;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - pad;
+    tip.style.left = `${Math.max(8, x)}px`; tip.style.top = `${Math.max(8, y)}px`;
+  }
+  const hideTip = () => { tip.style.opacity = '0'; };
+  function drawChart() {
+    const rows = [...LIMITS].sort((a, b) => b.n[metric] - a.n[metric] || a.id.localeCompare(b.id));
+    const max = metric === 'c5' ? 6.5 : metric === 'c3' ? 4 : 4;
+    const at = (v) => `${(100 * v / max).toFixed(2)}%`;
+    document.getElementById('chart').innerHTML = rows.map((l) => `<div class="crow" data-id="${l.id}" style="--hc:var(--h-${l.hall})">
+        <div class="cname"><span class="sw" aria-hidden="true"></span><span>${l.name}</span></div>
+        <div class="track"><div class="bar" style="width:${at(l.n[metric])}"></div><div class="ref" style="left:${at(ULT)}"></div><div class="ref today" style="left:${at(TODAY)}"></div></div>
+        <div class="cval">${r2(l.n[metric])}</div></div>`).join('');
+    const ticks = []; for (let v = 0; v <= max + 1e-9; v += (max > 5 ? 1 : 0.5)) ticks.push(v);
+    document.getElementById('ticks').innerHTML = ticks.map((v) => `<span style="left:${at(v)}">${v % 1 ? v.toFixed(1) : v}×</span>`).join('');
+    document.querySelectorAll('#chart .crow').forEach((row) => {
+      const l = LIMITS.find((x) => x.id === row.dataset.id);
+      row.addEventListener('mousemove', (e) => showTip(e, `<b>${l.name}</b>${hallOf(l.hall).name} · ${shapeLine(l)}<br>Power ${l.P}× · one foe ${r2(l.n.one)} · weak ${r2(l.n.weak)}<br>3 foes ${r2(l.n.c3)} · 5 foes ${r2(l.n.c5)} · ${pct(l.n.one / ULT)}% of the Ultimate`));
+      row.addEventListener('mouseleave', hideTip);
+    });
+  }
+  drawChart();
+  document.getElementById('chart-legend').innerHTML = HALLS.map((h) => `<span style="--hc:var(--h-${h.id})"><span class="sw"></span>${h.name}</span>`).join('') +
+    '<span><span class="line"></span>The Ultimate, 2.9×</span><span><span class="line today"></span>Today’s hybrid, 2.2×</span>';
+  document.getElementById('order-table').innerHTML = '<thead><tr><th>Limit Break</th><th>Hall</th><th>Shape</th><th class="num">Power</th><th class="num">One foe</th><th class="num">Weak (best)</th><th class="num">3 foes</th><th class="num">5 foes</th><th class="num">% Ult</th></tr></thead><tbody>' +
+    [...LIMITS].sort((a, b) => b.n.one - a.n.one).map((l) => `<tr><td>${l.name}</td><td>${hallOf(l.hall).name}</td><td>${shapeLine(l)}</td><td class="num">${l.P.toFixed(1)}</td><td class="num">${r2(l.n.one)}</td><td class="num">${r2(l.n.weak)}</td><td class="num">${r2(l.n.c3)}</td><td class="num">${r2(l.n.c5)}</td><td class="num">${pct(l.n.one / ULT)}%</td></tr>`).join('') + '</tbody>';
+
+  // The owner's rules, checked from the numbers above.
+  const by = (id) => LIMITS.find((l) => l.id === id).n;
+  const ult = by('brawler-2'), tri = by('brawler-1'), echo = by('brawler-3'), pact = by('spellblade-1'), summ = by('summoner-1'), ang = by('healer-1');
+  const othersMax = Math.max(...LIMITS.filter((l) => !['brawler-1', 'mage-1', 'brawler-2', 'mage-2'].includes(l.id)).map((l) => l.n.weak));
+  const checks = [
+    ['The Greatsword Ultimate is the highest', `2.9× in one hit; weak ${r2(ult.weak)}. No other seat on its own weakness passes the unweak Ultimate (best ${r2(othersMax)}).`, othersMax < ult.one],
+    ['The Fire Ultimate mirrors it', `Ten Thousand Candles: ${r2(by('mage-2').one)} and ${r2(by('mage-2').weak)}, identical.`, by('mage-2').one === ult.one],
+    ['The tri attacks are second', `2.5× unweak; ${r2(tri.one * 1.1)} on one weakness, under the Ultimate's ${r2(ult.one)}.`, tri.one * 1.1 < ult.one],
+    ['…a bit higher on several weaknesses', `${r2(tri.weak)} on two weaknesses the Ultimate doesn't share: +${pct(tri.weak / ult.one - 1)}% over ${r2(ult.one)}.`, tri.weak > ult.one && tri.weak < ult.one * 1.1],
+    ['The Spell Blade slightly less hard', `${r2(pact.one)} at random, ${pct(pact.one / echo.one)}% of a standard seat; its best ${r2(pact.weak)} the lowest of the one-foe seats.`, pact.one < echo.one && pact.weak <= ang.weak],
+    ['The Summoner as hard in AoE capacity', `${r2(summ.c3)} on three foes (the Ultimate on its weakness: ${r2(ult.weak)}); ${r2(summ.c5)} on five.`, summ.c3 > ult.one],
+  ];
+  document.getElementById('checks').innerHTML = checks.map(([t, d, ok]) => `<div class="check"><b>${ok ? '✓' : '✗'} ${t}</b><span>${d}</span></div>`).join('');
+
+  // ---- Coverage ---------------------------------------------------------------------------------------------------------
+  const shade = (n, max) => n ? `background:color-mix(in srgb, var(--accent) ${Math.round(10 + 50 * n / max)}%, transparent)` : '';
+  const hallTh = HALLS.map((h) => `<th class="hall-th" style="--hc:var(--h-${h.id})"><span class="sw"></span>${h.name.split(' ')[0]}</th>`).join('');
+  document.getElementById('kinds-table').innerHTML = `<thead><tr><th>Kind</th>${hallTh}<th class="num">Seats</th><th class="num">Halls</th></tr></thead><tbody>` +
+    KINDS.map((k) => {
+      const per = HALLS.map((h) => LIMITS.filter((l) => l.hall === h.id && l.n.kinds.includes(k)).length);
+      return `<tr><td>${kindChip(k)}</td>${per.map((n) => `<td class="cell${n ? '' : ' zero'}" style="${shade(n, 4)}">${n || '—'}</td>`).join('')}<td class="num">${per.reduce((a, b) => a + b, 0)}</td><td class="num">${per.filter(Boolean).length}</td></tr>`;
+    }).join('') + '</tbody>';
+  document.getElementById('sets-table').innerHTML = `<thead><tr><th>Set</th>${hallTh}<th class="num">Seats</th></tr></thead><tbody>` +
+    [...Object.keys(TWINS), 'Twilight'].map((set) => {
+      const per = HALLS.map((h) => LIMITS.filter((l) => l.hall === h.id && answered(l.n.kinds, true).includes(set)).length);
+      const ks = set === 'Twilight' ? TWILIGHT : TWINS[set];
+      return `<tr${set === 'Twilight' ? ' class="muted"' : ''}><td style="white-space:nowrap">${set}<div class="muted" style="font-size:11px">${ks.map((k) => LABEL[k]).join(' · ')}</div></td>${per.map((n) => `<td class="cell${n ? '' : ' zero'}" style="${shade(n, 4)}">${n || '—'}</td>`).join('')}<td class="num">${LIMITS.filter((l) => answered(l.n.kinds, true).includes(set)).length}</td></tr>`;
+    }).join('') + '</tbody>';
+  const classRows = Object.entries(DEFAULTS).map(([cls, w]) => {
+    const missing = KINDS.filter((k) => !w.includes(k));
+    const held = answered(w), miss = Object.keys(TWINS).filter((x) => !held.includes(x));
+    const adds = LIMITS.map((l) => l.n.kinds.filter((k) => missing.includes(k)));
+    let best = 0, pairs = 0, bestPair = '';
+    for (let i = 0; i < LIMITS.length; i++) for (let j = i + 1; j < LIMITS.length; j++) {
+      const set = new Set([...adds[i], ...adds[j]]);
+      if (set.size > best) { best = set.size; bestPair = `${LIMITS[i].name} + ${LIMITS[j].name}`; }
+      if (miss.every((x) => answered([...LIMITS[i].n.kinds, ...LIMITS[j].n.kinds]).includes(x))) pairs++;
+    }
+    const alone = LIMITS.filter((l) => miss.every((x) => answered(l.n.kinds).includes(x))).map((l) => l.name);
+    return `<tr><td><b>${cls}</b></td><td>${w.map((k) => kindChip(k)).join(' ')}</td><td>${held.join(', ')}</td><td>${miss.join(', ')}</td>
+      <td class="num">${adds.filter((a) => a.length).length} of 20</td><td>${best} <span class="muted">(${bestPair})</span></td><td class="num">${pairs}</td><td>${alone.join(', ') || '<span class="muted">—</span>'}</td></tr>`;
+  });
+  document.getElementById('class-table').innerHTML = '<thead><tr><th>Class</th><th>Weapons</th><th>Sets held</th><th>Sets missing</th><th class="num">Seats adding a kind</th><th>Most kinds two Heroes add</th><th class="num">Pairs closing every missing set</th><th>One seat closes them all</th></tr></thead><tbody>' + classRows.join('') + '</tbody>';
+
+  // ---- Migration --------------------------------------------------------------------------------------------------------
+  const nameOf = (id) => LIMITS.find((l) => l.id === id);
+  let mig = '<thead><tr><th>Today\'s seat</th><th>Limit Break (kinds)</th><th class="arrow"></th><th>Halls v2 seat</th><th>Limit Break (kinds)</th><th>What moves</th></tr></thead><tbody>';
+  for (const [id, name, kinds] of TODAY_SEATS) {
+    const n = nameOf(id);
+    mig += `<tr><td><code>${id}</code></td><td>${name} <span class="muted">(${kinds})</span></td><td class="arrow">→</td><td><code>${id}</code></td><td><b>${n.name}</b> <span class="muted">(${n.n.kinds.map((k) => LABEL[k]).join(', ')})</span></td><td class="muted">Id kept; Hero, Learners and Bonds as they are</td></tr>`;
+  }
+  for (const [to, olds] of Object.entries(MERGES)) {
+    const n = nameOf(to);
+    olds.forEach(([id, name, kinds, role], i) => {
+      mig += `<tr class="merge"><td><code>${id}</code> <span class="tag">${role}</span></td><td>${name} <span class="muted">(${kinds})</span></td><td class="arrow">→</td>` +
+        (i === 0 ? `<td rowspan="2"><code>${to}</code></td><td rowspan="2"><b>${n.name}</b> <span class="muted">(${n.n.kinds.map((k) => LABEL[k]).join(', ')})</span></td><td rowspan="2" class="muted">Merged: the higher Bond; the less-bonded Hero stays, the other leads the Learners; ten Learners by Bond</td>` : '') + '</tr>';
+    });
+  }
+  document.getElementById('mig-table').innerHTML = mig + '</tbody>';
+
+  // ---- Decisions --------------------------------------------------------------------------------------------------------
+  document.getElementById('dec').innerHTML = DECISIONS.map(([id, t]) => `<div><b>${id}</b>${t}</div>`).join('');
+
+  // ---- Theme ------------------------------------------------------------------------------------------------------------
+  const themeEl = document.getElementById('theme');
+  const setTheme = (t) => {
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
+    themeEl.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === t)));
+    try { localStorage.setItem('halls-v2-theme', t); } catch (e) { /* storage unavailable */ }
+  };
+  let saved = 'system';
+  try { saved = localStorage.getItem('halls-v2-theme') || 'system'; } catch (e) { /* storage unavailable */ }
+  setTheme(saved);
+  themeEl.addEventListener('click', (e) => { const b = e.target.closest('button[data-t]'); if (b) setTheme(b.dataset.t); });
+})();
+</script>
+</body>
+</html>

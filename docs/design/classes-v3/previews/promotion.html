@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promotion and Reclass</title>
+<!-- Classes v3 (docs/design/classes-v3/classes-v3.md §2.6, §7, §14): the promotion sheet and the reclass view inside the
+     approved Uma profile v2's Class tab, drawn at 390x844 inside a desktop page. Self-contained: uma-kit's tokens, light
+     and dark. Every Uma here is made up. -->
+<style>
+  /* uma-kit's theme tokens (uma-platform/packages/kit/theme.css), as the Tier rework's and profile v2's previews copy
+     them: light is uma-racer's, dark is uma-rpg's. The page follows the system; the Light/Dark buttons pin one. */
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #b8770a; --info: #2f6fe0; --locked: #8a94a3;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --bad: #c23b33; --bad-wash: #fbe4e2; --good-wash: #e2f2e8;
+    --cl-recruit: #8f6a58; --cl-apprentice: #5c78aa; --cl-duelist: #9c8642; --cl-caller: #8873aa; --cl-acolyte: #4f907a;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-tomeblade: #1d8aa2; --cl-armsummoner: #6c7d1c;
+    --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --k-greatsword: #d9772b; --k-axe: #8a52c7; --k-lance: #2f9a4f; --k-bow: #3aa38f; --k-katana: #c4466e;
+    --k-fire: #d23a2f; --k-ice: #2f7fd6; --k-lightning: #c9a400; --k-light: #b89a3a; --k-dark: #6d48b8;
+    --f-pendant: #2a78d6; --f-orb: #eb6834; --f-bell: #1baf7a; --f-insignia: #6250d6;
+    --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+      --cl-recruit: #c09482; --cl-apprentice: #8ea8d8; --cl-duelist: #cdb672; --cl-caller: #b8a3da; --cl-acolyte: #7ec2aa;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-tomeblade: #45bad4; --cl-armsummoner: #a8bb46;
+      --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+      --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+      --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+      --scrim: rgb(0 0 0 / 0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+    --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+    --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+    --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+    --cl-recruit: #c09482; --cl-apprentice: #8ea8d8; --cl-duelist: #cdb672; --cl-caller: #b8a3da; --cl-acolyte: #7ec2aa;
+    --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-tomeblade: #45bad4; --cl-armsummoner: #a8bb46;
+    --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+    --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+    --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+    --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+    --scrim: rgb(0 0 0 / 0.55);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 6px; }
+  p { margin: 0; }
+  a { color: inherit; }
+  code { font-size: 12px; background: var(--raised); padding: 0 4px; border-radius: 4px; }
+  .lead { color: var(--ink-soft); max-width: 960px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  nav.top { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--hairline); }
+  nav.top a, nav.top button { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font: 600 13px system-ui, sans-serif;
+    box-shadow: 0 1px 0 var(--hairline-strong); border: 0; cursor: pointer; }
+  nav.top a:hover { background: var(--raised); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  nav.top .spacer { flex: 1; }
+  nav.top button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; font-size: 16px; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note b { color: var(--ink); }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pills button { font: 600 12.5px system-ui, sans-serif; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; min-height: 32px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 2px; }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 6px;
+    background: var(--raised); border: 1px solid var(--hairline-strong); color: var(--ink); white-space: nowrap; }
+  .tag.good { background: var(--good-wash); border-color: transparent; color: var(--success); }
+  .tag.bad { background: var(--bad-wash); border-color: transparent; color: var(--bad); }
+  .tag.acc { background: var(--accent-wash); border-color: transparent; color: var(--accent-strong); }
+  .tag.new { background: var(--accent); border-color: transparent; color: var(--accent-ink); }
+  .glyph { width: 30px; height: 30px; border-radius: 8px; display: inline-grid; place-items: center; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: -.02em; flex: none; }
+  .glyph.sm { width: 22px; height: 22px; font-size: 10px; border-radius: 6px; }
+  .kchip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 2px 8px 2px 3px; border-radius: 999px; background: var(--raised); white-space: nowrap; }
+  .kchip i { width: 16px; height: 16px; border-radius: 5px; display: inline-block; flex: none; }
+  #tip { position: fixed; z-index: 60; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  .split { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--sunken); min-width: 80px; }
+  .split i { display: block; height: 100%; }
+  .foot { margin-top: 48px; font-size: 12px; color: var(--ink-faint); }
+  @media (max-width: 900px) {
+    main { padding: 20px 16px 60px; }
+    nav.top { margin: 16px -16px 0; padding: 10px 16px; }
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* ---- The phone: 390×844 at 1:1, as profile v2's previews draw it. Status 47 + top bar 62 + place header 52 = 161; the
+     body scrolls 683 px under the kit's bottom bar (80 px). ---- */
+  .pair { display: grid; grid-template-columns: 410px minmax(280px, 1fr); gap: 28px; align-items: start; margin-top: 16px; }
+  .phone-wrap { width: 410px; padding: 10px; }
+  .cap { font-size: 12px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; margin: 0 0 8px 10px; }
+  .phone { width: 390px; height: 844px; border-radius: 50px; background: var(--page); position: relative; overflow: hidden;
+    box-shadow: 0 0 0 10px var(--bezel), 0 0 0 11px #3a4250, 0 24px 48px rgb(0 0 0 / .22); font: 14px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  .ph-status { position: absolute; top: 0; left: 0; right: 0; height: 47px; display: flex; justify-content: space-between; align-items: center; padding: 6px 34px 0;
+    font: 600 15px system-ui, sans-serif; background: var(--panel); z-index: 3; }
+  .ph-status .island { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; }
+  .ph-top { position: absolute; top: 47px; left: 0; right: 0; height: 62px; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--panel); z-index: 3; }
+  .ph-top .ini { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; }
+  .ph-top .crest { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: #e8c25a; color: #1b1406; }
+  .ph-top .cur { margin-left: auto; display: flex; gap: 5px; }
+  .ph-top .cur span { font-size: 11.5px; font-weight: 700; padding: 4px 8px; border-radius: 999px; background: var(--raised); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ph-place { position: absolute; top: 109px; left: 0; right: 0; height: 52px; display: flex; align-items: center; gap: 2px; padding: 0 6px;
+    background: color-mix(in srgb, var(--panel) 95%, transparent); border-bottom: 1px solid var(--hairline); z-index: 3; }
+  .ph-place .ib { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--ink-soft); flex: none; font-size: 20px; }
+  .ph-place .ttl { flex: 1; font-size: 18px; font-weight: 600; min-width: 0; }
+  .ph-body { position: absolute; top: 161px; left: 0; right: 0; height: 683px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  .ph-inner { padding: 12px 16px 96px; }
+  .ph-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; background: color-mix(in srgb, var(--panel) 96%, transparent); border-top: 1px solid var(--hairline);
+    display: grid; grid-template-columns: repeat(5, 1fr); align-items: start; padding-top: 8px; z-index: 3; }
+  .ph-bar span { display: grid; justify-items: center; gap: 2px; font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
+  .ph-bar i { width: 26px; height: 26px; border-radius: 8px; background: var(--sunken); display: block; }
+  .ph-bar span.mid i { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); margin-top: -18px; box-shadow: 0 0 0 4px var(--panel); }
+  .ph-bar::after { content: ""; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: var(--ink); opacity: .85; }
+  .ph-scrim { position: absolute; inset: 0; background: var(--scrim); z-index: 10; }
+  .ph-sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 770px; background: var(--panel); border-radius: 22px 22px 0 0; z-index: 11;
+    display: flex; flex-direction: column; box-shadow: 0 -8px 30px rgb(0 0 0 / .2); }
+  .ph-sheet .handle { width: 40px; height: 5px; border-radius: 3px; background: var(--hairline-strong); margin: 8px auto 2px; flex: none; }
+  .ph-sheet .sh-head { display: flex; align-items: center; gap: 8px; padding: 4px 8px 6px 18px; flex: none; }
+  .ph-sheet .sh-head b { flex: 1; font-size: 17px; }
+  .ph-sheet .sh-head .x { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-soft); font-size: 18px; background: var(--raised); cursor: pointer; }
+  .ph-sheet .sh-body { overflow-y: auto; padding: 4px 18px 16px; }
+  .ph-sheet .sh-foot { padding: 10px 18px 30px; border-top: 1px solid var(--hairline); flex: none; }
+  .btn { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 12px; background: var(--accent); color: var(--accent-ink);
+    font-weight: 800; font-size: 15px; border: 0; width: 100%; cursor: pointer; font-family: inherit; }
+  .btn.off { background: var(--sunken); color: var(--ink-faint); cursor: default; }
+  .btn.ghost { background: var(--raised); color: var(--ink); }
+  .hd { display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px; gap: 12px; align-items: center; height: 64px; }
+  .portrait { width: 64px; height: 64px; border-radius: 10px; background: var(--sunken); overflow: hidden; display: block; }
+  .hd .nm { font-size: 17px; font-weight: 700; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hd .tt { font-size: 12.5px; color: var(--ink-soft); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hd .lv { display: flex; align-items: center; gap: 8px; height: 22px; font-size: 14px; font-weight: 800; }
+  .hd .lv .bar { flex: 1; height: 4px; border-radius: 2px; background: var(--sunken); overflow: hidden; }
+  .hd .lv .bar i { display: block; height: 100%; background: var(--info); border-radius: 2px; }
+  .target { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--hairline-strong); background: var(--raised); align-self: start; }
+  .facts { display: grid; grid-template-columns: 1fr 1.25fr .8fr; gap: 6px; margin-top: 12px; }
+  .fact { min-height: 44px; border-radius: 10px; background: var(--raised); padding: 4px 10px; display: flex; flex-direction: column; justify-content: center; position: relative; min-width: 0; }
+  .fact .l { font-size: 11px; color: var(--ink-soft); font-weight: 600; line-height: 14px; }
+  .fact .v { font-size: 12.5px; font-weight: 700; line-height: 17px; color: var(--accent-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fact.det { flex-direction: row; align-items: center; justify-content: flex-start; font-size: 12.5px; font-weight: 700; }
+  .tabbar { position: sticky; top: 0; z-index: 4; margin: 12px -16px 0; padding: 6px 16px; background: color-mix(in srgb, var(--page) 95%, transparent); }
+  .tabbar .in { display: flex; gap: 4px; background: var(--sunken); border-radius: 10px; padding: 4px; }
+  .tabbar .in > span { flex: 1; min-height: 44px; border-radius: 8px; font: 600 12.5px system-ui, sans-serif; color: var(--ink-soft); display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .tabbar .in > span.cur { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block; flex: none; }
+  .classrow { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 6px; margin-top: 12px; }
+  .ctile { min-height: 64px; border-radius: 12px; background: var(--raised); padding: 8px; display: flex; flex-direction: column; justify-content: center; gap: 3px; position: relative; min-width: 0; cursor: pointer; }
+  .ctile .top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .ctile .nm { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ctile .rk { font-size: 11px; font-weight: 700; color: var(--ink-soft); display: flex; align-items: center; gap: 5px; }
+  .ctile .mini { height: 3px; border-radius: 2px; background: var(--sunken); overflow: hidden; }
+  .ctile .mini i { display: block; height: 100%; background: var(--accent); }
+  .ctile.ready { background: var(--good-wash); }
+  .ctile .dot { position: absolute; top: 8px; right: 8px; }
+  .wtile { align-items: center; }
+  .wtile .ln { font-size: 11px; font-weight: 700; color: var(--ink-soft); }
+  .sel { box-shadow: inset 0 0 0 2px var(--accent) !important; }
+  .lbl11 { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-faint); margin: 14px 0 6px; display: flex; align-items: center; justify-content: space-between; min-height: 16px; }
+  .eqrow { display: grid; grid-template-columns: repeat(7, 44px); gap: 6px; justify-content: space-between; }
+  .eq { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); display: grid; place-items: center; position: relative; }
+  .eq .glyph { width: 26px; height: 26px; font-size: 10px; border-radius: 7px; }
+  .eq .gb { position: absolute; right: 0; bottom: -3px; font-size: 10.5px; padding: 0 4px; }
+  .eq.empty { background: transparent; border: 1.5px dashed var(--hairline-strong); }
+  .eq.none { visibility: hidden; }
+  .gb { display: inline-block; font-size: 11px; font-weight: 700; line-height: 15px; padding: 0 5px; border-radius: 5px; background: var(--ink); color: var(--panel); font-variant-numeric: tabular-nums; }
+  .autochip { min-height: 32px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; background: var(--accent); color: var(--accent-ink); text-transform: none; letter-spacing: 0; }
+  .treehd { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 2px; }
+  .treehd b { font-size: 12.5px; }
+  .treehd span { font-size: 12.5px; font-weight: 700; color: var(--accent-strong); min-height: 32px; display: inline-flex; align-items: center; }
+  .lim { display: flex; align-items: center; gap: 10px; min-height: 48px; border-radius: 12px; background: var(--raised); padding: 6px 12px; margin-top: 12px; }
+  .lim .k { font-size: 11px; font-weight: 700; color: var(--ink-faint); letter-spacing: .04em; text-transform: uppercase; }
+  .lim .v { flex: 1; font-size: 12.5px; font-weight: 600; min-width: 0; }
+  .lim::after { content: "›"; color: var(--ink-faint); font-size: 16px; }
+  .side h3 { margin-top: 14px; }
+  .side ul { margin: 6px 0 0; padding-left: 18px; color: var(--ink-soft); font-size: 13px; }
+  .side li { margin: 4px 0; }
+  .side li b { color: var(--ink); }
+
+  /* The Classes sheet's tree, at phone width */
+  .ctree { display: grid; grid-template-columns: 66px 62px 62px 62px 66px; gap: 6px 5px; justify-content: space-between; margin-top: 4px; }
+  .ctree .ch { font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-align: center; padding: 3px 0; border-radius: 6px; }
+  .ctree .ch.w { color: var(--phys); background: color-mix(in srgb, var(--phys) 10%, transparent); }
+  .ctree .ch.a { color: var(--accent-strong); background: color-mix(in srgb, var(--accent) 10%, transparent); grid-column: 2 / 5; }
+  .ctree .ch.m { color: var(--magic); background: color-mix(in srgb, var(--magic) 10%, transparent); }
+  .ctree .rl { grid-column: 1 / -1; font-size: 10.5px; font-weight: 700; color: var(--ink-faint); letter-spacing: .04em; margin: 4px 0 -2px; }
+  .ct { min-height: 60px; border-radius: 10px; background: var(--raised); padding: 5px 4px 4px; display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center;
+    cursor: pointer; position: relative; border: 1.5px solid transparent; min-width: 0; }
+  .ct .n { font-size: 10.5px; font-weight: 800; line-height: 12px; }
+  .ct .s { font-size: 10.5px; font-weight: 700; color: var(--ink-soft); line-height: 13px; }
+  .ct.on { background: var(--accent); color: var(--accent-ink); }
+  .ct.on .s { color: var(--accent-ink); opacity: .85; }
+  .ct.ready { background: var(--good-wash); }
+  .ct.ready .s { color: var(--success); }
+  .ct.open { background: transparent; border: 1.5px dashed var(--hairline-strong); }
+  .ct.closed { opacity: .4; }
+  .ct .dot { position: absolute; top: 5px; right: 5px; }
+  .ct.selr { box-shadow: 0 0 0 2px var(--accent); }
+  .ct.gap { visibility: hidden; cursor: default; }
+  .selline { margin-top: 12px; border-radius: 12px; background: var(--raised); padding: 8px 12px; font-size: 12.5px; }
+  .selline b { font-size: 14px; }
+  .selline .r { color: var(--ink-soft); font-size: 12px; margin-top: 2px; }
+  .door { display: flex; align-items: center; gap: 10px; min-height: 48px; border-bottom: 1px solid var(--hairline); font-size: 14px; margin-top: 6px; }
+  .door span:first-child { flex: 1; font-weight: 600; }
+  .door small { color: var(--ink-soft); font-size: 12px; }
+  .door::after { content: "›"; color: var(--ink-faint); font-size: 18px; }
+  /* The promotion sheet */
+  .ptiles { display: grid; gap: 8px; margin-top: 8px; }
+  .ptiles.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ptiles.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pt { border-radius: 12px; background: var(--raised); padding: 8px 8px 10px; cursor: pointer; border: 0; font: inherit; color: inherit; text-align: left; position: relative; min-height: 150px; display: flex; flex-direction: column; gap: 5px; }
+  .pt .top { display: flex; align-items: center; gap: 6px; }
+  .pt .n { font-size: 12.5px; font-weight: 800; line-height: 15px; }
+  .pt .sg { font-size: 10.5px; font-weight: 800; color: var(--success); }
+  .pt .held { font-size: 10.5px; font-weight: 800; color: var(--ink-soft); }
+  .pt .sl { font-size: 11px; font-weight: 700; color: var(--ink-soft); }
+  .pt .gl { display: flex; gap: 3px; }
+  .pt .role { font-size: 11px; color: var(--ink-soft); line-height: 14px; }
+  .pt.is-on { background: var(--accent); color: var(--accent-ink); }
+  .pt.is-on .sl, .pt.is-on .role, .pt.is-on .sg { color: var(--accent-ink); }
+  .ba { text-align: center; font-size: 13px; color: var(--ink-soft); margin-top: 12px; line-height: 1.5; }
+  .ba b { color: var(--ink); font-size: 15px; }
+  .ba .to { color: var(--success); font-weight: 800; }
+  .t0node { display: flex; gap: 12px; align-items: center; border-radius: 12px; background: var(--raised); padding: 10px 12px; margin-top: 8px; }
+  .t0node .big { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; position: relative; flex: none; }
+  .t0node .big .gb { position: absolute; right: -4px; bottom: -2px; }
+  .t0node b { display: block; font-size: 14px; }
+  .t0node small { color: var(--ink-soft); font-size: 12px; display: block; }
+  .promo-line { margin-top: 10px; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; }
+  .promo-line .bar { flex: 1; height: 6px; border-radius: 3px; background: var(--sunken); overflow: hidden; }
+  .promo-line .bar i { display: block; height: 100%; background: var(--success); }
+  .gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 14px; align-items: start; }
+  .msheet { background: var(--panel); border-radius: 18px; box-shadow: 0 1px 0 var(--hairline-strong), 0 0 0 1px var(--hairline); overflow: hidden; min-width: 0; }
+  .msheet .from { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; padding: 10px 14px 0; }
+  .msheet .hh { padding: 4px 14px; font-size: 15px; font-weight: 800; }
+  .msheet .bb { padding: 2px 14px 10px; }
+  .msheet .ff { padding: 8px 14px 12px; border-top: 1px solid var(--hairline); }
+  .msheet .btn { min-height: 40px; font-size: 13px; }
+  .msheet .pt { min-height: 132px; }
+  @media (max-width: 1100px) { .pair { grid-template-columns: minmax(0, 1fr); } .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Promotion and reclass, in her Class tab</h1>
+  <p class="lead">Classes v3 (<a href="../classes-v3.md">classes-v3.md</a> §2.6, §7, §14) inside the approved <a href="../../uma-profile-v2/proposal.md">Uma profile v2</a>’s
+    Class tab, at 390×844: a Tier 0 Uma’s tab, the <b>promotion sheet</b> at Rank 10, and the <b>Classes sheet</b>, which is the class tree: the reclass view.
+    Every phone is live: tap tiles, promote, switch. Every Uma here is made up.</p>
+  <nav class="top" aria-label="Sections">
+    <a href="#tier0">Tier 0</a><a href="#promote">Promotion</a><a href="#classes">Classes sheet</a><a href="#gallery">Every promotion</a><a href="#build">What H120 builds</a>
+    <a class="out" href="class-tree.html">Class tree ›</a><a class="out" href="weapon-shapes.html">Weapon shapes ›</a><a class="out" href="reset.html">Reset ›</a>
+    <span class="spacer"></span><span id="theme" style="display:flex;gap:6px"><button data-t="system">System</button><button data-t="light">Light</button><button data-t="dark">Dark</button></span>
+  </nav>
+
+  <section id="tier0">
+    <h2>1 · A Tier 0 Uma: Recruit, Rank 7</h2>
+    <p class="sub">Uma B, Lv 7. Her class tile counts to 10; her tree is one node, her skill in the selected weapon’s kind.</p>
+    <div class="pair">
+      <div class="phone-wrap"><p class="cap">Class tab · Tier 0</p><div class="phone" id="ph1"></div></div>
+      <div class="panel side">
+        <h3>What’s on the tab</h3>
+        <ul>
+          <li><b>Class tile:</b> “Recruit · R7/10”, the bar to 10. Tap: the Classes sheet (the tree, §3 below).</li>
+          <li><b>Weapon tiles:</b> any three of the ten; no line letter (Tier 0 has no fork).</li>
+          <li><b>Equipped 3/3:</b> her skill in each weapon’s kind; the badge is her Class Rank (the skill’s rank).</li>
+          <li><b>The tree:</b> one node, “Drill Strike · Lance · one foe · 1 hit · 1.97 · 10 MP”.</li>
+          <li><b>Promotion at R10 · 3 to go:</b> the next moment, with its bar.</li>
+          <li><b>No dot</b> until Rank 10: nothing to do yet.</li>
+        </ul>
+        <h3>Numbers</h3>
+        <ul><li>Tier 0 power by Class Rank: 1.52, 1.60, 1.67, 1.75, 1.82, 1.90, <b>1.97</b>, 2.05, 2.12, 2.20.</li>
+          <li>Rank r arrives with Uma Lv r when she fights as it from Lv 1: 3,600 Class EXP to Rank 10.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="promote">
+    <h2>2 · Rank 10: the promotion sheet</h2>
+    <p class="sub">Uma A, Lv 10, Recruit Rank 10 with 400 Class EXP waiting. The Class tab carries the dot; the class tile reads Promote. The sheet is open: pick a class and Promote. Close it to see the tab; promote to see her new class at Rank 10.</p>
+    <div class="pair">
+      <div class="phone-wrap"><p class="cap">The promotion sheet</p><div class="phone" id="ph2"></div></div>
+      <div class="panel side">
+        <h3>The sheet</h3>
+        <ul>
+          <li><b>Tiles show what differs:</b> slots, the three defaults, a one-line role. One is <b>Suggested</b> (Recruit: the Brawler).</li>
+          <li><b>Before → after</b> in one line: “Recruit R10 → Brawler R10 · depths 1–2 · 6 skills · +400 EXP”.</li>
+          <li><b>One action:</b> Promote to …, free. No confirm: it closes nothing, and the siblings stay open.</li>
+          <li><b>After:</b> she fights as it at Rank 10, its default weapons on; the tab redraws on her first weapon’s tree; the dot goes.</li>
+        </ul>
+        <h3>Rules behind it (§2.6)</h3>
+        <ul><li>Each child opens at <b>Class Rank 10</b>: Tier 0 is the old Ranks 1–10, so every depth comes before the world’s foes expect it.</li>
+          <li>EXP past Rank 10 waits on the Tier 0 and goes with her next promotion.</li>
+          <li>Promoting into a sibling later is free: her Recruit stays at Rank 10.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="classes">
+    <h2>3 · The Classes sheet: the class tree, the reclass view</h2>
+    <p class="sub">Uma C, Lv 34: a Brawler R34 who also holds Arms Spellblade R12, has her Recruit at Rank 10 and started an Acolyte (R4). Tap any tile: the footer becomes that class’s one action.</p>
+    <div class="pair">
+      <div class="phone-wrap"><p class="cap">Classes sheet</p><div class="phone" id="ph3"></div></div>
+      <div class="panel side">
+        <h3>States (profile v2’s state language, UP23)</h3>
+        <ul>
+          <li><b>On</b> (fill): her active class. Footer: <b>Standard preset</b>.</li>
+          <li><b>Available</b> (raised): a class she holds. Footer: <b>Fight as …</b>, free.</li>
+          <li><b>Ready</b> (green dot): a child of a Tier 0 at Rank 10. Footer: <b>Promote to …</b> (the promotion sheet).</li>
+          <li><b>Open</b> (dashed): a Tier 0 she hasn’t started. Footer: <b>Start … · R1</b>, free.</li>
+          <li><b>Closed</b> (faded): footer disabled with its gate, “Opens with Duelist R10 or Apprentice R10”.</li>
+        </ul>
+        <h3>Replaces</h3>
+        <ul><li>Profile v2’s Class sheet (“six class tiles in two rows”) and its Class Ranks grid: every rank is on its tile.</li>
+          <li><b>Class Manuals ›</b> is a door to the Exchange’s sheet with her picked; Back returns here (UP30: no spending in the profile).</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <h2>Every promotion sheet</h2>
+    <p class="sub">The other four Tier 0s at Rank 10, each with its children and its suggestion (Power over Wit picks the Arms child or the Paladin; these Umas lean Wit).</p>
+    <div class="gallery" id="gal"></div>
+  </section>
+
+  <section id="build">
+    <h2>What H120 now builds, and what H123 drops</h2>
+    <div class="grid2">
+      <div class="panel"><h3>H120 · Class tab (amended)</h3><table>
+        <tr><td><b>Class tile</b></td><td>Tier 0 “R7/10”; at 10 a Ready dot and “Promote”</td></tr>
+        <tr><td><b>Classes sheet</b></td><td>The tree: three columns, 13 tiles in five states; the footer by selection; the Class Manuals door</td></tr>
+        <tr><td><b>Promotion sheet</b></td><td>The Tier 0’s children, Suggested, before → after, Promote</td></tr>
+        <tr><td><b>Tier 0 tree</b></td><td>One node and the promotion line; no line squares</td></tr>
+        <tr><td><b>Dot</b></td><td>While she fights as a Tier 0 at Rank 10</td></tr>
+      </table></div>
+      <div class="panel"><h3>H123 · Template tab (amended)</h3><table>
+        <tr><td><b>Calling</b></td><td>Always fixed: “Calling Recruit · fixed · Trade Metal”; the pick tiles and confirm sheet go</td></tr>
+        <tr><td><b>★ Flourish</b></td><td>“Works as Recruit, Brawler, Arms Spellblade, Arms Summoner”</td></tr>
+        <tr><td><b>★ Moon II</b></td><td>DEF +8, M.DEF +8, or DEF +4 · M.DEF +4 (All-Rounder callings)</td></tr>
+        <tr><td><b>Types</b></td><td>15 (5 callings × 3 strides)</td></tr>
+      </table></div>
+    </div>
+  </section>
+  <p class="foot">Classes v3 preview · for the owner’s review, 2026-10-29 · every Uma made up.</p>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+'use strict';
+// Classes v3's previews (docs/design/classes-v3/classes-v3.md). Self-contained. Every Uma here is made up; class, weapon,
+// skill and place names are the game's own or this doc's. Numbers follow the doc's tables.
+
+// ---------- Theme: follow the system, or pin Light / Dark ----------
+function initTheme() {
+  const bar = document.getElementById('theme');
+  if (!bar) return;
+  let saved = null;
+  try { saved = localStorage.getItem('umaClassesV3.theme'); } catch (e) { saved = null; }
+  const apply = (t) => {
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
+    bar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === (t || 'system'))));
+  };
+  apply(saved);
+  bar.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    const t = b.dataset.t === 'system' ? null : b.dataset.t;
+    try { if (t) localStorage.setItem('umaClassesV3.theme', t); else localStorage.removeItem('umaClassesV3.theme'); } catch (err) { /* per-viewer convenience only */ }
+    apply(t);
+  });
+}
+
+// ---------- Tooltip ----------
+const tipEl = () => document.getElementById('tip');
+function placeTip(x, y) { const t = tipEl(); const w = t.offsetWidth, h = t.offsetHeight; t.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; t.style.top = (y + 16 + h > innerHeight ? Math.max(8, y - h - 12) : y + 16) + 'px'; }
+function showTip(x, y, title, body) { const t = tipEl(); t.innerHTML = `<b>${title}</b>${body}`; t.style.opacity = 1; placeTip(x, y); }
+function hideTip() { const t = tipEl(); if (t) t.style.opacity = 0; }
+function bindTips(root) {
+  (root || document).querySelectorAll('[data-tip]').forEach((el) => {
+    if (el.dataset.tipBound) return; el.dataset.tipBound = '1';
+    if (!el.hasAttribute('tabindex') && el.tagName !== 'BUTTON') el.setAttribute('tabindex', '0');
+    el.addEventListener('mouseenter', (e) => { const [t, b] = el.dataset.tip.split('||'); showTip(e.clientX, e.clientY, t, b || ''); });
+    el.addEventListener('mousemove', (e) => placeTip(e.clientX, e.clientY));
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('focus', () => { const [t, b] = el.dataset.tip.split('||'); const r = el.getBoundingClientRect(); showTip(r.left, r.bottom, t, b || ''); });
+    el.addEventListener('blur', hideTip);
+  });
+}
+
+// ---------- Kinds ----------
+const KIND = {
+  greatsword: { n: 'Greatsword', a: 'GS', ch: 'arms' }, axe: { n: 'Axe', a: 'Ax', ch: 'arms' }, lance: { n: 'Lance', a: 'Ln', ch: 'arms' },
+  bow: { n: 'Bow', a: 'Bw', ch: 'arms' }, katana: { n: 'Katana', a: 'Kt', ch: 'arms' },
+  fire: { n: 'Fire Tome', a: 'Fi', ch: 'tome' }, ice: { n: 'Blizzard Tome', a: 'Ic', ch: 'tome' }, lightning: { n: 'Thunder Tome', a: 'Th', ch: 'tome' },
+  light: { n: 'Light Tome', a: 'Li', ch: 'tome' }, dark: { n: 'Dark Tome', a: 'Dk', ch: 'tome' },
+};
+const glyph = (k, cls = '') => `<span class="glyph ${cls}" style="background:var(--k-${k})" aria-label="${KIND[k].n}">${KIND[k].a}</span>`;
+const kchip = (k) => `<span class="kchip"><i style="background:var(--k-${k})"></i>${KIND[k].n}</span>`;
+
+// ---------- The thirteen classes ----------
+// tier 0: recruit, duelist, acolyte, caller, apprentice. tier 1: brawler, spellblade (Arms Spellblade), armsummoner, paladin,
+// cleric, summoner (Tome Summoner), tomeblade (Tome Spellblade), mage (Sorcerer).
+const C = {
+  recruit: { n: 'Recruit', ab: 'Re', tier: 0, root: 'warrior', was: 'the owner’s Fighter', calling: 'Front among her best styles', combos: 'Front 27 · Front + Pace 19 · Front + Late 1', count: 47,
+    trade: 'Metal: Mine · Mine Workbench · Weapon Forge', skill: 'Drill Strike', children: ['brawler', 'spellblade', 'armsummoner'], def: ['greatsword', 'axe', 'lance'], preset: 'Bell (Greatsword)',
+    id: 'A soldier in her first weeks. One skill, any weapon; at Rank 10 she promotes into the Warrior column’s classes or the Arms hybrids.' },
+  duelist: { n: 'Duelist', ab: 'Du', tier: 0, root: 'allrounder', was: 'the owner’s Spell Blade', calling: 'Pace alone', combos: 'Pace 72', count: 72,
+    trade: 'Wood: Forest · Forest Workbench · Armorer', skill: 'Feint', children: ['spellblade', 'tomeblade'], def: ['katana', 'lance', 'lightning'], preset: 'Pendant',
+    id: 'One foe at a time, steel and spark: the Spellblades’ start. Promotes into either Spellblade.' },
+  acolyte: { n: 'Acolyte', ab: 'Ac', tier: 0, root: 'allrounder', was: 'the owner’s Healer', calling: 'Late alone', combos: 'Late 46', count: 46,
+    trade: 'Vegetables: Fields · Fields Workbench · Tome Forge', skill: 'Vigil', children: ['paladin', 'cleric'], def: ['light', 'ice', 'bow'], preset: 'Orb (Blizzard Tome)',
+    id: 'She serves the rites before she heals: her skill deals damage like the others. Promotes into the Paladin or the Cleric.' },
+  caller: { n: 'Caller', ab: 'Ca', tier: 0, root: 'allrounder', was: 'the owner’s Summoner', calling: 'End among her best styles', combos: 'Late + End 20 · End 13', count: 33,
+    trade: 'Fish: Fishery · Fishery Workbench · Charm Forge', skill: 'Beckon', children: ['armsummoner', 'summoner'], def: ['dark', 'ice', 'axe'], preset: 'Orb (Blizzard Tome)',
+    id: 'She calls; she doesn’t summon yet. Promotes into either Summoner.' },
+  apprentice: { n: 'Apprentice', ab: 'Ap', tier: 0, root: 'mage', was: 'the owner’s Mage', calling: 'Pace with Late or End', combos: 'Pace + Late 68 · Pace + Late + End 3 · Pace + End 1', count: 72,
+    trade: 'Stone: Monster Den · Den Workbench · Lapidary', skill: 'Primer', children: ['mage', 'tomeblade', 'summoner'], def: ['fire', 'ice', 'lightning'], preset: 'Pendant',
+    id: 'The magic word for a beginner. Promotes into the Sorcerer or the Tome hybrids.' },
+
+  brawler: { n: 'Brawler', ab: 'Br', tier: 1, root: 'warrior', parents: ['recruit'], type: 'Physical', slots: '3 Arms', def: ['greatsword', 'axe', 'lance'],
+    hand: '×1 · MP ×1', split: [100, 0], lean: [1.15, 1.1, 0.9, 1.1, 0.9, 0.8], prowess: '100/0', armor: 'ATK', trees: 5,
+    lineB: 'Combo · Reap · Impale · Barrage (Bow, new) · Draw', preset: 'Bell (Greatsword)', lb: '2×', twin: '—', was: 'Brawler',
+    id: 'Pure physical. One full act a turn: one foe hard, every foe, random foes, the target and the rest, a double cut.',
+    changes: 'Her Bow tree’s line A is a volley; its line B is Barrage (the old Bow line). Opens at Class Rank 10.' },
+  spellblade: { n: 'Arms Spellblade', ab: 'AB', tier: 1, root: 'allrounder', parents: ['recruit', 'duelist'], type: 'Physical hybrid', slots: '2 Arms + 1 Tome', def: ['katana', 'lance', 'lightning'],
+    hand: 'Arms 0.72 + Tome 0.44 · MP ×0.5 a half · the Arms half one hit more', split: [70, 30], lean: [1, 1.1, 0.95, 1, 1, 1], prowess: '70/30', armor: 'ATK', trees: 10,
+    lineB: 'Pierce on every tree', preset: 'Pendant (an Orb or a Bell on her Lance)', lb: '2.2×', twin: 'Lightning (Lance + Thunder)', was: 'Spell Blade',
+    id: 'Physical-led multi-hit: every act an Arms half and a Tome half, the Arms half first and one hit more. The shield chipper.',
+    changes: 'Today’s Spell Blade, renamed. Her Light trees land 2 hits (were 2 → 4); her Dark trees 2 → 4 (were 2).' },
+  armsummoner: { n: 'Arms Summoner', ab: 'AS', tier: 1, root: 'allrounder', parents: ['recruit', 'caller'], type: 'Physical hybrid', slots: '2 Arms + 1 Tome', def: ['bow', 'axe', 'dark'],
+    hand: 'Arms 0.62 + Tome 0.50 · MP ×0.5 a half · the Arms summon lingers', split: [70, 30], lean: [1, 1.1, 0.95, 1, 1, 1], prowess: '70/30', armor: 'ATK', trees: 10,
+    lineB: 'Bonded on Arms trees · Pack on Tome trees', preset: 'Orb (Bow)', lb: '2.2×', twin: 'Dark (Bow + Dark)', was: 'New', isNew: true,
+    id: 'Physical-led area: the Arms summon first; it lingers and strikes every foe once in farewell when her next pair comes. No support.',
+    changes: 'New: the Tome Summoner’s mirror. The Summoner’s summons on each kind’s tree; her lines mirrored.' },
+  paladin: { n: 'Paladin', ab: 'Pa', tier: 1, root: 'allrounder', parents: ['acolyte'], type: 'Healer', slots: '2 Arms + 1 Tome', def: ['greatsword', 'axe', 'light'],
+    hand: '×0.5 · MP ×0.6 · heals from ATK', split: [50, 50], lean: [1, 1, 0.8, 1.15, 1, 1.3], prowess: '80/20', armor: 'ATK', trees: 10,
+    lineB: 'Heavy (Valkyrie’s Oath on Light D3)', preset: 'Pendant', lb: '1.5×', twin: '—', was: 'Paladin', healer: true,
+    id: 'A healer whose Barriers grow with her ATK: blows Barrier and debuff, spells mend, bless and cleanse; she raises the fallen.',
+    changes: 'As today. Opens at Class Rank 10, from an Acolyte.' },
+  cleric: { n: 'Cleric', ab: 'Cl', tier: 1, root: 'allrounder', parents: ['acolyte'], type: 'Healer', slots: '2 Tomes + 1 Arm', def: ['light', 'ice', 'bow'],
+    hand: '×0.5 · MP ×0.6 · heals from M.ATK', split: [50, 50], lean: [1, 0.8, 1, 1, 1.15, 1.3], prowess: '20/80', armor: 'M.ATK', trees: 10,
+    lineB: 'Heavy (Rebirth on Light D3)', preset: 'Orb (Blizzard Tome)', lb: '1.5×', twin: '—', was: 'Cleric', healer: true,
+    id: 'A healer whose mends grow with her M.ATK: Regen from Light, drain from Dark, Rebirth.',
+    changes: 'As today. Opens at Class Rank 10, from an Acolyte.' },
+  summoner: { n: 'Tome Summoner', ab: 'TS', tier: 1, root: 'allrounder', parents: ['caller', 'apprentice'], type: 'Magical hybrid', slots: '2 Tomes + 1 Arm', def: ['dark', 'ice', 'axe'],
+    hand: 'Tome 0.62 + Arms 0.50 · MP ×0.5 a half · the Tome summon lingers', split: [30, 70], lean: [1, 0.95, 1.1, 1, 1, 1], prowess: '30/70', armor: 'M.ATK', trees: 10,
+    lineB: 'Bonded on Tome trees · Pack on Arms trees', preset: 'Orb (Blizzard Tome)', lb: '2.2×', twin: 'Ice (Blizzard + Axe)', was: 'Summoner',
+    id: 'Magic-led area: the Tome summon first; it lingers and strikes every foe once in farewell. No support.',
+    changes: 'Today’s Summoner, renamed. New defaults (were Dark, Light, Bow); her Bow and Dark summons are volleys, her Light summons double.' },
+  tomeblade: { n: 'Tome Spellblade', ab: 'TB', tier: 1, root: 'allrounder', parents: ['duelist', 'apprentice'], type: 'Magical hybrid', slots: '2 Tomes + 1 Arm', def: ['light', 'lightning', 'katana'],
+    hand: 'Tome 0.72 + Arms 0.44 · MP ×0.5 a half · the Tome half one hit more', split: [30, 70], lean: [1, 0.95, 1.1, 1, 1, 1], prowess: '30/70', armor: 'M.ATK', trees: 10,
+    lineB: 'Pierce on every tree', preset: 'Pendant (an Orb or a Bell on her Light)', lb: '2.2×', twin: 'Light (Light + Katana)', was: 'New', isNew: true,
+    id: 'Magic-led multi-hit: every act a Tome half and an Arms half, the Tome half first and one hit more. Her own skill names: Edged, Honed, Whetted, Gleaming, Sovereign.',
+    changes: 'New: the Arms Spellblade’s mirror. The Spellblade’s trees with her own names (Edged Volt … Sovereign Volt).' },
+  mage: { n: 'Sorcerer', ab: 'So', tier: 1, root: 'mage', parents: ['apprentice'], type: 'Magical', slots: '3 Tomes', def: ['fire', 'ice', 'lightning'],
+    hand: '×1 · MP ×1', split: [0, 100], lean: [0.9, 0.9, 1.15, 0.9, 1.1, 1.3], prowess: '0/100', armor: 'M.ATK', trees: 5,
+    lineB: 'Wave · Spike · Bolt · Pierce (Light, was Cascade) · Barrage (Dark, was Pierce)', preset: 'Pendant', lb: '2.4×', twin: '—', was: 'Mage',
+    id: 'Pure magic, the element ring: a nuke, every foe, random bolts, the target and the rest, a double cast.',
+    changes: 'Today’s Mage, renamed (id stays mage). Light becomes double, Dark a volley; Light B and Dark B swap roles to mirror the Brawler’s.' },
+};
+const T0 = ['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'];
+const T1 = ['brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage'];
+const ROOT_NAME = { warrior: 'Warrior', allrounder: 'All-Rounder', mage: 'Mage' };
+/** A class emblem (mock): a shield, filled for Tier 1, outlined for Tier 0. */
+const emblem = (c, size = 22) => {
+  const t0 = C[c].tier === 0;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path d="M12 2 L21 5 V12 C21 17 17 21 12 22 C7 21 3 17 3 12 V5 Z" fill="${t0 ? 'var(--panel)' : `var(--cl-${c})`}" stroke="var(--cl-${c})" stroke-width="${t0 ? 2 : 0}"/><text x="12" y="15.5" text-anchor="middle" font-size="8.5" font-weight="800" fill="${t0 ? `var(--cl-${c})` : '#fff'}" font-family="system-ui">${C[c].ab}</text></svg>`;
+};
+const splitBar = (s) => `<span class="split" aria-label="${s[0]}% physical, ${s[1]}% magical"><i style="width:${s[0]}%;background:var(--phys)"></i><i style="width:${s[1]}%;background:var(--magic)"></i></span>`;
+
+// ---------- Phones ----------
+const PCHILD_ROLE = {
+  brawler: 'One act ×1; one foe, every foe, random', spellblade: 'Multi-hit; the Arms half one hit more', armsummoner: 'Area; the Arms summon lingers',
+  mage: 'One cast ×1; the element ring', tomeblade: 'Multi-hit; the Tome half one hit more', summoner: 'Area; the Tome summon lingers',
+  paladin: 'Healer from ATK; Barriers, revive', cleric: 'Healer from M.ATK; Regen, Rebirth',
+};
+const T0POWER = [1.52, 1.60, 1.67, 1.75, 1.82, 1.90, 1.97, 2.05, 2.12, 2.20];
+const portrait = (hue) => `<svg class="portrait" viewBox="0 0 64 64" role="img" aria-label="Placeholder portrait"><rect width="64" height="64" fill="var(--sunken)"/>
+  <path d="M22 14 L25 4 L30 13 Z M42 14 L39 4 L34 13 Z" fill="hsl(${hue} 18% 55%)"/><circle cx="32" cy="25" r="12" fill="hsl(${hue} 18% 55%)"/>
+  <path d="M10 64 C12 46 21 40 32 40 C43 40 52 46 54 64 Z" fill="hsl(${hue} 18% 55%)"/></svg>`;
+const UMAS = {
+  B: { name: 'Uma B', title: 'Sample outfit B', hue: 20, lv: 7, exp: [96, 232], party: 'Party 1', work: 'Mine · 2h 10m', cls: 'recruit',
+    held: { recruit: { rank: 7, pct: 0.31 } }, weapons: { recruit: ['greatsword', 'axe', 'lance'] }, selW: 2, power: 96, wit: 88 },
+  A: { name: 'Uma A', title: 'Sample outfit A', hue: 200, lv: 10, exp: [20, 280], party: 'Party 1', work: 'Forest · 40m', cls: 'recruit',
+    held: { recruit: { rank: 10, wait: 400 } }, weapons: { recruit: ['greatsword', 'axe', 'lance'] }, selW: 0, power: 101, wit: 84 },
+  C: { name: 'Uma C', title: 'Sample outfit C', hue: 300, lv: 34, exp: [410, 664], party: 'Party 2', work: 'Fields · 3h', cls: 'brawler',
+    held: { recruit: { rank: 10 }, brawler: { rank: 34, pct: 0.4 }, spellblade: { rank: 12, pct: 0.3 }, acolyte: { rank: 4 } },
+    weapons: { brawler: ['greatsword', 'axe', 'lance'], spellblade: ['katana', 'lance', 'lightning'] }, selW: 0, power: 92, wit: 97 },
+};
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const slotsAt = (lv) => 3 + [10, 20, 30, 40].filter((g) => lv >= g).length;
+const openDepth = (r) => [1, 10, 20, 30, 40].filter((g) => r >= g).length;
+const isReady = (u, c) => C[c].tier === 1 && !u.held[c] && C[c].parents.some((p) => (u.held[p]?.rank ?? 0) >= 10);
+const suggestion = (u, t0) => ({ recruit: 'brawler', apprentice: 'mage' })[t0] ?? (u.power > u.wit ? C[t0].children[0] : C[t0].children[1]);
+function rankText(u, c) {
+  const h = u.held[c]; if (!h) return '';
+  return C[c].tier === 0 ? `R${h.rank}/10` : `R${h.rank}`;
+}
+function header(u) {
+  return `<div class="hd">${portrait(u.hue)}<div style="min-width:0"><div class="nm">${u.name}</div><div class="tt">${u.title} · <span style="color:var(--accent);font-weight:700">★★★</span></div>
+    <div class="lv">Lv ${u.lv}<span class="bar"><i style="width:${Math.round((u.exp[0] / u.exp[1]) * 100)}%"></i></span><small style="font-size:11px;color:var(--ink-faint);font-weight:600">${u.exp[0]}/${u.exp[1]}</small></div></div><span class="target"></span></div>
+    <div class="facts"><div class="fact"><span class="l">Party</span><span class="v">${u.party}</span></div><div class="fact"><span class="l">Work</span><span class="v">${u.work}</span></div><div class="fact det">Details</div></div>`;
+}
+function classDot(u) { return C[u.cls].tier === 0 && u.held[u.cls].rank >= 10 && C[u.cls].children.some((k) => !u.held[k]); }
+function tabbar(u) {
+  return `<div class="tabbar"><div class="in"><span class="cur">Class${classDot(u) ? ' <span class="dot"></span>' : ''}</span><span>Gear</span><span>Stars</span><span>Template</span></div></div>`;
+}
+function tier1Tree(u, w) {
+  const r = u.held[u.cls].rank, d = openDepth(r);
+  const X = { t: 179, A: 109, B: 249 }, Y = [26, 78, 130, 182, 234, 286];
+  const node = (x, y, on, rk, gate) => `<g opacity="${on ? 1 : 0.4}"><circle cx="${x}" cy="${y}" r="19" fill="${on ? 'var(--accent)' : 'var(--raised)'}" stroke="${on ? 'var(--accent)' : 'var(--hairline-strong)'}" stroke-width="1.5"/>
+    <text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" font-weight="800" fill="${on ? 'var(--accent-ink)' : 'var(--ink-soft)'}" font-family="system-ui">${KIND[w].a}</text>
+    ${rk ? `<circle cx="${x + 14}" cy="${y + 13}" r="8.5" fill="var(--ink)"/><text x="${x + 14}" y="${y + 17}" text-anchor="middle" font-size="10" font-weight="800" fill="var(--panel)" font-family="system-ui">${rk}</text>` : ''}</g>
+    ${gate ? `<g><rect x="${x + 4}" y="${y + 6}" width="28" height="15" rx="5" fill="var(--ink)"/><text x="${x + 18}" y="${y + 17}" text-anchor="middle" font-size="10" font-weight="800" fill="var(--panel)" font-family="system-ui">${gate}</text></g>` : ''}`;
+  const sr = (g) => Math.min(5, 1 + Math.floor((r - g) / 2));
+  const e = (x1, y1, x2, y2, on) => `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${on ? 'var(--accent)' : 'var(--hairline-strong)'}" stroke-width="${on ? 3 : 2}"/>`;
+  const sq = (x, y, L, on) => `<rect x="${x - 18}" y="${y - 18}" width="36" height="36" rx="8" fill="${on ? 'var(--accent)' : 'var(--raised)'}" stroke="${on ? 'var(--accent)' : 'var(--hairline-strong)'}" stroke-width="1.5"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="13" font-weight="800" fill="${on ? 'var(--accent-ink)' : 'var(--ink)'}" font-family="system-ui">${L}</text>`;
+  return `<svg viewBox="0 0 358 310" style="display:block;width:100%;height:auto" role="img" aria-label="${KIND[w].n} tree">
+    ${e(X.t, Y[0], X.t, Y[1], true)}${e(X.t, Y[1], X.A, Y[2], d >= 3)}${e(X.t, Y[1], X.B, Y[2], false)}${e(X.A, Y[2], X.A, Y[3], d >= 3)}${e(X.A, Y[3], X.A, Y[4], d >= 4)}${e(X.A, Y[4], X.A, Y[5], d >= 5)}
+    ${e(X.B, Y[2], X.B, Y[3], false)}${e(X.B, Y[3], X.B, Y[4], false)}${e(X.B, Y[4], X.B, Y[5], false)}
+    ${node(X.t, Y[0], true, sr(1))}${node(X.t, Y[1], d >= 2, d >= 2 ? sr(10) : 0, d >= 2 ? '' : 'R10')}
+    ${sq(X.A, Y[2], 'A', true)}${sq(X.B, Y[2], 'B', false)}
+    ${node(X.A, Y[3], d >= 3, d >= 3 ? sr(20) : 0, d >= 3 ? '' : 'R20')}${node(X.A, Y[4], d >= 4, d >= 4 ? sr(30) : 0, d >= 4 ? '' : 'R30')}${node(X.A, Y[5], d >= 5, d >= 5 ? sr(40) : 0, d >= 5 ? '' : 'R40')}
+    ${node(X.B, Y[3], false, 0)}${node(X.B, Y[4], false, 0)}${node(X.B, Y[5], false, 0)}</svg>`;
+}
+function classTab(u) {
+  const c = u.cls, t0 = C[c].tier === 0, h = u.held[c], ws = u.weapons[c] || C[c].def, w = ws[u.selW];
+  const ready = t0 && h.rank >= 10;
+  const pct = t0 ? h.rank / 10 : h.pct ?? (h.rank - 10) / 40;
+  const tile = `<div class="ctile ${ready ? 'ready' : ''}" data-act="sheet:classes">${ready ? '<span class="dot"></span>' : ''}<div class="top">${emblem(c, 22)}<span class="nm">${C[c].n}</span></div>
+    <span class="rk">${ready ? 'R10 · Promote' : rankText(u, c)}</span><span class="mini"><i style="width:${Math.min(100, pct * 100)}%"></i></span></div>`;
+  const wt = ws.map((k, i) => `<div class="ctile wtile ${i === u.selW ? 'sel' : ''}" data-act="w:${i}">${glyph(k)}<span class="ln">${t0 ? '—' : 'Line A'}</span></div>`).join('');
+  const n = slotsAt(u.lv);
+  const heldN = t0 ? 3 : 3 * openDepth(h.rank);
+  const eq = Array.from({ length: 7 }, (_, i) => i >= n ? '<span class="eq none"></span>' : i < Math.min(n, heldN)
+    ? `<span class="eq">${glyph(ws[i % 3])}<span class="gb">${t0 ? h.rank : Math.min(5, 1 + Math.floor((h.rank - [1, 10, 20, 30, 40][Math.floor(i / 3)]) / 2))}</span></span>` : '<span class="eq empty"></span>').join('');
+  let tree;
+  if (t0) {
+    const r = h.rank;
+    tree = `<div class="t0node"><span class="big" style="background:var(--k-${w})">${KIND[w].a}<span class="gb">${r}</span></span><span><b>${C[c].skill} · ${KIND[w].n}</b><small>One foe · 1 hit · ${T0POWER[r - 1].toFixed(2)} · 10 MP</small><small>Rank = her Class Rank · next ${r < 10 ? T0POWER[r].toFixed(2) + ' at R' + (r + 1) : 'max'}</small></span></div>
+      <div class="promo-line">${r < 10 ? `Promotion at R10 · ${10 - r} to go` : `<span style="color:var(--success)">Promotion ready</span>${h.wait ? ` · +${h.wait} EXP waiting` : ''}`}<span class="bar"><i style="width:${r * 10}%"></i></span></div>`;
+  } else tree = tier1Tree(u, w);
+  return `<div class="classrow">${tile}${wt}</div>
+    <div class="lbl11"><span>Equipped ${Math.min(n, heldN)}/${n}</span><span class="autochip">Auto</span></div><div class="eqrow">${eq}</div>
+    <div class="treehd"><b>${KIND[w].n} tree</b><span>Change ›</span></div>${tree}
+    <div class="lim"><span class="k">Limit</span><span class="v">${u.limit || 'None'}</span></div>`;
+}
+function tileState(u, c) {
+  if (u.cls === c) return 'on';
+  if (u.held[c]) return 'held';
+  if (isReady(u, c)) return 'ready';
+  if (C[c].tier === 0) return 'open';
+  return 'closed';
+}
+function classesSheet(st) {
+  const u = st.uma, sel = st.selClass || u.cls;
+  const t = (c) => {
+    if (!c) return '<span class="ct gap"></span>';
+    const s = tileState(u, c);
+    const sub = s === 'on' || s === 'held' ? rankText(u, c) : s === 'ready' ? 'Ready' : s === 'open' ? 'R1 · free' : 'Closed';
+    return `<span class="ct ${s} ${sel === c ? 'selr' : ''}" data-act="pick:${c}" role="button" aria-pressed="${sel === c}">${s === 'ready' ? '<span class="dot"></span>' : ''}${emblem(c, 18)}<span class="n">${C[c].n.replace(' ', '<br>')}</span><span class="s">${sub}</span></span>`;
+  };
+  const grid = `<div class="ctree"><div class="ch w">WARRIOR</div><div class="ch a">ALL-ROUNDER</div><div class="ch m">MAGE</div>
+    <div class="rl">TIER 0</div>${['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'].map(t).join('')}
+    <div class="rl">TIER 1</div>${['brawler', 'spellblade', 'paladin', 'armsummoner', 'mage'].map(t).join('')}${[null, 'tomeblade', 'cleric', 'summoner', null].map(t).join('')}</div>`;
+  const s = tileState(u, sel), d = C[sel];
+  const what = d.tier === 0 ? `Tier 0 · any three weapons · ${d.skill} · promotes to ${d.children.map((k) => C[k].n).join(', ')}`
+    : `${d.slots} · ${d.def.map((k) => KIND[k].n).join(', ')} · ${PCHILD_ROLE[sel]}`;
+  const gate = d.tier === 1 ? `From ${d.parents.map((p) => `${C[p].n} R10${(u.held[p]?.rank ?? 0) >= 10 ? ' ✓' : ''}`).join(' or ')}` : 'Every Tier 0 is open to every Uma';
+  const line = `<div class="selline"><b>${d.n}</b> <span class="muted" style="font-size:12px">${s === 'on' ? '· On' : s === 'held' ? '· Held' : s === 'ready' ? '· Ready' : s === 'open' ? '· Open' : '· Closed'}</span><div class="r">${what}</div><div class="r">${gate}</div></div>`;
+  const foot = s === 'on' ? `<button class="btn" data-act="noop">Standard preset · ${(u.weapons[sel] || d.def).map((k) => KIND[k].n.replace(' Tome', '')).join(' · ')}</button>`
+    : s === 'held' ? `<button class="btn" data-act="fight:${sel}">Fight as ${d.n}</button>`
+    : s === 'ready' ? `<button class="btn" data-act="topromote:${sel}">Promote to ${d.n}</button>`
+    : s === 'open' ? `<button class="btn" data-act="start:${sel}">Start ${d.n} · R1</button>`
+    : `<button class="btn off" disabled>Opens with ${d.parents.map((p) => C[p].n + ' R10').join(' or ')}</button>`;
+  return { title: 'Classes', body: grid + line + `<div class="door" data-tip="Class Manuals||A door to the Exchange’s Manual sheet with her picked. Back returns here."><span>Class Manuals</span><small>Exchange</small></div>`, foot };
+}
+function promoteSheet(st) {
+  const u = st.uma, t0 = st.from;
+  const kids = C[t0].children, sg = suggestion(u, t0), pick = st.promoteSel || sg;
+  const tiles = kids.map((k) => `<button class="pt ${pick === k ? 'is-on' : ''}" data-act="ppick:${k}" aria-pressed="${pick === k}">
+      <span class="top">${emblem(k, 22)}<span class="n">${C[k].n}</span></span>${k === sg ? '<span class="sg">Suggested</span>' : u.held[k] ? '<span class="held">Held</span>' : '<span class="sg" style="visibility:hidden">·</span>'}
+      <span class="sl">${C[k].slots}</span><span class="gl">${C[k].def.map((x) => glyph(x, 'sm')).join('')}</span><span class="role">${PCHILD_ROLE[k]}</span></button>`).join('');
+  const wait = u.held[t0].wait || 0;
+  const body = `<p style="font-size:13px;color:var(--ink-soft);margin:0">Choose her class. Free; the others stay open.</p><div class="ptiles n${kids.length}">${tiles}</div>
+    <div class="ba">${C[t0].n} R10 → <span class="to">${C[pick].n} R10</span><br><b>depths 1–2 · 6 skills</b>${wait ? ` · +${wait} EXP waiting` : ''}</div>`;
+  return { title: `Promote · ${C[t0].n} R10`, body, foot: `<button class="btn" data-act="promote:${pick}">Promote to ${C[pick].n}</button>` };
+}
+function phoneHTML(st) {
+  const u = st.uma;
+  const body = header(u) + tabbar(u) + classTab(u);
+  const sh = st.sheet === 'classes' ? classesSheet(st) : st.sheet === 'promote' ? promoteSheet(st) : null;
+  const sheet = sh ? `<div class="ph-scrim" data-act="close"></div><div class="ph-sheet" role="dialog" aria-label="${sh.title}"><div class="handle"></div>
+    <div class="sh-head"><b>${sh.title}</b><span class="x" data-act="close" aria-label="Close" role="button">✕</span></div><div class="sh-body">${sh.body}</div>${sh.foot ? `<div class="sh-foot">${sh.foot}</div>` : ''}</div>` : '';
+  return `<div class="ph-status"><span>9:41</span><span class="island"></span><span>●●● ▮</span></div>
+    <div class="ph-top"><span class="ini">T</span><span class="crest">T1</span><span class="cur"><span>Laurels 50,000</span><span>Tickets 12</span></span></div>
+    <div class="ph-place"><span class="ib">‹</span><span class="ttl">Stable</span><span class="ib">ⓘ</span></div>
+    <div class="ph-body"><div class="ph-inner">${body}</div></div>
+    <div class="ph-bar"><span><i></i>Town</span><span><i></i>Learning</span><span class="mid"><i></i>Battle</span><span><i></i>Wilds</span><span><i></i>Menu</span></div>${sheet}`;
+}
+const PH = new Map();
+function mount(id, st) {
+  const el = document.getElementById(id);
+  PH.set(el, st); el.innerHTML = phoneHTML(st); bindTips(el);
+  el.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    const s = PH.get(el), u = s.uma; const [k, arg] = a.dataset.act.split(':');
+    if (k === 'close') { s.sheet = null; s.selClass = null; }
+    else if (k === 'sheet') { if (C[u.cls].tier === 0 && u.held[u.cls].rank >= 10) { s.sheet = 'promote'; s.from = u.cls; s.promoteSel = null; } else { s.sheet = 'classes'; s.selClass = null; } }
+    else if (k === 'w') u.selW = Number(arg);
+    else if (k === 'pick') s.selClass = arg;
+    else if (k === 'fight') { u.cls = arg; u.selW = 0; s.sheet = null; }
+    else if (k === 'start') { u.held[arg] = { rank: 1 }; u.weapons[arg] = [...C[arg].def]; u.cls = arg; u.selW = 0; s.sheet = null; }
+    else if (k === 'topromote') { s.from = C[arg].parents.find((p) => (u.held[p]?.rank ?? 0) >= 10); s.promoteSel = arg; s.sheet = 'promote'; }
+    else if (k === 'ppick') s.promoteSel = arg;
+    else if (k === 'promote') {
+      const wait = u.held[s.from].wait || 0;
+      u.held[arg] = { rank: wait >= 280 ? 11 : 10, pct: wait >= 280 ? (wait - 280) / 296 / 40 + 0.025 : wait / 280 / 40 };
+      u.held[s.from].wait = 0; u.weapons[arg] = [...C[arg].def]; u.cls = arg; u.selW = 0; s.sheet = null; s.promoteSel = null;
+    } else return;
+    hideTip();
+    el.innerHTML = phoneHTML(s); bindTips(el);
+  });
+}
+mount('ph1', { uma: clone(UMAS.B), sheet: null });
+mount('ph2', { uma: clone(UMAS.A), sheet: 'promote', from: 'recruit', promoteSel: null });
+mount('ph3', { uma: clone(UMAS.C), sheet: 'classes', selClass: 'armsummoner' });
+
+// ---------- The gallery: the other four promotion sheets ----------
+(function () {
+  const u = { power: 80, wit: 99, held: {} };
+  document.getElementById('gal').innerHTML = ['apprentice', 'duelist', 'caller', 'acolyte'].map((t0) => {
+    u.held[t0] = { rank: 10 };
+    const kids = C[t0].children, sg = suggestion(u, t0);
+    return `<div class="msheet"><div class="from">From ${C[t0].n} R10</div><div class="hh">Promote · ${C[t0].n} R10</div><div class="bb"><div class="ptiles n${kids.length}">${kids.map((k) => `<div class="pt ${k === sg ? 'is-on' : ''}">
+      <span class="top">${emblem(k, 20)}<span class="n">${C[k].n}</span></span>${k === sg ? '<span class="sg">Suggested</span>' : '<span class="sg" style="visibility:hidden">·</span>'}<span class="sl">${C[k].slots}</span>
+      <span class="gl">${C[k].def.map((x) => glyph(x, 'sm')).join('')}</span><span class="role">${PCHILD_ROLE[k]}</span></div>`).join('')}</div></div>
+      <div class="ff"><span class="btn">Promote to ${C[sg].n}</span></div></div>`;
+  }).join('');
+})();
+initTheme();
+bindTips(document);
+</script>
+</body>
+</html>

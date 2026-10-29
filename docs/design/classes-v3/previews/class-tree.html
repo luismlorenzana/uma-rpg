@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class Tree</title>
+<!-- Classes v3 (docs/design/classes-v3/classes-v3.md §1–§7): the class tree with three roots, five Tier 0 classes and
+     eight Tier 1 classes; tap a class for its sheet; the reclass view; the calling rule with the release's counts
+     (counts only). Self-contained: uma-kit's tokens, light and dark; no external scripts, fonts or images. -->
+<style>
+  /* uma-kit's theme tokens (uma-platform/packages/kit/theme.css), as the Tier rework's and profile v2's previews copy
+     them: light is uma-racer's, dark is uma-rpg's. The page follows the system; the Light/Dark buttons pin one. */
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #b8770a; --info: #2f6fe0; --locked: #8a94a3;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --bad: #c23b33; --bad-wash: #fbe4e2; --good-wash: #e2f2e8;
+    --cl-recruit: #8f6a58; --cl-apprentice: #5c78aa; --cl-duelist: #9c8642; --cl-caller: #8873aa; --cl-acolyte: #4f907a;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-tomeblade: #1d8aa2; --cl-armsummoner: #6c7d1c;
+    --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --k-greatsword: #d9772b; --k-axe: #8a52c7; --k-lance: #2f9a4f; --k-bow: #3aa38f; --k-katana: #c4466e;
+    --k-fire: #d23a2f; --k-ice: #2f7fd6; --k-lightning: #c9a400; --k-light: #b89a3a; --k-dark: #6d48b8;
+    --f-pendant: #2a78d6; --f-orb: #eb6834; --f-bell: #1baf7a; --f-insignia: #6250d6;
+    --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+      --cl-recruit: #c09482; --cl-apprentice: #8ea8d8; --cl-duelist: #cdb672; --cl-caller: #b8a3da; --cl-acolyte: #7ec2aa;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-tomeblade: #45bad4; --cl-armsummoner: #a8bb46;
+      --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+      --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+      --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+      --scrim: rgb(0 0 0 / 0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+    --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+    --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+    --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+    --cl-recruit: #c09482; --cl-apprentice: #8ea8d8; --cl-duelist: #cdb672; --cl-caller: #b8a3da; --cl-acolyte: #7ec2aa;
+    --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-tomeblade: #45bad4; --cl-armsummoner: #a8bb46;
+    --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+    --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+    --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+    --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+    --scrim: rgb(0 0 0 / 0.55);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 6px; }
+  p { margin: 0; }
+  a { color: inherit; }
+  code { font-size: 12px; background: var(--raised); padding: 0 4px; border-radius: 4px; }
+  .lead { color: var(--ink-soft); max-width: 960px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  nav.top { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--hairline); }
+  nav.top a, nav.top button { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font: 600 13px system-ui, sans-serif;
+    box-shadow: 0 1px 0 var(--hairline-strong); border: 0; cursor: pointer; }
+  nav.top a:hover { background: var(--raised); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  nav.top .spacer { flex: 1; }
+  nav.top button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; font-size: 16px; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note b { color: var(--ink); }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pills button { font: 600 12.5px system-ui, sans-serif; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; min-height: 32px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 2px; }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 6px;
+    background: var(--raised); border: 1px solid var(--hairline-strong); color: var(--ink); white-space: nowrap; }
+  .tag.good { background: var(--good-wash); border-color: transparent; color: var(--success); }
+  .tag.bad { background: var(--bad-wash); border-color: transparent; color: var(--bad); }
+  .tag.acc { background: var(--accent-wash); border-color: transparent; color: var(--accent-strong); }
+  .tag.new { background: var(--accent); border-color: transparent; color: var(--accent-ink); }
+  .glyph { width: 30px; height: 30px; border-radius: 8px; display: inline-grid; place-items: center; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: -.02em; flex: none; }
+  .glyph.sm { width: 22px; height: 22px; font-size: 10px; border-radius: 6px; }
+  .kchip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 2px 8px 2px 3px; border-radius: 999px; background: var(--raised); white-space: nowrap; }
+  .kchip i { width: 16px; height: 16px; border-radius: 5px; display: inline-block; flex: none; }
+  #tip { position: fixed; z-index: 60; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  .split { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--sunken); min-width: 80px; }
+  .split i { display: block; height: 100%; }
+  .foot { margin-top: 48px; font-size: 12px; color: var(--ink-faint); }
+  @media (max-width: 900px) {
+    main { padding: 20px 16px 60px; }
+    nav.top { margin: 16px -16px 0; padding: 10px 16px; }
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* The tree */
+  .treewrap { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; margin-top: 16px; align-items: start; }
+  .treebox { padding: 14px 14px 8px; }
+  .treebox svg { display: block; width: 100%; height: auto; }
+  .node { cursor: pointer; }
+  .node:focus { outline: none; }
+  .node:focus-visible rect.box { stroke: var(--accent); stroke-width: 3; }
+  .node text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; pointer-events: none; }
+  .edge { fill: none; stroke-width: 2.2; transition: opacity .12s; }
+  .edge.hit { stroke: transparent; stroke-width: 12; cursor: help; }
+  .faded { opacity: .18; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 4px 4px 6px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .sheet { position: sticky; top: 64px; }
+  .sheet .hdr { display: flex; align-items: center; gap: 10px; }
+  .sheet .hdr b { font-size: 18px; }
+  .sheet .idl { color: var(--ink-soft); font-size: 13px; margin: 8px 0 10px; }
+  .kv { display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 4px 10px; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--hairline); align-items: center; }
+  .kv > span:first-child { color: var(--ink-soft); font-weight: 600; font-size: 12.5px; }
+  .kv .gl { display: flex; gap: 4px; flex-wrap: wrap; }
+  .leanrow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px; }
+  .leanrow div { background: var(--raised); border-radius: 6px; text-align: center; padding: 2px 0; font-size: 11px; color: var(--ink-soft); }
+  .leanrow b { display: block; color: var(--ink); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .leanrow .up b { color: var(--success); } .leanrow .dn b { color: var(--bad); }
+  .kidlist { display: flex; flex-direction: column; gap: 6px; }
+  .kid { display: flex; align-items: center; gap: 8px; background: var(--raised); border-radius: 10px; padding: 6px 10px; cursor: pointer; border: 0; font: inherit; color: inherit; text-align: left; min-height: 40px; }
+  .kid small { color: var(--ink-soft); font-size: 11.5px; display: block; }
+  .modebar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .reach { display: none; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .reach.on { display: flex; }
+  .reach button { display: inline-flex; align-items: center; gap: 6px; }
+  /* Thirteen */
+  .cls { display: flex; align-items: center; gap: 8px; font-weight: 700; white-space: nowrap; }
+  /* Calling bars */
+  .cbar { display: grid; grid-template-columns: 140px minmax(0, 1fr) 48px; gap: 10px; align-items: center; margin: 8px 0; }
+  .cbar .track { display: flex; height: 26px; border-radius: 6px; overflow: hidden; background: var(--sunken); }
+  .cbar .seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; border-right: 2px solid var(--panel); }
+  .cbar .n { font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+  .rule { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--hairline); }
+  .rule .no { width: 26px; height: 26px; border-radius: 50%; background: var(--sunken); display: grid; place-items: center; font-weight: 800; font-size: 12px; }
+  td.mx { text-align: center; font-variant-numeric: tabular-nums; }
+  td.mx.z { color: var(--ink-faint); }
+  td.mx.h { background: var(--accent-wash); font-weight: 800; }
+  @media (max-width: 1100px) { .treewrap { grid-template-columns: minmax(0, 1fr); } .sheet { position: static; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The class tree</h1>
+  <p class="lead">Classes v3 (<a href="../classes-v3.md">classes-v3.md</a> §1–§7): three roots left to right, <b>Warrior · All-Rounder · Mage</b>; five
+    Tier 0 classes on top, eight Tier 1 classes below. A hybrid has two parents. <b>Tap a class</b> for its sheet; switch to
+    <b>Reclass</b> to see what an Uma can open from the Tier 0s she has at Rank 10.</p>
+  <nav class="top" aria-label="Sections">
+    <a href="#tree">Tree</a><a href="#thirteen">All thirteen</a><a href="#calling">Calling</a><a href="#reclass">Reclassing</a>
+    <a class="out" href="promotion.html">Promotion ›</a><a class="out" href="weapon-shapes.html">Weapon shapes ›</a><a class="out" href="reset.html">Reset ›</a>
+    <span class="spacer"></span><span id="theme" style="display:flex;gap:6px"><button data-t="system">System</button><button data-t="light">Light</button><button data-t="dark">Dark</button></span>
+  </nav>
+  <div class="kpis">
+    <div class="kpi"><div class="label">Classes</div><div class="value">13 <span class="was">6</span></div><div class="delta">5 Tier 0 · 8 Tier 1</div></div>
+    <div class="kpi"><div class="label">Roots</div><div class="value">3</div><div class="delta">Warrior · All-Rounder · Mage</div></div>
+    <div class="kpi"><div class="label">New Tier 1 classes</div><div class="value">2</div><div class="delta">Tome Spellblade · Arms Summoner</div></div>
+    <div class="kpi"><div class="label">Tier 0 Rank 10</div><div class="value">Lv 10</div><div class="delta">the first continent’s capital</div></div>
+    <div class="kpi"><div class="label">A Tier 1 class opens at</div><div class="value">R10</div><div class="delta">Tier 0 is the old Ranks 1–10</div></div>
+    <div class="kpi"><div class="label">Another family</div><div class="value">3,600</div><div class="delta">its Tier 0 to Rank 10 · 4 Manuals</div></div>
+  </div>
+
+  <section id="tree">
+    <div class="modebar">
+      <div><h2>The tree</h2><p class="sub" style="margin:0">Solid edges: a class’s own Tier 0. Dashed: its channel’s root class (Recruit for an Arms hybrid, Apprentice for a Tome hybrid).</p></div>
+      <div class="pills" id="mode" role="group" aria-label="View"><span class="lbl">View</span><button data-m="sheets" aria-pressed="true">Sheets</button><button data-m="reclass" aria-pressed="false">Reclass</button></div>
+    </div>
+    <div class="reach pills" id="reach" role="group" aria-label="Tier 0 classes at Rank 10"><span class="lbl">Her Tier 0s at Rank 10</span></div>
+    <div class="treewrap">
+      <div class="panel treebox"><svg id="treesvg" viewBox="0 0 900 450" role="img" aria-label="The class tree: three roots, five Tier 0 classes, eight Tier 1 classes"></svg>
+        <div class="legend"><span><svg width="28" height="8"><path d="M0 4 H28" stroke="var(--ink-soft)" stroke-width="2.2"/></svg>Its own Tier 0</span>
+          <span><svg width="28" height="8"><path d="M0 4 H28" stroke="var(--ink-soft)" stroke-width="2.2" stroke-dasharray="5 4"/></svg>Its root class (the second parent)</span>
+          <span><span class="tag new">New</span> class</span><span>Outlined shield: Tier 0 · filled: Tier 1</span></div>
+      </div>
+      <aside class="panel sheet" id="sheet" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section id="thirteen">
+    <h2>All thirteen</h2>
+    <p class="sub">Ids in code font; the four kept Tier 1 ids keep their trees, saves and replays (CV4).</p>
+    <div class="panel scroll"><table id="t13"></table></div>
+  </section>
+
+  <section id="calling">
+    <h2>The calling: by running style alone</h2>
+    <p class="sub">Her best styles (every style at her top grade), the first row that fits. No Power, Wit or distance; no pick: the promotion is the pick (CV19). Counts from the local master-data release, 270 outfits, counts only.</p>
+    <div class="grid2">
+      <div class="panel" id="rules"></div>
+      <div class="panel" id="bars"><h3>Outfits per Tier 0, by best styles</h3></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3>Against today’s rule (each row’s default, before any pick)</h3>
+      <div class="scroll"><table id="cross"></table></div>
+      <p class="note"><b>101 outfits change trade</b> (Pace Umas between Wood and Stone, Pace sprinters out of Metal). The 33 Summoner and 46 healer callings stay where they were.</p>
+    </div>
+  </section>
+
+  <section id="reclass">
+    <h2>Reclassing</h2>
+    <p class="sub">The owner: “visible in game, whenever I want to reclass.” In her profile, the Class tab’s Classes sheet is this tree (see <a href="promotion.html">promotion and reclass</a>).</p>
+    <div class="grid2">
+      <div class="panel"><table>
+        <tr><th>R1</th><td><b>The classes she holds switch freely</b>, outside fights, as today; each keeps its Class Rank, weapons, lines and equipped skills</td></tr>
+        <tr><th>R2</th><td><b>Every Tier 0 is open to every Uma</b>, free, at Class Rank 1; her calling’s is where she starts, not a lock</td></tr>
+        <tr><th>R3</th><td><b>A Tier 1 class opens by promotion</b> from either parent at Class Rank 10, free, at Class Rank 10</td></tr>
+        <tr><th>R4</th><td><b>A closed class says how</b>: “Opens with Recruit R10 or Caller R10”</td></tr>
+        <tr><th>R5</th><td><b>Promotions are hers for good</b>: a Tier 1 class she holds is one with a rank</td></tr>
+        <tr><th>R6</th><td><b>Tiers 2 and 3</b> have no Tier 0: every Tier 1 class is open there from Rank 1</td></tr>
+      </table></div>
+      <div class="panel"><table>
+        <tr><th>From</th><th>To</th><th>Cost</th></tr>
+        <tr><td>Brawler</td><td>Arms Spellblade, Arms Summoner</td><td><b>Nothing</b>: her Recruit is at Rank 10</td></tr>
+        <tr><td>Brawler</td><td>Tome Spellblade</td><td>Duelist or Apprentice to Rank 10: 3,600 Class EXP, <b>4 Manuals</b></td></tr>
+        <tr><td>Brawler</td><td>Cleric</td><td>Acolyte to Rank 10: 3,600</td></tr>
+        <tr><td>Any</td><td>A class she holds</td><td>Nothing</td></tr>
+        <tr><td>Any</td><td>Gear</td><td>Only weapons she hasn’t raised: a grade belongs to the weapon kind</td></tr>
+      </table>
+      <p class="note">Try it above: switch the tree to <b>Reclass</b> and tick the Tier 0s she has at Rank 10.</p></div>
+    </div>
+  </section>
+  <p class="foot">Classes v3 preview · for the owner’s review, 2026-10-29 · made-up data only where an Uma appears.</p>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+'use strict';
+// Classes v3's previews (docs/design/classes-v3/classes-v3.md). Self-contained. Every Uma here is made up; class, weapon,
+// skill and place names are the game's own or this doc's. Numbers follow the doc's tables.
+
+// ---------- Theme: follow the system, or pin Light / Dark ----------
+function initTheme() {
+  const bar = document.getElementById('theme');
+  if (!bar) return;
+  let saved = null;
+  try { saved = localStorage.getItem('umaClassesV3.theme'); } catch (e) { saved = null; }
+  const apply = (t) => {
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
+    bar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === (t || 'system'))));
+  };
+  apply(saved);
+  bar.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    const t = b.dataset.t === 'system' ? null : b.dataset.t;
+    try { if (t) localStorage.setItem('umaClassesV3.theme', t); else localStorage.removeItem('umaClassesV3.theme'); } catch (err) { /* per-viewer convenience only */ }
+    apply(t);
+  });
+}
+
+// ---------- Tooltip ----------
+const tipEl = () => document.getElementById('tip');
+function placeTip(x, y) { const t = tipEl(); const w = t.offsetWidth, h = t.offsetHeight; t.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; t.style.top = (y + 16 + h > innerHeight ? Math.max(8, y - h - 12) : y + 16) + 'px'; }
+function showTip(x, y, title, body) { const t = tipEl(); t.innerHTML = `<b>${title}</b>${body}`; t.style.opacity = 1; placeTip(x, y); }
+function hideTip() { const t = tipEl(); if (t) t.style.opacity = 0; }
+function bindTips(root) {
+  (root || document).querySelectorAll('[data-tip]').forEach((el) => {
+    if (el.dataset.tipBound) return; el.dataset.tipBound = '1';
+    if (!el.hasAttribute('tabindex') && el.tagName !== 'BUTTON') el.setAttribute('tabindex', '0');
+    el.addEventListener('mouseenter', (e) => { const [t, b] = el.dataset.tip.split('||'); showTip(e.clientX, e.clientY, t, b || ''); });
+    el.addEventListener('mousemove', (e) => placeTip(e.clientX, e.clientY));
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('focus', () => { const [t, b] = el.dataset.tip.split('||'); const r = el.getBoundingClientRect(); showTip(r.left, r.bottom, t, b || ''); });
+    el.addEventListener('blur', hideTip);
+  });
+}
+
+// ---------- Kinds ----------
+const KIND = {
+  greatsword: { n: 'Greatsword', a: 'GS', ch: 'arms' }, axe: { n: 'Axe', a: 'Ax', ch: 'arms' }, lance: { n: 'Lance', a: 'Ln', ch: 'arms' },
+  bow: { n: 'Bow', a: 'Bw', ch: 'arms' }, katana: { n: 'Katana', a: 'Kt', ch: 'arms' },
+  fire: { n: 'Fire Tome', a: 'Fi', ch: 'tome' }, ice: { n: 'Blizzard Tome', a: 'Ic', ch: 'tome' }, lightning: { n: 'Thunder Tome', a: 'Th', ch: 'tome' },
+  light: { n: 'Light Tome', a: 'Li', ch: 'tome' }, dark: { n: 'Dark Tome', a: 'Dk', ch: 'tome' },
+};
+const glyph = (k, cls = '') => `<span class="glyph ${cls}" style="background:var(--k-${k})" aria-label="${KIND[k].n}">${KIND[k].a}</span>`;
+const kchip = (k) => `<span class="kchip"><i style="background:var(--k-${k})"></i>${KIND[k].n}</span>`;
+
+// ---------- The thirteen classes ----------
+// tier 0: recruit, duelist, acolyte, caller, apprentice. tier 1: brawler, spellblade (Arms Spellblade), armsummoner, paladin,
+// cleric, summoner (Tome Summoner), tomeblade (Tome Spellblade), mage (Sorcerer).
+const C = {
+  recruit: { n: 'Recruit', ab: 'Re', tier: 0, root: 'warrior', was: 'the owner’s Fighter', calling: 'Front among her best styles', combos: 'Front 27 · Front + Pace 19 · Front + Late 1', count: 47,
+    trade: 'Metal: Mine · Mine Workbench · Weapon Forge', skill: 'Drill Strike', children: ['brawler', 'spellblade', 'armsummoner'], def: ['greatsword', 'axe', 'lance'], preset: 'Bell (Greatsword)',
+    id: 'A soldier in her first weeks. One skill, any weapon; at Rank 10 she promotes into the Warrior column’s classes or the Arms hybrids.' },
+  duelist: { n: 'Duelist', ab: 'Du', tier: 0, root: 'allrounder', was: 'the owner’s Spell Blade', calling: 'Pace alone', combos: 'Pace 72', count: 72,
+    trade: 'Wood: Forest · Forest Workbench · Armorer', skill: 'Feint', children: ['spellblade', 'tomeblade'], def: ['katana', 'lance', 'lightning'], preset: 'Pendant',
+    id: 'One foe at a time, steel and spark: the Spellblades’ start. Promotes into either Spellblade.' },
+  acolyte: { n: 'Acolyte', ab: 'Ac', tier: 0, root: 'allrounder', was: 'the owner’s Healer', calling: 'Late alone', combos: 'Late 46', count: 46,
+    trade: 'Vegetables: Fields · Fields Workbench · Tome Forge', skill: 'Vigil', children: ['paladin', 'cleric'], def: ['light', 'ice', 'bow'], preset: 'Orb (Blizzard Tome)',
+    id: 'She serves the rites before she heals: her skill deals damage like the others. Promotes into the Paladin or the Cleric.' },
+  caller: { n: 'Caller', ab: 'Ca', tier: 0, root: 'allrounder', was: 'the owner’s Summoner', calling: 'End among her best styles', combos: 'Late + End 20 · End 13', count: 33,
+    trade: 'Fish: Fishery · Fishery Workbench · Charm Forge', skill: 'Beckon', children: ['armsummoner', 'summoner'], def: ['dark', 'ice', 'axe'], preset: 'Orb (Blizzard Tome)',
+    id: 'She calls; she doesn’t summon yet. Promotes into either Summoner.' },
+  apprentice: { n: 'Apprentice', ab: 'Ap', tier: 0, root: 'mage', was: 'the owner’s Mage', calling: 'Pace with Late or End', combos: 'Pace + Late 68 · Pace + Late + End 3 · Pace + End 1', count: 72,
+    trade: 'Stone: Monster Den · Den Workbench · Lapidary', skill: 'Primer', children: ['mage', 'tomeblade', 'summoner'], def: ['fire', 'ice', 'lightning'], preset: 'Pendant',
+    id: 'The magic word for a beginner. Promotes into the Sorcerer or the Tome hybrids.' },
+
+  brawler: { n: 'Brawler', ab: 'Br', tier: 1, root: 'warrior', parents: ['recruit'], type: 'Physical', slots: '3 Arms', def: ['greatsword', 'axe', 'lance'],
+    hand: '×1 · MP ×1', split: [100, 0], lean: [1.15, 1.1, 0.9, 1.1, 0.9, 0.8], prowess: '100/0', armor: 'ATK', trees: 5,
+    lineB: 'Combo · Reap · Impale · Barrage (Bow, new) · Draw', preset: 'Bell (Greatsword)', lb: '2×', twin: '—', was: 'Brawler',
+    id: 'Pure physical. One full act a turn: one foe hard, every foe, random foes, the target and the rest, a double cut.',
+    changes: 'Her Bow tree’s line A is a volley; its line B is Barrage (the old Bow line). Opens at Class Rank 10.' },
+  spellblade: { n: 'Arms Spellblade', ab: 'AB', tier: 1, root: 'allrounder', parents: ['recruit', 'duelist'], type: 'Physical hybrid', slots: '2 Arms + 1 Tome', def: ['katana', 'lance', 'lightning'],
+    hand: 'Arms 0.72 + Tome 0.44 · MP ×0.5 a half · the Arms half one hit more', split: [70, 30], lean: [1, 1.1, 0.95, 1, 1, 1], prowess: '70/30', armor: 'ATK', trees: 10,
+    lineB: 'Pierce on every tree', preset: 'Pendant (an Orb or a Bell on her Lance)', lb: '2.2×', twin: 'Lightning (Lance + Thunder)', was: 'Spell Blade',
+    id: 'Physical-led multi-hit: every act an Arms half and a Tome half, the Arms half first and one hit more. The shield chipper.',
+    changes: 'Today’s Spell Blade, renamed. Her Light trees land 2 hits (were 2 → 4); her Dark trees 2 → 4 (were 2).' },
+  armsummoner: { n: 'Arms Summoner', ab: 'AS', tier: 1, root: 'allrounder', parents: ['recruit', 'caller'], type: 'Physical hybrid', slots: '2 Arms + 1 Tome', def: ['bow', 'axe', 'dark'],
+    hand: 'Arms 0.62 + Tome 0.50 · MP ×0.5 a half · the Arms summon lingers', split: [70, 30], lean: [1, 1.1, 0.95, 1, 1, 1], prowess: '70/30', armor: 'ATK', trees: 10,
+    lineB: 'Bonded on Arms trees · Pack on Tome trees', preset: 'Orb (Bow)', lb: '2.2×', twin: 'Dark (Bow + Dark)', was: 'New', isNew: true,
+    id: 'Physical-led area: the Arms summon first; it lingers and strikes every foe once in farewell when her next pair comes. No support.',
+    changes: 'New: the Tome Summoner’s mirror. The Summoner’s summons on each kind’s tree; her lines mirrored.' },
+  paladin: { n: 'Paladin', ab: 'Pa', tier: 1, root: 'allrounder', parents: ['acolyte'], type: 'Healer', slots: '2 Arms + 1 Tome', def: ['greatsword', 'axe', 'light'],
+    hand: '×0.5 · MP ×0.6 · heals from ATK', split: [50, 50], lean: [1, 1, 0.8, 1.15, 1, 1.3], prowess: '80/20', armor: 'ATK', trees: 10,
+    lineB: 'Heavy (Valkyrie’s Oath on Light D3)', preset: 'Pendant', lb: '1.5×', twin: '—', was: 'Paladin', healer: true,
+    id: 'A healer whose Barriers grow with her ATK: blows Barrier and debuff, spells mend, bless and cleanse; she raises the fallen.',
+    changes: 'As today. Opens at Class Rank 10, from an Acolyte.' },
+  cleric: { n: 'Cleric', ab: 'Cl', tier: 1, root: 'allrounder', parents: ['acolyte'], type: 'Healer', slots: '2 Tomes + 1 Arm', def: ['light', 'ice', 'bow'],
+    hand: '×0.5 · MP ×0.6 · heals from M.ATK', split: [50, 50], lean: [1, 0.8, 1, 1, 1.15, 1.3], prowess: '20/80', armor: 'M.ATK', trees: 10,
+    lineB: 'Heavy (Rebirth on Light D3)', preset: 'Orb (Blizzard Tome)', lb: '1.5×', twin: '—', was: 'Cleric', healer: true,
+    id: 'A healer whose mends grow with her M.ATK: Regen from Light, drain from Dark, Rebirth.',
+    changes: 'As today. Opens at Class Rank 10, from an Acolyte.' },
+  summoner: { n: 'Tome Summoner', ab: 'TS', tier: 1, root: 'allrounder', parents: ['caller', 'apprentice'], type: 'Magical hybrid', slots: '2 Tomes + 1 Arm', def: ['dark', 'ice', 'axe'],
+    hand: 'Tome 0.62 + Arms 0.50 · MP ×0.5 a half · the Tome summon lingers', split: [30, 70], lean: [1, 0.95, 1.1, 1, 1, 1], prowess: '30/70', armor: 'M.ATK', trees: 10,
+    lineB: 'Bonded on Tome trees · Pack on Arms trees', preset: 'Orb (Blizzard Tome)', lb: '2.2×', twin: 'Ice (Blizzard + Axe)', was: 'Summoner',
+    id: 'Magic-led area: the Tome summon first; it lingers and strikes every foe once in farewell. No support.',
+    changes: 'Today’s Summoner, renamed. New defaults (were Dark, Light, Bow); her Bow and Dark summons are volleys, her Light summons double.' },
+  tomeblade: { n: 'Tome Spellblade', ab: 'TB', tier: 1, root: 'allrounder', parents: ['duelist', 'apprentice'], type: 'Magical hybrid', slots: '2 Tomes + 1 Arm', def: ['light', 'lightning', 'katana'],
+    hand: 'Tome 0.72 + Arms 0.44 · MP ×0.5 a half · the Tome half one hit more', split: [30, 70], lean: [1, 0.95, 1.1, 1, 1, 1], prowess: '30/70', armor: 'M.ATK', trees: 10,
+    lineB: 'Pierce on every tree', preset: 'Pendant (an Orb or a Bell on her Light)', lb: '2.2×', twin: 'Light (Light + Katana)', was: 'New', isNew: true,
+    id: 'Magic-led multi-hit: every act a Tome half and an Arms half, the Tome half first and one hit more. Her own skill names: Edged, Honed, Whetted, Gleaming, Sovereign.',
+    changes: 'New: the Arms Spellblade’s mirror. The Spellblade’s trees with her own names (Edged Volt … Sovereign Volt).' },
+  mage: { n: 'Sorcerer', ab: 'So', tier: 1, root: 'mage', parents: ['apprentice'], type: 'Magical', slots: '3 Tomes', def: ['fire', 'ice', 'lightning'],
+    hand: '×1 · MP ×1', split: [0, 100], lean: [0.9, 0.9, 1.15, 0.9, 1.1, 1.3], prowess: '0/100', armor: 'M.ATK', trees: 5,
+    lineB: 'Wave · Spike · Bolt · Pierce (Light, was Cascade) · Barrage (Dark, was Pierce)', preset: 'Pendant', lb: '2.4×', twin: '—', was: 'Mage',
+    id: 'Pure magic, the element ring: a nuke, every foe, random bolts, the target and the rest, a double cast.',
+    changes: 'Today’s Mage, renamed (id stays mage). Light becomes double, Dark a volley; Light B and Dark B swap roles to mirror the Brawler’s.' },
+};
+const T0 = ['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'];
+const T1 = ['brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage'];
+const ROOT_NAME = { warrior: 'Warrior', allrounder: 'All-Rounder', mage: 'Mage' };
+/** A class emblem (mock): a shield, filled for Tier 1, outlined for Tier 0. */
+const emblem = (c, size = 22) => {
+  const t0 = C[c].tier === 0;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path d="M12 2 L21 5 V12 C21 17 17 21 12 22 C7 21 3 17 3 12 V5 Z" fill="${t0 ? 'var(--panel)' : `var(--cl-${c})`}" stroke="var(--cl-${c})" stroke-width="${t0 ? 2 : 0}"/><text x="12" y="15.5" text-anchor="middle" font-size="8.5" font-weight="800" fill="${t0 ? `var(--cl-${c})` : '#fff'}" font-family="system-ui">${C[c].ab}</text></svg>`;
+};
+const splitBar = (s) => `<span class="split" aria-label="${s[0]}% physical, ${s[1]}% magical"><i style="width:${s[0]}%;background:var(--phys)"></i><i style="width:${s[1]}%;background:var(--magic)"></i></span>`;
+
+// ---------- The tree ----------
+const POS = {
+  recruit: [90, 70], duelist: [270, 70], acolyte: [450, 70], caller: [630, 70], apprentice: [810, 70],
+  brawler: [90, 300], spellblade: [224, 300], tomeblade: [316, 300], paladin: [404, 300], cleric: [496, 300], armsummoner: [584, 300], summoner: [676, 300], mage: [810, 300],
+};
+const T0W = 132, T0H = 64, T1W = 86, T1H = 70;
+const EDGES = [];
+T1.forEach((c) => C[c].parents.forEach((p) => EDGES.push({ from: p, to: c, cross: (p === 'recruit' || p === 'apprentice') && C[c].root === 'allrounder' })));
+const state = { sel: 'recruit', mode: 'sheets', r10: new Set(['recruit']) };
+
+function edgePath(e) {
+  const [x1, y1] = POS[e.from], [x2, y2] = POS[e.to];
+  const sy = y1 + T0H, ty = y2;
+  if (!e.cross) return `M${x1} ${sy} C ${x1} ${sy + 70}, ${x2} ${ty - 70}, ${x2} ${ty}`;
+  const ox = e.from === 'recruit' ? 34 : -34;
+  const bus = e.from === 'recruit' ? 205 : 232;
+  return `M${x1 + ox} ${sy} C ${x1 + ox} ${bus}, ${x2} ${bus - 10}, ${x2} ${ty}`;
+}
+function nodeSVG(c) {
+  const [x, y] = POS[c], t0 = C[c].tier === 0, w = t0 ? T0W : T1W, h = t0 ? T0H : T1H;
+  const name = C[c].n.split(' ');
+  const reach = state.mode === 'reclass';
+  let st = 'norm', badge = '';
+  if (reach) {
+    if (t0) { st = state.r10.has(c) ? 'held' : 'open'; badge = state.r10.has(c) ? 'R10' : 'R1 · free'; }
+    else { const ok = C[c].parents.some((p) => state.r10.has(p)); st = ok ? 'ready' : 'closed'; badge = ok ? 'Ready · R10' : 'Closed'; }
+  }
+  const sel = state.sel === c;
+  const fill = st === 'ready' ? 'var(--good-wash)' : 'var(--raised)';
+  const stroke = sel ? 'var(--accent)' : st === 'ready' ? 'var(--success)' : `var(--cl-${c})`;
+  const op = st === 'closed' ? 0.42 : 1;
+  const lines = t0 ? [C[c].n] : name.length > 1 ? [name[0], name.slice(1).join(' ')] : [name[0]];
+  const sub = t0 ? `${C[c].calling.replace(' among her best styles', '').replace('Pace with Late or End', 'Pace + a closer')} · ${C[c].count}` : C[c].def.map((k) => KIND[k].a).join(' ');
+  const tip = t0 ? `${C[c].n} · Tier 0||${C[c].calling} · ${C[c].count} outfits. Promotes to ${C[c].children.map((k) => C[k].n).join(', ')}.`
+    : `${C[c].n} · Tier 1||${C[c].slots}. Parents: ${C[c].parents.map((p) => C[p].n).join(' and ')}.`;
+  const em = t0 ? `<g transform="translate(${x - w / 2 + 8} ${y + 8})">${emblem(c, 22)}</g>` : `<g transform="translate(${x - 9} ${y + 5}) scale(.82)">${emblem(c, 22)}</g>`;
+  const nameY = t0 ? [y + 30] : lines.length > 1 ? [y + 37, y + 50] : [y + 43];
+  return `<g class="node" tabindex="0" role="button" aria-pressed="${sel}" aria-label="${C[c].n}" data-c="${c}" data-tip="${tip}" opacity="${op}">
+    <rect class="box" x="${x - w / 2}" y="${y}" width="${w}" height="${h}" rx="12" fill="${fill}" stroke="${stroke}" stroke-width="${sel ? 3 : 1.6}"/>
+    ${em}
+    ${C[c].isNew ? `<rect x="${x + w / 2 - 30}" y="${y - 8}" width="30" height="15" rx="5" fill="var(--accent)"/><text x="${x + w / 2 - 15}" y="${y + 3}" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--accent-ink)">New</text>` : ''}
+    ${lines.map((l, i) => `<text x="${x + (t0 ? 10 : 0)}" y="${nameY[i]}" text-anchor="middle" font-size="${t0 ? 14 : 11.5}" font-weight="800" fill="var(--ink)">${l}</text>`).join('')}
+    <text x="${x}" y="${y + h - (t0 ? 12 : 7)}" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--ink-soft)">${reach ? badge : sub}</text>
+  </g>`;
+}
+function drawTree() {
+  const svg = document.getElementById('treesvg');
+  const linked = new Set([state.sel]);
+  EDGES.forEach((e) => { if (e.from === state.sel || e.to === state.sel) { linked.add(e.from); linked.add(e.to); } });
+  const bands = `<rect x="6" y="8" width="168" height="404" rx="12" fill="color-mix(in srgb, var(--phys) 7%, transparent)"/>
+    <rect x="182" y="8" width="536" height="404" rx="12" fill="color-mix(in srgb, var(--accent) 6%, transparent)"/>
+    <rect x="726" y="8" width="168" height="404" rx="12" fill="color-mix(in srgb, var(--magic) 7%, transparent)"/>
+    <text x="90" y="34" text-anchor="middle" font-size="12" font-weight="800" letter-spacing=".08em" fill="var(--phys)">WARRIOR</text>
+    <text x="450" y="34" text-anchor="middle" font-size="12" font-weight="800" letter-spacing=".08em" fill="var(--accent-strong)">ALL-ROUNDER</text>
+    <text x="810" y="34" text-anchor="middle" font-size="12" font-weight="800" letter-spacing=".08em" fill="var(--magic)">MAGE</text>
+    <text x="16" y="60" font-size="10.5" font-weight="700" fill="var(--ink-faint)">TIER 0</text>
+    <text x="16" y="290" font-size="10.5" font-weight="700" fill="var(--ink-faint)">TIER 1</text>
+    <path d="M40 432 H860" stroke="var(--hairline-strong)" stroke-width="1.5"/><path d="M40 432 l8 -4 v8 z M860 432 l-8 -4 v8 z" fill="var(--ink-faint)"/>
+    <text x="40" y="447" font-size="11" fill="var(--ink-faint)">physical</text><text x="860" y="447" text-anchor="end" font-size="11" fill="var(--ink-faint)">magical</text>`;
+  const edges = EDGES.map((e) => {
+    const on = state.mode === 'sheets' ? (e.from === state.sel || e.to === state.sel) : state.r10.has(e.from);
+    const col = `var(--cl-${e.from})`;
+    const d = edgePath(e);
+    return `<path class="edge ${on ? '' : 'faded'}" d="${d}" stroke="${col}" ${e.cross ? 'stroke-dasharray="6 5"' : ''}/>
+      <path class="edge hit" d="${d}" data-tip="${C[e.from].n} → ${C[e.to].n}||At ${C[e.from].n} Class Rank 10, free; ${C[e.to].n} opens at Class Rank 10."/>`;
+  }).join('');
+  const nodes = [...T0, ...T1].map((c) => {
+    const g = nodeSVG(c);
+    return state.mode === 'sheets' && !linked.has(c) ? g.replace('opacity="1"', 'opacity=".55"') : g;
+  }).join('');
+  svg.innerHTML = bands + edges + nodes;
+  bindTips(svg);
+}
+function kv(k, v) { return `<div class="kv"><span>${k}</span><span>${v}</span></div>`; }
+function leanHTML(l) {
+  const lab = ['HP', 'ATK', 'MATK', 'DEF', 'MDEF', 'MP'];
+  return `<div class="leanrow">${l.map((v, i) => `<div class="${v > 1 ? 'up' : v < 1 ? 'dn' : ''}">${lab[i]}<b>×${v}</b></div>`).join('')}</div>`;
+}
+function drawSheet() {
+  const c = state.sel, d = C[c], el = document.getElementById('sheet');
+  const head = `<div class="hdr">${emblem(c, 34)}<div><b>${d.n}</b> ${d.isNew ? '<span class="tag new">New</span>' : ''}<div class="muted" style="font-size:12px">${d.tier === 0 ? 'Tier 0' : 'Tier 1'} · ${ROOT_NAME[d.root]} column · ${d.tier === 0 ? d.was : d.isNew ? 'new' : 'was ' + d.was} · <code>${c}</code></div></div></div><p class="idl">${d.id}</p>`;
+  let body = '';
+  if (d.tier === 0) {
+    body = kv('Calling', `${d.calling}<br><span class="muted">${d.combos}</span>`) + kv('Outfits', `<b>${d.count}</b> of 270`) + kv('Trade', d.trade)
+      + kv('Skill', `<b>${d.skill}</b>: one foe · 1 hit · 1.52 → 2.20 by Class Rank · 10 MP, cast with any of her three weapons`)
+      + kv('Slots', 'Three, any of the ten (three different)') + kv('Defaults', `<span class="gl">${d.def.map((k) => glyph(k, 'sm')).join('')}</span>`)
+      + kv('Stats', 'One act ×1 · no lean · armor’s offense and Prowess follow her slots · no support') + kv('Preset', d.preset)
+      + kv('Limit Break scale', '<b>1</b> (<a href="../halls-v2.md">Halls v2</a> HV5); no Tier 0 hall: she sits in any seat')
+      + kv('Class Rank', '1–10 at 2 × (120 + 16 × rank): <b>3,600</b>; Rank 10 with Uma Lv 10')
+      + `<h3 style="margin-top:14px">Promotes to</h3><div class="kidlist">${d.children.map((k) => `<button class="kid" data-go="${k}">${emblem(k, 24)}<span><b>${C[k].n}</b>${C[k].isNew ? ' <span class="tag new">New</span>' : ''}<small>${C[k].slots} · ${C[k].type}</small></span></button>`).join('')}</div>`;
+  } else {
+    body = kv('Parents', d.parents.map((p) => `<button class="kid" data-go="${p}" style="display:inline-flex;min-height:32px;padding:3px 8px;margin:0 4px 4px 0">${emblem(p, 18)} ${C[p].n}</button>`).join(''))
+      + kv('Fight type', d.type) + kv('Slots', d.slots) + kv('Defaults', `<span class="gl">${d.def.map((k) => glyph(k, 'sm')).join('')}</span> <span class="muted">${d.def.map((k) => KIND[k].n).join(', ')}</span>`)
+      + kv('Hand', d.hand) + kv('Split', d.healer ? 'Half hand; support carries her' : `${splitBar(d.split)} <span class="muted">${d.split[0]}/${d.split[1]}</span>`)
+      + kv('Lean', leanHTML(d.lean)) + kv('Prowess', d.prowess + ' ATK/M.ATK') + kv('Armor’s offense', d.armor)
+      + kv('Trees', `${d.trees} · line B: ${d.lineB}`) + kv('Both halves weak', d.twin) + kv('Preset', d.preset) + kv('Limit Break scale', `<b>${d.healer ? '0.75' : '1'}</b> × each Limit Break’s own power <span class="muted">(<a href="../halls-v2.md">Halls v2</a> HV5; today a class power of ${d.lb})</span>`)
+      + kv('What changes', d.changes);
+  }
+  if (state.mode === 'reclass') {
+    const open = T1.filter((k) => C[k].parents.some((p) => state.r10.has(p)));
+    body = `<p class="note" style="margin:0 0 10px"><b>Reclass view.</b> With ${[...state.r10].map((k) => C[k].n).join(', ') || 'no Tier 0'} at Rank 10 she can open <b>${open.map((k) => C[k].n).join(', ') || 'no Tier 1 class yet'}</b> for free. Every other class needs one more Tier 0 at Rank 10 (3,600 Class EXP, 4 Manuals). Every Tier 0 is always open at Rank 1.</p>` + body;
+  }
+  el.innerHTML = head + body;
+  el.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => { state.sel = b.dataset.go; render(); }));
+}
+function drawReach() {
+  const el = document.getElementById('reach');
+  el.classList.toggle('on', state.mode === 'reclass');
+  el.innerHTML = '<span class="lbl">Her Tier 0s at Rank 10</span>' + T0.map((c) => `<button data-r="${c}" aria-pressed="${state.r10.has(c)}">${emblem(c, 16)}${C[c].n}</button>`).join('');
+  el.querySelectorAll('[data-r]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.r; state.r10.has(k) ? state.r10.delete(k) : state.r10.add(k); render(); }));
+}
+function render() { drawTree(); drawSheet(); drawReach(); }
+document.getElementById('treesvg').addEventListener('click', (e) => { const g = e.target.closest('.node'); if (g) { state.sel = g.dataset.c; render(); } });
+document.getElementById('treesvg').addEventListener('keydown', (e) => { const g = e.target.closest('.node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); state.sel = g.dataset.c; render(); document.querySelector(`.node[data-c="${state.sel}"]`).focus(); } });
+document.getElementById('mode').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; state.mode = b.dataset.m; document.querySelectorAll('#mode button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); render(); });
+
+// ---------- All thirteen ----------
+(function () {
+  const rows = [...T0, ...T1].map((c) => {
+    const d = C[c];
+    const rel = d.tier === 0 ? '→ ' + d.children.map((k) => C[k].n).join(', ') : '← ' + d.parents.map((p) => C[p].n).join(', ');
+    return `<tr><td><span class="cls">${emblem(c, 20)}${d.n}${d.isNew ? ' <span class="tag new">New</span>' : ''}</span></td><td><code>${c}</code></td><td>${d.tier === 0 ? 'Tier 0' : 'Tier 1'}</td><td>${ROOT_NAME[d.root]}</td><td>${rel}</td>
+      <td>${d.tier === 0 ? 'Any three' : d.slots}</td><td style="white-space:nowrap">${d.def.map((k) => glyph(k, 'sm')).join(' ')}</td><td>${d.tier === 0 ? '×1, one skill' : d.hand}</td>
+      <td>${d.tier === 0 ? `<b>${d.count}</b> outfits` : d.healer ? 'Half hand' : `${splitBar(d.split)}`}</td></tr>`;
+  }).join('');
+  document.getElementById('t13').innerHTML = `<tr><th>Class</th><th>Id</th><th>Tier</th><th>Root</th><th>Promotes to · from</th><th>Slots</th><th>Defaults</th><th>Hand</th><th>Split · calling</th></tr>${rows}`;
+})();
+
+// ---------- Calling ----------
+(function () {
+  const R = [
+    ['1', '<b>Front</b> among her best styles', 'recruit'], ['2', '<b>Pace alone</b>', 'duelist'], ['3', '<b>Pace with Late or End</b>', 'apprentice'],
+    ['4', '<b>End</b> among them (Late + End, or End)', 'caller'], ['5', '<b>Late alone</b>', 'acolyte'],
+  ];
+  document.getElementById('rules').innerHTML = '<h3>The rule, the first row that fits</h3>' + R.map(([n, t, c]) => `<div class="rule"><span class="no">${n}</span><span>${t}</span><span class="cls">${emblem(c, 20)}${C[c].n}</span></div>`).join('')
+    + '<p class="note">Fifteen style combinations exist; ten occur in the release. The five with Front plus a closer, or all four, hold no outfit today and still land on Recruit.</p>';
+  const B = {
+    recruit: [['Front', 27], ['Front + Pace', 19], ['Front + Late', 1]], duelist: [['Pace', 72]],
+    apprentice: [['Pace + Late', 68], ['Pace + Late + End', 3], ['Pace + End', 1]], caller: [['Late + End', 20], ['End', 13]], acolyte: [['Late', 46]],
+  };
+  const max = 72;
+  document.getElementById('bars').innerHTML += ['recruit', 'duelist', 'apprentice', 'caller', 'acolyte'].map((c) => {
+    const segs = B[c].map(([t, n], i) => `<span class="seg" style="width:${(n / max) * 100}%;background:var(--cl-${c});filter:brightness(${1 - i * 0.14})" data-tip="${t}||${n} outfits">${n >= 12 ? t + ' ' + n : ''}</span>`).join('');
+    return `<div class="cbar"><span class="cls">${emblem(c, 20)}${C[c].n}</span><span class="track">${segs}</span><span class="n">${C[c].count}</span></div>`;
+  }).join('') + '<p class="note">Shares 17.4 · 26.7 · 26.7 · 12.2 · 17.0%. Each Tier 0 names one trade, so these are the trades’ head counts: Metal 47, Wood 72, Stone 72, Fish 33, Vegetables 46.</p>';
+  const OLD = ['Brawler', 'Mage', 'Spell Blade', 'Summoner', 'Paladin', 'Cleric'];
+  const NEW = ['recruit', 'duelist', 'apprentice', 'caller', 'acolyte'];
+  const M = { Brawler: [47, 11, 3, 0, 0], Mage: [0, 46, 28, 0, 0], 'Spell Blade': [0, 15, 41, 0, 0], Summoner: [0, 0, 0, 33, 0], Paladin: [0, 0, 0, 0, 33], Cleric: [0, 0, 0, 0, 13] };
+  const same = { Brawler: 'recruit', 'Spell Blade': 'duelist', Mage: 'apprentice', Summoner: 'caller', Paladin: 'acolyte', Cleric: 'acolyte' };
+  document.getElementById('cross').innerHTML = `<tr><th>Today’s calling ↓ · Tier 0 →</th>${NEW.map((c) => `<th class="num">${C[c].n}</th>`).join('')}<th class="num">Total</th></tr>`
+    + OLD.map((o) => `<tr><td><b>${o}</b></td>${M[o].map((n, i) => `<td class="mx ${n === 0 ? 'z' : NEW[i] === same[o] ? '' : 'h'}">${n || '·'}</td>`).join('')}<td class="num">${M[o].reduce((a, b) => a + b)}</td></tr>`).join('')
+    + `<tr><th>Total</th>${NEW.map((c) => `<th class="num">${C[c].count}</th>`).join('')}<th class="num">270</th></tr>`;
+})();
+
+initTheme();
+render();
+bindTips(document);
+</script>
+</body>
+</html>
