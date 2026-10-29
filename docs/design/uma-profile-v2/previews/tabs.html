@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile Tabs and Sheets</title>
+<!-- Uma profile v2 (docs/design/uma-profile-v2/proposal.md). Self-contained: uma-kit's tokens, light and dark (the System,
+     Light and Dark buttons pin one), phone mocks at 390x844 inside a desktop page. Every Uma, outfit and skill here is made
+     up; template, class, weapon and place names are the game's own. Built from one shared style and mock, so the four
+     pages draw the profile the same way. -->
+<style>
+  /* uma-kit's theme tokens (uma-platform/packages/kit/theme.css), as the Tier rework's previews copy them: light is
+     uma-racer's, dark is uma-rpg's. The page follows the system; the Light/Dark buttons pin one. */
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #b8770a; --info: #2f6fe0; --locked: #8a94a3;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --c1: #2a78d6; --c2: #eb6834; --bad: #c23b33; --bad-wash: #fbe4e2; --good-wash: #e2f2e8;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --k-greatsword: #d9772b; --k-axe: #8a52c7; --k-lance: #2f9a4f; --k-bow: #3aa38f; --k-katana: #c4466e;
+    --k-fire: #d23a2f; --k-ice: #2f7fd6; --k-lightning: #c9a400; --k-light: #b89a3a; --k-dark: #6d48b8;
+    --f-pendant: #2a78d6; --f-orb: #eb6834; --f-bell: #1baf7a; --f-insignia: #6250d6;
+    --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --c1: #3987e5; --c2: #d95926; --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+      --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+      --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+      --scrim: rgb(0 0 0 / 0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+    --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+    --c1: #3987e5; --c2: #d95926; --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+    --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+    --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+    --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+    --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+    --scrim: rgb(0 0 0 / 0.55);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 14px; margin: 0 0 6px; }
+  p { margin: 0; }
+  a { color: inherit; }
+  code { font-size: 12px; background: var(--raised); padding: 0 4px; border-radius: 4px; }
+  .lead { color: var(--ink-soft); max-width: 940px; }
+  .sub { color: var(--ink-soft); margin-bottom: 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  nav.top { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--hairline); }
+  nav.top a, nav.top button { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font: 600 13px system-ui, sans-serif;
+    box-shadow: 0 1px 0 var(--hairline-strong); border: 0; cursor: pointer; }
+  nav.top a:hover { background: var(--raised); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  nav.top .spacer { flex: 1; }
+  nav.top button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .value .was { color: var(--ink-faint); font-weight: 500; font-size: 16px; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note b { color: var(--ink); }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .pills button { font: 600 12.5px system-ui, sans-serif; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .pills .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; margin-right: 2px; }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 6px;
+    background: var(--raised); border: 1px solid var(--hairline-strong); color: var(--ink); white-space: nowrap; }
+  .tag.good { background: var(--good-wash); border-color: transparent; color: var(--success); }
+  .tag.bad { background: var(--bad-wash); border-color: transparent; color: var(--bad); }
+  .tag.acc { background: var(--accent-wash); border-color: transparent; color: var(--accent-strong); }
+  #tip { position: fixed; z-index: 60; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; box-shadow: 0 6px 18px rgb(0 0 0 / .18); left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+
+  /* ---- The phone: 390×844 at 1:1. Status 47 + top bar 62 + place header 52 = 161; the body scrolls 683 px under the
+     kit's bottom bar (80 px), as the audit measured. ---- */
+  .pair { display: grid; grid-template-columns: 410px 410px minmax(260px, 1fr); gap: 24px; align-items: start; margin-top: 16px; }
+  .pair.two { grid-template-columns: 410px minmax(280px, 1fr); }
+  .phone-wrap { width: 410px; padding: 10px; }
+  .cap { font-size: 12px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; margin: 0 0 8px 10px; }
+  .phone { width: 390px; height: 844px; border-radius: 50px; background: var(--page); position: relative; overflow: hidden;
+    box-shadow: 0 0 0 10px var(--bezel), 0 0 0 11px #3a4250, 0 24px 48px rgb(0 0 0 / .22); font: 14px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  .phone * { -webkit-tap-highlight-color: transparent; }
+  .ph-status { position: absolute; top: 0; left: 0; right: 0; height: 47px; display: flex; justify-content: space-between; align-items: center; padding: 6px 34px 0;
+    font: 600 15px system-ui, sans-serif; background: var(--panel); z-index: 3; }
+  .ph-status .island { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; }
+  .ph-top { position: absolute; top: 47px; left: 0; right: 0; height: 62px; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--panel); z-index: 3; }
+  .ph-top .ini { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; }
+  .ph-top .crest { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: #e8c25a; color: #1b1406; }
+  .ph-top .cur { margin-left: auto; display: flex; gap: 5px; }
+  .ph-top .cur span { font-size: 11.5px; font-weight: 700; padding: 4px 8px; border-radius: 999px; background: var(--raised); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ph-place { position: absolute; top: 109px; left: 0; right: 0; height: 52px; display: flex; align-items: center; gap: 2px; padding: 0 6px;
+    background: color-mix(in srgb, var(--panel) 95%, transparent); border-bottom: 1px solid var(--hairline); z-index: 3; }
+  .ph-place .ib { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--ink-soft); flex: none; font-size: 20px; }
+  .ph-place .ttl { flex: 1; font-size: 18px; font-weight: 600; min-width: 0; }
+  .ph-place .step { display: flex; align-items: center; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .ph-place .step .ib { width: 40px; color: var(--ink); }
+  .ph-body { position: absolute; top: 161px; left: 0; right: 0; height: 683px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  .ph-inner { padding: 12px 16px 96px; }
+  .ph-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; background: color-mix(in srgb, var(--panel) 96%, transparent); border-top: 1px solid var(--hairline);
+    display: grid; grid-template-columns: repeat(5, 1fr); align-items: start; padding-top: 8px; z-index: 3; }
+  .ph-bar span { display: grid; justify-items: center; gap: 2px; font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
+  .ph-bar i { width: 26px; height: 26px; border-radius: 8px; background: var(--sunken); display: block; }
+  .ph-bar span.mid i { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); margin-top: -18px; box-shadow: 0 0 0 4px var(--panel); }
+  .ph-bar::after { content: ""; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: var(--ink); opacity: .85; }
+  .fold { position: absolute; left: 0; right: 0; height: 0; border-top: 2px dashed var(--danger); z-index: 2; pointer-events: none; }
+  .fold span { position: absolute; right: 8px; top: -18px; font-size: 10.5px; font-weight: 700; color: var(--danger); background: var(--page); padding: 0 4px; border-radius: 4px; }
+
+  /* The sheet (the kit's BottomSheet: handle, title, Close, a scrolling body, a footer for the one action). */
+  .ph-scrim { position: absolute; inset: 0; background: var(--scrim); z-index: 10; }
+  .ph-sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 770px; background: var(--panel); border-radius: 22px 22px 0 0; z-index: 11;
+    display: flex; flex-direction: column; box-shadow: 0 -8px 30px rgb(0 0 0 / .2); }
+  .ph-sheet .handle { width: 40px; height: 5px; border-radius: 3px; background: var(--hairline-strong); margin: 8px auto 2px; flex: none; }
+  .ph-sheet .sh-head { display: flex; align-items: center; gap: 8px; padding: 4px 8px 6px 18px; flex: none; }
+  .ph-sheet .sh-head b { flex: 1; font-size: 17px; }
+  .ph-sheet .sh-head .x { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-soft); font-size: 18px; background: var(--raised); }
+  .ph-sheet .sh-body { overflow-y: auto; padding: 4px 18px 16px; }
+  .ph-sheet .sh-foot { padding: 10px 18px 30px; border-top: 1px solid var(--hairline); flex: none; }
+  .btn { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 12px; background: var(--accent); color: var(--accent-ink);
+    font-weight: 800; font-size: 15px; border: 0; width: 100%; cursor: pointer; }
+  .btn.off { background: var(--sunken); color: var(--ink-faint); cursor: default; }
+  .btn.sm { min-height: 44px; width: auto; padding: 0 14px; font-size: 12.5px; border-radius: 10px; }
+
+  /* Profile pieces, on the kit's scale: 22 · 17 · 14 · 12.5 · 11 px. */
+  .hd { display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px; gap: 12px; align-items: center; height: 64px; }
+  .portrait { width: 64px; height: 64px; border-radius: 10px; background: var(--sunken); overflow: hidden; display: block; }
+  .hd .nm { font-size: 17px; font-weight: 700; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hd .tt { font-size: 12.5px; color: var(--ink-soft); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hd .tt .rar { color: var(--accent); font-weight: 700; }
+  .hd .lv { display: flex; align-items: center; gap: 8px; height: 22px; font-size: 14px; font-weight: 800; }
+  .hd .lv .bar { flex: 1; height: 4px; border-radius: 2px; background: var(--sunken); overflow: hidden; }
+  .hd .lv .bar i { display: block; height: 100%; background: var(--info); border-radius: 2px; }
+  .hd .lv small { font-size: 11px; font-weight: 600; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .target { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--hairline-strong); background: var(--raised); display: grid; place-items: center; align-self: start; color: var(--ink-soft); }
+  .target.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .facts { display: grid; grid-template-columns: 1fr 1.25fr .8fr; gap: 6px; margin-top: 12px; }
+  .fact { min-height: 44px; border-radius: 10px; background: var(--raised); padding: 4px 10px; display: flex; flex-direction: column; justify-content: center; position: relative; min-width: 0; cursor: pointer; }
+  .fact .l { font-size: 11px; color: var(--ink-soft); font-weight: 600; line-height: 14px; }
+  .fact .v { font-size: 12.5px; font-weight: 700; line-height: 17px; color: var(--accent-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fact .v.plain { color: var(--ink); }
+  .fact::after { content: "›"; position: absolute; right: 9px; top: 50%; transform: translateY(-50%); color: var(--ink-faint); font-size: 16px; }
+  .fact.det { flex-direction: row; align-items: center; justify-content: flex-start; gap: 6px; font-size: 12.5px; font-weight: 700; }
+  .tabbar { position: sticky; top: 0; z-index: 4; margin: 12px -16px 0; padding: 6px 16px; background: color-mix(in srgb, var(--page) 95%, transparent); backdrop-filter: blur(6px); }
+  .tabbar .in { display: flex; gap: 4px; background: var(--sunken); border-radius: 10px; padding: 4px; }
+  .tabbar button { flex: 1; min-height: 44px; border: 0; background: transparent; border-radius: 8px; font: 600 12.5px system-ui, sans-serif; color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; min-width: 0; }
+  .tabbar button[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block; flex: none; }
+  .row1 { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 12px; }
+  .row1 .sum { flex: 1; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); min-width: 0; }
+  .row1 .sum b { color: var(--ink); }
+  .info { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-soft); flex: none; }
+  .info svg { width: 20px; height: 20px; }
+  .lbl11 { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-faint); margin: 12px 0 6px; display: flex; align-items: center; justify-content: space-between; min-height: 16px; }
+  .gb { display: inline-block; font-size: 11px; font-weight: 700; line-height: 15px; padding: 0 5px; border-radius: 5px; background: var(--ink); color: var(--panel); font-variant-numeric: tabular-nums; }
+  .glyph { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: -.02em; flex: none; }
+  .tap { cursor: pointer; }
+  .tap:hover { filter: brightness(1.04); }
+  .sel { box-shadow: inset 0 0 0 2px var(--accent) !important; }
+
+  /* Class */
+  .classrow { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 6px; }
+  .ctile { min-height: 64px; border-radius: 12px; background: var(--raised); padding: 8px; display: flex; flex-direction: column; justify-content: center; gap: 3px; position: relative; min-width: 0; }
+  .ctile .top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .ctile .nm { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ctile .rk { font-size: 11px; font-weight: 700; color: var(--ink-soft); }
+  .ctile .mini { height: 3px; border-radius: 2px; background: var(--sunken); overflow: hidden; }
+  .ctile .mini i { display: block; height: 100%; background: var(--accent); }
+  .wtile { align-items: center; }
+  .wtile .ln { font-size: 11px; font-weight: 700; color: var(--ink-soft); }
+  .eqrow { display: grid; grid-template-columns: repeat(7, 44px); gap: 6px; justify-content: space-between; }
+  .eq { width: 44px; height: 44px; border-radius: 10px; background: var(--raised); display: grid; place-items: center; position: relative; }
+  .eq .glyph { width: 26px; height: 26px; font-size: 10px; border-radius: 7px; }
+  .eq .gb { position: absolute; right: 0; bottom: -3px; font-size: 10.5px; padding: 0 4px; }
+  .eq.empty { background: transparent; border: 1.5px dashed var(--hairline-strong); }
+  .autochip { min-height: 32px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; background: var(--accent); color: var(--accent-ink); text-transform: none; letter-spacing: 0; }
+  .treehd { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 2px; }
+  .treehd b { font-size: 12.5px; }
+  .treehd span { font-size: 12.5px; font-weight: 700; color: var(--accent-strong); min-height: 32px; display: inline-flex; align-items: center; }
+  .tree svg { display: block; width: 100%; height: auto; }
+  .lim { display: flex; align-items: center; gap: 10px; min-height: 48px; border-radius: 12px; background: var(--raised); padding: 6px 12px; margin-top: 12px; }
+  .lim .k { font-size: 11px; font-weight: 700; color: var(--ink-faint); letter-spacing: .04em; text-transform: uppercase; }
+  .lim .v { flex: 1; font-size: 12.5px; font-weight: 600; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lim::after, .srow::after { content: "›"; color: var(--ink-faint); font-size: 16px; }
+
+  /* Gear */
+  .wgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .agrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .gtile { border-radius: 12px; background: var(--raised); padding: 8px 4px 6px; display: grid; justify-items: center; gap: 4px; position: relative; min-height: 72px; }
+  .gtile .glyph { width: 36px; height: 36px; font-size: 12px; }
+  .gtile .gb { position: absolute; top: 6px; right: 6px; }
+  .agrid .gtile .gb { top: 4px; right: 4px; }
+  .gtile .st { font-size: 11px; font-weight: 600; color: var(--ink-soft); white-space: nowrap; }
+  .gtile .dot { position: absolute; top: 8px; left: 8px; }
+  .gtile.g0 .glyph { background: transparent !important; border: 1.5px dashed var(--hairline-strong); color: var(--ink-faint); }
+  .acc { display: flex; align-items: center; gap: 10px; min-height: 56px; border-radius: 12px; background: var(--raised); padding: 8px 12px; position: relative; }
+  .acc .glyph { width: 36px; height: 36px; }
+  .acc .mid { flex: 1; min-width: 0; }
+  .acc .mid b { font-size: 12.5px; display: block; }
+  .acc .mid span { font-size: 11px; color: var(--ink-soft); font-weight: 600; }
+
+  /* Stars */
+  .map { display: block; margin: 4px auto 0; width: 300px; height: 300px; border-radius: 14px; background: var(--sunken); }
+  .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
+  .totals div { border-radius: 10px; background: var(--raised); padding: 5px 8px; text-align: center; min-height: 38px; }
+  .totals b { display: block; font-size: 11px; color: var(--ink-soft); font-weight: 700; }
+  .totals span { font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .totals .star { color: var(--accent-strong); font-size: 11px; }
+
+  /* Template */
+  .tname { font-size: 22px; font-weight: 800; color: var(--accent-strong); flex: 1; line-height: 1.15; }
+  .reads { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .reads div { border-radius: 10px; background: var(--raised); padding: 6px 8px; min-width: 0; }
+  .reads .k { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
+  .reads b { display: block; font-size: 12.5px; line-height: 17px; }
+  .reads span { display: block; font-size: 11px; color: var(--ink-soft); line-height: 14px; }
+  .calling { display: flex; align-items: center; gap: 8px; min-height: 52px; border-radius: 12px; background: var(--raised); padding: 6px 12px; margin-top: 12px; }
+  .calling .k { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; width: 58px; flex: none; }
+  .calling .v { flex: 1; font-size: 12.5px; font-weight: 700; min-width: 0; }
+  .calling .tr { font-size: 11px; color: var(--ink-soft); font-weight: 600; text-align: right; }
+  .picks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pick { border-radius: 12px; background: var(--raised); padding: 8px 10px; text-align: left; border: 0; font: inherit; color: inherit; cursor: pointer; min-height: 104px; position: relative; }
+  .pick .top { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; }
+  .pick .tn { font-size: 11px; font-weight: 700; color: var(--accent-strong); margin: 3px 0 4px; }
+  .pick dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 1px 6px; font-size: 11px; }
+  .pick dt { color: var(--ink-faint); } .pick dd { margin: 0; font-weight: 600; }
+  .pick .sg { position: absolute; top: 8px; right: 8px; font-size: 10.5px; font-weight: 800; color: var(--success); }
+  .pick.is-on { background: var(--accent); color: var(--accent-ink); }
+  .pick.is-on .tn, .pick.is-on dt { color: var(--accent-ink); opacity: .8; }
+  .pick.is-off { opacity: .45; cursor: default; }
+  .srow { display: flex; align-items: center; gap: 8px; min-height: 48px; border-bottom: 1px solid var(--hairline); padding: 0 2px; }
+  .srow .k { width: 86px; flex: none; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
+  .srow .k .s { color: var(--accent-strong); font-weight: 800; }
+  .srow .v { flex: 1; font-size: 12.5px; font-weight: 700; min-width: 0; }
+  .srow .v small { display: block; font-size: 11px; font-weight: 600; color: var(--ink-soft); }
+  .srow.fact-only::after { content: ""; width: 7px; }
+  .state { font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+  .state.on { background: var(--accent); color: var(--accent-ink); }
+  .state.off { background: transparent; color: var(--ink-faint); border: 1px solid var(--hairline-strong); }
+  .state.closed { background: transparent; color: var(--ink-faint); opacity: .8; }
+  .state.ready { background: var(--good-wash); color: var(--success); }
+  .apt { display: grid; grid-template-columns: 58px 1fr; gap: 4px 6px; align-items: center; font-size: 11px; }
+  .apt .k { font-weight: 700; color: var(--ink-faint); }
+  .apt .gs { display: flex; flex-wrap: wrap; gap: 4px; }
+  .gr { display: inline-flex; align-items: center; gap: 4px; padding: 1px 6px 1px 2px; border-radius: 999px; background: var(--raised); font-weight: 600; font-size: 11px; }
+  .gr i { width: 17px; height: 17px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 800; color: #1b1406; }
+  .gr.src { box-shadow: inset 0 0 0 2px var(--accent); }
+
+  /* Sheet content */
+  .ba { display: flex; align-items: baseline; justify-content: center; gap: 12px; font-size: 22px; font-weight: 800; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+  .ba .ar { color: var(--ink-faint); font-weight: 600; }
+  .ba .to { color: var(--success); }
+  .ba2 { text-align: center; font-size: 14px; font-weight: 600; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .ba2 b { color: var(--ink); }
+  .kv { display: flex; justify-content: space-between; gap: 10px; min-height: 32px; align-items: center; font-size: 14px; border-bottom: 1px solid var(--hairline); }
+  .kv span:first-child { color: var(--ink-soft); }
+  .kv b { font-weight: 700; text-align: right; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+  .chipb { min-height: 44px; min-width: 52px; padding: 0 12px; border-radius: 10px; background: var(--raised); display: inline-flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; gap: 6px; }
+  .chipb.on { background: var(--accent); color: var(--accent-ink); }
+  .chipb.sel { box-shadow: inset 0 0 0 2px var(--accent); }
+  .chipb.closed { opacity: .4; }
+  .chipb small { font-size: 11px; font-weight: 600; }
+  .fams { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0; }
+  .fam { min-height: 64px; border-radius: 12px; background: var(--raised); display: grid; justify-items: center; align-content: center; gap: 4px; font-size: 11px; font-weight: 700; position: relative; }
+  .fam .glyph { width: 30px; height: 30px; }
+  .fam.on { background: var(--accent); color: var(--accent-ink); }
+  .fam .stx { position: absolute; top: 4px; left: 6px; color: var(--accent-strong); font-size: 12px; }
+  .fam.on .stx { color: var(--accent-ink); }
+  .fam .dot { position: absolute; top: 6px; right: 6px; }
+  .sline { font-size: 14px; color: var(--ink-soft); margin: 6px 0; }
+  .sline b { color: var(--ink); }
+  .warnline { font-size: 12.5px; font-weight: 700; color: var(--warning); }
+  .pips { display: flex; gap: 4px; justify-content: center; margin: 4px 0 6px; }
+  .pips i { width: 26px; height: 6px; border-radius: 3px; background: var(--sunken); }
+  .pips i.on { background: var(--accent); }
+  .list { display: grid; gap: 6px; margin-top: 8px; }
+  .li { display: flex; align-items: center; gap: 10px; min-height: 48px; border-radius: 12px; background: var(--raised); padding: 6px 12px; font-size: 14px; }
+  .li .mid { flex: 1; min-width: 0; }
+  .li .mid small { display: block; font-size: 11px; color: var(--ink-soft); font-weight: 600; }
+  .li.on { background: var(--accent); color: var(--accent-ink); }
+  .li.on small { color: var(--accent-ink); opacity: .8; }
+  .li.off { opacity: .45; }
+  .dsec { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-faint); margin: 12px 0 2px; }
+  .dgrid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; }
+  .dgrid .kv { font-size: 12.5px; }
+  .dgrid .kv small { display: block; font-size: 11px; color: var(--ink-faint); font-weight: 600; }
+  .core5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .core5 div { border-radius: 10px; background: var(--raised); text-align: center; padding: 4px 2px; font-size: 11px; color: var(--ink-soft); font-weight: 600; }
+  .core5 b { display: block; font-size: 14px; color: var(--ink); }
+  .exp { font-size: 12.5px; font-weight: 700; color: var(--accent-strong); margin-top: 10px; min-height: 32px; display: flex; align-items: center; }
+
+  /* Mini sheets (the gallery): a sheet without the phone. */
+  .gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 14px; align-items: start; }
+  .msheet { background: var(--panel); border-radius: 18px; box-shadow: 0 1px 0 var(--hairline-strong), 0 0 0 1px var(--hairline); overflow: hidden; min-width: 0; }
+  .msheet .from { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; padding: 10px 14px 0; }
+  .msheet .sh-head { display: flex; align-items: center; padding: 4px 14px 4px; }
+  .msheet .sh-head b { flex: 1; font-size: 15px; }
+  .msheet .sh-body { padding: 2px 14px 10px; font-size: 13px; }
+  .msheet .sh-foot { padding: 8px 14px 12px; border-top: 1px solid var(--hairline); }
+  .msheet .btn { min-height: 40px; font-size: 13px; }
+  .msheet .kv { font-size: 12.5px; min-height: 28px; }
+  .msheet .ba { font-size: 18px; }
+  .msheet .li { font-size: 12.5px; min-height: 40px; }
+  .msheet .fams { grid-template-columns: repeat(4, 1fr); }
+  .msheet .fam { min-height: 52px; }
+  .msheet .chipb { min-height: 34px; min-width: 40px; }
+
+  .legend-states { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .legend-states div { background: var(--panel); border-radius: 12px; padding: 12px; box-shadow: 0 1px 0 var(--hairline-strong); font-size: 12.5px; color: var(--ink-soft); }
+  .legend-states b { display: block; color: var(--ink); font-size: 13px; margin: 8px 0 2px; }
+  .sw-state { height: 44px; border-radius: 10px; display: grid; place-items: center; font-weight: 700; font-size: 12.5px; position: relative; }
+  .notes h3 { margin-top: 12px; }
+  .notes h3:first-child { margin-top: 0; }
+  .notes ul { margin: 4px 0 0; padding-left: 18px; color: var(--ink-soft); font-size: 13px; }
+  .notes li { margin: 3px 0; }
+  .notes li b { color: var(--ink); }
+  @media (max-width: 1300px) { .pair { grid-template-columns: 410px 410px; } .pair .notes { grid-column: 1 / -1; } .gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .legend-states { grid-template-columns: repeat(3, minmax(0, 1fr)); } .grid2, .grid3 { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { main { padding: 20px 16px 60px; } nav.top { margin: 16px -16px 0; padding: 10px 16px; } .pair, .pair.two { grid-template-columns: 1fr; } .phone-wrap { transform-origin: top left; } .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .kpis, .legend-states { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gallery { grid-template-columns: 1fr; } }
+  @media (max-width: 440px) { .phone-wrap { zoom: .8; } .pair, .pair.two { grid-template-columns: minmax(0, 1fr) !important; } }
+
+
+</style>
+</head>
+<body>
+<main>
+  <h1>Uma profile v2: every tab, every sheet</h1>
+  <p class="lead">The new profile at 390×844, one tab a row: the tab on the left (live: tap anything), its main sheet open
+    on the right, then every other sheet it opens. Uma A (made up) is a <b>Fleet Bruiser</b> at Lv 40, a Brawler at Class
+    Rank 34, wearing a Pendant instead of her ★ Bell, with three raises and two jewels ready. From
+    <a href="../proposal.md">proposal.md</a> §3–§5 (UP5–UP19).</p>
+  <nav class="top">
+    <a href="#live">Live</a><a href="#states">States</a><a href="#header">Header and Details</a><a href="#class">Class</a><a href="#gear">Gear</a><a href="#stars">Stars</a><a href="#template">Template</a>
+    <a class="out" href="before-after.html">Before and after →</a><a class="out" href="template-tab.html">Template tab →</a><a class="out" href="doors.html">Doors →</a>
+    <span class="spacer"></span><span id="theme" style="display:flex;gap:6px"><button data-t="system">System</button><button data-t="light">Light</button><button data-t="dark">Dark</button></span>
+  </nav>
+  <div class="kpis">
+    <div class="kpi"><div class="label">Tab bar starts</div><div class="value">144 px <span class="was">284</span></div><div class="delta">21% of the first screen (was 42%, 78% with the calling card)</div></div>
+    <div class="kpi"><div class="label">Tabs</div><div class="value">4 <span class="was">5 + 2 views</span></div><div class="delta">Fixed; every one a system you change</div></div>
+    <div class="kpi"><div class="label">Class</div><div class="value">1.35 <span class="was">2.06</span></div><div class="delta">Screens at 390×844, as drawn here</div></div>
+    <div class="kpi"><div class="label">Gear</div><div class="value">0.97 <span class="was">3.29</span></div><div class="delta">One view (was Equip 1.54 + Upgrade 1.75)</div></div>
+    <div class="kpi"><div class="label">Stars</div><div class="value">1.16 <span class="was">outside</span></div><div class="delta">Extra Stats in the profile; no round trip</div></div>
+    <div class="kpi"><div class="label">Template</div><div class="value">1.31 <span class="was">1.47</span></div><div class="delta">Her uniqueness, every piece (was Racing)</div></div>
+  </div>
+
+  <section id="live">
+    <h2>Try it</h2>
+    <p class="sub">The whole profile, live. Switch tabs, tap a tile, a node, a row or a facts cell: each opens its one sheet,
+      with its one action in the footer. Tap outside a sheet or ✕ to close it. Hover anything for what it does.</p>
+    <div class="pair two">
+      <div class="phone-wrap"><div id="ph-live"></div></div>
+      <div class="panel notes">
+        <h3>One grammar on every tab (G1–G5)</h3>
+        <ul>
+          <li><b>First row:</b> the system's summary, its batch action (Raise all, Set all) and its (i).</li>
+          <li><b>The system, drawn:</b> a tree, a gear grid, a star map, her template. Labels and numbers only.</li>
+          <li><b>Tap an element → one sheet:</b> its detail, its choices, one action in the footer.</li>
+          <li><b>Free choices apply on tap</b> (class, weapon, family, kind). <b>Spending</b> shows cost and before → after.
+            <b>One-time choices</b> (the calling pick) confirm with what changes.</li>
+          <li><b>A sheet never opens a sheet;</b> it stays open after its action, on the new state.</li>
+        </ul>
+        <h3>Three layers</h3>
+        <ul>
+          <li><b>Header:</b> who she is and what she is doing. Display only; Party and Work are doors with Back.</li>
+          <li><b>Tabs:</b> each system drawn. Complex and visual.</li>
+          <li><b>Sheets:</b> where changes happen.</li>
+        </ul>
+        <h3>In the place header</h3>
+        <ul><li><b>‹ 3 / 26 ›</b> steps to the previous or next Uma of the list she came from, on the same tab (UP21).</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="states">
+    <h2>The state language: six states, one look each</h2>
+    <p class="sub">Today fill means three things and green four (audit §3.1). Here each look has one meaning, and green
+      means <b>Ready</b> only. ★ marks a template piece; it is not a state.</p>
+    <div class="legend-states">
+      <div><span class="sw-state" style="background:var(--accent);color:var(--accent-ink)">On</span><b>On</b>In effect now: her class, her line, an equipped skill, the worn family, an open node, the picked calling.</div>
+      <div><span class="sw-state" style="background:var(--raised);box-shadow:inset 0 0 0 2px var(--accent)">Selected</span><b>Selected</b>The one being shown or decided: the tree on screen, a pick tile not yet confirmed.</div>
+      <div><span class="sw-state" style="background:var(--raised)">Available</span><b>Available</b>Can be taken now, for free: another class, the other line, a held skill not equipped.</div>
+      <div><span class="sw-state" style="background:var(--raised);opacity:.4">Closed <span class="gb" style="margin-left:6px">R40</span></span><b>Closed</b>A gate not met, with the gate on it: Lv 41, R40, Craft 31.</div>
+      <div><span class="sw-state" style="background:var(--raised)"><span class="dot" style="position:absolute;top:8px;right:8px"></span>Ready</span><b>Ready</b>A spend or a pick can happen now. The only green.</div>
+      <div><span class="sw-state" style="border:1px dashed var(--ink-faint);color:var(--ink-faint)">Off</span><b>Off</b>Not hers or not working: the other line's skills, the Flourish as another class.</div>
+    </div>
+  </section>
+
+  <section id="header">
+    <h2>The header and the Details sheet</h2>
+    <p class="sub">64 px portrait, level and EXP on one line, one facts row: <b>Party · Work · Details</b>. The calling card
+      and the template chip move to the Template tab. Details holds every number nobody changes directly (today's Battle tab,
+      Work's numbers, the racing base stats).</p>
+    <div class="pair">
+      <div class="phone-wrap"><p class="cap">The header (Class tab)</p><div id="ph-h1"></div></div>
+      <div class="phone-wrap"><p class="cap">Details, from the header</p><div id="ph-h2"></div></div>
+      <div class="panel notes">
+        <h3>Header</h3>
+        <ul>
+          <li><b>Place header:</b> Back returns to the door; ‹ › step through her list. "‹ All outfits" goes.</li>
+          <li><b>Name, title and rarity;</b> "Lv 40", a thin EXP bar and 1,200/2,400 on one line; the target.</li>
+          <li><b>Party</b> (Party 1 · Fighting · No party) and <b>Work</b> (Mine · 1h 20m · Done · Idle) open her party and her
+            place; Back returns here on the same tab.</li>
+        </ul>
+        <h3>Details</h3>
+        <ul>
+          <li>Six sections: Offense, Defense, Sustain, Core, Work and Since. Every <code>umaBattleSheet</code> row, 0 included.</li>
+          <li>A stat's parts follow it (base · gear · Stars, ★ for her moon). Core stats show their racing base and growth.</li>
+          <li>No (i) inside a sheet: "How stats add up" expands inline (it replaces the wrong Battle (i), F8).</li>
+          <li>Gone: "Fights as …", "10 gathered" (F3), "Total with armor".</li>
+        </ul>
+        <h3>Locked</h3>
+        <ul><li>No level, <b>Unlock · 1 Ticket</b> instead of the facts row, then the Template content. No tab bar.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="class">
+    <h2>Class</h2>
+    <p class="sub">Her class and three weapons, the selected weapon's tree, her equipped skills and her Limit Break. Everything
+      here is free. The main sheet: a held skill with seven already equipped offers <b>Replace</b> in the sheet, instead of
+      today's blind unequip.</p>
+    <div class="pair">
+      <div class="phone-wrap"><p class="cap">Class tab</p><div id="ph-c1"></div></div>
+      <div class="phone-wrap"><p class="cap">Node sheet, 7/7 equipped</p><div id="ph-c2"></div></div>
+      <div class="panel notes">
+        <h3>Shows</h3>
+        <ul><li><b>Class tile</b> (Brawler, R34, its bar) and <b>three weapon tiles</b> (glyph, line); the selected one ringed.</li>
+          <li><b>Equipped 7/7</b> with <b>Auto</b>; the tree: trunk, the A/B squares, the lines; the <b>Limit</b> line.</li></ul>
+        <h3>Changes (all free)</h3>
+        <ul><li>Class (Class sheet), weapon per slot (weapon sheet), line (line sheet), equip and unequip (node sheet), Auto,
+          the standard preset (Class sheet's footer).</li></ul>
+        <h3>Gone from the tab</h3>
+        <ul><li>The Flourish line (Template), the second Class Rank bar, "Depths 1–5 open", the Inheritance card (the Limit
+          line), the Class Ranks grid (the Class sheet), the green marks on tree buttons (raises live on Gear). "Branch" is
+          "line" (F11).</li></ul>
+        <h3>Empty and edge</h3>
+        <ul><li>Lv 1: three slots. Closed depths faded with R10 … R40. No Limit Break: "Limit · None", its sheet opens her
+          class's hall.</li></ul>
+      </div>
+    </div>
+    <h3 style="margin-top:18px">Its other sheets</h3>
+    <div class="gallery" id="g-class"></div>
+  </section>
+
+  <section id="gear">
+    <h2>Gear</h2>
+    <p class="sub">One view: three weapons, five armor slots and the accessory, each at its grade with one stat. The Equip and
+      Upgrade split goes; a tap is free, the footer spends. Weapons are chosen on Class and raised here.</p>
+    <div class="pair">
+      <div class="phone-wrap"><p class="cap">Gear tab</p><div id="ph-g1"></div></div>
+      <div class="phone-wrap"><p class="cap">Weapon sheet: raise the Axe</p><div id="ph-g2"></div></div>
+      <div class="panel notes">
+        <h3>Shows</h3>
+        <ul><li>"Physical · 3 ready" (her armor's half follows her class) and <b>Raise all</b>.</li>
+          <li>Tiles: glyph, grade, one stat (Might 26, DEF 32), the green dot when a raise can happen now. G0 is an empty
+            frame with one "G0" (F15).</li></ul>
+        <h3>Changes</h3>
+        <ul><li><b>Grades:</b> before → after in display size, target chips starting on the highest the Warehouse covers
+          (Raise to G6 at once is one sheet), one Raise button; the sheet stays open.</li>
+          <li><b>The accessory:</b> family (four icons, ★ first) and kind, free on tap; its grade in the footer.</li>
+          <li><b>Raise all:</b> every ready slot, listed before one confirm.</li></ul>
+        <h3>Gone</h3>
+        <ul><li>"weak ×1.3" on every weapon (F13); the pill on every row; the preset (Class sheet); "Set on Skills ›"; the
+          Extra Stats button and total.</li></ul>
+        <h3>Empty and edge</h3>
+        <ul><li>No item: the button names it, disabled ("Arms Gem G8 ×0"). A gate: "Lv 41". G10: "Max". Nothing ready: no
+          Raise all.</li></ul>
+      </div>
+    </div>
+    <h3 style="margin-top:18px">Its other sheets</h3>
+    <div class="gallery" id="g-gear"></div>
+  </section>
+
+  <section id="stars">
+    <h2>Stars</h2>
+    <p class="sub">Her Extra Stats map, brought in from the Observatory: the Planet, Prowess, Vigor and Guard, five nodes each,
+      and ★ her moon's two. A node's sheet sets its jewel with before → after. The Observatory becomes a door: a list of
+      Umas, jewels ready first.</p>
+    <div class="pair">
+      <div class="phone-wrap"><p class="cap">Stars tab</p><div id="ph-s1"></div></div>
+      <div class="phone-wrap"><p class="cap">Node sheet: Guard III</p><div id="ph-s2"></div></div>
+      <div class="panel notes">
+        <h3>Shows</h3>
+        <ul><li>"Extra Stats · Open 13/22 · 2 ready" (one count format, was two) and <b>Set all</b>.</li>
+          <li>The map: open nodes On, ready ones with the dot, closed ones faint. The six totals; ★ her moon's part.</li></ul>
+        <h3>Changes</h3>
+        <ul><li><b>Set</b> on a node (its value resolved for her class: Prowess "ATK +6" as a Brawler, not "100/0").</li>
+          <li><b>Set all:</b> her moon first, then the emptiest shared moon, then the Planet; listed before one confirm.</li></ul>
+        <h3>Gone</h3>
+        <ul><li>The one-way trip to the Observatory (+4 taps back); its "a Sun, eight planets" blurb (F6); "Limit +1.6" (F12:
+          the gauge is whole, "+1").</li></ul>
+        <h3>Empty and edge</h3>
+        <ul><li>Under Lv 6 the moons are closed; nothing ready: no Set all; Planet V at Lv 41.</li></ul>
+      </div>
+    </div>
+    <h3 style="margin-top:18px">Its other sheets</h3>
+    <div class="gallery" id="g-stars"></div>
+  </section>
+
+  <section id="template">
+    <h2>Template</h2>
+    <p class="sub">Her uniqueness on one tab: her template, the three readings with their sources, the calling, every ★ piece
+      as a label, a number and a state, her aptitudes as the sources. Each row opens the sheet where it changes; the
+      signature row opens Gear's accessory sheet, here with her ★ Bell not worn (the dot).
+      <a href="template-tab.html">The Template page</a> has four Umas and the calling pick.</p>
+    <div class="pair">
+      <div class="phone-wrap"><p class="cap">Template tab</p><div id="ph-t1"></div></div>
+      <div class="phone-wrap"><p class="cap">★ Signature → the accessory sheet</p><div id="ph-t2"></div></div>
+      <div class="panel notes">
+        <h3>Shows</h3>
+        <ul><li><b>★ Fleet Bruiser</b>; Calling, Stride and Knack with their sources ("from Front A"); the knack names her
+          family (Fleet · Bell).</li>
+          <li>The calling (fixed here; Pace and Late Umas pick) and her trade.</li>
+          <li>Four ★ rows: Flourish, Signature, Moon I, Moon II, each with its number and state.</li>
+          <li>Racing: her aptitudes and growth, the three that set her template ringed; the racing skill.</li></ul>
+        <h3>Changes, from each row</h3>
+        <ul><li>Flourish Off → <b>Fight as Brawler</b>. Signature → tap ★ Bell (free). Moon → <b>Set</b>. The calling pick →
+          <b>Confirm</b>.</li></ul>
+        <h3>The dot</h3>
+        <ul><li>A pick waiting, or her signature not worn at G1+. The Flourish being off is shown, never flagged; her moon's
+          jewel flags Stars.</li></ul>
+      </div>
+    </div>
+    <h3 style="margin-top:18px">Its other sheets</h3>
+    <div class="gallery" id="g-template"></div>
+  </section>
+</main>
+
+<div id="tip" role="tooltip"></div>
+<script>
+// The Uma profile v2 previews' shared mock (proposal.md). Every Uma, outfit and skill here is made up; template names,
+// classes, weapons and places are the game's own words. Numbers follow the manual's Tier 1 tables at the Uma's level.
+'use strict';
+
+// ---------- Theme: follow the system, or pin Light / Dark ----------
+function initTheme() {
+  const bar = document.getElementById('theme');
+  if (!bar) return;
+  let saved = null;
+  try { saved = localStorage.getItem('umaProfileV2.theme'); } catch (e) { saved = null; }
+  const apply = (t) => {
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
+    bar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === (t || 'system'))));
+  };
+  apply(saved);
+  bar.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    const t = b.dataset.t === 'system' ? null : b.dataset.t;
+    try { if (t) localStorage.setItem('umaProfileV2.theme', t); else localStorage.removeItem('umaProfileV2.theme'); } catch (err) { /* per-viewer convenience only */ }
+    apply(t);
+  });
+}
+
+// ---------- Tooltip ----------
+const tipEl = () => document.getElementById('tip');
+function placeTip(x, y) { const t = tipEl(); const w = t.offsetWidth, h = t.offsetHeight; t.style.left = Math.max(8, Math.min(x + 14, innerWidth - w - 10)) + 'px'; t.style.top = (y + 16 + h > innerHeight ? Math.max(8, y - h - 12) : y + 16) + 'px'; }
+function showTip(x, y, title, body) { const t = tipEl(); t.innerHTML = `<b>${title}</b>${body}`; t.style.opacity = 1; placeTip(x, y); }
+function hideTip() { const t = tipEl(); if (t) t.style.opacity = 0; }
+function bindTips(root) {
+  (root || document).querySelectorAll('[data-tip]').forEach((el) => {
+    if (el.dataset.tipBound) return; el.dataset.tipBound = '1';
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    const [title, body] = el.dataset.tip.split('||');
+    el.addEventListener('mouseenter', (e) => showTip(e.clientX, e.clientY, title, body || ''));
+    el.addEventListener('mousemove', (e) => placeTip(e.clientX, e.clientY));
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); showTip(r.left, r.bottom, title, body || ''); });
+    el.addEventListener('blur', hideTip);
+  });
+}
+
+// ---------- Small pieces ----------
+const KIND = {
+  greatsword: { n: 'Greatsword', a: 'GS' }, axe: { n: 'Axe', a: 'Ax' }, lance: { n: 'Lance', a: 'Ln' }, bow: { n: 'Bow', a: 'Bw' }, katana: { n: 'Katana', a: 'Kt' },
+  fire: { n: 'Fire Tome', a: 'Fi' }, ice: { n: 'Blizzard Tome', a: 'Ic' }, lightning: { n: 'Thunder Tome', a: 'Th' }, light: { n: 'Light Tome', a: 'Li' }, dark: { n: 'Dark Tome', a: 'Dk' },
+};
+const FAM = { pendant: { n: 'Pendant', a: 'Pd' }, orb: { n: 'Orb', a: 'Ob' }, bell: { n: 'Bell', a: 'Bl' }, insignia: { n: 'Insignia', a: 'In' } };
+const CLS = { brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', summoner: 'Summoner', paladin: 'Paladin', cleric: 'Cleric' };
+const GRADE_C = { S: '#f2c94c', A: '#f2994a', B: '#eb6fb0', C: '#7fb8ff', D: '#6fd39a', E: '#b8a6f0', F: '#a6b0bc', G: '#8a94a0' };
+const glyph = (k, cls = '') => `<span class="glyph ${cls}" style="background:var(--k-${k})">${KIND[k].a}</span>`;
+const famGlyph = (f) => `<span class="glyph" style="background:var(--f-${f})">${FAM[f].a}</span>`;
+const armorGlyph = (s) => `<span class="glyph" style="background:var(--neutral-strong)">${s.slice(0, 2)}</span>`;
+const emblem = (c, size = 22) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L21 5 V12 C21 17 17 21 12 22 C7 21 3 17 3 12 V5 Z" fill="var(--cl-${c})"/><text x="12" y="16" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" font-family="system-ui">${CLS[c][0]}</text></svg>`;
+const portrait = (hue = 0, locked = false) => `<svg class="portrait" viewBox="0 0 64 64" aria-label="Placeholder portrait" role="img"${locked ? ' style="opacity:.6"' : ''}>
+  <rect width="64" height="64" fill="var(--sunken)"/>
+  <path d="M22 14 L25 4 L30 13 Z M42 14 L39 4 L34 13 Z" fill="hsl(${hue} 18% 55%)"/>
+  <circle cx="32" cy="25" r="12" fill="hsl(${hue} 18% 55%)"/>
+  <path d="M10 64 C12 46 21 40 32 40 C43 40 52 46 54 64 Z" fill="hsl(${hue} 18% 55%)"/>
+  ${locked ? '<rect x="4" y="4" width="22" height="14" rx="7" fill="rgb(0 0 0 / .55)"/><text x="15" y="14.5" text-anchor="middle" font-size="8" fill="#fff" font-family="system-ui" font-weight="700">Lock</text>' : ''}
+</svg>`;
+const INFO = '<span class="info" data-tip="(i)||One per tab, on its first row: the rules, one a line."><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="8"/><path d="M10 9 v5 M10 6.2 v.2"/></svg></span>';
+const TARGET = '<svg width="19" height="19" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="2.5"/><path d="M10 1 v3 M10 16 v3 M1 10 h3 M16 10 h3"/></svg>';
+const gb = (g) => `<span class="gb">G${g}</span>`;
+
+// ---------- The Umas (made up) ----------
+const UMAS = {
+  A: {
+    id: 'A', name: 'Uma A', title: 'Sample outfit A', rar: 3, hue: 30, lv: 40, exp: [1200, 2400], target: true, pos: '3 / 26',
+    party: 'Party 1', work: 'Mine · 1h 20m', cls: 'brawler', rank: 34, rankPct: 0.4,
+    weapons: [
+      { k: 'greatsword', line: 'A', g: 8, might: 45 },
+      { k: 'axe', line: 'B', g: 6, might: 26, ready: true, next: { g: 7, might: 35, item: 'Arms Gem G7', held: 2 } },
+      { k: 'lance', line: 'B', g: 7, might: 35, ready: true, next: { g: 8, might: 45, item: 'Arms Gem G8', held: 1 } },
+    ],
+    armor: [
+      { s: 'Head', st: 'DEF', v: 32, g: 8, nv: 36 }, { s: 'Body', st: 'HP', v: 105, g: 7 }, { s: 'Legs', st: 'MP', v: 18, g: 6 },
+      { s: 'Arms', st: 'M.DEF', v: 28, g: 7 }, { s: 'Feet', st: 'Speed', v: 10, g: 5, ready: true },
+    ],
+    half: 'Physical', acc: { fam: 'pendant', g: 7, eff: '+7 · 3 kinds', next: '+9 · 3 kinds' },
+    template: 'Fleet Bruiser', type: 'Bruiser',
+    calling: { v: 'Brawler', from: 'Front A', fixed: true, cls: 'brawler' },
+    stride: { v: 'Middle', from: 'Medium A' }, knack: { v: 'Fleet', from: 'Speed +20%' }, family: 'bell', trade: 'Mine · Weapon Forge',
+    flourish: { shape: 'Even pace', num: '1%/round · max 4%', on: true, cls: 'Brawler' },
+    sig: { n: 8, worn: false },
+    moon: [{ n: 'I', v: 'Evasion +2.4%', state: 'open', gate: 'Lv 16' }, { n: 'II', v: 'DEF +8', state: 'ready', gate: 'Lv 36' }],
+    stars: { open: 13, ready: 2 }, limit: { name: 'Limit Break A', line: 'Learner · Bond 2/10' },
+    apt: {
+      Surface: [['Turf', 'A'], ['Dirt', 'G']], Distance: [['Sprint', 'C'], ['Mile', 'B'], ['Medium', 'A', 1], ['Long', 'C']],
+      Style: [['Front', 'A', 1], ['Pace', 'B'], ['Late', 'C'], ['End', 'G']], Growth: [['Speed', '+20%', 1], ['Power', '+10%']],
+    },
+    dots: { class: false, gear: true, stars: true, template: true },
+  },
+  B: {
+    id: 'B', name: 'Uma B', title: 'Sample outfit B', rar: 2, hue: 200, lv: 12, exp: [340, 820], target: false, pos: '7 / 26',
+    party: 'No party', work: 'Idle', cls: 'spellblade', rank: 9, rankPct: 0.8,
+    template: 'Clever Spellfencer', type: 'Spellfencer',
+    calling: { pick: true, sel: 'spellblade', confirmed: false, from: 'Pace A · Power 96 > Wit 88',
+      opts: {
+        spellblade: { cls: 'spellblade', name: 'Clever Spellfencer', trade: 'Forest · Armorer', moon2: 'DEF +8', lead: 'Katana', suggested: true },
+        mage: { cls: 'mage', name: 'Clever Spellwright', trade: 'Monster Den · Lapidary', moon2: 'M.DEF +8', lead: 'Fire Tome' },
+      } },
+    stride: { v: 'Middle', from: 'Medium A' }, knack: { v: 'Clever', from: 'Wit +20%' }, family: 'insignia',
+    flourish: { shape: 'Even pace', num: '1%/round · max 4%', on: true, cls: 'Spell Blade' },
+    sig: { n: 2, worn: true }, acc: { fam: 'insignia', g: 2, eff: 'Bosses +3%' },
+    moon: [{ n: 'I', v: 'MP +4', state: 'closed', gate: 'Lv 16' }, { n: 'II', v: 'DEF +8', state: 'closed', gate: 'Lv 36' }],
+    apt: {
+      Surface: [['Turf', 'A'], ['Dirt', 'F']], Distance: [['Sprint', 'D'], ['Mile', 'A'], ['Medium', 'A', 1], ['Long', 'B']],
+      Style: [['Front', 'C'], ['Pace', 'A', 1], ['Late', 'B'], ['End', 'E']], Growth: [['Wit', '+20%', 1], ['Speed', '+10%']],
+    },
+    dots: { class: false, gear: false, stars: false, template: true },
+  },
+  C: {
+    id: 'C', name: 'Uma C', title: 'Sample outfit C', rar: 3, hue: 320, lv: 28, exp: [2100, 5200], target: false, pos: '12 / 26',
+    party: 'Party 2', work: 'Fields · Done', cls: 'paladin', rank: 22, rankPct: 0.2,
+    template: 'Tireless Pilgrim', type: 'Pilgrim',
+    calling: { pick: true, sel: 'cleric', confirmed: true, from: 'Late A · Wit 95 ≥ Power 90',
+      opts: {
+        cleric: { cls: 'cleric', name: 'Tireless Pilgrim', trade: 'Fields · Tome Forge', moon2: 'M.DEF +8', lead: 'Light Tome', suggested: true },
+        paladin: { cls: 'paladin', name: 'Tireless Stalwart', trade: 'Fields · Tome Forge', moon2: 'DEF +8', lead: 'Greatsword' },
+      } },
+    stride: { v: 'Stayer', from: 'Long A' }, knack: { v: 'Tireless', from: 'Stamina +20%' }, family: 'pendant',
+    flourish: { shape: 'Late reserve', num: '2%/round from round 3 · max 4%', on: false, cls: 'Cleric', as: 'Paladin' },
+    sig: { n: 5, worn: true }, acc: { fam: 'pendant', g: 5, eff: '+4 · 3 kinds' },
+    moon: [{ n: 'I', v: 'HP +20', state: 'open', gate: 'Lv 16' }, { n: 'II', v: 'M.DEF +8', state: 'closed', gate: 'Lv 36' }],
+    apt: {
+      Surface: [['Turf', 'A'], ['Dirt', 'C']], Distance: [['Sprint', 'G'], ['Mile', 'D'], ['Medium', 'B'], ['Long', 'A', 1]],
+      Style: [['Front', 'F'], ['Pace', 'C'], ['Late', 'A', 1], ['End', 'B']], Growth: [['Stamina', '+20%', 1], ['Wit', '+10%']],
+    },
+    dots: { class: false, gear: false, stars: false, template: false },
+  },
+  D: {
+    id: 'D', name: 'Uma D', title: 'Sample outfit D', rar: 1, hue: 140, locked: true,
+    template: 'Mighty Flarecaster', type: 'Flarecaster',
+    calling: { locked: true, from: 'Pace A · Wit 91 ≥ Power 84', a: 'Mage', b: 'Spell Blade' },
+    stride: { v: 'Dash', from: 'Mile A' }, knack: { v: 'Mighty', from: 'Power +20%' }, family: 'orb',
+    flourish: { shape: 'Clean break', num: 'Barrier 4% at the start', cls: 'Mage' },
+    sig: { n: 0 }, moon: [{ n: 'I', v: 'DEF/M.DEF +4' }, { n: 'II', v: 'M.DEF +8' }],
+    apt: {
+      Surface: [['Turf', 'A'], ['Dirt', 'E']], Distance: [['Sprint', 'B'], ['Mile', 'A', 1], ['Medium', 'C'], ['Long', 'G']],
+      Style: [['Front', 'D'], ['Pace', 'A', 1], ['Late', 'C'], ['End', 'G']], Growth: [['Power', '+20%', 1], ['Wit', '+10%']],
+    },
+    dots: {},
+  },
+};
+
+// ---------- The header ----------
+function headerHTML(u) {
+  if (u.locked) {
+    return `<div class="hd">${portrait(u.hue, true)}<div style="min-width:0"><div class="nm">${u.name}</div>
+      <div class="tt">${u.title} · <span class="rar">${'★'.repeat(u.rar)}</span></div><div class="lv" style="color:var(--ink-faint);font-size:12.5px">Locked</div></div><span></span></div>
+      <button class="btn" style="margin-top:12px" data-tip="Unlock · 1 Ticket||The kit's confirm follows. The ticket count stays in the top bar only.">Unlock · 1 Ticket</button>`;
+  }
+  const pct = Math.round((u.exp[0] / u.exp[1]) * 100);
+  return `<div class="hd">${portrait(u.hue)}<div style="min-width:0"><div class="nm">${u.name}</div>
+    <div class="tt">${u.title} · <span class="rar">${'★'.repeat(u.rar)}</span></div>
+    <div class="lv">Lv ${u.lv}<span class="bar"><i style="width:${pct}%"></i></span><small>${u.exp[0].toLocaleString('en-US')}/${u.exp[1].toLocaleString('en-US')}</small></div></div>
+    <span class="target ${u.target ? 'on' : ''}" data-tip="Target||A toggle, 44 pt. Ten at most.">${TARGET}</span></div>
+  <div class="facts">
+    <div class="fact" data-tip="Party||Opens her party's editor in the Party Hall. Back returns here, same tab."><span class="l">Party</span><span class="v">${u.party}</span></div>
+    <div class="fact" data-tip="Work||Opens her place in the Wilds. Back returns here, same tab."><span class="l">Work</span><span class="v">${u.work}</span></div>
+    <div class="fact det" data-act="sheet:details">Details</div>
+  </div>`;
+}
+function tabbarHTML(u, tab) {
+  const t = (k, n) => `<button role="tab" aria-selected="${tab === k}" data-act="tab:${k}">${n}${u.dots && u.dots[k] ? '<span class="dot" aria-hidden="true"></span>' : ''}</button>`;
+  return `<div class="tabbar"><div class="in" role="tablist">${t('class', 'Class')}${t('gear', 'Gear')}${t('stars', 'Stars')}${t('template', 'Template')}</div></div>`;
+}
+
+// ---------- Class ----------
+function treeSVG() {
+  const X = { t: 179, A: 109, B: 249 }, Y = [28, 84, 140, 196, 252, 308];
+  const edge = (x1, y1, x2, y2, on, dash) => `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${on ? 'var(--accent)' : 'var(--hairline-strong)'}" stroke-width="${on ? 3 : 2}" ${dash ? 'stroke-dasharray="4 4"' : ''} fill="none"/>`;
+  const node = (x, y, st, rank, gate, act, tip) => {
+    const fill = st === 'on' ? 'var(--accent)' : st === 'avail' ? 'var(--raised)' : st === 'closed' ? 'var(--raised)' : 'none';
+    const stroke = st === 'on' ? 'var(--accent)' : st === 'off' ? 'var(--ink-faint)' : 'var(--hairline-strong)';
+    const op = st === 'closed' ? 0.4 : st === 'off' ? 0.55 : 1;
+    const ink = st === 'on' ? 'var(--accent-ink)' : 'var(--ink-soft)';
+    return `<g class="tap" data-act="${act}" data-tip="${tip}" opacity="${op}">
+      <circle cx="${x}" cy="${y}" r="22" fill="transparent"/>
+      <circle cx="${x}" cy="${y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="1.5" ${st === 'off' ? 'stroke-dasharray="3 3"' : ''}/>
+      <text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" font-weight="800" fill="${ink}" font-family="system-ui">Ln</text>
+      ${rank ? `<circle cx="${x + 15}" cy="${y + 14}" r="9" fill="var(--ink)"/><text x="${x + 15}" y="${y + 18}" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--panel)" font-family="system-ui">${rank}</text>` : ''}
+    </g>${gate ? `<g><rect x="${x + 4}" y="${y + 6}" width="28" height="15" rx="5" fill="var(--ink)"/><text x="${x + 18}" y="${y + 17}" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--panel)" font-family="system-ui">${gate}</text></g>` : ''}`;
+  };
+  const sq = (x, y, L, on, act, tip) => `<g class="tap" data-act="${act}" data-tip="${tip}"><rect x="${x - 20}" y="${y - 20}" width="40" height="40" rx="9" fill="${on ? 'var(--accent)' : 'var(--raised)'}" stroke="${on ? 'var(--accent)' : 'var(--hairline-strong)'}" stroke-width="1.5"/>
+    <text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="${on ? 'var(--accent-ink)' : 'var(--ink)'}" font-family="system-ui">${L}</text></g>`;
+  return `<svg viewBox="0 0 358 340" role="img" aria-label="Lance tree">
+    ${edge(X.t, Y[0], X.t, Y[1], true)}
+    ${edge(X.t, Y[1], X.A, Y[2], false)}${edge(X.t, Y[1], X.B, Y[2], true)}
+    ${edge(X.A, Y[2], X.A, Y[3], false, true)}${edge(X.A, Y[3], X.A, Y[4], false, true)}${edge(X.A, Y[4], X.A, Y[5], false, true)}
+    ${edge(X.B, Y[2], X.B, Y[3], true)}${edge(X.B, Y[3], X.B, Y[4], true)}${edge(X.B, Y[4], X.B, Y[5], false)}
+    ${node(X.t, Y[0], 'on', 5, '', 'sheet:node1', 'Depth 1 · On||Equipped. Rank 5.')}
+    ${node(X.t, Y[1], 'avail', 5, '', 'sheet:replace', 'Depth 2 · Available||Held, not equipped. Its sheet offers Equip; with 7/7, Replace.')}
+    ${sq(X.A, Y[2], 'A', false, 'sheet:lineA', 'Line A · Available||Take it in its sheet (free).')}
+    ${sq(X.B, Y[2], 'B', true, 'sheet:line', 'Line B · Impale · On||Her line on this tree.')}
+    ${node(X.A, Y[3], 'off', 0, '', 'sheet:nodeA', 'Line A · Off||Not her line. Its sheet offers Take line A.')}
+    ${node(X.A, Y[4], 'off', 0, '', 'sheet:nodeA', 'Line A · Off||Not her line.')}
+    ${node(X.A, Y[5], 'off', 0, '', 'sheet:nodeA', 'Line A · Off||Not her line.')}
+    ${node(X.B, Y[3], 'on', 5, '', 'sheet:node1', 'Depth 3 · Line B · On||Equipped. Rank 5.')}
+    ${node(X.B, Y[4], 'on', 3, '', 'sheet:node', 'Depth 4 · Line B · On||Equipped. Rank 3 · next R36.')}
+    ${node(X.B, Y[5], 'closed', 0, 'R40', 'sheet:node5', 'Depth 5 · Closed||Opens at Class Rank 40.')}
+  </svg>`;
+}
+function classTab(u) {
+  const w = u.weapons;
+  const eq = [['greatsword', 5], ['greatsword', 5], ['axe', 5], ['axe', 3], ['lance', 5], ['lance', 5], ['lance', 3]];
+  return `<div class="row1" style="margin-top:12px">
+      <div class="classrow" style="flex:1">
+        <div class="ctile tap" data-act="sheet:class" data-tip="Class tile||Her class and Class Rank, with its bar inside. Opens the Class sheet: six classes, the standard preset."><div class="top">${emblem(u.cls)}<span class="nm">${CLS[u.cls]}</span></div><span class="rk">R${u.rank}</span><span class="mini"><i style="width:${u.rankPct * 100}%"></i></span></div>
+        ${w.map((x, i) => `<div class="ctile wtile tap ${i === 2 ? 'sel' : ''}" data-act="sheet:weapon" data-tip="${KIND[x.k].n} · Line ${x.line}||${i === 2 ? 'Selected: its tree shows below.' : 'Shows its tree below.'} Raises live on Gear.">${glyph(x.k)}<span class="ln">Line ${x.line}</span></div>`).join('')}
+      </div></div>
+    <div class="lbl11"><span>Equipped 7/7</span><span class="autochip" data-tip="Auto · On||The game picks. Tapping a slot opens its sheet; nothing unequips blind.">Auto</span></div>
+    <div class="eqrow">${eq.map(([k, r], i) => `<span class="eq tap" data-act="sheet:node" data-tip="Equipped skill||Opens its sheet (Unequip there).">${glyph(k)}<span class="gb">${r}</span></span>`).join('')}</div>
+    <div class="treehd"><b>Lance tree</b><span class="tap" data-act="sheet:weapon">Change ›</span></div>
+    <div class="tree">${treeSVG()}</div>
+    <div class="lim tap" data-act="sheet:limit"><span class="k">Limit</span><span class="v">${u.limit.name} · ${u.limit.line}</span></div>`;
+}
+
+// ---------- Gear ----------
+function gearTab(u) {
+  const ready = u.weapons.filter((w) => w.ready).length + u.armor.filter((a) => a.ready).length;
+  return `<div class="row1"><span class="sum"><b>${u.half}</b> · ${ready} ready</span><button class="btn sm" data-act="sheet:raiseall">Raise all</button>${INFO}</div>
+    <div class="lbl11"><span>Weapons</span></div>
+    <div class="wgrid">${u.weapons.map((w, i) => `<div class="gtile tap" data-act="sheet:w${i}" data-tip="${KIND[w.k].n} · G${w.g}||Might ${w.might}.${w.ready ? ' Ready: G' + (w.g + 1) + ' now.' : ''}">${w.ready ? '<span class="dot"></span>' : ''}${glyph(w.k)}${gb(w.g)}<span class="st">Might ${w.might}</span></div>`).join('')}</div>
+    <div class="lbl11"><span>Armor</span></div>
+    <div class="agrid">${u.armor.map((a, i) => `<div class="gtile tap" data-act="sheet:a${i}" data-tip="${a.s} · G${a.g}||${a.st} ${a.v}.${a.ready ? ' Ready.' : ''}">${a.ready ? '<span class="dot"></span>' : ''}${armorGlyph(a.s)}${gb(a.g)}<span class="st">${a.st} ${a.v}</span></div>`).join('')}</div>
+    <div class="lbl11"><span>Accessory</span></div>
+    <div class="acc tap" data-act="sheet:acc">${famGlyph(u.acc.fam)}<span class="mid"><b>${FAM[u.acc.fam].n} · ${u.acc.eff}</b><span>★ ${FAM[u.family].n} ${u.sig.worn ? 'worn' : 'not worn'}</span></span>${gb(u.acc.g)}</div>`;
+}
+
+// ---------- Stars ----------
+function starMap(u) {
+  const bodies = { planet: [180, 180, 38], prowess: [180, 64, 38], vigor: [88, 280, 38], guard: [272, 280, 38], moon: [306, 108, 24] };
+  const open = { planet: 4, prowess: 3, vigor: 3, guard: 2, moon: 1 };
+  const ready = { guard: 3, moon: 2 };
+  const count = { planet: 5, prowess: 5, vigor: 5, guard: 5, moon: 2 };
+  const label = { planet: 'Planet', prowess: 'Prowess', vigor: 'Vigor', guard: 'Guard', moon: '★ ' + u.type };
+  let s = '';
+  s += `<circle cx="180" cy="180" r="18" fill="#ffd84d" opacity=".18"/>`;
+  s += `<path d="M180 64 A118 118 0 0 1 272 280 A118 118 0 0 1 88 280 A118 118 0 0 1 180 64" fill="none" stroke="var(--hairline-strong)" stroke-dasharray="2 5"/>`;
+  s += `<circle cx="306" cy="108" r="34" fill="none" stroke="var(--accent)" stroke-opacity=".35"/>`;
+  for (const [b, [cx, cy, r]] of Object.entries(bodies)) {
+    s += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="${b === 'moon' ? 10 : 11}" font-weight="700" fill="${b === 'moon' ? 'var(--accent-strong)' : 'var(--ink-soft)'}" font-family="system-ui">${label[b]}</text>`;
+    for (let i = 0; i < count[b]; i++) {
+      const a = -Math.PI / 2 + (i * Math.PI * 2) / count[b];
+      const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+      const n = i + 1, isOpen = n <= open[b], isReady = ready[b] === n;
+      const roman = ['I', 'II', 'III', 'IV', 'V'][i];
+      const act = b === 'moon' ? 'sheet:smoon' : isReady ? 'sheet:snode' : 'sheet:snode';
+      const name = b === 'moon' ? `★ Moon ${roman}` : `${label[b]} ${roman}`;
+      const st = isOpen ? 'Open' : isReady ? 'Ready' : 'Closed';
+      s += `<g class="tap" data-act="${act}" data-tip="${name} · ${st}||${isReady ? 'A jewel in the Warehouse opens it now.' : isOpen ? 'In effect.' : 'Needs the node before it, its jewel and her level.'}">
+        <circle cx="${x}" cy="${y}" r="20" fill="transparent"/>
+        <circle cx="${x}" cy="${y}" r="9" fill="${isOpen ? 'var(--accent)' : 'var(--panel)'}" stroke="${isOpen || isReady ? 'var(--accent)' : 'var(--ink-faint)'}" stroke-width="1.6" opacity="${isOpen || isReady ? 1 : 0.45}"/>
+        ${isReady ? `<circle cx="${x + 8}" cy="${y - 8}" r="4" fill="var(--success)" stroke="var(--sunken)" stroke-width="1.5"/>` : ''}
+      </g>`;
+    }
+  }
+  return `<svg class="map" viewBox="0 0 360 360" role="img" aria-label="Extra Stats map">${s}</svg>`;
+}
+function starsTab(u) {
+  return `<div class="row1"><span class="sum"><b>Extra Stats</b> · Open ${u.stars.open}/22 · ${u.stars.ready} ready</span><button class="btn sm" data-act="sheet:setall">Set all</button>${INFO}</div>
+    ${starMap(u)}
+    <div class="totals">
+      <div><b>HP</b><span>+125</span></div><div><b>MP</b><span>+25</span></div><div><b>ATK</b><span>+25</span></div>
+      <div><b>M.ATK</b><span>+13</span></div><div><b>DEF</b><span>+19</span></div><div><b>M.DEF</b><span>+19</span></div>
+    </div>
+    <p style="text-align:center;font-size:11px;font-weight:700;color:var(--accent-strong);margin-top:6px">★ Evasion +2.4%</p>`;
+}
+
+// ---------- Template ----------
+function gradeChip(name, g, src) { return `<span class="gr ${src ? 'src' : ''}"><i style="background:${GRADE_C[g] || '#999'}">${g}</i>${name}</span>`; }
+function stateChip(kind, text, dot) { return `<span class="state ${kind}">${dot ? '<span class="dot"></span>' : ''}${text}</span>`; }
+function moonState(m) {
+  if (!m.state) return stateChip('off', m.gate || '—');
+  if (m.state === 'open') return stateChip('on', 'Open');
+  if (m.state === 'ready') return stateChip('ready', 'Ready', true);
+  return stateChip('closed', m.gate);
+}
+function callingBlock(u) {
+  const c = u.calling;
+  if (c.locked) return `<div class="calling"><span class="k">Calling</span><span class="v">Pick on unlock · ${c.a} or ${c.b}</span></div>`;
+  if (c.fixed) return `<div class="calling"><span class="k">Calling</span><span class="v">${emblem(c.cls, 18)} ${c.v} · fixed</span><span class="tr">Trade<br><b style="color:var(--ink)">${u.trade}</b></span></div>`;
+  const keys = Object.keys(c.opts);
+  const diffTrade = c.opts[keys[0]].trade !== c.opts[keys[1]].trade;
+  const tile = (k) => {
+    const o = c.opts[k];
+    const isSel = c.sel === k;
+    const cls = c.confirmed ? (isSel ? 'is-on' : 'is-off') : (isSel ? 'sel' : '');
+    return `<button class="pick ${cls}" data-act="${c.confirmed ? '' : 'pick:' + k}" data-tip="${CLS[o.cls]}||${c.confirmed ? (isSel ? 'Picked: On.' : 'Not picked: Off, kept visible.') : 'Tap to select (free until confirmed).'}">
+      ${o.suggested && !c.confirmed ? '<span class="sg">Suggested</span>' : ''}${c.confirmed && isSel ? '<span class="sg" style="color:var(--accent-ink)">Picked</span>' : ''}
+      <span class="top">${emblem(o.cls, 18)} ${CLS[o.cls]}</span><div class="tn">★ ${o.name}</div>
+      <dl>${diffTrade ? `<dt>Trade</dt><dd>${o.trade}</dd>` : ''}<dt>★ Moon II</dt><dd>${o.moon2}</dd><dt>Lead</dt><dd>${o.lead}</dd><dt>★ Flourish</dt><dd>as ${CLS[o.cls]}</dd></dl></button>`;
+  };
+  return `<div class="lbl11"><span style="display:inline-flex;align-items:center;gap:6px">Calling${c.confirmed ? '' : ' <span class="dot" aria-label="Ready"></span>'}</span>${diffTrade ? '' : `<span style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink-soft)">Trade · ${c.opts[keys[0]].trade}</span>`}</div>
+    <div class="picks">${tile(keys[0])}${tile(keys[1])}</div>
+    ${c.confirmed ? '' : `<button class="btn" style="margin-top:8px" data-act="sheet:confirm">Confirm</button>`}`;
+}
+function templateTab(u) {
+  const c = u.calling;
+  const name = c.opts ? c.opts[c.sel].name : u.template;
+  const fl = u.flourish;
+  const flState = u.locked ? '' : fl.on ? stateChip('on', 'On') : stateChip('off', 'Off · as ' + fl.as);
+  const sigState = u.locked ? '' : u.sig.worn ? stateChip('on', 'Worn') : stateChip('ready', 'Not worn', true);
+  const fromCalling = c.fixed ? c.from : c.from;
+  const callingVal = c.locked ? `${c.a} or ${c.b}` : c.fixed ? c.v : CLS[c.opts[c.sel].cls];
+  const moon2 = c.opts ? c.opts[c.sel].moon2 : u.moon[1].v;
+  return `<div class="row1" style="margin-top:14px"><span class="tname">★ ${name}</span>${INFO}</div>
+    <div class="reads">
+      <div><span class="k">Calling</span><b>${callingVal}</b><span>from ${fromCalling}</span></div>
+      <div><span class="k">Stride</span><b>${u.stride.v}</b><span>from ${u.stride.from}</span></div>
+      <div><span class="k">Knack</span><b>${u.knack.v} · ${FAM[u.family].n}</b><span>from ${u.knack.from}</span></div>
+    </div>
+    ${callingBlock(u)}
+    <div class="lbl11" style="margin-top:14px"><span>★ Pieces</span></div>
+    <div class="srow tap" data-act="sheet:flourish"><span class="k"><span class="s">★</span> Flourish</span><span class="v">${fl.shape}<small>${fl.num}</small></span>${flState}</div>
+    <div class="srow tap" data-act="sheet:acc"><span class="k"><span class="s">★</span> Signature</span><span class="v">${FAM[u.family].n}<small>${u.locked ? 'ATK/M.ATK +10 at Lv 50' : 'ATK/M.ATK +' + u.sig.n}</small></span>${sigState}</div>
+    <div class="srow tap" data-act="sheet:smoon1"><span class="k"><span class="s">★</span> Moon I</span><span class="v">${u.moon[0].v}<small>Lv 16 · Moon Jewel II</small></span>${u.locked ? '' : moonState(u.moon[0])}</div>
+    <div class="srow tap" data-act="sheet:smoon"><span class="k"><span class="s">★</span> Moon II</span><span class="v">${moon2}<small>Lv 36 · Moon Jewel IV</small></span>${u.locked ? '' : moonState(u.moon[1])}</div>
+    <div class="lbl11" style="margin-top:14px"><span>Racing</span><span style="text-transform:none;letter-spacing:0;font-weight:600">ringed: her template's sources</span></div>
+    <div class="apt">${Object.entries(u.apt).map(([k, list]) => `<span class="k">${k}</span><span class="gs">${list.map(([n, g, src]) => k === 'Growth' ? `<span class="gr ${src ? 'src' : ''}" style="padding-left:7px">${n} ${g}</span>` : gradeChip(n, g, src)).join('')}</span>`).join('')}</div>
+    <div class="srow tap" data-act="sheet:racing" style="margin-top:6px"><span class="k">Racing skill</span><span class="v" style="color:var(--ink-soft);font-weight:600">From the master data</span></div>`;
+}
+
+// ---------- Sheets: {title, body, foot} ----------
+const kv = (k, v) => `<div class="kv"><span>${k}</span><b>${v}</b></div>`;
+const MIGHT = [0, 1, 4, 8, 12, 19, 26, 35, 45, 57, 68];
+const ARMOR_OFF = [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5];
+const ARMOR_PER = { Head: 4, Body: 15, Legs: 3, Arms: 4, Feet: 2 };
+const gateLv = (g) => 5 * g - 4;
+// The Warehouse, for Uma A's sheets: what each raise can use now.
+const STOCK = { 'Arms Gem G7': 2, 'Arms Gem G8': 2, 'Armor Fittings G6': 3 };
+function weaponSheet(u, w, slot) {
+  const g = w.g;
+  const isTome = ['fire', 'ice', 'lightning', 'light', 'dark'].includes(w.k);
+  const item = (x) => `${isTome ? 'Tome Ink' : 'Arms Gem'} G${x}`;
+  let top = g;
+  while (top < 10 && gateLv(top + 1) <= u.lv && (STOCK[item(top + 1)] || 0) > 0) top++;
+  const chips = [];
+  for (let x = g + 1; x <= Math.min(10, g + 3); x++) {
+    if (gateLv(x) > u.lv) { chips.push(`<span class="chipb closed">G${x} <small>Lv ${gateLv(x)}</small></span>`); break; }
+    if (x <= top) chips.push(`<span class="chipb ${x === top ? 'sel' : ''}">G${x}</span>`);
+    else { chips.push(`<span class="chipb">G${x} <small>${item(x)} ×0</small></span>`); break; }
+  }
+  const n = top > g ? top : g + 1;
+  const foot = top > g ? `<button class="btn">Raise to G${top}</button>` : gateLv(g + 1) > u.lv ? `<button class="btn off">Lv ${gateLv(g + 1)}</button>` : `<button class="btn off">${item(g + 1)} ×0</button>`;
+  const costs = top > g ? Array.from({ length: top - g }, (_, i) => kv(item(g + 1 + i), `×1 · ${STOCK[item(g + 1 + i)]} held`)).join('') : kv(item(g + 1), `×1 · ${STOCK[item(g + 1)] || 0} held`);
+  return { title: `${KIND[w.k].n} · Slot ${slot}`, from: 'Gear › weapon tile', body: `
+      <div class="ba">G${g} <span class="ar">→</span> <span class="to">G${n}</span></div>
+      <p class="ba2">Might <b>${MIGHT[g]}</b> → <b style="color:var(--success)">${MIGHT[n]}</b></p>
+      <div class="chips">${chips.join('')}</div>${costs}`, foot };
+}
+function armorSheet(u, a) {
+  const g = a.g, n = g + 1, lvOk = gateLv(n) <= u.lv, held = a.ready ? 3 : 0;
+  const item = `Armor Fittings G${n}`;
+  const per = ARMOR_PER[a.s];
+  const foot = !lvOk ? `<button class="btn off">Lv ${gateLv(n)}</button>` : held ? `<button class="btn">Raise to G${n}</button>` : `<button class="btn off">${item} ×0</button>`;
+  return { title: `${a.s} · ${u.half}`, from: 'Gear › armor tile', body: `
+      <div class="ba">G${g} <span class="ar">→</span> <span class="to">G${n}</span></div>
+      <p class="ba2">${a.st} <b>${a.v}</b> → <b style="color:var(--success)">${per * n}</b> · ATK <b>${ARMOR_OFF[g]}</b> → <b style="color:var(--success)">${ARMOR_OFF[n]}</b></p>
+      <div class="chips">${lvOk ? `<span class="chipb ${held ? 'sel' : ''}">G${n}</span>` : `<span class="chipb closed">G${n} <small>Lv ${gateLv(n)}</small></span>`}</div>${kv(item, `×1 · ${held} held`)}`, foot };
+}
+function sheets(u) {
+  const w1 = u.weapons ? u.weapons[1] : null;
+  const extra = {};
+  if (u.weapons) u.weapons.forEach((w, i) => { extra['w' + i] = weaponSheet(u, w, i + 1); });
+  if (u.armor) u.armor.forEach((a, i) => { extra['a' + i] = armorSheet(u, a); });
+  return {
+    ...extra,
+    details: { title: 'Details', from: 'Header › Details', body: `
+      <div class="dsec">Offense</div><div class="dgrid">
+        ${kv('ATK', '176<small>base 133 · gear 18 · Stars 25</small>')}${kv('M.ATK', '85<small>base 72 · Stars 13</small>')}
+        ${kv('Might', 'GS 45 · Ax 26 · Ln 35')}${kv('Pendant', '+7 · 3 kinds')}
+        ${kv('★ Signature', 'Not worn')}${kv('&nbsp;', '&nbsp;')}</div>
+      <div class="dsec">Defense</div><div class="dgrid">${kv('DEF', '151<small>base 100 · gear 32 · Stars 19</small>')}${kv('M.DEF', '129<small>base 82 · gear 28 · Stars 19</small>')}${kv('Evasion', '8.4%<small>gear 6.0 · ★ 2.4</small>')}${kv('&nbsp;', '&nbsp;')}</div>
+      <div class="dsec">Sustain</div><div class="dgrid">${kv('HP', '1,140')}${kv('MP', '120 · +10/round')}${kv('★ Flourish', '4% · On')}${kv('Limit start', '0/12')}</div>
+      <div class="dsec">Core</div><div class="core5"><div><b>128</b>Speed<br>98 · +20%</div><div><b>116</b>Stamina<br>92 · +5%</div><div><b>141</b>Power<br>104 · +10%</div><div><b>97</b>Guts<br>80 · 0%</div><div><b>88</b>Wit<br>76 · 0%</div></div>
+      <div class="dsec">Work</div><div class="dgrid">${kv('Craft', '30 · 120/1,575')}${kv('Grades', 'G6 open · G7 at Craft 31')}${kv('Trade', 'Mine · Weapon Forge')}${kv('Since', '12 Oct 2026')}</div>
+      <div class="exp">How stats add up ›</div>`, foot: '' },
+    class: { title: 'Class', from: 'Class › class tile', body: `
+      <div class="list" style="grid-template-columns:1fr 1fr 1fr">${['brawler', 'mage', 'spellblade', 'summoner', 'paladin', 'cleric'].map((c, i) => `<div class="li ${c === u.cls ? 'on' : ''}" style="flex-direction:column;align-items:flex-start;gap:2px;min-height:64px">${emblem(c, 20)}<span style="font-size:12.5px;font-weight:700">${CLS[c]}</span><small>R${[34, 12, 8, 1, 3, 1][i]}</small></div>`).join('')}</div>
+      <p class="sline" style="margin-top:10px">Hand · Arms ×1 · MP ×1</p>
+      <p class="sline" style="font-size:12.5px">Tap a class: she fights as it. Free.</p>`,
+      foot: '<button class="btn">Standard preset</button><p style="text-align:center;font-size:11px;color:var(--ink-soft);margin-top:6px">Greatsword · Axe · Lance · ★ Bell</p>' },
+    weapon: { title: 'Slot 3 · Arms', from: 'Class › weapon tile › Change', body: `
+      <div class="list">${[['greatsword', 8, 45, 'Slot 1'], ['axe', 6, 26, 'Slot 2'], ['lance', 7, 35, 'Held'], ['bow', 2, 4, ''], ['katana', 0, 0, '']].map(([k, g, m, s]) => `<div class="li ${s === 'Held' ? 'on' : ''}">${glyph(k)}<span class="mid">${KIND[k].n}<small>G${g} · Might ${m}</small></span><b style="font-size:12.5px">${s}</b></div>`).join('')}</div>
+      <p class="sline" style="font-size:12.5px;margin-top:10px">Tap a weapon: she holds it. One in another slot swaps.</p>`, foot: '' },
+    line: { title: 'Lance · Line B · Impale', from: 'Class › line square', body: `
+      <div class="list">${[['Depth 3 · R20', 'one foe · 2 hits · 1.2×'], ['Depth 4 · R30', 'one foe · 2 hits · 1.4× · 12 MP'], ['Depth 5 · R40', 'one foe · 3 hits · 1.6× · 16 MP']].map(([d, l], i) => `<div class="li ${i === 2 ? 'off' : ''}">${glyph('lance')}<span class="mid">Lance skill ${i + 3}B<small>${d} · ${l}</small></span></div>`).join('')}</div>`,
+      foot: '<button class="btn off">Held</button>' },
+    lineA: { title: 'Lance · Line A', from: 'Class › line square', body: `
+      <div class="list">${[['Depth 3 · R20', 'random foes · 2 hits · 1.1×'], ['Depth 4 · R30', 'random foes · 3 hits · 1.3×'], ['Depth 5 · R40', 'random foes · 4 hits · 1.5×']].map(([d, l], i) => `<div class="li ${i === 2 ? 'off' : ''}">${glyph('lance')}<span class="mid">Lance skill ${i + 3}A<small>${d} · ${l}</small></span></div>`).join('')}</div>`,
+      foot: '<button class="btn">Take line A</button><p style="text-align:center;font-size:11px;color:var(--ink-soft);margin-top:6px">Free · equipped skills follow</p>' },
+    node: { title: 'Lance skill 4B', from: 'Class › node', body: `
+      <div class="pips"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+      <p class="ba2"><b>Rank 3</b> · next R36</p>
+      ${kv('Depth', '4 · Line B')}${kv('Skill', 'one foe · 2 hits · 1.4× · 12 MP')}${kv('Shield', 'cuts through')}`,
+      foot: '<button class="btn">Unequip</button>' },
+    node1: { title: 'Lance skill 1', from: 'Class › node', body: `<div class="pips"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><p class="ba2"><b>Rank 5</b></p>${kv('Depth', '1 · Trunk')}${kv('Skill', 'random foes · 2 hits · 1.6× · 10 MP')}`, foot: '<button class="btn">Unequip</button>' },
+    node5: { title: 'Lance skill 5B', from: 'Class › node', body: `<div class="pips"><i></i><i></i><i></i><i></i><i></i></div><p class="ba2"><b>Closed</b></p>${kv('Depth', '5 · Line B')}${kv('Opens', 'R40')}${kv('Skill', 'one foe · 3 hits · 1.6× · 16 MP')}`, foot: '<button class="btn off">Opens · R40</button>' },
+    nodeA: { title: 'Lance skill 3A', from: 'Class › node', body: `<p class="ba2"><b>Line A</b> · not held</p>${kv('Depth', '3 · Line A')}${kv('Skill', 'random foes · 2 hits · 1.1×')}`, foot: '<button class="btn">Take line A</button>' },
+    replace: { title: 'Lance skill 2', from: 'Class › node (7/7 equipped)', body: `
+      <div class="pips"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      <p class="ba2"><b>Rank 5</b> · Depth 2 · Trunk</p>
+      ${kv('Skill', 'random foes · 3 hits · 1.4× · 14 MP')}
+      <div class="dsec">Replace · Equipped 7/7</div>
+      <div class="list">${[['greatsword', 'Greatsword skill 1'], ['greatsword', 'Greatsword skill 3A'], ['axe', 'Axe skill 1'], ['axe', 'Axe skill 3B']].map(([k, n]) => `<div class="li">${glyph(k)}<span class="mid">${n}</span><b style="font-size:12.5px;color:var(--accent-strong)">Replace</b></div>`).join('')}<div class="li" style="justify-content:center;color:var(--ink-soft);font-size:12.5px">+ 3 more</div></div>`,
+      foot: '' },
+    limit: { title: u.limit ? u.limit.name : 'Limit', from: 'Class › Limit line', body: `
+      ${kv('Seat', 'Learner · Brawler Hall · Seat 2')}${kv('Bond', '2/10 · Strength 60%')}${kv('Next', '3/10')}${kv('Hero', 'Uma F')}`,
+      foot: '<button class="btn">Open Brawler Hall</button>' },
+    acc: { title: 'Accessory · G' + (u.acc ? u.acc.g : 0), from: 'Gear › accessory · Template › ★ Signature', body: `
+      <div class="fams">${['bell', 'pendant', 'orb', 'insignia'].sort((a, b) => (a === u.family ? -1 : b === u.family ? 1 : 0)).map((f) => `<span class="fam ${u.acc && u.acc.fam === f ? 'on' : ''} ${f === u.family && !u.sig.worn ? 'sel' : ''}">${f === u.family ? '<span class="stx">★</span>' : ''}${f === u.family && !u.sig.worn ? '<span class="dot"></span>' : ''}${famGlyph(f)}${FAM[f].n}</span>`).join('')}</div>
+      ${u.family === 'bell' ? `<div class="chips" style="margin:4px 0"><span class="chipb sel">${glyph('greatsword')} Greatsword</span><span class="chipb">Axe</span><span class="chipb">Lance</span></div>` : ''}
+      ${kv('Worn', u.acc ? FAM[u.acc.fam].n + ' · ' + u.acc.eff : 'None')}
+      ${kv('★ ' + FAM[u.family].n, (u.family === 'bell' ? 'Greatsword ×0.7' : '—') + ' · ★ ATK/M.ATK +' + u.sig.n)}
+      ${kv('★ Signature', u.sig.worn ? 'Worn' : 'Not worn')}
+      <div class="ba" style="font-size:18px;margin-top:10px">G${u.acc ? u.acc.g : 0} <span class="ar">→</span> <span class="to">G${(u.acc ? u.acc.g : 0) + 1}</span></div>
+      <p class="ba2">${u.acc && u.acc.next ? `<b>${u.acc.eff}</b> → <b style="color:var(--success)">${u.acc.next}</b>` : ''}</p>
+      <p class="sline" style="font-size:12.5px;text-align:center">Tap a family: she wears it. Free.</p>`,
+      foot: `<button class="btn">Raise to G${(u.acc ? u.acc.g : 0) + 1}</button><p style="text-align:center;font-size:11px;color:var(--ink-soft);margin-top:6px">Accessory Setting G${(u.acc ? u.acc.g : 0) + 1} ×1 · 1 held</p>` },
+    raiseall: { title: 'Raise all', from: 'Gear › first row', body: `
+      <div class="list">
+        <div class="li">${glyph('axe')}<span class="mid">Axe · G6 → G8<small>Arms Gem G7 ×1 · G8 ×1</small></span><b style="font-size:12.5px">Might 45</b></div>
+        <div class="li">${glyph('lance')}<span class="mid">Lance · G7 → G8<small>Arms Gem G8 ×1</small></span><b style="font-size:12.5px">Might 45</b></div>
+        <div class="li">${armorGlyph('Feet')}<span class="mid">Feet · G5 → G6<small>Armor Fittings G6 ×1</small></span><b style="font-size:12.5px">Speed 12</b></div>
+      </div>${kv('Uses', '4 items')}`,
+      foot: '<button class="btn">Raise 3</button>' },
+    snode: { title: 'Guard III', from: 'Stars › node', body: `
+      <p class="ba2" style="font-size:17px;color:var(--ink);font-weight:800">DEF/M.DEF +6</p>
+      <div class="ba" style="font-size:18px">DEF 151 <span class="ar">→</span> <span class="to">157</span></div>
+      <p class="ba2">M.DEF <b>129</b> → <b style="color:var(--success)">135</b></p>
+      ${kv('Moon Jewel III', '×1 · 4 held')}${kv('Opens', 'Lv 26 · Guard II open')}`,
+      foot: '<button class="btn">Set</button>' },
+    smoon: { title: `★ ${u.type || ''}'s moon II`, from: 'Stars › ★ node · Template › ★ Moon II', body: `
+      <p class="ba2" style="font-size:17px;color:var(--ink);font-weight:800">DEF +8</p>
+      <div class="ba" style="font-size:18px">DEF 151 <span class="ar">→</span> <span class="to">159</span></div>
+      ${kv('Reads', 'her calling · Physical')}${kv('Moon Jewel IV', '×1 · 1 held')}${kv('Opens', 'Lv 36 · moon I open')}${kv('Counts', 'every class')}`,
+      foot: '<button class="btn">Set</button>' },
+    smoon1: { title: `★ ${u.type || ''}'s moon I`, from: 'Stars › ★ node · Template › ★ Moon I', body: `
+      <p class="ba2" style="font-size:17px;color:var(--ink);font-weight:800">${u.moon ? u.moon[0].v : ''}</p>
+      ${kv('Reads', 'her knack · ' + (u.knack ? u.knack.v : ''))}${kv('Moon Jewel II', u.moon && u.moon[0].state === 'open' ? 'Open' : '×0')}${kv('Opens', 'Lv 16')}${kv('Counts', 'every class')}`,
+      foot: u.moon && u.moon[0].state === 'open' ? '<button class="btn off">Open</button>' : '<button class="btn off">Lv 16</button>' },
+    setall: { title: 'Set all', from: 'Stars › first row', body: `
+      <div class="list">
+        <div class="li"><span class="glyph" style="background:var(--accent)">IV</span><span class="mid">Moon Jewel IV → ★ moon II<small>DEF +8</small></span></div>
+        <div class="li"><span class="glyph" style="background:var(--neutral-strong)">III</span><span class="mid">Moon Jewel III → Guard III<small>DEF/M.DEF +6 · the emptiest moon</small></span></div>
+      </div>${kv('Moon Jewels', '★ moon first, then the emptiest moon')}`,
+      foot: '<button class="btn">Set 2</button>' },
+    flourish: { title: '★ Flourish · ' + u.flourish.shape, from: 'Template › ★ Flourish', body: `
+      <p class="ba2" style="font-size:17px;color:var(--ink);font-weight:800">${u.flourish.num}</p>
+      ${kv('Of', 'her max HP, once a fight')}${kv('Reads', 'her stride · ' + u.stride.v)}${kv('Works as', u.flourish.cls)}${u.locked ? '' : kv('Now', u.flourish.on ? 'On' : 'Off · as ' + u.flourish.as)}`,
+      foot: u.flourish.on || u.locked ? '' : `<button class="btn">Fight as ${u.flourish.cls}</button><p style="text-align:center;font-size:11px;color:var(--ink-soft);margin-top:6px">Free · her class switch</p>` },
+    racing: { title: 'Racing skill', from: 'Template › Racing skill', body: `<p class="sline">Its name and text come from the master data at runtime (no RPG effect).</p>`, foot: '' },
+    confirm: u.calling && u.calling.opts ? (() => { const o = u.calling.opts[u.calling.sel]; const keys = Object.keys(u.calling.opts); const other = u.calling.opts[keys.find((k) => k !== u.calling.sel)]; return { title: 'Confirm calling', from: 'Template › Confirm', body: `
+      <div class="ba" style="font-size:18px">${emblem(o.cls, 22)} ${CLS[o.cls]}</div>
+      ${kv('Template', '★ ' + o.name)}${o.trade !== other.trade ? kv('Trade', o.trade) : ''}${kv('★ Moon II', o.moon2)}${kv('Lead weapon', o.lead)}${kv('★ Flourish', 'as ' + CLS[o.cls])}${kv('Not picked', CLS[other.cls] + ' · ' + other.name)}
+      <p class="sline" style="text-align:center;margin-top:10px"><b>Final</b> · her class stays free</p>`,
+      foot: '<button class="btn" data-act="confirmonce">Confirm once</button>' }; })() : null,
+  };
+}
+
+// ---------- The phone ----------
+const PHONES = new Map();
+function phoneHTML(st) {
+  const u = st.uma;
+  const tab = u.locked ? null : st.tab;
+  let body = headerHTML(u);
+  if (u.locked) body += `<div style="margin-top:4px">${templateTab(u)}</div>`;
+  else {
+    body += tabbarHTML(u, tab);
+    const drawn = { class: !!u.weapons, gear: !!u.weapons, stars: !!u.stars, template: true };
+    body += !drawn[tab] ? `<p class="note" style="margin-top:12px">${u.name}'s ${tab[0].toUpperCase() + tab.slice(1)} tab isn't drawn on this page: every tab is on <a href="tabs.html#${tab}">the tabs page</a>, for Uma A.</p>`
+      : tab === 'class' ? classTab(u) : tab === 'gear' ? gearTab(u) : tab === 'stars' ? starsTab(u) : templateTab(u);
+  }
+  const sh = st.sheet ? sheets(u)[st.sheet] : null;
+  const sheet = sh ? `<div class="ph-scrim" data-act="${st.fixedSheet ? '' : 'close'}"></div><div class="ph-sheet" role="dialog" aria-label="${sh.title}"><div class="handle"></div>
+      <div class="sh-head"><b>${sh.title}</b><span class="x" data-act="${st.fixedSheet ? '' : 'close'}" aria-label="Close">✕</span></div>
+      <div class="sh-body">${sh.body}</div>${sh.foot ? `<div class="sh-foot">${sh.foot}</div>` : ''}</div>` : '';
+  return `<div class="ph-status"><span>9:41</span><span class="island"></span><span>●●● ▮</span></div>
+    <div class="ph-top"><span class="ini">T</span><span class="crest">T1</span><span class="cur"><span>Laurels 50,000</span><span>Tickets 12</span></span></div>
+    <div class="ph-place"><span class="ib">‹</span><span class="ttl">Stable</span>${u.locked ? '' : `<span class="step" data-tip="Next and previous||The list she was opened from. Keeps the tab."><span class="ib">‹</span>${u.pos}<span class="ib">›</span></span>`}<span class="ib">ⓘ</span></div>
+    <div class="ph-body"><div class="ph-inner">${body}</div></div>
+    <div class="ph-bar"><span><i></i>Town</span><span><i></i>Learning</span><span class="mid"><i></i>Battle</span><span><i></i>Wilds</span><span><i></i>Menu</span></div>
+    ${sheet}`;
+}
+function mountPhone(el, st) {
+  PHONES.set(el, st);
+  el.classList.add('phone');
+  el.innerHTML = phoneHTML(st);
+  bindTips(el);
+  if (st.interactive && !el.dataset.wired) {
+    el.dataset.wired = '1';
+    el.addEventListener('click', (e) => {
+      const a = e.target.closest('[data-act]'); if (!a || !a.dataset.act) return;
+      const s = PHONES.get(el); const [kind, arg] = a.dataset.act.split(':');
+      if (kind === 'tab') { s.tab = arg; s.sheet = null; el.querySelector('.ph-body').scrollTop = 0; }
+      else if (kind === 'sheet') { if (sheets(s.uma)[arg]) s.sheet = arg; }
+      else if (kind === 'close') s.sheet = null;
+      else if (kind === 'pick') { const o = s.uma.calling.opts[arg]; s.uma.calling.sel = arg; s.uma.template = o.name; if (s.uma.flourish) { s.uma.flourish.cls = CLS[o.cls]; s.uma.flourish.on = s.uma.cls === o.cls; s.uma.flourish.as = CLS[s.uma.cls]; } }
+      else if (kind === 'confirmonce') { s.uma.calling.confirmed = true; s.uma.dots.template = false; s.sheet = null; }
+      hideTip();
+      const keep = el.querySelector('.ph-body') ? el.querySelector('.ph-body').scrollTop : 0;
+      el.innerHTML = phoneHTML(s); bindTips(el);
+      if (kind !== 'tab') el.querySelector('.ph-body').scrollTop = keep;
+      if (typeof s.onChange === 'function') s.onChange(s);
+    });
+  }
+}
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+// A sheet outside the phone, for the galleries.
+function miniSheet(u, id) {
+  const sh = sheets(u)[id]; if (!sh) return '';
+  return `<div class="msheet"><div class="from">${sh.from}</div><div class="sh-head"><b>${sh.title}</b></div><div class="sh-body">${sh.body}</div>${sh.foot ? `<div class="sh-foot">${sh.foot}</div>` : ''}</div>`;
+}
+
+// The tabs page: one live phone, then a pair per tab (the tab, live; its main sheet, fixed) and a gallery of its sheets.
+initTheme();
+const ua = () => clone(UMAS.A);
+mountPhone(document.getElementById('ph-live'), { uma: ua(), tab: 'class', sheet: null, interactive: true });
+const PAIRS = [['h', 'class', 'details'], ['c', 'class', 'replace'], ['g', 'gear', 'w1'], ['s', 'stars', 'snode'], ['t', 'template', 'acc']];
+for (const [id, tab, sheet] of PAIRS) {
+  mountPhone(document.getElementById(`ph-${id}1`), { uma: ua(), tab, sheet: null, interactive: true });
+  mountPhone(document.getElementById(`ph-${id}2`), { uma: ua(), tab, sheet, fixedSheet: true });
+}
+const GALLERIES = {
+  'g-class': ['class', 'weapon', 'line', 'lineA', 'node', 'node5', 'limit'],
+  'g-gear': ['w0', 'w2', 'a0', 'a4', 'acc', 'raiseall'],
+  'g-stars': ['smoon', 'setall'],
+  'g-template': ['flourish', 'smoon', 'smoon1', 'racing'],
+};
+for (const [id, list] of Object.entries(GALLERIES)) document.getElementById(id).innerHTML = list.map((s) => miniSheet(ua(), s)).join('');
+bindTips();
+
+</script>
+</body>
+</html>
