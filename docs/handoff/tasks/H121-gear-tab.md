@@ -74,7 +74,7 @@ No rule or save change: every raise is today's `raiseGradeTo`, every family pick
 
 ### Build decisions (log them in the D-row)
 
-1. **The standard preset moves to the top of the Class tab for now.** The proposal puts it in the Class sheet's footer
+1. **The standard preset moves to the top of the Class tab for now** (main session, 2026-10-29: if H120 has landed first, the preset is already the Classes sheet's footer; skip this decision and only remove it from Gear). The proposal puts it in the Class sheet's footer
    (H120), which waits for the Classes v3 design; Gear has no room for it under B2 (+52 px is 1.05 screens). So
    `PresetButton` (H117's wording, `Standard preset` / `Standard preset · On`) becomes the first row of the Class tab's
    skeleton until H120 moves it. *Why:* its destination tab, and nothing lost meanwhile.
