@@ -1,10 +1,10 @@
 import {
-  ACCESSORY_FAMILY_LABEL, accessoryFlatValue, ARMOR_LABEL, ARMOR_SLOT_LABEL, armorHalf, armorKindFor, armorValues, gradeItemId, gradeOf, madeName,
-  isRpgElement, mightAt, raiseBlock, rpgTomeOf, rpgWeaponKind, signatureBonus, signatureWorn, WEAPON_LABEL,
+  ACCESSORY_FAMILY_LABEL, ARMOR_SLOT_LABEL, armorHalf, armorValues, gradeItemId, gradeOf, madeName,
+  mightAt, raiseBlock, signatureBonus, signatureWorn, WEAPON_LABEL,
   type AccessoryFamily, type AccessorySlotState, type ArmorSlot, type GearTier, type GradeTarget, type RpgClass, type RpgWeapon,
   type UmaGrades,
 } from '@rpg/domain'
-import { kindLabel } from '../../battle/labels'
+import { accessoryEffect, armorHalf as armorHalfCopy, armorStat, grade as gradeCopy, gradeStep, itemCount, might } from './copy'
 
 export interface GradeUpgradeView {
   grade: number
@@ -18,16 +18,16 @@ export interface GradeUpgradeView {
 export function gradeUpgradeView(grades: UmaGrades, target: GradeTarget, level: number,
   stock: Readonly<Record<string, number>>): GradeUpgradeView {
   const grade = gradeOf(grades, target)
-  if (grade >= 10) return { grade, next: null, item: null, label: 'G10', block: 'Already G10', ready: false }
+  if (grade >= 10) return { grade, next: null, item: null, label: 'G10 · Max', block: 'Already G10', ready: false }
   const next = grade + 1
   const item = gradeItemId(target, next)
   const block = raiseBlock(grades, target, level, stock)
-  return { grade, next, item, label: `G${grade} → G${next} · 1 ${madeName(item)}`, block, ready: block === null }
+  return { grade, next, item, label: `${gradeStep(grade, next)} · ${itemCount(madeName(item) ?? item, 1)}`, block, ready: block === null }
 }
 
 export function weaponGradeLine(grades: UmaGrades, weapon: RpgWeapon, tier: GearTier): string {
   const grade = gradeOf(grades, { kind: 'weapon', weapon })
-  return `${WEAPON_LABEL[weapon]} · G${grade} · Might ${mightAt(grade, tier)} · weak ×1.3`
+  return `${WEAPON_LABEL[weapon]} · ${gradeCopy(grade)} · ${might(mightAt(grade, tier))}`
 }
 
 const statLabel = { hp: 'HP', def: 'DEF', mp: 'MP', mdef: 'M.DEF', speed: 'Evasion' } as const
@@ -35,24 +35,18 @@ const statLabel = { hp: 'HP', def: 'DEF', mp: 'MP', mdef: 'M.DEF', speed: 'Evasi
 export function armorGradeLine(grades: UmaGrades, slot: ArmorSlot, classId: RpgClass, tier: GearTier): string {
   const grade = gradeOf(grades, { kind: 'armor', slot })
   const values = armorValues(slot, grade, tier)
-  const value = values.stat === 'speed' ? `${(values.value * 0.6).toFixed(1)}%` : `+${values.value}`
-  return `${ARMOR_SLOT_LABEL[slot]} · ${ARMOR_LABEL[armorKindFor(slot, armorHalf(classId))]} · G${grade} · ${statLabel[values.stat]} ${value}`
+  const value = values.stat === 'speed' ? `${(values.value * 0.6).toFixed(1)}%` : values.value
+  const offense = armorHalf(classId) === 'physical' ? 'ATK' : 'M.ATK'
+  return `${ARMOR_SLOT_LABEL[slot]} · ${armorHalfCopy(armorHalf(classId))} · ${gradeCopy(grade)} · ${armorStat(statLabel[values.stat], value)} · ${armorStat(offense, values.offense)}`
 }
 
 export function accessoryGradeLine(slot: AccessorySlotState | undefined, weapons: readonly RpgWeapon[], tier: GearTier,
   family: AccessoryFamily, level: number): string {
-  if (!slot || slot.family === null) return `Accessory · G${slot?.grade ?? 0} · Pick a form`
+  if (!slot || slot.family === null) return 'None · G0'
   const label = ACCESSORY_FAMILY_LABEL[slot.family]
   // A form picked at G0 waits for G1, where every accessory starts counting (H82).
-  if (slot.grade < 1) return `${label}${slot.kind ? ` · ${kindLabel(slot.kind)}` : ''} · G0 · counts from G1`
-  let effect: string
-  if (slot.family === 'pendant') effect = `+${accessoryFlatValue('pendant', slot.grade, tier)} on her three kinds`
-  else if (slot.family === 'orb') effect = `+${accessoryFlatValue('orb', slot.grade, tier)} ${slot.kind ? kindLabel(slot.kind) : ''} offense`
-  else if (slot.family === 'bell') {
-    const weapon = weapons.find((w) => rpgWeaponKind(w) === slot.kind)
-    effect = weapon ? `after her Attack, her ${WEAPON_LABEL[weapon]} at ${(slot.grade / 10).toFixed(1)}`
-      : `No ${slot.kind ? WEAPON_LABEL[isRpgElement(slot.kind) ? rpgTomeOf(slot.kind) : slot.kind] : 'weapon'} in her slots`
-  } else effect = `+${(slot.grade * 1.5).toFixed(slot.grade % 2 ? 1 : 0)}% on sub-bosses and bosses`
+  if (slot.grade < 1) return `${label} · G0 · Off`
+  const effect = accessoryEffect(slot.family, slot.grade, tier, slot.kind ?? undefined)
   const star = signatureWorn({ accessories: [slot] }, family) ? ` · ★ +${signatureBonus(level, tier)}` : ''
-  return `${label}${slot.kind ? ` · ${kindLabel(slot.kind)}` : ''} · G${slot.grade} · ${effect}${star}`
+  return `${label} · ${gradeCopy(slot.grade)} · ${effect}${star}`
 }

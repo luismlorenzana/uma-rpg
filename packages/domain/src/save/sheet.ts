@@ -2,7 +2,7 @@
 // battle rules so it ships with the Stable's lazy chunk, not the main bundle (H57). Engine v16 (H70): her MP row carries
 // what she regains a round (SB18's base regen and any Spring's) and a ★ Flourish row her template's (UT6, UT14).
 import {
-  BATTLE_ENGINE_VERSION, BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE,
+  BATTLE_ENGINE_VERSION, BATTLE_HEAL_OFFENSE_SCALE, BATTLE_HEAL_SCALE,
   BATTLE_LIMIT_MAX, rpgV2,
 } from '../rpg/battle/caps'
 import type { RpgFlourish } from '../rpg/battle/types'
@@ -17,19 +17,17 @@ import { mapPoints, moonTemplate } from '../economy/planet'
 import { umaTemplate } from '../roster/template'
 import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, umaWeaponMight, type BattleOutfit } from './battle'
 import { gearV1, isGrades, starMapOf, umaPick, type OwnedUma } from './save'
+import { accessoryEffect, accessoryLine, flourish, limitStart, mp, signature } from './sheet-words'
 
-const pct = (share: number) => `${Math.round(share * 1000) / 10}%`
-/** A Flourish in a few words (UT6), from the engine's own numbers: "Even pace · 1% a round, up to 4%". */
+/** A Flourish in the profile wording list (D251). */
 export function flourishShort(flourish: RpgFlourish): string {
-  const most = pct(BATTLE_FLOURISH_SHARE)
-  if (flourish === 'clean-break') return `Clean break · a Barrier of ${most} at the start`
-  if (flourish === 'even-pace') return `Even pace · ${pct(BATTLE_FLOURISH_RATE['even-pace'])} a round, up to ${most}`
-  return `Late reserve · from round ${BATTLE_FLOURISH_FROM}, ${pct(BATTLE_FLOURISH_RATE['late-reserve'])} a round, up to ${most}`
+  return flourishLineValue(flourish, true)
 }
-/** The sheet's ★ Flourish row: hers as she fights now, or "No effect as Brawler" outside her calling's class (from v19 her
- * Tier 0's family, CV21), the class named in the sheet's generation. */
+/** Kept for callers that only know whether a Flourish is active; the live sheet has the full template fact. */
 export const flourishSheetLine = (flourish: RpgFlourish | null, classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): string =>
-  (flourish ? flourishShort(flourish) : `No effect as ${rpgClassName(classId, engine)}`)
+  (flourish ? flourishShort(flourish) : `Off · ${rpgClassName(classId, engine)}`)
+
+const flourishLineValue = (value: RpgFlourish, on: boolean): string => flourish(value, on).replace('★ Flourish · ', '')
 
 /** One line of her battle sheet: the total, for the six core stats what gear and Extra Stats add, and a short note after
  * them (v16's MP: "+13 a round"). */
@@ -42,13 +40,13 @@ const permille = (n: number) => `${Math.round(n) / 10}%`
 export function accessorySheetLine(slot: AccessorySlotState | undefined, weapons: readonly import('../rpg/kinds').RpgWeapon[], tier: GearTier): string {
   if (!slot || slot.grade < 1 || slot.family === null) return 'None'
   const label = slot.kind ? KIND_NAME(slot.kind) : ''
-  if (slot.family === 'pendant') return `Pendant: +${accessoryFlatValue('pendant', slot.grade, tier)} on her three kinds`
-  if (slot.family === 'orb') return `Orb: ${label} +${accessoryFlatValue('orb', slot.grade, tier)}`
+  if (slot.family === 'pendant') return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier))
+  if (slot.family === 'orb') return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier, slot.kind))
   if (slot.family === 'bell') {
     const bell = accessoryParts(slot, weapons, tier).bell
-    return bell ? `Bell: ${label} ${(bell.power / 1000).toFixed(1)} after her Attack` : `Bell: No ${label} in her slots`
+    return bell ? accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier, slot.kind)) : `Bell · ${label} not held`
   }
-  return `Insignia: +${permille(15 * slot.grade)} on sub-bosses and bosses`
+  return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier))
 }
 /** Every battle stat she has with her active class in her tier, each always listed, 0 included (combat-balance.md §6.0).
  * Classes v2 (H57): her Orb's offense ("Fire Orb +34"), and a healer's mends from her ATK or M.ATK instead of Heal. */
@@ -92,19 +90,22 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
       extra: boosted.stats[k] - geared[k], star: boosted.stats[k] - sharedStats.stats[k],
     })
     const slot = grades.accessories[0]
-    const family = umaTemplate(outfit, umaPick(uma)).family
-    const signature = signatureWorn(grades, family) ? signatureBonus(uma.level, gearTier) : 0
+    const family = umaTemplate(outfit, umaPick(uma), engine).family
+    const worn = signatureWorn(grades, family)
+    const signatureValue = signatureBonus(uma.level, gearTier)
+    const flourishValue = umaTemplate(outfit, umaPick(uma), engine).flourish
+    const flourishOn = umaFlourish(outfit, uma, classId, umaPick(uma), engine) !== null
     const weaponRows: SheetRow[] = weapons.map((weapon) => ({
       label: 'Might', value: `${WEAPON_LABEL[weapon]} +${mightAt(gradeOf(grades, { kind: 'weapon', weapon }), gearTier)}`,
     }))
     return [
       { title: 'Offense', rows: [coreV3('ATK', 'atk'), coreV3('M.ATK', 'matk'), ...weaponRows,
         { label: 'Accessory', value: accessorySheetLine(slot, weapons, gearTier) },
-        ...(signature ? [{ label: 'Signature', value: `+${signature} ★` }] : [])] },
+        { label: '★ Signature', value: signature(signatureValue, worn).replace('★ Signature · ', '') }] },
       { title: 'Defense', rows: [coreV3('DEF', 'pdef'), coreV3('M.DEF', 'mdef'), { label: 'Evasion', value: permille(boosted.evasion) }] },
-      { title: 'Sustain', rows: [coreV3('HP', 'hp'), ...mends, { ...coreV3('MP', 'mp'), note: `+${regen} a round` },
-        { label: '★ Flourish', value: flourishSheetLine(umaFlourish(outfit, uma, classId, umaPick(uma), engine), classId, engine) }] },
-      { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
+      { title: 'Sustain', rows: [coreV3('HP', 'hp'), ...mends, { ...coreV3('MP', 'mp'), note: mp(boosted.stats.mp, regen).split(' · ')[1] },
+        { label: '★ Flourish', value: flourishLineValue(flourishValue, flourishOn) }] },
+      { title: 'Other', rows: [{ label: 'Limit start', value: limitStart(boosted.limitStart, BATTLE_LIMIT_MAX).replace('Limit start ', '') }] },
     ]
   }
   return [
@@ -116,8 +117,8 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
       { label: 'Thorns', value: permille(a.thorns) }, { label: 'Mirror', value: permille(a.mirror) }] },
     { title: 'Sustain', rows: [core('HP', 'hp'), ...mends,
       { label: 'HP Regen', value: ofHp(a.regen, ' a round') }, { label: 'Lifesteal', value: permille(a.lifesteal) },
-      { ...core('MP', 'mp'), note: `+${regen} a round` }, { label: 'MP Steal', value: permille(a.mpSteal) },
-      { label: '★ Flourish', value: flourishSheetLine(umaFlourish(outfit, uma, classId, umaPick(uma), engine), classId, engine) }] },
-    { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
+      { ...core('MP', 'mp'), note: mp(boosted.stats.mp, regen).split(' · ')[1] }, { label: 'MP Steal', value: permille(a.mpSteal) },
+      { label: '★ Flourish', value: flourishLineValue(umaTemplate(outfit, umaPick(uma), engine).flourish, umaFlourish(outfit, uma, classId, umaPick(uma), engine) !== null) }] },
+    { title: 'Other', rows: [{ label: 'Limit start', value: limitStart(boosted.limitStart, BATTLE_LIMIT_MAX).replace('Limit start ', '') }] },
   ]
 }

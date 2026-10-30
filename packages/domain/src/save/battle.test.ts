@@ -287,7 +287,7 @@ describe('her battle sheet (combat-balance.md §6.0)', () => {
     const labels = sheet.flatMap((g) => g.rows.map((r) => r.label))
     for (const label of ['ATK', 'M.ATK', 'Might', 'Orb', 'DEF', 'M.DEF', 'Evasion', 'Physical damage cut', 'Magical damage cut',
       'Bulwark (physical) at the start', 'Veil (magical) at the start', 'Thorns', 'Mirror', 'HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Steal',
-      '★ Flourish', 'Limit Break head start']) expect(labels).toContain(label)
+      '★ Flourish', 'Limit start']) expect(labels).toContain(label)
     // From v16 (H70) the MP row carries her regen; "MP Regen" retired with v15's sheet.
     expect(labels).not.toContain('MP Regen')
     // Classes v2: one flat Orb, and no Heal (a healer's Mends come from her ATK or M.ATK, `accessories-v2.test.ts`).

@@ -36,27 +36,27 @@ describe('the battle sheet on engine v16 (H70)', () => {
   it('reads a Class Rank 40 Mage\'s 296 MP as "296 · +13 a round", "+23" with a G10 Spring, and drops the MP Regen row', () => {
     const uma = mageAt(296)
     const mp = row(umaBattleSheet(MAGE, uma, 'mage', 1, 16), 'MP')
-    expect(`${mp.value} · ${mp.note}`).toBe('296 · +13 a round')
+    expect(`${mp.value} · ${mp.note}`).toBe('296 · +13/round')
     expect(rpgBaseMpRegen(296, { classId: 'mage', classRank: 40 }, 16)).toBe(13)
     const sprung = row(umaBattleSheet(MAGE, spring(uma), 'mage', 1, 16), 'MP')
-    expect(`${sprung.value} · ${sprung.note}`).toBe('296 · +23 a round')
+    expect(`${sprung.value} · ${sprung.note}`).toBe('296 · +23/round')
     expect(sustain(umaBattleSheet(MAGE, uma, 'mage', 1, 16)).map((r) => r.label))
       .toEqual(['HP', 'HP Regen', 'Lifesteal', 'MP', 'MP Steal', '★ Flourish'])
     // The base regen follows her Class Rank: 0.9% a depth open (R1's balance, H71; SB18 drafted 0.8%).
     const low = { ...uma, ranks: withTrack(uma.ranks, { kind: 'class', id: 'mage' }, { rank: 10, exp: 0 }) }
-    expect(row(umaBattleSheet(MAGE, low, 'mage', 1, 16), 'MP').note).toBe(`+${rpgBaseMpRegen(296, { classId: 'mage', classRank: 10 }, 16)} a round`)
+    expect(row(umaBattleSheet(MAGE, low, 'mage', 1, 16), 'MP').note).toBe(`+${rpgBaseMpRegen(296, { classId: 'mage', classRank: 10 }, 16)}/round`)
   })
 
   it('shows her Flourish as her calling, and no effect in another class', () => {
     const uma = mageAt(296)
-    expect(row(umaBattleSheet(MAGE, uma, 'mage', 1, 16), '★ Flourish').value).toBe('Even pace · 1% a round, up to 4%')
-    expect(row(umaBattleSheet(MAGE, uma, 'brawler', 1, 16), '★ Flourish').value).toBe('No effect as Brawler')
+    expect(row(umaBattleSheet(MAGE, uma, 'mage', 1, 16), '★ Flourish').value).toBe('Even pace · 1%/round · max 4% · On')
+    expect(row(umaBattleSheet(MAGE, uma, 'brawler', 1, 16), '★ Flourish').value).toBe('Even pace · 1%/round · max 4% · Off')
     // A pick moves her calling (H69): picked a Spell Blade, her Flourish works only as one.
     const picked = { ...uma, calling: { pick: 'spellblade' as const, confirmed: false } }
-    expect(row(umaBattleSheet(MAGE, picked, 'mage', 1, 16), '★ Flourish').value).toBe('No effect as Mage')
-    expect(row(umaBattleSheet(MAGE, picked, 'spellblade', 1, 16), '★ Flourish').value).toBe('Even pace · 1% a round, up to 4%')
-    expect(flourishShort('clean-break')).toBe('Clean break · a Barrier of 4% at the start')
-    expect(flourishShort('late-reserve')).toBe('Late reserve · from round 3, 2% a round, up to 4%')
+    expect(row(umaBattleSheet(MAGE, picked, 'mage', 1, 16), '★ Flourish').value).toBe('Even pace · 1%/round · max 4% · Off')
+    expect(row(umaBattleSheet(MAGE, picked, 'spellblade', 1, 16), '★ Flourish').value).toBe('Even pace · 1%/round · max 4% · On')
+    expect(flourishShort('clean-break')).toBe('Clean break · Barrier 4% · start · On')
+    expect(flourishShort('late-reserve')).toBe('Late reserve · round 3+ · 2%/round · max 4% · On')
   })
 
   it('was the live sheet from H72 to H82: v15\'s Sustain rows ("MP Regen", no Flourish) retired with the switch', () => {

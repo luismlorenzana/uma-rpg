@@ -177,8 +177,8 @@ function hall(id: string, name: string, cls: string, at: { x: number; y: number 
 
 const OBSERVATORY: Place = {
   id: 'observatory', page: 'learning', kind: 'town', name: 'Observatory', opensIn: 'S6', slots: 0, at: { x: 0.5, y: 0.84 },
-  blurb: "Each Uma's Extra Stats map: a Sun, eight planets and their moons.",
-  details: ['100 nodes per Uma per tier', 'Star Gems open nodes; level sets how many are active'],
+  blurb: "Each Uma's Extra Stats: a Planet, three moons and her own moon.",
+  details: ['22 nodes per Uma', 'Planet and Moon Jewels open nodes in order'],
 }
 
 /** Halls v2's hall (HV1, HV21; H133): its lore, then today's tail; its seats' home classes (`heroSeatHome`, by name), then

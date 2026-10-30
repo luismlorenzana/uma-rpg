@@ -83,19 +83,24 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
   return (
     <BottomSheet title={`Slot ${slot + 1} · ${SLOT_LABEL[kind]}`} onClose={onClose}>
       <div className="space-y-3">
-        {kinds.map((w) => (
+        {graded ? <ul className="space-y-1">
+          {kinds.map((w) => {
+            const otherSlot = weapons.indexOf(w)
+            return <li key={w}>
+              <button type="button" disabled={here === w} onClick={() => void choose(w, null)}
+                className={`flex min-h-11 w-full items-center gap-2 rounded-sm p-2 text-left ${here === w ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
+                <TrainingIcon weapon={w} size={32} />
+                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{weaponGradeLine(graded, w, tier)}</span>
+                <span className="shrink-0 text-[11px] text-ink-faint">{here === w ? 'Held' : otherSlot >= 0 ? `Slot ${otherSlot + 1}` : ''}</span>
+              </button>
+            </li>
+          })}
+        </ul> : kinds.map((w) => (
           <section key={w}>
             <h4 className="text-micro mb-1">
               {WEAPON_LABEL[w]}{weapons.includes(w) && w !== here ? ` · swaps with slot ${weapons.indexOf(w) + 1}` : ''}
             </h4>
-            {graded ? <ul className="space-y-1"><li>
-              <button type="button" disabled={here === w} onClick={() => void choose(w, null)}
-                className={`flex w-full items-center gap-2 rounded-sm p-2 text-left ${here === w ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
-                <TrainingIcon weapon={w} size={32} />
-                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{weaponGradeLine(graded, w, tier)}</span>
-                <span className="shrink-0 text-[11px] text-ink-faint">{here === w ? 'Held' : 'Hers'}</span>
-              </button>
-            </li></ul> : <ul className="space-y-1">
+            <ul className="space-y-1">
               {boundGrade(uma, w) === 0 && <li>
                 <button type="button" disabled={held(w, null)} onClick={() => void choose(w, null)}
                   className={`flex w-full items-center gap-2 rounded-sm p-2 text-left ${held(w, null) ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
@@ -124,7 +129,7 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
                   </li>
                 )
               })}
-            </ul>}
+            </ul>
           </section>
         ))}
         {error && <p className="text-[13px] text-danger">{error}</p>}

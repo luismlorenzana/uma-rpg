@@ -18,7 +18,6 @@ import {
   rpgExpToNext, rpgRework, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaProfile, umaTrade, slotJobOf,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades, umaPick,
 } from '@rpg/domain'
-import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
 import { Tabs, UiMark } from '@luismlorenzana/uma-kit/ui'
 import { useEffect, useState } from 'react'
@@ -39,7 +38,7 @@ import { formatDuration, useNow } from '../../ui/useNow'
 import { EquipView, upgradeCount, UpgradeView } from './GearCardV3'
 import { SkillsPage } from './SkillsPage'
 import { TemplateChip } from './TemplateCard'
-import { racingTemplate } from './template-view'
+import { bond as bondCopy, classRank, craftLevel, exp, gate, level, party as partyCopy, work as workCopy, unlock as unlockCopy } from './copy'
 
 const STAT_NAMES: Record<string, string> = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' }
 const GRADE_COLORS: Record<string, string> = { S: '#f2c94c', A: '#f2994a', B: '#eb6fb0', C: '#7fb8ff', D: '#6fd39a', E: '#b8a6f0', F: '#a6b0bc', G: '#8a94a0' }
@@ -72,19 +71,6 @@ function GradeChip({ grade }: { grade: string }) {
   )
 }
 
-/** A labelled row in a card. */
-function Row({ label, value, note }: { label: string; value: React.ReactNode; note?: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 text-[12px]">
-      <span className="shrink-0 text-ink-soft">{label}</span>
-      <span className="text-right">
-        <span className="font-semibold">{value}</span>
-        {note && <span className="text-ink-faint"> · {note}</span>}
-      </span>
-    </div>
-  )
-}
-
 export function OutfitProfile({ view, outfitId, place }: { view: MasterView; outfitId: string; place: Place }) {
   const nav = useHubNavigation()
   const world = useWorld()
@@ -109,7 +95,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
   if (!outfit) {
     return (
       <div className="p-4">
-        <p className="mb-3 text-ink-soft">That outfit isn’t in the current game data.</p>
+        <p className="mb-3 text-ink-soft">That outfit isn't in the current game data.</p>
         <button type="button" onClick={() => nav.subBack(place)} className="min-h-11 rounded-sm bg-raised px-4 font-semibold">Back to the Stable</button>
       </div>
     )
@@ -128,7 +114,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         portrait={bust ? <img src={bust} alt="" className="size-full object-cover object-top" /> : <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={112} />}
         name={outfit.name}
         title={outfit.title}
-        level={owned ? <>{formatLevel(owned.level)}<span className="ml-1.5 text-[12px] font-semibold text-ink-faint">Uma Level</span></> : undefined}
+        level={owned ? level(owned.level) : undefined}
         chips={<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p className="text-[12px] font-semibold text-accent">{'★'.repeat(outfit.rarity)}</p>
           <TemplateChip outfit={outfit} uma={owned} classId={owned ? activeClass(outfit, owned, tier) : null} />
@@ -136,8 +122,8 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         corner={owned && world ? <TargetToggle outfitId={outfit.outfitId} on={world.targets.includes(outfit.outfitId)} /> : undefined}
         locked={!owned}
         summary={owned && world ? <Summary outfit={outfit} owned={owned} world={world} onClass={() => setTab('skills')} />
-          : home !== null ? <ElsewhereNote text={`In Tier ${home}`} />
-          : tier > 1 ? <ElsewhereNote text="Unlocked in Tier 1" />
+          : home !== null ? <ElsewhereNote text={unlockCopy({ kind: 'tier', tier: home })} />
+          : tier > 1 ? <ElsewhereNote text={unlockCopy({ kind: 'tier-one' })} />
           : <UnlockBox outfit={outfit} tickets={world?.wallet.unlockTickets ?? 0} />}
         tabs={owned && world ? TABS.map((t) => ({ key: t, label: TAB_LABEL[t], ...tabDot(t, upgrades) })) : undefined}
         tab={owned && world ? shown : undefined}
@@ -146,7 +132,7 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
         {owned && world ? (
           <>
             {shown === 'skills' && <SkillsTab outfit={outfit} uma={owned} world={world} />}
-            {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} world={world} onClass={() => setTab('skills')} />}
+            {shown === 'battle' && <BattleTab outfit={outfit} uma={owned} />}
             {shown === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} upgrades={upgrades} onSkills={() => setTab('skills')} />}
             {shown === 'work' && <WorkTab outfit={outfit} uma={owned} world={world} />}
             {shown === 'racing' && <RacingTab view={view} outfit={outfit} uma={owned} />}
@@ -185,7 +171,7 @@ function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owne
     <section className="space-y-1.5">
       <div className="px-0.5">
         <Bar value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
-        <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
+        <p className="mt-0.5 text-[11px] text-ink-faint">{exp(owned.exp, next)}</p>
       </div>
       <div className="grid grid-cols-[1.1fr_.8fr_1.1fr] gap-1">
         <button type="button" onClick={onClass} aria-label={`${CLASS_LABEL[active]}, Class Rank ${classRankOf(owned.ranks, active)}`}
@@ -193,19 +179,20 @@ function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owne
           <ClassEmblem classId={active} />
           <span className="min-w-0">
             <span className="block truncate text-[11.5px] font-semibold leading-tight">{CLASS_LABEL[active]}</span>
-            <span className="block text-[9.5px] leading-tight text-ink-faint">Rank {classRankOf(owned.ranks, active)}</span>
+            <span className="block text-[9.5px] leading-tight text-ink-faint">{classRank(classRankOf(owned.ranks, active))}</span>
           </span>
         </button>
         <div className="flex min-h-12 min-w-0 flex-col justify-center rounded-sm bg-raised px-2" aria-label={`${CRAFT_LABEL} ${owned.craft.level}, grade ${highestGrade(owned.craft.level)} open`}>
           <p className="truncate text-[9.5px] font-semibold text-ink-soft">Craft</p>
-          <p className="font-display text-[15px] font-bold leading-tight">Lv {owned.craft.level}</p>
+          <p className="font-display text-[15px] font-bold leading-tight">{craftLevel(owned.craft.level).replace('Craft ', '')}</p>
         </div>
         <button type="button" className="min-h-12 min-w-0 rounded-sm bg-raised px-2 text-left active:bg-white/5"
           onClick={() => (work ? navigate(`/${placeById(work.placeId)!.page}/${work.placeId}`, { state: { fromHub: true } })
             : navigate(party ? `/town/party-hall/${party.party + 1}` : '/town/party-hall', { state: { fromHub: true } }))}>
-          <p className="truncate text-[9.5px] font-semibold text-ink-soft">{work ? 'Working' : fighting ? 'Fighting' : 'Party'}</p>
-          <p className="truncate text-[11.5px] font-semibold leading-tight text-accent">{work ? placeById(work.placeId)?.name : fighting ? 'Open fight' : party ? world.parties[party.party]?.name : 'Free'}</p>
-          {work && <p className="truncate text-[9.5px] leading-tight text-ink-faint">{work.done ? 'Done' : formatDuration(work.endsAt - Date.parse(now))}</p>}
+          <p className="truncate text-[9.5px] font-semibold text-ink-soft">{work ? 'Work' : 'Party'}</p>
+          <p className="truncate text-[11.5px] font-semibold leading-tight text-accent">{work
+            ? workCopy(placeById(work.placeId)?.name ?? work.placeId, work.done ? 'done' : formatDuration(work.endsAt - Date.parse(now)))
+            : partyCopy(fighting ? 'fighting' : party ? party.party + 1 : null)}</p>
         </button>
       </div>
     </section>
@@ -224,11 +211,8 @@ function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number 
     <section className="space-y-1.5">
       <button type="button" disabled={tickets < 1} onClick={() => setConfirming(true)}
         className="flex min-h-12 w-full items-center justify-center gap-2 rounded-sm bg-accent font-display text-base font-bold text-accent-ink disabled:opacity-40">
-        <TicketIcon size={20} /> Unlock · 1 Ticket
+        <TicketIcon size={20} /> {unlockCopy({ kind: 'ticket' })}
       </button>
-      <p className="text-center text-[12px] text-ink-faint">
-        {tickets > 0 ? `${tickets} Uma Tickets left` : 'No Uma Tickets left'}
-      </p>
       <UnlockConfirm open={confirming} onClose={() => setConfirming(false)} name={outfit.title ?? outfit.name} tickets={tickets}
         ticketMark={<UiMark mark="currency/uma-ticket" fallback={<TicketIcon size={16} />} />}
         onConfirm={() => unlock(outfit).then(() => setConfirming(false), (err: unknown) => {
@@ -240,23 +224,14 @@ function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number 
 
 // --- Battle: her RPG stats as she fights now ---------------------------------------------------------------------
 
-function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; onClass: () => void }) {
+function BattleTab({ outfit, uma }: { outfit: RosterOutfit; uma: OwnedUma }) {
   const tier = useActiveTier()
   const classId = activeClass(outfit, uma, tier)
   const base = projectRpgStats(umaProfile(outfit, uma, tier, classId))
   // Every battle stat, always listed (combat-balance.md §6.0): the domain builds the sheet, so a rule change shows here.
   const sheet = umaBattleSheet(outfit, uma, classId, tier)
-  const equipped = umaLoadout(outfit, uma, tier, classId)
-  const party = partyOf(world, outfit.outfitId)
   return (
     <div className="space-y-2">
-      <button type="button" onClick={onClass} className="flex min-h-11 w-full items-center justify-between rounded-sm bg-raised px-2.5 text-left">
-        <span>
-          <span className="block text-[11px] text-ink-faint">Fights as</span>
-          <span className="block text-[14px] font-semibold">{CLASS_LABEL[classId]}</span>
-        </span>
-        <span className="text-[12px] text-ink-soft">{equipped.length}/{rpgActiveSlots(uma.level)} skills · {party ? world.parties[party.party]?.name : 'no party'}</span>
-      </button>
       {sheet.map((group, i) => (
         <section key={group.title} className="rounded-sm bg-raised p-1.5">
           <div className="mb-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
@@ -266,20 +241,21 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
                 <span className="text-shard">Gear</span>
                 <span className="text-success">Extra Stats</span>
                 <HelpButton title="Battle stats">
-                  {/* Classes v2 (H59): Guts into HP, flat Orbs in the Damage slot, healers from ATK or M.ATK. */}
-                  <p>Her core stats grow by level and set her battle stats: Speed gives ATK and M.ATK, {rpgV2() ? 'Stamina, Power and Guts HP' : 'Stamina and Power HP'}, Wit MP, Power DEF, and Power and Wit M.DEF. Her class leans them.</p>
-                  <p>The total comes first; in brackets, what her gear adds (blue) and what her active Extra Stats add (green). Armor adds up: physical pieces ATK, magical pieces M.ATK, and each slot its defensive stat.</p>
-                  {rpgV2() ? <>
-                    <p>Might is each weapon's own: it counts only for hits made with that weapon. Her Damage slot's Orb adds offense to every hit of its kind; her Support slot's Talisman or Amulet a defensive effect.</p>
-                    <p>A Paladin's mends and Barriers grow with her ATK, a Cleric's with her M.ATK. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>
-                  </> : <p>Might is each weapon's own: it counts only for hits made with that weapon. Her two accessories add an Orb's kind to her hits, or a defensive effect. Speed points give evasion; Limit points a head start on the Limit Break gauge.</p>}
+                  <p>ATK, M.ATK ← Speed</p>
+                  <p>HP ← Stamina, Power, Guts</p>
+                  <p>MP ← Wit</p>
+                  <p>DEF ← Power</p>
+                  <p>M.DEF ← Power, Wit</p>
+                  <p>Then + gear, + Extra Stats, ★ her moon</p>
+                  <p>Might: a weapon's own hits only</p>
+                  <p>Mends: a Paladin's from ATK, a Cleric's from M.ATK</p>
                 </HelpButton>
               </>
             )}
           </div>
           <div className="grid grid-cols-3 gap-px overflow-hidden rounded-xs bg-hairline">
-            {group.rows.map((r) => (
-              <div key={r.label} className="min-w-0 bg-panel px-1.5 py-1">
+            {group.rows.map((r, i) => (
+              <div key={`${r.label}-${i}`} className="min-w-0 bg-panel px-1.5 py-1">
                 <p className="truncate text-[9.5px] text-ink-faint">{r.label}</p>
                 <p className="text-[12px] font-semibold tabular-nums">
                   <span className={r.gear === undefined ? '' : 'font-display'}>{r.value}</span>
@@ -307,7 +283,7 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
           ))}
         </div>
       </section>
-      <p className="px-0.5 text-[10px] text-ink-faint">Unlocked {new Date(uma.unlockedAt).toLocaleDateString()}.</p>
+      <p className="px-0.5 text-[10px] text-ink-faint">Unlocked {new Date(uma.unlockedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
     </div>
   )
 }
@@ -387,9 +363,9 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
         const bond = uma.bonds[id] ?? { level: 0, exp: 0 }
         const now = parents.includes(id)
         return (
-          <button key={id} type="button" onClick={hall(id)} className="flex w-full items-baseline justify-between gap-2 text-left text-[13px]">
+          <button key={id} type="button" onClick={hall(id)} className="flex min-h-11 w-full items-center justify-between gap-2 text-left text-[13px]">
             <span className="truncate">{heroLimit(id).name}{now ? '' : <span className="text-ink-faint"> · former Hero</span>}</span>
-            <span className="shrink-0 text-ink-soft">Bond {bond.level}/{BOND_MAX_LEVEL} · {Math.round(bondCapacity(bond.level) * 100)}% ›</span>
+            <span className="shrink-0 text-ink-soft">{bondCopy(bond.level, Math.round(bondCapacity(bond.level) * 100))}</span>
           </button>
         )
           })}
@@ -450,7 +426,7 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
         <button type="button" onClick={() => navigate(`/${placeById(work.placeId)!.page}/${work.placeId}`, { state: { fromHub: true } })} className="flex min-h-11 w-full items-center gap-2 rounded-sm bg-raised p-2 text-left">
           {out?.icon ? <ItemIcon id={out.icon} size={36} /> : <span className="size-9" />}
           <span className="min-w-0 flex-1">
-            <span className="block text-[11px] text-ink-faint">Working at {placeById(work.placeId)?.name}</span>
+            <span className="block text-[11px] text-ink-faint">{workCopy(placeById(work.placeId)?.name ?? work.placeId, work.done ? 'done' : formatDuration(work.endsAt - Date.parse(now)))}</span>
             <span className="block truncate text-[14px] font-semibold">{out?.name} · {work.finished}/{work.count}</span>
           </span>
           <span className="shrink-0 text-[12px] text-ink-soft">{work.done ? 'Done' : formatDuration(work.endsAt - Date.parse(now))}</span>
@@ -462,14 +438,13 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
           <section key="craft" className="rounded-sm bg-raised p-2">
             <div className="flex items-baseline justify-between">
               {rpgRework('economy')
-                ? <p className="text-[14px] font-semibold" data-craft-trade>Craft Lv <span className="font-display text-lg">{prof.level}</span> · {tradeLabel(umaTrade(outfit, umaPick(uma)))}</p>
+                ? <p className="text-[14px] font-semibold" data-craft-trade>{craftLevel(prof.level)} · {tradeLabel(umaTrade(outfit, umaPick(uma)))}</p>
                 : <p className="text-[14px] font-semibold">{CRAFT_LABEL} <span className="font-display text-lg">{prof.level}</span></p>}
-              <span className="text-[11px] text-ink-faint">10 gathered in {formatDuration(10 * itemMinutes(prof.level) * MINUTE)}</span>
             </div>
             <Bar className="mt-1.5" value={next ? prof.exp : 1} max={next ?? 1} tone="exp" />
             <p className="mt-1 text-[11px] text-ink-faint">
-              {next ? `${prof.exp.toLocaleString('en-US')} / ${next.toLocaleString('en-US')} EXP` : 'Max level'} · grade {highestGrade(prof.level)} open
-              {highestGrade(prof.level) < 10 ? ` · grade ${highestGrade(prof.level) + 1} at ${CRAFT_SHORT} Lv ${5 * (highestGrade(prof.level) + 1) - 4}` : ''}
+              {exp(prof.exp, next)} · G{highestGrade(prof.level)} open
+              {highestGrade(prof.level) < 10 ? ` · G${highestGrade(prof.level) + 1} at ${gate('craft', 5 * (highestGrade(prof.level) + 1) - 4)}` : ''}
             </p>
           </section>
         )
@@ -481,7 +456,6 @@ function WorkTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; 
 // --- Racing: the original's profile ---------------------------------------------------------------------------
 
 function RacingTab({ view, outfit, uma }: { view: MasterView; outfit: RosterOutfit; uma: OwnedUma | null }) {
-  const tier = useActiveTier()
   const [unique, setUnique] = useState<{ name: string; description: string } | null | 'loading'>('loading')
   useEffect(() => {
     let live = true
@@ -495,8 +469,6 @@ function RacingTab({ view, outfit, uma }: { view: MasterView; outfit: RosterOutf
     { name: 'Distance', grades: outfit.aptitudes.distance as Record<string, string> },
     { name: 'Style', grades: outfit.aptitudes.strategy as Record<string, string> },
   ]
-  // UT14: her template's readings and Flourish, what her aptitudes do here.
-  const template = racingTemplate(outfit, uma, uma ? activeClass(outfit, uma, tier) : null)
   return (
     <div className="space-y-2.5">
       <div className="space-y-1.5 rounded-sm bg-raised p-2">
@@ -511,12 +483,6 @@ function RacingTab({ view, outfit, uma }: { view: MasterView; outfit: RosterOutf
           </div>
         ))}
       </div>
-      <section>
-        <h4 className="text-micro mb-1">Her template</h4>
-        <div className="divide-y divide-hairline rounded-sm bg-raised">
-          {template.map((r) => <Row key={r.label} label={r.label} value={r.value} note={r.note} />)}
-        </div>
-      </section>
       <section>
         <h4 className="text-micro mb-1">Racing base stats · growth</h4>
         <table className="w-full text-[13px]">

@@ -63,7 +63,7 @@ describe('the Skills tab as a tree (H70)', () => {
   it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Sunder\'s detail on tap', async () => {
     show(await brawler())
     const tabs = within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')
-    expect(tabs.map((t) => t.getAttribute('aria-label'))).toEqual(['Greatsword, branch A', 'Axe, branch A', 'Lance, branch B'])
+    expect(tabs.map((t) => t.getAttribute('aria-label'))).toEqual(['Greatsword, line A', 'Axe, line A', 'Lance, line B'])
     expect(screen.getByRole('button', { name: 'Class: Brawler, R22' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Change Greatsword' })).toBeDefined()
 
