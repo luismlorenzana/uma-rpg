@@ -61,14 +61,14 @@
 | 1. Foundation | H136 → H126 | Main JS back to ~215 KB; the 13 classes, the tree, Tier 0 and promotion in the domain, dark at engine v19 | — |
 | 2. Rules and save | H128 ∥ H130 (both start on H126's reviewed branch; H130's healer-seat step waits for H129) → H129 (on H128's branch) → H131 | Weapon shapes, the twenty Limit Breaks, save v32 and the reset written, balance measured; all dark | H129 is the Halls group's domain packet: Phase 2 builds it, since H130 migrates the healer seats with the classes. H133 (ChatGPT) can start once H128 and H129 merge |
 | 3. The reset's screens | H132 (starts once H130's pull request is up) | "The classes are rebuilt" sheet and the Exchange's Manual sheet, inert | — |
-| 4. The switch | H137 (the promotion on today's Skills tab, done) → H134 | Engine v19 and save v32 live, the manual rewritten | H133 (Halls, ChatGPT). Not the Uma profile v2 (D252) |
+| 4. The switch | H137 (the promotion on today's Skills tab, done) → H134 | Engine v19 and save v32 live, the manual rewritten | H133 (Halls; Claude since 2026-10-29). Not the Uma profile v2 (D252) |
 
 **Halls of Heroes v2** (D241):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | [H129](tasks/H129-halls-v2-limit-breaks.md) | Halls v2 (D241): five halls, the twenty Limit Breaks with their own power, class scale and the 10-hit cap | Claude | M | H126, H128 | Done (`d5cf696`) |
-| [H133](tasks/H133-halls-v2-pages.md) | Halls v2: the Learning page's five halls and the Hall page (home class, shape, power), inert until H134  **Art ready:** pin uma-art 2.17.0 or later and draw `healer-sanctum` without the keep override. | ChatGPT | S–M | H128, H129 | Ready |
+| [H133](tasks/H133-halls-v2-pages.md) | Halls v2: the Learning page's five halls and the Hall page (home class, shape, power), inert until H134. **Art ready:** pin uma-art 2.17.0 or later and draw `healer-sanctum` without the keep override. | Claude (the owner, 2026-10-29) | S–M | H128, H129 | In progress |
 
 **After hardening:** Tier 2 and Tier 3 are re-planned. Their approved drafts stay in
 [design/tier-rework/](../design/tier-rework/README.md) (Class, Weapon, Extra Stats and Profession Progression, stat

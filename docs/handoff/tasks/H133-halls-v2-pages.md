@@ -193,3 +193,8 @@ reads the new pairs. Heroes, Learners, Bonds and the sheets are unchanged (HV22)
 ## Notes from the main session (2026-10-29)
 
 - **The Sanctum's art (owner, 2026-10-29):** if H135's uma-art release is out, pin it in `apps/web/package.json` and draw the Sanctum's own `healer-sanctum` frame instead of `knights-bastion`; if not, keep the borrowed frame and a later packet pins it.
+- **Claude builds it (the owner, 2026-10-29: "you get everything live").** A delegated Claude worker on
+  `feat/h133-halls-v2-pages` opens the pull request; the main session merges and deploys. uma-art 2.17.0 is published
+  (H135, D254, with H127's 2.16.0 emblems): pin it and draw `healer-sanctum`'s own frame, no `knights-bastion` override.
+  H117's `copy.ts` isn't on `main`: keep this packet's words in `hall-view.ts`, where its copy test will find them.
+
