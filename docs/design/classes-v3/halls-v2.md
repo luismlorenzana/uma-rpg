@@ -128,7 +128,8 @@ Learner's choice readable: five buildings, twenty seats, each class's own seats 
 **On the Learning page** (HV21): physical-led halls on the left and magic-led on the right, as today: the Warrior Dojo
 and the Mage Tower at the top, the Spell Blade Salle and the Summoner Circle below them, the Healer Sanctum in the
 middle, the Observatory under it. The Sanctum wears the `knights-bastion` frame the Paladin Bastion wears today; a
-temple of its own is an optional art packet (HV-F).
+temple of its own is an optional art packet (HV-F). Built in H133 (D255), live from H134, on its own temple: H135's
+`healer-sanctum` (uma-art 2.17.0, D254) came first, so no keep is borrowed.
 
 ### 2.2 Four seats, not two (HV2)
 
@@ -698,7 +699,7 @@ foe. Classes v3's doubles strike one foe, so it never needed this.
   first (above). Auto scores the new shapes as it scores skills.
 - **The balance simulation** (`rift/balance-sim.ts`): its Heroes on curve and the Duel's Limit Break rail (`limitRail`)
   on the twenty.
-- **Web:** the Hall page's seat card gains its home class, its shape and its power ("×2.9"); the five buildings. The profile's Inheritance card and the fight's Limit Break menu read the new data unchanged.
+- **Web:** the Hall page's seat card gains its home class, its shape and its power ("×2.9"); the five buildings. The profile's Inheritance card and the fight's Limit Break menu read the new data unchanged. Built in H133 (D255), live from H134.
 - **The manual:** [heroes](../../game/heroes.md) rewritten (five halls, twenty seats, the ladder, the merge history);
   [combat](../../game/combat.md#limit-breaks) and [classes](../../game/classes.md) regenerated (`pnpm docs:update`:
   the "Limit Break power" column becomes the class's scale).

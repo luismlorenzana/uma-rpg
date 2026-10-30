@@ -59,6 +59,10 @@ Phaser).
   the plaza between. The Account is a Town Hall place with no building.
 - **Learning:** the six Halls of Heroes face each other in pairs across the road (Brawler Dojo and Mage Tower, Spell
   Blade Salle and Summoner Circle, the Paladin Bastion and the Cleric Chapel), with the Observatory below (H59).
+  **From the switch (H134)**, Halls v2's five halls, one per family (H133, D255; the rules are
+  [Halls v2](../design/classes-v3/halls-v2.md) §2.1): the Warrior Dojo (the Brawler Dojo's id) and the Mage Tower on top,
+  the Spell Blade Salle and the Summoner Circle below them, the **Healer Sanctum** (`healer-sanctum`, uma-art's own temple)
+  in the middle where the Paladin Bastion and the Cleric Chapel stood, the Observatory under it.
 - **Battle:** a drill ground of its own, with flagstone roads, banners, weapon racks, training dummies and torches (H31,
   D148): the Scenario Gate above, the Rift below. The Rift keeps the Tier Finale's id, `tier-finale`, and draws
   uma-art's `rift` building (`Place.frame`, H50).
@@ -121,6 +125,22 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 | Den Workbench | `den-workbench` | station | 4 | Stonecutting: stones into cut stones. |
 | Lapidary | `lapidary` | station | 4 | Jewel Crafting: Planet and Moon Jewels. |
 <!-- /live -->
+
+**From the switch (H134)**, the Learning page is `learningPlaces`' third generation (H133, D255). Each hall's line is its
+lore and today's tail; its details open with its seats' home classes.
+
+| Place | Id | Home classes | What it is |
+|---|---|---|---|
+| Warrior Dojo | `brawler-dojo` | Brawler | The Warrior Dojo: power from self-training. Four Heroes, each with her own Limit Break, and their Learners. |
+| Mage Tower | `mage-tower` | Sorcerer | The Mage Tower: power from self-study. … |
+| Spell Blade Salle | `spell-blade-salle` | Arms Spellblade 1–2, Tome Spellblade 3–4 | The Spell Blade Salle: power from pacts with familiars. … |
+| Summoner Circle | `summoner-circle` | Arms Summoner 1–2, Tome Summoner 3–4 | The Summoner Circle: power from familiars, summoned. … |
+| Healer Sanctum | `healer-sanctum` | Paladin 1–2, Cleric 3–4 | The Healer Sanctum: power from a followed deity. … |
+| Observatory | `observatory` | — | As today. |
+
+An old link to `/learning/paladin-bastion` or `/learning/cleric-chapel` (a bookmark, an Inheritance row read before the
+switch) lands on `/learning/healer-sanctum`, keeping the rest of the path, the query and the navigation state
+(`movedPlace`, read in `PlaceRoute` only for an id with no place).
 
 ### A place's page
 
@@ -415,6 +435,23 @@ The six halls share `places/halls/HallPage.tsx` (D106; the rules are [Halls of H
   "Empty this seat (its 3 Learners leave; their Bonds stay)".
 - **A Learner's sheet:** "Bond 4/10 · 70% strength", its bar and the EXP to the next, "Inherits {Limit Break}, and
   {another} from her other Hero.", and "Leave this Hero (her Bond stays)".
+- **From the switch (H134)**, Halls v2's page (H133, D255; `hall-view.ts`'s `hallTitle`, `seatCard`, `hallHelpV19`; the
+  rules are [Halls v2](../design/classes-v3/halls-v2.md) §2–§5), for the five halls by family:
+  - The title is the place's name ("Warrior Dojo", "Healer Sanctum").
+  - Each seat card: "Seat 2 · Brawler" (its home class, faint), the name and kind icons, then its shape and power from
+    the Limit Break's casts, never its name: "One foe · 1 hit · ×2.9", "One foe · 6 hits · ×2.2" (a double counts two),
+    "Every foe · 3 hits · ×2.2", "Random · 8 hits · ×1.9", "Volley · 4 + 2 a foe · ×2.2" (hits on her foe + splash hits on
+    each other foe); a Healer Sanctum seat adds its stack ("· Brave 1", "· Armor Break 1", "· Faith 1", "· Mind Break 1").
+    The power is the seat's own (ink, the only weight on the line), not her class's scale. "Answers …" and the Learner
+    picker's "Adds …" read Classes v3's pairs (Katana–Light, Bow–Dark; Twilight stays Bow and Katana). Its line is the
+    seat's lore, in italics, in place of the blurb. The line wraps under the name, never truncated.
+  - The (i), one rule a line: "Five halls, one per family; any Uma sits in any seat." · "A Hero casts her seat’s Limit
+    Break at full strength." · "Its power is the seat’s (×1.9 to ×2.9), × her class’s scale (×0.95; a Paladin’s or a
+    Cleric’s ×0.8; a Tier 0’s ×1), × her deepest skill." · "Up to 10 Learners a Hero, 2 Heroes a Learner, at 50% + 5% a
+    Bond Level." · "A won fight raises each Bond: a stage 2, an elite or a boss 3, 12 a level." · "A Bond stays when she
+    leaves."
+  - The map's pips, the quick look, the Hero and Learner sheets and the pickers are unchanged; the profile's Inheritance
+    row opens the seat's hall (`HERO_HALL_PLACES`) and names its home class ("Paladin Hero · {Limit Break}").
 
 ### Observatory
 

@@ -1,10 +1,12 @@
 // A Hall of Heroes (D106, D107): four seats, each with its own unique Limit Break. A seat's Hero is shown large, her
 // Learners (ten at most) below her. A Hero always uses her seat's Limit Break at full strength; a Learner inherits it at
 // 50% plus 5% a Bond Level, and every won fight raises her Bond. A Learner sits under two Heroes at most. From engine v16
-// (CP28, H70) a seat names the twin sets it answers, and a Learner candidate the sets it adds to her weapons'.
+// (CP28, H70) a seat names the twin sets it answers, and a Learner candidate the sets it adds to her weapons'. From the
+// switch (Halls v2, HV21, HV25; H133) the page is the place's hall by family: its title is the place's name, each seat's
+// card names its home class, its shape and power, its side effect and its lore (`seatCard`), and the (i) is one rule a line.
 import {
-  activeClass, BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, bondOf, classOf, hallClass, HERO_MAX_LEARNERS, heroBlock, heroLimitKinds, heroLimitsOf, learnerBlock,
-  LEARNER_MAX_PARENTS, parentsOf, rpgV2, SaveRuleError, heroLimit, type HeroLimit, type HeroLimitId,
+  activeClass, BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, bondOf, classOf, hallOfPlace, HERO_MAX_LEARNERS, heroBlock, heroLimitKinds,
+  heroLimitsOfHall, learnerBlock, LEARNER_MAX_PARENTS, parentsOf, rpgRework, rpgV2, SaveRuleError, heroLimit, type HeroLimit, type HeroLimitId, type Place,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { Bar, CLASS_LABEL, KindMark } from '../../battle/labels'
@@ -18,10 +20,10 @@ import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
-import { learnerAdds, seatTwinSets, TWIN_SET_LABEL } from './hall-view'
+import { hallHelpV19, hallTitle, learnerAdds, seatCard, seatTwinSets, TWIN_SET_LABEL } from './hall-view'
 
 export default function HallPage({ place }: PageProps) {
-  return <MasterGate>{(view) => <Hall view={view} placeId={place.id} />}</MasterGate>
+  return <MasterGate>{(view) => <Hall view={view} place={place} />}</MasterGate>
 }
 
 /** A Limit Break's kinds as tiny icons. */
@@ -31,15 +33,15 @@ export function LimitKinds({ limit, size = 14 }: { limit: HeroLimit; size?: numb
 
 type Pick = { seat: HeroLimitId; role: 'hero' | 'learner' }
 
-function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
+function Hall({ view, place }: { view: MasterView; place: Place }) {
   const world = useWorld()
   const scope = useAlbumScope()
   const [pick, setPick] = useState<Pick | null>(null)
   const [heroOpen, setHeroOpen] = useState<HeroLimitId | null>(null)
   const [learner, setLearner] = useState<{ seat: HeroLimitId; outfitId: string } | null>(null)
   const [message, setMessage] = useState<string | null>(null)
-  const classId = hallClass(placeId)
-  if (!world || !classId) return null
+  const hall = hallOfPlace(place.id)
+  if (!world || !hall) return null
   const outfit = (id: string) => view.roster.find((o) => o.outfitId === id)
   const run = (op: () => Promise<unknown>, after?: () => void) => {
     setMessage(null)
@@ -49,8 +51,9 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
     <div className="space-y-3 p-4">
       <section className="rounded-md bg-raised p-3">
         <div className="-mr-2 -mt-2 flex items-center justify-between">
-          <p className="font-display text-lg font-bold">{CLASS_LABEL[classId]} Hall of Heroes</p>
+          <p className="font-display text-lg font-bold">{hallTitle(place, hall)}</p>
           <HelpButton title="Hall of Heroes">
+            {rpgRework('classes') ? hallHelpV19().map((line) => <p key={line}>{line}</p>) : <>
             <p>Limit Breaks come only from the Halls of Heroes. Each seat teaches its own; its Hero always uses it, at full strength: about twice a turn’s damage.</p>
             <p>Up to {HERO_MAX_LEARNERS} Learners sit under each Hero, and a Learner under {LEARNER_MAX_PARENTS} Heroes at most. In a fight she may use
               either Hero’s Limit Break, at 50% plus 5% a Bond Level (100% at Bond {BOND_MAX_LEVEL}), with all its weapons, elements,
@@ -59,14 +62,16 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
               boss {BOND_EXP_PER_WIN.boss}, {BOND_EXP_TO_NEXT} a level. A Bond stays when she leaves, so a Hero taken out of her seat and put back as its
               Learner starts at the Bond she earned.</p>
             <p>A Hero can’t be a Learner. Swapping a Hero keeps the seat’s Learners; emptying the seat sends them away.</p>
+            </>}
           </HelpButton>
         </div>
         <p className="text-[12px] text-ink-soft">Four Heroes, each with her own Limit Break, and their Learners.</p>
       </section>
       {message && <p className="rounded-sm bg-danger/15 p-2 text-[13px] text-danger">{message}</p>}
-      {heroLimitsOf(classId).map((limit, i) => {
+      {heroLimitsOfHall(hall).map((limit) => {
         const seat = world.heroes[limit.id]
         const hero = seat ? outfit(seat.hero) : undefined
+        const card = seatCard(limit)
         return (
           <section key={limit.id} className="rounded-md bg-raised p-3">
             <div className="flex gap-3">
@@ -76,14 +81,19 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
                 {seat ? <UmaBust outfitId={seat.hero} size={80} label={hero?.name ?? 'Hero'} className="size-full" /> : <span className="flex size-full flex-col items-center justify-center text-ink-faint"><span className="text-2xl">+</span><span className="text-[11px]">Hero</span></span>}
               </button>
               <div className="min-w-0 flex-1">
-                <p className="text-micro">Seat {i + 1} · Limit Break</p>
+                <p className="text-micro">{card.seat}</p>
                 <p className="font-display text-[16px] font-bold leading-tight">{limit.name}</p>
                 <div className="mt-0.5"><LimitKinds limit={limit} /></div>
+                {card.shape !== null && (
+                  <p className="mt-0.5 text-[12px] leading-4 text-ink-soft" data-seat-shape>
+                    {card.shape} · <span className="font-semibold text-ink">{card.power}</span>{card.effect && ` · ${card.effect}`}
+                  </p>
+                )}
                 {(() => {
                   const sets = seatTwinSets(limit)
                   return sets.length > 0 && <p className="mt-0.5 text-[12px] font-semibold leading-4">Answers {sets.map((t) => TWIN_SET_LABEL[t]).join(' · ')}</p>
                 })()}
-                <p className="mt-0.5 text-[12px] leading-4 text-ink-soft">{limit.blurb}</p>
+                <p className={`mt-0.5 text-[12px] leading-4 text-ink-soft${card.shape === null ? '' : ' italic'}`}>{card.line}</p>
                 <p className="mt-1 truncate text-[13px] font-semibold">{seat ? hero?.name ?? `Outfit ${seat.hero}` : <span className="text-ink-faint">No Hero yet</span>}</p>
               </div>
             </div>
@@ -188,13 +198,13 @@ function Hall({ view, placeId }: { view: MasterView; placeId: string }) {
 
 export function HallPeek({ place }: PeekProps) {
   const world = useWorld()
-  const classId = hallClass(place.id)
-  if (!world || !classId) return null
+  const hall = hallOfPlace(place.id)
+  if (!world || !hall) return null
   return (
     <MasterGate>
       {(view) => (
         <div className="space-y-1.5 p-4">
-          {heroLimitsOf(classId).map((limit) => {
+          {heroLimitsOfHall(hall).map((limit) => {
             const seat = world.heroes[limit.id]
             return (
               <div key={limit.id} className="flex items-center gap-2 rounded-sm bg-raised p-2 text-[13px]">

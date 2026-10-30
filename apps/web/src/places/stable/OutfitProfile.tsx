@@ -11,7 +11,7 @@
 import { STATS } from '@luismlorenzana/uma-data'
 import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import {
-  activeClass, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_IDS, heroLimit, heroLimitClass, heroSeatOf, parentsOf, isInFight, itemMinutes, MINUTE, classRankOf, classTrack,
+  activeClass, BOND_MAX_LEVEL, bondCapacity, HERO_HALL_PLACES, HERO_LIMIT_IDS, heroLimit, heroLimitHall, heroSeatHome, heroSeatOf, parentsOf, isInFight, itemMinutes, MINUTE, classRankOf, classTrack,
   highestGrade, KEY_LABELS, partyOf, placeById,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
   rpgExpToNext, rpgRework, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaProfile, umaTrade, slotJobOf,
@@ -349,7 +349,7 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
   const seat = heroSeatOf(world, outfitId)
   const parents = parentsOf(world, outfitId)
   const bonds = HERO_LIMIT_IDS.filter((id) => uma.bonds[id] || parents.includes(id))
-  const hall = (id: (typeof HERO_LIMIT_IDS)[number]) => () => navigate(`/learning/${HERO_HALLS[heroLimitClass(id)]}`, { state: { fromHub: true } })
+  const hall = (id: (typeof HERO_LIMIT_IDS)[number]) => () => navigate(`/learning/${HERO_HALL_PLACES[heroLimitHall(id)]}`, { state: { fromHub: true } })
   return (
     <section className="space-y-1 rounded-sm bg-raised p-2">
       <div className="flex min-h-9 items-center justify-between">
@@ -360,9 +360,9 @@ function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: Owne
       </div>
       {seat ? (
         <button type="button" onClick={hall(seat)} className="flex min-h-11 w-full items-center gap-2 rounded-xs bg-panel px-2 text-left">
-          <ClassEmblem classId={heroLimitClass(seat)} />
+          <ClassEmblem classId={heroSeatHome(seat)} />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-[12px] font-semibold">{CLASS_LABEL[heroLimitClass(seat)]} Hero · {heroLimit(seat).name}</span>
+            <span className="block truncate text-[12px] font-semibold">{CLASS_LABEL[heroSeatHome(seat)]} Hero · {heroLimit(seat).name}</span>
             <span className="block text-[10px] text-ink-soft">Bond {(uma.bonds[seat] ?? { level: 0 }).level}/{BOND_MAX_LEVEL}</span>
           </span>
           <span className="text-ink-faint">›</span>
