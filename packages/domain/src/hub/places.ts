@@ -3,6 +3,8 @@
 // global menu and the routes. Design: docs/archive/design/game-design.md §9; slice spec docs/archive/build-history/slices/S1-hub.md.
 import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
+import { rpgClassName } from '../rpg/class-tree'
+import { HERO_HALL_PLACES, heroSeatHome, type HeroHall } from '../rpg/hero-id'
 
 export const HUB_PAGES = ['town', 'learning', 'battle', 'wilds'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
@@ -179,10 +181,41 @@ const OBSERVATORY: Place = {
   details: ['100 nodes per Uma per tier', 'Star Gems open nodes; level sets how many are active'],
 }
 
+/** Halls v2's hall (HV1, HV21; H133): its lore, then today's tail; its seats' home classes (`heroSeatHome`, by name), then
+ * today's two lines. */
+function hallV19(heroHall: HeroHall, name: string, lore: string, at: { x: number; y: number }, engine: number): Place {
+  // Each run of seats one class is home to: "Brawler", or "Arms Spellblade 1–2, Tome Spellblade 3–4".
+  const runs: { home: string; first: number; last: number }[] = []
+  for (const n of [1, 2, 3, 4] as const) {
+    const home = rpgClassName(heroSeatHome(`${heroHall}-${n}`, engine), engine)
+    const run = runs[runs.length - 1]
+    if (run?.home === home) run.last = n
+    else runs.push({ home, first: n, last: n })
+  }
+  const homes = runs.length === 1 ? runs[0]!.home : runs.map((r) => `${r.home} ${r.first}–${r.last}`).join(', ')
+  const today = hall(HERO_HALL_PLACES[heroHall], name, name, at)
+  return { ...today, blurb: `The ${name}: power from ${lore}. Four Heroes, each with her own Limit Break, and their Learners.`,
+    details: [`Home: ${homes}`, ...today.details] }
+}
+
 /** The Learning page by generation (D178, H59). Classes v1: the five halls as they stand. Classes v2 adds the Paladin
  * Bastion (uma-art's `knights-bastion` keep) and pairs the mirrors across the trunk road: physical-led halls on the left,
- * magic-led on the right (Brawler and Mage, Spell Blade and Summoner, Paladin and Cleric), the Observatory below. */
+ * magic-led on the right (Brawler and Mage, Spell Blade and Summoner, Paladin and Cleric), the Observatory below. Halls
+ * v2 (engine v19, HV1, HV21; H133) folds them into five, one per family: the Warrior Dojo (the Brawler Dojo's id) and the
+ * Mage Tower on top, the Spell Blade Salle and the Summoner Circle below them, the Healer Sanctum (uma-art's own
+ * `healer-sanctum` temple, 2.17.0) in the middle where the Paladin Bastion and the Cleric Chapel stood, the Observatory
+ * under it. */
 export function learningPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
+  if (rpgRework('classes', engine)) {
+    return [
+      hallV19('brawler', 'Warrior Dojo', 'self-training', { x: 0.24, y: 0.1 }, engine),
+      hallV19('mage', 'Mage Tower', 'self-study', { x: 0.76, y: 0.11 }, engine),
+      hallV19('spellblade', 'Spell Blade Salle', 'pacts with familiars', { x: 0.22, y: 0.33 }, engine),
+      hallV19('summoner', 'Summoner Circle', 'familiars, summoned', { x: 0.78, y: 0.33 }, engine),
+      hallV19('healer', 'Healer Sanctum', 'a followed deity', { x: 0.5, y: 0.56 }, engine),
+      OBSERVATORY,
+    ]
+  }
   if (!rpgV2(engine)) {
     return [
       hall('brawler-dojo', 'Brawler Dojo', 'Brawler', { x: 0.24, y: 0.1 }),
@@ -278,6 +311,16 @@ export function isHubPage(value: string | undefined): value is HubPage {
 
 export function placeById(id: string | undefined): Place | undefined {
   return id === undefined ? undefined : BY_ID.get(id)
+}
+
+/** Places a later generation folded into another (HV21): from the switch the Paladin Bastion and the Cleric Chapel stand
+ * as the Healer Sanctum. */
+const MOVED_PLACES: Readonly<Record<string, string>> = { 'paladin-bastion': 'healer-sanctum', 'cleric-chapel': 'healer-sanctum' }
+
+/** Where an old link's place stands now, for an id the live generation has no place for (an old bookmark, an Inheritance
+ * row read before the switch): the place it folded into, or undefined. Inert while the old place stands. */
+export function movedPlace(id: string | undefined): Place | undefined {
+  return id === undefined || BY_ID.has(id) ? undefined : placeById(MOVED_PLACES[id])
 }
 
 /** Places drawn on a page's map, in registry order. */

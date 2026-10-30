@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { domAnimation } from 'motion/react'
 import { MemoryRouter, Route, Routes, useParams } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { heroLimitsOf, placeById } from '@rpg/domain'
+import { heroLimitsOfHall, placeById } from '@rpg/domain'
 import type { ReactNode } from 'react'
 import { buildCampaign } from '../battle/campaign'
 import { FeaturedSheet } from '../hub/Featured'
@@ -172,7 +172,7 @@ describe('SB4 uses the shared album in every RPG choice', () => {
   })
 
   it('Hall Heroes and Learners use shared choices and display the existing domain refusals instead of hiding them', async () => {
-    const seat = heroLimitsOf('brawler')[0]!.id
+    const seat = heroLimitsOfHall('brawler')[0]!.id
     fixture.world.heroes[seat] = { hero: '81001', learners: ['81002'] }
     show(<HallPage {...page('brawler-dojo')} />)
     fireEvent.click(screen.getByRole('button', { name: 'Add a Learner' }))
@@ -183,7 +183,7 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     fireEvent.click(screen.getAllByRole('button', { name: 'Choose a Hero' })[0]!)
     expect(within(dialog()).getByRole('button', { name: 'Aster. Already a Hero' }).hasAttribute('disabled')).toBe(true)
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Ember' }))
-    await waitFor(() => expect(calls.hero).toHaveBeenCalledWith(heroLimitsOf('brawler')[1]!.id, '81005'))
+    await waitFor(() => expect(calls.hero).toHaveBeenCalledWith(heroLimitsOfHall('brawler')[1]!.id, '81005'))
   })
 
   it('Class Manuals advance from the shared choice to her class bars', async () => {

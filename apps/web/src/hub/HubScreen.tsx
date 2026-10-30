@@ -1,8 +1,9 @@
 // The Hub (S1, D43, D147): a page's map on uma-kit (`HubMap`: the Phaser canvas, the place links and the page swipe),
 // Town Hall's plaza crowd, the Collect all pill and a place's quick look in the side panel (`?peek=:placeId`).
-// /:page/:placeId/* is a place's page; a link to a place on another page (an old `/town/scenario-gate`) goes there.
+// /:page/:placeId/* is a place's page; a link to a place on another page (an old `/town/scenario-gate`) goes there, and
+// one to a place that folded into another (the Paladin Bastion's, from the switch) to the place it became.
 import {
-  hallClass, HERO_LIMIT_IDS, heroLimitClass, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, liveWorkEnv,
+  hallOfPlace, heroLimitHall, heroLimitIds, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, liveWorkEnv, movedPlace,
   placeById, placeLock, placeOnPage, placeOpen, placesOn, workPlace, type HubPage, type Place, type TierWorld,
 } from '@rpg/domain'
 import { HubMap, type HubMapPlace, type PipModel } from '@luismlorenzana/uma-kit/hub'
@@ -40,15 +41,18 @@ export function HubRoute() {
   return <HubScreen page={page} peek={peek} />
 }
 
-/** /:page/:placeId/*, a place's page; a place on another page (an old link, a push URL) redirects to its own. */
+/** /:page/:placeId/*, a place's page; a place on another page (an old link, a push URL) redirects to its own, and an old
+ * hall's id to the hall it folded into (H133), keeping the rest of the path and the navigation state. */
 export function PlaceRoute() {
   const params = useParams()
   const location = useLocation()
   const page = params.page
   const rest = params['*'] ?? ''
-  const place = placeById(params.placeId)
+  const place = placeById(params.placeId) ?? movedPlace(params.placeId)
   if (!place) return <Navigate to={`/${isHubPage(page) ? page : lastPage()}`} replace />
-  if (place.page !== page) return <Navigate to={`/${place.page}/${place.id}${rest ? `/${rest}` : ''}${location.search}`} replace state={location.state} />
+  if (place.page !== page || place.id !== params.placeId) {
+    return <Navigate to={`/${place.page}/${place.id}${rest ? `/${rest}` : ''}${location.search}`} replace state={location.state} />
+  }
   return <PlacePage place={place} rest={rest} />
 }
 
@@ -60,9 +64,10 @@ function pipsOf(place: Place, world: TierWorld | null, tier: number, now: string
   if (place.slots === 0 || !placeOpen(place, world, tier)) return undefined
   const arch = archPips(place)
   const face = (outfitId: string) => <FaceTile outfitId={outfitId} size={arch ? 24 : 16} label="Assigned Uma" round />
-  const hall = hallClass(place.id)
+  // A hall's four seats in seat order (`heroLimitsOfHall`'s ids; the Limit Break table itself loads with the fight, H62).
+  const hall = hallOfPlace(place.id)
   if (hall && world) {
-    return HERO_LIMIT_IDS.filter((id) => heroLimitClass(id) === hall).map((id): PipModel => {
+    return heroLimitIds().filter((id) => heroLimitHall(id) === hall).map((id): PipModel => {
       const hero = world.heroes[id]?.hero
       return hero ? { state: 'busy', progress: 1, tone: 'var(--color-accent)', face: face(hero) } : { state: 'free' }
     })

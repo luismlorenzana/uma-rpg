@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { rpgV2 } from '../rpg/battle/caps'
-import { HERO_HALLS } from '../rpg/hero-id'
-import { CURRENT_SLICE, HUB_PAGES, PLACES, SLICES, isOpen, learningPlaces, placeById, placeLock, placeOnPage, placeOpen, placesOn, type Place } from './places'
+import { HERO_HALL_PLACES, heroHalls } from '../rpg/hero-id'
+import {
+  CURRENT_SLICE, HUB_PAGES, PLACES, SLICES, isOpen, learningPlaces, movedPlace, placeById, placeLock, placeOnPage, placeOpen, placesOn, type Place,
+} from './places'
+
+/** FNV-1a, as `places-v3.test.ts` hashes. */
+const fnv = (text: string): string => {
+  let h = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0
+  return h.toString(16).padStart(8, '0')
+}
 
 // Smallest supported phone (375×667): the map area is about 375 × 500 pt after the bars.
 const MAP_W = 375
@@ -77,7 +86,7 @@ describe('the Learning page by generation (H59, D178)', () => {
       page: 'learning', kind: 'class-hall', name: 'Paladin Bastion', slots: 4, opensIn: 'S7',
       blurb: 'The Paladin Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners.',
     })
-    expect(v2.filter((p) => p.kind === 'class-hall').map((p) => p.id).sort()).toEqual([...new Set(Object.values(HERO_HALLS))].sort())
+    expect(v2.filter((p) => p.kind === 'class-hall').map((p) => p.id).sort()).toEqual(heroHalls(15).map((h) => HERO_HALL_PLACES[h]).sort())
     expect(v2.every((p) => p.page === 'learning' && !p.hidden)).toBe(true)
     expectSpaced(v2)
     // The places a v1 page holds keep every field but their spot.
@@ -85,6 +94,58 @@ describe('the Learning page by generation (H59, D178)', () => {
       const moved = v2.find((q) => q.id === p.id)!
       expect({ ...moved, at: p.at }).toEqual(p)
     }
+  })
+
+  it('keeps v14\'s and v15–v18\'s lists byte for byte (H133)', () => {
+    // FNV-1a of each list's JSON, taken on `main` before H133.
+    expect(fnv(JSON.stringify(learningPlaces(14)))).toBe('e23a1379')
+    for (const engine of [15, 16, 17, 18]) expect(fnv(JSON.stringify(learningPlaces(engine))), `v${engine}`).toBe('797ab45f')
+  })
+
+  it('stands Halls v2\'s five halls from v19: physical left, magic right, the Healer Sanctum in the middle on its own temple (H133)', () => {
+    const v19 = learningPlaces(19)
+    expect(v19.map((p) => [p.id, p.name, p.at.x, p.at.y, p.frame ?? null])).toEqual([
+      ['brawler-dojo', 'Warrior Dojo', 0.24, 0.1, null], ['mage-tower', 'Mage Tower', 0.76, 0.11, null],
+      ['spell-blade-salle', 'Spell Blade Salle', 0.22, 0.33, null], ['summoner-circle', 'Summoner Circle', 0.78, 0.33, null],
+      // Its own building (uma-art 2.17.0, H135): no frame override, so the map draws `healer-sanctum`.
+      ['healer-sanctum', 'Healer Sanctum', 0.5, 0.56, null],
+      ['observatory', 'Observatory', 0.5, 0.84, null],
+    ])
+    expect(v19.map((p) => p.id)).not.toContain('paladin-bastion')
+    expect(v19.map((p) => p.id)).not.toContain('cleric-chapel')
+    expect(v19.filter((p) => p.kind === 'class-hall').map((p) => p.id)).toEqual(heroHalls(19).map((h) => HERO_HALL_PLACES[h]))
+    expect(v19.every((p) => p.page === 'learning' && !p.hidden)).toBe(true)
+    expectSpaced(v19)
+    expect(learningPlaces(20)).toEqual(v19)
+  })
+
+  it('gives each v19 hall its lore and its seats\' home classes, then today\'s lines (H133)', () => {
+    const today = learningPlaces(18).find((p) => p.id === 'brawler-dojo')!
+    expect(learningPlaces(19).filter((p) => p.kind === 'class-hall').map((p) => [p.blurb, p.details[0]])).toEqual([
+      ['The Warrior Dojo: power from self-training. Four Heroes, each with her own Limit Break, and their Learners.', 'Home: Brawler'],
+      ['The Mage Tower: power from self-study. Four Heroes, each with her own Limit Break, and their Learners.', 'Home: Sorcerer'],
+      ['The Spell Blade Salle: power from pacts with familiars. Four Heroes, each with her own Limit Break, and their Learners.',
+        'Home: Arms Spellblade 1–2, Tome Spellblade 3–4'],
+      ['The Summoner Circle: power from familiars, summoned. Four Heroes, each with her own Limit Break, and their Learners.',
+        'Home: Arms Summoner 1–2, Tome Summoner 3–4'],
+      ['The Healer Sanctum: power from a followed deity. Four Heroes, each with her own Limit Break, and their Learners.',
+        'Home: Paladin 1–2, Cleric 3–4'],
+    ])
+    for (const p of learningPlaces(19).filter((q) => q.kind === 'class-hall')) {
+      expect(p.details.slice(1), p.id).toEqual(today.details)
+      expect(p, p.id).toMatchObject({ page: 'learning', kind: 'class-hall', slots: 4, opensIn: 'S7' })
+    }
+  })
+})
+
+describe('old hall links (H133)', () => {
+  it('stay on their own place while it stands: the alias is read only for an id with no place', () => {
+    // The live generation (v18) keeps the Paladin Bastion and the Cleric Chapel, and has no Sanctum to move to.
+    expect(placeById('paladin-bastion')?.name).toBe('Paladin Bastion')
+    expect(movedPlace('paladin-bastion')).toBeUndefined()
+    expect(movedPlace('cleric-chapel')).toBeUndefined()
+    expect(movedPlace('nowhere')).toBeUndefined()
+    expect(movedPlace(undefined)).toBeUndefined()
   })
 })
 
