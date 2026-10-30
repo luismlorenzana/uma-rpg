@@ -1,5 +1,8 @@
 # Weapon Progression: weapons, armor, accessories and what they cost, Tier 1 to Tier 3
 
+> **Accessories superseded in part by D264 (2026-10-30):** three slots in every tier (was WP19's 1 · 2 · 3), the Pendant +ATK, the
+> Bell's id the Charm, +M.ATK, and new rows. Current rules are in [classes](../../game/classes.md) and [materials](../../game/materials.md).
+
 > **Approved by the owner, 2026-10-24 (D193): every call WP1–WP34 as written, with his notes applied (the refund reworked as tickets for time in the Profession review; accessories channel-neutral).** Changes from here are follow-ups logged against it.
 
 > **R2 live from H82, 2026-10-26 (D218)** (a follow-up, no decision changed): Tier 1's part of this doc plays in the

@@ -42,7 +42,7 @@ const COST = tickets(3 * GATHER_MS - NOW) + tickets(GATHER_MS - NOW) + tickets(2
 
 describe('Finish all on a place', () => {
   it('costs the sum of each running job\'s ⌈remaining ÷ 30 minutes⌉', () => {
-    expect(COST).toBe(3 + 1 + 2)
+    expect(COST).toBe(2 + 1 + 1)
     expect(finishAllCost(worldOf(threeRunning(0)), 'mine', at(NOW), 1)).toEqual({ jobs: 3, tickets: COST })
     expect(finishAllCost(worldOf(threeRunning(0)), 'weapon-forge', at(NOW), 1)).toBeNull()
   })

@@ -83,8 +83,8 @@ describe('setting the accessory slot’s form (R2, H75)', () => {
   it('changes the family and kind and keeps the grade', () => {
     let save = setAccessoryForm(graded(), '101', 'brawler', 0, 'orb', 'lance', NOW)
     expect(slotOf(save)).toEqual([accessorySlot('orb', 6, 'lance')])
-    save = setAccessoryForm(save, '101', 'brawler', 0, 'bell', 'axe', NOW)
-    expect(slotOf(save)).toEqual([accessorySlot('bell', 6, 'axe')])
+    save = setAccessoryForm(save, '101', 'brawler', 0, 'bell', undefined, NOW)
+    expect(slotOf(save)).toEqual([accessorySlot('bell', 6)])
     save = setAccessoryForm(save, '101', 'brawler', 0, 'insignia', undefined, NOW)
     expect(slotOf(save)).toEqual([accessorySlot('insignia', 6)])
     save = setAccessoryForm(save, '101', 'brawler', 0, null, undefined, NOW)
@@ -92,13 +92,7 @@ describe('setting the accessory slot’s form (R2, H75)', () => {
     expect(world(save).items).toEqual({})
   })
 
-  it('checks a Bell against the class she names: her active class’s three weapons', () => {
-    expect(slotOf(setAccessoryForm(graded(), '101', 'mage', 0, 'bell', 'fire', NOW))).toEqual([accessorySlot('bell', 6, 'fire')])
-    expect(refusal(() => setAccessoryForm(graded(), '101', 'brawler', 0, 'bell', 'fire', NOW))).toBe('bad-loadout: No Fire Tome in her slots')
-    expect(refusal(() => setAccessoryForm(graded(), '101', 'mage', 0, 'bell', 'greatsword', NOW))).toBe('bad-loadout: No Greatsword in her slots')
-  })
-
-  it('checks an Orb the same way since H107 (WP22, D219): only a kind she can hit with', () => {
+  it('checks an Orb against the class she names since H107 (WP22, D219): only a kind she can hit with', () => {
     expect(accessoryKinds(world(graded()).umas['101']!, 'brawler')).toEqual(['greatsword', 'axe', 'lance'])
     expect(accessoryKinds(world(graded()).umas['101']!, 'mage')).toEqual(['fire', 'ice', 'lightning'])
     expect(slotOf(setAccessoryForm(graded(), '101', 'mage', 0, 'orb', 'ice', NOW))).toEqual([accessorySlot('orb', 6, 'ice')])
@@ -111,13 +105,13 @@ describe('setting the accessory slot’s form (R2, H75)', () => {
     }
   })
 
-  it('refuses what one slot of base forms can’t hold', () => {
+  it('refuses what three slots of base forms can’t hold', () => {
     const save = graded()
     expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'talisman' as never, undefined, NOW))).toBe('bad-loadout: Unknown accessory')
-    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 1, 'pendant', undefined, NOW))).toBe('bad-loadout: No such accessory slot')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 3, 'pendant', undefined, NOW))).toBe('bad-loadout: No such accessory slot')
     expect(refusal(() => setAccessoryForm(save, '101', 'brawler', -1, 'pendant', undefined, NOW))).toBe('bad-loadout: No such accessory slot')
     expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'orb', undefined, NOW))).toBe('bad-loadout: An Orb needs a kind')
-    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'bell', undefined, NOW))).toBe('bad-loadout: A Bell needs a kind')
+    expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'bell', 'axe', NOW))).toBe('bad-loadout: A Charm has no kind')
     expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'pendant', 'axe', NOW))).toBe('bad-loadout: A Pendant has no kind')
     expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, 'insignia', 'axe', NOW))).toBe('bad-loadout: An Insignia has no kind')
     expect(refusal(() => setAccessoryForm(save, '101', 'brawler', 0, null, 'axe', NOW))).toBe('bad-loadout: Pick an accessory first')
@@ -130,9 +124,16 @@ describe('setting the accessory slot’s form (R2, H75)', () => {
     expect(slotOf(save)).toEqual([accessorySlot('pendant', 6)])
   })
 
-  it('leaves a Bell on a kind she no longer slots set, doing nothing', () => {
-    const save = setAccessoryForm(graded(), '101', 'brawler', 0, 'bell', 'greatsword', NOW)
-    expect(accessoryFormBlock(world(save).umas['101']!, 'mage', 0, 'bell', 'greatsword')).toBe('No Greatsword in her slots')
-    expect(slotOf(save)).toEqual([accessorySlot('bell', 6, 'greatsword')])
+  it('sets each slot on its own, the same family twice if she likes, and raises one grade at a time', () => {
+    let save = saveOf({}, 1, { ...newGrades(1), accessories: [accessorySlot('orb', 6, 'axe'), accessorySlot(null, 2), accessorySlot(null, 0)] })
+    save = setAccessoryForm(save, '101', 'brawler', 1, 'orb', 'axe', NOW)
+    save = setAccessoryForm(save, '101', 'brawler', 2, 'pendant', undefined, NOW)
+    expect(slotOf(save)).toEqual([accessorySlot('orb', 6, 'axe'), accessorySlot('orb', 2, 'axe'), accessorySlot('pendant', 0)])
   })
+
+  it('leaves an Orb on a kind she no longer slots set', () => {
+    const save = setAccessoryForm(graded(), '101', 'brawler', 0, 'orb', 'greatsword', NOW)
+    expect(accessoryFormBlock(world(save).umas['101']!, 'mage', 0, 'orb', 'greatsword')).toBe('No Greatsword in her slots')
+    expect(slotOf(save)).toEqual([accessorySlot('orb', 6, 'greatsword')])
+})
 })

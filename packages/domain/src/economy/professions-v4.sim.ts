@@ -14,33 +14,31 @@ import { TRADES, type PlaceIdV3 } from './professions'
 
 const range = (n: number): number[] => Array.from({ length: n }, (_, i) => i + 1)
 
-/** The made items one maxed Uma holds under the farm by line (FL9): a grade's 1.5 Arms Gems and 1.5 Tome Ink, 5 Armor
- * Fittings and an Accessory Setting, Planet Jewels I–V, Moon Jewels I–V on each of three moons, and with `moon` her own
- * moon's Moon Jewels II and IV. */
-export function umaPiecesV4(moon = false): Record<string, number> {
+/** The made items one maxed Uma holds (D264): a grade's 1.5 Arms Gems and 1.5 Tome Ink, 5 Armor Fittings and 3 Accessory
+ * Settings, three Planet Jewels I–V and Moon Jewels I–V on each of three moons. Her own moon's nodes take none. */
+export function umaPiecesV4(): Record<string, number> {
   const pieces: Record<string, number> = {}
   const add = (id: string, n: number) => { pieces[id] = (pieces[id] ?? 0) + n }
   for (const g of range(10)) {
-    add(gradeItem('weapon-gem', g), 1.5); add(gradeItem('tome-ink', g), 1.5); add(gradeItem('armor-fittings', g), 5); add(gradeItem('accessory-setting', g), 1)
+    add(gradeItem('weapon-gem', g), 1.5); add(gradeItem('tome-ink', g), 1.5); add(gradeItem('armor-fittings', g), 5); add(gradeItem('accessory-setting', g), 3)
   }
-  for (const n of range(5)) { add(jewelId('planet', n), 1); add(jewelId('moon', n), 3) }
-  if (moon) { add(jewelId('moon', 2), 1); add(jewelId('moon', 4), 1) }
+  for (const n of range(5)) { add(jewelId('planet', n), 3); add(jewelId('moon', n), 3) }
   return pieces
 }
 
 /** What one maxed Uma's pieces take: refined items by id. */
-export function umaRefinedV4(moon = false): Record<string, number> {
+export function umaRefinedV4(): Record<string, number> {
   const refined: Record<string, number> = {}
-  for (const [id, n] of Object.entries(umaPiecesV4(moon))) {
+  for (const [id, n] of Object.entries(umaPiecesV4())) {
     for (const [item, qty] of Object.entries(madeRecipeV4(id))) refined[item] = (refined[item] ?? 0) + qty * n
   }
   return refined
 }
 
 /** Her refined items by line (FL9's last column). */
-export function umaRefinedByLine(moon = false): Record<MaterialLine, number> {
+export function umaRefinedByLine(): Record<MaterialLine, number> {
   const out: Record<MaterialLine, number> = { metal: 0, wood: 0, vegetables: 0, fish: 0, stone: 0 }
-  for (const [id, n] of Object.entries(umaRefinedV4(moon))) out[lineItem(id)!.line] += n
+  for (const [id, n] of Object.entries(umaRefinedV4())) out[lineItem(id)!.line] += n
   return out
 }
 
@@ -49,15 +47,15 @@ const processingOf = (line: MaterialLine): PlaceIdV3 => PLACES_V4.find((p) => p.
 const makingOf = (line: MaterialLine): PlaceIdV3 => PLACES_V4.find((p) => (p.kinds.includes('craft') || p.kinds.includes('cut')) && p.line === line)!.id
 
 /** Hours each place spends on one maxed Uma at Craft Lv 25's speed, before ×1.25 (FL10, FL11). */
-export function placeHoursV4(moon = false): Record<PlaceIdV3, number> {
+export function placeHoursV4(): Record<PlaceIdV3, number> {
   const hours = Object.fromEntries(PLACES_V4.map((p) => [p.id, 0])) as Record<PlaceIdV3, number>
   const step = stepMinutes(LEDGER_LEVEL) / 60
-  for (const [item, n] of Object.entries(umaRefinedV4(moon))) {
+  for (const [item, n] of Object.entries(umaRefinedV4())) {
     const line = lineItem(item)!.line
     hours[gatheringOf(line)] += n * step
     hours[processingOf(line)] += n * step
   }
-  for (const [id, n] of Object.entries(umaPiecesV4(moon))) {
+  for (const [id, n] of Object.entries(umaPiecesV4())) {
     const [item, qty] = Object.entries(madeRecipeV4(id))[0] as [string, number]
     hours[makingOf(lineItem(item)!.line)] += n * qty * step
   }
@@ -70,8 +68,7 @@ export function professionsReport(): string {
   const total = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a + b, 0)
   const hours = placeHoursV4(), trades = tradeHoursOf(hours)
   const rows = [
-    `One Uma: ${total(umaPiecesV4())} pieces, ${total(umaRefinedV4())} refined (${total(umaRefinedV4(true))} with her moon), ` +
-      `${f1(total(hours))} h (${f1(total(placeHoursV4(true)))} h) at Craft Lv ${LEDGER_LEVEL} before ×1.25`,
+    `One Uma: ${total(umaPiecesV4())} pieces, ${total(umaRefinedV4())} refined, ${f1(total(hours))} h at Craft Lv ${LEDGER_LEVEL} before ×1.25`,
     `  by line: ${Object.entries(umaRefinedByLine()).map(([line, n]) => `${line} ${n}`).join(', ')}`,
     `  trades: ${TRADES.map((t) => `${t.id} ${f1(trades[t.id].hours)} h, ${pct(trades[t.id].share)}`).join(' · ')}`,
     `  places, maxed Umas a day: ${Object.entries(placeSupplyOf(hours)).map(([p, n]) => `${p} ${f2(n)}`).join(' · ')}`,

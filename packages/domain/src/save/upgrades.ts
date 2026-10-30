@@ -111,7 +111,7 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
     }
     const map = isStarMap(uma.stars) ? uma.stars : null
     const jewels = map ? Object.entries(world.items)
-      .filter(([id, count]) => count > 0 && madeIdentity(id)?.line.startsWith('jewel-') && jewelNodes(map, id, uma.level).length > 0)
+      .filter(([id, count]) => count > 0 && madeIdentity(id)?.line.startsWith('jewel-') && jewelNodes(map, id, uma.level, world.items).length > 0)
       .map(([id]) => id) : []
     return {
       gearSlots: [], gear: grades.length, grades, gems: 0, jewels, freeNodes: 0, stars: jewels.length, promote,

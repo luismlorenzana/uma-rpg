@@ -2,6 +2,9 @@
 
 **uma-rpg · ChatGPT · M · Needs: H119 · Unblocks: H125 (with H122 and H124); H123 opens this packet's accessory sheet**
 
+> **D264 (2026-10-30):** an Uma has three accessory slots, each with its own grade and family, so Gear is **eleven tiles**, not
+> nine; the Bell is the Charm (+M.ATK, no kind) and `accessoryFlatValue` is `accessorySlotValue`. Read this packet with that.
+
 ## Why
 
 Today's Gear tab is two views, Equip and Upgrade, the choice reset every session, with a raise pill on every row: raising

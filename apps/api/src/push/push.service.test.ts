@@ -12,7 +12,7 @@ const sub = (endpoint: string): Subscription => ({ endpoint, keys: { p256dh: 'p'
 
 describe('push tick (D63)', () => {
   it('announces each finish once, to every live device, and forgets devices that are gone', async () => {
-    // An invented outfit at Craft Lv1: 2 ores take 72 minutes (FL28), 57.6 at the Mine (×1.25 from day one).
+    // An invented outfit at Craft Lv1: 2 ores take 48 minutes (FL28, D264), 38.4 at the Mine (×1.25 from day one).
     const save: Save = startJob(unlockUma(newSave('Luis', at(0)), '101', at(0)), 'mine', 0,
       { outfitId: '101' }, 'copper-ore', 2, at(0))
     const saves = { load: async () => ({ revision: 1, save }), put: async () => { throw new Error('read only') } } as unknown as SaveRepository
@@ -26,16 +26,16 @@ describe('push tick (D63)', () => {
     await push.subscribe('u', sub('https://push.example/phone'), T0)
     await push.subscribe('u', sub('https://push.example/gone'), T0)
 
-    expect(await push.tick(T0 + 50 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
-    expect(await push.tick(T0 + 60 * MINUTE)).toEqual({ accounts: 1, sent: 1 })
+    expect(await push.tick(T0 + 30 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
+    expect(await push.tick(T0 + 40 * MINUTE)).toEqual({ accounts: 1, sent: 1 })
     expect(sent.map((s) => s.endpoint)).toEqual(['https://push.example/phone', 'https://push.example/gone'])
     expect(sent[0]!.payload).toMatchObject({ title: 'Work done', body: 'Mine: Copper Ore ×2', url: '/wilds/mine?tier=1', badge: 1 })
     expect((await records.get('u'))!.subscriptions.map((s) => s.endpoint)).toEqual(['https://push.example/phone'])
-    expect(await push.tick(T0 + 65 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
+    expect(await push.tick(T0 + 45 * MINUTE)).toEqual({ accounts: 1, sent: 0 })
   })
 
   it('sends one notification per tier world with news, each linking its tier, with the badge of both (H35)', async () => {
-    // A synthetic Tier 2 world: no promotion exists yet. Each world's Mine finishes 2 ores in 57.6 real minutes.
+    // A synthetic Tier 2 world: no promotion exists yet. Each world's Mine finishes 2 ores in 38.4 real minutes.
     let save: Save = unlockUma(newSave('Luis', at(0)), '101', at(0))
     save = { ...save, tierWorlds: { ...save.tierWorlds, '2': { ...newTierWorld(at(0), 0), umas: { '201': newOwnedUma(at(0)) } } } }
     save = startJob(save, 'mine', 0, { outfitId: '101' }, 'copper-ore', 2, at(0))

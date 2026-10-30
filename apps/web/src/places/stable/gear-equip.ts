@@ -8,7 +8,7 @@ import {
 import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine, type GradeUpgradeView } from './gear-v3'
 import { accessoryEffect, actions, classPresetName, signature as signatureCopy, standardPreset, staleKind } from './copy'
 
-/** One standard preset (D263): the class it's for, its name, its weapons and accessory, and whether she wears it. */
+/** One standard preset (D263): the class it's for, its name, its weapons, and whether she wears it. */
 export interface PresetRow { pick: RpgTier1Class; title: string; detail: string; on: boolean }
 /** The presets her class offers: a Tier 1 class its one, named "Standard preset", and a Tier 0 one for each class it promotes
  * into, named after that class. */
@@ -18,11 +18,11 @@ export function presetRows(world: TierWorld, outfitId: string, classId: RpgClass
     const plan = classPresetPlan(world, outfitId, classId, undefined, family, pick)
     const on = plan.changes === 0
     return { pick, on, title: picks.length > 1 ? classPresetName(rpgClassName(pick), on) : standardPreset(on),
-      detail: [...plan.weapons.map((w) => WEAPON_LABEL[w]), ACCESSORY_FAMILY_LABEL[plan.accessory?.family ?? family]].join(' · ') }
+      detail: plan.weapons.map((w) => WEAPON_LABEL[w]).join(' · ') }
   })
 }
 
-/** A kind a Bell or an Orb can sit on, labelled by her weapon ("Thunder Tome"). */
+/** A kind an Orb can sit on, labelled by her weapon ("Thunder Tome"). */
 export interface KindChoice { kind: RpgDamageKind; label: string }
 
 export interface AccessoryCard {
@@ -32,18 +32,18 @@ export interface AccessoryCard {
   signature: string | null
   /** Its effect at the slot's grade; at G0, what G1 gives. */
   effect: string
-  /** A Bell's or an Orb's kinds: the ones she can hit with. A Pendant or an Insignia has none. */
+  /** An Orb's kinds: the ones she can hit with. A Pendant, a Charm or an Insignia has none. */
   kinds: readonly KindChoice[]
   /** She wears this family in the slot. */
   wearing: boolean
   /** The kind she wears it on, when it takes one. */
   wornKind: RpgDamageKind | null
-  /** A Bell or an Orb left on a kind she no longer holds ("No Greatsword in her slots"). */
+  /** An Orb left on a kind she no longer holds ("No Greatsword in her slots"). */
   stale: string | null
 }
 
-/** The card order: her signature family first, then Bell, Pendant, Orb, Insignia. */
-const ORDER: readonly AccessoryFamily[] = ['bell', 'pendant', 'orb', 'insignia']
+/** The card order: her signature family first, then Pendant, Charm (id `bell`), Orb, Insignia. */
+const ORDER: readonly AccessoryFamily[] = ['pendant', 'bell', 'orb', 'insignia']
 
 /** A kind's weapon name: an element reads as its Tome. */
 export const kindWeaponLabel = (kind: RpgDamageKind): string => WEAPON_LABEL[isRpgElement(kind) ? rpgTomeOf(kind) : kind]
@@ -66,7 +66,7 @@ export function accessoryCards(slot: AccessorySlotState | undefined, kinds: read
       label: ACCESSORY_FAMILY_LABEL[family],
       signature: family === signature ? signatureCopy(signatureBonus(level, tier), wearing) : null,
       effect: grade < 1 ? `G1: ${familyEffect(family, 1, tier)}` : familyEffect(family, grade, tier),
-      kinds: family === 'bell' || family === 'orb' ? choices : [],
+      kinds: family === 'orb' ? choices : [],
       wearing,
       wornKind,
       stale: wornKind && !kinds.includes(wornKind) ? staleKind(kindWeaponLabel(wornKind)) : null,

@@ -3,7 +3,7 @@
 import { BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE } from '../rpg/battle/caps'
 import type { RpgFlourish } from '../rpg/battle/types'
 import type { RpgDamageKind } from '../rpg/kinds'
-import { ACCESSORY_FAMILY_LABEL, accessoryFlatValue } from '../economy/accessories'
+import { ACCESSORY_FAMILY_LABEL, accessorySlotValue, INSIGNIA_SLOT_PERMILLE } from '../economy/accessories'
 import type { AccessoryFamily, GearTier } from '../economy/grades'
 
 const pct = (share: number): string => `${Math.round(share * 1000) / 10}%`
@@ -13,10 +13,10 @@ const kindName = (kind: RpgDamageKind): string => kind[0]!.toUpperCase() + kind.
 /** C1, C3 and C8: an accessory's one effect wording; G0 is always Off. */
 export function accessoryEffect(family: AccessoryFamily, grade: number, tier: GearTier, kind?: RpgDamageKind | null): string {
   if (grade < 1) return 'Off'
-  if (family === 'pendant') return `+${number(accessoryFlatValue(family, grade, tier))} · 3 kinds`
-  if (family === 'orb') return `${kind ? kindName(kind) : 'Kind'} +${number(accessoryFlatValue(family, grade, tier))}`
-  if (family === 'bell') return `${kind ? kindName(kind) : 'Extra hit'} ×${(grade / 10).toFixed(1)}`
-  return `Bosses +${(grade * 1.5).toLocaleString('en-US', { maximumFractionDigits: 1 })}%`
+  if (family === 'pendant') return `ATK +${number(accessorySlotValue(family, grade, tier))}`
+  if (family === 'bell') return `M.ATK +${number(accessorySlotValue(family, grade, tier))}`
+  if (family === 'orb') return `${kind ? kindName(kind) : 'Kind'} +${number(accessorySlotValue(family, grade, tier))}`
+  return `Bosses +${(grade * INSIGNIA_SLOT_PERMILLE / 10).toLocaleString('en-US', { maximumFractionDigits: 1 })}%`
 }
 
 /** C3 and C8: the complete Flourish fact, with its one state word. */

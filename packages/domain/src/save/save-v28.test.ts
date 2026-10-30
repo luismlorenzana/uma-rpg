@@ -30,7 +30,7 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
   it('parses the rich v27 save through toV28, and its open v15 fights replay to their frozen ends', () => {
     const world = parseSave(v28Save()).tierWorlds['1']!
     expect(world.grant).toMatchObject({ tickets: 3900, seen: false })
-    expect(world.umas['100']!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+    expect(world.umas['100']!.gear).toEqual({ weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) })
     expect('gear' in world || 'gems' in world).toBe(false)
     for (const [battle, spec] of [[world.world.run.battle!, V27_WORLD_FIGHT], [world.rift.battle!, V27_RIFT_FIGHT]] as const) {
       expect(battle.input.version).toBe(15)
@@ -55,13 +55,12 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
     refused((w) => { w.buildings = { mine: { level: 2 } } }, /buildings: unknown keys mine/)
     // A map node out of order: Planet II before Planet I.
     refused((w) => { w.umas['100']!.stars = { open: ['planet:2'], moons: [] } }, /umas\.100\.stars\.open: planet:2 needs planet:1 first/)
-    // A legacy item, a gear rank, Gear Marks, an accessory slot too many, a Pendant with a kind, an Orb without one.
+    // A legacy item, a gear rank, Gear Marks, a Pendant with a kind, an Orb without one.
     refused((w) => { w.items.flax = 1 }, /items\.flax: unknown item/)
     refused((w) => { (w.umas['100']!.ranks as Raw).weapons = {} }, /ranks: unknown keys weapons/)
     refused((w) => { (w.wallet as Raw).gearMarks = 0 }, /wallet: unknown keys gearMarks/)
     const slots = (list: unknown[]) => (w: RawWorld) => { (w.umas['100']!.gear as Raw).accessories = list }
-    refused(slots([{ grade: 0, family: null, form: 'base' }, { grade: 0, family: null, form: 'base' }]), /accessories: expected 1–1 entries/)
-    refused(slots([{ grade: 0, family: 'pendant', form: 'base', kind: 'fire' }]), /accessories\.0\.kind: only an Orb or a Bell has a kind/)
+    refused(slots([{ grade: 0, family: 'pendant', form: 'base', kind: 'fire' }]), /accessories\.0\.kind: only an Orb has a kind/)
     refused(slots([{ grade: 0, family: 'orb', form: 'base' }]), /accessories\.0\.kind: expected one of the ten kinds/)
   })
 
@@ -89,7 +88,7 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
     const unlocked = unlockUma(save, '9000', '2026-10-25T12:00:00.000Z', '1', 'apprentice')
     expect(unlocked.tierWorlds['1']!.umas['9000']).toMatchObject({
       classId: 'apprentice', craft: { level: 1, exp: 0 }, ranks: { classes: {} }, stars: { open: [], moons: [] },
-      gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] },
+      gear: { weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) },
     })
     for (const s of [save, unlocked]) expect(parseSave(JSON.parse(JSON.stringify(s)))).toEqual(s)
   })

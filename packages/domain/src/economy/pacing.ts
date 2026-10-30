@@ -48,8 +48,9 @@ export const itemMinutes = (level: number): number => {
 export const REFINE_SHARE = 0.25
 /** Minutes to refine one item at a profession level: 13½ at Lv1, 9 at Lv50. */
 export const refineMinutes = (level: number): number => itemMinutes(level) * REFINE_SHARE
-/** The Wilds' trios (D230, FL28): each v4 step takes 36 minutes at Lv1, falling evenly to 24 at Lv50. */
-export const STEP_MINUTES = { atFirst: 36, atMax: 24 } as const
+/** The Wilds' trios (D230, FL28): each v4 step takes 24 minutes at Lv1, falling evenly to 16 at Lv50 (D264: was 36 to 24,
+ * two thirds, as a rank now takes half as many items again, so a place's hours hold). */
+export const STEP_MINUTES = { atFirst: 24, atMax: 16 } as const
 export const stepMinutes = (level: number): number => {
   const l = Math.min(PROFESSION_MAX_LEVEL, Math.max(1, Math.floor(level)))
   return STEP_MINUTES.atFirst - ((STEP_MINUTES.atFirst - STEP_MINUTES.atMax) * (l - 1)) / (PROFESSION_MAX_LEVEL - 1)
@@ -65,15 +66,15 @@ export const jobExp = (minutes: number): number => Math.round(minutes * EXP_PER_
 export const MAX_JOB_COUNT = 10
 /** Refining, at a quarter of the time, comes in these batches (D139): a ×40 refine takes as long as a 10-item gather. */
 export const REFINE_BATCHES = [1, 4, 8, 20, 40] as const
-/** The Wilds' job sizes (D233): with every step the same length (FL28), a job of n steps takes about n × 24 minutes at a
- * place, so ×1 … ×20 run from about half an hour to about 8 hours (×2 one, ×5 two, ×10 four, ×20 eight). */
-export const JOB_SIZES = [1, 2, 3, 5, 10, 15, 20] as const
+/** The Wilds' job sizes (D233, D264): with every step the same length (FL28), a job of n steps takes about n × 16 minutes at
+ * a place, so ×1 … ×30 run from about a quarter of an hour to about 8 hours (×3 one, ×10 about three, ×30 eight). */
+export const JOB_SIZES = [1, 2, 3, 5, 10, 15, 20, 30] as const
 /** A job's longest size, in steps: about 8 hours. */
-export const JOB_STEPS_MOST = 20
+export const JOB_STEPS_MOST = 30
 /** The sizes offered for an item of `steps` steps (1 to gather or process; a made item's refined items): those up to
- * about 8 hours, so an Arms Gem (7) offers 1, 2 and 3, an Accessory Setting (10) 1 and 2. */
+ * about 8 hours, so an Arms Gem (10) offers 1, 2 and 3, Armor Fittings (3) up to 10, a Setting or a jewel (5) up to 5. */
 export const jobSizes = (steps: number): number[] => JOB_SIZES.filter((n) => n <= Math.max(1, Math.round(JOB_STEPS_MOST / steps)))
-/** The most items one new job of a kind makes (a gather 20 since D233; a process keeps v1's 40 for queued jobs). */
+/** The most items one new job of a kind makes (a gather 30 since D264; a process keeps v1's 40 for queued jobs). */
 export const maxJobCount = (kind: 'gather' | 'refine' | 'craft' | 'cut'): number =>
   kind === 'refine' ? REFINE_BATCHES.at(-1)! : kind === 'gather' ? JOB_SIZES.at(-1)! : MAX_JOB_COUNT
 

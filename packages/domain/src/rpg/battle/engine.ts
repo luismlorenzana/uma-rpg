@@ -179,8 +179,8 @@ function validCharms(a: BattleAlly, version: BattleInput['version']): boolean {
     (a.mpRegen === undefined || safeInt(a.mpRegen, 0, 10_000)) && shares.every((v) => v === undefined || safeInt(v, 0, 1000))
 }
 /** v17 (H75, D212): her accessory's base form and her signature, each refused before v17. `flat` 0–1,000 a kind; a Bell
- * of one of her weapons' kinds at 1–3,000 per mille; an Insignia 1–1,000 per mille; `signature` 0–1,000. One slot (WP19):
- * at most one of a non-empty `flat`, a `bell` and an `insignia` (R3 relaxes it with the slot count). */
+ * of one of her weapons' kinds at 1–3,000 per mille; an Insignia 1–1,000 per mille; `signature` 0–1,000. To v19 one slot
+ * (WP19): at most one of a non-empty `flat`, a `bell` and an `insignia`. From v20 three (D264), so any of them together. */
 function validAccessory(a: BattleAlly, version: BattleInput['version']): boolean {
   const { flat, bell, insignia, signature } = a
   if (flat === undefined && bell === undefined && insignia === undefined && signature === undefined) return true
@@ -192,7 +192,7 @@ function validAccessory(a: BattleAlly, version: BattleInput['version']): boolean
     !a.weapons.some((w) => isRpgWeapon(w) && rpgWeaponKind(w) === bell.kind))) return false
   if (insignia !== undefined && (!record(insignia, 1) || !safeInt(insignia.value, 1, 1_000))) return false
   if (signature !== undefined && !safeInt(signature, 0, 1_000)) return false
-  return [flat !== undefined && Object.keys(flat).length > 0, bell !== undefined, insignia !== undefined].filter(Boolean).length <= 1
+  return rpgRework('halls', version) || [flat !== undefined && Object.keys(flat).length > 0, bell !== undefined, insignia !== undefined].filter(Boolean).length <= 1
 }
 /** The kinds her Orbs add to every hit: v11's two, or older fights' one. */
 const orbsOf = (a: BattleAlly): readonly RpgDamageKind[] | undefined => a.orbs ?? (a.orb ? [a.orb] : undefined)

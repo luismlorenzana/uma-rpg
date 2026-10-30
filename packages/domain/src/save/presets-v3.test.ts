@@ -108,9 +108,9 @@ describe('applying R2’s preset to a graded Uma', () => {
     expect(wearClassPreset(save, '101', 'mage', NOW, '1', V17)).toBe(save)
   })
 
-  it('dresses a fresh Uma’s G0 slot in her family, a Fleet Spell Blade’s Bell on her Lance', () => {
+  it('dresses a fresh Uma’s first G0 slot in her family, a Fleet Spell Blade’s Bell on her Lance', () => {
     const world = graded('spellblade')
     const after = applyClassPreset(world, '101', 'spellblade', V17, familyOf('fleet'))
-    expect(after.umas['101']!.gear).toEqual({ ...newGrades(1), accessories: [accessorySlot('bell', 0, 'lance')] })
+    expect(after.umas['101']!.gear).toEqual({ ...newGrades(1), accessories: [accessorySlot('bell', 0, 'lance'), ...newGrades(1).accessories.slice(1)] })
   })
 })

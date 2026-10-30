@@ -55,16 +55,16 @@ describe('the Wilds\' places over the save', () => {
     const { save: after, got } = collectJob(save, 'mine', 0, at(2 * GATHER_MS))
     expect(got).toEqual({ items: 2, exp: 2 * jobExp(stepMinutes(1)), levelsUp: 0, done: true })
     expect(worldOf(after).items).toEqual({ 'copper-ore': 2 })
-    expect(worldOf(after).umas['101']!.craft).toEqual({ level: 1, exp: 144 })
+    expect(worldOf(after).umas['101']!.craft).toEqual({ level: 1, exp: 96 })
     save = after
     expect(availableWorkers(worldOf(save), at(2 * GATHER_MS), 1).has('101')).toBe(true)
   })
 
-  it('makes a made item from the Warehouse and pays it back into it: 7 Ingots, one step each', () => {
-    let save = saveOf({ 101: 1 }, { 'copper-ingot': 8, 'pine-plank': 3 })
+  it('makes a made item from the Warehouse and pays it back into it: 10 Ingots, one step each', () => {
+    let save = saveOf({ 101: 1 }, { 'copper-ingot': 11, 'pine-plank': 3 })
     save = startJob(save, 'weapon-forge', 0, { outfitId: '101' }, 'weapon-gem-g1', 1, at(0))
     expect(worldOf(save).items).toEqual({ 'copper-ingot': 1, 'pine-plank': 3 })
-    const done = collectJob(save, 'weapon-forge', 0, at(7 * GATHER_MS)).save
+    const done = collectJob(save, 'weapon-forge', 0, at(10 * GATHER_MS)).save
     expect(worldOf(done).items).toEqual({ 'copper-ingot': 1, 'pine-plank': 3, 'weapon-gem-g1': 1 })
     expect(worldOf(done).gear).toBeUndefined()
   })
@@ -82,9 +82,9 @@ describe('the Wilds\' places over the save', () => {
     const tier2 = startJob(saveOf({ 201: 26 }, {}, '2'), 'mine', 0, { outfitId: '201' }, 'gold-ore', 1, at(0), '2')
     expect(worldOf(tier2, '2').work['201']?.entries[0]?.request.item).toBe('gold-ore')
     const plan = planJob(worldOf(saveOf({ 101: 46 }, {}, '2'), '2'), 'lapidary', { outfitId: '101' }, 'jewel-moon-5', 1, 2)!
-    expect(plan.inputs).toEqual({ 'cut-philosophers-stone': 4 })
+    expect(plan.inputs).toEqual({ 'cut-philosophers-stone': 5 })
     expect(plan.output).toEqual({ id: 'jewel-moon-5', name: 'Moon Jewel V', grade: 10 })
-    expect(plan.block).toBe("Needs 4 Cut Philosopher's Stone")
+    expect(plan.block).toBe("Needs 5 Cut Philosopher's Stone")
     expect(plan.item).toBeNull()
     expect(planJob(worldOf(saveOf({ 101: 1 })), 'mine', { outfitId: '101' }, 'iron-ore')).toMatchObject({
       output: { id: 'iron-ore', name: 'Iron Ore', grade: 3 }, itemMs: GATHER_MS, block: 'Needs Craft Lv11' })

@@ -1,5 +1,9 @@
 # The farm by line: three steps for every trade, on G1–G10 materials
 
+> **Recipes and step time superseded in part by D264 (2026-10-30):** an Arms Gem or Tome Ink takes 10, Armor Fittings 3, an
+> Accessory Setting or a jewel 5, and a step 24 → 16 minutes, so a rank is exactly 30 refined items a line. The rest stands;
+> current numbers are in [materials](../../game/materials.md).
+
 > **Live from H112 (2026-10-26, save v30).** The owner's request, 2026-10-26 (D224); the main session's design. It replaces parts of
 > [profession-progression](profession-progression.md) (§3, §4's processing, §6's recipes and times, PP7–PP13, PP17).
 > It is built in four packets: H109 (the rules, dark), H110 (save v30, dark), H111 (the screens, inert) and H112 (the

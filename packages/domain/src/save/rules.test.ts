@@ -44,7 +44,7 @@ describe('collection rules', () => {
       const world = worldOf(save)
       const uma = world.umas['100201']!
       // Every grade G0; her armor's half is her class's, so nothing about it is written.
-      expect(uma.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+      expect(uma.gear).toEqual({ weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) })
       expect(armorHalf(uma.classId!)).toBe(want[c])
       // From v16 her start is written as her class (H67), whichever it is.
       expect(uma.classId).toBe(c)
@@ -53,7 +53,7 @@ describe('collection rules', () => {
       expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
     }
     // Without a starting class (tests, the pacing sim) she starts with no class and every grade G0.
-    expect(worldOf(unlockUma(before, '100201', T1)).umas['100201']!).toMatchObject({ classId: null, gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] } })
+    expect(worldOf(unlockUma(before, '100201', T1)).umas['100201']!).toMatchObject({ classId: null, gear: { weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) } })
   })
 
   it('gives magical armor to exactly the Mage, Summoner and Cleric of v18’s six (D160 §7), and from v19 to the Tome Spellblade and three Tier 0 too', () => {

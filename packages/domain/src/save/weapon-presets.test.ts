@@ -66,19 +66,24 @@ describe('the weapon presets (D263)', () => {
     for (const c of RPG_TIER1_CLASSES) for (const t of RPG_CLASS_PARENTS[c]) expect(rpgPresetClasses(t), t).toContain(c)
   })
 
-  it('wear the class\'s form, an Orb or a Bell on a kind she holds, or her ★ family', () => {
-    const form = (c: RpgTier1Class, family?: 'orb' | 'bell' | 'pendant' | 'insignia') => weaponPreset(c, family).accessory
-    expect(form('brawler')).toEqual({ family: 'bell', kind: 'greatsword' })
-    expect(form('mage')).toEqual({ family: 'pendant' })
-    expect(form('armsummoner')).toEqual({ family: 'orb', kind: 'bow' })
-    expect(form('summoner')).toEqual({ family: 'orb', kind: 'dark' })
-    expect(form('cleric')).toEqual({ family: 'orb', kind: 'light' })
-    expect(form('paladin', 'bell')).toEqual({ family: 'bell', kind: 'lance' })
-    expect(form('tomeblade', 'orb')).toEqual({ family: 'orb', kind: 'lightning' })
-    expect(form('spellblade', 'insignia')).toEqual({ family: 'insignia' })
-    for (const c of RPG_TIER1_CLASSES) {
-      const { kind } = form(c, 'orb')
-      expect(RPG_WEAPON_PRESETS[c].map(rpgWeaponKind), c).toContain(kind)
+  it('wear three slots: her channels and an Orb on a kind she holds, her ★ family first (D264)', () => {
+    const forms = (c: RpgTier1Class, family?: 'orb' | 'bell' | 'pendant' | 'insignia') => weaponPreset(c, family).accessories.map((a) => a.kind ? `${a.family} ${a.kind}` : a.family)
+    expect(forms('brawler')).toEqual(['pendant', 'pendant', 'orb greatsword'])
+    expect(forms('paladin')).toEqual(['pendant', 'pendant', 'orb lance'])
+    expect(forms('mage')).toEqual(['bell', 'bell', 'orb fire'])
+    expect(forms('cleric')).toEqual(['bell', 'bell', 'orb light'])
+    expect(forms('spellblade')).toEqual(['pendant', 'bell', 'orb katana'])
+    expect(forms('armsummoner')).toEqual(['pendant', 'bell', 'orb bow'])
+    expect(forms('tomeblade')).toEqual(['bell', 'pendant', 'orb lightning'])
+    expect(forms('summoner')).toEqual(['bell', 'pendant', 'orb dark'])
+    // Her ★ family leads: in the place of one of its own, else of slot 1.
+    expect(forms('brawler', 'orb')).toEqual(['orb greatsword', 'pendant', 'pendant'])
+    expect(forms('brawler', 'pendant')).toEqual(['pendant', 'pendant', 'orb greatsword'])
+    expect(forms('brawler', 'insignia')).toEqual(['insignia', 'pendant', 'orb greatsword'])
+    expect(forms('mage', 'pendant')).toEqual(['pendant', 'bell', 'orb fire'])
+    expect(forms('spellblade', 'bell')).toEqual(['bell', 'pendant', 'orb katana'])
+    for (const c of RPG_TIER1_CLASSES) for (const { kind } of weaponPreset(c).accessories) {
+      if (kind) expect(RPG_WEAPON_PRESETS[c].map(rpgWeaponKind), c).toContain(kind)
     }
   })
 
@@ -89,14 +94,16 @@ describe('the weapon presets (D263)', () => {
     expect(classOf(uma, 'acolyte').weapons).toEqual(['tome-light', 'tome-ice', 'bow'])
     const paladin = wearClassPreset(save, '101', 'acolyte', T, TIER_ONE, undefined, null, 'paladin')
     expect(classOf(her(paladin), 'acolyte').weapons).toEqual(['lance', 'greatsword', 'tome-light'])
-    expect(her(paladin).gear).toEqual({ ...gear, accessories: [{ grade: 0, family: 'pendant', form: 'base' }] })
+    expect(her(paladin).gear).toEqual({ ...gear, accessories: [{ grade: 0, family: 'pendant', form: 'base' }, { grade: 0, family: 'pendant', form: 'base' },
+      { grade: 0, family: 'orb', form: 'base', kind: 'lance' }] })
     expect(classPresetPlan(worldOf(paladin), '101', 'acolyte', undefined, null, 'paladin').changes).toBe(0)
     expect(classPresetPlan(worldOf(paladin), '101', 'acolyte', undefined, null, 'cleric').changes).toBeGreaterThan(0)
     // The same save when nothing would change.
     expect(wearClassPreset(paladin, '101', 'acolyte', T, TIER_ONE, undefined, null, 'paladin')).toBe(paladin)
     const cleric = wearClassPreset(paladin, '101', 'acolyte', T, TIER_ONE, undefined, null, 'cleric')
     expect(classOf(her(cleric), 'acolyte').weapons).toEqual(['tome-light', 'tome-fire', 'lance'])
-    expect(her(cleric).gear).toMatchObject({ accessories: [{ grade: 0, family: 'orb', form: 'base', kind: 'light' }] })
+    expect(her(cleric).gear).toMatchObject({ accessories: [{ grade: 0, family: 'bell', form: 'base' }, { grade: 0, family: 'bell', form: 'base' },
+      { grade: 0, family: 'orb', form: 'base', kind: 'light' }] })
   })
 
   it('work for every Tier 0 and every child, and refuse a class it doesn\'t offer', () => {

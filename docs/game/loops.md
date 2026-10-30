@@ -148,15 +148,15 @@ Each world has its own wallet (`TierWorld.wallet`).
 <!-- live:prices -->
 | Raw materials | Stocked | Price (Laurels), × the world's tier |
 |---|---|---|
-| G1–G5, every line | after the tier's first win | 30 |
-| G6–G10, every line | after a win on continent 3 | 80 |
+| G1–G5, every line | after the tier's first win | 20 |
+| G6–G10, every line | after a win on continent 3 | 53 |
 
 | Thing | Price (Laurels) |
 |---|---|
 | Speed Ticket | 10 |
 | Sweep Ticket | 15 |
 
-A Speed Ticket takes 30 minutes off a running job. Selling, × the world's tier: a raw G1–G5 item 6, a G6–G10 one 16; refined twice that; a made item 6 + 6 × its grade. A Class Manual costs 1,000 Class Marks, not Laurels.
+A Speed Ticket takes 30 minutes off a running job. Selling, × the world's tier: a raw G1–G5 item 4, a G6–G10 one 11; refined twice that; a made item 6 + 6 × its grade. A Class Manual costs 1,000 Class Marks, not Laurels.
 <!-- /live -->
 
 The Exchange (`save/exchange.ts`) sells raw materials only: each line's ten grades in every world, G1–G5 once the world
@@ -302,8 +302,8 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
   place makes its item from refined ones ([materials](materials.md)).
 - **Grades** (FL6): every line has ten, G1–G10; grade g opens at Craft Lv 5g − 4 (1, 6, 11 … 46) to gather, to process
   and to make, and a made item of grade g takes its line's refined items of grade g.
-- **Speed (FL28):** set by her Craft Level alone, the same for every item and grade. One step takes 36 minutes at Lv 1,
-  falling evenly to 24 at Lv 50, before the place's ×1.25. Gathering one raw item is one step; processing it is one step;
+- **Speed (FL28):** set by her Craft Level alone, the same for every item and grade. One step takes 24 minutes at Lv 1,
+  falling evenly to 16 at Lv 50, before the place's ×1.25. Gathering one raw item is one step; processing it is one step;
   making is one step per refined item in its recipe.
 - **Pace (D96):** a level takes 12 hours of work at Lv 1, rising to 18 at Lv 49 (88,200 EXP to Lv 50). Craft EXP is 2 a
   minute of the job at her level, before the place's speed, whatever it makes, so every job levels at the same rate an
@@ -314,10 +314,10 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
     work is finished collects it first.
   - Every job runs in the shared work engine, `@luismlorenzana/uma-work`, the same code as uma-racer's; this game
     supplies its kinds (gather, process, make), its fifteen places and its Craft Level.
-  - **Sizes (D233):** every step takes the same time, so sizes are brackets of steps: ×1, ×2, ×3, ×5, ×10, ×15 or ×20
-    to gather or process, about half an hour, 1, 1½, 2, 4, 6 and 8 hours at mid Craft Level. A make offers the sizes up
-    to about 20 steps: Armor Fittings (2 steps) to ×10, a Moon Jewel (4) to ×5, an Arms Gem or Tome Ink (7) to ×3, an
-    Accessory Setting or a Planet Jewel (10) to ×2. Each size shows its time.
+  - **Sizes (D233, D264):** every step takes the same time, so sizes are brackets of steps: ×1, ×2, ×3, ×5, ×10, ×15, ×20
+    or ×30 to gather or process, about a quarter of an hour, ½, ¾, 1¼, 2¾, 4, 5½ and 8 hours at mid Craft Level. A make offers
+    the sizes up to about 30 steps: Armor Fittings (3 steps) to ×10, an Accessory Setting or a jewel (5) to ×5, an Arms Gem
+    or Tome Ink (10) to ×3. Each size shows its time.
   - Inputs leave the Warehouse when the job starts. Outputs go to the Warehouse when collected.
 - **Queues:** up to three more jobs wait behind the current one, for the same Uma at the same place. Each starts the
   moment the one before ends and takes its inputs then, so a chain catches up however late it's collected. If the
@@ -336,7 +336,7 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
 - **Targets:** mark up to ten Umas a world on their profiles (`save/targets.ts`). Every place then lists what maxing
   them still takes from it:
   - **The making places:** each made item still needed to raise her active class's three weapons, her five armor slots
-    and her accessory slot to G10, or to open an Extra Stats node.
+    and her accessory slots to G10, or to open an Extra Stats node.
   - **The workbenches:** the refined items of their line those still need.
   - **The gathering places:** the raw items of their line those still need.
   - **Each line** shows the total need, what's in the Warehouse and what's coming. It stays until the Warehouse holds
@@ -351,11 +351,11 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
 <!-- live:jobs -->
 | Setting | Value |
 |---|---|
-| One step | gather one raw or process one raw into one refined: 36 min at Craft Lv1, falling evenly to 24 min at Lv50 (ten in 6 h and 4 h) |
-| Make one item | one step for each refined item in it: an Arms Gem or Tome Ink 7, Armor Fittings 2, an Accessory Setting 10, a Planet Jewel 10, a Moon Jewel 4 (an Arms Gem 4.2 h at Lv1, 2.8 h at Lv50) |
+| One step | gather one raw or process one raw into one refined: 24 min at Craft Lv1, falling evenly to 16 min at Lv50 (ten in 4 h and 2.7 h) |
+| Make one item | one step for each refined item in it: an Arms Gem or Tome Ink 10, Armor Fittings 3, an Accessory Setting 5, a Planet Jewel 5, a Moon Jewel 5 (an Arms Gem 4 h at Lv1, 2.7 h at Lv50) |
 | Opens | grade g at Craft Lv 5g − 4, to gather, to process and to make |
 | Craft EXP | 2 per minute of the job at her level, before the place's speed |
-| Sizes | ×1, ×2, ×3, ×5, ×10, ×15, ×20 to gather or process; a make up to about 20 steps (8 h at Craft Lv25): Armor Fittings ×10, a Moon Jewel ×5, an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×2 |
+| Sizes | ×1, ×2, ×3, ×5, ×10, ×15, ×20, ×30 to gather or process; a make up to about 30 steps (8 h at Craft Lv25): Armor Fittings ×10, a Moon Jewel ×5, an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×5 |
 | Jobs queued after it | 3 |
 | Places | 4 Uma slots each, speed ×1.25, from day one; no upgrades |
 | Extra Stats and armor points | +1 to its stat per point (+5 HP); Speed 0.6% evasion; Limit +0.4 starting charge |
@@ -368,10 +368,10 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
 The Observatory's map (EP1–EP8; `economy/planet.ts`, `save/observatory.ts`):
 - Each Uma has a map of a **Planet** and three moons, **Prowess**, **Vigor** and **Guard**, five nodes each (20, the same
   for every class), and beside them **her moon**, two nodes read from her template ★.
-- **A jewel opens a node,** in order: Planet n needs a Planet Jewel n, a moon's node n a Moon Jewel n (the moon picked
-  when it's set), her moon's I and II Moon Jewels II and IV. A node opens at Uma Lv 5g − 4 for its grade (Planet n is
-  grade 2n − 1, a moon's n grade 2n, her moon's I and II grades 4 and 8), once the node below it on its body is open.
-  The jewel is used up.
+- **Jewels open nodes,** in order, three a rank (D264): Planet n takes three Planet Jewels n, a moon's node n one Moon
+  Jewel n (the moon picked when it's set). A node opens at Uma Lv 5g − 4 for its grade (Planet n is grade 2n − 1, a moon's n
+  grade 2n), once the node below it on its body is open. The jewels are used up.
+- **Her moon takes no jewel:** node I opens with the third moon's node II, node II with the third moon's node IV.
 - **Every open node counts:** nothing to switch on.
 - **What a node gives** (Tier 1, × 1.8 in Tier 2 and × 2.6 in Tier 3):
 
@@ -396,18 +396,17 @@ The Observatory's map (EP1–EP8; `economy/planet.ts`, `save/observatory.ts`):
 Every made item and value is in [materials](materials.md#gear); `economy/grades.ts`, `economy/accessories.ts` and
 `save/forge.ts` hold the rules.
 - **Slots:** a grade on each of the ten weapons (she fights with her class's three), five armor slots (head, body, legs,
-  arms, feet) and one accessory slot, each G0 to G10. Grade g opens at Uma Lv 5g − 4.
+  arms, feet) and three accessory slots, each G0 to G10. Grade g opens at Uma Lv 5g − 4.
 - **Raising a grade:** a made item of the next grade from the Warehouse (an Arms Gem for an Arms weapon, Tome Ink for a
   Tome, Armor Fittings, an Accessory Setting) raises the slot one grade; a sheet can climb several grades at once when
   the Warehouse holds each one. The Gear tab's Upgrade view marks a slot she can raise now.
 - **What it does:** a weapon's Might on its hits; armor its slot's stat and ATK or M.ATK by her class's half; her
   accessory's family in its base form; her signature while she wears her knack's family ([combat](combat.md#damage)).
-- **The accessory slot:** its family (Pendant, Orb, Bell, Insignia), and an Orb's or a Bell's kind (one of her three
-  weapons' kinds), change freely on the Gear tab's Equip view; the grade is the slot's and stays, raised on its Upgrade
-  view.
+- **The accessory slots:** each has its own family (Pendant, Charm, Orb, Insignia), an Orb's kind (one of her three
+  weapons'), which change freely on the Gear tab's Equip view, and its own grade, raised on its Upgrade view.
 - **Standard preset (D164, D263):** at the top of the Gear tab, a tap puts on her active class's preset
-  ([classes](classes.md#standard-presets)), or a Tier 0's pick among the classes it promotes into: three weapons and her
-  accessory slot's family (her signature's ★ family when she has one, else the class's form). Grades don't move.
+  ([classes](classes.md#standard-presets)), or a Tier 0's pick among the classes it promotes into: three weapons and all three
+  accessory slots (the class's set, her signature's ★ family first). Grades don't move.
 
 ## Springs, replays and Sweeps
 

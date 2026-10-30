@@ -17,12 +17,16 @@ describe('targets (R2; the farm by line since H112)', () => {
     const count = (prefix: string) => total(plan.made.filter((row) => row.key.startsWith(prefix)))
     expect(count('weapon-gem-')).toBe(30)
     expect(count('armor-fittings-')).toBe(50)
-    expect(count('accessory-setting-')).toBe(10)
-    expect(count('jewel-planet-')).toBe(5)
-    expect(count('jewel-moon-')).toBe(17)
-    // A Brawler's three Arms: 30 Arms Gems × 7 Ingots, 50 Fittings × 2 Planks, 10 Settings × 10 Fillets, 5 Planets × 10
-    // and 17 Moons × 4 cut stones (FL9).
-    expect(total(plan.refined)).toBe(210 + 100 + 100 + 50 + 68)
+    expect(count('accessory-setting-')).toBe(30)
+    expect(count('jewel-planet-')).toBe(15)
+    expect(count('jewel-moon-')).toBe(15)
+    // A Brawler's three Arms: 30 Arms Gems × 10 Ingots, 50 Fittings × 3 Planks, 30 Settings × 5 Fillets, and 15 Planet and
+    // 15 Moon Jewels × 5 cut stones (D264).
+    expect(total(plan.refined)).toBe(300 + 150 + 150 + 150)
+    // Every grade the same on every line but the one she doesn't use: the wishlist is flat.
+    for (const place of ['forest-workbench', 'fishery-workbench', 'den-workbench']) {
+      expect(new Set(facilityTargets(plan, place).map((row) => row.need)), place).toEqual(new Set([15]))
+    }
     expect(total(plan.raw)).toBe(total(plan.refined))
     const lineOf = (key: string) => lineItem(key)?.line
     const forge = facilityTargets(plan, 'weapon-forge')

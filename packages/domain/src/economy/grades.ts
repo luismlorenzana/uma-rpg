@@ -26,8 +26,9 @@ export type GearTier = keyof typeof TIER_SCALE_TENTHS
 
 export const gradeGateLevel = (grade: number): number => 5 * grade - 4
 
+/** Her accessory slots: three in every tier (D264, save v34; was 1 · 2 · 3 by tier, WP19). */
 export function accessorySlotCount(_tier: GearTier, _engine = BATTLE_ENGINE_VERSION): number {
-  return 1
+  return 3
 }
 
 export function newGrades(tier: GearTier): UmaGrades {

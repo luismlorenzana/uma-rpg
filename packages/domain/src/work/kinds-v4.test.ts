@@ -77,7 +77,7 @@ describe('the farm by line\'s places and env (FL1–FL3)', () => {
 
 describe('gathering (FL5, FL6)', () => {
   it('gathers its line\'s raw items only, grade g from Craft Lv 5g − 4', () => {
-    expect(first(plan(worldOf({ 101: 1 }), 'mine', 'gather', 'copper-ore', { count: 3 }))).toEqual({ seconds: 1728, inputs: [], output: { item: 'copper-ore' }, exp: 72 })
+    expect(first(plan(worldOf({ 101: 1 }), 'mine', 'gather', 'copper-ore', { count: 3 }))).toEqual({ seconds: 1152, inputs: [], output: { item: 'copper-ore' }, exp: 48 })
     expect(why(plan(worldOf({ 101: 5 }), 'mine', 'gather', 'tin-ore'))).toBe('Needs Craft Lv6')
     expect(first(plan(worldOf({ 101: 6 }), 'mine', 'gather', 'tin-ore')).seconds).toBe(seconds(stepMinutes(6)))
     expect(why(plan(worldOf({ 101: 10 }), 'mine', 'gather', 'iron-ore'))).toBe('Needs Craft Lv11')
@@ -118,16 +118,16 @@ describe('processing at the line\'s making place (FL2, FL10)', () => {
 
 describe('making (FL3, FL7, FL9, FL10)', () => {
   it('takes one line\'s refined items of its own grade, the same amount at every grade', () => {
-    expect(madeRecipeV4('weapon-gem-g3')).toEqual({ 'iron-ingot': 7 })
-    expect(madeRecipeV4('tome-ink-g1')).toEqual({ 'chopped-carrot': 7 })
-    expect(madeRecipeV4('armor-fittings-g10')).toEqual({ 'yggdrasil-plank': 2 })
-    expect(madeRecipeV4('accessory-setting-g4')).toEqual({ 'mackerel-fillet': 10 })
-    expect(madeRecipeV4('jewel-planet-3')).toEqual({ 'cut-emerald': 10 })
-    expect(madeRecipeV4('jewel-moon-5')).toEqual({ 'cut-philosophers-stone': 4 })
+    expect(madeRecipeV4('weapon-gem-g3')).toEqual({ 'iron-ingot': 10 })
+    expect(madeRecipeV4('tome-ink-g1')).toEqual({ 'chopped-carrot': 10 })
+    expect(madeRecipeV4('armor-fittings-g10')).toEqual({ 'yggdrasil-plank': 3 })
+    expect(madeRecipeV4('accessory-setting-g4')).toEqual({ 'mackerel-fillet': 5 })
+    expect(madeRecipeV4('jewel-planet-3')).toEqual({ 'cut-emerald': 5 })
+    expect(madeRecipeV4('jewel-moon-5')).toEqual({ 'cut-philosophers-stone': 5 })
     expect(madeRecipeV4('branch-gem')).toEqual({ 'cobalt-ingot': 7 })
     expect(() => madeRecipeV4('copper-ore')).toThrow(RangeError)
-    const want = { 'weapon-gem': ['metal', 7], 'tome-ink': ['vegetables', 7], 'armor-fittings': ['wood', 2], 'accessory-setting': ['fish', 10],
-      'jewel-planet': ['stone', 10], 'jewel-moon': ['stone', 4], 'branch-gem': ['metal', 7] } as const
+    const want = { 'weapon-gem': ['metal', 10], 'tome-ink': ['vegetables', 10], 'armor-fittings': ['wood', 3], 'accessory-setting': ['fish', 5],
+      'jewel-planet': ['stone', 5], 'jewel-moon': ['stone', 5], 'branch-gem': ['metal', 7] } as const
     for (const m of MADE_IDENTITIES) {
       const [[id, qty]] = Object.entries(madeRecipeV4(m.id)) as [[string, number]]
       expect(lineItem(id), m.id).toMatchObject({ line: want[m.line][0], grade: m.grade, refined: true })
@@ -136,22 +136,22 @@ describe('making (FL3, FL7, FL9, FL10)', () => {
     }
   })
 
-  it('makes an Arms Gem G1 from 7 Copper Ingot at one step each: 252 minutes at Craft Lv 1', () => {
-    expect(makeMinutesV4(1, 7)).toBe(252)
-    expect(makeMinutesV4(50, 7)).toBe(168)
+  it('makes an Arms Gem G1 from 10 Copper Ingot at one step each: 240 minutes at Craft Lv 1', () => {
+    expect(makeMinutesV4(1, 10)).toBe(240)
+    expect(makeMinutesV4(50, 10)).toBe(160)
     const gem = first(plan(worldOf({ 101: 1 }), 'weapon-forge', 'craft', 'weapon-gem-g1', { count: 10 }))
-    expect(gem).toEqual({ seconds: seconds(252), inputs: [{ item: 'copper-ingot', qty: 7 }], output: { item: 'weapon-gem-g1' }, exp: jobExp(252) })
+    expect(gem).toEqual({ seconds: seconds(240), inputs: [{ item: 'copper-ingot', qty: 10 }], output: { item: 'weapon-gem-g1' }, exp: jobExp(240) })
     expect(plan(worldOf({ 101: 1 }), 'weapon-forge', 'craft', 'weapon-gem-g1', { count: 10 })).toHaveLength(10)
     expect(why(plan(worldOf({ 101: 50 }), 'weapon-forge', 'craft', 'tome-ink-g1'))).toBe(NOT_HERE)
     expect(why(plan(worldOf({ 101: 50 }), 'weapon-forge', 'craft', 'branch-gem', { tier: 2 }))).toBe(NOT_HERE)
   })
 
   it('makes Tome Ink at its Forge, Settings at the Charm Forge, Fittings at the Armorer and jewels at the Lapidary', () => {
-    expect(first(plan(worldOf({ 101: 1 }), 'tome-forge', 'craft', 'tome-ink-g1')).inputs).toEqual([{ item: 'chopped-carrot', qty: 7 }])
-    expect(first(plan(worldOf({ 101: 16 }), 'charm-forge', 'craft', 'accessory-setting-g4')).seconds).toBe(seconds(makeMinutesV4(16, 10)))
+    expect(first(plan(worldOf({ 101: 1 }), 'tome-forge', 'craft', 'tome-ink-g1')).inputs).toEqual([{ item: 'chopped-carrot', qty: 10 }])
+    expect(first(plan(worldOf({ 101: 16 }), 'charm-forge', 'craft', 'accessory-setting-g4')).seconds).toBe(seconds(makeMinutesV4(16, 5)))
     expect(first(plan(worldOf({ 101: 1 }), 'armorer', 'craft', 'armor-fittings-g1')).seconds).toBe(seconds(72))
     expect(why(plan(worldOf({ 101: 20 }), 'lapidary', 'cut', 'jewel-planet-3'))).toBe('Needs Craft Lv21')
-    expect(first(plan(worldOf({ 101: 21 }), 'lapidary', 'cut', 'jewel-planet-3')).inputs).toEqual([{ item: 'cut-emerald', qty: 10 }])
+    expect(first(plan(worldOf({ 101: 21 }), 'lapidary', 'cut', 'jewel-planet-3')).inputs).toEqual([{ item: 'cut-emerald', qty: 5 }])
     expect(why(plan(worldOf({ 101: 50 }), 'lapidary', 'craft', 'jewel-planet-3'))).toBe(NOT_HERE)
     expect(why(plan(worldOf({ 101: 50 }), 'tome-forge', 'craft', 'weapon-gem-g1'))).toBe(NOT_HERE)
   })

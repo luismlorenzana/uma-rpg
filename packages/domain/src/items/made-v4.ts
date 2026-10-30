@@ -1,7 +1,8 @@
 // The farm by line's recipes (D224; farm-by-line.md FL7, FL9, FL14; H109): a made item takes one line's refined items of
 // its own grade, the same amount at every grade (a jewel's grade is its node's: Planet n 2n − 1, Moon n 2n). An Arms Gem
-// (R2's Weapon Gem, renamed) or Tome Ink 7, Armor Fittings 2, an Accessory Setting 10, a Planet Jewel 10, a Moon Jewel 4;
-// each line carries about 100–110 refined items a maxed Uma (FL9). Live since H112 (save v30).
+// (R2's Weapon Gem, renamed) or Tome Ink 10, Armor Fittings 3, an Accessory Setting 5, a Planet Jewel or a Moon Jewel 5, so
+// one rank of everything takes two Umas, one on Arms and one on Tomes, exactly 30 refined items on each of the five lines
+// (D264, FL9's successor): 3 × 10, 5 × 3 × 2, 3 × 5 × 2, 3 × 5 × 2. Live since H112 (save v30).
 import { lineItemId, type MaterialLine } from './lines'
 import { madeName } from './made'
 import { madeIdentity, type MadeLine } from './made-id'
@@ -9,12 +10,12 @@ import { madeIdentity, type MadeLine } from './made-id'
 /** Each made line's line and amount (FL9). The Branch Gem is R3's (not live): its world's G5 metal, a placeholder R3
  * replaces. */
 export const RECIPE_V4: Readonly<Record<MadeLine, { line: MaterialLine; qty: number }>> = {
-  'weapon-gem': { line: 'metal', qty: 7 },
-  'tome-ink': { line: 'vegetables', qty: 7 },
-  'armor-fittings': { line: 'wood', qty: 2 },
-  'accessory-setting': { line: 'fish', qty: 10 },
-  'jewel-planet': { line: 'stone', qty: 10 },
-  'jewel-moon': { line: 'stone', qty: 4 },
+  'weapon-gem': { line: 'metal', qty: 10 },
+  'tome-ink': { line: 'vegetables', qty: 10 },
+  'armor-fittings': { line: 'wood', qty: 3 },
+  'accessory-setting': { line: 'fish', qty: 5 },
+  'jewel-planet': { line: 'stone', qty: 5 },
+  'jewel-moon': { line: 'stone', qty: 5 },
   'branch-gem': { line: 'metal', qty: 7 },
 }
 

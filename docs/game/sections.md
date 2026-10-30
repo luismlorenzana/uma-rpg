@@ -163,7 +163,7 @@ world map's party bar).
   - RPG: Class, her active class, the thirteen in the tree's order (the five Tier 0s, then Brawler, Arms Spellblade, Arms
     Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer); Can upgrade;
   - Template: Calling (the five Tier 0s, read from her running styles: Warrior, Spellblade, Mage, Summoner, Healer),
-    Stride (three), Knack (five) and Signature (Pendant, Orb, Bell, Insignia);
+    Stride (three), Knack (five) and Signature (Pendant, Orb, Charm, Insignia);
   - Trade: "Mine · Weapon Forge", "Forest · Armorer", "Fields · Tome Forge", "Fishery · Charm Forge" and "Monster Den ·
     Lapidary", each with its head count, locked outfits too.
 - **Seven sorts:** Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and
@@ -260,9 +260,8 @@ UX](../design/profile-ux.md), D229):
 [combat](combat.md#where-damage-comes-from)):
 - "Fights as Sorcerer" with "5/7 skills · Party 1" (opens Skills).
 - Four groups in three columns, every row always listed, 0 included:
-  - **Offense:** ATK, M.ATK, Might for each of her three weapons ("Fire Tome +8"), Accessory ("Pendant: +2 on her three
-    kinds", "Orb: Fire +8", "Bell: Katana 0.4 after her Attack", "Insignia: +6% on sub-bosses and bosses", or "None"),
-    and Signature ("+10 ★") while she wears her family;
+  - **Offense:** ATK, M.ATK, Might for each of her three weapons ("Fire Tome +8"), Accessory 1–3 ("Pendant · ATK +3",
+    "Charm · M.ATK +3", "Orb · Fire +4", "Insignia · Bosses +2.5%", or "None"), and Signature ("+10 ★") while she wears her family;
   - **Defense:** DEF, M.DEF, Evasion;
   - **Sustain:** HP, a healer's Mends ("×1.33 (from M.ATK)" for a Cleric, "(from ATK)" for a Paladin), MP with what she
     regains a round ("296 · +13 a round"), and ★ Flourish ("Even pace · 1% a round, up to 4%", or "No effect as
@@ -278,20 +277,19 @@ UX](../design/profile-ux.md), D229):
 for the session.
 - **Equip**, what she wears:
   - the standard preset (`presetRows`; D263): one row, "Standard preset" or "Standard preset · On", with her class's
-    emblem and "Lance · Greatsword · Light Tome · Pendant" under it. A Tier 0 shows a "Standard preset" heading and one row
+    emblem and "Lance · Greatsword · Light Tome" under it. A Tier 0 shows a "Standard preset" heading and one row
     for each class it promotes into, each with that class's emblem and name ("Paladin", "Cleric · On"). A tap sets those
-    weapons and puts her ★ family on its kind; no grade moves ([classes](classes.md#standard-presets)).
+    weapons and all three accessory slots, her ★ family first; no grade moves ([classes](classes.md#standard-presets)).
   - **Loadout** ("Set on Skills ›"): her three weapons' icons with their grades, then "Physical armor" or "Magical
     armor" with the five slots' icons and grades. A slot at G0 is an empty frame.
-  - **Accessory · G4**: four family buttons in one row, her ★ family first, then Bell, Pendant, Orb and Insignia; the
-    one she wears is ringed. Below, the selected family only: its name; what it does at the slot's grade ("+2 on her
-    three kinds"; "From G1: …" at G0); "★ Her signature: ATK and M.ATK +10" on her family; "No Greatsword in her slots"
-    on a Bell or Orb left on a kind she no longer holds; for a Bell or an Orb, one kind button per weapon she holds; and
-    one button: **Equip**, **Equipped**, or "Switch to Lance".
+  - **Accessory 1 · G4**, **Accessory 2** and **Accessory 3**, a section a slot: four family buttons in one row, her ★
+    family first, then Pendant, Charm, Orb and Insignia; the one she wears is ringed. Below, the selected family only: its
+    name; what it does at the slot's grade ("ATK +3"; "G1: ATK +1" at G0); "★ Signature · ATK/M.ATK +10 · Worn" on her
+    family; "Greatsword not held" on an Orb left on a kind she no longer holds; for an Orb, one kind button per weapon she
+    holds; and one button, **Set**.
 - **Upgrade**, what she spends:
   - **Grades**, in three groups: Weapons ("Greatsword · G3 · Might 8 · weak ×1.3"), Armor ("Head · Helm · G2 · DEF +8")
-    and Accessory ("Pendant · G4 · +2 on her three kinds · ★ +10", "Bell · Katana · G0 · counts from G1", "Accessory ·
-    G0 · Pick a form"). Each row's pill raises it at once ("G3 → G4 · 1 Arms Gem G4"; Tome Ink on a Tome), with the
+    and Accessory, one row a slot ("Pendant · G4 · ATK +2 · ★ +10", "Charm · G0 · Off", "None · G0"). Each row's pill raises it at once ("G3 → G4 · 1 Arms Gem G4"; Tome Ink on a Tome), with the
     green mark, or says why not ("Needs Lv 16", "Needs 1 Arms Gem G4", "Already G10").
   - A row's sheet: "Now · G3 · Might 8 · weak ×1.3", "Next · …", an armor slot's half ("Her class's half · Helm"), the
     raise button, and **Up to G6** when the Warehouse holds several grades, which lists the items and asks Cancel or
@@ -452,10 +450,10 @@ Level.
 - **Her map:** the Planet in the middle; Prowess, Vigor and Guard around it, five nodes each; and her own moon's two, "★
   Longblade". An open node is filled. A tap opens its sheet: "Prowess II"; what it gives ("+4 to every stat", "as
   Brawler ATK +6, M.ATK +0", "HP +30, MP +6", "DEF and M.DEF +6"; her moon's "Tireless · HP +20" and "DEF +8"); and its
-  jewel ("needs a Planet Jewel III · opens at Lv 21", or "Planet Jewel III · Open").
+  jewels ("Planet Jewel III ×3 · Lv 21", "Moon Jewel II · Open"; her moon's "With its moons · Lv 16").
 - Prowess's split ("Prowess · Brawler 100/0: ATK +6, M.ATK +0"), then the six stats' totals, her moon's part starred.
-- **Set:** each jewel in the Warehouse that opens one of her nodes now ("Moon Jewel I ×4", "Opens Prowess I · …",
-  **Set**), or "No jewels ready." A jewel that fits several nodes asks which one.
+- **Set:** each jewel in the Warehouse that opens one of her nodes now, with three in stock for a Planet node ("Moon Jewel I
+  ×4", "Opens Prowess I · …", **Set**), or "No jewels ready." A jewel that fits several nodes asks which one.
 
 Its quick look and (i) show the place's line, which still reads "a Sun, eight planets and their moons".
 
@@ -631,7 +629,7 @@ kit's `uma-kit/work`.
   - **Who:** the shared Uma picker; her trade's Umas first (free ones, then the highest Craft Level), each face with her
     Craft Level ("C30"). Anyone else is greyed "Another trade", unless the place is an open shop. Locked and busy Umas
     say why. Fighting doesn't block work (D119).
-  - **How many** follows the picked job (D233), each size with its time: ×1, ×2, ×3, ×5, ×10, ×15 or ×20 to gather or
+  - **How many** follows the picked job (D233), each size with its time: ×1, ×2, ×3, ×5, ×10, ×15, ×20 or ×30 to gather or
     process (about half an hour to 8 hours); a make's sizes stop near 8 hours (Armor Fittings to ×10, a Moon Jewel ×5,
     an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×2). A targets link keeps its own count. A chosen
     size stays while What changes.

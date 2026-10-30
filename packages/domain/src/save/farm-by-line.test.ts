@@ -36,8 +36,8 @@ function worldWith(tier: number, continents: readonly number[]): TierWorld {
 }
 
 describe('the farm by line (save v31)', () => {
-  it('is in the live save (v33 since D261, which keeps the farm by line as it is)', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(33)
+  it('is in the live save (v34 since D264, which keeps the farm by line as it is)', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(34)
   })
 
   it('lets the Warehouse hold the hundred line items and Tome Ink (FL5, FL14)', () => {
@@ -57,7 +57,7 @@ describe('work on the farm by line\'s env (FL2, FL10)', () => {
     const row = worldOf(save, '1').work['101']!
     expect(row.entries[0]!.request).toEqual({ kind: 'refine', item: 'copper-ingot', count: 8 })
     expect(worldOf(save, '1').items).toEqual({})
-    const made = startJob(one({ 'copper-ingot': 7 }), 'weapon-forge', 1, { outfitId: '101' }, 'weapon-gem-g1', 1, NOW)
+    const made = startJob(one({ 'copper-ingot': 10 }), 'weapon-forge', 1, { outfitId: '101' }, 'weapon-gem-g1', 1, NOW)
     expect(worldOf(made, '1').work['101']!.entries[0]!.request).toEqual({ kind: 'craft', item: 'weapon-gem-g1', count: 1 })
     expect(() => startJob(one({ 'pine-log': 1 }), 'mine-workbench', 0, { outfitId: '101' }, 'pine-plank', 1, NOW)).toThrow("That isn't made here.")
   })
@@ -66,8 +66,8 @@ describe('work on the farm by line\'s env (FL2, FL10)', () => {
     const world = gradedWorld({ umas: { '101': gradedUma() } })
     const gem = planJob(world, 'weapon-forge', { outfitId: '101' }, 'weapon-gem-g1', 1)!
     expect(gem.output).toEqual({ id: 'weapon-gem-g1', name: 'Arms Gem G1', grade: 1 })
-    expect(gem.inputs).toEqual({ 'copper-ingot': 7 })
-    expect(gem.block).toBe('Needs 7 Copper Ingot')
+    expect(gem.inputs).toEqual({ 'copper-ingot': 10 })
+    expect(gem.block).toBe('Needs 10 Copper Ingot')
     const ink = planJob(world, 'tome-forge', { outfitId: '101' }, 'tome-ink-g2', 1)!
     expect(ink.output).toEqual({ id: 'tome-ink-g2', name: 'Tome Ink G2', grade: 2 })
     expect(ink.block).toBe('Needs Craft Lv6')
@@ -115,8 +115,8 @@ describe('targets by line (FL9, FL22)', () => {
     const plan = planFor('mage')
     expect(total(plan.made.filter((r) => r.key.startsWith('tome-ink-')))).toBe(30)
     expect(plan.made.some((r) => r.key.startsWith('weapon-gem-'))).toBe(false)
-    // 30 Tome Ink × 7 = 210 vegetable cuts; 50 Fittings × 2 Planks; 10 Settings × 10 Fillets; 5 Planets × 10 and 17 Moons × 4.
-    expect(total(plan.refined)).toBe(210 + 100 + 100 + 50 + 68)
+    // 30 Tome Ink × 10 = 300 vegetable cuts; 50 Fittings × 3 Planks; 30 Settings × 5 Fillets; 15 Planet Jewels and 15 Moon Jewels × 5.
+    expect(total(plan.refined)).toBe(300 + 150 + 150 + 150)
     expect(total(plan.raw)).toBe(total(plan.refined))
     expect(plan.made.find((r) => r.key === 'tome-ink-g3')).toMatchObject({ name: 'Tome Ink G3', grade: 3, need: 3 })
     expect(facilityTargets(plan, 'tome-forge').map((r) => r.key)).toEqual(Array.from({ length: 10 }, (_, i) => `tome-ink-g${i + 1}`))
@@ -133,7 +133,7 @@ describe('targets by line (FL9, FL22)', () => {
     expect(forge.filter((r) => r.key.startsWith('weapon-gem-'))).toHaveLength(10)
     expect(forge).toHaveLength(10)
     expect(facilityTargets(planFor('brawler'), 'mine-workbench')[0]?.key).toBe('copper-ingot')
-    expect(facilityTargets(planFor('brawler'), 'mine-workbench').find((r) => r.key === 'iron-ingot')).toMatchObject({ name: 'Iron Ingot', grade: 3, need: 21 })
+    expect(facilityTargets(planFor('brawler'), 'mine-workbench').find((r) => r.key === 'iron-ingot')).toMatchObject({ name: 'Iron Ingot', grade: 3, need: 30 })
     expect(facilityTargets(planFor('brawler'), 'mine').map((r) => r.key)[1]).toBe('tin-ore')
   })
 })
@@ -149,13 +149,13 @@ describe('the Exchange by grade (FL12, FL13)', () => {
     expect(stockedTypes(worldWith(2, [3]), 2)).toHaveLength(50)
   })
 
-  it('prices raw G1–G5 at 30 and G6–G10 at 80 Laurels × the tier, and sells as R2 does by grade', () => {
-    expect([rawPriceV4('tin-ore', 1), rawPriceV4('gold-ore', 1), rawPriceV4('trout', 2), rawPriceV4('tin-ingot', 1)]).toEqual([30, 80, 60, 0])
-    expect([sellPrice('items', 'trout'), sellPrice('items', 'eel'), sellPrice('items', 'eel-fillet'), sellPrice('items', 'tome-ink-g3', 2)]).toEqual([6, 16, 32, 48])
+  it('prices raw G1–G5 at 20 and G6–G10 at 53 Laurels × the tier, and sells at two thirds of R2 by grade (D264)', () => {
+    expect([rawPriceV4('tin-ore', 1), rawPriceV4('gold-ore', 1), rawPriceV4('trout', 2), rawPriceV4('tin-ingot', 1)]).toEqual([20, 53, 40, 0])
+    expect([sellPrice('items', 'trout'), sellPrice('items', 'eel'), sellPrice('items', 'eel-fillet'), sellPrice('items', 'tome-ink-g3', 2)]).toEqual([4, 11, 22, 48])
     const world = worldWith(1, [1])
     const bought = buyRawItem(saveOf({ ...world, wallet: { ...world.wallet, laurels: 100 } }), 'tin-ore', 3, stockedTypes(world, 1), NOW, '1')
     expect(worldOf(bought, '1').items).toEqual({ 'tin-ore': 3 })
-    expect(worldOf(bought, '1').wallet.laurels).toBe(10)
+    expect(worldOf(bought, '1').wallet.laurels).toBe(40)
     expect(() => buyRawItem(saveOf(world), 'tin-ingot', 1, stockedTypes(world, 1), NOW, '1')).toThrow('raw items only')
     expect(() => buyRawItem(saveOf(world), 'gold-ore', 1, stockedTypes(world, 1), NOW, '1')).toThrow('Not stocked yet')
   })

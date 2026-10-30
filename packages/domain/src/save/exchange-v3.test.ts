@@ -39,34 +39,34 @@ describe('what the Exchange stocks (PP17, FL12)', () => {
 })
 
 describe('buying and selling (PP17)', () => {
-  it('sells a stocked raw item at 30 (G1–G5) or 80 (G6–G10) Laurels × the world\'s tier', () => {
+  it('sells a stocked raw item at 20 (G1–G5) or 53 (G6–G10) Laurels × the world\'s tier', () => {
     expect([1, 2, 3].map((t) => [rawPriceV4('copper-ore', t), rawPriceV4('iron-ore', t), rawPriceV4('gold-ore', t), rawPriceV4('titanium-ore', t)]))
-      .toEqual([[30, 30, 80, 80], [60, 60, 160, 160], [90, 90, 240, 240]])
+      .toEqual([[20, 20, 53, 53], [40, 40, 106, 106], [60, 60, 159, 159]])
     expect(rawPriceV4('copper-ingot', 1)).toBe(0)
     const world = worldWith(2, [1, 2], { wallet: { ...gradedWorld().wallet, laurels: 1000 } })
     const stocked = stockedTypes(world, 2)
     const bought = buyRawItem(saveOf(2, world), 'tin-ore', 3, stocked, NOW, '2')
     expect(worldOf(bought, '2').items).toEqual({ 'tin-ore': 3 })
-    expect(worldOf(bought, '2').wallet.laurels).toBe(1000 - 3 * 60)
+    expect(worldOf(bought, '2').wallet.laurels).toBe(1000 - 3 * 40)
     expect(() => buyRawItem(saveOf(2, world), 'gold-ore', 1, stocked, NOW, '2')).toThrow('Not stocked yet')
     expect(() => buyRawItem(saveOf(2, world), 'gold-ingot', 1, stocked, NOW, '2')).toThrow('raw items only')
     expect(() => buyRawItem(saveOf(2, world), 'weapon-gem-g1', 1, stocked, NOW, '2')).toThrow('raw items only')
-    expect(() => buyRawItem(saveOf(2, world), 'carp', 17, stocked, NOW, '2')).toThrow('needs 1020 Laurels')
+    expect(() => buyRawItem(saveOf(2, world), 'carp', 26, stocked, NOW, '2')).toThrow('needs 1040 Laurels')
   })
 
   it('buys back materials and made items × the world\'s tier, and nothing off the retired shelves', () => {
     const prices = (tier: number) => ['carrot', 'cabbage', 'chopped-carrot', 'shredded-cabbage', 'weapon-gem-g1', 'weapon-gem-g10', 'jewel-moon-5', 'branch-gem']
       .map((id) => sellPrice('items', id, tier))
     // Cabbage is G3 now: a low band's price, as Carrot's.
-    expect(prices(1)).toEqual([6, 6, 12, 12, 12, 66, 66, 36])
-    expect(prices(2)).toEqual([12, 12, 24, 24, 24, 132, 132, 72])
-    expect(prices(3)).toEqual([18, 18, 36, 36, 36, 198, 198, 108])
-    expect([sellPrice('items', 'eel', 1), sellPrice('items', 'tome-ink-g3', 1), sellPrice('items', 'nothing', 1)]).toEqual([16, 24, 0])
+    expect(prices(1)).toEqual([4, 4, 8, 8, 12, 66, 66, 36])
+    expect(prices(2)).toEqual([8, 8, 16, 16, 24, 132, 132, 72])
+    expect(prices(3)).toEqual([12, 12, 24, 24, 36, 198, 198, 108])
+    expect([sellPrice('items', 'eel', 1), sellPrice('items', 'tome-ink-g3', 1), sellPrice('items', 'nothing', 1)]).toEqual([11, 24, 0])
     expect(sellPrice('gems', 'moon-atk-1', 1)).toBe(0)
     const world = worldWith(2, [], { items: { 'cut-diamond': 2 } })
     const sold = sellStock(saveOf(2, world), 'items', 'cut-diamond', 2, NOW, '2')
     expect(worldOf(sold, '2').items).toEqual({})
-    expect(worldOf(sold, '2').wallet.laurels).toBe(world.wallet.laurels + 2 * 64)
+    expect(worldOf(sold, '2').wallet.laurels).toBe(world.wallet.laurels + 2 * 44)
   })
 
   it('keeps the tickets as they are', () => {

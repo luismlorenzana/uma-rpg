@@ -49,7 +49,7 @@ Code: `packages/domain/src/rpg/battle/` (`engine.ts` the reducer, `skills.ts` it
 - **Auto and speed.** Auto plays each Uma's turn with the same policy the balance simulation uses (`autoAction`):
   - a ready Limit Break first (a Hero's own, a Learner's from her highest Bond), on the foe it scores best on;
   - otherwise the best affordable skill or Attack, weighing weaknesses, how many foes it reaches and a standing
-    shield; an Attack counts her Bell's follow-up, and against a Rift foe's ward the warded channel counts for less;
+    shield; against a Rift foe's ward the warded channel counts for less;
   - a healer's support counts too: a mend for the hurt, a Barrier for the threatened, a revive for the fallen (a support
     that uses its whole share is worth 1.5 casts of its depth's damage);
   - a volley counts its splash on every other standing foe too;
@@ -123,7 +123,7 @@ resolves first whatever order the halves were picked in:
 
 ## Damage
 
-Every hit an Uma makes, a skill's, an Attack's, a Bell's, a farewell's or a Limit Break's, takes the same steps (WP31,
+Every hit an Uma makes, a skill's, an Attack's, a farewell's or a Limit Break's, takes the same steps (WP31,
 the damage stack, `battleDamage`). For each part of each hit:
 
 1. **Offense:** her ATK for an Arms kind, her M.ATK for an element (a Learner's inherited Limit Break hits with the higher
@@ -138,7 +138,7 @@ the damage stack, `battleDamage`). For each part of each hit:
    [above](#the-actions)) × her **Skill Rank**, ×0.95 to ×1.05 ([classes](classes.md#skills-depths-lines-and-ranks));
    Attacks and Limit Breaks don't rank, and a Tier 0's skill takes her Class Rank's power instead. A volley's hits on the
    tapped foe share 0.8 of its power and its splash hit on each other foe is 0.35 (for 2 MP more than the depth's); a
-   double's two hits on one foe each carry half. A farewell's, a Bell's and a Limit
+   double's two hits on one foe each carry half. A farewell's and a Limit
    Break's power are their own (above, [below](#her-accessory-and-signature) and [below](#limit-breaks)).
 3. **Weak:** ×1.3 when the hit's kind is on the foe's list ([below](#weaknesses-shields-and-breaks)), or it's Light or
    Dark against a Hexed foe.
@@ -161,7 +161,7 @@ move's power.
 
 - **Guards:** a guard who intercepts a hit takes half of it, at least 1. An Uma's Guard covers one Uma from foes'
   single-target moves (never a move on everyone). A foe guard covers the foe with the lowest share of HP until the foes'
-  next turn: an Uma's one-foe skills, Attacks and Bell on her land on the guard, and a weak one chips the guard's shield.
+  next turn: an Uma's one-foe skills and Attacks on her land on the guard, and a weak one chips the guard's shield.
 - **Barriers:** a foe's hit spends her Barrier first (a healer's, or her Flourish's), then her HP.
 
 Where the stats come from (`projectRpgStats` in `rpg/rules.ts`):
@@ -213,23 +213,21 @@ The Brawler leans ATK ×1.1 and DEF ×1.1; her map is the core her level opens, 
 
 ## Her accessory and signature
 
-One accessory slot in every tier for now, holding one of four families' base forms (WP17–WP25, D212;
-[materials](materials.md#gear)). A slot at G0 or without a family does nothing. Values are Tier 1's at G1 → G10:
+Three accessory slots in every tier, each with its own grade and one of four families' base forms, repeats allowed (D264,
+was one; [materials](materials.md#gear)). A slot at G0 or without a family does nothing. Values are Tier 1's at G1 → G10, one
+slot:
 
 | Family | In a fight | G1 → G10 |
 |---|---|---|
-| **Pendant** | Flat offense on each of her three weapons' kinds | +1 → +14 |
-| **Orb** | Flat offense on its one kind, which must be one of her weapons' when she sets it; it counts on any hit of that kind, a Limit Break's too | +1 → +27 |
-| **Bell** | A follow-up hit after an act with an Attack in it | 0.1 → 1.0 of an Attack |
-| **Insignia** | Her hits on sub-bosses and bosses ×(1 + 1.5% a grade) | ×1.015 → ×1.15 |
+| **Pendant** | +ATK, a real stat: it counts on every Arms hit, a Paladin's mends and an inherited Limit Break | +1 → +6 |
+| **Charm** | +M.ATK, the same way | +1 → +6 |
+| **Orb** | Flat offense on its one kind, which must be one of her weapons' when she sets it; it counts on any hit of that kind, a Limit Break's too | +1 → +9 |
+| **Insignia** | Her hits on sub-bosses and bosses ×(1 + 0.5% a grade) | ×1.005 → ×1.05 |
 
-Flat offense is ×1.8 in Tier 2 and ×2.6 in Tier 3; the Bell and the Insignia are the same in every tier.
+Slots add up: three G10 Orbs on one kind are +27 and three G10 Insignias ×1.15. The Pendant, the Charm and the Orb are ×1.8 in
+Tier 2 and ×2.6 in Tier 3; the Insignia is the same in every tier.
 
-- **The Bell's follow-up** (WP21): when her act includes an Attack (either half of a pair; never a skill-only act, a Guard
-  or a Limit Break), her weapon of the Bell's kind strikes once more: one hit of its kind at 0.1 a grade × her hand for
-  that weapon, on the act's target, or a foe drawn by the seed if it fell. It takes every step of the stack, a guard can
-  intercept it, and a weak one chips a shield and breaks a lock. It never splits (no Spellblade extra hit), adds
-  nothing to the Limit gauge, and works only on a kind she slots. The log labels it "Bell".
+- **A fight already open** keeps what it started with, a Bell's follow-up hit too: only fights started before D264 have one.
 - **The Insignia** reads the foe's rank, not her face: the Rift Horde's boss-faced leaders are regulars, so it skips them.
 - **Her signature** (WP33, UT7): while one of her slots holds her knack's family at G1 or above, she adds 0.2 a level ×
   the tier's multiplier (×1, ×1.8, ×2.6) to her ATK and M.ATK on her hits: +10 at Tier 1 Lv 50
@@ -605,7 +603,7 @@ scales `HERO_LIMIT_SCALE` and `HERO_LIMIT_MAX_HITS` (10) ([above](#limit-breaks)
 | `BATTLE_FLOURISH_RATE` | Even pace 0.01, Late reserve 0.02 | v16: the share of her max HP those two Flourishes mend at a round's end |
 | `BATTLE_FLOURISH_FROM` | 3 | v16: the first round whose end Late reserve mends at |
 | `RPG_BASE_MP_REGEN_V17` | 0.01 | v17: the base MP regen a depth (5% from Class Rank 40) |
-| `BELL_PERMILLE_PER_GRADE` | 100 | v17: a Bell's follow-up, per mille of an Attack a grade, × her hand |
-| `INSIGNIA_PERMILLE_PER_GRADE` | 15 | v17: an Insignia's extra damage on sub-bosses and bosses, per mille a grade |
+| `BELL_PERMILLE_PER_GRADE` | 100 | v17–v20: a Bell's follow-up, per mille of an Attack a grade, × her hand; only fights already open, D264 |
+| `INSIGNIA_SLOT_PERMILLE` | 5 | an Insignia slot's extra damage on sub-bosses and bosses, per mille a grade (D264) |
 | Signature | 0.2 a level × tier | v17: her ATK and M.ATK while she wears her knack's family |
 <!-- /live -->

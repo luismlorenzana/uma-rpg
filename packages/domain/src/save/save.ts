@@ -685,7 +685,7 @@ function parseGrade(value: unknown, path: string, level: number): number {
 const gearTier = (tier: number): GearTier => Math.min(3, Math.max(1, tier)) as GearTier
 
 /** v28's gear (H74, H75; WP2, WP3, WP19): a grade on each weapon and armor slot, absent being G0, and her tier's accessory
- * slots, each a grade and a base form: no family, a Pendant or an Insignia, or an Orb or a Bell on one of the ten kinds. */
+ * slots, each a grade and a base form: no family, a Pendant, a Charm or an Insignia, or an Orb on one of the ten kinds (D264). */
 function parseGrades(value: unknown, path: string, level: number, tier: number): UmaGrades {
   const o = object(value, path, ['weapons', 'armor', 'accessories'])
   const graded = <K extends string>(raw: unknown, at: string, keys: readonly K[]): Partial<Record<K, { grade: number }>> => {
@@ -701,8 +701,8 @@ function parseGrades(value: unknown, path: string, level: number, tier: number):
     if (a.family !== null && !(ACCESSORY_FAMILIES as readonly unknown[]).includes(a.family)) throw new SaveParseError(`${at}.family`, `expected null or ${ACCESSORY_FAMILIES.join(', ')}`)
     if (a.form !== 'base') throw new SaveParseError(`${at}.form`, 'expected base')
     const family = a.family as AccessorySlotState['family']
-    const kinded = family === 'orb' || family === 'bell'
-    if (kinded ? !RPG_DAMAGE_KINDS.includes(a.kind as RpgDamageKind) : 'kind' in a) throw new SaveParseError(`${at}.kind`, kinded ? 'expected one of the ten kinds' : 'only an Orb or a Bell has a kind')
+    const kinded = family === 'orb'
+    if (kinded ? !RPG_DAMAGE_KINDS.includes(a.kind as RpgDamageKind) : 'kind' in a) throw new SaveParseError(`${at}.kind`, kinded ? 'expected one of the ten kinds' : 'only an Orb has a kind')
     return { grade, family, form: 'base', ...(kinded ? { kind: a.kind as RpgDamageKind } : {}) }
   })
   return { weapons: graded(o.weapons, `${path}.weapons`, WEAPON_TYPES), armor: graded(o.armor, `${path}.armor`, ARMOR_SLOTS), accessories }

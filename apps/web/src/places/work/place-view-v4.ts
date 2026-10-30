@@ -52,8 +52,8 @@ export function makeGroupsV4(placeId: string, level: number): MadeGroup[] {
 /** A job's kind at a place: by its item under the farm by line. */
 export const jobKindAtV4 = (placeId: string, id: string): JobKind => jobKindV4(placeId, id) ?? placeSpecV4(placeId)?.kinds[0] ?? 'gather'
 
-/** The sizes a job offers (D233), about half an hour to about 8 hours: ×1 … ×20 to gather or process; a make's by its
- * refined items, so an Arms Gem ×1, ×2 or ×3. */
+/** The sizes a job offers (D233, D264), about a quarter of an hour to about 8 hours: ×1 … ×30 to gather or process; a make's
+ * by its refined items, so an Arms Gem ×1, ×2 or ×3. */
 export const jobSizesV4 = (item: string): number[] => jobSizes(isLineItemId(item) ? 1 : madeRefinedV4(item))
 
 /** What the sheet opens on: the highest grade she can take of the place's one kind. */

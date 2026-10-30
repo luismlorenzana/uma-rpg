@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-30; save v33, engine v20 (Classes v3 and Halls v2, D240, D241; the halls' trim, D261).** The full running-system
+> **Status: current, 2026-10-30; save v34, engine v20 (Classes v3 and Halls v2, D240, D241; the halls' trim, D261; three accessory slots, D264).** The full running-system
 > reference is [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -31,7 +31,7 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
   (D247).
 - An Uma keeps `classId` and per-class `classes` (three weapons, her `lines`, loadout) for the thirteen classes (Tier 0s
   in Tier 1's world only), her Craft Level, Class Ranks (a Tier 0's 1–10 with EXP waiting, a held Tier 1 class's from 10),
-  her Extra Stats map (`stars`: open nodes), her gear grades (by weapon kind, five armor slots, one accessory slot with
+  her Extra Stats map (`stars`: open nodes), her gear grades (by weapon kind, five armor slots, three accessory slots with
   its family and kind) and Bonds (seats by hall, the Healer Sanctum's `healer-*` from v32). Her calling pick (`calling`,
   D205) went with v32.
   There are no active `build`/`builds` keys (D86).
@@ -66,8 +66,9 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v31 the Wilds' trios: old work settles; each line moves to separate gathering, processing and making places | D230, D232 |
 | v32 Classes v3's reset: every Uma to her Tier 0 at Class Rank 1 (a later tier's to its Tier 1 class), her Class EXP back as Class Marks, the calling pick dropped; Halls v2's Healer Sanctum merge; moved trades settle on the next boot; open v18 fights replay on v18 | D247 |
 | v33 the halls' trim: the Warrior Dojo's and the Mage Tower's seats 3–4 fold into seats 1–2, each Uma's higher Bond kept | D261 |
+| v34 three accessory slots: her slot stays slot 1, a Bell drops its kind, Planet Jewels in stock count three each, her moon opens with its rank | D264 |
 
-`parseSave` accepts v1–v33 and returns v33; a world older than v10 takes v10's reset (D69), and `migrations.ts` runs the
+`parseSave` accepts v1–v34 and returns v34; a world older than v10 takes v10's reset (D69), and `migrations.ts` runs the
 rest.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots

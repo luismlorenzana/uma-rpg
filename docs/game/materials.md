@@ -28,8 +28,8 @@ each, from one uma-art family; every world, Tiers 2 and 3 included, uses the sam
 - **Processing** turns one raw item into its refined form.
 - **A made item of grade g** takes its line's refined items of grade g only (FL7). A jewel's grade is its node's.
 - **Every step is equal** (FL28): gathering one raw item, processing one, and each refined item in a recipe all take one
-  step, 36 minutes at Craft Lv 1 falling to 24 at Lv 50, before the place's ×1.25. A refined item costs three steps in
-  all: 108 minutes of work at Craft Lv 1, 72 at Lv 50.
+  step, 24 minutes at Craft Lv 1 falling to 16 at Lv 50, before the place's ×1.25. A refined item costs three steps in
+  all: 72 minutes of work at Craft Lv 1, 48 at Lv 50.
 
 ## Items by line
 
@@ -120,81 +120,96 @@ Each making place makes one thing from its own line (FL3):
 
 | Made item | Ids | Made at | From | Does |
 |---|---|---|---|---|
-| Arms Gem G1–G10 | `weapon-gem-g1` … `weapon-gem-g10` | Weapon Forge | 7 Ingots | Raises an Arms weapon (Greatsword, Axe, Lance, Bow, Katana) one grade |
-| Tome Ink G1–G10 | `tome-ink-g1` … `tome-ink-g10` | Tome Forge | 7 vegetable cuts | Raises a Tome (Fire, Blizzard, Thunder, Light, Dark) one grade |
-| Armor Fittings G1–G10 | `armor-fittings-g1` … `armor-fittings-g10` | Armorer | 2 Planks | Raises an armor slot one grade |
-| Accessory Setting G1–G10 | `accessory-setting-g1` … `accessory-setting-g10` | Charm Forge | 10 Fillets | Raises her accessory slot one grade |
-| Planet Jewel I–V | `jewel-planet-1` … `jewel-planet-5` | Lapidary | 10 cut stones | Opens Planet I–V |
-| Moon Jewel I–V | `jewel-moon-1` … `jewel-moon-5` | Lapidary | 4 cut stones | Opens a moon's node I–V; II and IV also her moon's I and II |
+| Arms Gem G1–G10 | `weapon-gem-g1` … `weapon-gem-g10` | Weapon Forge | 10 Ingots | Raises an Arms weapon (Greatsword, Axe, Lance, Bow, Katana) one grade |
+| Tome Ink G1–G10 | `tome-ink-g1` … `tome-ink-g10` | Tome Forge | 10 vegetable cuts | Raises a Tome (Fire, Blizzard, Thunder, Light, Dark) one grade |
+| Armor Fittings G1–G10 | `armor-fittings-g1` … `armor-fittings-g10` | Armorer | 3 Planks | Raises an armor slot one grade |
+| Accessory Setting G1–G10 | `accessory-setting-g1` … `accessory-setting-g10` | Charm Forge | 5 Fillets | Raises one accessory slot one grade |
+| Planet Jewel I–V | `jewel-planet-1` … `jewel-planet-5` | Lapidary | 5 cut stones | Three open Planet I–V |
+| Moon Jewel I–V | `jewel-moon-1` … `jewel-moon-5` | Lapidary | 5 cut stones | Opens a moon's node I–V |
 
 - **One recipe an item, the same at every grade and in every world** (FL9, `RECIPE_V4`): the refined items of the item's
   grade. Every recipe is listed under [jewels](#jewels) and [gear](#gear).
 - **The Arms Gem keeps R2's Weapon Gem ids:** it raises Arms only, and Tome Ink raises Tomes (FL4).
-- **Making one** takes one step for each refined item in it: an Arms Gem or Tome Ink 7, Armor Fittings 2, an Accessory
-  Setting or a Planet Jewel 10, a Moon Jewel 4. The job sizes follow from that ([loops](loops.md#craft-level)).
+- **Making one** takes one step for each refined item in it: an Arms Gem or Tome Ink 10, Armor Fittings 3, an Accessory
+  Setting, a Planet Jewel or a Moon Jewel 5. The job sizes follow from that ([loops](loops.md#craft-level)).
 - **Icons:** the gear rows of uma-art's `gear` atlas for a slot's grade, its `items` atlas for made items (Tome Ink
   borrows the essences' infusion bottles, FL15).
 - Made items wait in the Warehouse with the materials until a grade is raised or a jewel is set. They sell for 6 + 6 ×
   their grade Laurels, × the world's tier.
 
+### What a rank takes
+
+**Every line takes the same (D264).** One rank of everything, on two Umas, one with three Arms and one with three Tomes, is
+exactly 30 refined items on each of the five lines, so all fifteen places spend the same hours:
+
+| Line | Uma on 3 Arms | Uma on 3 Tomes | Both |
+|---|---|---|---|
+| Metal: 3 Arms Gems × 10 | 30 | 0 | 30 |
+| Vegetables: 3 Tome Ink × 10 | 0 | 30 | 30 |
+| Wood: 5 Armor Fittings × 3 | 15 | 15 | 30 |
+| Fish: 3 Accessory Settings × 5 | 15 | 15 | 30 |
+| Stone: 3 jewels × 5 | 15 | 15 | 30 |
+
+One Uma's weapon line is double the others because she uses only one of the two; across both Umas it evens out. That is 8.0
+hours at each of the line's three places at Craft Lv 25. A hybrid splits her 30 between Metal and Vegetables.
+
 ### What a maxed Uma takes
 
-G0 to G10 on her three weapons, five armor slots and accessory slot, and the whole Extra Stats map (D230's per-Uma
-review; the ledger is `economy/professions-v4.sim.ts`):
+G0 to G10 on her three weapons, five armor slots and three accessory slots, and the whole Extra Stats map (the ledger is
+`economy/professions-v4.sim.ts`):
 
 | Upgrade | Made items | Refined each | Refined in all | Line |
 |---|---|---|---|---|
-| Three weapons | 30 | 7 | 210 | Metal for an Arm, Vegetables for a Tome |
-| Five armor slots | 50 | 2 | 100 | Wood |
-| One accessory slot | 10 | 10 | 100 | Fish |
-| The Planet, I–V | 5 | 10 | 50 | Stone |
-| Three moons, I–V each, and her moon's two | 17 | 4 | 68 | Stone |
+| Three weapons | 30 | 10 | 300 | Metal for an Arm, Vegetables for a Tome |
+| Five armor slots | 50 | 3 | 150 | Wood |
+| Three accessory slots | 30 | 5 | 150 | Fish |
+| The Planet, I–V | 15 | 5 | 75 | Stone |
+| Three moons, I–V each | 15 | 5 | 75 | Stone |
 
 By her class, in refined items a line:
 
 | Her class (her slots) | Metal | Vegetables | Wood | Fish | Stone |
 |---|---|---|---|---|---|
-| Brawler (3 Arms) | 210 | 0 | 100 | 100 | 118 |
-| Arms Spellblade, Arms Summoner, Paladin (2 Arms, 1 Tome) | 140 | 70 | 100 | 100 | 118 |
-| Tome Spellblade, Tome Summoner, Cleric (1 Arm, 2 Tomes) | 70 | 140 | 100 | 100 | 118 |
-| Sorcerer (3 Tomes) | 0 | 210 | 100 | 100 | 118 |
+| Brawler (3 Arms) | 300 | 0 | 150 | 150 | 150 |
+| Arms Spellblade, Arms Summoner, Paladin (2 Arms, 1 Tome) | 200 | 100 | 150 | 150 | 150 |
+| Tome Spellblade, Tome Summoner, Cleric (1 Arm, 2 Tomes) | 100 | 200 | 150 | 150 | 150 |
+| Sorcerer (3 Tomes) | 0 | 300 | 150 | 150 | 150 |
 
-A Tier 0's three slots take any weapon, so her row is whichever of these her three weapons make (70 refined items of
-Metal an Arm, of Vegetables a Tome).
-
-Averaged over a roster's classes, each weapon line carries about 105 refined items an Uma, close to Wood's and Fish's
-100, so the five trades get about the same work ([pacing](../design/pacing.md)).
+A Tier 0's three slots take any weapon, so her row is whichever of these her three weapons make (100 refined items of
+Metal an Arm, of Vegetables a Tome). Averaged over a roster with Arms and Tomes split evenly, every line carries exactly 150
+refined items an Uma, so the five trades get the same work ([pacing](../design/pacing.md)).
 
 ### Jewels
 
-A jewel's grade is its node's: Planet n is grade 2n − 1, a moon's node n grade 2n. A Moon Jewel opens node n of any of
-the three moons, picked when it's set; Moon Jewels II and IV can open her own moon's I and II instead. Setting one uses it
-up ([loops](loops.md#extra-stats-and-gear)).
+A jewel's grade is its node's: Planet n is grade 2n − 1, a moon's node n grade 2n. **Every rank sets three jewels (D264):** a
+Planet node takes three Planet Jewels, and a Moon Jewel opens node n of any of the three moons, picked when it's set. Her own
+moon's two nodes take none: they open with the third moon's node II and IV. Setting a jewel uses it up
+([loops](loops.md#extra-stats-and-gear)).
 
 <!-- live:gems -->
 | Jewel | Id | Opens | Grade | Uma Lv | Recipe |
 |---|---|---|---|---|---|
-| Planet Jewel I | `jewel-planet-1` | Planet I | 1 | 1 | 10× Cut Quartz |
-| Planet Jewel II | `jewel-planet-2` | Planet II | 3 | 11 | 10× Cut Citrine |
-| Planet Jewel III | `jewel-planet-3` | Planet III | 5 | 21 | 10× Cut Emerald |
-| Planet Jewel IV | `jewel-planet-4` | Planet IV | 7 | 31 | 10× Cut Ruby |
-| Planet Jewel V | `jewel-planet-5` | Planet V | 9 | 41 | 10× Cut Starstone |
-| Moon Jewel I | `jewel-moon-1` | node I of a moon | 2 | 6 | 4× Cut Amethyst |
-| Moon Jewel II | `jewel-moon-2` | node II of a moon; her moon's I | 4 | 16 | 4× Cut Garnet |
-| Moon Jewel III | `jewel-moon-3` | node III of a moon | 6 | 26 | 4× Cut Sapphire |
-| Moon Jewel IV | `jewel-moon-4` | node IV of a moon; her moon's II | 8 | 36 | 4× Cut Diamond |
-| Moon Jewel V | `jewel-moon-5` | node V of a moon | 10 | 46 | 4× Cut Philosopher's Stone |
+| Planet Jewel I | `jewel-planet-1` | Planet I, three a node | 1 | 1 | 5× Cut Quartz |
+| Planet Jewel II | `jewel-planet-2` | Planet II, three a node | 3 | 11 | 5× Cut Citrine |
+| Planet Jewel III | `jewel-planet-3` | Planet III, three a node | 5 | 21 | 5× Cut Emerald |
+| Planet Jewel IV | `jewel-planet-4` | Planet IV, three a node | 7 | 31 | 5× Cut Ruby |
+| Planet Jewel V | `jewel-planet-5` | Planet V, three a node | 9 | 41 | 5× Cut Starstone |
+| Moon Jewel I | `jewel-moon-1` | node I of a moon | 2 | 6 | 5× Cut Amethyst |
+| Moon Jewel II | `jewel-moon-2` | node II of a moon | 4 | 16 | 5× Cut Garnet |
+| Moon Jewel III | `jewel-moon-3` | node III of a moon | 6 | 26 | 5× Cut Sapphire |
+| Moon Jewel IV | `jewel-moon-4` | node IV of a moon | 8 | 36 | 5× Cut Diamond |
+| Moon Jewel V | `jewel-moon-5` | node V of a moon | 10 | 46 | 5× Cut Philosopher's Stone |
 <!-- /live -->
 
 ## Gear
 
 **Grades, not pieces** (WP2, WP3; `economy/grades.ts`, `save/forge.ts`): every Uma holds a grade on each of the ten
-weapons, her five armor slots (head, body, legs, arms, feet) and her one accessory slot, from G0 to G10. A made item of
+weapons, her five armor slots (head, body, legs, arms, feet) and her three accessory slots, from G0 to G10. A made item of
 the next grade raises one of them a grade; nothing is crafted, bound or worn out, and gear has no ranks (Weapon, Armor and
 Accessory Ranks retired in R2, D218).
 
 - **The gate:** grade g opens at **Uma Lv 5g − 4** (1, 6, 11 … 46).
-- **What raises it** (FL4): an Arms weapon takes Arms Gems, a Tome Tome Ink, an armor slot Armor Fittings, the accessory
+- **What raises it** (FL4): an Arms weapon takes Arms Gems, a Tome Tome Ink, an armor slot Armor Fittings, an accessory
   slot Accessory Settings, each of the grade it reaches. A climb of several grades at once takes each grade's item, and
   says what's missing ("Needs Lv 26", "Needs 1 Arms Gem G3", "Needs Tome Ink G2 and G3").
 - **A weapon's Might:** its grade's value, added to the offense of her hits with that weapon, × the tier
@@ -203,11 +218,11 @@ Accessory Ranks retired in R2, D218).
   half: a physical-led class's armor gives ATK (Brawler, Arms Spellblade, Arms Summoner, Paladin), a magic-led class's
   M.ATK (Sorcerer, Tome Spellblade, Tome Summoner, Cleric), and a Tier 0's a third a slot to each slot's channel.
   Switching class switches the half; the grades stay.
-- **The accessory slot:** its grade, and a family she sets freely (WP19, `setAccessoryForm`): the **Pendant** (flat
-  offense on her three weapons' kinds), the **Orb** (flat offense on one of them), the **Bell** (a follow-up strike with
-  her weapon of its kind when her act includes an Attack) or the **Insignia** (more damage to sub-bosses and bosses). An
-  Orb or a Bell takes one of her active class's three kinds (D223); one left on a kind she no longer holds stays set and
-  does nothing. G0 does nothing. A fight keeps the form and grades she had when it began.
+- **The accessory slots (D264):** three in every tier, each with its own grade and a family she sets freely
+  (`setAccessoryForm`): the **Pendant** (+ATK), the **Charm** (+M.ATK), the **Orb** (flat offense on one kind) or the
+  **Insignia** (more damage to sub-bosses and bosses). The same family can fill more than one, and each slot raises on its
+  own. An Orb takes one of her active class's three kinds (D223); one left on a kind she no longer holds stays set. G0 does
+  nothing. A fight keeps the forms and grades she had when it began.
 - **Her signature** (WP33, UT7): her knack names one family ([classes](classes.md#her-calling-and-her-template)). While
   she wears it at G1 or above, her ATK and M.ATK rise 0.2 a level × the tier. The Gear tab puts that family first, marked
   ★, and her standard preset wears it.
@@ -242,25 +257,25 @@ What raises a slot one grade, in every world:
 
 | Grade | Arms Gem (an Arms weapon) | Tome Ink (a Tome) | Armor Fittings | Accessory Setting |
 |---|---|---|---|---|
-| 1 | 7× Copper Ingot | 7× Chopped Carrot | 2× Pine Plank | 10× Carp Fillet |
-| 2 | 7× Tin Ingot | 7× Diced Potato | 2× Birch Plank | 10× Trout Fillet |
-| 3 | 7× Iron Ingot | 7× Shredded Cabbage | 2× Cedar Plank | 10× Sardine Fillet |
-| 4 | 7× Silver Ingot | 7× Diced Onion | 2× Maple Plank | 10× Mackerel Fillet |
-| 5 | 7× Cobalt Ingot | 7× Tomato Purée | 2× Oak Plank | 10× Salmon Fillet |
-| 6 | 7× Gold Ingot | 7× Sliced Bell Pepper | 2× Cherry Plank | 10× Sea Bream Fillet |
-| 7 | 7× Platinum Ingot | 7× Sliced Eggplant | 2× Mahogany Plank | 10× Eel Fillet |
-| 8 | 7× Titanium Ingot | 7× Trimmed Asparagus | 2× Ebony Plank | 10× Tuna Fillet |
-| 9 | 7× Mythril Ingot | 7× Golden Carrot Purée | 2× Elderwood Plank | 10× Silverfin Fillet |
-| 10 | 7× Orichalcum Ingot | 7× Pumpkin Purée | 2× Yggdrasil Plank | 10× Rainbow Koi Fillet |
+| 1 | 10× Copper Ingot | 10× Chopped Carrot | 3× Pine Plank | 5× Carp Fillet |
+| 2 | 10× Tin Ingot | 10× Diced Potato | 3× Birch Plank | 5× Trout Fillet |
+| 3 | 10× Iron Ingot | 10× Shredded Cabbage | 3× Cedar Plank | 5× Sardine Fillet |
+| 4 | 10× Silver Ingot | 10× Diced Onion | 3× Maple Plank | 5× Mackerel Fillet |
+| 5 | 10× Cobalt Ingot | 10× Tomato Purée | 3× Oak Plank | 5× Salmon Fillet |
+| 6 | 10× Gold Ingot | 10× Sliced Bell Pepper | 3× Cherry Plank | 5× Sea Bream Fillet |
+| 7 | 10× Platinum Ingot | 10× Sliced Eggplant | 3× Mahogany Plank | 5× Eel Fillet |
+| 8 | 10× Titanium Ingot | 10× Trimmed Asparagus | 3× Ebony Plank | 5× Tuna Fillet |
+| 9 | 10× Mythril Ingot | 10× Golden Carrot Purée | 3× Elderwood Plank | 5× Silverfin Fillet |
+| 10 | 10× Orichalcum Ingot | 10× Pumpkin Purée | 3× Yggdrasil Plank | 5× Rainbow Koi Fillet |
 
-Accessory families (one slot, its family, form and kind a setting changed freely outside fights; the grade is the slot's):
+Accessory families (three slots, each with its own grade, family and kind, set freely outside fights; the same family can fill more than one):
 
 | Family | Base form | G1 → G10 (Tier 1) |
 |---|---|---|
-| Pendant | Flat offense on each of her three weapons' kinds | 1, 1, 2, 2, 4, 5, 7, 9, 12, 14 |
-| Orb | Flat offense on one kind she sets, one of her three weapons’ kinds | 1, 2, 3, 5, 8, 10, 14, 18, 23, 27 |
-| Bell | When her act includes an Attack, her weapon of its kind strikes again at a share of an Attack | 0.1 a grade × her hand (1 at G10), every tier |
-| Insignia | Her hits on sub-bosses and bosses hit harder | +1.5% a grade (+15% at G10), every tier |
+| Pendant | +ATK | 1, 1, 2, 2, 3, 3, 4, 5, 5, 6 |
+| Charm | +M.ATK | 1, 1, 2, 2, 3, 3, 4, 5, 5, 6 |
+| Orb | Flat offense on one kind she sets, one of her three weapons’ kinds | 1, 1, 2, 3, 4, 5, 6, 7, 8, 9 |
+| Insignia | Her hits on sub-bosses and bosses hit harder | +0.5% a grade (+5% at G10) |
 
 Her signature: while she wears her knack's family, ATK and M.ATK +2 · +6 · +10 at Lv 10 · 30 · 50 (0.2 a level × the tier).
 <!-- /live -->

@@ -27,8 +27,8 @@ function editedV32Uma(id: string, change: (uma: Raw) => void): unknown {
 }
 
 describe('save v27 (H69, live since H72)', () => {
-  it('runs with the Tier rework’s fight and economy live, Classes v3 (H134) and the save v33', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), RPG_WEAPON_SLOTS, SAVE_SCHEMA_VERSION]).toEqual([20, true, 3, 33])
+  it('runs with the Tier rework’s fight and economy live, Classes v3 (H134) and the save v34', () => {
+    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), RPG_WEAPON_SLOTS, SAVE_SCHEMA_VERSION]).toEqual([20, true, 3, 34])
   })
 
   it('parses a v26 world through the chain: three weapons, lines and every Uma’s calling, which v32 records and resets', () => {
@@ -57,7 +57,7 @@ describe('save v27 (H69, live since H72)', () => {
       expect(parsed.classesV3!.umas[id]).toMatchObject({ classId: world.umas[id]!.classId, ranks: world.umas[id]!.ranks.classes, pick: null })
     }
     // Her crafted Katana went with v28's grades (H82): it is the grant's one piece.
-    expect(parsed.umas['102']!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+    expect(parsed.umas['102']!.gear).toEqual({ weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) })
     expect(parsed.grant!.deleted.gear).toBe(1)
     // Written back and read again, the world is the same.
     const save = parseSave(migrated(v26Save(), toV27))

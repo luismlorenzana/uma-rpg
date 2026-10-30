@@ -69,10 +69,10 @@ describe('icon frames (P37–P38)', () => {
     for (let grade = 1; grade <= 10; grade++) {
       const forms = [slot('pendant', grade), slot('insignia', grade),
         ...Object.keys(bellRows).map(kind => slot('orb', grade, kind as AccessorySlotState['kind'])),
-        ...Object.keys(bellRows).map(kind => slot('bell', grade, kind as AccessorySlotState['kind']))]
+        slot('bell', grade)]
       for (const state of forms) {
         const row = state.family === 'pendant' ? 'charm' : state.family === 'insignia' ? 'ring'
-          : state.family === 'orb' ? (state.kind!.match(/^(greatsword|axe|lance|bow|katana)$/) ? `orb-${state.kind}-hue` : `orb-${state.kind}`) : bellRows[state.kind!]
+          : state.family === 'orb' ? (state.kind!.match(/^(greatsword|axe|lance|bow|katana)$/) ? `orb-${state.kind}-hue` : `orb-${state.kind}`) : 'amulet-ward'
         const frame = gear.frames[`${row}-g${grade}` as keyof typeof gear.frames]!
         expect(iconFrame(accessoryIconId(state))).toEqual({ sheet: 'gear', x: frame.x, y: frame.y,
           ...('kind' in state && state.kind ? { kind: state.kind } : {}) })

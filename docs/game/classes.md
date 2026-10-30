@@ -253,8 +253,8 @@ Its four pieces all work in Tier 1:
   Spellblade-calling Uma both keep it as an Arms Spellblade. It gives 4% of her max HP a fight, in her stride's shape. Clean
   break's Barrier lapses at round 1's end. Not a heal skill: no healing scale, it never overheals, and a fallen Uma gets
   none. Once a fight, not each wave ([combat](combat.md#sustain-mp-and-the-flourish)).
-- **★ Her signature** (UT7, D212): her knack names an accessory family: Fleet the Bell, Mighty the Orb, Tireless the
-  Pendant, Gritty and Clever the Insignia. While her accessory slot wears that family at G1 or more, her ATK and M.ATK
+- **★ Her signature** (UT7, D212): her knack names an accessory family: Fleet the Charm, Mighty the Orb, Tireless the
+  Pendant, Gritty and Clever the Insignia. While one of her accessory slots wears that family at G1 or more, her ATK and M.ATK
   rise 0.2 a level × the tier (Tier 1: +2, +6, +10 at Lv 10, 30, 50), whatever class she fights as. Her standard preset
   wears it, and the Gear tab lists her family first with a ★ ([materials](materials.md#gear)).
 - **★ Her moon** (UT10, D213): two nodes beside her Extra Stats map, opened by a Moon Jewel II (Lv 16) and IV (Lv 36).
@@ -305,7 +305,7 @@ her blows on the foe they hit, her spells on every Uma.
 **Twins** (CV13): each Arm has a twin element: Greatsword and Fire, Axe and Ice, Lance and Lightning, **Katana and Light**
 (the doubles) and **Bow and Dark** (the volleys); the Bow and the Katana together are **Twilight**, a Light and Dark foe's
 Arms. The twin sets are what the Rift's fronts draw, what a Hall's seat reads ([heroes](heroes.md#learners)) and how a
-hybrid's preset places an Orb or a Bell; the world's stages deal each foe her own list
+hybrid's preset places an Orb; the world's stages deal each foe her own list
 ([combat](combat.md#weaknesses-shields-and-breaks)). Engine v18 and before paired the Bow with Light and the Katana with
 Dark, and their fights replay so.
 
@@ -349,17 +349,18 @@ stat (DEF, HP, MP, M.DEF, Speed). Every piece also adds offense to her class's h
 Spellblade, an Arms Summoner or a Paladin, M.ATK for a Sorcerer, a Tome Spellblade, a Tome Summoner or a Cleric, a third a
 slot to each slot's channel for a Tier 0. So switching class switches it.
 
-**One accessory slot** (WP19, D212, D223): its grade, raised with Accessory Settings, and its family, a setting changed
-freely outside fights; G0 does nothing. The four families:
+**Three accessory slots, in every tier** (D264; was 1 · 2 · 3 by tier, WP19): each has its own grade, raised with Accessory
+Settings, and its own family, a setting changed freely outside fights. The same family can fill more than one. G0 does
+nothing. The four families:
 
-- **Pendant:** flat offense on each of her three weapons' kinds.
+- **Pendant:** +ATK.
+- **Charm:** +M.ATK. Its id is `bell`, and it wears the Bell's icon.
 - **Orb:** flat offense on one kind, one of her three weapons' kinds.
-- **Bell:** after an act with an Attack in it, her weapon of its kind strikes once more; one of her weapons' kinds.
 - **Insignia:** her hits on sub-bosses and bosses hit harder.
 
-Values are in [materials](materials.md#gear) and how they reach a hit in [combat](combat.md#damage). The slot is hers, not
-her class's: after a class or weapon switch, an Orb or a Bell left on a kind she no longer slots stays set, and its card
-says so. She sets it on the Gear tab's Equip view: four cards of one shape, her ★ signature family first.
+Values are in [materials](materials.md#gear) and how they reach a hit in [combat](combat.md#damage). The slots are hers, not
+her class's: after a class or weapon switch, an Orb left on a kind she no longer slots stays set, and its card says so. She
+sets them on the Gear tab's Equip view: one section a slot, four cards of one shape, her ★ signature family first.
 
 ### Standard presets
 
@@ -367,11 +368,11 @@ says so. She sets it on the Gear tab's Equip view: four cards of one shape, her 
 them: a Tier 1 class's "Standard preset", or one row for each class a Tier 0 promotes into, so she starts on the weapons she
 means to keep: three rows for the Warrior and the Mage, two for the Spellblade, the Summoner and the Healer.
 
-A tap puts her active class on those three weapons and sets her accessory slot's form: her ★ signature family, an Orb or a
-Bell on her first weapon's kind (a hybrid's on the kind of her lead half that twins her lone weapon when she holds it, else
-her lead half's first: the Arms Summoner's Bow, the Tome Summoner's Dark), a Pendant or an Insignia with none. With no ★
-family she gets the class's form below. Grades don't move and nothing is spent. Her lines stay; her equipped skills of a tree
-the preset takes out of her slots leave her loadout. Nothing else is stored: a row reads **On** while she wears that preset.
+A tap puts her active class on those three weapons and sets all three accessory slots: the class's set below, with her ★
+signature family first, in the place of one of its own or else of slot 1. An Orb sits on her first weapon's kind (a hybrid's
+on the kind of her lead half that twins her lone weapon when she holds it, else her lead half's first: the Arms Summoner's
+Bow, the Tome Summoner's Dark). Grades don't move and nothing is spent. Her lines stay; her equipped skills of a tree the
+preset takes out of her slots leave her loadout. Nothing else is stored: a row reads **On** while she wears that preset.
 
 **A promotion lands on the child's preset,** whatever her Tier 0 held. **The defaults** are what a class holds until she
 picks: no Uma's weapons move until she taps a row, so an Uma promoted before D263 keeps the weapons she has. A grade belongs
@@ -380,14 +381,14 @@ to the weapon, so it follows her from a Tier 0 into a class whose preset slots t
 <!-- live:presets -->
 | Class | Offered by | Weapons | Armor | Accessory |
 |---|---|---|---|---|
-| Brawler | Warrior | Greatsword, Axe, Lance | Physical | Bell (Greatsword) |
-| Arms Spellblade | Warrior, Spellblade | Katana, Axe, Thunder Tome | Physical | Pendant |
-| Arms Summoner | Warrior, Summoner | Bow, Axe, Dark Tome | Physical | Orb (Bow) |
-| Paladin | Healer | Lance, Greatsword, Light Tome | Physical | Pendant |
-| Cleric | Healer | Light Tome, Fire Tome, Lance | Magical | Orb (Light Tome) |
-| Tome Summoner | Summoner, Mage | Dark Tome, Blizzard Tome, Bow | Magical | Orb (Dark Tome) |
-| Tome Spellblade | Spellblade, Mage | Thunder Tome, Blizzard Tome, Katana | Magical | Pendant |
-| Sorcerer | Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Pendant |
+| Brawler | Warrior | Greatsword, Axe, Lance | Physical | Pendant, Pendant, Orb (Greatsword) |
+| Arms Spellblade | Warrior, Spellblade | Katana, Axe, Thunder Tome | Physical | Pendant, Charm, Orb (Katana) |
+| Arms Summoner | Warrior, Summoner | Bow, Axe, Dark Tome | Physical | Pendant, Charm, Orb (Bow) |
+| Paladin | Healer | Lance, Greatsword, Light Tome | Physical | Pendant, Pendant, Orb (Lance) |
+| Cleric | Healer | Light Tome, Fire Tome, Lance | Magical | Charm, Charm, Orb (Light Tome) |
+| Tome Summoner | Summoner, Mage | Dark Tome, Blizzard Tome, Bow | Magical | Charm, Pendant, Orb (Dark Tome) |
+| Tome Spellblade | Spellblade, Mage | Thunder Tome, Blizzard Tome, Katana | Magical | Charm, Pendant, Orb (Thunder Tome) |
+| Sorcerer | Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Charm, Charm, Orb (Fire Tome) |
 
 | Class | Holds until she picks |
 |---|---|
@@ -425,8 +426,8 @@ The defaults follow each class's identity: the Brawler's and the Sorcerer's are 
 one channel each); the Spellblades hold multi-hit kinds and the Summoners area kinds, and each hybrid holds one twin set in
 both halves, so both halves land weak on a foe weak to it (the Arms Spellblade the Lightning set, the Tome Spellblade the Light
 set, the Arms Summoner the Dark set, the Tome Summoner the Ice set); the Paladin keeps her Barriers, Aegis and Enfeeble on the
-Greatsword and the Axe and her revive on the Light Tome. The balance simulation wears them, with each class's accessory
-form before D263. The balance party (Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Cleric) holds all ten kinds; so do the
+Greatsword and the Axe and her revive on the Light Tome. The balance simulation wears them, with R2's one accessory slot
+until the combat balance pass after D264. The balance party (Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Cleric) holds all ten kinds; so do the
 Brawler, the Sorcerer, the Tome Spellblade, the Arms Summoner and a Paladin, and the five Tier 0s. The Rift's fronts suggest
 guided weapons on top of them ([loops](loops.md#the-rift)).
 

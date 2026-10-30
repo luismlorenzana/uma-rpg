@@ -40,9 +40,9 @@ describe('the Paladin’s start (H58, §3.3)', () => {
     save = unlockUma(save, '2', T(0), '1', 'cleric')
     save = unlockUma(save, '3', T(0), '1', 'brawler')
     const { umas } = worldOf(save)
-    expect(umas['1']).toMatchObject({ classId: 'paladin', gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] } })
+    expect(umas['1']).toMatchObject({ classId: 'paladin', gear: { weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) } })
     expect(umas['2']!.classId).toBe('cleric')
-    expect(umas['3']).toMatchObject({ classId: 'brawler', gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] } })
+    expect(umas['3']).toMatchObject({ classId: 'brawler', gear: { weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) } })
     expect([armorHalf('paladin'), armorHalf('cleric'), armorHalf('brawler')]).toEqual(['physical', 'magical', 'physical'])
   })
 

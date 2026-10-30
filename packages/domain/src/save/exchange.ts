@@ -63,7 +63,7 @@ export function stockedTypes(world: TierWorld, _tier?: string | number): string[
 }
 
 /** Raw prices (FL12): a G1–G5 item 30 Laurels, a G6–G10 one 80, × the world's tier (D170: fights pay × tier). */
-export const RAW_PRICE_V3: Readonly<Record<RawBand, number>> = { low: 30, high: 80 }
+export const RAW_PRICE_V3: Readonly<Record<RawBand, number>> = { low: 20, high: 53 }
 /** A raw line item's price in a world of `tier`; 0 for an id that isn't one. */
 export function rawPriceV4(id: string, tier: string | number): number {
   const m = lineItem(id)
@@ -240,7 +240,7 @@ export type Shelf = 'items' | 'gems' | 'gear'
 
 /** Selling prices (PP17, FL13), before × the world's tier: raw G1–G5 6, G6–G10 16; refined twice that; a made item
  * 6 + 6g. */
-export const SELL_RAW_V3: Readonly<Record<RawBand, number>> = { low: 6, high: 16 }
+export const SELL_RAW_V3: Readonly<Record<RawBand, number>> = { low: 4, high: 11 }
 function sellPriceV3(shelf: Shelf, id: string, tier: number): number {
   if (shelf !== 'items') return 0
   const material = lineItem(id)

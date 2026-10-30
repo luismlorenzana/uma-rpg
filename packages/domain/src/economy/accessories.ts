@@ -13,6 +13,9 @@
 //   frozen into the fight's input (UT18), outside the kind cap. Any class (UT12).
 // The engine's rules (v17) are in `rpg/battle/engine.ts`; the presets (WP25, UT8, SB10) in `save/presets.ts`. Data and
 // pure rules, safe for the main bundle.
+// D264, save v34: three slots in every tier, each with its own family and grade, repeats allowed. The Pendant is +ATK, the
+// Bell's id is now the Charm, +M.ATK, the Orb one kind and the Insignia bosses (`accessorySlotValue`, `accessorySlotsParts`,
+// `accessoryOffense`). Below them R2's one-slot rows stay for the balance harness until the combat balance pass.
 import type { BattleBell, BattleInsignia } from '../rpg/battle/types'
 import { rpgWeaponKind, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
 import { GRADE_MAX, TIER_SCALE_TENTHS, tierScaled, type AccessoryFamily, type AccessorySlotState, type GearTier, type UmaGrades } from './grades'
@@ -29,8 +32,40 @@ export const BELL_PERMILLE_PER_GRADE = 100
 /** WP23: an Insignia's factor, per mille a grade: +1.5% a grade, +15% at G10, the same in every tier. */
 export const INSIGNIA_PERMILLE_PER_GRADE = 15
 
-/** The families' names on the screens. */
-export const ACCESSORY_FAMILY_LABEL: Readonly<Record<AccessoryFamily, string>> = { pendant: 'Pendant', orb: 'Orb', bell: 'Bell', insignia: 'Insignia' }
+/** The families' names on the screens. The id `bell` stays and reads Charm (D264). */
+export const ACCESSORY_FAMILY_LABEL: Readonly<Record<AccessoryFamily, string>> = { pendant: 'Pendant', orb: 'Orb', bell: 'Charm', insignia: 'Insignia' }
+
+/** D264: a Pendant's ATK or a Charm's M.ATK, one slot, Tier 1, G1–G10: a third of the old Pendant's and a little over, since
+ * a hybrid now splits her slots between ATK and M.ATK. */
+export const OFFENSE_SLOT_T1: readonly number[] = [1, 1, 2, 2, 3, 3, 4, 5, 5, 6]
+/** D264: an Orb's flat offense on its kind, one slot, Tier 1, G1–G10: three at G10 are today's one Orb. */
+export const ORB_SLOT_T1: readonly number[] = [1, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+/** D264: an Insignia's factor, per mille a grade: three at G10 are today's one, +15%. */
+export const INSIGNIA_SLOT_PERMILLE = 5
+
+/** What one slot's family gives at a grade and tier: a Pendant's ATK, a Charm's M.ATK or an Orb's offense on its kind. 0 at
+ * G0 and for the Insignia, which is a factor. */
+export function accessorySlotValue(family: AccessoryFamily, grade: number, tier: GearTier): number {
+  const row = family === 'orb' ? ORB_SLOT_T1 : family === 'insignia' ? null : OFFENSE_SLOT_T1
+  return row && grade >= 1 ? tierScaled(row[Math.min(GRADE_MAX, grade) - 1]!, tier) : 0
+}
+/** What her Orbs and Insignias put into a fight, slot by slot and summed: flat offense by kind, and one Insignia's value. */
+export function accessorySlotsParts(slots: readonly AccessorySlotState[], tier: GearTier): AccessoryParts {
+  const parts: AccessoryParts = { flat: {} }
+  let insignia = 0
+  for (const slot of slots) {
+    if (slot.family === null || slot.grade < 1) continue
+    const grade = Math.min(GRADE_MAX, slot.grade)
+    if (slot.family === 'orb' && slot.kind) parts.flat[slot.kind] = (parts.flat[slot.kind] ?? 0) + accessorySlotValue('orb', grade, tier)
+    else if (slot.family === 'insignia') insignia += INSIGNIA_SLOT_PERMILLE * grade
+  }
+  return insignia ? { ...parts, insignia: { value: insignia } } : parts
+}
+/** What her Pendants and Charms add to ATK and M.ATK: real stats, so a healer's mends and an inherited Limit Break read them. */
+export function accessoryOffense(slots: readonly AccessorySlotState[], tier: GearTier): { atk: number; matk: number } {
+  const total = (family: AccessoryFamily) => slots.reduce((n, s) => n + (s.family === family ? accessorySlotValue(family, s.grade, tier) : 0), 0)
+  return { atk: total('pendant'), matk: total('bell') }
+}
 
 const FLAT_T1: Readonly<Partial<Record<AccessoryFamily, readonly number[]>>> = { pendant: PENDANT_T1, orb: ORB_T1 }
 

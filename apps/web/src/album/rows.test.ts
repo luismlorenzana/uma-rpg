@@ -105,7 +105,7 @@ describe('the Stable\'s Template filters (UT15, H70)', () => {
       ['Template', 'calling', ['Warrior', 'Spellblade', 'Mage', 'Summoner', 'Healer']],
       ['Template', 'stride', ['Dash', 'Middle', 'Stayer']],
       ['Template', 'knack', ['Fleet', 'Mighty', 'Tireless', 'Gritty', 'Clever']],
-      ['Template', 'signature', ['Pendant', 'Orb', 'Bell', 'Insignia']],
+      ['Template', 'signature', ['Pendant', 'Orb', 'Charm', 'Insignia']],
       ['Trade', 'trade', ['Mine · Weapon Forge', 'Forest · Armorer', 'Fields · Tome Forge', 'Fishery · Charm Forge', 'Monster Den · Lapidary']],
     ])
   })

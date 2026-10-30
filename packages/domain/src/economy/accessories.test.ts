@@ -103,6 +103,6 @@ describe('the signature (WP33, UT7, SB15)', () => {
 
   it('names her family by her knack, UT7’s five', () => {
     expect(Object.fromEntries(UMA_KNACKS.map((knack) => [knack, ACCESSORY_FAMILY_LABEL[KNACK_FAMILY[knack]]])))
-      .toEqual({ fleet: 'Bell', mighty: 'Orb', tireless: 'Pendant', gritty: 'Insignia', clever: 'Insignia' })
+      .toEqual({ fleet: 'Charm', mighty: 'Orb', tireless: 'Pendant', gritty: 'Insignia', clever: 'Insignia' })
   })
 })

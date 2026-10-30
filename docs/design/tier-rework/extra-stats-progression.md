@@ -1,5 +1,8 @@
 # Extra Stats Progression: the Planet and its moons from Tier 1 to Tier 3
 
+> **Superseded in part by D264 (2026-10-30):** a Planet node takes three jewels, every rank sets three, and her moon takes none.
+> Final stats are unchanged.
+
 > **Approved by the owner, 2026-10-24 (D194): every call EP1–EP29 as written.** Changes from here are follow-ups logged against it.
 
 > **R2 live from H82, 2026-10-26 (D218)** (a follow-up, no decision changed): Tier 1's part of this doc plays in the

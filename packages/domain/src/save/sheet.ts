@@ -10,7 +10,7 @@ import { rpgIsHealer, rpgWeaponKind } from '../rpg/kinds'
 import { projectRpgStats, rpgBaseMpRegen, rpgClassName, type RpgClass } from '../rpg/rules'
 import { addPoints, applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight, noAccessoryEffects } from '../economy/gear'
-import { accessoryFlatValue, accessoryParts, signatureBonus, signatureWorn } from '../economy/accessories'
+import { accessorySlotValue, signatureBonus, signatureWorn } from '../economy/accessories'
 import { gradeOf, mightAt, type AccessorySlotState, type GearTier } from '../economy/grades'
 import { classRankOf, WEAPON_LABEL } from '../economy/ranks'
 import { mapPoints, moonTemplate } from '../economy/planet'
@@ -36,17 +36,10 @@ export interface SheetGroup { title: 'Offense' | 'Defense' | 'Sustain' | 'Other'
 const KIND_NAME = (k: string) => k[0]!.toUpperCase() + k.slice(1)
 const permille = (n: number) => `${Math.round(n) / 10}%`
 
-/** R2's accessory row in the battle sheet. */
-export function accessorySheetLine(slot: AccessorySlotState | undefined, weapons: readonly import('../rpg/kinds').RpgWeapon[], tier: GearTier): string {
+/** One accessory slot's row in the battle sheet. */
+export function accessorySheetLine(slot: AccessorySlotState | undefined, tier: GearTier): string {
   if (!slot || slot.grade < 1 || slot.family === null) return 'None'
-  const label = slot.kind ? KIND_NAME(slot.kind) : ''
-  if (slot.family === 'pendant') return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier))
-  if (slot.family === 'orb') return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier, slot.kind))
-  if (slot.family === 'bell') {
-    const bell = accessoryParts(slot, weapons, tier).bell
-    return bell ? accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier, slot.kind)) : `Bell · ${label} not held`
-  }
-  return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier))
+  return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier, slot.kind))
 }
 /** Every battle stat she has with her active class in her tier, each always listed, 0 included (combat-balance.md §6.0).
  * Classes v2 (H57): her Orb's offense ("Fire Orb +34"), and a healer's mends from her ATK or M.ATK instead of Heal. */
@@ -89,7 +82,6 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
       label, value: String(boosted.stats[k]), gear: geared[k] - base[k],
       extra: boosted.stats[k] - geared[k], star: boosted.stats[k] - sharedStats.stats[k],
     })
-    const slot = grades.accessories[0]
     const family = umaTemplate(outfit, umaPick(uma), engine).family
     const worn = signatureWorn(grades, family)
     const signatureValue = signatureBonus(uma.level, gearTier)
@@ -100,7 +92,7 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
     }))
     return [
       { title: 'Offense', rows: [coreV3('ATK', 'atk'), coreV3('M.ATK', 'matk'), ...weaponRows,
-        { label: 'Accessory', value: accessorySheetLine(slot, weapons, gearTier) },
+        ...grades.accessories.map((slot, i) => ({ label: `Accessory ${i + 1}`, value: accessorySheetLine(slot, gearTier) })),
         { label: '★ Signature', value: signature(signatureValue, worn).replace('★ Signature · ', '') }] },
       { title: 'Defense', rows: [coreV3('DEF', 'pdef'), coreV3('M.DEF', 'mdef'), { label: 'Evasion', value: permille(boosted.evasion) }] },
       { title: 'Sustain', rows: [coreV3('HP', 'hp'), ...mends, { ...coreV3('MP', 'mp'), note: mp(boosted.stats.mp, regen).split(' · ')[1] },

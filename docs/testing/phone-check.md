@@ -82,11 +82,11 @@ button and footer should stay reachable without horizontal page scrolling, in li
     and Other (`Limit start n/12`); gear's part in blue and Extra Stats' in green. (D204, D217, D258)
 13. **Gear → Equip.** On a promoted Uma, tap **Standard preset**: expect **Standard preset · On** and her preset's weapons. On a
     Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it to read **· On** and Loadout to show its three
-    weapons; a Warrior or a Mage shows three rows. Tap each accessory family: one detail at
-    a time, her ★ family first with its signature line. On a Bell or an Orb, the kind buttons are her three weapons';
-    **Set** one, then pick another kind and tap **Replace**. Check the weapon chips' colours in both themes: the
+    weapons; a Warrior or a Mage shows three rows. Expect **Accessory 1**, **2** and **3**, her old slot's grade on the first.
+    In a slot, tap each accessory family: one detail at a time, her ★ family first with its signature line. On an Orb, the
+    kind buttons are her three weapons'; **Set** one. Set the same accessory in two slots: both stick. Check the weapon chips' colours in both themes: the
     Katana jade, the Bow rose. (D223)
-14. **Gear → Upgrade.** Expect "Upgrade · n" to match the green marks. Tap a ready pill: the grade goes up by one, one
+14. **Gear → Upgrade.** Expect three Accessory rows, each raising on its own. Expect "Upgrade · n" to match the green marks. Tap a ready pill: the grade goes up by one, one
     made item is spent and the count drops. A blocked row says why ("Needs Lv …", "Needs 1 Arms Gem G…", "Already G10").
     On a row with several grades in stock, open it, tap **Raise to G…**, read the list and **Confirm**. Tap **Extra Stats**:
     her Observatory map opens. (D217, D223)

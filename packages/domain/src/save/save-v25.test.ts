@@ -48,7 +48,7 @@ describe('save v25 with the switch on (H58)', () => {
     expect(Object.keys(world.heroes).filter((id) => /^(paladin|cleric)-/.test(id))).toEqual([])
     expect(world.umas['108']!.bonds).toEqual({ 'healer-1': { level: 4, exp: 3 }, 'healer-2': { level: 10, exp: 0 } })
     // toV25's typed accessories (`migrations-v25.test.ts`) are gone with v28's grades: their pieces are in the grant.
-    expect(world.umas['105']!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+    expect(world.umas['105']!.gear).toEqual({ weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) })
     expect(world.grant!.deleted.gear).toBeGreaterThan(0)
     // Party 1 keeps its two Clerics: on v18's rules they can't fight together until one changes class; v32's reset sends
     // both to their Tier 0, which is no healer.

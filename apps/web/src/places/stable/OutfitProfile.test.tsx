@@ -37,21 +37,24 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
     expect(screen.getByRole('button', { name: 'Mark target' }).textContent).toBe('')
 
     fireEvent.click(screen.getByRole('tab', { name: 'Gear' }))
-    const families = within(screen.getByRole('radiogroup', { name: 'Accessory family' })).getAllByRole('radio')
+    // Three slots (D264), each its own one-row picker.
+    const pickers = screen.getAllByRole('radiogroup', { name: 'Accessory family' })
+    expect(pickers).toHaveLength(3)
+    const families = within(pickers[0]!).getAllByRole('radio')
     expect(families).toHaveLength(4)
-    expect(families.map((family) => family.getAttribute('aria-label')!.replace('Signature ', '')).sort()).toEqual(['Pendant', 'Bell', 'Orb', 'Insignia'].sort())
-    expect(screen.getAllByRole('button', { name: 'Set' })).toHaveLength(1)
+    expect(families.map((family) => family.getAttribute('aria-label')!.replace('Signature ', '')).sort()).toEqual(['Pendant', 'Charm', 'Orb', 'Insignia'].sort())
+    expect(screen.getAllByRole('button', { name: 'Set' })).toHaveLength(3)
 
-    fireEvent.click(screen.getByRole('radio', { name: 'Orb' }))
+    fireEvent.click(within(pickers[1]!).getByRole('radio', { name: 'Orb' }))
     expect(within(screen.getByRole('group', { name: 'Orb: which weapon' })).getAllByRole('button')).toHaveLength(3)
-    expect(screen.getAllByRole('button', { name: 'Set' })).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: 'Set' })).toHaveLength(3)
   })
 
   it('shows the Gear dot, the grade rows\' marks and the jewels to set, and drops them once used; no skill costs points (v16 on)', () => {
-    // Aster: a Warrior at Class Rank 5, and a Weapon Gem G1 and a Planet Jewel I in the Warehouse.
+    // Aster: a Warrior at Class Rank 5, and a Weapon Gem G1 and three Planet Jewels I in the Warehouse.
     let save = withWorld(fixture.save, (w) => {
       const aster = w.umas['81001']!
-      return { ...w, items: { 'weapon-gem-g1': 1, 'jewel-planet-1': 1 }, umas: { ...w.umas, '81001': { ...aster,
+      return { ...w, items: { 'weapon-gem-g1': 1, 'jewel-planet-1': 3 }, umas: { ...w.umas, '81001': { ...aster,
         ranks: withTrack(aster.ranks, { kind: 'class', id: 'recruit' }, { rank: 5, exp: 0 }) } } }
     })
     fixture.world = worldOf(save)

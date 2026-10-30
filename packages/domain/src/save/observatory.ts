@@ -5,7 +5,7 @@
 import { gemIdentity, gemNodes, nodeGrade, starPoints } from '../economy/stars'
 import { activeNodeSlots } from '../economy/pacing'
 import type { Points } from '../economy/bonus'
-import { isMapNode, mapNodeGate, MAP_NODES, nodeBody, nodeJewel, nodeNumeral, type StarMap } from '../economy/planet'
+import { isMapNode, mapNodeGate, MAP_NODES, nodeBody, nodeJewel, nodeJewelCount, nodeNumeral, withHerMoon, type StarMap } from '../economy/planet'
 import { madeName } from '../items/made'
 import { madeIdentity } from '../items/made-id'
 import { SaveRuleError, TIER_ONE, worldOf } from './rules'
@@ -83,12 +83,13 @@ const isJewel = (id: string): boolean => {
 
 /**
  * Why this jewel can't open this node on her map now, or null (EP5, EP17): it must fit the node (a Planet Jewel n only
- * Planet n; a Moon Jewel n a moon's node n, and her moon's node of that jewel: II for `template:1`, IV for `template:2`),
- * the node must be closed, the node before it on its body open, and her level at its gate; then one in `stock`.
+ * Planet n; a Moon Jewel n a moon's node n; her moon's nodes take none, D264), the node must be closed, the node before it
+ * on its body open, and her level at its gate; then enough in `stock`, three for a Planet node.
  */
 export function jewelBlock(map: StarMap, jewelId: string, node: string, level: number, stock: Readonly<Record<string, number>>): string | null {
   if (!isJewel(jewelId)) return 'Not a jewel'
   if (!isMapNode(node)) return 'Unknown node'
+  if (nodeBody(node) === 'template') return 'Opens with its moons'
   if (nodeJewel(node) !== jewelId) {
     // Its name's numeral is the node it opens on every body (EP §11.1): "Moon Jewel II" a node II.
     const name = madeName(jewelId)!, numeral = name.split(' ').at(-1)
@@ -99,8 +100,9 @@ export function jewelBlock(map: StarMap, jewelId: string, node: string, level: n
   const before = Array.from({ length: nodeNumeral(node) - 1 }, (_, i) => `${nodeBody(node)}:${i + 1}`).find((id) => !map.open.includes(id))
   if (before) return `Set ${madeName(nodeJewel(before))} first`
   if (level < mapNodeGate(node)) return `Opens at Lv ${mapNodeGate(node)}`
-  if ((stock[jewelId] ?? 0) < 1) return NONE_IN_WAREHOUSE
-  return null
+  const have = stock[jewelId] ?? 0
+  if (have < 1) return NONE_IN_WAREHOUSE
+  return have < nodeJewelCount(node) ? `Needs ${nodeJewelCount(node)} in the Warehouse` : null
 }
 
 /** How many nodes a node's body has open: the Set list's "furthest behind" (EP §3.5). */
@@ -109,27 +111,26 @@ const openOn = (map: StarMap, node: string): number => map.open.filter((n) => no
 /**
  * The nodes a jewel can open for her now (stock aside), in map order (the Planet, Prowess, Vigor, Guard, her moon), the
  * body furthest behind (fewest nodes open) first, as the Set list suggests it (EP §3.5); [] when none. A Planet Jewel has
- * one node at most; a Moon Jewel II or IV can also open her moon's.
+ * one node at most. `stock` counts what she has, for the list of what she can set now.
  */
-export function jewelNodes(map: StarMap, jewelId: string, level: number): string[] {
-  const stock = { [jewelId]: 1 }
+export function jewelNodes(map: StarMap, jewelId: string, level: number, stock: Readonly<Record<string, number>> = { [jewelId]: 3 }): string[] {
   const fits = MAP_NODES.filter((node) => jewelBlock(map, jewelId, node, level, stock) === null)
   return fits.map((node, i) => ({ node, i, behind: openOn(map, node) }))
     .sort((a, b) => a.behind - b.behind || a.i - b.i).map((x) => x.node)
 }
 
-/** She sets one jewel from the Warehouse (`world.items`) on a node of her v3 map: the count falls (a count at 0 leaves the
- * Warehouse) and the node opens, counting from the next fight (EP5, EP6). Refused with `jewelBlock`'s reason, and "Not
- * graded" for a v1 map. */
+/** She sets a node's jewels from the Warehouse (`world.items`) on her v3 map: the count falls (a count at 0 leaves the
+ * Warehouse) and the node opens, with her moon's when it was the third of its rank, counting from the next fight (EP5, EP6,
+ * D264). Refused with `jewelBlock`'s reason, and "Not graded" for a v1 map. */
 export function setJewel(save: Save, outfitId: string, jewelId: string, node: string, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = world.umas[outfitId]
   if (!uma) throw new SaveRuleError('not-owned', 'Not unlocked')
   if (!isStarMap(uma.stars)) throw new SaveRuleError('bad-job', NOT_GRADED)
   const block = jewelBlock(uma.stars, jewelId, node, uma.level, world.items)
-  if (block) throw new SaveRuleError(block === NONE_IN_WAREHOUSE ? 'no-items' : 'bad-job', block)
-  const items = { ...world.items, [jewelId]: world.items[jewelId]! - 1 }
+  if (block) throw new SaveRuleError(block === NONE_IN_WAREHOUSE || block.startsWith('Needs') ? 'no-items' : 'bad-job', block)
+  const items = { ...world.items, [jewelId]: world.items[jewelId]! - nodeJewelCount(node) }
   if (items[jewelId] === 0) delete items[jewelId]
-  const stars: StarMap = { ...uma.stars, open: [...uma.stars.open, node] }
+  const stars: StarMap = { ...uma.stars, open: withHerMoon([...uma.stars.open, node]) }
   return withWorld(save, tier, { ...world, items, umas: { ...world.umas, [outfitId]: { ...uma, stars } } }, now)
 }

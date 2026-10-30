@@ -46,10 +46,6 @@ const MATERIAL_ROW = { fish: 4, vegetables: 8, ores: 20, crystals: 22, woods: 28
 const MADE_ROW = { 'weapon-gem': 34, 'armor-fittings': 35, 'accessory-setting': 36, 'tome-ink': 19 } as const
 const PLANET_JEWEL_ART = ['gem-sun-4', 'gem-sun-4', 'gem-sun-6', 'gem-sun-8', 'gem-sun-10'] as const
 const MOON_JEWEL_ART = ['gem-limit-2', 'gem-limit-4', 'gem-limit-6', 'gem-limit-8', 'gem-limit-10'] as const
-const BELL_ROW: Readonly<Record<RpgDamageKind, (typeof GEAR_ART_ROWS)[number]>> = {
-  greatsword: 'talisman-vital', axe: 'talisman-vampire', lance: 'talisman-bulwark', bow: 'talisman-iron', katana: 'talisman-thorn',
-  fire: 'amulet-spring', ice: 'amulet-siphon', lightning: 'amulet-veil', light: 'amulet-ward', dark: 'amulet-mirror',
-}
 
 /** A synthetic id consumed only by `ItemIcon`; the save keeps the slot as structured data. */
 export function accessoryIconId(slot: AccessorySlotState | undefined): string {
@@ -65,7 +61,7 @@ function accessoryFrame(id: string): IconFrame | null | undefined {
   const kind = kindWord !== 'none' ? kindWord as RpgDamageKind : undefined
   const row = family === 'pendant' ? 'charm' : family === 'insignia' ? 'ring'
     : family === 'orb' && kind ? (isRpgWeaponKind(kind) ? `orb-${kind}-hue` : `orb-${kind}`) as (typeof GEAR_ART_ROWS)[number]
-      : family === 'bell' && kind ? BELL_ROW[kind] : undefined
+      : family === 'bell' ? 'amulet-ward' : undefined
   if (!row) return null
   return { sheet: 'gear', x: (grade - 1) * ATLAS_CELL, y: GEAR_ART_ROWS.indexOf(row) * ATLAS_CELL, ...(kind ? { kind } : {}) }
 }

@@ -203,7 +203,7 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-/** Every step to v33 for a world of `tier` (v32 → v33, the halls' trim, since D261). */
+/** Every step to v34 for a world of `tier` (v33 → v34, the three accessory slots, since D264). */
 export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v27 = migrateWorldToV27(raw, version)
   const v28 = version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
@@ -211,7 +211,8 @@ export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v30 = version < 30 && isRecord(v29) ? toV30(v29) : v29
   const v31 = version < 31 && isRecord(v30) ? toV31(v30) : v30
   const v32 = version < 32 && isRecord(v31) ? toV32(v31, tier) : v31
-  return version < 33 && isRecord(v32) ? toV33(v32) : v32
+  const v33 = version < 33 && isRecord(v32) ? toV33(v32) : v32
+  return version < 34 && isRecord(v33) ? toV34(v33) : v33
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
@@ -1263,4 +1264,43 @@ function toV20(world: Record<string, unknown>): Record<string, unknown> {
     }))
   }
   return w
+}
+
+// --- v33 → v34 (D264): three accessory slots, and Extra Stats at three jewels a rank ---------------------------------------
+
+const V34_EMPTY_SLOT = { grade: 0, family: null, form: 'base' }
+const V34_MOON_RANKS = [['template:1', 2], ['template:2', 4]] as const
+/**
+ * v33 → v34 (D264). Per world:
+ * 1. **Accessories:** each graded Uma's slot stays slot 1 with its grade, and two empty slots join it. The Pendant keeps its
+ *    id and the Bell's reads Charm, which takes no kind, so a Bell drops hers. Nothing is refunded: no Setting was spent on a
+ *    form.
+ * 2. **Planet Jewels in the Warehouse × 3:** a Planet node now takes three, and each one here opened a node.
+ * 3. **Her moon:** a node opens by itself once all three moons hold its rank, so an Uma already there gets it. A jewel she
+ *    spent on it stays spent; it opened the same node.
+ * Everything else stands: set jewels, grades, stock, running jobs. An open fight holds its frozen inputs, a Bell's too.
+ * Literals only, as every step. Run once, by the version; anything malformed is left for the strict parse.
+ */
+export function toV34(world: Record<string, unknown>): Record<string, unknown> {
+  const umas: Record<string, unknown> = isRecord(world.umas) ? { ...world.umas } : {}
+  for (const [id, uma] of Object.entries(umas)) {
+    if (!isRecord(uma)) continue
+    const next: Record<string, unknown> = { ...uma }
+    if (isRecord(uma.gear) && Array.isArray(uma.gear.accessories)) {
+      const first = uma.gear.accessories[0]
+      const kept = isRecord(first) && first.family === 'bell' ? (({ kind: _kind, ...rest }) => rest)(first) : first ?? V34_EMPTY_SLOT
+      next.gear = { ...uma.gear, accessories: [kept, { ...V34_EMPTY_SLOT }, { ...V34_EMPTY_SLOT }] }
+    }
+    if (isRecord(uma.stars) && Array.isArray(uma.stars.open)) {
+      const open = [...uma.stars.open]
+      for (const [node, rank] of V34_MOON_RANKS) {
+        if (!open.includes(node) && ['prowess', 'vigor', 'guard'].every((moon) => open.includes(`${moon}:${rank}`))) open.push(node)
+      }
+      next.stars = { ...uma.stars, open }
+    }
+    umas[id] = next
+  }
+  const items: Record<string, unknown> = isRecord(world.items) ? { ...world.items } : {}
+  for (const [id, count] of Object.entries(items)) if (id.startsWith('jewel-planet-') && typeof count === 'number') items[id] = count * 3
+  return { ...world, umas, ...(isRecord(world.items) ? { items } : {}) }
 }

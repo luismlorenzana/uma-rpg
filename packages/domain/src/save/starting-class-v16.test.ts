@@ -56,7 +56,7 @@ describe('the start by calling, engine v16 (H67)', () => {
     expect(ROWS.map((o) => umas[o.outfitId]!.classId)).toEqual(['recruit', 'caller', 'caller', 'duelist', 'duelist', 'duelist', 'acolyte', 'acolyte'])
     expect(ROWS.map((o) => activeClass(o, umas[o.outfitId]!))).toEqual(ROWS.map((o) => startingClass(o)))
     // v28 (H82): every grade G0, and her armor's half her class's.
-    for (const o of ROWS) expect(umas[o.outfitId]!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+    for (const o of ROWS) expect(umas[o.outfitId]!.gear).toEqual({ weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) })
     expect(ROWS.map((o) => armorHalf(umas[o.outfitId]!.classId!))).toEqual(['physical', 'magical', 'magical', 'physical', 'physical', 'physical', 'magical', 'magical'])
   })
 

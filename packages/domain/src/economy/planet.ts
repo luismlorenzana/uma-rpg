@@ -70,6 +70,18 @@ export function nodeJewel(id: string): string {
   return jewelId('moon', body === 'template' ? 2 * n : n)
 }
 
+/** How many jewels open a node (D264): a Planet node three, a moon's node one, so every rank sets three jewels. */
+export const nodeJewelCount = (id: string): number => (nodeBody(id) === 'planet' ? 3 : 1)
+/** Her open nodes with her moon's, which take no jewel (D264): node I opens with the third moon's node II, node II with the
+ * third moon's node IV. */
+export function withHerMoon(open: readonly string[]): string[] {
+  const next = [...open]
+  for (const [id, n] of [['template:1', 2], ['template:2', 4]] as const) {
+    if (!next.includes(id) && MAP_MOONS.every((moon) => next.includes(`${moon}:${n}`))) next.push(id)
+  }
+  return next
+}
+
 /** Tier 1's points a node: the Planet's I–V (EP2) and a moon's I–V (EP3). */
 export const PLANET_T1 = [1, 2, 4, 6, 8] as const
 export const MOON_T1 = [2, 4, 6, 8, 10] as const

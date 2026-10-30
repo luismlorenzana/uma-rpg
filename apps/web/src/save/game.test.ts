@@ -127,7 +127,7 @@ describe('game store', () => {
     // Tier 0, CV19; v28: the half is her class's, every grade G0, H82).
     expect([world!.umas['100201']!.classId, world!.umas['100101']!.classId]).toEqual(['acolyte', 'recruit'])
     expect([world!.umas['100201']!.classId, world!.umas['100101']!.classId].map((c) => armorHalf(c!))).toEqual(['magical', 'physical'])
-    expect(world!.umas['100201']!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+    expect(world!.umas['100201']!.gear).toEqual({ weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) })
     await expect(unlock(outfit('100101'))).rejects.toThrow(/already/)
   })
 

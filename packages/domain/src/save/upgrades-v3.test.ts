@@ -8,7 +8,7 @@ const worldAt = (level: number) => {
   const gear = newGrades(1)
   gear.weapons.greatsword = { grade: 1 }
   gear.accessories[0] = { grade: 1, family: null, form: 'base' }
-  return gradedWorld({ items: { 'weapon-gem-g2': 1, 'jewel-moon-2': 1 }, umas: { '101': gradedUma({ level, gear, stars: starMap() }) } })
+  return gradedWorld({ items: { 'weapon-gem-g2': 1, 'jewel-moon-1': 1 }, umas: { '101': gradedUma({ level, gear, stars: starMap() }) } })
 }
 
 describe('R2 Can upgrade', () => {
@@ -20,7 +20,8 @@ describe('R2 Can upgrade', () => {
     const early = upgradesFor(worldAt(5), '101', 'brawler', 1, 17)!
     expect(early.grades).not.toContainEqual({ kind: 'weapon', weapon: 'greatsword' })
     expect(early.grades).toContainEqual({ kind: 'accessory', slot: 0 })
-    expect(upgradesFor(worldAt(16), '101', 'brawler', 1, 17)!.jewels).toEqual(['jewel-moon-2'])
+    expect(upgradesFor(worldAt(6), '101', 'brawler', 1, 17)!.jewels).toEqual(['jewel-moon-1'])
+    expect(early.jewels).toEqual([])
   })
 
   it('counts nothing else', () => {

@@ -39,14 +39,14 @@ describe('the farm by line\'s What step (FL22)', () => {
     expect(jobKindAtV4('mine', 'tin-ore')).toBe('gather')
     expect(jobKindAtV4('lapidary', 'jewel-planet-1')).toBe('cut')
     expect(jobKindAtV4('den-workbench', 'cut-ruby')).toBe('refine')
-    expect(jobSizesV4('tin-ore')).toEqual([1, 2, 3, 5, 10, 15, 20])
-    expect(jobSizesV4('copper-ingot')).toEqual([1, 2, 3, 5, 10, 15, 20])
+    expect(jobSizesV4('tin-ore')).toEqual([1, 2, 3, 5, 10, 15, 20, 30])
+    expect(jobSizesV4('copper-ingot')).toEqual([1, 2, 3, 5, 10, 15, 20, 30])
     expect(jobSizesV4('armor-fittings-g1')).toEqual([1, 2, 3, 5, 10])
     expect(jobSizesV4('jewel-moon-1')).toEqual([1, 2, 3, 5])
     expect(jobSizesV4('weapon-gem-g4')).toEqual([1, 2, 3])
     expect(jobSizesV4('tome-ink-g1')).toEqual([1, 2, 3])
-    expect(jobSizesV4('accessory-setting-g1')).toEqual([1, 2])
-    expect(jobSizesV4('jewel-planet-1')).toEqual([1, 2])
+    expect(jobSizesV4('accessory-setting-g1')).toEqual([1, 2, 3, 5])
+    expect(jobSizesV4('jewel-planet-1')).toEqual([1, 2, 3, 5])
   })
 
   it('opens on the highest grade she can take', () => {

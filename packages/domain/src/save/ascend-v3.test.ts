@@ -37,7 +37,7 @@ describe('ascending with R2\'s Warehouse (PP23)', () => {
       w.umas['101']!.gear = {
         weapons: { greatsword: { grade: 7 } },
         armor: { head: { grade: 5 }, body: { grade: 5 }, legs: { grade: 5 }, arms: { grade: 5 }, feet: { grade: 5 } },
-        accessories: [{ grade: 3, family: 'bell', form: 'base', kind: 'greatsword' }],
+        accessories: [{ grade: 3, family: 'orb', form: 'base', kind: 'greatsword' }, { grade: 0, family: 'bell', form: 'base' }, { grade: 0, family: null, form: 'base' }],
       }
       w.umas['101']!.stars = { open: ['planet:1', 'prowess:1'], moons: [] }
     })
@@ -49,7 +49,7 @@ describe('ascending with R2\'s Warehouse (PP23)', () => {
     expect(worldOf(after, '1').items).toEqual(back)
     expect(worldOf(after, '1').gear).toBeUndefined()
     const her = worldOf(after, '2').umas['101']!
-    expect(her.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: 'bell', form: 'base', kind: 'greatsword' }] })
+    expect(her.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: 'orb', form: 'base', kind: 'greatsword' }, { grade: 0, family: 'bell', form: 'base' }, { grade: 0, family: null, form: 'base' }] })
     expect(her.stars).toEqual({ open: [], moons: [] })
   })
 })

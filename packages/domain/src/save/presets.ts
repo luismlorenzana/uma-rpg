@@ -133,22 +133,33 @@ export function presetAccessory(classId: RpgClass, weapons: readonly RpgWeapon[]
   return family === 'orb' || family === 'bell' ? { family, kind: presetKind(classId, weapons, engine) } : { family }
 }
 
-/** A Tier 1 class's weapon preset (D263): its three weapons, its armor half and her accessory form, her ★ `family` when she
- * has one, else the class's own, an Orb or a Bell on `presetKind`'s kind of those weapons (the Tome Summoner's Orb on Dark,
- * the twin of her Bow; the Cleric's on Light, her first slot). */
-export function weaponPreset(classId: RpgTier1Class, family?: AccessoryFamily | null, engine: number = BATTLE_ENGINE_VERSION): ClassPresetV3 {
+/** Each Tier 1 class's three accessory slots (D264): her channel's stat, and an Orb. A pure channel its stat twice, a hybrid
+ * one of each with her lead channel's first. The id `bell` is the Charm. */
+const PRESET_SLOTS: Readonly<Record<RpgTier1Class, readonly AccessoryFamily[]>> = {
+  brawler: ['pendant', 'pendant', 'orb'], paladin: ['pendant', 'pendant', 'orb'],
+  mage: ['bell', 'bell', 'orb'], cleric: ['bell', 'bell', 'orb'],
+  spellblade: ['pendant', 'bell', 'orb'], armsummoner: ['pendant', 'bell', 'orb'],
+  tomeblade: ['bell', 'pendant', 'orb'], summoner: ['bell', 'pendant', 'orb'],
+}
+/** A weapon preset: a class's weapons and armor half, and one accessory form a slot. */
+export interface WeaponPreset { classId: RpgClass; weapons: RpgWeapon[]; armor: 'physical' | 'magical'; accessories: PresetAccessory[] }
+/** A Tier 1 class's weapon preset (D263, D264): its three weapons, its armor half and her three accessory forms: the class's,
+ * with her ★ `family` first in the place of one of its own or else of slot 1, and an Orb on `presetKind`'s kind of those
+ * weapons (the Tome Summoner's on Dark, the twin of her Bow; the Cleric's on Light, her first slot). */
+export function weaponPreset(classId: RpgTier1Class, family?: AccessoryFamily | null, engine: number = BATTLE_ENGINE_VERSION): WeaponPreset {
   const weapons = rpgPresetWeapons(classId, engine)
-  const worn = family ?? classPresetAccessory(classId, engine).family
-  return { classId, weapons, armor: RPG_CLASS_ARMOR[classId],
-    accessory: worn === 'orb' || worn === 'bell' ? { family: worn, kind: presetKind(classId, weapons, engine) } : { family: worn } }
+  const slots = [...PRESET_SLOTS[classId]]
+  if (family) { slots.splice(Math.max(0, slots.indexOf(family)), 1); slots.unshift(family) }
+  const accessories = slots.map((f): PresetAccessory => (f === 'orb' ? { family: f, kind: presetKind(classId, weapons, engine) } : { family: f }))
+  return { classId, weapons, armor: RPG_CLASS_ARMOR[classId], accessories }
 }
 
 /** The preset `classId` wears: from `presets` the picked Tier 1 class's (D263; one of `rpgPresetClasses`, by default her own,
  * or a Tier 0's model child), before them her class's row in her family. */
-function presetFor(classId: RpgClass, family: AccessoryFamily | null | undefined, engine: number, pick?: RpgTier1Class): ClassPresetV3 {
+function presetFor(classId: RpgClass, family: AccessoryFamily | null | undefined, engine: number, pick?: RpgTier1Class): WeaponPreset {
   if (!rpgRework('presets', engine)) {
     const preset = classPresetV3(classId, engine)
-    return { ...preset, accessory: presetAccessory(classId, preset.weapons, family, engine) }
+    return { ...preset, accessories: [presetAccessory(classId, preset.weapons, family, engine)] }
   }
   const to = pick ?? (rpgIsTier0(classId) ? RPG_TIER0_MODEL[classId] : classId)
   if (!rpgPresetClasses(classId).includes(to)) throw new SaveRuleError('bad-class', `no ${to} preset for ${classId}`)
@@ -170,8 +181,10 @@ export interface PresetPlan {
   /** Slots that end differently: weapon positions, weapon pieces, an armor slot's kind or piece, accessory slots. For a
    * graded Uma: weapon positions and her accessory slot's family or kind. */
   changes: number
-  /** R2 (H75): a graded Uma's accessory slot form after it. */
+  /** R2 (H75): a graded Uma's first accessory slot's form after it. */
   accessory?: PresetAccessory
+  /** D264: each accessory slot's form after it. */
+  accessories?: PresetAccessory[]
 }
 
 /** R2 (H75): the plan for a graded Uma: the preset's three weapons (counted by position, as v1's) and her accessory slot's
@@ -179,13 +192,14 @@ export interface PresetPlan {
 function classPresetPlanV3(uma: OwnedUma, grades: UmaGrades, classId: RpgClass, engine: number, family?: AccessoryFamily | null,
   pick?: RpgTier1Class): PresetPlan {
   const preset = presetFor(classId, family, engine, pick)
-  const { accessory } = preset
+  const { accessories } = preset
   const current = classOf(uma, classId).weapons
-  const slot = grades.accessories[0]
   const kinds = Object.fromEntries(ARMOR_SLOTS.map((s) => [s, armorKindFor(s, preset.armor)])) as Record<ArmorSlot, ArmorKind>
-  const changes = preset.weapons.filter((w, i) => current[i] !== w).length +
-    (slot?.family !== accessory.family || slot?.kind !== accessory.kind || slot?.form !== 'base' ? 1 : 0)
-  return { classId, weapons: preset.weapons, kinds, wear: {}, binds: [], changes, accessory }
+  const changes = preset.weapons.filter((w, i) => current[i] !== w).length + accessories.filter((form, i) => {
+    const slot = grades.accessories[i]
+    return slot?.family !== form.family || slot?.kind !== form.kind || slot?.form !== 'base'
+  }).length
+  return { classId, weapons: preset.weapons, kinds, wear: {}, binds: [], changes, accessory: accessories[0], accessories }
 }
 
 /** On one type's track: the piece she'd wear, her best own piece her rank allows or the top of the climb, and the stock
@@ -260,7 +274,7 @@ export function applyClassPreset(world: TierWorld, outfitId: string, classId: Rp
   const plan = classPresetPlan(world, outfitId, classId, engine, family, pick)
   if (plan.changes === 0) return world
   const uma = world.umas[outfitId]!
-  if (isGrades(uma.gear) && plan.accessory) return applyPresetV3(world, outfitId, uma, uma.gear, plan.weapons, plan.accessory, classId)
+  if (isGrades(uma.gear) && plan.accessories) return applyPresetV3(world, outfitId, uma, uma.gear, plan.weapons, plan.accessories, classId)
   const currentGear = gearV1(uma)
   let gear = gearStock(world)
   if (plan.binds.length) {
@@ -281,14 +295,16 @@ export function applyClassPreset(world: TierWorld, outfitId: string, classId: Rp
   return { ...world, gear, umas: { ...world.umas, [outfitId]: { ...uma, classes, gear: { locker, equipped, kinds: { ...plan.kinds } } } } }
 }
 
-/** R2 (H75): a graded Uma with the preset: the class's weapons (only when they change) and her first accessory slot's form,
- * its grade kept. */
-function applyPresetV3(world: TierWorld, outfitId: string, uma: OwnedUma, grades: UmaGrades, weapons: RpgWeapon[], form: PresetAccessory,
+/** R2 (H75): a graded Uma with the preset: the class's weapons (only when they change) and each accessory slot's form, its
+ * grade kept. */
+function applyPresetV3(world: TierWorld, outfitId: string, uma: OwnedUma, grades: UmaGrades, weapons: RpgWeapon[], forms: readonly PresetAccessory[],
   classId: RpgClass): TierWorld {
   const setup = classOf(uma, classId)
   const classes = setup.weapons.every((w, i) => w === weapons[i]) ? uma.classes : { ...uma.classes, [classId]: withClassWeapons(setup, weapons) }
-  const slot: AccessorySlotState = { grade: grades.accessories[0]?.grade ?? 0, family: form.family, form: 'base', ...(form.kind ? { kind: form.kind } : {}) }
-  const accessories = grades.accessories.length ? grades.accessories.map((s, i) => (i === 0 ? slot : s)) : [slot]
+  const accessories = Array.from({ length: Math.max(grades.accessories.length, forms.length) }, (_, i): AccessorySlotState => {
+    const form = forms[i]
+    return form ? { grade: grades.accessories[i]?.grade ?? 0, family: form.family, form: 'base', ...(form.kind ? { kind: form.kind } : {}) } : grades.accessories[i]!
+  })
   return { ...world, umas: { ...world.umas, [outfitId]: { ...uma, classes, gear: { ...grades, accessories } } } }
 }
 

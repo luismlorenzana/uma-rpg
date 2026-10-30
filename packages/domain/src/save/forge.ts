@@ -207,13 +207,13 @@ export function raiseGradeTo(save: Save, outfitId: string, target: GradeTarget, 
 
 // --- Accessory forms (R2, H75; weapon-progression §5.3, WP19, WP34) ---------------------------------------------------
 
-const FAMILY_WORD: Readonly<Record<AccessoryFamily, string>> = { pendant: 'A Pendant', orb: 'An Orb', bell: 'A Bell', insignia: 'An Insignia' }
+const FAMILY_WORD: Readonly<Record<AccessoryFamily, string>> = { pendant: 'A Pendant', orb: 'An Orb', bell: 'A Charm', insignia: 'An Insignia' }
 const EMPTY_SLOT: AccessorySlotState = { grade: 0, family: null, form: 'base' }
 
 /**
- * Why her accessory slot can't take this form, or null (R2: one slot, base forms; R3's H84 extends it). A family's base
- * form, or null to take it off; an Orb or a Bell takes one of `accessoryKinds` ("No Fire Tome in her slots", WP21; the
- * Orb since H107, WP22's follow-up in D219), and a Pendant or an Insignia none. `classId` is her active class, which the
+ * Why her accessory slot can't take this form, or null (three slots since D264). A family's base form, or null to take it
+ * off; an Orb takes one of `accessoryKinds` ("No Fire Tome in her slots"; H107, WP22's follow-up in D219), and a Pendant, a
+ * Charm or an Insignia none. `classId` is her active class, which the
  * caller passes (as `upgradesFor` takes it): the save can't read her style.
  */
 export function accessoryFormBlock(uma: OwnedUma, classId: RpgClass, slot: number, family: AccessoryFamily | null,
@@ -223,23 +223,22 @@ export function accessoryFormBlock(uma: OwnedUma, classId: RpgClass, slot: numbe
   if (family !== null && !ACCESSORY_FAMILIES.includes(family)) return 'Unknown accessory'
   if (kind !== undefined && !isRpgDamageKind(kind)) return 'Unknown kind'
   if (family === null) return kind === undefined ? null : 'Pick an accessory first'
-  if (family === 'pendant' || family === 'insignia') return kind === undefined ? null : `${FAMILY_WORD[family]} has no kind`
+  if (family !== 'orb') return kind === undefined ? null : `${FAMILY_WORD[family]} has no kind`
   if (kind === undefined) return `${FAMILY_WORD[family]} needs a kind`
   if (!accessoryKinds(uma, classId).includes(kind)) return `No ${WEAPON_LABEL[isRpgElement(kind) ? rpgTomeOf(kind) : kind]} in her slots`
   return null
 }
 
-/** The kinds a Bell or an Orb can take for her (WP21, WP22 with D219's follow-up): the kinds she can hit with, her
+/** The kinds an Orb can take for her (WP22 with D219's follow-up): the kinds she can hit with, her
  * `classId`'s three weapons' kinds in order. The one source: R3 adds a Dual's partner kind here. */
 export function accessoryKinds(uma: OwnedUma, classId: RpgClass): RpgDamageKind[] {
   return classOf(uma, classId).weapons.map((weapon) => rpgWeaponKind(weapon))
 }
 
 /**
- * Sets her accessory slot's form (R2, WP19, WP34; H75): a family's base form and, for an Orb or a Bell, its kind; null
- * takes it off. The slot's grade never changes: a form is a setting, changed freely outside fights. Refused as
- * `accessoryFormBlock` says (`bad-loadout`). A Bell left on a kind she no longer slots, after a class or weapon change,
- * stays set and does nothing (`accessoryParts`); the sheet says so (H79).
+ * Sets an accessory slot's form (R2, WP34; H75): a family's base form and, for an Orb, its kind; null takes it off. The
+ * slot's grade never changes: a form is a setting, changed freely outside fights. Refused as `accessoryFormBlock` says
+ * (`bad-loadout`). An Orb left on a kind she no longer slots stays set, and still counts on that kind's hits.
  */
 export function setAccessoryForm(save: Save, outfitId: string, classId: RpgClass, slot: number, family: AccessoryFamily | null,
   kind: RpgDamageKind | undefined, now: string, tier = TIER_ONE): Save {

@@ -9,7 +9,7 @@ import { gemById, nodeGem, STAR_NODES } from '../economy/gems'
 import { EQUIP_LABEL, gearById, gearId, gearTrackOf, isAccessory, type EquipType } from '../economy/gear'
 import { facilitySpec } from '../economy/jobs'
 import { gradeItemId, gradeOf, type GradeTarget } from '../economy/grades'
-import { MAP_NODES, nodeJewel } from '../economy/planet'
+import { CORE_NODES, nodeJewel, nodeJewelCount } from '../economy/planet'
 import { isMakingPlaceV4, isProcessingPlaceV4, placeSpecV4 } from '../economy/places-v4'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, GEAR_MAX_RANK } from '../economy/ranks'
 import { itemById } from '../items/catalog'
@@ -76,7 +76,9 @@ export function targetDemand(uma: OwnedUma, classId: RpgClass): Map<string, numb
       ...uma.gear.accessories.map((_, slot): GradeTarget => ({ kind: 'accessory', slot })),
     ]
     for (const target of targets) for (let grade = gradeOf(uma.gear, target) + 1; grade <= GEAR_MAX_RANK; grade++) add(gradeItemId(target, grade))
-    if (isStarMap(uma.stars)) for (const node of MAP_NODES) if (!uma.stars.open.includes(node)) add(nodeJewel(node))
+    if (isStarMap(uma.stars)) {
+      for (const node of CORE_NODES) if (!uma.stars.open.includes(node)) for (let n = 0; n < nodeJewelCount(node); n++) add(nodeJewel(node))
+    }
     return demand
   }
   for (const type of gearTypes(uma, classId)) {

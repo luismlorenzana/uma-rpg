@@ -1,4 +1,4 @@
 // The save's schema version, in a module with no imports so the catalogs and the rules can read it without a cycle
-// through `save.ts`. v33 (D261): the Warrior Dojo's and the Mage Tower's seats 3–4 fold into their seats 1–2.
+// through `save.ts`. v34 (D264): three accessory slots, and Extra Stats at three jewels a rank.
 
-export const SAVE_SCHEMA_VERSION = 33
+export const SAVE_SCHEMA_VERSION = 34

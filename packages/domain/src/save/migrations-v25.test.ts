@@ -2,7 +2,7 @@
 // v26's and v27's steps since H72, v28's since H82, and v32's reset since H134).
 import { describe, expect, it } from 'vitest'
 import { rpgNode } from '../rpg/catalog'
-import { migrateWorld, toV25, toV26, toV27, toV28, toV29, toV30, toV31, toV32 } from './migrations'
+import { migrateWorld, toV25, toV26, toV27, toV28, toV29, toV30, toV31, toV32, toV34 } from './migrations'
 import { gearV1, parseSave, SAVE_SCHEMA_VERSION, type OwnedUma, type TierWorld } from './save'
 import { CLERIC_LOADOUT, CLERIC_TREE, migrated, v24Save, type V24Class } from './v25.fixture'
 
@@ -15,19 +15,19 @@ const umaOf = (w: V24World, id: string): V24Uma => w.umas[id]!
 const raw = (w: unknown) => w as Record<string, unknown>
 
 describe('save v25’s migration (H58, chained in H61)', () => {
-  it('stays chained before v26–v33: a v24 world runs through every later step, a v25 world through v26’s to v33’s', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(33)
+  it('stays chained before v26–v34: a v24 world runs through every later step, a v25 world through v26’s to v34’s', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(34)
     const w24 = world()
     const v31 = toV31(toV30(toV29(toV28(toV27(toV26(raw(migrate(world()))))))))
-    expect(migrateWorld(w24, 24)).toEqual(toV32(v31))
-    expect(migrateWorld(w24, 25)).toEqual(toV32(toV31(toV30(toV29(toV28(toV27(toV26(raw(w24)))))))))
+    expect(migrateWorld(w24, 24)).toEqual(toV34(toV32(v31)))
+    expect(migrateWorld(w24, 25)).toEqual(toV34(toV32(toV31(toV30(toV29(toV28(toV27(toV26(raw(w24))))))))))
     // Up to v31 she keeps her Paladin copy set up; v32's reset clears the setups.
     expect(Object.keys((v31.umas as Record<string, OwnedUma>)['103']!.classes).sort()).toEqual(['cleric', 'mage', 'paladin'])
     // A v24 save parses through v25, v26, v27, v28 and on to v32.
     const save = v24Save()
     expect(save.schemaVersion).toBe(24)
     const parsed = parseSave(JSON.parse(JSON.stringify(save)))
-    expect(parsed.schemaVersion).toBe(33)
+    expect(parsed.schemaVersion).toBe(34)
     expect(parsed).toEqual(parseSave({ ...(migrated(save, (w) => toV28(toV27(toV26(toV25(w))))) as object), schemaVersion: 28 }))
     // Her Paladin's copied rank reaches v32's record.
     expect(Object.keys(parsed.tierWorlds['1']!.classesV3!.umas['103']!.ranks).sort()).toEqual(['cleric', 'mage', 'paladin'])

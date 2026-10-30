@@ -25,9 +25,9 @@ import {
   trackOf, weaponExpShares, withTrack, type RankRef, type RankTrack, type Ranks,
 } from '../economy/ranks'
 import { starPoints } from '../economy/stars'
-import { addPoints, type Points } from '../economy/bonus'
+import { addPoints, noPoints, type Points } from '../economy/bonus'
 import { armorHalf, gradeMight, gradePoints, type GearTier } from '../economy/grades'
-import { accessoryParts, signatureBonus, signatureWorn } from '../economy/accessories'
+import { accessoryOffense, accessorySlotsParts, signatureBonus, signatureWorn } from '../economy/accessories'
 import { mapPoints, moonTemplate, type MoonTemplate } from '../economy/planet'
 import { accessoryKindOf, equippedAccessories, equippedMight, equippedPoints, gearById, isAccessory } from '../economy/gear'
 import { equipGear, unequipGear } from './forge'
@@ -292,7 +292,7 @@ export function umaPointParts(uma: OwnedUma, classId: RpgClass = 'brawler', tier
   const weapons = classOf(uma, classId).weapons
   const thirds = rpgIsTier0(classId) ? weapons.filter((w) => !isRpgTome(w)).length : undefined
   const gear = isGrades(uma.gear)
-    ? gradePoints(gradesOf(uma), armorHalf(classId), tier, thirds)
+    ? addPoints(gradePoints(gradesOf(uma), armorHalf(classId), tier, thirds), { ...noPoints(), ...accessoryOffense(gradesOf(uma).accessories, tier) })
     : equippedPoints(gearV1(uma).equipped)
   const extra = isStarMap(uma.stars) ? mapPoints(uma.stars.open, classId, tier, template, weapons) : starPoints(starsV1(uma).active)
   return { gear, extra }
@@ -382,7 +382,7 @@ export function partyMembers(world: TierWorld, ids: readonly string[], outfits: 
     if (!isGrades(uma.gear)) return { ...common, accessories: equippedAccessories(gearV1(uma).equipped, engine) }
     const grades = gradesOf(uma)
     const signature = signatureWorn(grades, umaTemplate(outfit, umaPick(uma)).family) ? signatureBonus(uma.level, gearTier) : 0
-    return { ...common, accessory: accessoryParts(grades.accessories[0], weapons, gearTier), ...(signature ? { signature } : {}) }
+    return { ...common, accessory: accessorySlotsParts(grades.accessories, gearTier), ...(signature ? { signature } : {}) }
   })
 }
 

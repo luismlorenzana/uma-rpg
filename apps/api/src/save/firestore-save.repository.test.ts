@@ -1,5 +1,5 @@
 // The production repository's backup on a schema change (D69), against an in-memory Firestore: a schema bump (H134's v32, the
-// reset; D261's v33, the trim) must keep the stored save whole, so the first new write over a stored v31 save keeps
+// reset; D261's v33, the trim; D264's v34, three accessory slots) must keep the stored save whole, so the first new write over a stored v31 save keeps
 // `saveBackups/{uid}-v31`. Invented data only.
 import { newOwnedUma, newSave, parseSavePut, SAVE_SCHEMA_VERSION as V, type Save } from '@rpg/domain'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -60,28 +60,28 @@ const RESET = {
 describe('the Firestore save repository (D45, D69)', () => {
   beforeEach(() => store.clear())
 
-  it('runs on save v33 since D261', () => {
-    expect(V).toBe(33)
+  it('runs on save v34 since D264', () => {
+    expect(V).toBe(34)
   })
 
-  it('keeps saveBackups/{uid}-v31 on the first v33 write, and no backup on later v33 writes', async () => {
+  it('keeps saveBackups/{uid}-v31 on the first v34 write, and no backup on later v34 writes', async () => {
     const repo = new FirestoreSaveRepository()
     const v31 = { revision: 7, save: storedV31('Luis') }
     store.set('saves/u', structuredClone(v31))
-    // Loading migrates what's stored to v33 (the reset applied) and writes nothing.
+    // Loading migrates what's stored to v34 (the reset applied) and writes nothing.
     const loaded = await repo.load('u')
     expect(loaded.revision).toBe(7)
-    expect(loaded.save?.schemaVersion).toBe(33)
+    expect(loaded.save?.schemaVersion).toBe(34)
     expect(loaded.save?.tierWorlds['1']).toMatchObject(RESET)
     expect(loaded.save?.tierWorlds['1']!.heroes).not.toHaveProperty('paladin-1')
     expect(store.get('saves/u')).toEqual(v31)
     expect(store.has('saveBackups/u-v31')).toBe(false)
-    // The new app's first write: v33 is stored, and the v31 document is copied whole first.
+    // The new app's first write: v34 is stored, and the v31 document is copied whole first.
     const next = await repo.put('u', 7, loaded.save!, V)
     expect(next.revision).toBe(8)
     expect(store.get('saveBackups/u-v31')).toEqual({ ...v31, backedUpAt: SERVER_TIME })
     expect(store.get('saves/u')).toMatchObject({ revision: 8 })
-    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 33, tierWorlds: { '1': RESET } })
+    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 34, tierWorlds: { '1': RESET } })
     // A later v33 write over v33 backs nothing up.
     store.delete('saveBackups/u-v31')
     await repo.put('u', 8, loaded.save!, V)
@@ -98,9 +98,9 @@ describe('the Firestore save repository (D45, D69)', () => {
     expect(sent.save.tierWorlds['1']).toMatchObject(RESET)
     await repo.put('u', 3, sent.save, sent.sentSchemaVersion)
     expect(store.get('saves/u')).toMatchObject({ revision: 4 })
-    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 33, tierWorlds: { '1': RESET } })
+    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 34, tierWorlds: { '1': RESET } })
     expect(store.get('saveBackups/u-v31')).toMatchObject({ revision: 3, save: { schemaVersion: 31 } })
-    // Now v33 is stored: the old app's next write is refused with what's stored, and nothing changes.
+    // Now v34 is stored: the old app's next write is refused with what's stored, and nothing changes.
     await expect(repo.put('u', 4, sent.save, 31)).rejects.toBeInstanceOf(RevisionConflict)
     expect(store.get('saves/u')).toMatchObject({ revision: 4 })
   })

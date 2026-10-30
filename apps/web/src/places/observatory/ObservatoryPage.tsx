@@ -2,7 +2,7 @@
 // 5 + ⌊level / 2⌋ open nodes are active at once, each adding its grade's points to her stats in every fight.
 import {
   activeClass, activeNodeSlots, BRIDGES, EFFECT_LABEL, gemNameV1, gemStock, isStarMap, ITEM_EFFECTS, jewelNodes, KNACK_LABEL, madeName, mapNodeGate, mapPoints,
-  MAP_NODES, moonTemplate, nodeBody, nodeFromGem, nodeGem, nodeJewel, nodeNumeral, nodePoints, prowessSplit, RING, SaveRuleError, starPoints, starsV1,
+  MAP_NODES, moonTemplate, nodeBody, nodeFromGem, nodeGem, nodeJewel, nodeJewelCount, nodeNumeral, nodePoints, prowessSplit, RING, SaveRuleError, starPoints, starsV1,
   umaTemplate, classOf, type GearTier, type MoonTemplate, type OwnedUma, type RpgClass, type RpgWeapon, umaPick,
 } from '@rpg/domain'
 import { useState } from 'react'
@@ -125,7 +125,7 @@ function ObservatoryV3({ view, rows, owned, id, uma, tier, picking, setPicking, 
   const [jewelPick, setJewelPick] = useState<{ jewel: string; nodes: string[] } | null>(null)
   const sharedOpen = map.open.filter((node) => !node.startsWith('template:')).length
   const templateOpen = map.open.filter((node) => node.startsWith('template:')).length
-  const settable = Object.entries(world.items).filter(([item, count]) => count > 0 && jewelNodes(map, item, uma.level).length > 0)
+  const settable = Object.entries(world.items).filter(([item, count]) => count > 0 && jewelNodes(map, item, uma.level, world.items).length > 0)
   const run = (jewel: string, node: string) => {
     setMessage(null)
     setMapJewel(id, jewel, node).then(() => { setMessage(`Opened ${mapNodeTitle(node, template.type)}`); setJewelPick(null) },
@@ -162,7 +162,7 @@ function ObservatoryV3({ view, rows, owned, id, uma, tier, picking, setPicking, 
     {message && <p className="rounded-sm bg-raised p-2 text-[13px]">{message}</p>}
     <section><h3 className="mb-1.5 text-micro">Set</h3>
       {settable.length === 0 ? <p className="text-[13px] text-ink-faint">No jewels ready.</p> : <ul className="space-y-1.5">{settable.map(([jewel, count]) => {
-        const node = jewelNodes(map, jewel, uma.level)[0]!
+        const node = jewelNodes(map, jewel, uma.level, world.items)[0]!
         return <li key={jewel}><button type="button" onClick={() => set(jewel)} className="flex min-h-12 w-full items-center gap-2 rounded-sm bg-raised p-2 text-left">
           <ItemIcon id={jewel} size={32} /><span className="min-w-0 flex-1"><span className="block text-[13px] font-semibold">{itemCount(madeName(jewel) ?? jewel, count)}</span>
             <span className="block text-[11px] text-ink-soft">Opens {mapNodeTitle(node, template.type)} · {mapNodeValue(node, classId, moon.knack, moon.channel, tier, weapons)}</span></span>
@@ -209,7 +209,7 @@ function NodeSheet({ node, open, classId, weapons, knack, channel, tier, type, o
 }) {
   return <BottomSheet title={mapNodeTitle(node, type)} onClose={onClose}><div className="space-y-2 rounded-md bg-raised p-3 text-[13px]">
     <p className="font-semibold">{mapNodeValue(node, classId, knack, channel, tier, weapons)}</p>
-    <p className="text-ink-soft">{madeName(nodeJewel(node))} · {open ? 'Open' : gate('level', mapNodeGate(node))}</p>
+    <p className="text-ink-soft">{nodeBody(node) === 'template' ? 'With its moons' : `${madeName(nodeJewel(node))}${nodeJewelCount(node) > 1 ? ` ×${nodeJewelCount(node)}` : ''}`} · {open ? 'Open' : gate('level', mapNodeGate(node))}</p>
   </div></BottomSheet>
 }
 

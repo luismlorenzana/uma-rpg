@@ -69,7 +69,7 @@ describe('R2 gear grades (D193–D198)', () => {
     expect(raiseBlock(grades, target, 50, {})).toBe('Already G10')
   })
 
-  it('starts one accessory slot in every R2 tier', () => {
-    for (const tier of [1, 2, 3] as const) expect(newGrades(tier)).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
+  it('starts three accessory slots in every tier (D264)', () => {
+    for (const tier of [1, 2, 3] as const) expect(newGrades(tier)).toEqual({ weapons: {}, armor: {}, accessories: Array(3).fill({ grade: 0, family: null, form: 'base' }) })
   })
 })

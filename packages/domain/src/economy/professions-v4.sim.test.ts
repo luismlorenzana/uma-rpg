@@ -7,53 +7,34 @@ const total = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a
 const near = (actual: number, want: number, within: number, label?: string) => expect(Math.abs(actual - want), label).toBeLessThanOrEqual(within)
 
 describe('the Wilds\' trios pacing ledger (H114, FL30)', () => {
-  it('one Uma: 110 pieces, 520 refined (528 with her moon), each line 100–110 (FL9)', () => {
-    expect(total(umaPiecesV4())).toBe(110)
-    expect(total(umaPiecesV4(true))).toBe(112)
-    expect(total(umaRefinedV4())).toBe(520)
-    expect(total(umaRefinedV4(true))).toBe(528)
-    expect(umaRefinedByLine()).toEqual({ metal: 105, wood: 100, vegetables: 105, fish: 100, stone: 110 })
-    expect(umaRefinedByLine(true).stone).toBe(118)
-    // A grade-g item takes its line's grade g: Arms Gems on Ingots G1–G10, 10.5 a grade.
-    expect(umaRefinedV4()['iron-ingot']).toBe(10.5)
-    expect(umaRefinedV4()['cut-emerald']).toBe(10)
-    expect(umaRefinedV4()['cut-philosophers-stone']).toBe(12)
+  it('one Uma: 140 pieces, 750 refined, 150 on every line (D264)', () => {
+    expect(total(umaPiecesV4())).toBe(140)
+    expect(total(umaRefinedV4())).toBe(750)
+    expect(umaRefinedByLine()).toEqual({ metal: 150, wood: 150, vegetables: 150, fish: 150, stone: 150 })
+    // A grade-g item takes its line's grade g: Arms Gems on Ingots G1–G10, 15 a grade, and so on every line at every grade.
+    expect(umaRefinedV4()['iron-ingot']).toBe(15)
+    expect(umaRefinedV4()['cut-emerald']).toBe(15)
+    expect(umaRefinedV4()['cut-philosophers-stone']).toBe(15)
+    expect(new Set(Object.values(umaRefinedV4()))).toEqual(new Set([15]))
   })
 
-  it('783.2 hours (795.2 with her moon), each trio\'s three places equal', () => {
+  it('753.1 hours, 50.2 at every one of the fifteen places (D264)', () => {
     const hours = placeHoursV4()
-    near(total(hours), 783.2, 0.1)
-    near(total(placeHoursV4(true)), 795.2, 0.1)
-    for (const [gathering, processing, making, h] of [
-      ['mine', 'mine-workbench', 'weapon-forge', 52.7], ['fields', 'fields-workbench', 'tome-forge', 52.7],
-      ['forest', 'forest-workbench', 'armorer', 50.2], ['fishery', 'fishery-workbench', 'charm-forge', 50.2],
-      ['monster-den', 'den-workbench', 'lapidary', 55.2],
-    ] as const) {
-      near(hours[gathering], h, 0.05, gathering)
-      near(hours[processing], hours[gathering], 1e-9, processing)
-      near(hours[making], hours[gathering], 1e-9, making)
-    }
+    near(total(hours), 753.1, 0.1)
+    for (const place of Object.values(hours)) near(place, 50.2, 0.05)
   })
 
   it('splits her work by trade and supplies each place as FL11 says', () => {
     const t = tradeHoursOf(placeHoursV4())
-    const want = { physical: [158.1, 20.2], 'physical-hybrid': [150.6, 19.2], healer: [158.1, 20.2], 'magical-hybrid': [150.6, 19.2], magical: [165.7, 21.2] } as const
-    for (const [trade, [hours, share]] of Object.entries(want)) {
-      near(t[trade as keyof typeof t].hours, hours, 0.05, trade)
-      near(100 * t[trade as keyof typeof t].share, share, 0.05, trade)
-    }
-    const s = placeSupplyOf(placeHoursV4())
-    for (const id of ['monster-den', 'den-workbench', 'lapidary'] as const) near(s[id], 2.17, 0.005)
-    for (const id of ['mine', 'mine-workbench', 'weapon-forge', 'fields', 'fields-workbench', 'tome-forge'] as const) near(s[id], 2.28, 0.005)
-    for (const id of ['forest', 'forest-workbench', 'armorer', 'fishery', 'fishery-workbench', 'charm-forge'] as const) near(s[id], 2.39, 0.005)
+    for (const trade of Object.values(t)) { near(trade.hours, 150.6, 0.05); near(100 * trade.share, 20, 0.01) }
+    for (const supply of Object.values(placeSupplyOf(placeHoursV4()))) near(supply, 2.39, 0.005)
   })
 
-  it('keeps R2\'s pace: forty 1.27 a day (Stone\'s seven bind), a run of twenty in 15.8 days; twenty 0.54; G10 held on day 22.5', () => {
+  it('beats R2\'s pace with no line behind: forty 1.39 a day, a run of twenty in 14.3 days; twenty 0.60; G10 held on day 22.5', () => {
     const forty = rosterRateOf(FORTY, placeHoursV4())
-    near(forty.rate, 1.27, 0.005)
-    expect(forty.binds).toBe('magical (7 Umas)')
-    near(20 / forty.rate, 15.8, 0.05)
-    near(rosterRateOf(TWENTY, placeHoursV4()).rate, 0.54, 0.005)
+    near(forty.rate, 1.39, 0.005)
+    near(20 / forty.rate, 14.3, 0.05)
+    near(rosterRateOf(TWENTY, placeHoursV4()).rate, 0.60, 0.005)
     const days = gradeDaysAt(forty.rate)
     near(days[9]!.opens, craftDay(46), 1e-9)
     near(days[9]!.party, 22.5, 0.05)

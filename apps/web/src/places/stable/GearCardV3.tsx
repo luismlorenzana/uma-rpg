@@ -2,7 +2,7 @@
 // half, and her accessory slot as four cards of one shape, ★ on her signature family), and **Upgrade**, every slot's
 // grade row with the made item that raises it, then Extra Stats. The data is `gear-equip.ts`'.
 import {
-  ACCESSORY_FAMILY_LABEL, accessoryFlatValue, ARMOR_SLOTS, ARMOR_SLOT_LABEL, accessoryKinds, activeClass, armorHalf, armorKindFor, armorValues, classOf,
+  ACCESSORY_FAMILY_LABEL, accessorySlotValue, ARMOR_SLOTS, ARMOR_SLOT_LABEL, accessoryKinds, activeClass, armorHalf, armorKindFor, armorValues, classOf,
   gradeOf, isGrades, madeName, mightAt, raisePlan, starMapOf, umaTemplate, WEAPON_LABEL,
   type AccessoryFamily, type ArmorSlot, type GearTier, type GradeTarget, type OwnedUma, type RosterOutfit, type RpgClass,
   type RpgDamageKind, type TierWorld, type UmaUpgrades, umaPick,
@@ -216,12 +216,13 @@ export function EquipView({ outfit, uma, world, tier, onSkills }: { outfit: Rost
       {grades.accessories.map((slot, i) => (
         <section key={i} className="space-y-1.5 rounded-sm bg-raised p-2">
           <div className="flex items-center justify-between">
-            <h4 className="text-micro">Accessory · {grade(slot.grade)}</h4>
+            <h4 className="text-micro">Accessory {i + 1} · {grade(slot.grade)}</h4>
             <HelpButton title="Accessory">
-              <p>Pendant · +{accessoryFlatValue('pendant', Math.max(1, slot.grade), tier)} on each of her three kinds</p>
-              <p>Orb · +{accessoryFlatValue('orb', Math.max(1, slot.grade), tier)} on one kind</p>
-              <p>Bell · one more hit of that kind after her Attack, ×0.1 a grade</p>
-              <p>Insignia · +1.5% a grade on sub-bosses and bosses</p>
+              <p>Pendant · ATK +{accessorySlotValue('pendant', Math.max(1, slot.grade), tier)}</p>
+              <p>Charm · M.ATK +{accessorySlotValue('bell', Math.max(1, slot.grade), tier)}</p>
+              <p>Orb · +{accessorySlotValue('orb', Math.max(1, slot.grade), tier)} on one kind</p>
+              <p>Insignia · +0.5% a grade on sub-bosses and bosses</p>
+              <p>Three slots, each with its own grade. The same accessory can fill more than one.</p>
               <p>The form changes freely outside fights. Its strength follows the slot’s grade, raised on Upgrade.</p>
             </HelpButton>
           </div>

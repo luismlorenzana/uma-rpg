@@ -41,6 +41,8 @@ export const BATTLE_HEAL_SCALE = 300
 //
 // The weapon presets (D263) read one stage, `presets`, at engine v20. No fight reads it: a fight freezes her weapons when
 // it starts, so the presets need neither a new engine nor a new save. Older generations keep their rows for the sims.
+// The three accessory slots (D264) need no engine either: a slot reaches a fight as frozen stats and `flat`, and only
+// `validAccessory` widens, which no older fight can notice. Save v34 carries them.
 
 /** The engine new fights start on, and the generation every rule's default reads (D179). Older versions still replay. */
 export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 20

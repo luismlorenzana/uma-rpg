@@ -8,7 +8,7 @@ import {
 } from '../economy/pacing'
 import { MAX_QUEUE } from '@luismlorenzana/uma-work'
 import {
-  ACCESSORY_FAMILY_LABEL, BELL_PERMILLE_PER_GRADE, INSIGNIA_PERMILLE_PER_GRADE, ORB_T1, PENDANT_T1, signatureBonus,
+  ACCESSORY_FAMILY_LABEL, BELL_PERMILLE_PER_GRADE, INSIGNIA_SLOT_PERMILLE, OFFENSE_SLOT_T1, ORB_SLOT_T1, signatureBonus,
 } from '../economy/accessories'
 import { armorValues, GRADE_MAX, gradeGateLevel, mightAt, TIER_SCALE_TENTHS, type GearTier } from '../economy/grades'
 import { MOON_T1, PLANET_T1, PROWESS_SPLIT, TEMPLATE_T1 } from '../economy/planet'
@@ -213,9 +213,8 @@ function templates(): string {
 function presets(): string {
   return table(['Class', 'Offered by', 'Weapons', 'Armor', 'Accessory'], RPG_CLASSES.filter((c): c is RpgTier1Class => !isTier0(c)).map((c) => {
     const p = weaponPreset(c)
-    const a = p.accessory
     return [CLASS_NAME[c], RPG_CLASS_PARENTS[c].map((t) => CLASS_NAME[t]).join(', '), p.weapons.map(weaponName).join(', '), cap(p.armor),
-      `${ACCESSORY_FAMILY_LABEL[a.family]}${a.kind ? ` (${kindName(a.kind)})` : ''}`]
+      p.accessories.map((a) => `${ACCESSORY_FAMILY_LABEL[a.family]}${a.kind ? ` (${kindName(a.kind)})` : ''}`).join(', ')]
   })) + '\n\n' + table(['Class', 'Holds until she picks'], RPG_CLASSES.map((c) => [CLASS_NAME[c], rpgDefaultWeapons(c).map(weaponName).join(', ')]))
 }
 /** A damage kind's name: a weapon's, or a Tome's element. */
@@ -372,8 +371,8 @@ function battleConstants(): string {
     ['`BATTLE_FLOURISH_RATE`', `Even pace ${BATTLE_FLOURISH_RATE['even-pace']}, Late reserve ${BATTLE_FLOURISH_RATE['late-reserve']}`, 'v16: the share of her max HP those two Flourishes mend at a round\'s end'],
     ['`BATTLE_FLOURISH_FROM`', BATTLE_FLOURISH_FROM, 'v16: the first round whose end Late reserve mends at'],
     ['`RPG_BASE_MP_REGEN_V17`', RPG_BASE_MP_REGEN_V17, `v17: the base MP regen a depth (${pct(RPG_BASE_MP_REGEN_V17 * RPG_BASE_MP_REGEN_DEPTHS)} from Class Rank ${RPG_DEPTH_GATES[RPG_BASE_MP_REGEN_DEPTHS - 1]})`],
-    ['`BELL_PERMILLE_PER_GRADE`', BELL_PERMILLE_PER_GRADE, 'v17: a Bell\'s follow-up, per mille of an Attack a grade, × her hand'],
-    ['`INSIGNIA_PERMILLE_PER_GRADE`', INSIGNIA_PERMILLE_PER_GRADE, 'v17: an Insignia\'s extra damage on sub-bosses and bosses, per mille a grade'],
+    ['`BELL_PERMILLE_PER_GRADE`', BELL_PERMILLE_PER_GRADE, 'v17–v20: a Bell\'s follow-up, per mille of an Attack a grade, × her hand; only fights already open, D264'],
+    ['`INSIGNIA_SLOT_PERMILLE`', INSIGNIA_SLOT_PERMILLE, 'an Insignia slot\'s extra damage on sub-bosses and bosses, per mille a grade (D264)'],
     ['Signature', '0.2 a level × tier', 'v17: her ATK and M.ATK while she wears her knack\'s family'],
   ]
   return table(['Constant', 'Value', 'Meaning'], rows)
@@ -492,7 +491,7 @@ function gems(): string {
   const jewels = MADE_IDENTITIES.filter((m) => m.line === 'jewel-planet' || m.line === 'jewel-moon')
   return table(['Jewel', 'Id', 'Opens', 'Grade', 'Uma Lv', 'Recipe'], jewels.map((m) => {
     const n = Math.ceil(m.grade / 2)
-    const opens = m.line === 'jewel-planet' ? `Planet ${['I', 'II', 'III', 'IV', 'V'][n - 1]}` : `node ${['I', 'II', 'III', 'IV', 'V'][n - 1]} of a moon${n === 2 || n === 4 ? `; her moon's ${n === 2 ? 'I' : 'II'}` : ''}`
+    const opens = m.line === 'jewel-planet' ? `Planet ${['I', 'II', 'III', 'IV', 'V'][n - 1]}, three a node` : `node ${['I', 'II', 'III', 'IV', 'V'][n - 1]} of a moon`
     return [madeName(m.id)!, `\`${m.id}\``, opens, m.grade, gradeGateLevel(m.grade), inputs(madeRecipeV4(m.id))]
   }))
 }
@@ -508,15 +507,15 @@ function gear(): string {
     inputs(madeRecipeV4(`weapon-gem-g${g}`)), inputs(madeRecipeV4(`tome-ink-g${g}`)), inputs(madeRecipeV4(`armor-fittings-g${g}`)),
     inputs(madeRecipeV4(`accessory-setting-g${g}`))]))
   const forms = table(['Family', 'Base form', 'G1 → G10 (Tier 1)'], [
-    [ACCESSORY_FAMILY_LABEL.pendant, 'Flat offense on each of her three weapons\' kinds', PENDANT_T1.join(', ')],
-    [ACCESSORY_FAMILY_LABEL.orb, 'Flat offense on one kind she sets, one of her three weapons’ kinds', ORB_T1.join(', ')],
-    [ACCESSORY_FAMILY_LABEL.bell, 'When her act includes an Attack, her weapon of its kind strikes again at a share of an Attack', `${BELL_PERMILLE_PER_GRADE / 1000} a grade × her hand (${(BELL_PERMILLE_PER_GRADE * GRADE_MAX) / 1000} at G10), every tier`],
-    [ACCESSORY_FAMILY_LABEL.insignia, 'Her hits on sub-bosses and bosses hit harder', `+${INSIGNIA_PERMILLE_PER_GRADE / 10}% a grade (+${(INSIGNIA_PERMILLE_PER_GRADE * GRADE_MAX) / 10}% at G10), every tier`],
+    [ACCESSORY_FAMILY_LABEL.pendant, '+ATK', OFFENSE_SLOT_T1.join(', ')],
+    [ACCESSORY_FAMILY_LABEL.bell, '+M.ATK', OFFENSE_SLOT_T1.join(', ')],
+    [ACCESSORY_FAMILY_LABEL.orb, 'Flat offense on one kind she sets, one of her three weapons’ kinds', ORB_SLOT_T1.join(', ')],
+    [ACCESSORY_FAMILY_LABEL.insignia, 'Her hits on sub-bosses and bosses hit harder', `+${INSIGNIA_SLOT_PERMILLE / 10}% a grade (+${(INSIGNIA_SLOT_PERMILLE * GRADE_MAX) / 10}% at G10)`],
   ])
   return values +
     `\n\nEach armor piece adds its offense to ATK on a physical Uma and to M.ATK on a magical one (her class's half), and its slot's stat. Armor's values × ${TIERS_123.map((t) => TIER_SCALE_TENTHS[t] / 10).join(', ')} in Tiers 1, 2 and 3 (Feet Speed doesn't scale).\n\n` +
     'What raises a slot one grade, in every world:\n\n' + made +
-    '\n\nAccessory families (one slot, its family, form and kind a setting changed freely outside fights; the grade is the slot\'s):\n\n' + forms +
+    '\n\nAccessory families (three slots, each with its own grade, family and kind, set freely outside fights; the same family can fill more than one):\n\n' + forms +
     `\n\nHer signature: while she wears her knack's family, ATK and M.ATK +${signatureBonus(10, 1)} · +${signatureBonus(30, 1)} · +${signatureBonus(50, 1)} at Lv 10 · 30 · 50 (0.2 a level × the tier).`
 }
 /** The Planet and three moons (EP1–EP8, EP23) and her moon (UT10): what a node gives in Tier 1. */

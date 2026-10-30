@@ -19,18 +19,20 @@ describe('setJewel (EP5, EP17)', () => {
   it('runs with Classes v3 live (H134) over weaknesses v2 and R2’s economy', () => expect(BATTLE_ENGINE_VERSION).toBe(20))
 
   it('a Lv 1 Uma sets a Planet Jewel I on Planet I: the node opens and the count falls', () => {
-    const save = setJewel(withUma({ level: 1 }, { 'jewel-planet-1': 2 }), '101', 'jewel-planet-1', 'planet:1', '2026-10-25T13:00:00.000Z')
+    const save = setJewel(withUma({ level: 1 }, { 'jewel-planet-1': 4 }), '101', 'jewel-planet-1', 'planet:1', '2026-10-25T13:00:00.000Z')
     expect(umaOf(save).stars).toEqual({ open: ['planet:1'], moons: [] })
     expect(worldOf(save).items['jewel-planet-1']).toBe(1)
     expect(save.account.updatedAt).toBe('2026-10-25T13:00:00.000Z')
-    const last = setJewel(withUma({ level: 1 }, { 'jewel-planet-1': 1 }), '101', 'jewel-planet-1', 'planet:1', NOW)
+    const last = setJewel(withUma({ level: 1 }, { 'jewel-planet-1': 3 }), '101', 'jewel-planet-1', 'planet:1', NOW)
     expect('jewel-planet-1' in worldOf(last).items).toBe(false)
+    // A Planet node takes three (D264).
+    expect(() => setJewel(withUma({ level: 1 }, { 'jewel-planet-1': 2 }), '101', 'jewel-planet-1', 'planet:1', NOW)).toThrow('Needs 3 in the Warehouse')
   })
 
   it('a jewel above her level waits: Planet Jewel II at Lv 10 opens at Lv 11', () => {
-    const save = withUma({ level: 10, stars: starMap('planet:1') }, { 'jewel-planet-2': 1 })
+    const save = withUma({ level: 10, stars: starMap('planet:1') }, { 'jewel-planet-2': 3 })
     expect(() => setJewel(save, '101', 'jewel-planet-2', 'planet:2', NOW)).toThrow('Opens at Lv 11')
-    expect(umaOf(setJewel(withUma({ level: 11, stars: starMap('planet:1') }, { 'jewel-planet-2': 1 }), '101', 'jewel-planet-2', 'planet:2', NOW)).stars)
+    expect(umaOf(setJewel(withUma({ level: 11, stars: starMap('planet:1') }, { 'jewel-planet-2': 3 }), '101', 'jewel-planet-2', 'planet:2', NOW)).stars)
       .toEqual(starMap('planet:1', 'planet:2'))
   })
 
@@ -45,7 +47,7 @@ describe('setJewel (EP5, EP17)', () => {
     expect(() => setJewel(save, '101', 'jewel-moon-3', 'vigor:2', NOW)).toThrow('A Moon Jewel III opens a node III')
     expect(() => setJewel(save, '101', 'jewel-planet-2', 'vigor:2', NOW)).toThrow('A Planet Jewel II opens Planet II')
     expect(() => setJewel(save, '101', 'jewel-moon-2', 'planet:2', NOW)).toThrow('A Moon Jewel II opens a node II')
-    expect(() => setJewel(save, '101', 'jewel-moon-2', 'template:2', NOW)).toThrow('A Moon Jewel II opens a node II')
+    expect(() => setJewel(save, '101', 'jewel-moon-2', 'template:2', NOW)).toThrow('Opens with its moons')
     expect(() => setJewel(save, '101', 'weapon-gem-g2', 'vigor:2', NOW)).toThrow('Not a jewel')
     expect(() => setJewel(save, '101', 'jewel-moon-2', 'moon:hp:2', NOW)).toThrow('Unknown node')
   })
@@ -56,18 +58,17 @@ describe('setJewel (EP5, EP17)', () => {
     expect(() => setJewel(withUma({ level: 6 }, { 'jewel-moon-1': 0 }), '101', 'jewel-moon-1', 'guard:1', NOW)).toThrow('None in the Warehouse')
   })
 
-  it('her moon: a Moon Jewel II opens template:1 at Lv 16, a Moon Jewel IV template:2 only after it', () => {
-    const items = { 'jewel-moon-2': 1, 'jewel-moon-4': 2 }
-    expect(() => setJewel(withUma({ level: 15 }, items), '101', 'jewel-moon-2', 'template:1', NOW)).toThrow('Opens at Lv 16')
-    expect(() => setJewel(withUma({ level: 40 }, items), '101', 'jewel-moon-4', 'template:2', NOW)).toThrow('Set Moon Jewel II first')
-    let save = setJewel(withUma({ level: 16 }, items), '101', 'jewel-moon-2', 'template:1', NOW)
-    expect(umaOf(save).stars).toEqual(starMap('template:1'))
-    save = saveOf({ ...worldOf(save), umas: { '101': { ...umaOf(save), level: 35 } } })
-    expect(() => setJewel(save, '101', 'jewel-moon-4', 'template:2', NOW)).toThrow('Opens at Lv 36')
-    save = saveOf({ ...worldOf(save), umas: { '101': { ...umaOf(save), level: 36 } } })
-    save = setJewel(save, '101', 'jewel-moon-4', 'template:2', NOW)
-    expect(umaOf(save).stars).toEqual(starMap('template:1', 'template:2'))
-    expect(worldOf(save).items).toEqual({ 'jewel-moon-4': 1 })
+  it('her moon takes no jewel: node I opens with the third Moon II, node II with the third Moon IV (D264)', () => {
+    const moons = (n: number) => ['prowess', 'vigor', 'guard'].flatMap((moon) => Array.from({ length: n }, (_, i) => `${moon}:${i + 1}`))
+    expect(() => setJewel(withUma({ level: 16 }, { 'jewel-moon-2': 1 }), '101', 'jewel-moon-2', 'template:1', NOW)).toThrow('Opens with its moons')
+    const two = moons(2).filter((id) => id !== 'guard:2')
+    const save = setJewel(withUma({ level: 16, stars: starMap(...two) }, { 'jewel-moon-2': 1 }), '101', 'jewel-moon-2', 'guard:2', NOW)
+    expect(umaOf(save).stars).toEqual(starMap(...two, 'guard:2', 'template:1'))
+    const short = setJewel(withUma({ level: 16, stars: starMap('prowess:1', 'vigor:1') }, { 'jewel-moon-2': 1 }), '101', 'jewel-moon-2', 'vigor:2', NOW)
+    expect(umaOf(short).stars).toEqual(starMap('prowess:1', 'vigor:1', 'vigor:2'))
+    const four = moons(4).filter((id) => id !== 'vigor:4')
+    const late = setJewel(withUma({ level: 36, stars: starMap(...four, 'template:1') }, { 'jewel-moon-4': 1 }), '101', 'jewel-moon-4', 'vigor:4', NOW)
+    expect(umaOf(late).stars).toEqual(starMap(...four, 'template:1', 'vigor:4', 'template:2'))
   })
 
   it('a v1 map is "Not graded", and a v3 map refuses Star Gems and active slots', () => {
@@ -88,13 +89,19 @@ describe('jewelNodes (EP §3.5)', () => {
     expect(jewelNodes(starMap('planet:1'), 'jewel-moon-1', 5)).toEqual([])
   })
 
-  it('lists Prowess, Vigor, Guard and her moon, the one furthest behind first', () => {
+  it('lists Prowess, Vigor and Guard, the one furthest behind first, never her moon', () => {
     const map = starMap('planet:1', 'prowess:1', 'vigor:1', 'guard:1')
-    expect(jewelNodes(map, 'jewel-moon-2', 16)).toEqual(['template:1', 'prowess:2', 'vigor:2', 'guard:2'])
-    const later = starMap('planet:1', 'planet:2', 'prowess:1', 'prowess:2', 'prowess:3', 'vigor:1', 'vigor:2', 'vigor:3', 'guard:1', 'guard:2', 'guard:3', 'template:1')
-    expect(jewelNodes(later, 'jewel-moon-4', 36)).toEqual(['template:2', 'prowess:4', 'vigor:4', 'guard:4'])
-    expect(jewelNodes(later, 'jewel-moon-4', 35)).toEqual([])
-    expect(jewelNodes(starMap('prowess:1', 'template:1'), 'jewel-moon-2', 50)).toEqual(['prowess:2'])
+    expect(jewelNodes(map, 'jewel-moon-2', 16)).toEqual(['prowess:2', 'vigor:2', 'guard:2'])
+    const later = starMap('planet:1', 'prowess:1', 'prowess:2', 'vigor:1', 'guard:1', 'guard:2')
+    expect(jewelNodes(later, 'jewel-moon-2', 16)).toEqual(['vigor:2'])
+    expect(jewelNodes(starMap('vigor:1', 'prowess:1', 'prowess:2', 'prowess:3'), 'jewel-moon-2', 16)).toEqual(['vigor:2'])
+    expect(jewelNodes(map, 'jewel-moon-2', 15)).toEqual([])
+  })
+
+  it('counts what she has when asked what she can set now', () => {
+    expect(jewelNodes(starMap(), 'jewel-planet-1', 1, { 'jewel-planet-1': 2 })).toEqual([])
+    expect(jewelNodes(starMap(), 'jewel-planet-1', 1, { 'jewel-planet-1': 3 })).toEqual(['planet:1'])
+    expect(jewelNodes(starMap(), 'jewel-moon-1', 6, { 'jewel-moon-1': 1 })).toEqual(['prowess:1', 'vigor:1', 'guard:1'])
   })
 
   it('a Planet Jewel opens one node at most; none when it’s open or its body is behind', () => {
@@ -109,5 +116,6 @@ describe('jewelNodes (EP §3.5)', () => {
     expect(jewelBlock(starMap('vigor:1'), 'jewel-moon-2', 'vigor:2', 1, {})).toBe('Opens at Lv 16')
     expect(jewelBlock(starMap('vigor:1'), 'jewel-moon-2', 'vigor:2', 16, {})).toBe('None in the Warehouse')
     expect(jewelBlock(starMap('vigor:1'), 'jewel-moon-2', 'vigor:2', 16, { 'jewel-moon-2': 1 })).toBeNull()
+    expect(jewelBlock(starMap(), 'jewel-planet-1', 'planet:1', 1, { 'jewel-planet-1': 1 })).toBe('Needs 3 in the Warehouse')
   })
 })

@@ -103,20 +103,20 @@ describe('toV32: the record (CV26, CV30)', () => {
     expect(toV32(once)).toBe(once)
   })
 
-  it('is chained once after toV31: migrateWorld runs it on a v31 world, not on a v33 one, and the schema is 33', () => {
+  it('is chained once after toV31: migrateWorld runs it on a v31 world, not on a v34 one, and the schema is 34', () => {
     const world = raw(v31World())
     const chained = migrateWorld(world, 31)
     expect(chained).toEqual(toV32(raw(v31World())))
-    expect(migrateWorld(chained, 33)).toBe(chained)
+    expect(migrateWorld(chained, 34)).toBe(chained)
     expect(toV32(chained as Raw)).toBe(chained)
-    expect(SAVE_SCHEMA_VERSION).toBe(33)
+    expect(SAVE_SCHEMA_VERSION).toBe(34)
   })
 
-  it('parses a v31 save to v33 with the reset applied, which round-trips', () => {
+  it('parses a v31 save to v34 with the reset applied, which round-trips', () => {
     // The fixture's constructor stamps the live schema; a stored v31 save says 31.
     const save = JSON.parse(JSON.stringify({ ...v31Save(), schemaVersion: 31 })) as Save
     const parsed = parseSave(save)
-    expect(parsed.schemaVersion).toBe(33)
+    expect(parsed.schemaVersion).toBe(34)
     const one = parsed.tierWorlds['1']!
     expect(one.classesV3).toEqual(toV32(raw(save.tierWorlds['1']!)).classesV3)
     expect(one.classesV3!.umas[UMA.B]!.pick).toBe('spellblade')
