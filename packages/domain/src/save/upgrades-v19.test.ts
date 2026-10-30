@@ -2,9 +2,9 @@
 // as at Class Rank 10 with a child she doesn't hold counts, so the Stable's mark and filter find her. Nothing else moves; at
 // engine 18 (the live game) the reason is never there. Invented Umas only.
 import { describe, expect, it, vi } from 'vitest'
-import { rpgPromotionWaits, type RpgClass } from '../rpg/rules'
+import type { RpgClass } from '../rpg/rules'
 import { gradedUma, gradedWorld } from './economy-v3.fixture'
-import { upgradesFor } from './upgrades'
+import { umaPromotionWaits, upgradesFor } from './upgrades'
 
 vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(19, await orig()))
 
@@ -33,9 +33,9 @@ describe('Promote: a waiting promotion counts as an upgrade (H137)', () => {
   })
 
   it('reads the rule from the class tree: the Acolyte\'s two, the Initiate\'s three', () => {
-    expect(rpgPromotionWaits({ classes: { acolyte: { rank: 10 }, paladin: { rank: 10 } } }, 'acolyte')).toBe(true)
-    expect(rpgPromotionWaits({ classes: { acolyte: { rank: 10 }, paladin: { rank: 10 }, cleric: { rank: 11 } } }, 'acolyte')).toBe(false)
-    expect(rpgPromotionWaits({ classes: { apprentice: { rank: 10 }, mage: { rank: 30 }, tomeblade: { rank: 10 } } }, 'apprentice')).toBe(true)
-    expect(rpgPromotionWaits({ classes: {} }, 'apprentice')).toBe(false)
+    expect(umaPromotionWaits({ classes: { acolyte: { rank: 10 }, paladin: { rank: 10 } } }, 'acolyte')).toBe(true)
+    expect(umaPromotionWaits({ classes: { acolyte: { rank: 10 }, paladin: { rank: 10 }, cleric: { rank: 11 } } }, 'acolyte')).toBe(false)
+    expect(umaPromotionWaits({ classes: { apprentice: { rank: 10 }, mage: { rank: 30 }, tomeblade: { rank: 10 } } }, 'apprentice')).toBe(true)
+    expect(umaPromotionWaits({ classes: {} }, 'apprentice')).toBe(false)
   })
 })

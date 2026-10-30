@@ -6,7 +6,8 @@ import { RPG_CLASSES, rpgClassGate } from '../rpg/rules'
 import {
   activeClass, chooseClass, confirmCalling, pickCalling, promoteUma, promotionPlan, startingClass, type BattleOutfit,
 } from './battle'
-import { umaClassTree, umaHeldClasses } from './class'
+import { umaHeldClasses } from './class'
+import { umaClassTree } from './class-tiles'
 import { manualBlock } from './exchange'
 import { SaveRuleError, unlockUma, worldOf } from './rules'
 import { newSave, type Save } from './save'

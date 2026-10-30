@@ -10,8 +10,8 @@
 import {
   activeClass, BATTLE_ENGINE_VERSION, classTrack, healerBlock, partyOf, promotionPlan, RPG_CLASS_CHILDREN, RPG_CLASS_PARENTS, RPG_CLASS_ROOTS,
   RPG_ROOT_NAME, RPG_TIER0_CLASSES, RPG_TIER0_MAX_RANK, RPG_TIER0_ROOT, RPG_TIER0_SKILL, RPG_TIER1_CLASSES, rpgClassExpToNext, rpgClassName,
-  rpgClassSlots, rpgDefaultWeapons, rpgHand, rpgHoldsTier1, rpgIsHealer, rpgIsTier0, rpgPromotionWaits, rpgReadyParent, rpgRework,
-  rpgSuggestedPromotion, umaClassTree, type BattleOutfit, type OwnedUma, type RpgClass, type RpgClassTile, type RpgClassTileState,
+  rpgClassSlots, rpgDefaultWeapons, rpgHand, rpgHoldsTier1, rpgIsHealer, rpgIsTier0, rpgReadyParent, rpgRework,
+  rpgSuggestedPromotion, umaClassTree, umaPromotionWaits, type BattleOutfit, type OwnedUma, type RpgClass, type RpgClassTile, type RpgClassTileState,
   type RpgSlotKind, type RpgTier0Class, type RpgTier1Class, type RpgWeapon, type TierWorld,
 } from '@rpg/domain'
 import { classRankWord, tier0RankWord, waitingWord } from '../../ui/rank-words'
@@ -153,13 +153,13 @@ export function classesSheet(outfit: BattleOutfit, uma: Uma, world: Pick<TierWor
 /**
  * The Tier 0 a promotion sheet promotes from (H120 decision 4), or null. Opened for a child (a Ready tile): the Tier 0 she
  * fights as when it is one of its parents at Rank 10, else its first parent at Rank 10 in the table's order. Opened from
- * the class button: the Tier 0 she fights as while a promotion waits on it (`rpgPromotionWaits`).
+ * the class button: the Tier 0 she fights as while a promotion waits on it (`umaPromotionWaits`).
  */
 export function promotionFrom(outfit: BattleOutfit, uma: Uma, tier: number | string = 1, child: RpgTier1Class | null = null,
   engine: number = BATTLE_ENGINE_VERSION): RpgTier0Class | null {
   if (!rpgRework('classes', engine) || Number(tier) !== 1) return null
   const active = activeClass(outfit, uma, tier, engine)
-  if (!child) return rpgIsTier0(active) && rpgPromotionWaits(uma.ranks, active, tier, engine) ? active : null
+  if (!child) return rpgIsTier0(active) && umaPromotionWaits(uma.ranks, active, tier, engine) ? active : null
   if (rpgIsTier0(active) && RPG_CLASS_PARENTS[child].includes(active) && classTrack(uma.ranks, active).rank >= RPG_TIER0_MAX_RANK) return active
   return rpgReadyParent(uma.ranks, child)
 }
@@ -254,7 +254,7 @@ export function promotionLine(uma: Uma, classId: RpgTier0Class, tier: number | s
   if (track.rank < RPG_TIER0_MAX_RANK) {
     return { text: `Promotion at R${RPG_TIER0_MAX_RANK} · ${RPG_TIER0_MAX_RANK - track.rank} to go`, ...tier0Progress(classId, track, engine), opens: false }
   }
-  if (!rpgPromotionWaits(uma.ranks, classId, tier, engine)) return null
+  if (!umaPromotionWaits(uma.ranks, classId, tier, engine)) return null
   return { text: track.exp > 0 ? `Promotion · ${waitingWord(track.exp)}` : 'Promotion · Ready', value: 1, max: 1, opens: true }
 }
 /** A Tier 0 node's title: her skill and the weapon that casts it, "Drill Strike · Lance" (the catalog names it by the

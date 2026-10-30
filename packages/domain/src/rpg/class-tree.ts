@@ -122,14 +122,6 @@ export const rpgClassClosedText = (classId: RpgTier1Class): string =>
 /** Her parent Tier 0 at Class Rank 10 she can promote into this Tier 1 class from, the first in the table's order, or null. */
 export const rpgReadyParent = (ranks: RpgClassRanks, classId: RpgTier1Class): RpgTier0Class | null =>
   RPG_CLASS_PARENTS[classId].find((p) => rankIn(ranks, p) >= RPG_TIER0_MAX_RANK) ?? null
-/** Whether a promotion waits on her (§14.1's Ready dot; H137, D253): from v19, in Tier 1's world, the class she fights as
- * (`classId`) is a Tier 0 at Class Rank 10 with a child she doesn't hold. Never while she fights as a Tier 1 class: her
- * siblings are then a choice, not a dot. */
-export function rpgPromotionWaits(ranks: RpgClassRanks, classId: RpgClass, tier: number | string = 1,
-  engine: number = BATTLE_ENGINE_VERSION): boolean {
-  if (!rpgRework('classes', engine) || Number(tier) !== 1 || !rpgIsTier0(classId)) return false
-  return rankIn(ranks, classId) >= RPG_TIER0_MAX_RANK && RPG_CLASS_CHILDREN[classId].some((c) => !rpgHoldsTier1(ranks, c))
-}
 
 /**
  * Why she can't fight as a class now, or null (CV8–CV10). Before v19 every class of the generation is open. From v19, in

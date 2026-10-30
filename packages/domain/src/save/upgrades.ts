@@ -6,14 +6,14 @@
 // CP14), so skills never count. Extra Stats: gem kinds she can set (the Observatory's rule, `nodeFromGem`) and free active
 // slots she could fill. Pure and cheap: lookups by id, no scan of the stock per slot, so the Stable can ask it for every
 // Uma.
-import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
+import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { accessoryFits, ACCESSORY_TYPES, gearId, gearIdentity, gearLevel, isAccessory, type EquipType, type GearSlot } from '../economy/gear-id'
 import { activeNodeSlots } from '../economy/pacing'
 import { ACCESSORY_SLOTS, ARMOR_SLOTS } from '../economy/ranks'
 import { gradeOf, raiseBlock, type GradeTarget } from '../economy/grades'
 import { GEM_IDENTITIES, gemNodes, nodeGrade } from '../economy/stars'
 import { madeIdentity } from '../items/made-id'
-import { rpgPromotionWaits, type RpgClass } from '../rpg/rules'
+import { RPG_CLASS_CHILDREN, RPG_TIER0_MAX_RANK, rpgHoldsTier1, rpgIsTier0, type RpgClass, type RpgClassRanks } from '../rpg/rules'
 import { classOf } from './battle'
 import { jewelNodes } from './observatory'
 import { gearStock, gearV1, gemStock, isGrades, isStarMap, slotKind, starsV1, type OwnedUma, type TierWorld } from './save'
@@ -33,9 +33,18 @@ export interface UmaUpgrades {
   /** gems + freeNodes. */
   stars: number
   /** Classes v3 (v19; H137, D253): she fights as a Tier 0 at Class Rank 10 with a child she doesn't hold, so a promotion
-   * waits (`rpgPromotionWaits`): the Stable's mark and the Skills tab's Ready dot. Always false before v19. */
+   * waits (`umaPromotionWaits`): the Stable's mark and the Skills tab's Ready dot. Always false before v19. */
   promote: boolean
   any: boolean
+}
+
+/** Whether a promotion waits on her (Classes v3 §14.1's Ready dot; H137, D253): from v19, in Tier 1's world, the class she
+ * fights as (`classId`) is a Tier 0 at Class Rank 10 with a child she doesn't hold. Never while she fights as a Tier 1
+ * class: her siblings are then a choice, not a dot. Here, not in the class tree's module, so it loads with the Stable. */
+export function umaPromotionWaits(ranks: RpgClassRanks, classId: RpgClass, tier: number | string = 1,
+  engine: number = BATTLE_ENGINE_VERSION): boolean {
+  if (!rpgRework('classes', engine) || Number(tier) !== 1 || !rpgIsTier0(classId)) return false
+  return (ranks.classes[classId]?.rank ?? 1) >= RPG_TIER0_MAX_RANK && RPG_CLASS_CHILDREN[classId].some((c) => !rpgHoldsTier1(ranks, c))
 }
 
 /** Each gem's nodes as `[node, grade]`, lowest first, built once. */
@@ -82,7 +91,7 @@ function better(uma: OwnedUma, stock: Readonly<Record<string, number>>, bound: M
 export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClass, tier: number | string = 1, engine: number = BATTLE_ENGINE_VERSION): UmaUpgrades | null {
   const uma = world.umas[outfitId]
   if (!uma) return null
-  const promote = rpgPromotionWaits(uma.ranks, classId, tier, engine)
+  const promote = umaPromotionWaits(uma.ranks, classId, tier, engine)
   if (isGrades(uma.gear) || isStarMap(uma.stars)) {
     const grades: GradeTarget[] = []
     if (isGrades(uma.gear)) {

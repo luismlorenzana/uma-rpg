@@ -11,7 +11,8 @@ import {
   actInFight, activeClass, callingConfirmed, chooseClass, confirmCalling, fillRanks, openFightOf, partyMembers, pickCalling, promoteUma, promotionPlan,
   startFight, startingClass, type BattleOutfit,
 } from './battle'
-import { umaClassTree, umaHeldClasses } from './class'
+import { umaHeldClasses } from './class'
+import { umaClassTree } from './class-tiles'
 import { manualBlock, readManuals } from './exchange'
 import { ascend, signUpRift } from './rift'
 import { riftWorldSave, T as RT, TWENTY } from './rift-rules.fixture'

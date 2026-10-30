@@ -44,8 +44,9 @@ import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit 
 import { RPG_RESET_TIER0 } from './classes-v3'
 
 // An Uma's class (H62) and one healer a party (H59): in `save/class.ts`, so the main bundle and the party screens read them
-// without this module and the engine. Classes v3's class tree (`umaClassTree`, `umaHeldClasses`, H126) isn't re-exported
-// here: this subpath loads as a namespace, which would keep them in the main bundle before a screen reads them.
+// without this module and the engine. Classes v3's class tree (`umaClassTree`, in `save/class-tiles.ts` since H137, and
+// `umaHeldClasses`, H126) isn't re-exported here: this subpath loads as a namespace, which would keep them in the main
+// bundle before a screen reads them.
 export {
   activeClass, classOf, healerBlock, ONE_HEALER, startingClass, styleClass, withClassWeapons, type BattleOutfit, type StartingOutfit,
 } from './class'
