@@ -11,7 +11,7 @@ import { useHubNavigation } from '../../hub/navigation'
 import { beginRiftFight } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import type { PageProps } from '../registry'
-import { GuidedWeapons } from './GuidedWeapons'
+import { GuidanceNeeds, GuidedWeapons } from './GuidedWeapons'
 import { PartyPick } from './PartyPick'
 import { bestParty, frontPartyBlock, planSize } from './rift-view'
 import { useRift } from './use-rift'
@@ -80,6 +80,7 @@ export function StageSheet({ campaign, place, front, plan, status, onClose }: {
       </div>
     }>
       <p className="mb-2 text-[13px] text-ink-soft">{planLine(plan, tier)}</p>
+      {status === 'next' && !open && <GuidanceNeeds campaign={campaign} world={world} front={front} party={party} roster={run.roster} />}
       <PlanFoes campaign={campaign} plan={plan} />
     </BottomSheet>
   )

@@ -1,6 +1,6 @@
 // An Echo's sheet (H50, rift.md §8): its front and level, its foes, a party of five Lv 50 Umas and Fight (from v16 with
 // the front's guided weapons, H70); once won, Sweeps with Sweep Tickets, whose result shows like a win.
-import { FRONT_NAME, SaveRuleError, type EchoLevel, type RiftFront } from '@rpg/domain'
+import { FRONT_NAME, RPG_TIER_MAX_LEVEL, SaveRuleError, type EchoLevel, type RiftFront } from '@rpg/domain'
 import { riftFight, riftFightBlock, sweepEchoBlock, type RiftFightResult } from '@rpg/domain/rift'
 import { useMemo, useState } from 'react'
 import type { Campaign } from '../../battle/campaign'
@@ -8,7 +8,7 @@ import { useHubNavigation } from '../../hub/navigation'
 import { beginRiftFight, sweepEchoes } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import type { PageProps } from '../registry'
-import { GuidedWeapons } from './GuidedWeapons'
+import { GuidanceNeeds, GuidedWeapons } from './GuidedWeapons'
 import { PartyPick } from './PartyPick'
 import { bestParty, levelPartyBlock } from './rift-view'
 import { RiftResult } from './RiftResult'
@@ -75,6 +75,8 @@ export function EchoSheet({ campaign, place, front, level, onClose }: {
       </div>
     }>
       <p className="mb-2 text-[13px] text-ink-soft">{planLine(plan, tier)}{won ? ' · won ✓' : ''}</p>
+      {!open && <GuidanceNeeds campaign={campaign} world={world} front={front} party={party}
+        roster={Object.keys(world.umas).filter((id) => world.umas[id]!.level >= RPG_TIER_MAX_LEVEL)} />}
       <PlanFoes campaign={campaign} plan={plan} />
     </BottomSheet>
   )
