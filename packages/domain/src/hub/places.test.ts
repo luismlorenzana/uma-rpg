@@ -98,10 +98,10 @@ describe('the Learning page by generation (H59, D178)', () => {
     }
   })
 
-  it('keeps v14\'s and v15–v18\'s lists byte for byte (H133)', () => {
-    // FNV-1a of each list's JSON, taken on `main` before H133.
-    expect(fnv(JSON.stringify(learningPlaces(14)))).toBe('e23a1379')
-    for (const engine of [15, 16, 17, 18]) expect(fnv(JSON.stringify(learningPlaces(engine))), `v${engine}`).toBe('797ab45f')
+  it('keeps v14\'s and v15–v18\'s lists byte for byte except H117\'s shared Observatory copy', () => {
+    // FNV-1a after H117 changed only the Observatory's shared blurb and details.
+    expect(fnv(JSON.stringify(learningPlaces(14)))).toBe('40ec8c6d')
+    for (const engine of [15, 16, 17, 18]) expect(fnv(JSON.stringify(learningPlaces(engine))), `v${engine}`).toBe('3afe29af')
   })
 
   it('stands Halls v2\'s five halls from v19: physical left, magic right, the Healer Sanctum in the middle on its own temple (H133)', () => {

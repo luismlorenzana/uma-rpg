@@ -85,7 +85,7 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     show(<PartyHallPage {...page('party-hall', '1')} />)
     // Aster fights as her calling's Tier 0 (v19).
     expect(screen.getByText((_, element) => element?.textContent === 'Lead · Recruit')).toBeDefined()
-    fireEvent.click(screen.getByRole('button', { name: /Slot 2 · add an Uma/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Slot 2, empty' }))
     expect(within(dialog()).getByRole('button', { name: 'Aster. In this party' }).hasAttribute('disabled')).toBe(true)
     expect(within(dialog()).queryByRole('button', { name: /Fable/ })).toBeNull()
     const cinder = within(dialog()).getByRole('button', { name: 'Cinder' })

@@ -87,9 +87,7 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
   // A graded Uma (save v28, R2) has a grade on each weapon slot and no pieces; a v27 one her pieces and their slots.
   const graded = isGrades(uma.gear) ? uma.gear : null
   const better: readonly string[] = graded ? (upgrades?.grades ?? []).flatMap((g) => (g.kind === 'weapon' ? [g.weapon] : [])) : upgrades?.gearSlots ?? []
-  const rankTrack = classTrack(uma.ranks, classId)
-  const rank = rankTrack.rank
-  const rankFill = fill('class', rankTrack)
+  const rank = classRankOf(uma.ranks, classId)
   const slots = rpgActiveSlots(uma.level)
   const flourish = rootFlourish(outfit, uma, classId)
   const run = (op: () => Promise<void>) => {

@@ -53,7 +53,8 @@ describe.skipIf(!HAS_RELEASE)('the template against the local master-data releas
     const names = new Map<string, number>()
     let picks = 0, pace = 0, late = 0
     for (const outfit of roster) {
-      const t = umaTemplate(outfit)
+      // This is §2.4's Classes v2 census; Classes v3 has its own live census below.
+      const t = umaTemplate(outfit, null, 18)
       rows[`${t.row}`] += 1
       fight[({ brawler: 'physical', spellblade: 'physical hybrid', mage: 'magical', summoner: 'magical hybrid', paladin: 'healer', cleric: 'healer' } as const)[t.calling as RpgV2Class]] += 1
       strides[t.stride] += 1
@@ -61,7 +62,7 @@ describe.skipIf(!HAS_RELEASE)('the template against the local master-data releas
       families[t.family] += 1
       types.set(t.type, (types.get(t.type) ?? 0) + 1)
       names.set(t.name, (names.get(t.name) ?? 0) + 1)
-      const pick = umaCallingPick(outfit)
+      const pick = umaCallingPick(outfit, 18)
       if (pick) { picks += 1; if (pick.options.includes('mage')) pace += 1; else late += 1 }
     }
     const sizes = [...names.values()].sort((a, b) => a - b)

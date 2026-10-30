@@ -84,6 +84,7 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
     fixture.world = { ...fixture.world,
       heroes: { 'brawler-1': { hero: '81002', learners: ['81001'] } },
       umas: { ...fixture.world.umas, '81001': { ...aster,
+        classId: 'brawler',
         classes: { ...aster.classes, brawler: { weapons: ['greatsword', 'axe', 'lance'], lines: {}, loadout: [] } },
         bonds: { 'brawler-1': { level: 2, exp: 0 } },
       } },

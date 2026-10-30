@@ -14,7 +14,7 @@ import * as copy from './copy'
 import { accessoryCards, cardButton, upgradeRows } from './gear-equip'
 import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine } from './gear-v3'
 import { handLine, rankText } from './SkillTree'
-import { callingCard, flourishLine, rootFlourish, templateCard } from './template-view'
+import { flourishLine, rootFlourish, templateCard } from './template-view'
 
 const NAMES = [
   ...Object.values(WEAPON_LABEL), ...Object.values(ACCESSORY_FAMILY_LABEL), ...Object.values(ARMOR_SLOT_LABEL),
@@ -128,7 +128,6 @@ describe('the profile wording list (H117)', () => {
       { source: 'level and exp ends', value: [copy.level(1), copy.level(50), copy.exp(0, 168), copy.exp(301, null)] },
       { source: 'templateCard locked', value: templateCard(outfit, null, null) },
       { source: 'templateCard owned', value: templateCard(outfit, owned, 'mage', 1, { 'jewel-template-1': 1 }) },
-      { source: 'callingCard', value: callingCard(outfit, owned.calling) },
       { source: 'rootFlourish', value: rootFlourish(outfit, owned, 'mage') },
       { source: 'handLine', value: handLine('spellblade', { power: 1, arms: .72, tome: .44, mp: 1, linger: 0, pair: false, lead: 'arms', extra: true }) },
       { source: 'rankText', value: [rankText({ open: true, rank: 3, nextRankAt: 14, gate: 1 }), rankText({ open: false, rank: 0, nextRankAt: null, gate: 30 })] },

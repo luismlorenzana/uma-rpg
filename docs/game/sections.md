@@ -94,7 +94,7 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 | Spell Blade Salle | `spell-blade-salle` | class-hall | 4 | The Spell Blade Salle: power from pacts with familiars. Four Heroes, each with her own Limit Break, and their Learners. |
 | Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Circle: power from familiars, summoned. Four Heroes, each with her own Limit Break, and their Learners. |
 | Healer Sanctum | `healer-sanctum` | class-hall | 4 | The Healer Sanctum: power from a followed deity. Four Heroes, each with her own Limit Break, and their Learners. |
-| Observatory | `observatory` | town | — | Each Uma's Extra Stats map: a Sun, eight planets and their moons. |
+| Observatory | `observatory` | town | — | Each Uma's Extra Stats: a Planet, three moons and her own moon. |
 
 ### Battle (`battle`)
 
