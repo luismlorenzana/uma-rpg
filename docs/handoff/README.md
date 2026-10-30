@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H139; decision numbers from D262). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H139; decision numbers from D263). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it. Open now:
@@ -39,8 +39,7 @@ retirement and the hall-based names are already on `main`.
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H118](tasks/H118-kit-compact-profile-frame.md) | Both apps: a compact `ProfileFrame` header (`size`, `progress`) and a face door on `SlotRow` (`onFace`), uma-kit 0.16.0; uma-rpg pins it | Claude (uma-platform session) | S | — | Ready |
-| [H119](tasks/H119-profile-frame.md) | Uma profile v2: the frame, four tabs (Class, Gear, Stars, Template) as a skeleton, the compact header and facts row (Party · Work · Details), the Details sheet, routes `outfit/:id/:tab` and the tab key, locked | Claude | M | H117, H118 | Waiting |
+| [H119](tasks/H119-profile-frame.md) | Uma profile v2: the frame, four tabs (Class, Gear, Stars, Template) as a skeleton, the compact header and facts row (Party · Work · Details), the Details sheet, routes `outfit/:id/:tab` and the tab key, locked | Claude | M | H117, H118 | Ready |
 | [H120](tasks/H120-class-tab.md) | Uma profile v2: the Class tab, placing the class tree, promotion and Tier 0 sheets already on `main` (H137) | ChatGPT | M | H119 | Waiting |
 | [H121](tasks/H121-gear-tab.md) | Uma profile v2: the Gear tab, nine tiles, raise sheets with before → after, Raise all | ChatGPT | M | H119 | Waiting |
 | [H122](tasks/H122-stars-tab-observatory-door.md) | Uma profile v2: the Stars tab, Set all, and the Observatory as a door (its old route redirects) | ChatGPT | M | H119 | Waiting |
@@ -65,7 +64,8 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
-| H138 | Five base-class family emblems in place and the uma-art 2.18.0 pin (D262, platform P78); all other UI pixels and metadata frozen; actual native Classes-sheet acceptance at both phone widths, light/dark | Art `9dc40f3` ([platform #60](https://github.com/luismlorenzana/uma-platform/pull/60)), [2.18.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/41099542585); RPG pin in this delivery |
+| H118 | Compact `ProfileFrame`/progress and optional worker face doors (platform P79), uma-kit 0.16.0 [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41116447663) and pinned; both games' full checks, default markup frozen, four native size/theme checks and a 44pt worker-face tap. RPG keeps its existing display until H119/H124; H119 is Ready after H117 and H118. | Kit `5662009` ([platform #62](https://github.com/luismlorenzana/uma-platform/pull/62)); RPG pin `d5c733a` ([#84](https://github.com/luismlorenzana/uma-rpg/pull/84)), [production workflow](https://github.com/luismlorenzana/uma-rpg/actions/runs/41117831299) |
+| H138 | Five base-class family emblems in place and the uma-art 2.18.0 pin (D262, platform P78); all other UI pixels and metadata frozen; actual native Classes-sheet acceptance at both phone widths, light/dark | Art `9dc40f3` ([platform #60](https://github.com/luismlorenzana/uma-platform/pull/60)), [2.18.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/41099542585); RPG pin `d48ed93` ([#83](https://github.com/luismlorenzana/uma-rpg/pull/83)) |
 | H117 | Uma profile v2: the live profile's compact copy, one wording list in code, copy enforcement in CI and three 44 pt targets (D258) | `e14a93c` |
 
 ## How a packet reads
