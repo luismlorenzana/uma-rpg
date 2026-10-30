@@ -58,7 +58,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
    **Off**, an always-listed ★ Signature with **Worn** or **Not worn**, and separate ★ Moon I/II rows. An All-Rounder
    calling's II reads `DEF +4 · M.DEF +4`. No calling card appears. Mark her as a target and unmark her. Tap the class
    cell (Skills opens) and the Party or Working cell (its place opens). A locked profile has **Unlock · 1 Ticket** and
-   no ticket-balance sentence. (D206, D229, D240, D251)
+   no ticket-balance sentence. (D206, D229, D240, D258)
 9. **Skills tab: Classes.** On a Tier 0, the class button reads "R7/10" and her trees are one node each ("Drill Strike
    · Greatsword", "R7/10") with "Promotion at R10 · 3 to go" under them; **Change** lists all ten weapons. Tap the class
    button: **Classes** shows the tree, Warrior · All-Rounder · Mage over the Tier 0 row and the Tier 1 rows. Tap a
@@ -78,7 +78,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
     and the Tier 1 classes she holds. (D201, D206, D229)
 12. **Battle tab.** Expect four groups in three columns: Offense (ATK, M.ATK, Might for each weapon, Accessory, and an
     always-listed ★ Signature), Defense, Sustain (HP, MP with `+n/round`, and the full ★ Flourish with **On** or **Off**)
-    and Other (`Limit start n/12`); gear's part in blue and Extra Stats' in green. (D204, D217, D251)
+    and Other (`Limit start n/12`); gear's part in blue and Extra Stats' in green. (D204, D217, D258)
 13. **Gear → Equip.** Tap **Standard preset**: expect **Standard preset · On**. Tap each accessory family: one detail at
     a time, her ★ family first with its signature line. On a Bell or an Orb, the kind buttons are her three weapons';
     **Set** one, then pick another kind and tap **Replace**. Check the weapon chips' colours in both themes: the
@@ -101,7 +101,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
     "One foe · 1 hit · ×2.9" on seat 2, "Volley · 4 + 2 a foe · ×2.2" on seat 4. Seat a Hero with **+ Hero**, then tap
     **+** for a Learner: the picker shows `Bond n/10 · n/2 Heroes` and "Adds …", and Umas that can't sit there show why.
     Open the Learner's sheet: expect `Bond n/10 · Strength n%` and **Leave**. A Hero's sheet says
-    `Hero · Strength 100%`; emptying its seat uses the compact **Empty seat** confirmation. (D106, D241, D251, D255)
+    `Hero · Strength 100%`; emptying its seat uses the compact **Empty seat** confirmation. (D106, D241, D255, D258)
 19. **Observatory.** Pick an Uma: expect `Open n/22` and her map with "★ {her type}". Tap a closed node: its sheet uses
     compact values such as `+21 · all six`, `HP +100 · MP +20` and `DEF/M.DEF +4`, then names its jewel. Tap **Set** on a
     ready jewel: the node fills, the counts and totals go up and

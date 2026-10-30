@@ -49,6 +49,8 @@ describe('the profile wording list (H117)', () => {
     expect(copy.exp(1200, 2400)).toBe('1,200/2,400')
     expect(copy.exp(301, null)).toBe('Max · 301 EXP')
     expect(copy.classRank(40)).toBe('R40')
+    expect(copy.tier0Rank(7)).toBe('R7/10')
+    expect(copy.waitingExp(17400)).toBe('+17,400 EXP waiting')
     expect(copy.craftLevel(10)).toBe('Craft 10')
     expect(copy.gate('level', 36)).toBe('Lv 36')
     expect(copy.gate('rank', 30)).toBe('R30')

@@ -19,7 +19,7 @@ import { activeClass, classOf, umaFlourish, umaPointParts, umaProfile, umaWeapon
 import { gearV1, isGrades, starMapOf, umaPick, type OwnedUma } from './save'
 import { accessoryEffect, accessoryLine, flourish, limitStart, mp, signature } from './sheet-words'
 
-/** A Flourish in the profile wording list (D251). */
+/** A Flourish in the profile wording list (D258). */
 export function flourishShort(flourish: RpgFlourish): string {
   return flourishLineValue(flourish, true)
 }

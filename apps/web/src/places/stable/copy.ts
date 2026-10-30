@@ -1,4 +1,4 @@
-// The Uma profile's wording list (D251, H117; proposal C1–C10 / UP25–UP27).
+// The Uma profile's wording list (D258, H117; proposal C1–C10 / UP25–UP27).
 // Every fact printed by today's profile enters here first. Screens split a returned line into cells when useful,
 // but never invent a second wording. Rules and confirms remain in HelpButton or confirmation sheets.
 import type { AccessoryFamily, ArmorSlot, GearTier, RpgBranch, RpgDamageKind, RpgFlourish } from '@rpg/domain'
@@ -13,6 +13,8 @@ export const level = (value: number): string => `Lv ${n(value)}`
 export const exp = (value: number, next: number | null): string => next === null ? `Max · ${n(value)} EXP` : `${n(value)}/${n(next)}`
 /** C8/C9: Class Rank. The expanded wording belongs only in aria labels. */
 export const classRank = (value: number): string => `R${n(value)}`
+export const tier0Rank = (value: number): string => `${classRank(value)}/10`
+export const waitingExp = (value: number): string => `+${n(value)} EXP waiting`
 /** C8/C9: Craft Level. */
 export const craftLevel = (value: number): string => `Craft ${n(value)}`
 

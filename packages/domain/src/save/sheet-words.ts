@@ -1,4 +1,4 @@
-// The profile wording shared by the domain-built battle sheet and the lazy web screens (D251, H117).
+// The profile wording shared by the domain-built battle sheet and the lazy web screens (D258, H117).
 // C1–C10: facts are labels and numbers, never narration; each fact has one builder and one number format.
 import { BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE } from '../rpg/battle/caps'
 import type { RpgFlourish } from '../rpg/battle/types'
