@@ -61,14 +61,14 @@
 | 1. Foundation | H136 → H126 | Main JS back to ~215 KB; the 13 classes, the tree, Tier 0 and promotion in the domain, dark at engine v19 | — |
 | 2. Rules and save | H128 ∥ H130 (both start on H126's reviewed branch; H130's healer-seat step waits for H129) → H129 (on H128's branch) → H131 | Weapon shapes, the twenty Limit Breaks, save v32 and the reset written, balance measured; all dark | H129 is the Halls group's domain packet: Phase 2 builds it, since H130 migrates the healer seats with the classes. H133 (ChatGPT) can start once H128 and H129 merge |
 | 3. The reset's screens | H132 (starts once H130's pull request is up) | "The classes are rebuilt" sheet and the Exchange's Manual sheet, inert | — |
-| 4. The switch | H137 (the promotion on today's Skills tab, done) → H134 | Engine v19 and save v32 live, the manual rewritten | H133 (Halls; Claude since 2026-10-29). Not the Uma profile v2 (D252) |
+| 4. The switch | H137 (the promotion on today's Skills tab, done) → H134 | Engine v19 and save v32 live, the manual rewritten | H133 done. Not the Uma profile v2 (D252) |
 
 **Halls of Heroes v2** (D241):
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | [H129](tasks/H129-halls-v2-limit-breaks.md) | Halls v2 (D241): five halls, the twenty Limit Breaks with their own power, class scale and the 10-hit cap | Claude | M | H126, H128 | Done (`d5cf696`) |
-| [H133](tasks/H133-halls-v2-pages.md) | Halls v2: the Learning page's five halls and the Hall page (home class, shape, power), inert until H134. **Art ready:** pin uma-art 2.17.0 or later and draw `healer-sanctum` without the keep override. | Claude (the owner, 2026-10-29) | S–M | H128, H129 | In progress |
+| [H133](tasks/H133-halls-v2-pages.md) | Halls v2: the Learning page's five halls and the Hall page (home class, shape, power), inert until H134. **Art ready:** pin uma-art 2.17.0 or later and draw `healer-sanctum` without the keep override. | Claude (the owner, 2026-10-29) | S–M | H128, H129 | Done (`cd32387`) |
 
 **After hardening:** Tier 2 and Tier 3 are re-planned. Their approved drafts stay in
 [design/tier-rework/](../design/tier-rework/README.md) (Class, Weapon, Extra Stats and Profession Progression, stat
@@ -85,6 +85,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 | Id | Task | Commit |
 |---|---|---|
+| H133 | Halls v2's Learning page and Hall page, inert until H134 (D255): five halls by family with the Healer Sanctum's own temple (uma-art 2.17.0 pinned), the seat card's home class, shape and power, the old hall links aliased to the Sanctum, every web reader on the hall-based names. Main JS 219.91 KB on CI (+0.41 with the pin). [#79](https://github.com/luismlorenzana/uma-rpg/pull/79) | `cd32387` |
 | H137 | Classes v3's class tree, promotion sheet, Tier 0 tree and Ready dot on today's Skills tab, inert until H134 (D252, D253): `class-view.ts`, `ClassesSheet.tsx` and `PromotionSheet.tsx` as standalone sheets H120 reuses; the Manuals door to the Exchange with Back to the sheet; the Stable's Promote reason (`umaPromotionWaits`); `umaClassTree` moved to a lazy `save/class-tiles.ts`. Main JS 218.73 KB locally. [#78](https://github.com/luismlorenzana/uma-rpg/pull/78) | `fdec2aa` |
 | H135 | The Healer Sanctum's original open temple, delivered in [uma-platform #58](https://github.com/luismlorenzana/uma-platform/pull/58), P77/D254: three steps, four columns, a sun pediment and static gold/violet braziers; all 50 older buildings unchanged; [uma-art 2.17.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40978750402). H133 or its first later adopter pins it and draws `healer-sanctum` without the keep override. | platform `bab58c3` |
 | H131 | Classes v3's and Halls v2's balance on engine v19, dark (D249), 32 seeds on Auto against v18: every Tier 1 stage still wins (S1, H2: 0 points); the mirrors within 2–6% (S3, S4); the Rift's right builds 91–100% a stage, champions 60–68%, the Convergence 50%. Tuned, v19 only: Tier 0 power ×1.05 (1.60 → 2.31), `HANDS_V19` (Tome Spellblade Arms 0.48, Arms Summoner Tome 0.46, both Summoners' lead 0.57), Light Pierce 0.85, the Limit Break scale 0.95 (healers 0.8), `RIFT_TUNING_V19`. **Recorded misses:** Paladin ÷ Cleric 117% (147% at Lv 30), Limit Breaks above the analytic for the hybrids and Summoners (133–150%: home seats now strike in her own weapons' kinds), Iron's stages 9–11 +16 points, the Arms Spellblade at 79–80% physical from Lv 30, the Bow Barrage and Light Pierce B lines, Lv 20's pace 90%. Main JS 219.44 KB gzip on CI | `598060e` |

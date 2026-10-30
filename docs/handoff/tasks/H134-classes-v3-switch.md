@@ -250,4 +250,10 @@ changes the owner's save**, so it's rehearsed on a full-shaped scratch save firs
   Tier 1 curve: hide the Tier 0s there or draw them to 10 (H120 removes the grid later). The Flourish line reads "No
   effect as …" for a Tier 0 at v19: check it against the templates' rule (Flourish by family) and fix the wording or the
   rule's reader.
+- **From H133 (D255), for the flip:** uma-art 2.17.0 is pinned (H127's emblems and the Sanctum's temple). The old hall
+  names (`HERO_HALLS`, `hallClass`, `heroLimitsOf`, `heroLimitClass`, `heroHallClass`) have no web reader left; domain
+  readers remain in `docs/render.ts` (the manual's halls table), `world/balance-party.ts` and four tests: move them or
+  keep what a replay reads. `hallTitle`'s, `seatCard`'s and the (i)'s v18 branches can go. `grant/classes-lines.ts`
+  shows its literal "Paladin Bastion" and "Cleric Chapel" fallbacks at v19 (the places are gone): confirm or name them
+  through the merge record.
 
