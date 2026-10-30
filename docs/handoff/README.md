@@ -1,9 +1,10 @@
 # Handoff: open work
 
-> **Status: 2026-10-28, after D238.** Tier 1 is built and live: engine v18, save v31. That covers the Tier rework's R1
-> and R2, the farm by line, the Wilds' trios and weaknesses v2. Tier 2 and Tier 3 worlds run Tier 1's rules × tier until
-> they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before Tier 2
-> and Tier 3 are reworked.
+> **Status: 2026-10-30, after D257.** Tier 1 is built and live: engine v19, save v32. That covers the Tier rework's R1
+> and R2, the farm by line, the Wilds' trios, weaknesses v2, and **Classes v3 with Halls v2** (thirteen classes in a tree,
+> Tier 0 and promotion, five halls and twenty Limit Breaks; H134). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
+> until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
+> Tier 2 and Tier 3 are reworked.
 >
 > - **The manual of the game as it is:** [docs/game/](../game/README.md). Read it before any packet.
 > - **History** (decisions D1–D237, finished build plans, done packets, superseded specs) is in
@@ -29,7 +30,7 @@
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 
-**Uma profile v2** (D239):
+**Uma profile v2** (D239). **Engine v19 is live since H134 (D257):** where a packet below builds a screen for both generations or "inert until H134", build it for v19 only. H137's sheets, the retired calling card and the hall-based names are already on `main`; H120 places H137's sheets in its Class tab:
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -54,14 +55,14 @@
 | [H131](tasks/H131-classes-v3-balance.md) | Balance on engine v19: Classes v3's S1–S10 and Halls v2's targets, knobs as the designs name them | Claude | M–L | H126, H128, H129 | Done (`598060e`) |
 | [H132](tasks/H132-classes-rebuilt-sheet-exchange.md) | "The classes are rebuilt" sheet and its Account row, the Exchange's Manual sheet | Claude | S–M | H126, H129, H130 | Done (`7890105`) |
 | [H137](tasks/H137-classes-v3-promotion-today.md) | Classes v3: the class tree, the promotion sheet, the Tier 0 tree and the Ready dot on today's Skills tab, as sheets H120 reuses (D252); inert until H134 | Claude | M | — | Done (`fdec2aa`) |
-| [H134](tasks/H134-classes-v3-switch.md) | **The switch:** engine v19 and save v32 live with `toV32` chained, the kind colours swapped, the manual rewritten | Claude | M | H127, H130, H131, H132, H133, H137 | Waiting |
+| [H134](tasks/H134-classes-v3-switch.md) | **The switch:** engine v19 and save v32 live with `toV32` chained, the kind colours swapped, the manual rewritten | Claude | M | H127, H130, H131, H132, H133, H137 | Done (`c78e01a`) |
 
 | Phase | Packets | What it leaves on main | Needs from other groups |
 |---|---|---|---|
 | 1. Foundation | H136 → H126 | Main JS back to ~215 KB; the 13 classes, the tree, Tier 0 and promotion in the domain, dark at engine v19 | — |
 | 2. Rules and save | H128 ∥ H130 (both start on H126's reviewed branch; H130's healer-seat step waits for H129) → H129 (on H128's branch) → H131 | Weapon shapes, the twenty Limit Breaks, save v32 and the reset written, balance measured; all dark | H129 is the Halls group's domain packet: Phase 2 builds it, since H130 migrates the healer seats with the classes. H133 (ChatGPT) can start once H128 and H129 merge |
 | 3. The reset's screens | H132 (starts once H130's pull request is up) | "The classes are rebuilt" sheet and the Exchange's Manual sheet, inert | — |
-| 4. The switch | H137 (the promotion on today's Skills tab, done) → H134 | Engine v19 and save v32 live, the manual rewritten | H133 done. Not the Uma profile v2 (D252) |
+| 4. The switch | H137 → H134 | Engine v19 and save v32 live, the manual rewritten | **Done 2026-10-30 (D257): Classes v3 and Halls v2 are live** |
 
 **Halls of Heroes v2** (D241):
 
@@ -76,15 +77,16 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v18, save v31; uma-kit 0.15.0, uma-art 2.15.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v19, save v32; uma-kit 0.15.0, uma-art 2.17.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
-- **CI:** the web suite sometimes fails with Vitest's `Timeout calling "onTaskUpdate"` while every test passes. Rerun
-  the failed job.
+- **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
+  "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.
 
 ## Done
 
 | Id | Task | Commit |
 |---|---|---|
+| H134 | **Classes v3 and Halls v2 live** (D257): engine v19 and save v32 in one commit, `toV32` chained; the Rift's guidance by held classes and the Stable's v19 facets; v14–v18 replays under 19; every v19 mock folded into its live test; the calling pick, `calling-repair.ts`, the old hall names and the emblem fallback retired; the Bow and Katana tones swapped; the manual rewritten. The scratch migration matched (Tier 1 +78 Manuals = 78,000 Marks, A–E 21/13/10/0/34; the Sanctum's merge; Tier 2 +9). Main JS 218.75 KB locally. [#80](https://github.com/luismlorenzana/uma-rpg/pull/80) | `c78e01a` |
 | H133 | Halls v2's Learning page and Hall page, inert until H134 (D255): five halls by family with the Healer Sanctum's own temple (uma-art 2.17.0 pinned), the seat card's home class, shape and power, the old hall links aliased to the Sanctum, every web reader on the hall-based names. Main JS 219.91 KB on CI (+0.41 with the pin). [#79](https://github.com/luismlorenzana/uma-rpg/pull/79) | `cd32387` |
 | H137 | Classes v3's class tree, promotion sheet, Tier 0 tree and Ready dot on today's Skills tab, inert until H134 (D252, D253): `class-view.ts`, `ClassesSheet.tsx` and `PromotionSheet.tsx` as standalone sheets H120 reuses; the Manuals door to the Exchange with Back to the sheet; the Stable's Promote reason (`umaPromotionWaits`); `umaClassTree` moved to a lazy `save/class-tiles.ts`. Main JS 218.73 KB locally. [#78](https://github.com/luismlorenzana/uma-rpg/pull/78) | `fdec2aa` |
 | H135 | The Healer Sanctum's original open temple, delivered in [uma-platform #58](https://github.com/luismlorenzana/uma-platform/pull/58), P77/D254: three steps, four columns, a sun pediment and static gold/violet braziers; all 50 older buildings unchanged; [uma-art 2.17.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40978750402). H133 or its first later adopter pins it and draws `healer-sanctum` without the keep override. | platform `bab58c3` |
