@@ -1,11 +1,12 @@
-// Halls v2 in the domain (H129; halls-v2.md §0, §2–§5, HV1–HV17, HV20), engine v19 (live since H134): five halls, their seat
-// ids by generation, the twenty Limit Breaks with their own power, kinds, shapes and statuses, the class scale and the hit
-// cap, checked against the design's tables. The numbers are §3.3's at 100%, scale 1 and an open power of 1, before stats.
+// Halls v2 in the domain (H129; halls-v2.md §0, §2–§5, HV1–HV17, HV20), engine v19 (live H134 to D261, and still every v19
+// fight's): five halls, their seat ids by generation, the twenty Limit Breaks with their own power, kinds, shapes and statuses,
+// the class scale and the hit cap, checked against the design's tables. The numbers are §3.3's at 100%, scale 1 and an open
+// power of 1, before stats. The live trim is `halls-v20.test.ts`.
 import { describe, expect, it } from 'vitest'
 import { RPG_AOE_SHARE, RPG_RANDOM_BONUS, RPG_VOLLEY, type RpgSkillDef } from './catalog'
 import { RPG_TIER1_CLASSES } from './class-tree'
 import {
-  ALL_HERO_LIMIT_IDS, HERO_HALL_PLACES, HERO_LIMIT_IDS, HERO_LIMIT_MAX_HITS, HERO_LIMIT_SCALE, HERO_LIMITS, hallOfPlace, heroHalls,
+  ALL_HERO_LIMIT_IDS, HERO_HALL_PLACES, HERO_LIMIT_MAX_HITS, HERO_LIMIT_SCALE, hallOfPlace, heroHalls,
   heroLimitFor, heroLimitHall, heroLimitIds, heroLimitKinds, heroLimitsOfHall, heroLimitScale, heroLimitSkills, heroSeatHome,
   isHeroLimitId, type HeroHall, type HeroLimit, type HeroLimitId,
 } from './heroes'
@@ -113,9 +114,6 @@ describe('Halls v2’s halls and seats by generation (HV1, HV3, HV20)', () => {
     expect(ALL_HERO_LIMIT_IDS).toHaveLength(28)
     expect(new Set(ALL_HERO_LIMIT_IDS).size).toBe(28)
     expect(new Set([...heroLimitIds(14), ...heroLimitIds(18), ...heroLimitIds(V19)])).toEqual(new Set(ALL_HERO_LIMIT_IDS))
-    // The live game is Halls v2's twenty since H134.
-    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(V19))
-    expect(HERO_LIMITS.map((l) => l.id)).toEqual(heroLimitIds(V19))
   })
 
   it('reads a seat by generation: `healer-*` only from v19, `paladin-*` and `cleric-*` only before it', () => {

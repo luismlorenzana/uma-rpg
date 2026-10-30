@@ -58,7 +58,7 @@ afterEach(() => {
 })
 
 describe('the Skills tab as a tree (H70)', () => {
-  it('runs on engine 19: weaknesses v2 (H116) and Classes v3 (H134) live', () => expect(BATTLE_ENGINE_VERSION).toBe(19))
+  it('runs on engine 19: weaknesses v2 (H116) and Classes v3 (H134) live', () => expect(BATTLE_ENGINE_VERSION).toBe(20))
 
   it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Sunder\'s detail on tap', async () => {
     show(await brawler())

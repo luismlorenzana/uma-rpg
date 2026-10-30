@@ -203,14 +203,15 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-/** Every step to v32 for a world of `tier` (v31 → v32, Classes v3's reset and the Healer Sanctum's merge, since H134). */
+/** Every step to v33 for a world of `tier` (v32 → v33, the halls' trim, since D261). */
 export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v27 = migrateWorldToV27(raw, version)
   const v28 = version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
   const v29 = version < 29 && isRecord(v28) ? toV29(v28) : v28
   const v30 = version < 30 && isRecord(v29) ? toV30(v29) : v29
   const v31 = version < 31 && isRecord(v30) ? toV31(v30) : v30
-  return version < 32 && isRecord(v31) ? toV32(v31, tier) : v31
+  const v32 = version < 32 && isRecord(v31) ? toV32(v31, tier) : v31
+  return version < 33 && isRecord(v32) ? toV33(v32) : v32
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
@@ -514,6 +515,59 @@ export function toV32(world: Record<string, unknown>, tier = 1): Record<string, 
     ...world, umas: isRecord(world.umas) ? umas : world.umas, wallet, heroes: isRecord(world.heroes) ? heroes : world.heroes,
     classesV3: { manuals, marks, umas: lines, halls, traded: false, seen: false },
   }
+}
+
+// --- v32 → v33 (D261): the owner's trim of the halls -----------------------------------------------------------------------
+
+/** The kept seat each closed seat folds into. Literals: the live seat list isn't read. */
+const V33_FOLDS = [['brawler-1', 'brawler-3'], ['brawler-2', 'brawler-4'], ['mage-1', 'mage-3'], ['mage-2', 'mage-4']] as const
+
+/**
+ * v32 → v33 (D261; heroes.md's "The trim"): **the Warrior Dojo's and the Mage Tower's seats 3 and 4 close**, each folding
+ * into the same hall's seat 1 or 2 (3 → 1, 4 → 2). Per world, for each pair:
+ * 1. **Bonds:** each Uma's Bond with the kept seat is the higher of her two (level, then EXP); the closed seat's goes.
+ * 2. **A kept seat with no Hero** takes the closed seat whole: its Hero and its Learners in their order.
+ * 3. **A kept seat with a Hero** keeps everyone it has. The closed seat's Hero joins its Learners, then the closed seat's
+ *    Learners by Bond with the kept seat (a tie keeps their order), in its free places up to ten. Anyone past ten keeps her
+ *    Bond, unseated, and an Uma already there sits once.
+ * The three Sanctum seats that change kinds keep their ids, Heroes, Learners and Bonds. An open fight finishes on engine v19
+ * and pays its Bonds to the seats she holds now. Literals only, as every step. Idempotent by shape (no closed seat, no
+ * closed Bond, nothing to do). Anything malformed is left for the strict parse.
+ */
+export function toV33(world: Record<string, unknown>): Record<string, unknown> {
+  const umas: Record<string, unknown> = isRecord(world.umas) ? { ...world.umas } : {}
+  const heroes: Record<string, unknown> = isRecord(world.heroes) ? { ...world.heroes } : {}
+  const seatOf = (id: string): { hero: string; learners: string[] } | null => {
+    const seat = heroes[id]
+    return isRecord(seat) && typeof seat.hero === 'string' && isStrings(seat.learners) ? { hero: seat.hero, learners: seat.learners } : null
+  }
+  for (const [kept, closed] of V33_FOLDS) {
+    // 1. Bonds.
+    for (const [id, uma] of Object.entries(umas)) {
+      if (!isRecord(uma) || !isRecord(uma.bonds) || !isTrack(uma.bonds[closed])) continue
+      const { [closed]: gone, ...bonds } = uma.bonds as Record<string, Track>
+      const own = bonds[kept]
+      bonds[kept] = isTrack(own) && !bondAbove(gone!, own) ? own : { level: gone!.level, exp: gone!.exp }
+      umas[id] = { ...uma, bonds }
+    }
+    const from = seatOf(closed)
+    if (!from) continue
+    delete heroes[closed]
+    const into = seatOf(kept)
+    // 2. No Hero there: the seat moves whole. A malformed kept seat stays for the strict parse.
+    if (!into) {
+      if (!(kept in heroes)) heroes[kept] = { hero: from.hero, learners: [...from.learners] }
+      continue
+    }
+    // 3. Her Hero and Learners stay; the closed seat's follow in the free places.
+    const bondWith = (id: string): Track => { const uma = umas[id]; const t = isRecord(uma) && isRecord(uma.bonds) ? uma.bonds[kept] : null; return isTrack(t) ? t : NO_BOND }
+    const incoming = from.learners.filter((id, i) => from.learners.indexOf(id) === i && id !== into.hero && !into.learners.includes(id))
+    // A stable sort: a tie keeps the closed seat's order.
+    const ranked = incoming.map((id, i) => ({ id, i, bond: bondWith(id) }))
+      .sort((p, q) => (bondAbove(q.bond, p.bond) ? 1 : bondAbove(p.bond, q.bond) ? -1 : p.i - q.i))
+    heroes[kept] = { hero: into.hero, learners: [...into.learners, from.hero, ...ranked.map((r) => r.id)].slice(0, V32_MAX_LEARNERS) }
+  }
+  return { ...world, umas: isRecord(world.umas) ? umas : world.umas, heroes: isRecord(world.heroes) ? heroes : world.heroes }
 }
 
 export interface TierGrant {

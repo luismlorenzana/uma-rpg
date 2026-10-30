@@ -28,9 +28,9 @@ const halves = (a: BattleAction): string[] =>
   a.kind === 'guard' || a.kind === 'limit' ? [] : [...(a.kind === 'skill' ? [a.skill.id] : []), ...(a.pair?.skill ? [a.pair.skill.id] : [])]
 
 describe('the frozen v18 replays (H126)', () => {
-  it('runs Classes v3 live: engine 19, the classes stage on, thirteen classes (H134)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
-    expect([rpgRework('weak'), rpgRework('classes'), rpgRework('t2Weapons')]).toEqual([true, true, false])
+  it('runs Classes v3 live: engine 20, the classes stage on, thirteen classes (H134, D261)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
+    expect([rpgRework('weak'), rpgRework('classes'), rpgRework('halls'), rpgRework('t2Weapons')]).toEqual([true, true, true, false])
     expect(RPG_CLASSES).toHaveLength(13)
   })
 

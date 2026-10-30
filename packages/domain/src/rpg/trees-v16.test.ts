@@ -47,8 +47,8 @@ const RENAMED_V19: Readonly<Record<string, string>> = {
 }
 
 describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
-  it('runs with the Tier rework’s fight live (on 19 since H134): seven equipped slots at most', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+  it('runs with the Tier rework’s fight live (on 20 since D261): seven equipped slots at most', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
     expect(RPG_ACTIVE_SLOT_GATES).toEqual([10, 20, 30, 40])
     expect(RPG_MAX_ACTIVE_SLOTS).toBe(7)
     // v18's six classes' 750 and Classes v3's 210 (`trees-v19.test.ts`).

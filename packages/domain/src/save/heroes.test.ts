@@ -28,9 +28,9 @@ function stable(): Save {
 const round = (s: Save) => expect(parseSave(JSON.parse(JSON.stringify(s)))).toEqual(s)
 
 describe('Halls of Heroes (D106)', () => {
-  it('has five halls of four seats, one unique Limit Break each (Halls v2, live since H134); v15–v18 kept six (classes v2, D181)', () => {
-    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(19))
-    expect(HERO_LIMIT_IDS).toHaveLength(20)
+  it('has five halls and sixteen seats, one unique Limit Break each (the trim, D261); v19 had twenty, v15–v18 six halls (classes v2, D181)', () => {
+    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(20))
+    expect(HERO_LIMIT_IDS).toHaveLength(16)
     expect(heroLimitsOfHall('healer').map((l) => l.id)).toEqual(['healer-1', 'healer-2', 'healer-3', 'healer-4'])
     expect(heroLimitIds(18)).toHaveLength(24)
     expect(heroLimitsOfHall('cleric', 18).map((l) => l.id)).toEqual(['cleric-1', 'cleric-2', 'cleric-3', 'cleric-4'])

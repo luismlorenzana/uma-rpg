@@ -1,5 +1,5 @@
-// The Halls of Heroes (D106, D112): five halls, one per class, four seats each, and the only source of Limit Breaks. A
-// seat's Hero always fights with its unique Limit Break; up to ten Learners sit under her, two Heroes at most each.
+// The Halls of Heroes (D106, D112): five halls and the only source of Limit Breaks. A seat's Hero always fights with its
+// unique Limit Break; up to ten Learners sit under her, two Heroes at most each.
 // Every won fight raises the Bond of each Learner with her Heroes' seats, and of each Hero with her own seat. A Bond
 // stays with the Uma when she leaves the seat, so a Hero taken out of hers, then seated as its Learner, starts there.
 import {

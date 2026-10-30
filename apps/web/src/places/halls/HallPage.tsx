@@ -1,4 +1,4 @@
-// A Hall of Heroes (D106, D107): four seats, each with its own unique Limit Break. A seat's Hero is shown large, her
+// A Hall of Heroes (D106, D107): its seats (two or four, D261), each with its own unique Limit Break. A seat's Hero is shown large, her
 // Learners (ten at most) below her. A Hero always uses her seat's Limit Break at full strength; a Learner inherits it at
 // 50% plus 5% a Bond Level, and every won fight raises her Bond. A Learner sits under two Heroes at most. From engine v16
 // (CP28, H70) a seat names the twin sets it answers, and a Learner candidate the sets it adds to her weapons'. From the

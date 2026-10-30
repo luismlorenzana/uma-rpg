@@ -3,8 +3,9 @@
 // its shape: its weapons and elements (worn or not), its hits and its statuses. Classes v2 (engine v15, §5) adds the
 // Paladin Bastion: 24 Limit Breaks, read by generation like every class rule (D179). Engine v16 (the Tier rework's fight,
 // H65) changes two seats' kinds (CP35). Halls v2 (engine v19, D241; H129, built dark) rebuilds them as five halls by
-// family and twenty Limit Breaks, each with a power of its own. A Limit Break never takes a Skill Rank (CP28): its power
-// is her open depth's.
+// family and twenty Limit Breaks, each with a power of its own. The owner's trim (engine v20, D261) closes the Warrior
+// Dojo's and the Mage Tower's seats 3–4 and changes three Healer Sanctum seats' kinds: sixteen. A Limit Break never takes
+// a Skill Rank (CP28): its power is her open depth's.
 import { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, rpgRework, rpgV2 } from './battle/caps'
 import { RPG_AOE_SHARE, RPG_RANDOM_BONUS, RPG_VOLLEY, type RpgHit, type RpgSkillDef, type RpgSupport } from './catalog'
 import type { RpgClass, RpgDamageKind } from './kinds'
@@ -250,17 +251,32 @@ const HALLS_V2: readonly HeroLimit[] = [
 ]
 /** v19's twenty, in seat order (`heroLimitIds(19)`). */
 const BY_V19 = new Map(HALLS_V2.map((l) => [l.id, l]))
+/** v20 (D261): the Dojo and the Tower keep seats 1–2, and the Sanctum's seats match the Paladin's and the Cleric's kinds as
+ * the owner set them: Lance + Light (Archangel's Judgment, unchanged), Greatsword + Dark, Lightning + Light and Fire + Dark.
+ * Each keeps its shape, its power and its stack; a Light strike lands twice, as Archangel's Judgment's does. */
+const BY_V20 = new Map([...BY_V19].filter(([id]) => heroLimitIds(RPG_REWORK_ENGINE.halls).includes(id)))
+BY_V20.set('healer-2', seat('healer-2', 'Archdemon’s Toll', 2, 'Armor Break 1 on one foe, then two Greatsword and two Dark hits on her',
+  'The Archdemon names a price: the foe’s armor first, then the blade.',
+  [{ target: 'one', hits: [], status: stack('armor-break') },
+    { target: 'one', hits: [one('greatsword', 0.3), one('greatsword', 0.3), one('dark', 0.2), one('dark', 0.2)] }]))
+BY_V20.set('healer-3', seat('healer-3', 'Seraph’s Storm', 2, 'Two Lightning bolts and a Light double on one foe, then Faith 1 on every ally',
+  'The Seraph calls the storm down, and her light strikes twice.',
+  [{ target: 'one', hits: [one('lightning', 0.3), one('lightning', 0.3), twice('light', 0.4)], status: stack('faith') }]))
+BY_V20.set('healer-4', seat('healer-4', 'Cinder Fiend’s Barrage', 2, 'Mind Break 1 on one foe, then two Fire and two Dark hits on her',
+  'The Cinder Fiend cracks the foe’s mind, then rains embers and shadow.',
+  [{ target: 'one', hits: [], status: stack('mind-break') },
+    { target: 'one', hits: [one('fire', 0.3), one('fire', 0.3), one('dark', 0.2), one('dark', 0.2)] }]))
 
 const byVersion = (version: number) =>
-  (rpgRework('classes', version) ? BY_V19 : rpgRework('fight', version) ? BY_V16 : rpgV2(version) ? BY_V2 : BY_V1)
+  (rpgRework('halls', version) ? BY_V20 : rpgRework('classes', version) ? BY_V19 : rpgRework('fight', version) ? BY_V16 : rpgV2(version) ? BY_V2 : BY_V1)
 const LIVE = byVersion(BATTLE_ENGINE_VERSION)
-/** The live generation's Limit Breaks, in seat order: the six halls' 24 (20 to v14), with v16's two kinds since H72
- * (D210); Halls v2's twenty from H134. Screens and the manual read these; the engine reads `heroLimitFor(id, version)`. */
+/** The live generation's Limit Breaks, in seat order: the trim's sixteen since D261 (Halls v2's twenty from H134). Screens
+ * and the manual read these; the engine reads `heroLimitFor(id, version)`. */
 export const HERO_LIMITS: readonly HeroLimit[] = [...LIVE.values()]
 export const heroLimit = (id: HeroLimitId): HeroLimit => LIVE.get(id)!
 /** A seat's Limit Break in an engine's generation (D179): the engine always asks with the fight's version. Undefined only
- * for a seat its generation lacks (a Paladin seat before v15 or from v19, a Healer seat before v19: the engine refuses
- * them). */
+ * for a seat its generation lacks (a Paladin seat before v15 or from v19, a Healer seat before v19, `brawler-3` from v20:
+ * the engine refuses them). */
 export const heroLimitFor = (id: HeroLimitId, version: number): HeroLimit | undefined => byVersion(version).get(id)
 /** Her class's Limit Break power in engines v10–v18 (D179): the hybrids' 2.2× from v15 (§5). From v19 the Limit Break's
  * own `power` × `heroLimitScale` replaces it. */

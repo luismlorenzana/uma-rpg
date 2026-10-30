@@ -24,10 +24,10 @@ const v31World = (): TierWorld => {
 }
 
 describe('save v25 with the switch on (H58)', () => {
-  it('runs with Classes v3’s live lists (H134): thirteen classes, twenty seats', () => {
+  it('runs with Classes v3’s live lists (H134): thirteen classes, sixteen seats', () => {
     expect(RPG_CLASSES).toEqual(rpgClasses(19))
     expect(RPG_CLASSES).toHaveLength(13)
-    expect(HERO_LIMIT_IDS).toHaveLength(20)
+    expect(HERO_LIMIT_IDS).toHaveLength(16)
   })
 
   it('parses a v24 world run through toV25: the Paladin and the Bastion’s seats (then v27’s classes, v28’s grades and v32’s reset)', () => {

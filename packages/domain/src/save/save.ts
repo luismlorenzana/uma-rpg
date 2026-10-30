@@ -794,8 +794,8 @@ function parseRanks(value: unknown, path: string): Ranks {
   return ranks
 }
 
-/** A Hero seat of the live generation (`isHeroLimitId`): from the classes stage save v32's, Halls v2's `heroLimitIds(19)`
- * (H129, H130), so a `paladin-*` or `cleric-*` seat or Bond is refused there and a `healer-*` one before it. */
+/** A Hero seat of the live generation (`isHeroLimitId`): save v33's, the trim's `heroLimitIds(20)` (D261), so a closed seat's
+ * Bond, a `paladin-*` or `cleric-*` one is refused (save v32's `toV33` folds the closed seats). */
 function parseBonds(value: unknown, path: string): Partial<Record<HeroLimitId, BondTrack>> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const bonds: Partial<Record<HeroLimitId, BondTrack>> = {}

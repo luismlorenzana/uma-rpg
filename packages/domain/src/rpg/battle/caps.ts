@@ -35,17 +35,21 @@ export const BATTLE_HEAL_SCALE = 300
 // moved BATTLE_ENGINE_VERSION to 19 (and the save to v32), live since. `rpg/battle/v18-replays.test.ts` pins v18's fights
 // under the live switch. R3–R5 (Tier 2's weapons and classes, Tier 3) were removed by D238: their
 // stages went, but `t2Weapons` stays, at no engine, since the Branch Gem's two gates read it; the Tier 2 re-plan gives it one.
+//
+// The owner's trim of the halls (D261) is engine v20 and save v33 under one stage, `halls`: the Warrior Dojo and the Mage
+// Tower keep seats 1–2, and three Healer Sanctum seats change kinds. `rpg/battle/v19-replays.test.ts` pins v19's fights.
 
 /** The engine new fights start on, and the generation every rule's default reads (D179). Older versions still replay. */
-export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 19
+export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 20
 /** The first engine of classes v2: the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs (D160, D179). */
 export const RPG_V2_ENGINE = 15
 /** Whether an engine plays classes v2's rules. Rules call it with their `engine` argument, never bare. */
 export const rpgV2 = (engine: number = BATTLE_ENGINE_VERSION): boolean => engine >= RPG_V2_ENGINE
 /** The first engine of each release (D198): R1 Tier 1's fight, R2 its economy, weaknesses v2 (D235: every foe her own
- * list, by rank, weaknesses-v2.md), Classes v3 with Halls v2 (D240, D241: live since H134), and Tier 2's weapons, which
- * has no engine until the Tier 2 re-plan (D238 removed R3–R5; the Branch Gem's gates read it, so it stays shut). */
-export const RPG_REWORK_ENGINE = { fight: 16, economy: 17, weak: 18, classes: 19, t2Weapons: Infinity } as const
+ * list, by rank, weaknesses-v2.md), Classes v3 with Halls v2 (D240, D241: live since H134), the trim of the halls (D261),
+ * and Tier 2's weapons, which has no engine until the Tier 2 re-plan (D238 removed R3–R5; the Branch Gem's gates read it,
+ * so it stays shut). */
+export const RPG_REWORK_ENGINE = { fight: 16, economy: 17, weak: 18, classes: 19, halls: 20, t2Weapons: Infinity } as const
 /** A Tier rework release, by its stage name. */
 export type RpgReworkStage = keyof typeof RPG_REWORK_ENGINE
 /** Whether an engine plays a Tier rework release's rules (H64, D200). Rules call it with their `engine` argument; rules

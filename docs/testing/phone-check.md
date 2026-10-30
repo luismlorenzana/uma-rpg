@@ -1,7 +1,7 @@
 # Current phone check
 
 Use this script for a release, in order, on the [live game](https://uma-rpg.web.app). It tests the game as it runs today
-(engine v19, save v32); the screens are in [Game sections](../game/sections.md) and the rules in the [game
+(engine v20, save v33); the screens are in [Game sections](../game/sections.md) and the rules in the [game
 manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
 
 Use your existing save; do not reset it. Before you start, have: one full party of five with one healer; an Uma at Lv 10
@@ -99,7 +99,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
     cloud sync.
 18. **Halls of Heroes.** Open the Healer Sanctum: its title, four seats each a card with "Seat 1 · Paladin" (its home
     class), its shape and power ("One foe · 4 hits · ×2.0 · Brave 1"), "Answers …" and its lore. Open the Warrior Dojo:
-    "One foe · 1 hit · ×2.9" on seat 2, "Volley · 4 + 2 a foe · ×2.2" on seat 4. Seat a Hero with **+ Hero**, then tap
+    two seats, "One foe · 1 hit · ×2.9" on seat 2. Seat a Hero with **+ Hero**, then tap
     **+** for a Learner: the picker shows `Bond n/10 · n/2 Heroes` and "Adds …", and Umas that can't sit there show why.
     Open the Learner's sheet: expect `Bond n/10 · Strength n%` and **Leave**. A Hero's sheet says
     `Hero · Strength 100%`; emptying its seat uses the compact **Empty seat** confirmation. (D106, D241, D255, D258)

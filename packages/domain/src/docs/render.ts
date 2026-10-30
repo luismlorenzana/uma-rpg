@@ -31,7 +31,7 @@ import { BATTLE_LIMIT_CHARGE, BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, BATTLE_LIMIT
 import * as K from '../rpg/battle/skills'
 import {
   BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALL_PLACES, heroHalls, HERO_LIMIT_MAX_HITS,
-  HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, HERO_MAX_LEARNERS, heroLimitFor, heroLimitKinds, heroLimitPower, heroLimitScale,
+  HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, HERO_MAX_LEARNERS, heroLimitFor, heroLimitKinds, heroLimitPower, heroLimitScale, heroLimitsOfHall,
   LEARNER_MAX_PARENTS, type HeroCast, type HeroHall, type HeroLimitId,
 } from '../rpg/heroes'
 import {
@@ -315,7 +315,7 @@ function heroes(): string {
       ...support(c)]
       .filter(Boolean).join(' + ')).join('; '),
   ])) + '\n\n' + table(['Setting', 'Value'], [
-    ['Seats', `4 per hall, ${heroHalls().length} halls, ${HERO_LIMITS.length} in all; a Hero sits in one seat; any Uma may sit in any seat`],
+    ['Seats', `${heroHalls().map((h) => `${heroLimitsOfHall(h).length} ${hall(h)}`).join(', ')}: ${HERO_LIMITS.length} in all; a Hero sits in one seat; any Uma may sit in any seat`],
     ['Learners', `${HERO_MAX_LEARNERS} per Hero; ${LEARNER_MAX_PARENTS} Heroes per Learner; a Hero is never a Learner`],
     ['Power at 100%', `the Limit Break's own power × her class's scale (${[...new Set(RPG_CLASSES.map((c) => heroLimitScale(c)))].sort().reverse().map((v) =>
       `${x(v)} ${RPG_CLASSES.filter((c) => heroLimitScale(c) === v).map((c) => CLASS_NAME[c]).join(', ')}`).join('; ')}) × her open depth's power; ` +

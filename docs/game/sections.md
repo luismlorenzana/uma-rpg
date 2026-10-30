@@ -31,7 +31,8 @@ Phaser).
   shut.
   - On the Wilds, four pips hang over each roof in a half arch: a free slot is a small dot, a working Uma her face in a
     progress ring with her Craft Level on its lower left. The Ready badge sits at the building's foot (D233).
-  - A hall's four pips are its seats' Heroes. Town Hall's and Battle's places have none.
+  - A hall's pips are its seats' Heroes, two in the Warrior Dojo and the Mage Tower, four in the others. Town Hall's and
+    Battle's places have none.
 - **Town Hall's plaza** (`hub/Featured.tsx`, D150): up to five small chibis stand on the road, each bobbing on its own
   beat.
   - The featured Uma is in front: the one picked on this device for this tier, else the highest Uma Level.
@@ -46,7 +47,7 @@ Phaser).
 - **Quick looks** (each place's `Peek`; a place without one shows its line):
   - the Stable: Umas owned out of all, Uma Tickets (Tier 1) and the latest four unlocks;
   - the Party Hall: full parties out of twenty, Umas placed out of owned;
-  - a hall: its four seats, each with its Hero's face, its Limit Break and "3/10" Learners or "Open";
+  - a hall: its seats, each with its Hero's face, its Limit Break and "3/10" Learners or "Open";
   - a Wilds place: [its compact page](#wilds);
   - the Rift: [its line and fronts](#the-rift);
   - the Warehouse, the Exchange and the Observatory: their line from the list below.

@@ -1,5 +1,10 @@
 # Halls v2: the Halls of Heroes' Limit Break rework
 
+> **Superseded in part by D261 (2026-10-30, engine v20, save v33):** the Warrior Dojo and the Mage Tower seat two, so HV2's
+> four seats hold only in the other three halls, and the Sanctum's seats are Lance + Light, Greatsword + Dark, Lightning +
+> Light (Seraph's Storm) and Fire + Dark (Cinder Fiend's Barrage). This page stays as v19's design; the
+> [manual](../../game/heroes.md) is the game as it plays.
+>
 > **Built and live (H126–H134, D257).** Approved by the owner on 2026-10-29 (D241) and live from H134 with Classes v3 on
 > engine v19 and save v32; the [manual](../../game/heroes.md) is the game as it plays. The Healer Sanctum stands in its
 > own building, H135's temple (uma-art 2.17.0, D254), drawn by H133; the class scale is H131's (D249): 0.95 for the six

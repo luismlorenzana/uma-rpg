@@ -59,12 +59,12 @@ export function PlaceRoute() {
 /** The Wilds' places hang their pips over the building in a half arch, bigger, each with her Craft Level (D233). */
 const archPips = (place: Place): boolean => place.page === 'wilds'
 
-/** A place's slot pips: workers' faces ringed by their job's progress, a hall's four Heroes, or free dots. */
+/** A place's slot pips: workers' faces ringed by their job's progress, a hall's Heroes, or free dots. */
 function pipsOf(place: Place, world: TierWorld | null, tier: number, now: string): PipModel[] | undefined {
   if (place.slots === 0 || !placeOpen(place, world, tier)) return undefined
   const arch = archPips(place)
   const face = (outfitId: string) => <FaceTile outfitId={outfitId} size={arch ? 24 : 16} label="Assigned Uma" round />
-  // A hall's four seats in seat order (`heroLimitsOfHall`'s ids; the Limit Break table itself loads with the fight, H62).
+  // A hall's seats in seat order (`heroLimitsOfHall`'s ids; the Limit Break table itself loads with the fight, H62).
   const hall = hallOfPlace(place.id)
   if (hall && world) {
     return heroLimitIds().filter((id) => heroLimitHall(id) === hall).map((id): PipModel => {

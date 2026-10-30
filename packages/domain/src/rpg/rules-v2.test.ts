@@ -17,8 +17,8 @@ const V1 = 14, V2 = 15
 const FIVE: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
 
 describe('the one switch (D179)', () => {
-  it('is on engine 19 since H134, with classes v2 from 15', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+  it('is on engine 20 since D261, with classes v2 from 15', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
     expect(RPG_V2_ENGINE).toBe(15)
     expect([rpgV2(), rpgV2(14), rpgV2(15)]).toEqual([true, false, true])
     expect(BATTLE_HEAL_OFFENSE_SCALE).toBe(300)
@@ -135,8 +135,8 @@ describe('the Paladin as an identity (D179)', () => {
     // Every generation's 28 (H129): v14's 20, the Paladin Bastion's four (v15–v18) and Halls v2's Healer Sanctum (v19).
     expect(ALL_HERO_LIMIT_IDS).toHaveLength(28)
     expect(heroLimitIds(18)).toEqual(ALL_HERO_LIMIT_IDS.slice(0, 24))
-    // The live seats are Halls v2's twenty since H134 (`halls-v19.test.ts`).
-    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(19))
+    // The live seats are the trim's sixteen since D261 (`halls-v20.test.ts`).
+    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(20))
     expect([isHeroLimitId('paladin-1', 18), isHeroLimitId('paladin-1', V1), isHeroLimitId('paladin-1', V2)]).toEqual([true, false, true])
     expect(ALL_HERO_LIMIT_IDS.slice(0, 20).every((id) => isHeroLimitId(id, V1) && isHeroLimitId(id, V2))).toBe(true)
     expect(HERO_HALL_PLACES.paladin).toBe('paladin-bastion')
@@ -148,7 +148,7 @@ describe('the Paladin as an identity (D179)', () => {
     for (const l of HERO_LIMITS) expect(heroLimitFor(l.id, BATTLE_ENGINE_VERSION)).toEqual(heroLimit(l.id))
     expect(heroLimitFor('paladin-1', V1)).toBeUndefined()
     expect(heroLimitIds(18).filter((id) => heroLimitFor(id, 18))).toHaveLength(24)
-    expect(HERO_LIMITS).toHaveLength(20)
+    expect(HERO_LIMITS).toHaveLength(16)
   })
 
   it('has ten trees of node identities; the live catalog lists the thirteen classes’ 960 since H134', () => {

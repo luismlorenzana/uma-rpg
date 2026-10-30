@@ -103,20 +103,20 @@ describe('toV30 (FL17–FL19)', () => {
   })
 })
 
-describe('chained (H114; through v32 since H134)', () => {
-  it('runs once from v29 through v32 and leaves a v32 world untouched', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(32)
+describe('chained (H114; through v33 since D261)', () => {
+  it('runs once from v29 through v33 and leaves a v33 world untouched', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(33)
     const world = raw(v29World())
     expect(migrateWorld(world, 29)).toEqual(toV32(toV31(toV30(raw(v29World())))))
     const v30 = toV30(raw(v29World()))
     expect(migrateWorld(v30, 30)).toEqual(toV32(toV31(v30)))
     const v32 = toV32(toV31(toV30(raw(v29World()))))
-    expect(migrateWorld(v32, 32)).toBe(v32)
+    expect(migrateWorld(v32, 33)).toBe(v32)
   })
 
-  it('parses a stored v29 save to v32: settled, converted, every world', () => {
+  it('parses a stored v29 save to v33: settled, converted, every world', () => {
     const parsed = parseSave(JSON.parse(JSON.stringify(v29Save())))
-    expect(parsed.schemaVersion).toBe(32)
+    expect(parsed.schemaVersion).toBe(33)
     expect(parsed.tierWorlds['1']!.work).toEqual({})
     expect(parsed.tierWorlds['1']!.items['gold-ingot']).toBe(V29_MATERIAL_STOCK['iron-ingot']! + 6)
     expect(parsed.tierWorlds['2']!.items).toEqual({ 'copper-ore': 4, 'gold-ingot': 3, 'gold-ore': 2, 'carp-fillet': 5 })

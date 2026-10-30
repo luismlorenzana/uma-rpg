@@ -14,7 +14,7 @@ code as it runs on https://uma-rpg.web.app. Specs, plans and history live elsewh
 | [Combat](combat.md) | Rounds, actions, the damage stack, her accessory and signature, weaknesses, shields and Breaks, statuses, support, MP and the Flourish, Limit Breaks, foes, the Rift's foes, constants |
 | [Classes and weapons](classes.md) | The class tree's thirteen classes, Tier 0 and promotion, reclassing, her calling and template, ten weapons in three slots and their five shapes, armor and the accessory, presets, skill depths, lines and Skill Ranks, the four bars |
 | [Skill trees](skill-trees.md) | Every Tier 1 tree and node with its line, MP and effect; the lines at a glance; Pierce; equipped skills |
-| [Halls of Heroes](heroes.md) | Five halls: Heroes, Learners, Bonds, the twenty Limit Breaks and their power, the Healer Sanctum's merge |
+| [Halls of Heroes](heroes.md) | Five halls: Heroes, Learners, Bonds, the sixteen Limit Breaks and their power, the Healer Sanctum's merge and the trim |
 | [Materials](materials.md) | The lines and their G1–G10 materials, the fifteen Wilds places, the made items and their recipes, gear by grade |
 | [The world map](maps.md) | Biomes, signatures, a stage's foes, formations and waves, capitals, continents and regions |
 

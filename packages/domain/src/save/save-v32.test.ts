@@ -29,8 +29,8 @@ function v32Save(change: (worlds: { '1': RawWorld; '2': RawWorld }) => void = ()
 const parsed = (): Save => parseSave(v32Save())
 
 describe('save v32\'s parse (H130), the classes stage live', () => {
-  it('runs with the classes stage live and the schema 32 (H134)', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('classes'), SAVE_SCHEMA_VERSION]).toEqual([19, true, 32])
+  it('runs with the classes stage live, and the schema 33 since D261', () => {
+    expect([BATTLE_ENGINE_VERSION, rpgRework('classes'), SAVE_SCHEMA_VERSION]).toEqual([20, true, 33])
   })
 
   it('parses the v31 save through toV32, round-trips it, and its two open v18 fights replay to their frozen ends', () => {

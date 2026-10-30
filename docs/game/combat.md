@@ -1,16 +1,16 @@
 # Combat
 
-How a fight works today, on **engine v19**. It is Tier 1's fight from the Tier rework (engine v16, D210:
+How a fight works today, on **engine v20**. It is Tier 1's fight from the Tier rework (engine v16, D210:
 [class progression](../design/tier-rework/class-progression.md)), its economy (engine v17, D218:
 [weapon progression](../design/tier-rework/weapon-progression.md) and
 [Extra Stats progression](../design/tier-rework/extra-stats-progression.md)),
 [weaknesses v2](../design/tier-rework/weaknesses-v2.md) (engine v18, D235–D237), and
 [Classes v3](../design/classes-v3/classes-v3.md) with [Halls v2](../design/classes-v3/halls-v2.md) (engine v19, D240,
 D241). Engine v19 brings the thirteen classes and Tier 0, the hands' lead half, the volley and the double, the re-paired
-twins (Katana–Light, Bow–Dark), the Brawler's and the Sorcerer's new B lines, the Halls' twenty Limit Breaks with their
-own power, and the Rift's builds by family; every other battle rule is v18's. A fight started on an older engine (v6–v18)
-replays and settles on that engine's own rules: fights from v18 and before replay with six classes and the 24 Limit
-Breaks.
+twins (Katana–Light, Bow–Dark), the Brawler's and the Sorcerer's new B lines, the Halls' Limit Breaks with their own
+power, and the Rift's builds by family; every other battle rule is v18's. Engine v20 (D261) only trims the Halls to sixteen
+Limit Breaks. A fight started on an older engine (v6–v19) replays and settles on that engine's own rules: fights from v19
+replay with the twenty, and fights from v18 and before with six classes and the 24 Limit Breaks.
 
 Every number below comes from the code. The tables between `live` markers are generated (see
 [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the engine.
@@ -371,7 +371,7 @@ Horde's leaders, who are regulars in a captain's or a champion's role.
 ## Limit Breaks
 
 From engine v19 (Halls v2, D241, HV5) **a Limit Break carries its own power**: at 100% it is worth that power (×1.9 to
-×2.9, each seat's in [Halls of Heroes](heroes.md#the-twenty-limit-breaks)) × the scale of the class she casts it as × her
+×2.9, each seat's in [Halls of Heroes](heroes.md#the-sixteen-limit-breaks)) × the scale of the class she casts it as × her
 open depth's single-target power (a Tier 0's skill power at her Class Rank), shared among its hits; every-foe hits take
 the area share (0.55 a foe) and random hits ×1.05, as skills do. The scale is H131's (D249): 1 for a Tier 0, 0.95 for the
 six Tier 1 damage classes and 0.8 for the Paladin and the Cleric, so a healer on a Healer Sanctum seat lands 1.6×.
@@ -406,7 +406,7 @@ six Tier 1 damage classes and 0.8 for the Paladin and the Cleric, so a healer on
 In fights from v15–v18, a Limit Break that mends or raises a Barrier does it at 66% of each Uma's max HP ×0.4, × her healing scale and the cast's strength; its cleanse and its revive land at any strength. The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn. Limit Breaks don't rank: their power follows her open depth, never her Skill Ranks. Fights from engines v15–v18 replay with six halls' 24 Limit Breaks, each worth her class's own power at 100% (Brawler 2×, Mage 2.4×, Spell Blade 2.2×, Cleric 1.5×, Summoner 2.2×, Paladin 1.5×); from v16 Rampart Charge charges with an Axe and Choir of Angels strikes with Light, then Lightning (CP35); fights from v15 replay with Rampart Charge's Greatsword and Choir of Angels' Light twice. Fights from engines v10–v14 replay with five halls' twenty: the Cleric Chapel's seats 3 and 4 Archangel’s Verdict and Archdemon’s Pact, Sunfire Edge in one cleave, Moon Fox on one foe, the Spell Blade at 2× and the Summoner at 1.8×, and a Learner's hits at each kind's own offense. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: Brawler Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon; Mage Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all; Spell Blade Twin Arts: an Arms skill and a Tome skill, both at full power (no half); Cleric Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks; Summoner Grand Summon: one summon at twice her strength that lingers at twice its share.
 <!-- /live -->
 
-The block's line on a mend or a Barrier is the 24's, for fights from engines v15–v18. The twenty Limit Breaks
+The block's line on a mend or a Barrier is the 24's, for fights from engines v15–v18. The sixteen Limit Breaks
 themselves, and how Heroes and Learners earn them, are in [Halls of Heroes](heroes.md).
 
 ## Foes

@@ -1,6 +1,6 @@
 # Architecture
 
-> **Status: current, 2026-10-30; save v32, engine v19 (Classes v3 and Halls v2, D240, D241).** The full running-system
+> **Status: current, 2026-10-30; save v33, engine v20 (Classes v3 and Halls v2, D240, D241; the halls' trim, D261).** The full running-system
 > reference is [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
@@ -65,8 +65,9 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v30 the farm by line: old material stock converts to the five graded lines and old work settles; each making place processes its own line and makes its item | D224, D228 |
 | v31 the Wilds' trios: old work settles; each line moves to separate gathering, processing and making places | D230, D232 |
 | v32 Classes v3's reset: every Uma to her Tier 0 at Class Rank 1 (a later tier's to its Tier 1 class), her Class EXP back as Class Marks, the calling pick dropped; Halls v2's Healer Sanctum merge; moved trades settle on the next boot; open v18 fights replay on v18 | D247 |
+| v33 the halls' trim: the Warrior Dojo's and the Mage Tower's seats 3–4 fold into seats 1–2, each Uma's higher Bond kept | D261 |
 
-`parseSave` accepts v1–v32 and returns v32; a world older than v10 takes v10's reset (D69), and `migrations.ts` runs the
+`parseSave` accepts v1–v33 and returns v33; a world older than v10 takes v10's reset (D69), and `migrations.ts` runs the
 rest.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
@@ -78,7 +79,7 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | Module | Owns |
 |---|---|
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
-| `rpg/battle/` | Deterministic combat reducer and cues; engine v19 (Classes v3 and Halls v2, D240, D241, live since H134) plays the thirteen classes, the hands' lead half, the volley and the double, the re-paired twins and the halls' twenty Limit Breaks; v18 is weaknesses v2 (D235–D237: its foes' lists dealt per stage by `rpg/campaign/weaknesses.ts`), v17 R2's economy on v16's fight; every older version replays as it was; `caps.ts` holds the switch and `rpgRework` |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v20 trims the halls to sixteen Limit Breaks (D261); v19 (Classes v3 and Halls v2, D240, D241) plays the thirteen classes, the hands' lead half, the volley and the double, the re-paired twins and the halls' twenty Limit Breaks; v18 is weaknesses v2 (D235–D237: its foes' lists dealt per stage by `rpg/campaign/weaknesses.ts`), v17 R2's economy on v16's fight; every older version replays as it was; `caps.ts` holds the switch and `rpgRework` |
 | `rpg/catalog.ts`, `rpg/rules.ts`, `rpg/class-tree.ts`, `rpg/tree-view.ts` | D86 classes, six since classes v2 (D179), thirteen in a tree since Classes v3 (D240): five Tier 0 promoting at Class Rank 10 into eight Tier 1; 70 Tier 1 trees and 50 one-node Tier 0 trees, class rules by generation; from v16 (live since H72) each tree a trunk and one fork into lines A and B, Skill Ranks and the Skills tab's tree model (D201) |
 | `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, from v18 with each foe's list from the stage dealer (`rpg/campaign/weaknesses.ts`, D235–D237) over Tier 1's shields |
 | `economy/`, `items/` | Professions and the fifteen places, times and prices, gear grades, accessories, the Planet, Class Ranks, points; the five lines' hundred items, the made items and their one-line recipes (D224, D230); v1's catalogs for the migrations |

@@ -142,8 +142,8 @@ describe('Tier 1’s foes on v16 (D202)', () => {
 })
 
 describe('the foe generators live (H116, H134)', () => {
-  it('generate the live engine’s foes by default: v19’s since H134', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+  it('generate the live engine’s foes by default: v19’s and v20’s are one', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
     const w1 = worldContinent({ name: 'T', order: 1 })
     for (const region of w1.regions.slice(0, 8)) expect(regionChapter(region, cast)).toEqual(regionChapter(region, cast, 19))
     expect(capitalChapter(w1, cast)).toEqual(capitalChapter(w1, cast, 19))

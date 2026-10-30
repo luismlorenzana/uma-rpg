@@ -158,7 +158,7 @@ export interface BattleEnemy {
   phaseTwo?: { thresholdPercent: number; moves: BattleEnemyMove[] }
 }
 export interface BattleInput {
-  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19
+  version: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
   seed: number
   allies: BattleAlly[]
   /** The first wave. */
@@ -204,7 +204,7 @@ export interface BattleUnit {
 }
 export interface BattleIntent { enemyId: string; moveId: string; targetId: string }
 export interface BattleState {
-  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19
+  engineVersion: 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
   input: BattleInput
   round: number
   /** The wave on the field, 0-based; only in fights with waves. */

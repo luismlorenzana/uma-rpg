@@ -1,8 +1,8 @@
 // The Halls' twin-set lines (H70, live since H72; class-progression.md §8.2, CP28): a seat's Limit Break answers its kinds'
 // twin sets, and a Learner adds the ones her weapons miss. Halls v2's seat cards (H133; halls-v2.md §2.1, §4, §5.2, HV21,
-// HV25; live since H134): each shape's words from the Limit Break's casts (a double two hits, a volley's hits on her foe +
-// its splash a foe), the seat's own power, the healers' stacks, the home class, the lore in place of the blurb; "Answers"
-// and "Adds" on Classes v3's pairs; the (i)'s rules.
+// HV25; live since H134): each shape's words from the Limit Break's casts (a double two hits), the seat's own power, the
+// healers' stacks, the home class, the lore in place of the blurb; "Answers" and "Adds" on Classes v3's pairs; the (i)'s
+// rules. The trim (D261): the Dojo and the Tower seat two.
 import {
   BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, HERO_LIMIT_IDS, HERO_LIMIT_SCALE, heroLimit, heroLimitFor, heroLimitIds, heroLimitKinds, rpgAnsweredTwinSets,
   rpgDefaultWeapons, type HeroLimitId,
@@ -32,8 +32,8 @@ const card = (id: HeroLimitId) => seatCard(heroLimit(id))
 const line = (id: HeroLimitId) => shapeLine(card(id))
 
 describe('the seat card (HV25)', () => {
-  it('has a card for each of the twenty live seats', () => {
-    expect(HERO_LIMIT_IDS.map((id) => card(id).seat.split(' · ')[1])).toHaveLength(20)
+  it('has a card for each of the sixteen live seats', () => {
+    expect(HERO_LIMIT_IDS.map((id) => card(id).seat.split(' · ')[1])).toHaveLength(16)
   })
 
   it('names the seat and its home class', () => {
@@ -48,15 +48,12 @@ describe('the seat card (HV25)', () => {
   it('says each shape and the seat\'s own power, from the casts', () => {
     expect(line('brawler-1')).toBe('One foe · 3 hits · ×2.5')
     expect(line('brawler-2')).toBe('One foe · 1 hit · ×2.9')
-    // Echo Draw: three draws, each a double.
-    expect(line('brawler-3')).toBe('One foe · 6 hits · ×2.2')
-    // Hundred-Shadow Rain: two volleys of 2 + 1.
-    expect(line('mage-4')).toBe('Volley · 4 + 2 a foe · ×2.2')
-    expect(line('brawler-4')).toBe('Volley · 4 + 2 a foe · ×2.2')
     expect(line('spellblade-1')).toBe('Random · 8 hits · ×1.9')
     expect(line('spellblade-2')).toBe('Random · 10 hits · ×1.9')
     expect(line('spellblade-3')).toBe('Random · 8 hits · ×1.9')
     expect(line('summoner-1')).toBe('Every foe · 3 hits · ×2.2')
+    // A Light double in Seraph's Storm counts as two hits.
+    expect(line('healer-3')).toContain('One foe · 4 hits')
   })
 
   it('adds a healer seat\'s one stack, curse or blessing', () => {
@@ -77,9 +74,9 @@ describe('the seat card (HV25)', () => {
 
 describe('"Answers" and "Adds" on Classes v3\'s pairs (§5.2)', () => {
   it('reads the new twins: the Katana with Light, the Bow with Dark; Twilight stays Bow and Katana', () => {
-    // Echo Draw (Katana) and Hundred-Arrow Rain (Bow).
-    expect(seatTwinSets(heroLimit('brawler-3'))).toEqual(['light', 'twilight'])
-    expect(seatTwinSets(heroLimit('brawler-4'))).toEqual(['dark', 'twilight'])
+    // Wisp Pact (Light, Katana) and Centaur Warband (Axe, Bow).
+    expect(seatTwinSets(heroLimit('spellblade-4'))).toEqual(['light', 'twilight'])
+    expect(seatTwinSets(heroLimit('summoner-1'))).toEqual(['ice', 'dark', 'twilight'])
   })
 
   it('adds what a Brawler\'s defaults miss under Wisp Pact', () => {

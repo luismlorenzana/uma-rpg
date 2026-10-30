@@ -31,7 +31,7 @@ export function learnerAdds(limit: HeroLimit, weapons: readonly RpgWeapon[]): Rp
 export interface SeatCard {
   /** "Seat 2 · Brawler" (its home class). */
   seat: string
-  /** "One foe · 1 hit", "Every foe · 3 hits", "Random · 8 hits", "Volley · 4 + 2 a foe". */
+  /** "One foe · 1 hit", "Every foe · 3 hits", "Random · 8 hits". */
   shape: string
   /** The Limit Break's own power: "×2.9". */
   power: string
@@ -40,19 +40,13 @@ export interface SeatCard {
   line: string
 }
 
-const hitsIn = (limit: HeroLimit, which: (cast: HeroLimit['casts'][number]) => boolean): number =>
-  limit.casts.filter(which).reduce((n, c) => n + c.hits.reduce((m, h) => m + (h.double ? 2 : 1), 0), 0)
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
 
-/** Its shape in words (HV25), from its casts: a double counts as two hits; a volley's first number is its hits on the
- * tapped foe over all its volley casts, the second its splash hits on each other foe. */
+/** Its shape in words (HV25), from its casts: a double counts as two hits. */
 export function shapeWords(limit: HeroLimit): string {
   const casts = limit.casts.filter((c) => c.hits.length > 0)
-  if (casts.some((c) => c.volley)) {
-    return `Volley · ${hitsIn(limit, (c) => !!c.volley)} + ${casts.filter((c) => c.volley && c.splash).length} a foe`
-  }
   const target = casts[0]?.target ?? 'one'
-  const n = hitsIn(limit, (c) => c.hits.length > 0)
+  const n = casts.reduce((sum, c) => sum + c.hits.reduce((m, h) => m + (h.double ? 2 : 1), 0), 0)
   return `${target === 'all' ? 'Every foe' : target === 'random' ? 'Random' : 'One foe'} · ${plural(n, 'hit')}`
 }
 
@@ -60,7 +54,7 @@ export function shapeWords(limit: HeroLimit): string {
 export const powerWord = (power: number): string => `×${power.toFixed(1)}`
 
 /** A seat's card (HV25): its home class, shape words, own power, side effect and lore (the blurb tells the shape the shape
- * line already says). Halls v2's twenty each have a power (H129); the live halls are theirs since H134. */
+ * line already says). Every live seat has a power (H129). */
 export function seatCard(limit: HeroLimit): SeatCard {
   const n = limit.id.slice(limit.id.lastIndexOf('-') + 1)
   const status = limit.casts.find((c) => c.status)?.status

@@ -89,7 +89,7 @@ const worldC = (): TierWorld => ({ ...newTierWorld(NOW, 3), umas: { [C.outfitId]
 
 describe('the Classes sheet from v19 (Uma C)', () => {
   it('runs on engine 19, the thirteen classes live', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
     expect(RPG_CLASSES).toHaveLength(13)
   })
 

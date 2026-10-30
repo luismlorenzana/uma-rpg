@@ -20,7 +20,7 @@ function heldInBoth(classId: RpgClass, weapons: readonly RpgWeapon[], engine?: n
 
 describe('presets on v19\'s twins (CV13), the live game', () => {
   it('runs with Classes v3 live', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
   })
 
   it('puts an Orb or a Bell on the Arms Spellblade\'s Lance, the Tome Spellblade\'s Light, the Arms Summoner\'s Bow, the Tome Summoner\'s Blizzard', () => {

@@ -31,7 +31,7 @@ describe('the pairs and the twin sets by engine (CV13)', () => {
     expect(rpgTwinSets(19)).toEqual(V19_SETS)
     expect(Object.keys(rpgTwinSets(19))).toEqual(RPG_TWIN_SET_IDS)
     expect(RPG_TWIN_SET_IDS).toEqual(['fire', 'ice', 'lightning', 'light', 'dark', 'twilight'])
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
     expect(RPG_TWIN_SETS).toEqual(V19_SETS)
     expect([rpgTwinWeaknesses('light', 19), rpgTwinWeaknesses('dark', 19), rpgTwinWeaknesses('twilight', 19)]).toEqual([
       { weapons: ['katana'], elements: ['light'] }, { weapons: ['bow'], elements: ['dark'] }, { weapons: ['bow', 'katana'], elements: [] }])

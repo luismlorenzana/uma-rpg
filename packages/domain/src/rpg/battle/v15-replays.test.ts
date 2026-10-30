@@ -25,7 +25,7 @@ const halves = (a: BattleAction): string[] =>
 
 describe('the frozen v15 replays (H64)', () => {
   it('runs with the Tier rework’s fight and economy and Classes v3 live (H72, H82, H134)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
     expect([rpgV2(), rpgRework('fight'), rpgRework('economy'), rpgRework('classes'), rpgRework('t2Weapons')]).toEqual([true, true, true, true, false])
     expect(RPG_WEAPON_SLOTS).toBe(3)
     expect(RPG_CLASS_SLOTS.brawler).toHaveLength(3)

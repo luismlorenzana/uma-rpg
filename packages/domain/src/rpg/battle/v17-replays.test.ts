@@ -9,7 +9,7 @@ const replays = process.env.UPDATE_V17 ? regenerateV17Replays() : loadV17Replays
 
 describe('the frozen v17 replays (H116)', () => {
   it('runs with weaknesses v2 and Classes v3 live (H116, H134)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
     expect([rpgRework('economy'), rpgRework('weak'), rpgRework('classes'), rpgRework('t2Weapons')]).toEqual([true, true, true, false])
   })
 

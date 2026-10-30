@@ -2,6 +2,7 @@
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from './battle/caps'
 import type { RpgClass } from './kinds'
 
+/** The most seats a hall has: from v20 (D261) the Warrior Dojo and the Mage Tower have two. */
 export const HERO_SEATS = 4
 /** A Hall of Heroes (Halls v2, HV20; H129): a type of its own, no longer a class. Classes v1's five halls (to engine v14),
  * classes v2's six with the Paladin Bastion (v15–v18, D179), and from v19 five by family (HV1): the Dojo, the Tower, the
@@ -26,22 +27,26 @@ const seatsOf = (halls: readonly HeroHall[]): readonly HeroLimitId[] =>
 const SEATS_V1 = seatsOf(HALLS_V1)
 const SEATS_V2 = seatsOf(HALLS_V2)
 const SEATS_V19 = seatsOf(HALLS_V19)
-/** The seats of an engine's generation, in seat order: 20 to v14, 24 v15–v18, Halls v2's 20 from v19. */
+/** The four seats the owner's trim closed (D261): the Warrior Dojo's and the Mage Tower's 3 and 4. */
+const CLOSED_V20: readonly HeroLimitId[] = ['brawler-3', 'brawler-4', 'mage-3', 'mage-4']
+const SEATS_V20 = SEATS_V19.filter((id) => !CLOSED_V20.includes(id))
+/** The seats of an engine's generation, in seat order: 20 to v14, 24 v15–v18, Halls v2's 20 on v19, the trim's 16 from
+ * v20 (D261). */
 export const heroLimitIds = (engine: number = BATTLE_ENGINE_VERSION): readonly HeroLimitId[] =>
-  rpgRework('classes', engine) ? SEATS_V19 : rpgV2(engine) ? SEATS_V2 : SEATS_V1
+  rpgRework('halls', engine) ? SEATS_V20 : rpgRework('classes', engine) ? SEATS_V19 : rpgV2(engine) ? SEATS_V2 : SEATS_V1
 /** Every seat of every generation (28): identities. The Paladin Bastion's four join with classes v2 (engine v15), the
  * Healer Sanctum's with Halls v2 (v19). */
 export const ALL_HERO_LIMIT_IDS: readonly HeroLimitId[] = seatsOf(ALL_HALLS)
-/** The live seats: Halls v2's 20 since H134 (24 v15–v18). */
+/** The live seats: the trim's 16 since D261. */
 export const HERO_LIMIT_IDS: readonly HeroLimitId[] = heroLimitIds()
-/** A seat of an engine's generation (D179): a Paladin seat only v15–v18, a Healer seat only from v19. The save and the
- * engine's `validHeroes` read it (the save the live generation's, the engine the fight's). */
+/** A seat of an engine's generation (D179): a Paladin seat only v15–v18, a Healer seat only from v19, `brawler-3` to v19.
+ * The save and the engine's `validHeroes` read it (the save the live generation's, the engine the fight's). */
 export const isHeroLimitId = (id: unknown, engine: number = BATTLE_ENGINE_VERSION): id is HeroLimitId =>
   heroLimitIds(engine).includes(id as HeroLimitId)
 /** A seat's hall: its id's prefix. */
 export const heroLimitHall = (id: HeroLimitId): HeroHall => id.slice(0, id.lastIndexOf('-')) as HeroHall
 
-/** Halls v2's home classes (HV1, HV3): seats 1–2's, then seats 3–4's. */
+/** Halls v2's home classes (HV1, HV3): seats 1–2's, then seats 3–4's (from v20 the Dojo and the Tower have only the first). */
 const HOMES_V19 = {
   brawler: ['brawler', 'brawler'], mage: ['mage', 'mage'], spellblade: ['spellblade', 'tomeblade'], summoner: ['armsummoner', 'summoner'],
   healer: ['paladin', 'cleric'],

@@ -196,7 +196,7 @@ describe('a v19 fight from the save (§13)', () => {
     ])
     save = startFight(save, region, region.nodes.find((n) => n.kind === 'fight')!.id, OUTFITS, T(2))
     const run = openFightOf(worldOf(save))!
-    expect(run.battle!.input.version).toBe(19)
+    expect(run.battle!.input.version).toBe(20)
     expect(run.battle!.input.allies.map((a) => a.classId)).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'])
     let result = null
     for (let n = 0; n < 400 && !result; n++) {

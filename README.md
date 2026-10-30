@@ -14,7 +14,7 @@ owner's iPhone as a Home Screen web app at https://uma-rpg.web.app. It has:
 
 ## Status
 
-Tier 1 is built and live (engine v19, save v32): the Tier rework's R1 and R2, Classes v3 and Halls v2, and the owner's
+Tier 1 is built and live (engine v20, save v33): the Tier rework's R1 and R2, Classes v3 and Halls v2, and the owner's
 iterations since. **The current phase is Tier 1 hardening** ([docs/handoff/](docs/handoff/README.md)); Tier 2 and Tier 3
 run Tier 1's rules × tier until they are re-planned after it. See the cross-game [roadmap](https://github.com/luismlorenzana/uma-platform/blob/main/docs/roadmap.md).
 

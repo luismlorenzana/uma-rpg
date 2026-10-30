@@ -108,7 +108,7 @@ describe('the Flourish as her calling\'s class, v16–v18 (H68), engine 18 expli
 
 describe('the Flourish as her Tier 0\'s family, live since H134 (CV21)', () => {
   it('reads her Tier 0 as her calling, with her stride\'s Flourish as before', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect(BATTLE_ENGINE_VERSION).toBe(20)
     expect(IDS.map((id) => umaTemplate(OUTFITS.get(id)!)).map((t) => [t.calling, t.flourish])).toEqual([['duelist', 'even-pace'],
       ['recruit', 'clean-break'], ['caller', 'late-reserve'], ['recruit', 'even-pace'], ['acolyte', 'clean-break']])
   })
@@ -128,7 +128,7 @@ describe('the Flourish as her Tier 0\'s family, live since H134 (CV21)', () => {
   it('freezes each Uma’s Flourish into a world-map fight’s input, and Clean break opens it with her Barrier', () => {
     const started = startFight(worldMap(), region, S1, OUTFITS, T0)
     const input = worldOf(started).world.run.battle!.input
-    expect(input.version).toBe(19)
+    expect(input.version).toBe(20)
     expect(input.allies.map((a) => a.classId)).toEqual(['duelist', 'recruit', 'caller', 'recruit', 'acolyte'])
     expect(flourishes(input.allies)).toEqual({ 201: 'even-pace', 202: 'clean-break', 203: 'late-reserve', 204: 'even-pace', 205: 'clean-break' })
     const opening = createBattle(input).cues.flatMap((c) => (c.kind === 'cover' ? [[c.targetId, c.label]] : []))
@@ -150,7 +150,7 @@ describe('the Flourish as her Tier 0\'s family, live since H134 (CV21)', () => {
     })
     const started = startRiftFight(save, { kind: 'front', front: 'iron', stage: 1 }, 0, RIFT_OUTFITS, ROSTER, RT(2))
     const input = worldOf(started).rift.battle!.input
-    expect(input.version).toBe(19)
+    expect(input.version).toBe(20)
     expect(flourishes(input.allies)).toEqual({ 101: 'even-pace', 102: null, 103: 'even-pace', 104: null, 105: null })
   })
 })

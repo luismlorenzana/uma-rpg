@@ -35,7 +35,7 @@ const ROWS = [
 
 describe('the start by calling, engine v16 (H67)', () => {
   it('runs with the Tier rework’s fight live, and Classes v3 since H134', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), rpgRework('classes')]).toEqual([19, true, true])
+    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), rpgRework('classes')]).toEqual([20, true, true])
   })
 
   it('starts her in her calling, where v15 started her in her style’s class', () => {

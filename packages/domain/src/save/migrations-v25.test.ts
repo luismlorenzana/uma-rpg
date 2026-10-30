@@ -15,8 +15,8 @@ const umaOf = (w: V24World, id: string): V24Uma => w.umas[id]!
 const raw = (w: unknown) => w as Record<string, unknown>
 
 describe('save v25’s migration (H58, chained in H61)', () => {
-  it('stays chained before v26–v32: a v24 world runs through every later step, a v25 world through v26’s to v32’s', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(32)
+  it('stays chained before v26–v33: a v24 world runs through every later step, a v25 world through v26’s to v33’s', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(33)
     const w24 = world()
     const v31 = toV31(toV30(toV29(toV28(toV27(toV26(raw(migrate(world()))))))))
     expect(migrateWorld(w24, 24)).toEqual(toV32(v31))
@@ -27,7 +27,7 @@ describe('save v25’s migration (H58, chained in H61)', () => {
     const save = v24Save()
     expect(save.schemaVersion).toBe(24)
     const parsed = parseSave(JSON.parse(JSON.stringify(save)))
-    expect(parsed.schemaVersion).toBe(32)
+    expect(parsed.schemaVersion).toBe(33)
     expect(parsed).toEqual(parseSave({ ...(migrated(save, (w) => toV28(toV27(toV26(toV25(w))))) as object), schemaVersion: 28 }))
     // Her Paladin's copied rank reaches v32's record.
     expect(Object.keys(parsed.tierWorlds['1']!.classesV3!.umas['103']!.ranks).sort()).toEqual(['cleric', 'mage', 'paladin'])

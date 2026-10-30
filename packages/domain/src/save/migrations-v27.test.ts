@@ -22,12 +22,12 @@ const BRAWLER_ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance', 'bow', 'katana'
 
 describe('save v27’s migration (H69), chained by H72', () => {
   it('runs on every world before v27 and on none at v27, and v28’s step after it (H82)', () => {
-    expect([SAVE_SCHEMA_VERSION, BATTLE_ENGINE_VERSION]).toEqual([32, 19])
+    expect([SAVE_SCHEMA_VERSION, BATTLE_ENGINE_VERSION]).toEqual([33, 20])
     const raw = world() as unknown as Raw
     expect(migrateWorldToV27(raw, 27)).toBe(raw)
     expect(migrateWorldToV27(raw, 26)).toEqual(toV27(raw))
     expect(migrateWorld(raw, 26)).toEqual(toV32(toV31(toV30(toV29(toV28(toV27(raw)))))))
-    expect(migrateWorld(raw, 32)).toBe(raw)
+    expect(migrateWorld(raw, 33)).toBe(raw)
     // A v25 world runs through v26's lead step too, then v27's (whose calling v32 drops again).
     expect(migrateWorldToV27(raw, 25)).toHaveProperty('umas.100.calling', { pick: null, confirmed: false })
   })
@@ -138,10 +138,10 @@ describe('save v27’s migration (H69), chained by H72', () => {
 })
 
 describe('the live parse (H72)', () => {
-  it('parses a save labelled v26 through the chain to v32 and refuses v26’s keys on a class setup', () => {
+  it('parses a save labelled v26 through the chain to v33 and refuses v26’s keys on a class setup', () => {
     const save = v26Save()
     const parsed = parseSave(JSON.parse(JSON.stringify(save)))
-    expect(parsed.schemaVersion).toBe(32)
+    expect(parsed.schemaVersion).toBe(33)
     expect(parsed).toEqual(parseSave(migrated(save, toV27)))
     expect(parsed).toEqual(parseSave({ ...(migrated(save, (w) => toV28(toV27(w))) as object), schemaVersion: 28 }))
     // v32's reset ends the chain: her Brawler (v27's three weapons, `toV27`'s tests above) is in the record, no setup kept.
