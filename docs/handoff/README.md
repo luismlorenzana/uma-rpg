@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-10-30, after D257.** Tier 1 is built and live: engine v19, save v32. That covers the Tier rework's R1
+> **Status: 2026-10-30, after D258.** Tier 1 is built and live: engine v19, save v32. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, and **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls and twenty Limit Breaks; H134). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H138; decision numbers from D258). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H138; decision numbers from D259). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it. Open now:
@@ -34,7 +34,6 @@ retirement and the hall-based names are already on `main`.
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H117](tasks/H117-profile-copy-cleanup.md) | Uma profile v2 (D239): the copy cleanup on today's tabs (the 54 strings, the 3 wrong texts, F5, F11–F15), three 44 pt targets, the wording list as `copy.ts` and the copy test, the dead v1 preset sheet | ChatGPT | S–M | — | Ready |
 | [H118](tasks/H118-kit-compact-profile-frame.md) | Both apps: a compact `ProfileFrame` header (`size`, `progress`) and a face door on `SlotRow` (`onFace`), uma-kit 0.16.0; uma-rpg pins it | Claude (uma-platform session) | S | — | Ready |
 | [H119](tasks/H119-profile-frame.md) | Uma profile v2: the frame, four tabs (Class, Gear, Stars, Template) as a skeleton, the compact header and facts row (Party · Work · Details), the Details sheet, routes `outfit/:id/:tab` and the tab key, locked | Claude | M | H117, H118 | Waiting |
 | [H120](tasks/H120-class-tab.md) | Uma profile v2: the Class tab, placing the class tree, promotion and Tier 0 sheets already on `main` (H137) | ChatGPT | M | H119 | Waiting |
@@ -61,6 +60,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H117 | Uma profile v2: the live profile's compact copy, one wording list in code, copy enforcement in CI and three 44 pt targets (D258) | `e14a93c` |
 
 ## How a packet reads
 
