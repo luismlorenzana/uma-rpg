@@ -1,6 +1,6 @@
 # Game loops
 
-What the player does, what it pays and what it costs, as the game runs on engine v18 and save v31. Numbers come from the
+What the player does, what it pays and what it costs, as the game runs on engine v19 and save v32. Numbers come from the
 code: generated tables between `live` markers, the rest checked against `packages/domain/src/economy/`, `items/`,
 `work/`, `save/`, `rpg/campaign/rewards.ts` and `rift/`. A tier's next world opens when the Rift below it ascends twenty
 Umas ([the Rift](#the-rift); the page is in [sections](sections.md#the-rift)).
@@ -13,7 +13,7 @@ Umas ([the Rift](#the-rift); the page is in [sections](sections.md#the-rift)).
       └──────────────── five Uma Shards (Tier 1) ◄──────────┼───────────┼──────────┼──────────┘
                                                             │           │          ▼
            Uma Level: stats, skill slots, gear gates ◄──────┘           │    the Exchange: raw materials,
-           Class Rank: deeper skills, Skill Ranks ◄─────────────────────┘    Speed and Sweep Tickets
+           Class Rank: promotion, depths, Skill Ranks ◄─────────────────┘    Speed and Sweep Tickets
            past Rank 50: Class Marks ─► Class Manuals                              │
                                                  ┌─────────────────────────────────┘
                                                  ▼
@@ -36,10 +36,12 @@ tier's world keeps its own Umas, wallet, Warehouse and work.
 - **Parties:** 20 parties of 5. An Uma belongs to at most one party; adding her to another moves her.
 - **Active party:** the one that fights, sweeps and drinks at Springs. You can switch any time no fight is open. A fight
   needs all five slots filled; Umas at work fight too (D119).
-- **Classes:** switching is free. A new Uma starts in her **calling**, and her armor's half is her class's, magical for a
-  Mage, Cleric or Summoner ([classes](classes.md#her-calling-and-her-template)). A Pace or Late Uma picks once between
-  her two callings, and her first win confirms it; the pick waits while she works ("Finish her work first"), because it
-  moves her trade ([Craft Level](#craft-level)). A party fights with one healer, a Paladin or a Cleric, at most.
+- **Classes** ([classes](classes.md)): a new Uma starts as her **calling**, a Tier 0 read from her running styles alone,
+  at Class Rank 1 ([her calling](classes.md#her-calling-and-her-template)); at Class Rank 10 she promotes, free, into one
+  of its Tier 1 classes ([Tier 0 and promotion](classes.md#tier-0-and-promotion)). Switching among the classes she holds
+  is free, and every Tier 0 is open to every Uma. Her armor's offense follows the class she fights as. Her calling never
+  moves, so neither does her trade ([Craft Level](#craft-level)). A party fights with one healer, a Paladin or a Cleric,
+  at most.
 
 ## Leveling
 
@@ -70,13 +72,16 @@ Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight �
 
 ## Ranks
 
-One bar a class (D102; [classes](classes.md#ranks-and-levels) for what it opens). Weapon, Armor and Accessory Ranks and
-Gear Marks retired with R2 (WP3, D218):
+One bar a class (D102; [classes](classes.md#ranks-and-levels) for what it opens). A Tier 0 climbs Ranks 1–10 on twice the
+curve; a Tier 1 class opens at Rank 10 in Tier 1's world and climbs to 50, at Rank 1 in a later tier
+([Tier 0 and promotion](classes.md#tier-0-and-promotion)). Weapon, Armor and Accessory Ranks and Gear Marks retired with
+R2 (WP3, D218):
 
 <!-- live:ranks -->
 | Bar | Ranks | Per win worth E Uma EXP | Opens |
 |---|---|---|---|
-| Class Rank, per class | 1–50 | 2E to the class she fought as | Its trees' depths at 1, 10, 20, 30, 40; ranks every skill she holds, a Skill Rank every 2 Class Ranks up to 5 |
+| Class Rank, a Tier 0 | 1–10 | 2E to the class she fought as | Her skill's power rises each rank; at Rank 10 her promotion, the EXP past it waiting for it (up to 23,680) |
+| Class Rank, a Tier 1 class | 1–50 (from 10 in Tier 1's world) | 2E to the class she fought as | Its trees' depths at 1, 10, 20, 30, 40; ranks every skill she holds, a Skill Rank every 2 Class Ranks up to 5 |
 
 | Class Rank | EXP to next |
 |---|---|
@@ -87,14 +92,22 @@ Gear Marks retired with R2 (WP3, D218):
 | 40 | 760 |
 | 49 | 904 |
 
+A Tier 0's ladder is twice the curve to Rank 10 (272 at Rank 1, 3,600 in all).
+
 Past the max rank, EXP banks at 50% as Class Marks. A Class Manual costs 1,000 Class Marks and gives 1,000 EXP to one class of one Uma. Gear has no ranks: a slot's grade is what she wears ([materials](materials.md#gear)).
 <!-- /live -->
 
 - **What a win pays,** for `E` Uma EXP: 2E to the class she fought as. A Sweep pays the same, an Echo twice
-  ([the Rift](#the-rift)).
-- **A campaign** (about 120 first clears) takes one Uma to Lv 50 and two classes to Rank 50.
-- **Class Marks:** past Rank 50, a class's EXP banks at half rate in the world's wallet. **Class Manuals** at the
-  Exchange turn 1,000 Class Marks into 1,000 EXP on one class of one Uma. Uma EXP is never for sale.
+  ([the Rift](#the-rift)). Fighting as her Tier 0 from Lv 1, an Uma reaches Class Rank r with Uma Lv r, so Rank 10 with
+  Lv 10.
+- **Past a Tier 0's Rank 10** her EXP **waits** on it, up to 23,680 (what Ranks 10–50 take), and her next promotion takes
+  it all at once; past that it banks as Class Marks at half rate.
+- **A campaign** (about 120 first clears) takes one Uma to Lv 50, her Tier 0 to Rank 10 and two Tier 1 classes of its
+  family to Rank 50.
+- **Class Marks:** past Rank 50 (or a Tier 0's waiting room), a class's EXP banks at half rate in the world's wallet.
+  **Class Manuals** at the Exchange turn 1,000 Class Marks into 1,000 EXP on one class of one Uma, on its own curve: on a
+  Tier 0 to Rank 10, then into her waiting EXP. In Tier 1's world a Manual can't go on a Tier 1 class she hasn't
+  promoted into. Uma EXP is never for sale.
 
 ## Laurels and EXP
 
@@ -128,7 +141,7 @@ Each world has its own wallet (`TierWorld.wallet`).
 | Sweep Tickets | The Exchange | One Sweep of a cleared regular stage or a won Echo |
 | Uma Tickets | 20 at the start (Tier 1); 5 Uma Shards each | Unlocking an outfit |
 | Uma Shards | Lv 10, 20, 30, 40, 50, Tier 1 only | Turned into Uma Tickets automatically |
-| Class Marks | Class EXP past Rank 50, at half rate; EXP banked past Lv 50, on Ascend | Class Manuals |
+| Class Marks | Class EXP past Rank 50 (or past a Tier 0's waiting room), at half rate; EXP banked past Lv 50, on Ascend; Classes v3's refund ([below](#the-classes-are-rebuilt-save-v32)) | Class Manuals |
 
 ### The Exchange
 
@@ -150,6 +163,23 @@ The Exchange (`save/exchange.ts`) sells raw materials only: each line's ten grad
 has a win and G6–G10 once it has a win on its continent 3. It sells up to 99 at a time, and Speed and Sweep Tickets
 beside them; its Manuals spend Class Marks. Refined and made items come only from the Wilds.
 
+**The Class Manual sheet** (`manual-view.ts`, D250; the screen is in [sections](sections.md#exchange)) reads Manuals onto
+one bar of one Uma, 1,000 Class Marks each, at once:
+
+- **Her bars:** in Tier 1's world the five Tier 0s, her calling's first ("R1/10 · Calling"), then the Tier 1 classes she
+  holds; a class she can't fight as yet isn't listed. In a later tier the eight Tier 1 classes, her active class first.
+- **The counts:** 1, 5, 10 and Max (as many as the Marks buy, up to 99), and two more while they apply:
+  - **To Rank 10** on a Tier 0 below Rank 10: the Manuals that bring her there, ⌈(3,600 − her EXP from Rank 1) ÷ 1,000⌉,
+    4 from Rank 1;
+  - **Her share:** her part of the reset's refund not read yet ([below](#the-classes-are-rebuilt-save-v32)). It counts
+    down on any bar she reads and shows in the sheet's head while it lasts. A hint, not a reservation: the Marks are the
+    world's.
+- **A Tier 0 at Rank 10** keeps taking Manuals into her waiting EXP, up to the 23,680 her promotion can take; her bar
+  reads it, `R10 · +12,400 EXP waiting`. Its counts stop at that room ("Room for 4"), the last Manual allowed to pass it;
+  what passes comes back as Class Marks at half, and the footer says so ("+n Class Marks back"), as on a bar at Rank 50.
+- **The worked example** (Classes v3 §8.7): Uma A's share is 21 Manuals. On her Recruit at Rank 1, To Rank 10 reads 4;
+  reading 16 takes her to `R10 · +12,400 EXP waiting`, and promoting to the Brawler makes her a Brawler R35 at once.
+
 ### The Warehouse
 
 Each world's Warehouse (`TierWorld.items`) holds its materials and made items, free to use: a job takes its inputs from
@@ -158,8 +188,9 @@ it. Anything in it sells for a few Laurels (the prices above); its shelves are i
 
 ## The Tier rework's updates
 
-Four save steps rebuilt the economy: v28 and v29 (the grant), v30 (the farm by line) and v31 (the trios). Each ran
-once per world, the first time the save opened after it ([architecture](architecture.md) has the save history).
+Four save steps rebuilt the economy: v28 and v29 (the grant), v30 (the farm by line) and v31 (the trios); a fifth, v32,
+rebuilt the classes and the halls. Each ran once per world, the first time the save opened after it
+([architecture](architecture.md) has the save history).
 
 ### The Tier rework's grant
 
@@ -195,24 +226,78 @@ became the Weapon Forge, the Workbench the Tome Forge, the Charm Shop the Charm 
 of job. Save v31 settled v30's running work into the Warehouse with its Craft EXP and dropped queues; nothing else
 changed.
 
+### The classes are rebuilt (save v32)
+
+Classes v3 and Halls v2 (D240, D241; H130, D247; live from H134) rebuilt every Uma's classes, once in every world, the
+first time the save opened as v32 ([Classes v3](../design/classes-v3/classes-v3.md) §8):
+
+- **Her class:** in Tier 1's world, her calling's Tier 0 at Class Rank 1 (her class left empty, so she fights as it);
+  in a later tier, her class's Tier 1 class at Class Rank 1 (the Mage the Sorcerer, the Spell Blade the Arms
+  Spellblade, the Summoner the Tome Summoner, the rest as they were).
+- **Reset:** every class's Class Rank, back to 1; every class's weapons, lines and equipped skills, back to their
+  defaults; her calling pick, dropped (her calling is the new rule's).
+- **The refund, class by class,** in whole Class Manuals rounded up, for each class's EXP E (what its Class Rank took on
+  the old curve, plus its bar):
+  - in Tier 1's world **⌈(E + min(E, 1,800)) ÷ 1,000⌉**: its first 1,800 twice, because the Tier 0 ladder to Rank 10
+    costs 3,600 where the old Ranks 1–10 cost 1,800, so every class she had can be rebuilt to its rank from its own
+    Tier 0;
+  - in a later tier **⌈E ÷ 1,000⌉**, 1:1 (no Tier 0 there).
+
+  The Manuals were paid as **Class Marks**, 1,000 a Manual, into the world's wallet: a Class Manual isn't an item, the
+  Exchange reads Manuals for Marks. Each Uma's share is recorded (`TierWorld.classesV3`) and offered as "Her share" in
+  the Exchange's Manual sheet ([above](#the-exchange)). Marks already banked stayed.
+- **Stays:** Uma Levels, EXP and Shards; weapon, armor and accessory grades and her accessory's family and kind (there is
+  no Weapon Rank to reset: it retired with R2); her Extra Stats map and jewels (her moon's node II re-reads her calling's
+  root); Craft Levels; parties, targets, Laurels, tickets, items and achievements; an open Rift run's sealed fronts and
+  roster.
+- **Trades:** an Uma whose calling's line moved (the Pace Umas between Wood and Stone, the Pace sprinters from Metal)
+  had her running job finished into the Warehouse with its Craft EXP and her queue dropped, once the roster loaded
+  after the save opened (`settleClassesV3Trades`); her Craft Level stayed. A place whose trade lost its last Uma became
+  an open shop.
+- **Halls:** the Paladin Bastion and the Cleric Chapel merged into the Healer Sanctum, each Uma keeping her higher Bond
+  ([heroes](heroes.md#the-merge-save-v32)). No other seat or Bond moved.
+- **Open fights** finished on engine v18 with the classes they started with; the class EXP they paid to a class she
+  could no longer fight as went to its family's Tier 0 (the Brawler's to the Recruit, the Mage's to the Initiate, the
+  Spell Blade's to the Duelist, the Summoner's to the Caller, the Paladin's and the Cleric's to the Acolyte). The next
+  fight started on engine v19.
+
+| Uma (made up) | Before | Class EXP | Manuals | A rebuild |
+|---|---|---|---|---|
+| A, Front A | Brawler R34 (bar 300), Paladin R12 (bar 100) | 13,236 · 2,476 | 16 + 5 = **21** | 16 on her Recruit, promote: a Brawler R35; 5 on an Acolyte, promote: a Paladin R14 |
+| B, Pace A and Late A | Spell Blade R26, Mage R8 (bar 50) | 8,200 · 1,338 | 10 + 3 = **13** | 10 on a Duelist, promote: an Arms Spellblade R26; 3 on her Initiate: R8 |
+| C, Late A | Cleric R24 (bar 200) | 7,376 | **10** | 10 on her Acolyte, promote: a Cleric R26 |
+| D, Pace A, Lv 1 | No Class EXP | 0 | **0** | — |
+| E, Late A and End A | Summoner R50, Mage R15 | 25,480 · 3,360 | 28 + 6 = **34** | 28 on her Caller, promote: a Tome Summoner R50; 6 on an Initiate, promote: a Sorcerer R17 |
+
+That world got 78 Manuals, 78,000 Class Marks. B's calling became the Initiate, so her trade moved Wood → Stone and her
+template Spellfencer → Spellwright; D's became the Duelist, Stone → Wood.
+
+The first time each such world opens, the sheet **"The classes are rebuilt"** shows it: "+78 Class Manuals" and
+"78,000 Class Marks · Exchange", the tree's three roots and five Tier 0s, how to rebuild an Uma (read her share onto her
+Tier 0, then promote at Rank 10), what reset and what stayed, the moved trades, the Halls line, and each Uma's line
+("Spell Blade R26 · Mage R8 → Initiate R1 · trade Wood → Stone", her share on the right). Both of its buttons, To the
+Exchange and Later, close it for good; the Account's row **"The classes are rebuilt · 78 Class Manuals"** reopens it
+([sections](sections.md#account)).
+
 ## Craft Level
 
 Each Uma has one profession level, **Craft Level** (save key `craft`, D144), raised by every job in the Wilds' fifteen
 places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the pages are in [sections](sections.md)).
 
-- **Her trade** (PP2, FL25–FL27): her calling names one line, and its three places are hers, in the Wilds' row order:
+- **Her trade** (PP2, FL25–FL27, CV20): her calling, a Tier 0, names one line, one trade a Tier 0, and its three places
+  are hers, in the Wilds' row order:
 
 | Her calling | Line | Gather | Process | Make |
 |---|---|---|---|---|
-| Brawler | Metal | Mine (Mining) | Mine Workbench (Smelting) | Weapon Forge (Arms Crafting): Arms Gems |
-| Paladin, Cleric | Vegetables | Fields (Farming) | Fields Workbench (Prepping) | Tome Forge (Tome Crafting): Tome Ink |
-| Spell Blade | Wood | Forest (Wood Chopping) | Forest Workbench (Sawing) | Armorer (Armor Crafting): Armor Fittings |
-| Summoner | Fish | Fishery (Fishing) | Fishery Workbench (Filleting) | Charm Forge (Accessory Crafting): Accessory Settings |
-| Mage | Stone | Monster Den (Hunting) | Den Workbench (Stonecutting) | Lapidary (Jewel Crafting): Planet and Moon Jewels |
+| Recruit | Metal | Mine (Mining) | Mine Workbench (Smelting) | Weapon Forge (Arms Crafting): Arms Gems |
+| Acolyte | Vegetables | Fields (Farming) | Fields Workbench (Prepping) | Tome Forge (Tome Crafting): Tome Ink |
+| Duelist | Wood | Forest (Wood Chopping) | Forest Workbench (Sawing) | Armorer (Armor Crafting): Armor Fittings |
+| Caller | Fish | Fishery (Fishing) | Fishery Workbench (Filleting) | Charm Forge (Accessory Crafting): Accessory Settings |
+| Initiate | Stone | Monster Den (Hunting) | Den Workbench (Stonecutting) | Lapidary (Jewel Crafting): Planet and Moon Jewels |
 
-- **Her calling sets her trade,** never her active class: a class switch moves no job. A trade works three places,
-  twelve slots. Another trade's places refuse her ("Another trade"), unless the world has no Uma of that trade: then
-  the place is an **open shop** and takes everyone until one arrives.
+- **Her calling sets her trade,** never her active class: a class switch or a promotion moves no job. A trade works
+  three places, twelve slots. Another trade's places refuse her ("Another trade"), unless the world has no Uma of that
+  trade: then the place is an **open shop** and takes everyone until one arrives.
 - **One kind a place:** a gathering place gathers its line's raw items, a workbench processes them one for one, a making
   place makes its item from refined ones ([materials](materials.md)).
 - **Grades** (FL6): every line has ten, G1–G10; grade g opens at Craft Lv 5g − 4 (1, 6, 11 … 46) to gather, to process
@@ -294,16 +379,16 @@ The Observatory's map (EP1–EP8; `economy/planet.ts`, `save/observatory.ts`):
 | Body | Nodes | Opens at Lv | Points (Tier 1) | To |
 |---|---|---|---|---|
 | Planet | I–V | 1, 11, 21, 31, 41 | 1, 2, 4, 6, 8 | all six core stats (HP 5 a point) |
-| Prowess | I–V | 6, 16, 26, 36, 46 | 2, 4, 6, 8, 10 | ATK and M.ATK by her active class: Brawler 100/0, Mage 0/100, Spell Blade 70/30, Cleric 20/80, Summoner 30/70, Paladin 80/20 |
+| Prowess | I–V | 6, 16, 26, 36, 46 | 2, 4, 6, 8, 10 | ATK and M.ATK by her active class: Brawler 100/0, Arms Spellblade 70/30, Arms Summoner 70/30, Paladin 80/20, Cleric 20/80, Tome Summoner 30/70, Tome Spellblade 30/70, Sorcerer 0/100; a Tier 0 a third for each of her three weapons, by its channel |
 | Vigor | I–V | 6, 16, 26, 36, 46 | 2, 4, 6, 8, 10 | HP and MP |
 | Guard | I–V | 6, 16, 26, 36, 46 | 2, 4, 6, 8, 10 | DEF and M.DEF |
-| ★ Her moon | I, II | 16, 36 | 4, 8 | I: her knack's stat; II: her calling's channel's defense |
+| ★ Her moon | I, II | 16, 36 | 4, 8 | I: her knack's stat; II: her calling's root: Warrior DEF, Mage M.DEF, All-Rounder half each |
 <!-- /live -->
 
 - **What a point does (D104, flat):** ATK, M.ATK, DEF, M.DEF or MP +1; HP +5; Speed 0.6% evasion (up to 50%); Limit a
   0.4 head start on the Limit Break gauge. Speed and Limit come only from her moon (a Fleet or Gritty knack, 4 points in
   every tier); a fight's gauge is whole, so a Gritty moon's 1.6 starts it at 1.
-- **Prowess** splits by the class she fights as when the fight starts.
+- **Prowess** splits by the class she fights as when the fight starts; a Tier 0's a third a slot to each slot's channel.
 - Ascending to a new tier starts her map empty.
 
 ### Gear
@@ -347,11 +432,18 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   can be cancelled.
 - **The roster lock:** front and Convergence fights take only the twenty. Between fights, arrange them into any of the
   world's parties, and change their classes, skills and gear freely.
-- **The guidance** (the guided builds, engine v16, CP7): each front suggests a build of five classes with every
-  member's three weapons, and the page suggests the party that fits a front best and one for each of the Convergence's
-  slots, never one with two healers; "Use the guided weapons" sets its members' weapons in one tap
-  ([combat](combat.md#the-rifts-foes) has every build). A front, Echo or Convergence fight takes one healer at most, as
-  the world map does.
+- **The guidance** (the guided builds, engine v16, CP7; by family from v19, CV23): each front suggests a build of five
+  classes with every member's three weapons: Iron the Warrior side (two Brawlers, an Arms Spellblade, an Arms Summoner,
+  a Paladin), Arcane the Mage side (two Sorcerers, a Tome Spellblade, a Tome Summoner, a Cleric), the Duel the
+  Spellblades (two of each and a Paladin), the Horde the Summoners (two of each and a Cleric). A run's twenty hold all
+  eight Tier 1 classes ([combat](combat.md#the-rifts-foes) has every build and its weapons).
+- **It reads the classes she holds** (CV §10.1): a member fits a guided class she holds, not only the one she fights as,
+  so a rebuilt roster still fits. The page suggests the party that fits a front best and one for each of the
+  Convergence's slots, never one with two healers. **Use the guided weapons** sets each member's build weapons in one
+  tap, and switches a member into the guided class she holds when she fights as another. A guided class the chosen party
+  leaves empty says so, "Needs an Arms Summoner" ("Needs 2 Brawlers"), with up to three roster Umas outside the party who
+  could fill it: those who can promote into it now first ("Ready to promote"), then those who hold it ("Holds it"); a
+  row opens her Skills tab. A front, Echo or Convergence fight takes one healer at most, as the world map does.
 - **Fronts and seals:** Iron, Arcane, Duel and Horde, twelve stages each. The fronts go in any order, a front's stages
   in order: only its next stage can be fought, and a cleared stage isn't replayed. A front fight takes one of the
   world's twenty parties, full, all five on the roster. Its 12th stage seals the front.
@@ -367,7 +459,8 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
 - **Echoes:** each front at Lv 45, 50 and 55, for any full party of Lv 50 Umas while the Rift is open, with or without
   a run. A win fills each Uma's Class Rank for the class she fought as at twice a stage's rule, E being a regular stage's
   EXP at the Echo's level for her: Lv 45 pays half, Lv 55 the same as Lv 50 (fighting above her never pays more). Past
-  Rank 50 it banks as Class Marks. No Uma EXP, Laurels, Shards or Bonds.
+  Rank 50 it banks as Class Marks; on a Tier 0 at Rank 10 it waits for her promotion. No Uma EXP, Laurels, Shards or
+  Bonds.
   - **The pace** (H51, D176): a fresh class reaches Rank 30 in about 9 Echo wins at Lv 50 or 55 and 17 at Lv 45, and
     Rank 50 in 20 (40 at Lv 45).
   - **How hard:** a party with one Uma at Class Rank 1 wins the Lv 45 Echoes, and an on-curve party the Lv 50 ones.
@@ -380,8 +473,11 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
     its Learners leave it. The made items her grades used go back to the old world's Warehouse (a G5 Arms weapon returns
     Arms Gems G1–G5, a G5 Tome Tome Ink G1–G5); the jewels she set are gone.
   - **They arrive** at Lv 1 with Class Rank 1 everywhere, her classes' weapons, lines and equipped skills back to their
-    defaults, every grade G0, an empty Extra Stats map, Craft Lv 1 and no Bonds. Each keeps her class, her calling and
-    her accessory slot's family and kind.
+    defaults, every grade G0, an empty Extra Stats map, Craft Lv 1 and no Bonds. Each keeps her class and her accessory
+    slot's family and kind; her calling is her racing profile's, as always. A later tier has no Tier 0 and every Tier 1
+    class is open there from Class Rank 1 (CV10), so an Uma who ascends as a Tier 0 arrives as her **suggested
+    promotion** (the Recruit a Brawler, the Initiate a Sorcerer; a Duelist, a Caller or an Acolyte her Arms child or the
+    Paladin with Power over Wit, else her Tome child or the Cleric), at Class Rank 1.
   - **The new world** gets the purse, 1,000 Laurels and 5 Speed Tickets an Uma, and their banked EXP as Class Marks. A
     party whose five all ascend moves, with its name, into its first empty party; the rest fill the next empty parties,
     five at a time.
@@ -393,7 +489,7 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
 | The Rift opens | 5 Lv 50 Umas in the tier's world (Tiers 1 and 2) |
 | A run | 20 Lv 50 Umas; 4 fronts of 12 stages, then the Convergence's 4 fights |
 | Echoes | Each front at Lv 45, 50, 55 |
-| Echo pay | ×2 a stage's Class, Weapon, Armor and Accessory Rank EXP; no Uma EXP, Laurels, Shards or Bonds |
+| Echo pay | ×2 a stage's Class Rank EXP (a Tier 0 at Rank 10 keeps it waiting for her promotion); no Uma EXP, Laurels, Shards or Bonds |
 | Class EXP an Echo win, Lv 50 Uma | Lv 45: 652 · Lv 50: 1,300 · Lv 55: 1,300 |
 | Ascension purse, per Uma | 1,000 Laurels and 5 Speed Tickets (20,000 and 100 a run) |
 | Banked EXP on Ascend, per Uma | 1 Class Mark per 10 EXP, 2,000 at most |

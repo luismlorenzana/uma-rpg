@@ -1,14 +1,15 @@
 // Tier 1's foes on engine v16 (H66, D202; class-progression.md §4.1, §4.4): every foe of every rank is weak to her twins
 // (CP5), the sub-boss's and the boss's shields are `RPG_FOE_SHIELDS_V16`'s (CP8, SB6; H71 measured today's 6 and 8, D207),
-// and nothing else moves; live since H72 (D210), so the generators give v16's foes by default. v15's generation stays
-// byte for byte as it was, whatever the switch says: the digests below were taken on the generators before H66.
+// and nothing else moves; live from H72 (D210), the generators giving the live engine's foes by default (v19's since H134,
+// whose twins re-pair, CV13: the rule's checks name v16). v15's generation stays byte for byte as it was, whatever the
+// switch says: the digests below were taken on the generators before H66.
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import type { BattleEnemy } from '../rpg/battle/types'
 import { rpgCampaignChapter, type RpgCampaignChapter } from '../rpg/campaign/chapters'
 import { RPG_FOE_SHIELDS_V16, RPG_FOE_TUNING, rpgFoeShields } from '../rpg/campaign/enemies'
 import {
-  RPG_ELEMENTS, RPG_KIND_PAIRS, RPG_TWIN_SET_IDS, RPG_TWIN_SETS, rpgAnsweredTwinSets, rpgElementWeakness, rpgTwinArm, rpgTwinsOf,
+  RPG_ELEMENTS, RPG_KIND_PAIRS, RPG_TWIN_SET_IDS, rpgAnsweredTwinSets, rpgElementWeakness, rpgTwinArm, rpgTwinSets, rpgTwinsOf,
   type RpgElement,
 } from '../rpg/kinds'
 import { RIFT_FRONT_SPECS, riftGuidedBuild, riftTuning } from '../rift/fronts'
@@ -25,6 +26,7 @@ const TIER1 = continents([1, 2, 3, 4, 5])
 const chapters = (list: ReturnType<typeof continents>, engine: number): RpgCampaignChapter[] =>
   list.flatMap((c) => [...c.regions.map((r) => regionChapter(r, cast, engine)), capitalChapter(c, cast, engine)])
 const foesOf = (chapter: RpgCampaignChapter): BattleEnemy[] => chapter.nodes.flatMap((n) => [n.enemies, ...(n.waves ?? [])].flat())
+const V16 = 16
 
 /** FNV-1a, as `world.ts` hashes and `tier1-foes.test.ts` pins. */
 function fnv1a(text: string): string {
@@ -37,10 +39,10 @@ describe('her twins (CP5): the rule', () => {
   it('names the six twin sets and each element’s Arm', () => {
     expect(RPG_TWIN_SET_IDS).toEqual(['fire', 'ice', 'lightning', 'light', 'dark', 'twilight'])
     for (const [arm, element] of RPG_KIND_PAIRS) {
-      expect(rpgTwinArm(element)).toBe(arm)
-      expect(RPG_TWIN_SETS[element]).toEqual([arm, element])
+      expect(rpgTwinArm(element, V16)).toBe(arm)
+      expect(rpgTwinSets(V16)[element]).toEqual([arm, element])
     }
-    expect(RPG_TWIN_SETS.twilight).toEqual(['bow', 'katana'])
+    expect(rpgTwinSets(V16).twilight).toEqual(['bow', 'katana'])
   })
 
   it.each([
@@ -73,10 +75,10 @@ describe('her twins (CP5): the rule', () => {
   })
 
   it('lists the twin sets a list of kinds answers, weapons as the kinds they deal', () => {
-    expect(rpgAnsweredTwinSets(['greatsword', 'axe', 'lance'])).toEqual(['fire', 'ice', 'lightning'])
-    expect(rpgAnsweredTwinSets(['katana', 'lance', 'tome-lightning'])).toEqual(['lightning', 'dark', 'twilight'])
-    expect(rpgAnsweredTwinSets(['tome-light', 'ice', 'bow'])).toEqual(['ice', 'light', 'twilight'])
-    expect(rpgAnsweredTwinSets([])).toEqual([])
+    expect(rpgAnsweredTwinSets(['greatsword', 'axe', 'lance'], V16)).toEqual(['fire', 'ice', 'lightning'])
+    expect(rpgAnsweredTwinSets(['katana', 'lance', 'tome-lightning'], V16)).toEqual(['lightning', 'dark', 'twilight'])
+    expect(rpgAnsweredTwinSets(['tome-light', 'ice', 'bow'], V16)).toEqual(['ice', 'light', 'twilight'])
+    expect(rpgAnsweredTwinSets([], V16)).toEqual([])
   })
 })
 
@@ -100,7 +102,7 @@ describe('Tier 1’s foes on v16 (D202)', () => {
       const lead = rpgElementWeakness(foe.element)
       const answer = own.includes(lead) ? rpgElementWeakness(foe.element2!) : lead
       expect(own).not.toContain(answer)
-      expect({ weapons, elements }).toEqual({ weapons: [rpgTwinArm(answer)], elements: [answer] })
+      expect({ weapons, elements }).toEqual({ weapons: [rpgTwinArm(answer, V16)], elements: [answer] })
     }
     expect(twilight).toBeGreaterThan(0)
   })
@@ -139,21 +141,21 @@ describe('Tier 1’s foes on v16 (D202)', () => {
   })
 })
 
-describe('the foe generators live (H116)', () => {
-  it('generate the live engine’s foes by default: v18’s weakness lists', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
+describe('the foe generators live (H116, H134)', () => {
+  it('generate the live engine’s foes by default: v19’s since H134', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
     const w1 = worldContinent({ name: 'T', order: 1 })
-    for (const region of w1.regions.slice(0, 8)) expect(regionChapter(region, cast)).toEqual(regionChapter(region, cast, 18))
-    expect(capitalChapter(w1, cast)).toEqual(capitalChapter(w1, cast, 18))
-    expect(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast)).toEqual(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast, 18))
-    expect(rpgFoeShields()).toEqual(rpgFoeShields(18))
+    for (const region of w1.regions.slice(0, 8)) expect(regionChapter(region, cast)).toEqual(regionChapter(region, cast, 19))
+    expect(capitalChapter(w1, cast)).toEqual(capitalChapter(w1, cast, 19))
+    expect(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast)).toEqual(rpgCampaignChapter({ scenarioId: 7, name: 'C', order: 2 }, cast, 19))
+    expect(rpgFoeShields()).toEqual(rpgFoeShields(19))
     expect(rpgFoeShields(17)).toEqual(RPG_FOE_SHIELDS_V16)
     const ctx = { tier: 1, runId: 't1-r1', roster: packRoster(), defeated: new Set<string>() }
     for (const front of ['duel', 'horde'] as const) {
-      expect(riftFight(ctx, { kind: 'front', front, stage: 3 })).toEqual(riftFight(ctx, { kind: 'front', front, stage: 3 }, 18))
+      expect(riftFight(ctx, { kind: 'front', front, stage: 3 })).toEqual(riftFight(ctx, { kind: 'front', front, stage: 3 }, 19))
     }
-    expect(riftTuning()).toBe(riftTuning(18))
-    for (const front of RIFT_FRONTS) expect(RIFT_FRONT_SPECS[front].build).toEqual(riftGuidedBuild(front, 18))
+    expect(riftTuning()).toBe(riftTuning(19))
+    for (const front of RIFT_FRONTS) expect(RIFT_FRONT_SPECS[front].build).toEqual(riftGuidedBuild(front, 19))
   })
 })
 

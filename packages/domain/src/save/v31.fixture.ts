@@ -184,5 +184,5 @@ export function v31Tier2(): TierWorld {
 /** The whole save at v31. */
 export function v31Save(): Save {
   const fresh = newSave('Tester', T0, V31_ENGINE)
-  return { ...fresh, account: { ...fresh.account, updatedAt: T2 }, tierWorlds: { '1': v31World(), '2': v31Tier2() } }
+  return { ...fresh, schemaVersion: 31 as Save['schemaVersion'], account: { ...fresh.account, updatedAt: T2 }, tierWorlds: { '1': v31World(), '2': v31Tier2() } }
 }

@@ -155,9 +155,12 @@ By her class, in refined items a line:
 | Her class (her slots) | Metal | Vegetables | Wood | Fish | Stone |
 |---|---|---|---|---|---|
 | Brawler (3 Arms) | 210 | 0 | 100 | 100 | 118 |
-| Spell Blade, Paladin (2 Arms, 1 Tome) | 140 | 70 | 100 | 100 | 118 |
-| Summoner, Cleric (1 Arm, 2 Tomes) | 70 | 140 | 100 | 100 | 118 |
-| Mage (3 Tomes) | 0 | 210 | 100 | 100 | 118 |
+| Arms Spellblade, Arms Summoner, Paladin (2 Arms, 1 Tome) | 140 | 70 | 100 | 100 | 118 |
+| Tome Spellblade, Tome Summoner, Cleric (1 Arm, 2 Tomes) | 70 | 140 | 100 | 100 | 118 |
+| Sorcerer (3 Tomes) | 0 | 210 | 100 | 100 | 118 |
+
+A Tier 0's three slots take any weapon, so her row is whichever of these her three weapons make (70 refined items of
+Metal an Arm, of Vegetables a Tome).
 
 Averaged over a roster's classes, each weapon line carries about 105 refined items an Uma, close to Wood's and Fish's
 100, so the five trades get about the same work ([pacing](../design/pacing.md)).
@@ -197,8 +200,9 @@ Accessory Ranks retired in R2, D218).
 - **A weapon's Might:** its grade's value, added to the offense of her hits with that weapon, × the tier
   ([combat](combat.md#damage)). She fights with her class's three weapons; a weapon she doesn't slot keeps its grade.
 - **Armor:** each slot adds its stat (head DEF, body HP, legs MP, arms M.DEF, feet Speed) and ATK or M.ATK by her class's
-  half: a physical class's armor gives ATK, a magical class's (Mage, Cleric, Summoner) M.ATK. Switching class switches the
-  half; the grades stay.
+  half: a physical-led class's armor gives ATK (Brawler, Arms Spellblade, Arms Summoner, Paladin), a magic-led class's
+  M.ATK (Sorcerer, Tome Spellblade, Tome Summoner, Cleric), and a Tier 0's a third a slot to each slot's channel.
+  Switching class switches the half; the grades stay.
 - **The accessory slot:** its grade, and a family she sets freely (WP19, `setAccessoryForm`): the **Pendant** (flat
   offense on her three weapons' kinds), the **Orb** (flat offense on one of them), the **Bell** (a follow-up strike with
   her weapon of its kind when her act includes an Attack) or the **Insignia** (more damage to sub-bosses and bosses). An
@@ -210,11 +214,13 @@ Accessory Ranks retired in R2, D218).
 - **On Ascend** every grade starts at G0 in the new tier, and the made items her grades used go back to the old world's
   Warehouse ([loops](loops.md#the-rift)).
 
-**Colors by kind** (D234, uma-art 2.15.0): a Tome wears its element's color and an Arm its own, beside its twin
-element's: the Greatsword orange (Fire), the Lance green (Lightning), the Axe purple (Ice), the Bow pale jade (Light) and
-the Katana deep rose (Dark). The color is the same at every grade; the grade shows in the fittings (a Tome's gem
-fittings; an Arm's hilt, guard or tips in the grade's ingot, copper to orichalcum). An Arm's Orb wears its color. The
-small kind glyphs on every screen use the same colors: the art's tones in dark mode, deeper ones in light mode.
+**Colors by kind** (D234, uma-art's weapon art since 2.15.0): a Tome wears its element's color and an Arm its own,
+painted beside its twin element's as the twins were then: the Greatsword orange (Fire), the Lance green (Lightning), the
+Axe purple (Ice), the Bow pale jade and the Katana deep rose. The color is the same at every grade; the grade shows in
+the fittings (a Tome's gem fittings; an Arm's hilt, guard or tips in the grade's ingot, copper to orichalcum). An Arm's
+Orb wears its color. The small kind glyphs on every screen use the same colors, the art's tones in dark mode and deeper
+ones in light mode, except the Bow's and the Katana's: with the twins re-paired (Katana–Light, Bow–Dark; engine v19) the
+glyphs swapped them, the Katana jade beside Light and the Bow rose beside Dark. The weapon art is unchanged.
 
 <!-- live:gear -->
 | Grade | Opens at Lv | Weapon Might (Tier 1 · 2 · 3) | Armor: offense a piece | Head DEF | Body HP | Legs MP | Arms M.DEF | Feet Speed |

@@ -1,4 +1,4 @@
-// Classes v3's reset over the save (save v32, D240, D247; classes-v3.md §8.1, §8.4, §8.5; H130, dark until H134): the
+// Classes v3's reset over the save (save v32, D240, D247; classes-v3.md §8.1, §8.4, §8.5; H130, live since H134): the
 // Tier 0 a v31 class's fight pays after the reset, and the trades the new calling moves. `toV32` (migrations.ts) writes
 // the reset and its record; what needs master data runs here, after the parse, as D220's calling repair does. Loaded
 // with `save/battle.ts`, which re-exports it (the web imports it only while a world's record waits for its trades). Pure.

@@ -1,7 +1,7 @@
 // The Hub (S1, D43, D147): a page's map on uma-kit (`HubMap`: the Phaser canvas, the place links and the page swipe),
 // Town Hall's plaza crowd, the Collect all pill and a place's quick look in the side panel (`?peek=:placeId`).
 // /:page/:placeId/* is a place's page; a link to a place on another page (an old `/town/scenario-gate`) goes there, and
-// one to a place that folded into another (the Paladin Bastion's, from the switch) to the place it became.
+// one to a place that folded into another (the Paladin Bastion's, since H134) to the place it became.
 import {
   hallOfPlace, heroLimitHall, heroLimitIds, HUB_PAGE_NAMES, HUB_PAGES, isHubPage, liveWorkEnv, movedPlace,
   placeById, placeLock, placeOnPage, placeOpen, placesOn, workPlace, type HubPage, type Place, type TierWorld,

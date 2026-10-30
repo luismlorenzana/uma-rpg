@@ -1,6 +1,6 @@
 // Save v32's migration (H130; classes-v3.md §8, CV25–CV30; halls-v2.md §7, HV18–HV19), unmocked: `toV32` on raw v31
 // worlds. The refund of §8.7's worked examples, the reset by world, what stays, the record, and the Healer Sanctum's
-// merge. `toV32` is written, not chained: the live save stays v31 (H134 chains it).
+// merge. `toV32` is chained after `toV31` since H134: a v31 save parses to v32.
 import { describe, expect, it } from 'vitest'
 import { migrateWorld, toV32 } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type ClassesV3Record, type HeroSeat, type OwnedUma, type Save, type TierWorld } from './save'
@@ -103,20 +103,31 @@ describe('toV32: the record (CV26, CV30)', () => {
     expect(toV32(once)).toBe(once)
   })
 
-  it('is not chained: migrateWorld leaves a v31 world alone and the schema stays 31', () => {
+  it('is chained once after toV31: migrateWorld runs it on a v31 world, not on a v32 one, and the schema is 32', () => {
     const world = raw(v31World())
-    expect(migrateWorld(world, 31)).toBe(world)
-    expect(SAVE_SCHEMA_VERSION).toBe(31)
+    const chained = migrateWorld(world, 31)
+    expect(chained).toEqual(toV32(raw(v31World())))
+    expect(migrateWorld(chained, 32)).toBe(chained)
+    expect(toV32(chained as Raw)).toBe(chained)
+    expect(SAVE_SCHEMA_VERSION).toBe(32)
   })
 
-  it('leaves the live game as today: a v31 save parses and round-trips unchanged, and a v32 world is refused', () => {
-    const save = JSON.parse(JSON.stringify(v31Save())) as Save
+  it('parses a v31 save to v32 with the reset applied, which round-trips', () => {
+    // The fixture's constructor stamps the live schema; a stored v31 save says 31.
+    const save = JSON.parse(JSON.stringify({ ...v31Save(), schemaVersion: 31 })) as Save
     const parsed = parseSave(save)
-    expect(parsed).toEqual(save)
+    expect(parsed.schemaVersion).toBe(32)
+    const one = parsed.tierWorlds['1']!
+    expect(one.classesV3).toEqual(toV32(raw(save.tierWorlds['1']!)).classesV3)
+    expect(one.classesV3!.umas[UMA.B]!.pick).toBe('spellblade')
+    expect(one.wallet.classMarks).toBe(5000 + 78_000)
+    for (const uma of Object.values(one.umas)) {
+      expect(uma).toMatchObject({ classId: null, classes: {}, ranks: { classes: {} } })
+      expect('calling' in uma).toBe(false)
+    }
+    expect(Object.keys(one.heroes).filter((id) => /^(paladin|cleric)-/.test(id))).toEqual([])
+    expect(parsed.tierWorlds['2']!.umas['200']!.classId).toBe('brawler')
     expect(parseSave(JSON.parse(JSON.stringify(parsed)))).toEqual(parsed)
-    expect(parsed.tierWorlds['1']!.umas[UMA.B]!.calling).toEqual({ pick: 'spellblade', confirmed: true })
-    const migrated = { ...save, tierWorlds: { ...save.tierWorlds, '1': toV32(raw(save.tierWorlds['1']!)) } }
-    expect(() => parseSave(migrated)).toThrow(/tierWorlds\.1: unknown keys classesV3/)
   })
 })
 

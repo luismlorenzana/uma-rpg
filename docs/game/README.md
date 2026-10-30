@@ -9,12 +9,12 @@ code as it runs on https://uma-rpg.web.app. Specs, plans and history live elsewh
 |---|---|
 | [Architecture](architecture.md) | Repos, packages, the web app, the API, the save and its history, private content, deploy, local setup |
 | [Dependencies](dependencies.md) | Tooling, every package and version, cloud services, uma-platform packages |
-| [Game loops](loops.md) | Collection and parties, leveling, Class Rank and Marks, Laurels and currencies, Speed Tickets, the Exchange and the Warehouse, the Tier rework's updates, Craft Level and trades, Extra Stats and gear, Springs and Sweeps, the Rift, achievements |
+| [Game loops](loops.md) | Collection and parties, leveling, Class Rank and Marks, Laurels and currencies, Speed Tickets, the Exchange and its Manual sheet, the Warehouse, the Tier rework's updates and the classes' reset, Craft Level and trades, Extra Stats and gear, Springs and Sweeps, the Rift, achievements |
 | [Game sections](sections.md) | Every Hub page and place, every screen, the global UI |
 | [Combat](combat.md) | Rounds, actions, the damage stack, her accessory and signature, weaknesses, shields and Breaks, statuses, support, MP and the Flourish, Limit Breaks, foes, the Rift's foes, constants |
-| [Classes and weapons](classes.md) | The six classes, her calling and template, ten weapons in three slots, armor and the accessory, presets, skill depths, lines and Skill Ranks, the four bars |
-| [Skill trees](skill-trees.md) | Every tree and node with its line, MP and effect; the lines at a glance; Pierce; equipped skills |
-| [Halls of Heroes](heroes.md) | Six halls: Heroes, Learners, Bonds and the 24 unique Limit Breaks |
+| [Classes and weapons](classes.md) | The class tree's thirteen classes, Tier 0 and promotion, reclassing, her calling and template, ten weapons in three slots and their five shapes, armor and the accessory, presets, skill depths, lines and Skill Ranks, the four bars |
+| [Skill trees](skill-trees.md) | Every Tier 1 tree and node with its line, MP and effect; the lines at a glance; Pierce; equipped skills |
+| [Halls of Heroes](heroes.md) | Five halls: Heroes, Learners, Bonds, the twenty Limit Breaks and their power, the Healer Sanctum's merge |
 | [Materials](materials.md) | The lines and their G1–G10 materials, the fifteen Wilds places, the made items and their recipes, gear by grade |
 | [The world map](maps.md) | Biomes, signatures, a stage's foes, formations and waves, capitals, continents and regions |
 

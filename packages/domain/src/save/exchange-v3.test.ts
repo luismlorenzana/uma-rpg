@@ -1,12 +1,13 @@
 // R2's Exchange and the calling pick's block (H77; profession-progression.md §10, PP2, PP17), on engine v17 (live
 // since H82): raw materials by pair as a world's continents fall, × the world's tier, selling materials and made items,
-// and the pick refused while she works.
+// and her work's block on the pick (the pick itself refused for everyone from v19, CV19).
 import { describe, expect, it } from 'vitest'
+import { CALLING_NO_PICK } from '../roster/template'
 import { pickCalling, type BattleOutfit } from './battle'
 import { ECONOMY_V3_NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { buyRawItem, buyTickets, rawPriceV4, sellPrice, sellStock, stockedTypes } from './exchange'
 import { worldOf } from './rules'
-import type { Save, TierWorld } from './save'
+import { SAVE_SCHEMA_VERSION, type Save, type TierWorld } from './save'
 import { callingPickBlock, CALLING_WORKING } from './status'
 import { collectJob, startJob } from './work'
 
@@ -19,7 +20,7 @@ function worldWith(tier: number, continents: readonly number[], overrides: Parti
   return { ...base, world: { ...base.world, run: { ...base.world.run, wins: { start: 1, ...wins } } } }
 }
 const saveOf = (tier: number, world: TierWorld): Save => ({
-  schemaVersion: 31,
+  schemaVersion: SAVE_SCHEMA_VERSION,
   account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
   tierWorlds: { [String(tier)]: world },
 })
@@ -76,24 +77,23 @@ describe('buying and selling (PP17)', () => {
 })
 
 describe('the calling pick while she works (PP2)', () => {
-  // An invented Pace Uma, Power over Wit: her pick moves her between the Spell Blade's and the Mage's trades.
+  // An invented Pace Uma, Power over Wit: to v18 her pick moved her between the Spell Blade's and the Mage's trades.
   const pace: BattleOutfit = {
     outfitId: '101', baseStats: { speed: 110, stamina: 110, power: 104, guts: 110, wit: 90 }, growthRatePercents: { speed: 10, stamina: 0, power: 0, guts: 0, wit: 0 },
     aptitudes: { strategy: { front: 'B', pace: 'A', late: 'B', end: 'B' }, distance: { sprint: 'B', mile: 'A', medium: 'B', long: 'B' } },
   }
-  const save = saveOf(1, worldWith(1, [], { items: { 'pine-log': 2 }, umas: { '101': gradedUma({ level: 5, calling: { pick: null, confirmed: false } }) } }))
+  const save = saveOf(1, worldWith(1, [], { items: { 'pine-log': 2 }, umas: { '101': gradedUma({ level: 5 }) } }))
 
-  it('is refused while she has work started or ready, and free once collected', () => {
+  it('is blocked while she has work started or ready, and not once collected; from v19 the pick is refused first', () => {
     expect(callingPickBlock(worldOf(save), '101', NOW)).toBeNull()
-    expect(worldOf(pickCalling(save, pace, 'mage', NOW)).umas['101']!.calling).toEqual({ pick: 'mage', confirmed: false })
+    expect(() => pickCalling(save, pace, 'mage', NOW)).toThrow(CALLING_NO_PICK)
     const working = startJob(save, 'forest', 0, { outfitId: '101' }, 'pine-log', 1, NOW)
     expect(callingPickBlock(worldOf(working), '101', NOW)).toBe(CALLING_WORKING)
     expect(CALLING_WORKING).toBe('Finish her work first')
-    expect(() => pickCalling(working, pace, 'mage', NOW)).toThrow('Finish her work first')
+    expect(() => pickCalling(working, pace, 'mage', NOW)).toThrow(CALLING_NO_PICK)
     const later = new Date(Date.parse(NOW) + 3 * 3_600_000).toISOString()
     expect(callingPickBlock(worldOf(working), '101', later)).toBe(CALLING_WORKING)
     const collected = collectJob(working, 'forest', 0, later).save
     expect(callingPickBlock(worldOf(collected), '101', later)).toBeNull()
-    expect(worldOf(pickCalling(collected, pace, 'mage', later)).umas['101']!.calling?.pick).toBe('mage')
   })
 })

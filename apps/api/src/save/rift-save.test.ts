@@ -21,12 +21,16 @@ const OUTFITS = new Map(ids(101, 25).map((id): [string, BattleOutfit] => [id, {
   growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 10, wit: 10 }, aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
 }]))
 
-/** Twenty-five Lv 50 Umas in parties 0–4. */
+/** Each class's Tier 0 parent: from Classes v3 (H134) a Tier 1 class is held in Tier 1's world once promoted into. */
+const PARENT = { brawler: 'recruit', mage: 'apprentice', spellblade: 'recruit', cleric: 'acolyte', summoner: 'caller' } as const
+/** Twenty-five Lv 50 Umas in parties 0–4, each promoted into her class at Class Rank 10. */
 function lv50(): Save {
   const save = newSave('API Rift', T(0))
   const world = save.tierWorlds['1']!
   ids(101, 25).forEach((id, i) => {
-    world.umas[id] = { ...newOwnedUma(T(0)), level: 50, classId: CLASSES[i % 5]! }
+    const classId = CLASSES[i % 5]!
+    world.umas[id] = { ...newOwnedUma(T(0)), level: 50, classId,
+      ranks: { classes: { [PARENT[classId]]: { rank: 10, exp: 0 }, [classId]: { rank: 10, exp: 0 } } } }
     world.parties[Math.floor(i / 5)]!.slots[i % 5] = id
   })
   return save

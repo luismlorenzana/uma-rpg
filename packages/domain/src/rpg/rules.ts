@@ -5,7 +5,7 @@
 // skill she holds has a Skill Rank (H65, class-progression.md §6.1–§6.2).
 // Class rules answer by generation (D179): classes v1 to engine v14, classes v2 (docs/archive/design/classes-v2.md) from v15, and
 // from v16 the Tier rework's fight (D200, docs/design/tier-rework/class-progression.md §3), a third row where it differs;
-// from v19 Classes v3 (D240, docs/design/classes-v3/classes-v3.md; dark until H134): thirteen classes, five of them Tier 0
+// from v19 Classes v3 (D240, docs/design/classes-v3/classes-v3.md; live since H134): thirteen classes, five of them Tier 0
 // (any three weapons, one skill, Class Rank 1–10) and two new hybrids, a fourth row where it differs.
 // Each takes `engine`, defaulting to the live BATTLE_ENGINE_VERSION (`battle/caps.ts`, the one switch), so the game
 // follows the switch; the engine always passes the fight's own version. The `RPG_CLASS_*` tables are the live

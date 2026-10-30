@@ -1,8 +1,8 @@
 // v6–v15 fights replay exactly, whatever the Tier rework builds (H64, D200): the frozen fixture's v15 fights, generated on
 // the engine before H64, replayed under the live engine. Since H72 (D210) every rule's default reads the Tier rework's
 // fight (three weapons, the Summoner's Arms hand 0.50), and since H82 (D218) its economy (engine v17): a rules call in the
-// engine that leaned on its default instead of the fight's version would move them. (Until H72 and H82 twin files
-// replayed them with `caps.ts` mocked to 16 and 17; this is now that case, live.)
+// engine that leaned on its default instead of the fight's version would move them; since H134 (engine v19) Classes v3.
+// (Until H72, H82 and H134 twin files replayed them with `caps.ts` mocked to 16, 17 and 19; this is now that case, live.)
 import { describe, expect, it } from 'vitest'
 import { RPG_V2_CLASSES, RPG_CLASS_SLOTS, RPG_WEAPON_SLOTS, rpgHand } from '../rules'
 import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, rpgRework, rpgV2 } from './engine'
@@ -24,12 +24,14 @@ const halves = (a: BattleAction): string[] =>
   a.kind === 'guard' || a.kind === 'limit' ? [] : [...(a.kind === 'skill' ? [a.skill.id] : []), ...(a.pair?.skill ? [a.pair.skill.id] : [])]
 
 describe('the frozen v15 replays (H64)', () => {
-  it('runs with the Tier rework’s fight and economy live (H72, H82)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
-    expect([rpgV2(), rpgRework('fight'), rpgRework('economy'), rpgRework('t2Weapons')]).toEqual([true, true, true, false])
+  it('runs with the Tier rework’s fight and economy and Classes v3 live (H72, H82, H134)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect([rpgV2(), rpgRework('fight'), rpgRework('economy'), rpgRework('classes'), rpgRework('t2Weapons')]).toEqual([true, true, true, true, false])
     expect(RPG_WEAPON_SLOTS).toBe(3)
     expect(RPG_CLASS_SLOTS.brawler).toHaveLength(3)
-    expect(rpgHand({ classId: 'summoner' })).toMatchObject({ arms: 0.5, tome: 0.62 })
+    // The Tome Summoner's v19 hand (H131: her lead half 0.57); R1's 0.62 replays from the fight's version.
+    expect(rpgHand({ classId: 'summoner' })).toMatchObject({ arms: 0.5, tome: 0.57 })
+    expect(rpgHand({ classId: 'summoner' }, 18)).toMatchObject({ arms: 0.5, tome: 0.62 })
   })
 
   it.each(replays.map((r) => [r.name, r] as const))('%s replays byte for byte under the live engine', (_, r) => {

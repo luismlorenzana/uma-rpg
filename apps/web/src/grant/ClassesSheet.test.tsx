@@ -44,7 +44,7 @@ describe('ClassesSheet (H132)', () => {
     expect(sheet.querySelector('[data-classes-grant]')!.textContent).toBe('+34 Class Manuals')
     expect(sheet.textContent).toContain('34,000 Class Marks · Exchange')
     expect(sheet.querySelector('[data-classes-tree]')!.textContent).toContain('Duelist · Acolyte · Caller')
-    expect(sheet.textContent).toContain('Her profile → Class → Promote (Rank 10)')
+    expect(sheet.textContent).toContain('Her profile → Skills → Promote (Rank 10)')
     expect(sheet.textContent).toContain('1 Uma moved trade · her running work finished into the Warehouse')
     expect(sheet.querySelector('[data-classes-halls]')!.textContent).toContain('Beryl Hero → Learner · Archdemon’s Toll · Bond 4')
     expect([...sheet.querySelectorAll('[data-classes-umas] li')].map((li) => li.textContent)).toEqual([

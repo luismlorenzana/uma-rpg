@@ -4,15 +4,16 @@
 import { describe, expect, it } from 'vitest'
 import { RPG_ALL_NODES, RPG_NODES, RPG_PIERCE_SCALE, RPG_SKILL_POWER, RPG_TOMEBLADE_DEPTHS, RPG_TOMEBLADE_SPELLS, rpgNode, rpgNodeSkill, rpgTreeNodes } from './catalog'
 import { RPG_BRANCH_B, RPG_BRANCH_B_NAME, rpgBranchNode, rpgNodeIdentity, rpgNodeLine, rpgTreeOf, validRpgLines } from './node-identity'
-import { isRpgTome, RPG_CLASSES, RPG_TIER0_CLASSES, RPG_WEAPONS, type RpgProfile } from './rules'
+import { isRpgTome, RPG_CLASSES, RPG_TIER0_CLASSES, RPG_WEAPONS, rpgClasses, type RpgProfile } from './rules'
 import { rpgSkillRankUps, rpgTreeView } from './tree-view'
 
 const V18 = 18, V19 = 19
 
 describe('the catalog with Classes v3 (H126)', () => {
-  it('holds 960 nodes: 750 to v18, the two hybrids\' 160 and the Tier 0s\' 50; the live list stays 750', () => {
+  it('holds 960 nodes: 750 to v18, the two hybrids\' 160 and the Tier 0s\' 50; the live list is all 960 since H134', () => {
     expect(RPG_ALL_NODES).toHaveLength(960)
-    expect(RPG_NODES).toHaveLength(750)
+    expect(RPG_NODES).toEqual(RPG_ALL_NODES)
+    expect(RPG_ALL_NODES.filter((n) => rpgClasses(V18).includes(n.classId))).toHaveLength(750)
     expect(new Set(RPG_NODES.map((n) => n.classId))).toEqual(new Set(RPG_CLASSES))
     const of = (c: string) => RPG_ALL_NODES.filter((n) => n.classId === c)
     expect([of('tomeblade').length, of('armsummoner').length]).toEqual([80, 80])

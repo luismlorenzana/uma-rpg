@@ -32,18 +32,18 @@ export const BATTLE_HEAL_SCALE = 300
 // Classes v3 and Halls v2 (D240, D241; docs/design/classes-v3/) are engine v19 and save v32 under one stage, `classes`:
 // thirteen classes in a tree (five Tier 0 that promote at Class Rank 10 into eight Tier 1), the calling by running style,
 // and the twenty Limit Breaks. Built dark from H126 (D244, D245), every rule reads `rpgRework('classes', engine)`; H134
-// alone moves BATTLE_ENGINE_VERSION to 19 (and the save to v32). `rpg/battle/v18-replays*.test.ts` pins v18's fights
-// under the live switch and with it mocked to 19. R3–R5 (Tier 2's weapons and classes, Tier 3) were removed by D238: their
+// moved BATTLE_ENGINE_VERSION to 19 (and the save to v32), live since. `rpg/battle/v18-replays.test.ts` pins v18's fights
+// under the live switch. R3–R5 (Tier 2's weapons and classes, Tier 3) were removed by D238: their
 // stages went, but `t2Weapons` stays, at no engine, since the Branch Gem's two gates read it; the Tier 2 re-plan gives it one.
 
 /** The engine new fights start on, and the generation every rule's default reads (D179). Older versions still replay. */
-export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 18
+export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 19
 /** The first engine of classes v2: the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs (D160, D179). */
 export const RPG_V2_ENGINE = 15
 /** Whether an engine plays classes v2's rules. Rules call it with their `engine` argument, never bare. */
 export const rpgV2 = (engine: number = BATTLE_ENGINE_VERSION): boolean => engine >= RPG_V2_ENGINE
 /** The first engine of each release (D198): R1 Tier 1's fight, R2 its economy, weaknesses v2 (D235: every foe her own
- * list, by rank, weaknesses-v2.md), Classes v3 with Halls v2 (D240, D241: dark until H134), and Tier 2's weapons, which
+ * list, by rank, weaknesses-v2.md), Classes v3 with Halls v2 (D240, D241: live since H134), and Tier 2's weapons, which
  * has no engine until the Tier 2 re-plan (D238 removed R3–R5; the Branch Gem's gates read it, so it stays shut). */
 export const RPG_REWORK_ENGINE = { fight: 16, economy: 17, weak: 18, classes: 19, t2Weapons: Infinity } as const
 /** A Tier rework release, by its stage name. */

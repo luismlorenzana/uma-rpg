@@ -265,8 +265,6 @@ export const heroLimitFor = (id: HeroLimitId, version: number): HeroLimit | unde
 /** Her class's Limit Break power in engines v10–v18 (D179): the hybrids' 2.2× from v15 (§5). From v19 the Limit Break's
  * own `power` × `heroLimitScale` replaces it. */
 export const heroLimitPower = (classId: RpgClass, version: number): number => (rpgV2(version) ? POWER_V2 : POWER_V1)[classId]
-/** A seat's Limit Breaks by class, in seat order, in the live generation (kept for the live web until H133). */
-export const heroLimitsOf = (classId: RpgClass): HeroLimit[] => HERO_LIMITS.filter((l) => l.classId === classId)
 /** A hall's Limit Breaks in an engine's generation, in seat order: none for a hall that generation lacks. */
 export const heroLimitsOfHall = (hall: HeroHall, engine: number = BATTLE_ENGINE_VERSION): HeroLimit[] =>
   heroLimitIds(engine).filter((id) => heroLimitHall(id) === hall).map((id) => byVersion(engine).get(id)!)

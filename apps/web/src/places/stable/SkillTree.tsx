@@ -4,7 +4,7 @@
 // branch dimmed, a closed depth faded with its gate, five rank pips on every node and a branch sheet to take the other
 // branch (free; her equipped skills follow). Nothing is learned and nothing costs points (CP14). The model is the domain's
 // `rpgTreeView`, which reads the catalog: only this lazy page imports it.
-// Classes v3 (engine v19; H137, D253, inert until H134): the class button opens the Classes sheet (the class tree) in
+// Classes v3 (engine v19; H137, D253, live since H134): the class button opens the Classes sheet (the class tree) in
 // place of the Class sheet, or the promotion sheet while one waits ("Promote", the Ready dot); a Tier 0's trees are one
 // node each, her skill with her Class Rank "R7/10", and a promotion line; at engine 18 the tab is as before.
 import {

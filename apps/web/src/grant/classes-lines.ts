@@ -22,7 +22,7 @@ const LEAD_TIER1 = 'Every Uma starts her class tree at Rank 1 of her Tier 0.'
 const LEAD_LATER = 'Every Uma starts again at Rank 1 of her class.'
 const STEP_READ_TIER1 = 'Exchange → Read a Class Manual → her Tier 0 → Her share'
 const STEP_READ_LATER = 'Exchange → Read a Class Manual → her class → Her share'
-const STEP_PROMOTE = 'Her profile → Class → Promote (Rank 10)'
+const STEP_PROMOTE = 'Her profile → Skills → Promote (Rank 10)'
 const STEP_PROMOTE_NOTE = 'EXP past Rank 10 goes with her into the new class'
 const RESET = 'Class Ranks · weapons per class · lines · equipped skills · callings'
 const STAYS = 'Uma Levels · weapon, armor and accessory grades · Extra Stats · Craft Levels · Bonds · Hall seats · Laurels · items'
@@ -30,6 +30,8 @@ const WEAPONS = 'No Weapon Rank since R2: grades stay'
 const HALLS_FOOT = 'Each Uma keeps her higher Bond'
 /** Halls v2's merged hall until H133 gives it a place (HV21). */
 const SANCTUM = 'Healer Sanctum'
+/** The two halls the Healer Sanctum merged (save v32, HV18), by the names they had to v18. */
+const OLD_HALLS = 'Paladin Bastion · Cleric Chapel'
 
 const num = (n: number) => n.toLocaleString('en-US')
 
@@ -125,7 +127,8 @@ export function classesLines(record: ClassesV3Record, who: (outfitId: string) =>
     weapons: WEAPONS,
     trades: moved > 0 ? `${num(moved)} ${moved === 1 ? 'Uma' : 'Umas'} moved trade · ${moved === 1 ? 'her' : 'their'} running work finished into the Warehouse` : null,
     halls: merged || record.halls.length > 0 ? {
-      head: `${placeName(HERO_HALL_PLACES.paladin, 'Paladin Bastion')} · ${placeName(HERO_HALL_PLACES.cleric, 'Cleric Chapel')} → ${placeName(HERO_HALL_PLACES.healer, SANCTUM)}`,
+      // The two old halls are history at v19 (no place keeps their names), so the sheet names them as the owner knew them.
+      head: `${OLD_HALLS} → ${placeName(HERO_HALL_PLACES.healer, SANCTUM)}`,
       moves: record.halls.map((move) => ({ outfitId: move.outfitId, label: name(move.outfitId), value: hallMove(move) })),
       foot: HALLS_FOOT,
     } : null,

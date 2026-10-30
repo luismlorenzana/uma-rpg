@@ -1,7 +1,7 @@
 // Save v31 (H114, FL31): v30 work settles without a clock before the Wilds' ten place ids become fifteen. Uncollected
-// output and Craft EXP are paid, queues drop, and everything else stays.
+// output and Craft EXP are paid, queues drop, and everything else stays. Since H134 the chain runs `toV32` after it.
 import { describe, expect, it } from 'vitest'
-import { migrateWorld, toV31 } from './migrations'
+import { migrateWorld, toV31, toV32 } from './migrations'
 import { newSave, parseSave, SAVE_SCHEMA_VERSION, type TierWorld } from './save'
 import { v30Save, v30World } from './v30.fixture'
 
@@ -21,20 +21,23 @@ describe('toV31 (D230, FL31)', () => {
     for (const key of ['wallet', 'parties', 'world', 'targets', 'heroes', 'rift', 'grant'] as const) expect(after[key]).toEqual(before[key])
   })
 
-  it('is chained once after v30', () => {
+  it('is chained once after v30, with toV32 after it', () => {
     const before = raw(v30World())
-    expect(migrateWorld(before, 30)).toEqual(toV31(raw(v30World())))
+    const expected = toV32(toV31(raw(v30World())))
+    expect(migrateWorld(before, 30)).toEqual(expected)
     const v31 = toV31(raw(v30World()))
-    expect(migrateWorld(v31, 31)).toBe(v31)
+    expect(migrateWorld(v31, 31)).toEqual(expected)
+    const v32 = toV32(toV31(raw(v30World())))
+    expect(migrateWorld(v32, 32)).toBe(v32)
   })
 
-  it('parses a stored v30 save and starts new saves at v31', () => {
+  it('parses a stored v30 save through v31 to v32 and starts new saves at v32', () => {
     const parsed = parseSave(JSON.parse(JSON.stringify(v30Save())))
-    expect(parsed.schemaVersion).toBe(31)
+    expect(parsed.schemaVersion).toBe(32)
     expect(Object.values(parsed.tierWorlds).every((world) => Object.keys(world.work).length === 0)).toBe(true)
-    expect(SAVE_SCHEMA_VERSION).toBe(31)
+    expect(SAVE_SCHEMA_VERSION).toBe(32)
     const fresh = newSave('Today', '2026-10-27T12:00:00.000Z')
-    expect(fresh.schemaVersion).toBe(31)
+    expect(fresh.schemaVersion).toBe(32)
     expect(parseSave(JSON.parse(JSON.stringify(fresh)))).toEqual(fresh)
   })
 })

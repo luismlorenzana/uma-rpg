@@ -1,12 +1,10 @@
-// Presets on the twins re-paired (H128; classes-v3.md §3, §3.8, §4.3; CV13), with the switch mocked to 19 (what H134 will
-// make live): a hybrid's Orb or Bell sits on her lead half's kind that twins her lone weapon in v19's pairs, and each
-// hybrid's defaults hold one twin set in both halves, four different sets.
-import { describe, expect, it, vi } from 'vitest'
+// Presets on the twins re-paired (H128; classes-v3.md §3, §3.8, §4.3; CV13), live since H134: a hybrid's Orb or Bell sits
+// on her lead half's kind that twins her lone weapon in v19's pairs, and each hybrid's defaults hold one twin set in both
+// halves, four different sets; v18's pairs stay for v18's fights, engine 18 explicit.
+import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { isRpgTome, rpgAnsweredTwinSets, rpgDefaultWeapons, rpgHand, type RpgClass, type RpgTwinSet, type RpgWeapon } from '../rpg/rules'
 import { presetAccessory, presetKind } from './presets'
-
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(19, await orig()))
 
 const HYBRIDS = ['spellblade', 'tomeblade', 'armsummoner', 'summoner'] as const
 /** Her lead half's and her other half's weapons, by her hand's `lead`. */
@@ -20,7 +18,7 @@ function heldInBoth(classId: RpgClass, weapons: readonly RpgWeapon[], engine?: n
   return lead!.filter((set) => set !== 'twilight' && other!.includes(set))
 }
 
-describe('presets on v19\'s twins (CV13), the switch at 19', () => {
+describe('presets on v19\'s twins (CV13), the live game', () => {
   it('runs with Classes v3 live', () => {
     expect(BATTLE_ENGINE_VERSION).toBe(19)
   })

@@ -67,9 +67,10 @@ function bestiaryRuns(): { boss: number; subboss: number; slots: { boss: number;
 // --- The checks ---------------------------------------------------------------------------------------------------------
 
 describe('the Rift\'s balance (H51)', () => {
-  it('lets Iron\'s guided party win Iron\'s stage 1', () => {
-    const plan = planOf('t1-r1', { kind: 'front', front: 'iron', stage: 1 })
-    expect(fight(plan, guided('iron'), riftSeed('rift:t1:1')).won).toBe(true)
+  it('lets Iron\'s v18 guided party win Iron\'s stage 1', () => {
+    // v18's measure on one seed; v19's Iron build is a coin's edge on it, so balance-v19.test.ts counts eight seeds a run.
+    const plan = planOf('t1-r1', { kind: 'front', front: 'iron', stage: 1 }, 18)
+    expect(fight(plan, guided('iron', 18), riftSeed('rift:t1:1'), 18).won).toBe(true)
   })
 
   it('has Arcane\'s guided party (all magic) lose Iron\'s champion', () => {

@@ -14,6 +14,7 @@ import {
   activeClass, BOND_MAX_LEVEL, bondCapacity, HERO_HALL_PLACES, HERO_LIMIT_IDS, heroLimit, heroLimitHall, heroSeatHome, heroSeatOf, parentsOf, isInFight, itemMinutes, MINUTE, classRankOf, classTrack,
   highestGrade, KEY_LABELS, partyOf, placeById,
   CRAFT_LABEL, CRAFT_SHORT, PROFESSION_MAX_LEVEL, professionExpToNext, projectRpgStats, RPG_CLASSES, RPG_TIER_MAX_LEVEL, rpgActiveSlots, umaLoadout,
+  rpgClassExpToNext, rpgClassMaxRank, rpgIsTier0, type RpgClass,
   rpgExpToNext, rpgRework, rpgV2, SaveRuleError, skillText, umaBattleSheet, umaProfile, umaTrade, slotJobOf,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld, type UmaUpgrades, umaPick,
 } from '@rpg/domain'
@@ -35,10 +36,9 @@ import { tradeLabel } from '../../save/trade'
 import { HelpButton } from '../../ui/HelpButton'
 import { BackIcon, TargetIcon, TicketIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
-import { fill } from '../../ui/RankBars'
 import { EquipView, upgradeCount, UpgradeView } from './GearCardV3'
 import { SkillsPage } from './SkillsPage'
-import { CallingCard, TemplateChip } from './TemplateCard'
+import { TemplateChip } from './TemplateCard'
 import { racingTemplate } from './template-view'
 
 const STAT_NAMES: Record<string, string> = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' }
@@ -187,7 +187,6 @@ function Summary({ outfit, owned, world, onClass }: { outfit: RosterOutfit; owne
         <Bar value={next ? owned.exp : 1} max={next ?? 1} tone="exp" />
         <p className="mt-0.5 text-[11px] text-ink-faint">{next ? `${owned.exp} / ${next} EXP` : `Max level · ${owned.exp} EXP banked`}</p>
       </div>
-      <CallingCard outfit={outfit} uma={owned} />
       <div className="grid grid-cols-[1.1fr_.8fr_1.1fr] gap-1">
         <button type="button" onClick={onClass} aria-label={`${CLASS_LABEL[active]}, Class Rank ${classRankOf(owned.ranks, active)}`}
           className="flex min-h-12 min-w-0 items-center gap-1.5 rounded-sm bg-raised px-2 text-left">
@@ -315,7 +314,19 @@ function BattleTab({ outfit, uma, world, onClass }: { outfit: RosterOutfit; uma:
 
 // --- Skills: class, weapons, trees (D86), then every class's rank ------------------------------------------------
 
+/** The Class Ranks grid's classes: before v19 the generation's six; from v19 (Classes v3, H134) in Tier 1's world the five
+ * Tier 0s and the Tier 1 classes she holds (promoted into), in a later world the eight Tier 1 classes. */
+export function rankGridClasses(uma: Pick<OwnedUma, 'ranks'>, tier: number | string): RpgClass[] {
+  if (!rpgRework('classes')) return [...RPG_CLASSES]
+  return RPG_CLASSES.filter((c) => (rpgIsTier0(c) ? Number(tier) === 1 : Number(tier) !== 1 || !!uma.ranks.classes[c]))
+}
+/** A class's bar on its own ladder: a Tier 0's to Rank 10 (from v19), anyone else's the Uma Level's curve. */
+function classFill(classId: RpgClass, track: { rank: number; exp: number }): { value: number; max: number } {
+  return track.rank >= rpgClassMaxRank(classId) ? { value: 1, max: 1 } : { value: track.exp, max: rpgClassExpToNext(classId, track.rank) }
+}
+
 function SkillsTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
+  const tier = useActiveTier()
   return (
     <div className="space-y-2">
       <SkillsPage outfit={outfit} name={outfit.name} />
@@ -323,9 +334,9 @@ function SkillsTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma
       <section className="rounded-sm bg-raised p-2">
         <p className="text-[11px] text-ink-faint">Class Ranks</p>
         <div className="mt-1 grid grid-cols-3 gap-1" aria-label="Class Ranks">
-          {RPG_CLASSES.map((c) => {
+          {rankGridClasses(uma, tier).map((c) => {
             const track = classTrack(uma.ranks, c)
-            const progress = fill('class', track)
+            const progress = classFill(c, track)
             return (
               <div key={c} className="rounded-xs bg-panel px-1.5 py-1" aria-label={`${CLASS_LABEL[c]} Rank ${track.rank}`}>
                 <span className="flex items-center gap-1">

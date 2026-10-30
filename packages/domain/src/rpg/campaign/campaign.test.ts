@@ -99,10 +99,11 @@ describe('rewards (D51)', () => {
   })
 })
 
-/** An invented Lv1 party: five Brawlers with no skills, on the live generation's three weapons. */
+/** An invented Lv1 party: five Recruits with no skills, on the live generation's three weapons (from v19, live since H134,
+ * a fresh Uma's class is her Tier 0; a Tier 1 class opens at Class Rank 10, CV8). */
 function member(id: string, level = 1): RpgProfile {
   return { outfitId: id, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
-    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0.1, wit: 0.1 }, classId: 'brawler', weapons: rpgDefaultWeapons('brawler'),
+    growthRates: { speed: 0.1, stamina: 0.1, power: 0.1, guts: 0.1, wit: 0.1 }, classId: 'recruit', weapons: rpgDefaultWeapons('recruit'),
     tier: 1, level, exp: 0, tree: [], legacy: [], classRank: level }
 }
 const party = ['m1', 'm2', 'm3', 'm4', 'm5'].map((id) => ({ profile: member(id), loadout: [] }))

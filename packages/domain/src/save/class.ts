@@ -2,7 +2,7 @@
 // party (H59). Kept out of `save/battle.ts` so the main bundle and the party screens can read them without loading the
 // fight rules and the engine, which only the lazy `@rpg/domain/battle` subpath reaches (H62). `save/battle.ts`
 // re-exports all of it. Pure.
-// Classes v3 (engine v19, D240; H126, dark until H134): her class when none is chosen reads her world (her calling's Tier 0
+// Classes v3 (engine v19, D240; H126, live since H134): her class when none is chosen reads her world (her calling's Tier 0
 // in Tier 1's, its suggested promotion later) and the classes she holds; her class tree as the screens draw it is
 // `save/class-tiles.ts` (H137), which loads with the screens that draw it.
 import type { Aptitudes } from '@luismlorenzana/uma-data'

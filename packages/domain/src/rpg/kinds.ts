@@ -43,7 +43,7 @@ const RPG_V3_CLASSES: readonly RpgClass[] = [...RPG_TIER0_CLASSES, 'brawler', 's
 export function rpgClasses(engine: number = BATTLE_ENGINE_VERSION): readonly RpgClass[] {
   return rpgRework('classes', engine) ? RPG_V3_CLASSES : rpgV2(engine) ? RPG_V2_CLASSES : RPG_V1_CLASSES
 }
-/** The live classes: the five until the switch (H61), the six after; thirteen from H134. Every list, picker and parser
+/** The live classes: the five until H61, the six to v18; thirteen since H134. Every list, picker and parser
  * reads this. */
 export const RPG_CLASSES: readonly RpgClass[] = rpgClasses()
 /** A Tier 0 class (Classes v3, CV5): the ids exist in every generation's tables, the class only from engine v19. */

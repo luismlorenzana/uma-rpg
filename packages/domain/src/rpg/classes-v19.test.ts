@@ -14,11 +14,12 @@ const V15 = 15, V16 = 16, V17 = 17, V18 = 18, V19 = 19
 const A = 'arms', T = 'tome'
 
 describe('the thirteen classes (CV4, §13)', () => {
-  it('lists six to v18 and thirteen from v19, in the tree\'s order; the live list stays six until H134', () => {
+  it('lists six to v18 and thirteen from v19, in the tree\'s order; the live list is thirteen since H134', () => {
     expect(rpgClasses(V18)).toEqual(['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'paladin'])
     expect(rpgClasses(V19)).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice', 'brawler', 'spellblade', 'armsummoner', 'paladin',
       'cleric', 'summoner', 'tomeblade', 'mage'])
-    expect(rpgClasses()).toEqual(RPG_V2_CLASSES)
+    expect(rpgClasses()).toEqual(rpgClasses(V19))
+    expect(rpgClasses(V18)).toEqual(RPG_V2_CLASSES)
     expect(rpgClasses(V19).filter(rpgIsTier0)).toEqual(RPG_TIER0_CLASSES)
     // One healer a party: the Paladin and the Cleric; a Tier 0 is none (CV22).
     expect(RPG_HEALERS).toEqual(['paladin', 'cleric'])
@@ -62,7 +63,8 @@ describe('each class\'s v19 row (§2.4, §3, §3.8)', () => {
 
   it('keeps v18\'s rows: the Summoner on Dark, Light and Bow with her Orb on Light, every other class as v19', () => {
     expect(rpgDefaultWeapons('summoner', V18)).toEqual(['tome-dark', 'tome-light', 'bow'])
-    expect(rpgDefaultWeapons('summoner')).toEqual(['tome-dark', 'tome-light', 'bow'])
+    // The live default is v19's since H134.
+    expect(rpgDefaultWeapons('summoner')).toEqual(['tome-dark', 'tome-ice', 'axe'])
     expect(form('summoner', V18)).toBe('orb light')
     for (const c of rpgClasses(V18).filter((x) => x !== 'summoner')) {
       expect(rpgDefaultWeapons(c, V18), c).toEqual(rpgDefaultWeapons(c, V19))

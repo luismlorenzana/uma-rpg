@@ -36,8 +36,8 @@ function worldWith(tier: number, continents: readonly number[]): TierWorld {
 }
 
 describe('the farm by line (save v31)', () => {
-  it('is the live save', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(31)
+  it('is in the live save (v32 since H134, which keeps the farm by line as it is)', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(32)
   })
 
   it('lets the Warehouse hold the hundred line items and Tome Ink (FL5, FL14)', () => {

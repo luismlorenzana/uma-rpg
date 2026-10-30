@@ -17,7 +17,7 @@
 // accessory's base form and her signature join the damage stack (H75, D212): `flat` and `signature` in a hit's offense,
 // the Insignia a factor after the weak step, and the Bell's follow-up after an act with an Attack (`ring`).
 // v18 changes generated world-foe weakness lists and the Summoner's Tome hand; the reducer otherwise keeps v17's rules.
-// v19 classes v3 (D240, D241), dark until H134: thirteen classes, Tier 0, hands' lead half from data; H128's shapes and
+// v19 classes v3 (D240, D241), live since H134: thirteen classes, Tier 0, hands' lead half from data; H128's shapes and
 // twins, H129's Limit Breaks. A Tier 0 fights only in Tier 1's world at Class Rank 1–10, a Tier 1 class there only from
 // Class Rank 10; her one skill's power is her Class Rank's (`rpgSkillFactor`), her open depth 1.
 // Older fights replay unchanged: every class rule the engine reads takes the fight's own version (`battle/caps.ts`).

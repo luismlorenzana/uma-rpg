@@ -1,11 +1,12 @@
 import {
-  newOwnedUma, newSave, type BattleEnemy, type BattleOutfit, type EnemyTier, type Franchise, type RiftRun, type RosterMember, type RpgClass,
-  type TierWorld,
+  newOwnedUma, newSave, type BattleEnemy, type BattleOutfit, type EnemyTier, type Franchise, type OwnedUma, type RiftRun, type RosterMember,
+  type RpgClass, type TierWorld,
 } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import {
-  ascendLines, ascendNumbers, bestParty, convergenceMissing, frontPartyBlock, guidanceMatch, guidedWeapons, levelPartyBlock, partyGuidance, partyHolding,
-  riftFinaleFaces, riftFinalePlans, riftHome, riftRefLabel, riftRefTitle, suggestConvergence,
+  ascendLines, ascendNumbers, bestParty, convergenceMissing, frontPartyBlock, guidanceFit, guidanceMatch, guidanceNeeds, guidedPlan, guidedWeapons,
+  levelPartyBlock, needLine, partyClassesOf, partyFit, partyGuidance, partyHeldOf, partyHolding, riftFinaleFaces, riftFinalePlans, riftHome,
+  riftRefLabel, riftRefTitle, suggestConvergence,
 } from './rift-view'
 
 const NOW = '2026-10-22T12:00:00.000Z'
@@ -18,27 +19,30 @@ const outfit = (id: string): BattleOutfit => ({
   aptitudes: { strategy: { front: 'A', pace: 'G', late: 'G', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
 })
 const OUTFITS: ReadonlyMap<string, BattleOutfit> = new Map(ids(101, 40).map((id) => [id, outfit(id)]))
-/** The guided parties, Iron's to Horde's (classes v2's, D178 point 5): parties 0–3 hold the twenty in those classes. */
+/** The guided parties, Iron's to Horde's (Classes v3's, CV23): parties 0–3 hold the twenty in those classes. */
 const GUIDED: RpgClass[][] = [
-  ['brawler', 'brawler', 'spellblade', 'spellblade', 'paladin'],
-  ['mage', 'mage', 'summoner', 'summoner', 'cleric'],
-  ['brawler', 'brawler', 'mage', 'mage', 'paladin'],
-  ['spellblade', 'spellblade', 'summoner', 'summoner', 'cleric'],
+  ['brawler', 'brawler', 'spellblade', 'armsummoner', 'paladin'],
+  ['mage', 'mage', 'tomeblade', 'summoner', 'cleric'],
+  ['spellblade', 'spellblade', 'tomeblade', 'tomeblade', 'paladin'],
+  ['armsummoner', 'armsummoner', 'summoner', 'summoner', 'cleric'],
 ]
+/** Iron's guided party in classes v2 (D178 point 5), for v16's guided weapons. */
+const IRON_V2: RpgClass[] = ['brawler', 'brawler', 'spellblade', 'spellblade', 'paladin']
 
 /**
- * Tier 1: the run's twenty in parties 0–3 (Iron's, Arcane's, Duel's and Horde's classes, but listed Horde first so the
- * suggestion has to sort them), party 4 with a Lv 49, party 5 with an Uma off the roster, party 6 with an empty slot.
+ * Tier 1: the run's twenty in parties 0–3 (Iron's, Arcane's, Duel's and Horde's classes, each held at Class Rank 10, but
+ * listed Horde first so the suggestion has to sort them), party 4 with a Lv 49, party 5 with an Uma off the roster, party 6
+ * with an empty slot (those three Recruits).
  */
 function fixture(): { world: TierWorld; run: Pick<RiftRun, 'roster'> } {
   const world = newSave('Rift view', NOW).tierWorlds['1']!
   const order = [3, 0, 1, 2]
   order.forEach((guided, p) => GUIDED[guided]!.forEach((classId, k) => {
     const id = TWENTY[p * 5 + k]!
-    world.umas[id] = { ...newOwnedUma(NOW), level: 50, classId }
+    world.umas[id] = { ...newOwnedUma(NOW), level: 50, classId, ranks: { classes: { [classId]: { rank: 10, exp: 0 } } } }
     world.parties[p]!.slots[k] = id
   }))
-  ids(121, 15).forEach((id) => { world.umas[id] = { ...newOwnedUma(NOW), level: 50, classId: 'brawler' } })
+  ids(121, 15).forEach((id) => { world.umas[id] = { ...newOwnedUma(NOW), level: 50, classId: 'recruit' } })
   world.umas['125'] = { ...world.umas['125']!, level: 49 }
   world.parties[4]!.slots = ids(121, 5)
   world.parties[5]!.slots = ids(126, 5)
@@ -60,11 +64,11 @@ describe('the Rift’s labels (H50)', () => {
     expect(riftHome({ kind: 'echo', front: 'iron', level: '50' })).toBe('')
   })
 
-  it('reads each front’s party guidance: classes v2’s, live since H61', () => {
-    expect(partyGuidance('iron')).toBe('2 Brawler · 2 Spell Blade · Paladin')
-    expect(partyGuidance('arcane')).toBe('2 Mage · 2 Summoner · Cleric')
-    expect(partyGuidance('duel')).toBe('2 Brawler · 2 Mage · Paladin')
-    expect(partyGuidance('horde')).toBe('2 Spell Blade · 2 Summoner · Cleric')
+  it('reads each front’s party guidance: Classes v3’s builds by family, live since H134', () => {
+    expect(partyGuidance('iron')).toBe('2 Brawler · Arms Spellblade · Arms Summoner · Paladin')
+    expect(partyGuidance('arcane')).toBe('2 Sorcerer · Tome Spellblade · Tome Summoner · Cleric')
+    expect(partyGuidance('duel')).toBe('2 Arms Spellblade · 2 Tome Spellblade · Paladin')
+    expect(partyGuidance('horde')).toBe('2 Arms Summoner · 2 Tome Summoner · Cleric')
   })
 })
 
@@ -89,7 +93,7 @@ describe('which parties can fight', () => {
     const { world, run } = fixture()
     expect(guidanceMatch(GUIDED[0]!, 'iron')).toBe(5)
     expect(guidanceMatch(GUIDED[1]!, 'iron')).toBe(0)
-    expect(guidanceMatch(GUIDED[3]!, 'arcane')).toBe(3)
+    expect(guidanceMatch(GUIDED[3]!, 'arcane')).toBe(2)
     expect(bestParty(world, 'iron', OUTFITS, (i) => frontPartyBlock(world, run, i))).toBe(1)
     expect(bestParty(world, 'horde', OUTFITS, (i) => frontPartyBlock(world, run, i))).toBe(0)
     expect(bestParty(world, 'iron', OUTFITS, () => 'No')).toBeNull()
@@ -129,8 +133,8 @@ describe('which parties can fight', () => {
 
 describe('the guided weapons (CP7, H70)', () => {
   it('pairs a party\'s members to the front\'s build by class, in party order', () => {
-    // Iron's build: the first Brawler and Spell Blade on their defaults, the second ones on the Bow and the Katana.
-    expect(guidedWeapons(GUIDED[0]!, 'iron', 16)).toEqual([
+    // v16's Iron build: the first Brawler and Spell Blade on their defaults, the second ones on the Bow and the Katana.
+    expect(guidedWeapons(IRON_V2, 'iron', 16)).toEqual([
       ['greatsword', 'axe', 'lance'], ['bow', 'katana', 'axe'],
       ['katana', 'lance', 'tome-lightning'], ['bow', 'greatsword', 'tome-fire'],
       ['greatsword', 'axe', 'tome-light'],
@@ -140,8 +144,11 @@ describe('the guided weapons (CP7, H70)', () => {
       ['greatsword', 'axe', 'tome-light'], ['greatsword', 'axe', 'lance'], null, ['bow', 'katana', 'axe'], null,
     ])
     expect(guidedWeapons([null, 'cleric'], 'arcane', 16)).toEqual([null, ['tome-light', 'tome-ice', 'bow']])
-    // The live build is v16's.
-    expect(guidedWeapons(GUIDED[0]!, 'iron')).toEqual(guidedWeapons(GUIDED[0]!, 'iron', 16))
+    // The live build is v19's: Iron's second Brawler on the Bow, Katana and Axe, its Arms Summoner on her defaults.
+    const live = guidedWeapons(GUIDED[0]!, 'iron')
+    expect(live).toEqual(guidedWeapons(GUIDED[0]!, 'iron', 19))
+    expect(live[1]).toEqual(['bow', 'katana', 'axe'])
+    expect(live.every((w) => w !== null)).toBe(true)
   })
 })
 
@@ -194,5 +201,102 @@ describe('the finale’s faces (H52)', () => {
     expect(faces).toEqual([...new Set(bosses)])
     // Two champions on Iron, Arcane and the Horde, one on the Duel, twice over: no face repeats while unused ones remain.
     expect(faces).toHaveLength(14)
+  })
+})
+
+// --- The guidance by held classes (Classes v3, CV §10.1; H134): a rebuilt party counts the classes its members hold, not
+// only the ones they fight as; each guided class the party leaves empty names who could fill it, Ready to promote first.
+
+type Ranks = Partial<Record<RpgClass, number>>
+const rebuilt = (classId: RpgClass | null, ranks: Ranks): OwnedUma => ({
+  ...newOwnedUma(NOW), level: 50, classId,
+  ranks: { classes: Object.fromEntries(Object.entries(ranks).map(([c, rank]) => [c, { rank, exp: 0 }])) },
+})
+
+/**
+ * Tier 1 after the reset, rebuilt (every outfit a Front runner, her Tier 0 the Recruit): party 0 (101–105) fights as Tier
+ * 0s: 101 holds the Brawler, 102 the Brawler and the Arms Spellblade, 104 the Paladin; 103 and 105 hold no Tier 1 class.
+ * Party 1 (106–110) are five Recruits at Rank 1. The roster's others: 111 holds the Arms Summoner, 112 a Recruit at R10 and
+ * 113 a Caller at R10 (both Ready for it), 114 a Recruit at R9.
+ */
+function rebuiltFixture(): { world: TierWorld; roster: string[] } {
+  const world = newSave('Rift v19', NOW).tierWorlds['1']!
+  const umas: Record<string, OwnedUma> = {
+    101: rebuilt('recruit', { recruit: 10, brawler: 12 }),
+    102: rebuilt(null, { recruit: 10, brawler: 10, spellblade: 10 }),
+    103: rebuilt('duelist', { duelist: 4 }),
+    104: rebuilt('acolyte', { acolyte: 10, paladin: 10 }),
+    105: rebuilt('recruit', {}),
+    111: rebuilt('caller', { caller: 10, armsummoner: 11 }),
+    112: rebuilt('recruit', { recruit: 10 }),
+    113: rebuilt('caller', { caller: 10 }),
+    114: rebuilt('recruit', { recruit: 9 }),
+  }
+  for (const id of ids(106, 5)) umas[id] = rebuilt(null, {})
+  world.umas = umas
+  world.parties[0]!.slots = ids(101, 5)
+  world.parties[1]!.slots = ids(106, 5)
+  return { world, roster: [...ids(101, 10), '111', '114', '112', '113'] }
+}
+
+describe('the Rift’s guidance by held classes (CV §10.1, H134)', () => {
+  it('counts the classes a rebuilt party holds, where its active classes count none', () => {
+    const { world } = rebuiltFixture()
+    const party = ids(101, 5)
+    expect(guidanceMatch(partyClassesOf(world, party, OUTFITS), 'iron')).toBe(0)
+    const held = partyHeldOf(world, party, OUTFITS)
+    expect(held[0]).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice', 'brawler'])
+    expect(held[1]![0]).toBe('recruit')
+    expect(held[1]).toEqual(expect.arrayContaining(['brawler', 'spellblade']))
+    // Iron: Brawler, Brawler (Bow, Katana, Axe), Arms Spellblade, Arms Summoner, Paladin. 101 and 102 take two of the three
+    // Arms slots between them, 104 the Paladin.
+    const fit = guidanceFit(held, 'iron')
+    expect(fit.filter((m) => m !== null)).toHaveLength(3)
+    expect(fit[4]).toBe(3)
+    expect(partyFit(world, party, 'iron', OUTFITS)).toBe(3)
+    expect(partyFit(world, ids(106, 5), 'iron', OUTFITS)).toBe(0)
+  })
+
+  it('seats a member on the class she fights as before one she only holds', () => {
+    const { world } = rebuiltFixture()
+    world.umas['104'] = { ...world.umas['104']!, classId: 'paladin' }
+    const plan = guidedPlan(partyHeldOf(world, ids(101, 5), OUTFITS), 'iron')
+    expect(plan[3]).toEqual({ classId: 'paladin', weapons: ['greatsword', 'axe', 'tome-light'], switch: false })
+    // The others switch with the tap: their Tier 0 isn't in the build.
+    expect(plan[0]).toMatchObject({ classId: 'brawler', switch: true })
+    expect(plan[1]).toMatchObject({ switch: true })
+    expect([plan[2], plan[4]]).toEqual([null, null])
+  })
+
+  it('suggests the party that holds the most of a front’s classes', () => {
+    const { world, roster } = rebuiltFixture()
+    const block = (i: number) => (i <= 1 ? null : 'Needs five')
+    expect(bestParty(world, 'iron', OUTFITS, block)).toBe(0)
+    expect(suggestConvergence(world, { roster }, OUTFITS)[0]).toBe(0)
+  })
+
+  it('names each guided class the party leaves empty, with who could fill it: Ready to promote first, then Holds it', () => {
+    const { world, roster } = rebuiltFixture()
+    const needs = guidanceNeeds(world, ids(101, 5), 'iron', roster, OUTFITS)
+    const summoner = needs.find((n) => n.classId === 'armsummoner')!
+    expect(needLine(summoner, (c) => ({ armsummoner: 'Arms Summoner' } as Record<string, string>)[c]!)).toBe('Needs an Arms Summoner')
+    expect(summoner.umas).toEqual([{ outfitId: '112', ready: true }, { outfitId: '113', ready: true }, { outfitId: '111', ready: false }])
+    expect(needs.map((n) => [n.classId, n.count])).toHaveLength(2)
+    // The party's empty Arms slot (a Brawler or the Arms Spellblade): 112 is Ready for both, 111 holds neither.
+    const arms = needs.find((n) => n.classId !== 'armsummoner')!
+    expect(['brawler', 'spellblade']).toContain(arms.classId)
+    expect(arms.umas[0]).toEqual({ outfitId: '112', ready: true })
+    // A party of five Recruits at Rank 1 needs all five, a Brawler twice.
+    const fresh = guidanceNeeds(world, ids(106, 5), 'iron', roster, OUTFITS)
+    expect(fresh.map((n) => [n.classId, n.count])).toEqual([['brawler', 2], ['spellblade', 1], ['armsummoner', 1], ['paladin', 1]])
+    expect(needLine(fresh[0]!, () => 'Brawler')).toBe('Needs 2 Brawlers')
+    expect(needLine(fresh[3]!, () => 'Paladin')).toBe('Needs a Paladin')
+    // Ready first (112, a Recruit at R10), then the roster's Brawlers in its order (101, 102: party 0, not this one).
+    expect(fresh[0]!.umas.map((u) => u.outfitId)).toEqual(['112', '101', '102'])
+  })
+
+  it('needs nothing before v19', () => {
+    const { world, roster } = rebuiltFixture()
+    expect(guidanceNeeds(world, ids(101, 5), 'iron', roster, OUTFITS, 1, 18)).toEqual([])
   })
 })

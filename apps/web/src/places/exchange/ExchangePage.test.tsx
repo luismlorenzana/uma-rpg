@@ -1,6 +1,7 @@
 // The Exchange's Class Manual route (H132, shared with H120's door): `/town/exchange/manual` opens the sheet on the
 // picker, `/town/exchange/manual/:outfitId` on her bars; a tap selects a bar and a count, the footer reads them and the
-// sheet stays open; closing it replaces the URL with `/town/exchange`, keeping the navigation state. The live engine (v18).
+// sheet stays open; closing it replaces the URL with `/town/exchange`, keeping the navigation state. The live engine (v19
+// since H134): Aster, a Brawler R34 in Tier 1's world, has the five Tier 0 bars and her Brawler's.
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
 import { configureKit, MotionRoot } from '@luismlorenzana/uma-kit/ui'
 import { placeById } from '@rpg/domain'
@@ -66,6 +67,7 @@ describe('the Manual sheet\'s route (H132, H120)', () => {
     expect(within(dialog()).getByRole('button', { name: 'Aster' })).toBeDefined()
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Aster' }))
     await waitFor(() => expect(where()).toBe('/town/exchange/manual/81001 {"back":true}'))
+    // The five Tier 0s and the Brawler she holds.
     await waitFor(() => expect(document.querySelectorAll('[data-manual-bar]')).toHaveLength(6))
   })
 
@@ -90,11 +92,11 @@ describe('the Manual sheet\'s route (H132, H120)', () => {
     fixture.world.wallet.classMarks = 7_000
     show('/town/exchange/manual/81001')
     await screen.findByRole('dialog', { name: 'Read a Class Manual' })
-    fireEvent.click(document.querySelector('[data-manual-bar="mage"]')!)
-    expect(document.querySelector('[data-manual-bar="mage"]')!.getAttribute('aria-pressed')).toBe('true')
+    fireEvent.click(document.querySelector('[data-manual-bar="duelist"]')!)
+    expect(document.querySelector('[data-manual-bar="duelist"]')!.getAttribute('aria-pressed')).toBe('true')
     expect(document.querySelector<HTMLButtonElement>('[data-manual-count="10"]')!.disabled).toBe(true)
-    // 136 + 152 + 168 + 184 + 200 = 840 of 1,000.
-    expect(document.querySelector('[data-manual-step]')!.getAttribute('data-manual-step')).toBe('Mage R1 → R6')
+    // A Tier 0's own curve: 272 + 304 + 336 = 912 of 1,000.
+    expect(document.querySelector('[data-manual-step]')!.getAttribute('data-manual-step')).toBe('Duelist R1 → R4')
   })
 
   it('closing it lands on /town/exchange with the navigation state kept; Choose another Uma goes back to the picker', async () => {

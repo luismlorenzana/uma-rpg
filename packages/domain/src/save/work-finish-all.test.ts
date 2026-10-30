@@ -2,6 +2,7 @@
 // ⌈remaining ÷ 30 minutes⌉; finishing spends exactly that and starts each queue at once; short tickets refuse; one
 // running job has no Finish all.
 import { describe, expect, it } from 'vitest'
+import { SAVE_SCHEMA_VERSION } from './version'
 import { stepMinutes } from '../economy/pacing'
 import { ECONOMY_V3_NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { worldOf } from './rules'
@@ -21,7 +22,7 @@ function saveWith(timeTickets: number): Save {
   const world = gradedWorld({ wallet: { ...base.wallet, timeTickets },
     umas: Object.fromEntries(['101', '102', '103'].map((id) => [id, gradedUma({ craft: { level: 1, exp: 0 } })])) })
   return {
-    schemaVersion: 31,
+    schemaVersion: SAVE_SCHEMA_VERSION,
     account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
     tierWorlds: { 1: world },
   }

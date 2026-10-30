@@ -1,9 +1,9 @@
-// Save v32's strict parse and rules (H130; classes-v3.md §8, §13, §14.3; halls-v2.md §7.3), with the switch mocked to 19
-// (the classes stage live): the v31 save through `toV32` parses and its two open v18 fights replay to their frozen ends;
-// unmigrated it doesn't; v32's rules are refused one by one; a new save and a new unlock round-trip; the sheet's `seen`,
-// "Her share" counting down, and the open world fight settling after the reset. (Unmocked, today's v31 saves parse and
-// round-trip unchanged: `migrations-v32.test.ts`.)
-import { describe, expect, it, vi } from 'vitest'
+// Save v32's strict parse and rules (H130; classes-v3.md §8, §13, §14.3; halls-v2.md §7.3), live since H134 (the classes
+// stage): the v31 save through `toV32` parses and its two open v18 fights replay to their frozen ends; unmigrated it
+// doesn't; v32's rules are refused one by one; a new save and a new unlock round-trip; the sheet's `seen`, "Her share"
+// counting down, and the open world fight settling after the reset. (A stored v31 save, labelled 31, runs `toV32` through
+// the chain: `migrations-v32.test.ts`.)
+import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { HERO_LIMIT_IDS } from '../rpg/hero-id'
 import { RPG_TIER0_BANK } from '../rpg/rules'
@@ -15,24 +15,22 @@ import { markClassesV3Seen, unlockUma, worldOf } from './rules'
 import { newSave, parseSave, SAVE_SCHEMA_VERSION, type Save } from './save'
 import { UMA, v18Replay, V31_RIFT_FIGHT, V31_T, V31_WORLD_FIGHT, v31Save, v31WorldChapter } from './v31.fixture'
 
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(19, await orig()))
-
 type Raw = Record<string, unknown>
 type RawUma = Raw & { ranks: { classes: Raw }; classes: Raw; bonds: Raw }
 type RawWorld = Raw & { umas: Record<string, RawUma>; classesV3: Raw & { umas: Record<string, Raw> } }
 const NOW = '2026-10-29T12:00:00.000Z'
-/** The v31 save with every world through `toV32`, still labelled 31 (H134 bumps it), and `change` on its worlds. */
+/** The v31 save with every world through `toV32`, labelled 32 (so the chain leaves it), and `change` on its worlds. */
 function v32Save(change: (worlds: { '1': RawWorld; '2': RawWorld }) => void = () => {}): Raw {
   const save = JSON.parse(JSON.stringify(v31Save())) as Raw & { tierWorlds: Record<string, Raw> }
   const tierWorlds = Object.fromEntries(Object.entries(save.tierWorlds).map(([k, w]) => [k, toV32(w, Number(k))]))
   change(tierWorlds as { '1': RawWorld; '2': RawWorld })
-  return JSON.parse(JSON.stringify({ ...save, tierWorlds })) as Raw
+  return JSON.parse(JSON.stringify({ ...save, schemaVersion: 32, tierWorlds })) as Raw
 }
 const parsed = (): Save => parseSave(v32Save())
 
 describe('save v32\'s parse (H130), the classes stage live', () => {
-  it('runs with the classes stage live in this file, the schema still 31', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('classes'), SAVE_SCHEMA_VERSION]).toEqual([19, true, 31])
+  it('runs with the classes stage live and the schema 32 (H134)', () => {
+    expect([BATTLE_ENGINE_VERSION, rpgRework('classes'), SAVE_SCHEMA_VERSION]).toEqual([19, true, 32])
   })
 
   it('parses the v31 save through toV32, round-trips it, and its two open v18 fights replay to their frozen ends', () => {
@@ -49,8 +47,8 @@ describe('save v32\'s parse (H130), the classes stage live', () => {
     }
   })
 
-  it('refuses the same save unmigrated: her calling pick, then a Paladin seat', () => {
-    const v31 = JSON.parse(JSON.stringify(v31Save())) as { tierWorlds: Record<string, RawWorld> }
+  it('refuses the same save unmigrated (labelled 32, so the chain skips toV32): her calling pick, then a Paladin seat', () => {
+    const v31 = JSON.parse(JSON.stringify({ ...v31Save(), schemaVersion: 32 })) as { tierWorlds: Record<string, RawWorld> }
     expect(() => parseSave(v31)).toThrow(/umas\.100: unknown keys calling/)
     for (const world of Object.values(v31.tierWorlds)) for (const uma of Object.values(world.umas)) delete uma.calling
     expect(() => parseSave(v31)).toThrow(/umas\.100\.bonds\.paladin-2: not a Hero seat/)

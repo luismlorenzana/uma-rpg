@@ -4,8 +4,9 @@ A personal, never-distributed party RPG inspired by *Umamusume: Pretty Derby* an
 owner's iPhone as a Home Screen web app at https://uma-rpg.web.app. It has:
 
 - a three-page Hub of the Wilds, halls and town;
-- per-Uma leveling with six classes, three weapons a class and fifty skill trees (a trunk, one fork, Skill Ranks), one
-  healer a party, and each Uma's calling and template;
+- per-Uma leveling with thirteen classes in a tree (five Tier 0s that promote at Class Rank 10 into eight Tier 1
+  classes), three weapons a class and seventy skill trees (a trunk, one fork, Skill Ranks), one healer a party, and
+  each Uma's calling and template;
 - the farm by line: fifteen Wilds places where each trade gathers, processes and makes its own line's G1–G10 items, which
   raise her gear by grade and open her Extra Stats (the Planet and its moons);
 - a world map of five continents and turn-based party battles with weaknesses, Breaks, waves and Limit Breaks;
@@ -13,9 +14,9 @@ owner's iPhone as a Home Screen web app at https://uma-rpg.web.app. It has:
 
 ## Status
 
-Tier 1 is built and live (engine v18, save v31): the Tier rework's R1 and R2 and the owner's iterations since. **The
-current phase is Tier 1 hardening** ([docs/handoff/](docs/handoff/README.md)); Tier 2 and Tier 3 run Tier 1's rules ×
-tier until they are re-planned after it. See the cross-game [roadmap](https://github.com/luismlorenzana/uma-platform/blob/main/docs/roadmap.md).
+Tier 1 is built and live (engine v19, save v32): the Tier rework's R1 and R2, Classes v3 and Halls v2, and the owner's
+iterations since. **The current phase is Tier 1 hardening** ([docs/handoff/](docs/handoff/README.md)); Tier 2 and Tier 3
+run Tier 1's rules × tier until they are re-planned after it. See the cross-game [roadmap](https://github.com/luismlorenzana/uma-platform/blob/main/docs/roadmap.md).
 
 ## Documentation
 

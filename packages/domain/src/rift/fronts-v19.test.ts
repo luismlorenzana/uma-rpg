@@ -50,9 +50,10 @@ describe('the Rift\'s builds by family (CV23)', () => {
     expect(count(twenty)).toEqual({ brawler: 2, mage: 2, spellblade: 3, tomeblade: 3, armsummoner: 3, summoner: 3, paladin: 2, cleric: 2 })
   })
 
-  it('keeps v18\'s guidance and the live fronts until H134', () => {
+  it('keeps v18\'s guidance; the live fronts are v19\'s since H134', () => {
     expect(riftParty('duel', V18)).toEqual(['brawler', 'brawler', 'mage', 'mage', 'paladin'])
     expect(riftGuidedBuild('iron', V18).map((m) => m.classId)).toEqual(['brawler', 'brawler', 'spellblade', 'spellblade', 'paladin'])
-    expect(RIFT_FRONT_SPECS).toEqual(riftFrontSpecs(V18))
+    expect(RIFT_FRONT_SPECS).toEqual(riftFrontSpecs(V19))
+    expect(riftFrontSpecs(V19)).not.toEqual(riftFrontSpecs(V18))
   })
 })

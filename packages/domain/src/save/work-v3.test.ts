@@ -2,6 +2,7 @@
 // on engine v17: the live env, four slots a place, no levels, collects, Speed Tickets, the trade gate through the
 // operations' context and none for settles.
 import { describe, expect, it } from 'vitest'
+import { SAVE_SCHEMA_VERSION } from './version'
 import { jobExp, MINUTE, stepMinutes } from '../economy/pacing'
 import { tradeOfCalling } from '../economy/professions'
 import type { UmaCallingClass } from '../roster/template'
@@ -24,7 +25,7 @@ function saveOf(umas: Record<string, number>, items: Record<string, number> = {}
   const world = gradedWorld({ items, wallet: { ...base.wallet, ...wallet },
     umas: Object.fromEntries(Object.entries(umas).map(([id, level]) => [id, gradedUma({ craft: { level, exp: 0 } })])) })
   return {
-    schemaVersion: 31,
+    schemaVersion: SAVE_SCHEMA_VERSION,
     account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
     tierWorlds: { [tier]: world },
   }

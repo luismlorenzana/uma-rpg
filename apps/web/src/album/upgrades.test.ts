@@ -36,3 +36,22 @@ describe('Can upgrade on the Stable (H34)', () => {
     expect(result.counts.upgrade).toEqual({ true: 1 })
   })
 })
+
+/** "Can upgrade" from v19 (H137, D253): a Tier 0 she fights as at Class Rank 10 with a child she doesn't hold carries the
+ * mark and the filter finds her (one reason, Promote); below Rank 10, or once she fights as a Tier 1 class, nothing. */
+describe('Can upgrade: Promote (v19)', () => {
+  it('marks a Recruit at R10 and the preset keeps her; a Recruit at R9 and a Brawler stay unmarked', async () => {
+    const { view, world } = await albumFixture()
+    const set = (id: string, classId: 'recruit' | 'brawler', classes: Record<string, { rank: number; exp: number }>) => {
+      world.umas[id] = { ...world.umas[id]!, classId, ranks: { classes } }
+    }
+    set('81001', 'recruit', { recruit: { rank: 10, exp: 400 } })
+    set('81002', 'recruit', { recruit: { rank: 9, exp: 0 } })
+    set('81003', 'brawler', { recruit: { rank: 10, exp: 0 }, brawler: { rank: 12, exp: 0 } })
+    expect(umaUpgrades(world, view.roster[0]!)).toMatchObject({ promote: true, gear: 0, stars: 0, any: true })
+    const rows = withUpgrades(albumRows(view, world, [], NOW), world)
+    const picked = STABLE_PRESETS.find((p) => p.key === 'upgrade')!.apply(STABLE_SCHEMA.fallback)
+    expect(stableResult(rows, picked).rows.map((row) => row.id)).toEqual(['81001'])
+    expect(rows.find((row) => row.id === '81003')).toMatchObject({ upgrades: { promote: false }, facets: { upgrade: false } })
+  })
+})

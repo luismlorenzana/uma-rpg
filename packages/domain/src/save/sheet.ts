@@ -26,9 +26,10 @@ export function flourishShort(flourish: RpgFlourish): string {
   if (flourish === 'even-pace') return `Even pace · ${pct(BATTLE_FLOURISH_RATE['even-pace'])} a round, up to ${most}`
   return `Late reserve · from round ${BATTLE_FLOURISH_FROM}, ${pct(BATTLE_FLOURISH_RATE['late-reserve'])} a round, up to ${most}`
 }
-/** The sheet's ★ Flourish row: hers as she fights now, or "No effect as Brawler" outside her calling's class. */
-export const flourishSheetLine = (flourish: RpgFlourish | null, classId: RpgClass): string =>
-  (flourish ? flourishShort(flourish) : `No effect as ${rpgClassName(classId)}`)
+/** The sheet's ★ Flourish row: hers as she fights now, or "No effect as Brawler" outside her calling's class (from v19 her
+ * Tier 0's family, CV21), the class named in the sheet's generation. */
+export const flourishSheetLine = (flourish: RpgFlourish | null, classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): string =>
+  (flourish ? flourishShort(flourish) : `No effect as ${rpgClassName(classId, engine)}`)
 
 /** One line of her battle sheet: the total, for the six core stats what gear and Extra Stats add, and a short note after
  * them (v16's MP: "+13 a round"). */
@@ -102,7 +103,7 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
         ...(signature ? [{ label: 'Signature', value: `+${signature} ★` }] : [])] },
       { title: 'Defense', rows: [coreV3('DEF', 'pdef'), coreV3('M.DEF', 'mdef'), { label: 'Evasion', value: permille(boosted.evasion) }] },
       { title: 'Sustain', rows: [coreV3('HP', 'hp'), ...mends, { ...coreV3('MP', 'mp'), note: `+${regen} a round` },
-        { label: '★ Flourish', value: flourishSheetLine(umaFlourish(outfit, uma, classId), classId) }] },
+        { label: '★ Flourish', value: flourishSheetLine(umaFlourish(outfit, uma, classId, umaPick(uma), engine), classId, engine) }] },
       { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
     ]
   }
@@ -116,7 +117,7 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
     { title: 'Sustain', rows: [core('HP', 'hp'), ...mends,
       { label: 'HP Regen', value: ofHp(a.regen, ' a round') }, { label: 'Lifesteal', value: permille(a.lifesteal) },
       { ...core('MP', 'mp'), note: `+${regen} a round` }, { label: 'MP Steal', value: permille(a.mpSteal) },
-      { label: '★ Flourish', value: flourishSheetLine(umaFlourish(outfit, uma, classId), classId) }] },
+      { label: '★ Flourish', value: flourishSheetLine(umaFlourish(outfit, uma, classId, umaPick(uma), engine), classId, engine) }] },
     { title: 'Other', rows: [{ label: 'Limit Break head start', value: `${boosted.limitStart} / ${BATTLE_LIMIT_MAX}` }] },
   ]
 }

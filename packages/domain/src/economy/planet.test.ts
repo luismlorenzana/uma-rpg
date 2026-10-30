@@ -9,7 +9,7 @@ import {
   CORE_NODES, isMapNode, MAP_NODES, mapNodeGate, mapNodeGrade, mapPoints, moonTemplate, nodeBody, nodeJewel, nodeNumeral, nodePoints,
   prowessSplit, type MoonTemplate,
 } from './planet'
-import { RPG_CLASSES, type RpgClass, type RpgV2Class } from '../rpg/kinds'
+import { RPG_CLASSES, rpgIsTier0, type RpgClass, type RpgTier1Class } from '../rpg/kinds'
 import { templateOutfit, TEMPLATE_CASES } from '../save/economy-v3.fixture'
 
 const TIERS: readonly GearTier[] = [1, 2, 3]
@@ -94,11 +94,15 @@ describe('Prowess, split by her class (EP23, §3.3)', () => {
   })
 
   it('every class’s sums in Tiers 1–3, each node keeping its total', () => {
-    const expected: Record<RpgV2Class, string[]> = {
+    // The Tier 1 classes by their table, the new hybrids their pair's mirror (CV18); a Tier 0's by her slots: planet-v19.test.ts.
+    const expected: Record<RpgTier1Class, string[]> = {
       brawler: ['30/0', '54/0', '78/0'], mage: ['0/30', '0/54', '0/78'], spellblade: ['21/9', '39/15', '55/23'],
       summoner: ['9/21', '15/39', '23/55'], paladin: ['24/6', '43/11', '63/15'], cleric: ['6/24', '11/43', '15/63'],
+      armsummoner: ['21/9', '39/15', '55/23'], tomeblade: ['9/21', '15/39', '23/55'],
     }
-    for (const classId of RPG_CLASSES) expect(TIERS.map((t) => sums(classId, t))).toEqual(expected[classId as RpgV2Class])
+    const tier1 = RPG_CLASSES.filter((c): c is RpgTier1Class => !rpgIsTier0(c))
+    expect(tier1).toHaveLength(8)
+    for (const classId of tier1) expect(TIERS.map((t) => sums(classId, t)), classId).toEqual(expected[classId])
     for (const classId of RPG_CLASSES) for (const points of [2, 4, 5, 7, 10, 11, 14, 16, 18, 21, 26]) {
       const split = prowessSplit(points, classId)
       expect(split.atk + split.matk).toBe(points)
@@ -129,16 +133,18 @@ describe('her moon (EP14, UT10)', () => {
     expect(TIERS.map((t) => [two('magical', t).def, two('magical', t).mdef])).toEqual([[0, 8], [0, 14], [0, 21]])
   })
 
-  it('every knack and channel from an invented outfit’s template, in every class', () => {
+  it('every knack and channel from an invented outfit’s template, in every class (v18’s calling)', () => {
+    // The fixture's channels are v18's callings (a Front runner's Brawler, an End closer's Summoner); from v19 her Tier 0's
+    // root names node II (template-v19.test.ts).
     for (const { knack, channel, calling } of TEMPLATE_CASES) {
       const outfit = templateOutfit('1', knack, channel)
-      expect(moonTemplate(outfit)).toEqual({ knack, channel })
+      expect(moonTemplate(outfit, null, 18)).toEqual({ knack, channel })
       for (const t of TIERS) for (const classId of RPG_CLASSES) {
-        const both = mapPoints(['template:1', 'template:2'], classId, t, moonTemplate(outfit))
+        const both = mapPoints(['template:1', 'template:2'], classId, t, moonTemplate(outfit, null, 18))
         expect(both[channel === 'physical' ? 'def' : 'mdef']).toBeGreaterThanOrEqual([8, 14, 21][t - 1]!)
         expect(both.atk + both.matk).toBe(0)
       }
-      expect(umaCalling(outfit)).toBe(calling)
+      expect(umaCalling(outfit, null, 18)).toBe(calling)
     }
   })
 
@@ -155,14 +161,16 @@ describe('a full Tier 1 map (§3.3, §8.1)', () => {
   })
 
   it('every class at Lv 50 in Tiers 1–3 (§8.1’s grants)', () => {
-    const offense: Record<RpgV2Class, number[][]> = {
+    // Every Tier 1 class; a Tier 0's Prowess by her slots: planet-v19.test.ts.
+    const offense: Record<RpgTier1Class, number[][]> = {
       brawler: [[51, 21], [92, 38], [133, 55]], mage: [[21, 51], [38, 92], [55, 133]], spellblade: [[42, 30], [77, 53], [110, 78]],
       summoner: [[30, 42], [53, 77], [78, 110]], paladin: [[45, 27], [81, 49], [118, 70]], cleric: [[27, 45], [49, 81], [70, 118]],
+      armsummoner: [[42, 30], [77, 53], [110, 78]], tomeblade: [[30, 42], [53, 77], [78, 110]],
     }
-    for (const classId of RPG_CLASSES) for (const t of TIERS) {
+    for (const classId of RPG_CLASSES.filter((c): c is RpgTier1Class => !rpgIsTier0(c))) for (const t of TIERS) {
       const p = mapPoints(CORE_NODES, classId, t)
       const stat = [51, 92, 133][t - 1]
-      expect([p.hp * 5, p.mp, p.atk, p.matk, p.def, p.mdef]).toEqual([[255, 460, 665][t - 1], stat, ...offense[classId as RpgV2Class][t - 1]!, stat, stat])
+      expect([p.hp * 5, p.mp, p.atk, p.matk, p.def, p.mdef]).toEqual([[255, 460, 665][t - 1], stat, ...offense[classId][t - 1]!, stat, stat])
     }
   })
 })

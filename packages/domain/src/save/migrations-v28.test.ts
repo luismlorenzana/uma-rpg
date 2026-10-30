@@ -3,7 +3,7 @@
 // hands each world its tier.
 import { describe, expect, it, vi } from 'vitest'
 import { ITEM_IDENTITIES } from '../items/identity'
-import { migrateWorld, toV28, toV29, toV30, toV31, type TierGrant } from './migrations'
+import { migrateWorld, toV28, toV29, toV30, toV31, toV32, type TierGrant } from './migrations'
 import { newSave, parseSave, SAVE_SCHEMA_VERSION } from './save'
 import { facilitiesAt, richV27Save, v27Entry, v27Row, v27Uma, v27World } from './v28.fixture'
 import { v26Save } from './v27.fixture'
@@ -19,17 +19,17 @@ const richWorld = (): Raw => richV27Save().tierWorlds['1'] as Raw
 const v28 = (world: Raw, tier = 1): World => toV28(world, tier) as World
 
 describe('toV28 (D214): R2\'s economy and the compensation, chained by H82 (D218)', () => {
-  it('is chained: every world before v28 runs through v31, and a v31 world is left', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(31)
+  it('is chained: every world before v28 runs through v32, and a v32 world is left', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(32)
     const raw = richWorld()
-    expect(migrateWorld(raw, 27)).toEqual(toV31(toV30(toV29(toV28(raw)))))
-    const done = toV31(toV30(toV29(toV28(raw))))
-    expect(migrateWorld(done, 31)).toBe(done)
+    expect(migrateWorld(raw, 27)).toEqual(toV32(toV31(toV30(toV29(toV28(raw))))))
+    const done = toV32(toV31(toV30(toV29(toV28(raw)))))
+    expect(migrateWorld(done, 32)).toBe(done)
   })
 
-  it('the rich v27 save is a real one: it parses through the chain to v31, its work settled and its grant paid in tickets only', () => {
+  it('the rich v27 save is a real one: it parses through the chain to v32, its work settled and its grant paid in tickets only', () => {
     const save = parseSave(richV27Save())
-    expect(save.schemaVersion).toBe(31)
+    expect(save.schemaVersion).toBe(32)
     expect(save.tierWorlds['1']!.work).toEqual({})
     const grant = v28(richWorld()).grant!
     expect(save.tierWorlds['1']!.grant).toEqual({ ...grant, back: { ...grant.back, items: 0, stock: 0 } })
@@ -151,9 +151,9 @@ describe('toV28 (D214): R2\'s economy and the compensation, chained by H82 (D218
     expect(toV28(richWorld(), 2)).toEqual(toV28(richWorld(), 1))
   })
 
-  it('starts new saves as v31\'s, which round-trip; engine 16 still builds v27\'s for an old save\'s fixtures', () => {
+  it('starts new saves as v32\'s, which round-trip; engine 16 still builds v27\'s for an old save\'s fixtures', () => {
     const save = newSave('Today', '2026-10-25T12:00:00.000Z')
-    expect(save.schemaVersion).toBe(31)
+    expect(save.schemaVersion).toBe(32)
     expect(save.tierWorlds['1']).toMatchObject({ grant: null, buildings: {} })
     expect(['gems', 'gear'].some((k) => k in save.tierWorlds['1']!)).toBe(false)
     expect('gearMarks' in save.tierWorlds['1']!.wallet).toBe(false)

@@ -2,10 +2,24 @@
 // it grants. The hook is mocked here, in a file of its own, so its real rules don't decide what this checks.
 import { describe, expect, it, vi } from 'vitest'
 import { achievementsEarned, type RiftWin } from '../rift/achievements'
+import { RPG_CLASS_PARENTS } from '../rpg/class-tree'
+import { rpgIsTier0, type RpgTier1Class } from '../rpg/kinds'
 import { beginConvergence, signUpRift, startRiftFight } from './rift'
-import { OUTFITS, play, riftWorldSave, ROSTER, T, TWENTY, weaken } from './rift-rules.fixture'
+import { OUTFITS, play, riftWorldSave as balanceWorldSave, ROSTER, T, TWENTY, weaken } from './rift-rules.fixture'
 import { worldOf } from './rules'
 import type { Save } from './save'
+
+/** The fixture's world with each Uma promoted into her balance-party class (Classes v3, H134): in Tier 1's world a Tier 1
+ * class is held from Class Rank 10, so she holds her first parent Tier 0 and her class at Rank 10. */
+function riftWorldSave(): Save {
+  const save = balanceWorldSave()
+  for (const uma of Object.values(save.tierWorlds['1']!.umas)) {
+    const c = uma.classId
+    if (!c || rpgIsTier0(c)) continue
+    uma.ranks = { ...uma.ranks, classes: { [RPG_CLASS_PARENTS[c as RpgTier1Class][0]!]: { rank: 10, exp: 0 }, [c]: { rank: 10, exp: 0 } } }
+  }
+  return save
+}
 
 vi.mock('../rift/achievements', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../rift/achievements')>()),

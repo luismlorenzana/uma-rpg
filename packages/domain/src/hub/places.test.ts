@@ -35,11 +35,11 @@ function expectSpaced(places: readonly Place[]): void {
 }
 
 describe('place registry', () => {
-  it('has 28 visible places on four pages in the bar\'s order (D147; fifteen in the Wilds since H114) plus the hidden Account', () => {
-    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(28)
+  it('has 27 visible places on four pages in the bar\'s order (D147; fifteen in the Wilds since H114, five halls since H134) plus the hidden Account', () => {
+    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(27)
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
     expect(HUB_PAGES).toEqual(['town', 'learning', 'battle', 'wilds'])
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 7, 2, 15])
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 6, 2, 15])
     expect(PLACES.filter((p) => p.direct).map((p) => p.id)).toEqual(['scenario-gate'])
   })
 
@@ -63,15 +63,17 @@ describe('place registry', () => {
 describe('the Learning page by generation (H59, D178)', () => {
   const spots = (list: readonly Place[]) => list.map((p) => [p.id, p.at.x, p.at.y, p.frame ?? null])
 
-  it('is the old list in classes v1, and the live generation\'s (v2 since H61) on the map', () => {
+  it('is the old list in classes v1, and the live generation\'s (Halls v2\'s since H134) on the map', () => {
     expect(spots(learningPlaces(14))).toEqual([
       ['brawler-dojo', 0.24, 0.1, null], ['mage-tower', 0.76, 0.11, null], ['spell-blade-salle', 0.22, 0.33, null],
       ['cleric-chapel', 0.78, 0.33, null], ['summoner-circle', 0.5, 0.56, null], ['observatory', 0.5, 0.84, null],
     ])
     expect(placesOn('learning')).toEqual(learningPlaces())
-    expect(placesOn('learning')).toEqual(learningPlaces(15))
+    expect(placesOn('learning')).toEqual(learningPlaces(19))
     expect(rpgV2()).toBe(true)
-    expect(placeById('paladin-bastion')?.frame).toBe('knights-bastion')
+    // The Paladin Bastion (classes v2's keep) and the Cleric Chapel stand as the Healer Sanctum, its own temple.
+    expect([placeById('paladin-bastion'), placeById('cleric-chapel')]).toEqual([undefined, undefined])
+    expect(placeById('healer-sanctum')?.frame).toBeUndefined()
   })
 
   it('pairs the six halls across the road in classes v2, the Bastion on the knights-bastion keep', () => {
@@ -139,11 +141,12 @@ describe('the Learning page by generation (H59, D178)', () => {
 })
 
 describe('old hall links (H133)', () => {
-  it('stay on their own place while it stands: the alias is read only for an id with no place', () => {
-    // The live generation (v18) keeps the Paladin Bastion and the Cleric Chapel, and has no Sanctum to move to.
-    expect(placeById('paladin-bastion')?.name).toBe('Paladin Bastion')
-    expect(movedPlace('paladin-bastion')).toBeUndefined()
-    expect(movedPlace('cleric-chapel')).toBeUndefined()
+  it('land on the Healer Sanctum: the alias is read only for an id with no place', () => {
+    // Since H134 the Paladin Bastion and the Cleric Chapel stand as the Healer Sanctum.
+    expect(placeById('paladin-bastion')).toBeUndefined()
+    expect(movedPlace('paladin-bastion')?.id).toBe('healer-sanctum')
+    expect(movedPlace('cleric-chapel')?.id).toBe('healer-sanctum')
+    expect(movedPlace('healer-sanctum')).toBeUndefined()
     expect(movedPlace('nowhere')).toBeUndefined()
     expect(movedPlace(undefined)).toBeUndefined()
   })
@@ -158,7 +161,7 @@ describe('the Rift (H50)', () => {
     expect(rift).toMatchObject({ page: 'battle', name: 'The Rift', frame: 'rift', opensIn: 'S8' })
     expect(rift.blurb).toBe('Twenty Lv 50 Umas seal four fronts, then ascend together.')
     expect(CURRENT_SLICE).toBe('S8')
-    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['paladin-bastion', 'knights-bastion'], ['tier-finale', 'rift'],
+    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['tier-finale', 'rift'],
       ['fields', 'vegetable-garden'], ['armorer', 'lancers-barracks']])
   })
 

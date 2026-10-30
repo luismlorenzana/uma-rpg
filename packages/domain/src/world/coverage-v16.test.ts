@@ -1,10 +1,11 @@
 // The Tier rework's coverage checks (H66, D202; class-progression.md §4.5, CP4 and CP7): the campaign is balanced on the
 // owner's defaults (H64) and the Rift's guided builds answer their fronts, checked on the rules and the generator before
-// any fight. Fast, so it runs on every build; it prints nothing.
+// any fight. Fast, so it runs on every build; it prints nothing. v16–v18's twins throughout (explicit since H134: Classes v3
+// re-pairs them from v19, CV13, `kinds-v19.test.ts`).
 import { describe, expect, it } from 'vitest'
 import {
-  isRpgTome, isRpgWeaponKind, RPG_DAMAGE_KINDS, RPG_ELEMENTS, RPG_TWIN_SET_IDS, RPG_TWIN_SETS, RPG_WEAPON_KINDS, rpgAnsweredTwinSets,
-  rpgClassSlots, rpgDefaultWeapons, rpgTomeOf, rpgTwinsOf, rpgWeaponKind, validRpgWeapons,
+  isRpgTome, isRpgWeaponKind, RPG_DAMAGE_KINDS, RPG_ELEMENTS, RPG_TWIN_SET_IDS, RPG_WEAPON_KINDS, rpgAnsweredTwinSets,
+  rpgClassSlots, rpgDefaultWeapons, rpgTomeOf, rpgTwinSets, rpgTwinsOf, rpgWeaponKind, validRpgWeapons,
   type RpgClass, type RpgV2Class, type RpgDamageKind, type RpgTwinSet, type RpgWeapon,
 } from '../rpg/rules'
 import type { BattleWeaknesses } from '../rpg/battle/types'
@@ -26,7 +27,7 @@ const holders = (party: readonly (readonly RpgWeapon[])[], kinds: readonly RpgDa
   kinds.map((k) => party.filter((m) => kindsOf(m).includes(k)).length)
 /** How many members answer each twin set (hold either of its kinds). */
 const answers = (party: readonly (readonly RpgWeapon[])[], sets: readonly RpgTwinSet[] = RPG_TWIN_SET_IDS): number[] =>
-  sets.map((set) => party.filter((m) => rpgAnsweredTwinSets(m).includes(set)).length)
+  sets.map((set) => party.filter((m) => rpgAnsweredTwinSets(m, V16).includes(set)).length)
 const setOf = (w: BattleWeaknesses): RpgTwinSet => w.elements[0] ?? 'twilight'
 /** The world's 48 signatures as twin sets: each signature one, a pair's two leads a half each (W3). */
 const signatureSets = (): [RpgTwinSet, number][] => BIOMES.flatMap((b) => b.signatures.flatMap((sig) =>
@@ -68,8 +69,8 @@ describe('the campaign’s four checks on the owner’s defaults (CP4)', () => {
     // One pick: a kind of the set in one of her slots of its channel, the rest her defaults, still a legal set of three.
     const onePick = (classId: RpgClass, set: RpgTwinSet): boolean => {
       const defaults = rpgDefaultWeapons(classId, V16)
-      if (rpgAnsweredTwinSets(defaults).includes(set)) return true
-      return RPG_TWIN_SETS[set].some((kind) => {
+      if (rpgAnsweredTwinSets(defaults, V16).includes(set)) return true
+      return rpgTwinSets(V16)[set].some((kind) => {
         const weapon: RpgWeapon = isRpgWeaponKind(kind) ? kind : rpgTomeOf(kind)
         return rpgClassSlots(classId, V16).some((slot, i) => (slot === 'tome') === isRpgTome(weapon) &&
           validRpgWeapons(classId, defaults.map((w, k) => (k === i ? weapon : w)), V16))
@@ -93,7 +94,7 @@ describe('the campaign’s four checks on the owner’s defaults (CP4)', () => {
   it('answers 66% of signatures with one Brawler or Mage, 59% a Paladin, 41% a Spell Blade or Cleric, 34% a Summoner', () => {
     const sets = signatureSets()
     const share = (classId: RpgClass) => {
-      const held = rpgAnsweredTwinSets(rpgDefaultWeapons(classId, V16))
+      const held = rpgAnsweredTwinSets(rpgDefaultWeapons(classId, V16), V16)
       return pct(sets.filter(([s]) => held.includes(s)).reduce((sum, [, w]) => sum + w, 0) / 48)
     }
     const expected: Record<RpgV2Class, number> = { brawler: 66, mage: 66, paladin: 59, spellblade: 41, cleric: 41, summoner: 34 }

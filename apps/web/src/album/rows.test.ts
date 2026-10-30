@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { byLevel, workOrder } from '@luismlorenzana/uma-kit/roster'
 import { availabilityBlock, availableWorkers, newOwnedUma, newTierWorld, startJob, worldOf } from '@rpg/domain'
 import { activePartyRows } from './party-rows'
-import { albumRows, STABLE_FACETS, stableResult, STABLE_SCHEMA, STABLE_SORTS, TIER_ONE_SCOPE } from './rows'
+import { albumRows, stableFacets, STABLE_FACETS, stableResult, STABLE_SCHEMA, STABLE_SORTS, TIER_ONE_SCOPE } from './rows'
 import { albumFixture, NOW } from './testing'
 
 describe('SB4 RPG album adapters', () => {
   it('projects shared master rows and the RPG values without mutating the save', async () => {
     const { view, world } = await albumFixture(), before = JSON.stringify(world)
     const rows = albumRows(view, world, ['81001'], NOW)
-    expect(rows[0]).toMatchObject({ id: '81001', name: 'Aster', level: 3, workLevel: 12, isNew: false, classId: 'brawler' })
+    expect(rows[0]).toMatchObject({ id: '81001', name: 'Aster', level: 3, workLevel: 12, isNew: false, classId: 'recruit' })
     expect(rows[1]?.isNew).toBe(true)
     expect(rows[5]).toMatchObject({ level: null, workLevel: null, uma: null, free: false })
     expect(JSON.stringify(world)).toBe(before)
@@ -82,8 +82,9 @@ describe('one Uma, one tier world in the album (H35)', () => {
 })
 
 describe('the Stable\'s Template filters (UT15, H70)', () => {
-  /** The six invented outfits re-shaped: 81001 a front runner at Long (an Ironhide), 81002 a Pace Uma with Wit over Power
-   * (a Mage, owned, who picked the Spell Blade), the rest Pace Umas with Power at Mile (Spell Blades). */
+  /** The six invented outfits re-shaped: 81001 a front runner at Long (a Recruit, an Ironhide), 81002 a Pace Uma at Medium
+   * (a Duelist, a Spellfencer; owned, with a v18 pick of the Spell Blade that v19 ignores), the rest Pace Umas at Mile
+   * (Duelists). */
   async function templated() {
     const fx = await albumFixture()
     const [ironhide, pacer, ...rest] = fx.view.roster
@@ -101,7 +102,7 @@ describe('the Stable\'s Template filters (UT15, H70)', () => {
     const at = STABLE_FACETS.findIndex((f) => f.group === 'Template')
     expect(STABLE_FACETS[at - 1]!.group).toBe('RPG')
     expect(STABLE_FACETS.slice(at).map((f) => [f.group, f.key, f.options!.map((o) => o.label)])).toEqual([
-      ['Template', 'calling', ['Brawler', 'Mage', 'Spell Blade', 'Cleric', 'Summoner', 'Paladin']],
+      ['Template', 'calling', ['Recruit', 'Duelist', 'Initiate', 'Caller', 'Acolyte']],
       ['Template', 'stride', ['Dash', 'Middle', 'Stayer']],
       ['Template', 'knack', ['Fleet', 'Mighty', 'Tireless', 'Gritty', 'Clever']],
       ['Template', 'signature', ['Pendant', 'Orb', 'Bell', 'Insignia']],
@@ -109,17 +110,52 @@ describe('the Stable\'s Template filters (UT15, H70)', () => {
     ])
   })
 
-  it('finds an Ironhide by her template\'s name, and counts an owned Uma\'s pick as her calling', async () => {
+  it('finds an Ironhide by her template\'s name, and files each Uma under her running style\'s Tier 0', async () => {
     const { view, world } = await templated()
     const rows = albumRows(view, world, [], NOW, TIER_ONE_SCOPE)
     const found = stableResult(rows, { ...STABLE_SCHEMA.fallback, search: 'ironhide' }).rows.map((r) => r.id)
     expect(found).toEqual(['81001'])
-    expect(rows[0]!.facets).toMatchObject({ calling: ['brawler'], stride: ['stayer'] })
-    // Her row says Mage; her pick makes her a Spell Blade (and a Spellfencer by name).
-    expect(rows[1]!.facets.calling).toEqual(['spellblade'])
+    expect(rows[0]!.facets).toMatchObject({ calling: ['recruit'], stride: ['stayer'] })
+    // Pace alone makes her a Duelist (a Spellfencer by name); her old pick no longer counts.
+    expect(rows[1]!.facets.calling).toEqual(['duelist'])
     expect(rows[1]!.search).toContain('spellfencer')
-    const blades = stableResult(rows, { ...STABLE_SCHEMA.fallback, filters: { calling: ['spellblade'] } })
-    expect(blades.rows.map((r) => r.id).sort()).toEqual(['81002', '81003', '81004', '81005', '81006'])
-    expect(blades.counts.calling).toMatchObject({ brawler: 1, spellblade: 5, mage: 0 })
+    const duelists = stableResult(rows, { ...STABLE_SCHEMA.fallback, filters: { calling: ['duelist'] } })
+    expect(duelists.rows.map((r) => r.id).sort()).toEqual(['81002', '81003', '81004', '81005', '81006'])
+    expect(duelists.counts.calling).toMatchObject({ recruit: 1, duelist: 5, apprentice: 0 })
+  })
+})
+
+describe('the Stable’s Calling and Class facets (v19; CV §14.5, H134)', () => {
+  const labels = (key: string, facets = STABLE_FACETS) => facets.find((f) => f.key === key)!.options!.map((o) => o.label)
+
+  it('lists the five Tier 0s as callings and the thirteen classes, Tier 0 first', () => {
+    expect(labels('calling')).toEqual(['Recruit', 'Duelist', 'Initiate', 'Caller', 'Acolyte'])
+    expect(labels('class')).toEqual(['Recruit', 'Duelist', 'Acolyte', 'Caller', 'Initiate',
+      'Brawler', 'Arms Spellblade', 'Arms Summoner', 'Paladin', 'Cleric', 'Tome Summoner', 'Tome Spellblade', 'Sorcerer'])
+    // The groups and their order stay: Class and Can upgrade in RPG, Calling first in Template.
+    expect(STABLE_FACETS.map((f) => f.key)).toEqual(['ownership', 'rarity', 'surface', 'distance', 'strategy', 'sex', 'new', 'free', 'class', 'upgrade',
+      'calling', 'stride', 'knack', 'signature', 'trade'])
+    // An explicit older engine keeps v18's six.
+    expect(labels('calling', stableFacets(18))).toEqual(['Brawler', 'Mage', 'Spell Blade', 'Cleric', 'Summoner', 'Paladin'])
+    expect(labels('class', stableFacets(18))).toEqual(['Brawler', 'Mage', 'Spell Blade', 'Cleric', 'Summoner', 'Paladin'])
+  })
+
+  it('files each Uma under her style’s Tier 0, a pick ignored, and her class as the one she fights as', async () => {
+    const fx = await albumFixture()
+    const [front, pacer, closer] = fx.view.roster
+    Object.assign(front!, { aptitudes: { ...front!.aptitudes, strategy: { front: 'A', pace: 'A', late: 'C', end: 'C' } } })
+    Object.assign(pacer!, { aptitudes: { ...pacer!.aptitudes, strategy: { front: 'C', pace: 'A', late: 'C', end: 'C' } } })
+    Object.assign(closer!, { aptitudes: { ...closer!.aptitudes, strategy: { front: 'C', pace: 'C', late: 'A', end: 'A' } } })
+    fx.world.umas['81002'] = { ...fx.world.umas['81002']!, classId: null, calling: { pick: 'mage', confirmed: true } }
+    fx.world.umas['81003'] = { ...fx.world.umas['81003']!, classId: 'summoner', ranks: { classes: { caller: { rank: 10, exp: 0 }, summoner: { rank: 10, exp: 0 } } } }
+    const rows = albumRows(fx.view, fx.world, [], NOW, TIER_ONE_SCOPE)
+    expect(rows.slice(0, 3).map((r) => [r.facets.calling, r.facets.class])).toEqual([
+      [['recruit'], ['recruit']], [['duelist'], ['duelist']], [['caller'], ['summoner']],
+    ])
+    const recruits = stableResult(rows, { ...STABLE_SCHEMA.fallback, filters: { calling: ['recruit'] } })
+    expect(recruits.rows.map((r) => r.id)).toContain('81001')
+    expect(recruits.rows.map((r) => r.id)).not.toContain('81002')
+    const summoners = stableResult(rows, { ...STABLE_SCHEMA.fallback, filters: { class: ['summoner'] } })
+    expect(summoners.rows.map((r) => r.id)).toEqual(['81003'])
   })
 })

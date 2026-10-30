@@ -13,8 +13,8 @@ import { v15Replay, V27_RIFT_FIGHT, V27_WORLD_FIGHT } from './v27.fixture'
 
 type Raw = Record<string, unknown>
 type RawWorld = Raw & { umas: Record<string, Raw>; items: Record<string, number> }
-/** The rich save with every world through `toV28`, labelled with the live schema so this file can exercise today's
- * strict parser without re-running historical migrations, and `change` on Tier 1's world. */
+/** The rich save with every world through `toV28`, labelled v31 (the last schema before Classes v3) so only v32's reset
+ * runs before today's strict parser, not the historical steps, and `change` on Tier 1's world. */
 function v28Save(change: (world: RawWorld) => void = () => {}): Raw {
   const raw = richV27Save()
   const tierWorlds = Object.fromEntries(Object.entries(raw.tierWorlds).map(([k, w]) => [k, toV28(w, Number(k))]))
@@ -23,8 +23,8 @@ function v28Save(change: (world: RawWorld) => void = () => {}): Raw {
 }
 
 describe('save v28\'s parse (H78), the economy stage live', () => {
-  it('runs with R2\'s economy live in this file', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('economy')]).toEqual([18, true])
+  it('runs with R2\'s economy live in this file, under Classes v3 (H134)', () => {
+    expect([BATTLE_ENGINE_VERSION, rpgRework('economy')]).toEqual([19, true])
   })
 
   it('parses the rich v27 save through toV28, and its open v15 fights replay to their frozen ends', () => {
@@ -85,9 +85,10 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
     const world = save.tierWorlds['1']!
     expect(world).toMatchObject({ items: {}, buildings: {}, work: {}, grant: null })
     expect('gear' in world || 'gems' in world || 'gearMarks' in world.wallet).toBe(false)
-    const unlocked = unlockUma(save, '9000', '2026-10-25T12:00:00.000Z', '1', 'mage')
+    // Since Classes v3 she starts as a Tier 0 (a Mage is held only from Rank 10): the Mage line's Initiate.
+    const unlocked = unlockUma(save, '9000', '2026-10-25T12:00:00.000Z', '1', 'apprentice')
     expect(unlocked.tierWorlds['1']!.umas['9000']).toMatchObject({
-      classId: 'mage', craft: { level: 1, exp: 0 }, ranks: { classes: {} }, stars: { open: [], moons: [] },
+      classId: 'apprentice', craft: { level: 1, exp: 0 }, ranks: { classes: {} }, stars: { open: [], moons: [] },
       gear: { weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] },
     })
     for (const s of [save, unlocked]) expect(parseSave(JSON.parse(JSON.stringify(s)))).toEqual(s)

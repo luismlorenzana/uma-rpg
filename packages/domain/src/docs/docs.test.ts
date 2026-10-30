@@ -7,7 +7,7 @@ import { renderBlock, type PackageJson } from './render'
 
 const ROOT = join(__dirname, '..', '..', '..', '..')
 const DOCS = join(ROOT, 'docs', 'game')
-const BLOCK = /<!-- live:([a-z-]+) -->\n[\s\S]*?<!-- \/live -->/g
+const BLOCK = /<!-- live:([a-z0-9-]+) -->\n[\s\S]*?<!-- \/live -->/g
 const PACKAGES = ['package.json', 'apps/web/package.json', 'apps/api/package.json', 'packages/domain/package.json']
 const packages = PACKAGES.map((path) => ({ path, json: JSON.parse(readFileSync(join(ROOT, path), 'utf8')) as PackageJson }))
 

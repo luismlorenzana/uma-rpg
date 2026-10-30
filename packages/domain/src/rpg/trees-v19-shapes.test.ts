@@ -1,15 +1,15 @@
-// The weapon shapes on engine v19 (H128; classes-v3.md §4.1, §4.2; CV12, CV14), built dark: Katana and Light a double, Bow
+// The weapon shapes on engine v19 (H128; classes-v3.md §4.1, §4.2; CV12, CV14), live since H134: Katana and Light a double, Bow
 // and Dark a volley (0.8 of the depth's power on the tapped foe, one splash hit at 0.35 on every other, +2 MP), the
 // Brawler's Bow B Barrage, the Sorcerer's Light B Pierce and Dark B Barrage. Every v16–v18 def stays as it was: the digest
 // below was taken on the catalog before this change.
 import { createHash } from 'node:crypto'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   RPG_ALL_NODES, RPG_LINE_B_POWER_V16, RPG_LINE_B_POWER_V19, RPG_NODES, RPG_PIERCE_SCALE, RPG_SKILL_MP, RPG_SKILL_POWER, RPG_VOLLEY, RPG_VOLLEY_MP,
   rpgNode, rpgNodeSkill, rpgRankedSkill, type RpgHit, type RpgSkillDef,
 } from './catalog'
 import { RPG_BRANCH_B, RPG_BRANCH_B_NAME, rpgBranchBName, rpgBranchNode, rpgClassWeapons } from './node-identity'
-import { isRpgTome, rpgClasses, RPG_WEAPONS, rpgIsTier0, type RpgClass, type RpgWeapon } from './kinds'
+import { rpgClasses, RPG_WEAPONS, rpgIsTier0, type RpgClass, type RpgWeapon } from './kinds'
 
 const V18 = 18, V19 = 19
 const P = (d: number) => RPG_SKILL_POWER[d - 1]!
@@ -191,12 +191,12 @@ describe('the B lines at v19 (CV14)', () => {
     for (const id of ['brawler-lance.4a', 'brawler-katana.4a', 'mage-tome-ice.4a']) expect(def(id, V19)).toEqual(def(id, V18))
   })
 
-  it('names the lines by generation; the live table stays v18\'s', () => {
+  it('names the lines by generation; the live table is v19\'s since H134', () => {
     expect([rpgBranchBName('brawler', 'bow', V19), rpgBranchBName('mage', 'tome-light', V19), rpgBranchBName('mage', 'tome-dark', V19)])
       .toEqual(['Barrage', 'Pierce', 'Barrage'])
-    expect([rpgBranchBName('brawler', 'bow', V18), rpgBranchBName('mage', 'tome-light', V18), rpgBranchBName('mage', 'tome-dark')])
+    expect([rpgBranchBName('brawler', 'bow', V18), rpgBranchBName('mage', 'tome-light', V18), rpgBranchBName('mage', 'tome-dark', V18)])
       .toEqual(['Rain', 'Cascade', 'Pierce'])
-    expect([RPG_BRANCH_B_NAME.brawler.bow, RPG_BRANCH_B_NAME.mage['tome-light'], RPG_BRANCH_B_NAME.mage['tome-dark']]).toEqual(['Rain', 'Cascade', 'Pierce'])
+    expect([RPG_BRANCH_B_NAME.brawler.bow, RPG_BRANCH_B_NAME.mage['tome-light'], RPG_BRANCH_B_NAME.mage['tome-dark']]).toEqual(['Barrage', 'Pierce', 'Barrage'])
     // Every other line keeps its name, and the side letters never move.
     for (const c of rpgClasses(V19)) for (const w of rpgClassWeapons(c)) {
       const moved = (c === 'brawler' && w === 'bow') || (c === 'mage' && (w === 'tome-light' || w === 'tome-dark'))
@@ -221,8 +221,11 @@ describe('the B lines at v19 (CV14)', () => {
 
 describe('three generations on one id', () => {
   it('plays every v18 node\'s def at 16–18 as before H128 (the digest taken before step 2), and v6–v15\'s too', () => {
-    expect(RPG_NODES).toHaveLength(750)
-    const at = (v: number) => digest(RPG_NODES.map((n) => [n.id, rpgNodeSkill(n, v)]))
+    // v18's six classes' 750, in catalog order (the live list until H134).
+    const v18 = RPG_ALL_NODES.filter((n) => rpgClasses(V18).includes(n.classId))
+    expect(v18).toHaveLength(750)
+    expect(RPG_NODES).toEqual(RPG_ALL_NODES)
+    const at = (v: number) => digest(v18.map((n) => [n.id, rpgNodeSkill(n, v)]))
     for (const v of [16, 17, 18]) expect(at(v), `v${v}`).toBe('92b1d2f5e64504217a6f5acbedf14d48ea1305859268954b8e284fe1841d95ae')
     for (const v of [6, 14, 15]) expect(at(v), `v${v}`).toBe('d716ae0e768ef7e9e247ef7566e2edb730f1c095f3f95e98061e3bc7c752659e')
   })
@@ -255,23 +258,8 @@ describe('three generations on one id', () => {
     }
   })
 
-  it('keeps the live names and summaries v18\'s', () => {
-    expect(['brawler-bow.5', 'brawler-bow.3b', 'brawler-bow.5b', 'mage-tome-light.4b', 'mage-tome-dark.3a', 'mage-tome-dark.5a'].map((id) => rpgNode(id)!.name))
-      .toEqual(['Starfall Barrage', 'Rain of Arrows', 'Starfall Rain', 'Luxaja Cascade', 'Noxaga Pierce', 'Void Pierce'])
-    expect(rpgNode('mage-tome-dark.1')!.summary).toBe('one foe · 2 hits · 1.6')
-    expect(isRpgTome('tome-dark')).toBe(true)
-  })
-})
-
-describe('the names with the switch mocked to 19 (the live generation\'s, as names are presentation)', () => {
-  afterEach(() => { vi.doUnmock('./battle/caps'); vi.resetModules() })
-
-  it('names Starfall Volley, the Barrages and the Pierces, and the branches Barrage, Pierce, Barrage', async () => {
-    vi.resetModules()
-    vi.doMock('./battle/caps', async (orig) => (await import('./battle/caps-at.fixture')).capsAt(19, await orig()))
-    const live = await import('./catalog')
-    const ids = await import('./node-identity')
-    const name = (id: string) => live.rpgNode(id)!.name
+  it('names the live catalog v19\'s since H134 (names are presentation): Starfall Volley, the Barrages and the Pierces', () => {
+    const name = (id: string) => rpgNode(id)!.name
     expect(['brawler-bow.1', 'brawler-bow.4', 'brawler-bow.5'].map(name)).toEqual(['Twin Arrows', 'Arrow Storm', 'Starfall Volley'])
     expect([3, 4, 5].map((d) => name(`brawler-bow.${d}b`))).toEqual(['Quiver Barrage', 'Storm Barrage', 'Starfall Barrage'])
     expect([3, 4, 5].map((d) => name(`mage-tome-light.${d}b`))).toEqual(['Luxaga Pierce', 'Luxaja Pierce', 'Holy Pierce'])
@@ -279,10 +267,8 @@ describe('the names with the switch mocked to 19 (the live generation\'s, as nam
     // Every other name stays, the cores of Light and Dark among them.
     expect(['mage-tome-light.5', 'mage-tome-dark.5', 'summoner-bow.5', 'spellblade-tome-dark.5', 'brawler-katana.5a'].map(name))
       .toEqual(['Holy', 'Black Hole', 'Sagittarius', 'Celestial Shade', 'Final Draw'])
-    expect([ids.RPG_BRANCH_B_NAME.brawler.bow, ids.RPG_BRANCH_B_NAME.mage['tome-light'], ids.RPG_BRANCH_B_NAME.mage['tome-dark']])
-      .toEqual(['Barrage', 'Pierce', 'Barrage'])
     // The summaries are v19's, a volley's splash in them.
-    expect(live.rpgNode('mage-tome-dark.1')!.summary).toBe('one foe · 1 hit · 1.28 · 0.56 on every other foe')
-    expect(live.rpgNode('mage-tome-light.3')!.summary).toBe('one foe · 2 hits · 2.9')
+    expect(rpgNode('mage-tome-dark.1')!.summary).toBe('one foe · 1 hit · 1.28 · 0.56 on every other foe')
+    expect(rpgNode('mage-tome-light.3')!.summary).toBe('one foe · 2 hits · 2.9')
   })
 })

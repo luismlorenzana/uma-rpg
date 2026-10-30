@@ -4,9 +4,9 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { domAnimation } from 'motion/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { placeById, raiseGrade, setJewel, withTrack, worldOf, type Save, type TierWorld } from '@rpg/domain'
+import { placeById, raiseGrade, setJewel, withTrack, worldOf, type RpgClass, type Save, type TierWorld } from '@rpg/domain'
 import { albumFixture, NOW } from '../../album/testing'
-import { OutfitProfile } from './OutfitProfile'
+import { OutfitProfile, rankGridClasses } from './OutfitProfile'
 
 let fixture: Awaited<ReturnType<typeof albumFixture>>
 vi.mock('../../save/game', async importOriginal => ({ ...await importOriginal<typeof import('../../save/game')>(), useWorld: () => fixture.world }))
@@ -48,11 +48,11 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
   })
 
   it('shows the Gear dot, the grade rows\' marks and the jewels to set, and drops them once used; no skill costs points (v16 on)', () => {
-    // Aster: Class Rank 5, and a Weapon Gem G1 and a Planet Jewel I in the Warehouse.
+    // Aster: a Recruit at Class Rank 5, and a Weapon Gem G1 and a Planet Jewel I in the Warehouse.
     let save = withWorld(fixture.save, (w) => {
       const aster = w.umas['81001']!
       return { ...w, items: { 'weapon-gem-g1': 1, 'jewel-planet-1': 1 }, umas: { ...w.umas, '81001': { ...aster,
-        ranks: withTrack(aster.ranks, { kind: 'class', id: 'brawler' }, { rank: 5, exp: 0 }) } } }
+        ranks: withTrack(aster.ranks, { kind: 'class', id: 'recruit' }, { rank: 5, exp: 0 }) } } }
     })
     fixture.world = worldOf(save)
     const ui = render(profile())
@@ -77,5 +77,39 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeDefined()
     expect(screen.queryByRole('img', { name: 'Can upgrade' })).toBeNull()
     expect(screen.queryByText(/to set/)).toBeNull()
+  })
+})
+
+/** Aster fighting as `classId` with these Class Ranks. */
+function aster(classId: RpgClass, classes: Record<string, { rank: number; exp: number }>): TierWorld {
+  const world = worldOf(fixture.save)
+  return { ...world, umas: { ...world.umas, '81001': { ...world.umas['81001']!, level: 10, classId, ranks: { classes } } } }
+}
+
+/** Her profile's Ready dot (H137, D253; live since H134): the Skills tab carries the kit's green dot while she fights as a
+ * Tier 0 at Class Rank 10 with a child she doesn't hold, and drops it below Rank 10 or once she fights as a Tier 1 class. */
+describe('the Skills tab\'s Ready dot (v19)', () => {
+  it('shows while a promotion waits on her Tier 0 at R10', () => {
+    fixture.world = aster('recruit', { recruit: { rank: 10, exp: 400 } })
+    render(profile())
+    expect(screen.getByRole('tab', { name: 'Skills, ready' })).toBeDefined()
+    expect(screen.getByRole('tab', { name: 'Gear' })).toBeDefined()
+  })
+
+  it('stays off below R10 and as a Tier 1 class', () => {
+    fixture.world = aster('recruit', { recruit: { rank: 9, exp: 0 } })
+    const ui = render(profile())
+    expect(screen.getByRole('tab', { name: 'Skills' })).toBeDefined()
+    fixture.world = aster('brawler', { recruit: { rank: 10, exp: 0 }, brawler: { rank: 10, exp: 0 } })
+    ui.rerender(profile())
+    expect(screen.getByRole('tab', { name: 'Skills' })).toBeDefined()
+  })
+})
+
+describe('the Class Ranks grid (v19)', () => {
+  it('lists the five Tier 0s and the Tier 1 classes she holds in Tier 1\'s world, the eight Tier 1 classes in a later one', () => {
+    const ranks = { classes: { recruit: { rank: 10, exp: 0 }, brawler: { rank: 10, exp: 0 } } }
+    expect(rankGridClasses({ ranks }, 1)).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice', 'brawler'])
+    expect(rankGridClasses({ ranks }, 2)).toEqual(['brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage'])
   })
 })

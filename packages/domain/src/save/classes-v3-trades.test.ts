@@ -1,16 +1,13 @@
-// Save v32's trade step (H130; classes-v3.md §8.4, CV20, CV28), with the switch mocked to 19: after the reset, an Uma whose
-// trade the new calling moves has her running work finished into the Warehouse with its Craft EXP and her queue dropped;
-// one whose trade stays keeps working. Made-up outfits only, never master data.
-import { describe, expect, it, vi } from 'vitest'
+// Save v32's trade step (H130; classes-v3.md §8.4, CV20, CV28), live since H134: after the reset, an Uma whose trade the
+// new calling moves has her running work finished into the Warehouse with its Craft EXP and her queue dropped; one whose
+// trade stays keeps working. Made-up outfits only, never master data.
+import { describe, expect, it } from 'vitest'
 import { grantProfessionExp } from '../economy/pacing'
 import type { CallingOutfit } from '../roster/template'
 import { settleClassesV3Trades } from './classes-v3'
 import { toV32 } from './migrations'
-import { repairCallingChoices } from './calling-repair'
 import { newSave, parseSave, umaPick, type Save } from './save'
 import { UMA, v31Save } from './v31.fixture'
-
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(19, await orig()))
 
 const NOW = '2026-10-29T12:00:00.000Z'
 type Grade = 'A' | 'B'
@@ -25,10 +22,10 @@ const D = outfit(UMA.D, { pace: 'A' }, 90, 100)
 // F: Front A; the Brawler and the Recruit, both Metal.
 const F = outfit(UMA.F, { front: 'A' }, 110, 90)
 
-/** The v31 save through `toV32` and v32's parse. */
+/** The v31 save through `toV32` and v32's parse (labelled 32, so the chain doesn't run again). */
 const reset = (): Save => {
   const save = JSON.parse(JSON.stringify(v31Save())) as { tierWorlds: Record<string, Record<string, unknown>> }
-  return parseSave({ ...save, tierWorlds: Object.fromEntries(Object.entries(save.tierWorlds).map(([k, w]) => [k, toV32(w, Number(k))])) })
+  return parseSave({ ...save, schemaVersion: 32, tierWorlds: Object.fromEntries(Object.entries(save.tierWorlds).map(([k, w]) => [k, toV32(w, Number(k))])) })
 }
 
 describe('settleClassesV3Trades (CV28)', () => {
@@ -74,9 +71,8 @@ describe('settleClassesV3Trades (CV28)', () => {
     expect(settleClassesV3Trades(fresh, [B, D, F], NOW)).toBe(fresh)
   })
 
-  it('leaves D220\'s calling repair a no-op beside it, and every pick reads null (umaPick)', () => {
+  it('leaves every pick null after the reset (umaPick; D220\'s calling repair retired with the pick, H134)', () => {
     const save = reset()
-    expect(repairCallingChoices(save, [B, D, F], NOW)).toBe(save)
     expect(Object.values(save.tierWorlds['1']!.umas).map(umaPick).every((p) => p === null)).toBe(true)
     expect(umaPick({ calling: { pick: 'mage', confirmed: true } })).toBe('mage')
   })

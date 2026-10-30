@@ -1,5 +1,8 @@
 # Class Progression: the six classes from Tier 1 to Tier 3
 
+> **Classes v3 (D240, live from H134) replaces the calling pick (CP29) and the six-class callings:** see
+> [Classes v3](../classes-v3/classes-v3.md) and the [manual](../../game/classes.md).
+>
 > **Approved by the owner, 2026-10-24 (D192): every call CP1–CP43 as written, CP42's Pierce included.** "A fine enough
 > state for now." Changes from here are follow-ups logged against it.
 >

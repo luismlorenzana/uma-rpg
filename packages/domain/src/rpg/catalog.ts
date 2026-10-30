@@ -10,7 +10,7 @@
 // generation at module load, so an old fight may show a new name.
 // Classes v3 (engine v19, D240; H126) adds 210 nodes on new ids, so no older def moves: the Tome Spellblade's and the Arms
 // Summoner's ten trees of eight line nodes each (`addLineTree`), and the five Tier 0 classes' ten trees of one node each
-// (`addTier0Tree`). 960 in all; the live list stays 750 until H134.
+// (`addTier0Tree`). 960 in all, the live list since H134 (750 to v18).
 // Engine v19's weapon shapes (CV12–CV14; H128) play new data on old ids, kept apart in `skill19` as v16 did: Katana and
 // Light are a double and Bow and Dark a volley (`RPG_VOLLEY`), on the Brawler's Bow, the Sorcerer's Light and Dark, the
 // Spell Blade's Light and Dark cores and the Summoner's Bow, Dark and Light summons; the Brawler's Bow B becomes Barrage, the
@@ -649,7 +649,7 @@ for (const classId of RPG_TIER0_CLASSES) for (const weapon of RPG_WEAPONS) addTi
 
 /** Every node of every generation (960: 750 to v18, D179; Classes v3's 210 from v19, H126): `rpgNode` finds any of them. */
 export const RPG_ALL_NODES: readonly RpgNode[] = NODES
-/** The live generation's nodes: the five classes' 600 until the switch (H61), all 750 after; 960 from H134. */
+/** The live generation's nodes: the five classes' 600 until H61, 750 to v18; 960 since H134. */
 export const RPG_NODES: readonly RpgNode[] = NODES.filter((n) => RPG_CLASSES.includes(n.classId))
 const BY_ID = new Map(NODES.map((n) => [n.id, n]))
 export const rpgNode = (id: string): RpgNode | undefined => BY_ID.get(id)

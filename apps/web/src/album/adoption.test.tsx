@@ -83,7 +83,8 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     fixture.world.parties[0]!.slots[0] = '81001'
     fixture.world.parties[1]!.slots[0] = '81003'
     show(<PartyHallPage {...page('party-hall', '1')} />)
-    expect(screen.getByText((_, element) => element?.textContent === 'Lead · Brawler')).toBeDefined()
+    // Aster fights as her calling's Tier 0 (v19).
+    expect(screen.getByText((_, element) => element?.textContent === 'Lead · Recruit')).toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: /Slot 2 · add an Uma/ }))
     expect(within(dialog()).getByRole('button', { name: 'Aster. In this party' }).hasAttribute('disabled')).toBe(true)
     expect(within(dialog()).queryByRole('button', { name: /Fable/ })).toBeNull()
@@ -190,7 +191,8 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     show(<Routes><Route path="/town/exchange/*" element={<ExchangeAt />} /></Routes>, '/town/exchange')
     fireEvent.click(screen.getByRole('button', { name: /Read a Class Manual/ }))
     fireEvent.click(within(dialog()).getByRole('button', { name: 'Cinder' }))
-    await waitFor(() => expect(document.querySelectorAll('[data-manual-bar]')).toHaveLength(6))
+    // Her five Tier 0 bars (v19): she holds no Tier 1 class yet.
+    await waitFor(() => expect(document.querySelectorAll('[data-manual-bar]')).toHaveLength(5))
     expect(within(dialog()).getByRole('list', { name: 'Classes' })).toBeDefined()
   })
 

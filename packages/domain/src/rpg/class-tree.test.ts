@@ -91,12 +91,12 @@ describe('Tier 0 (CV5, CV6)', () => {
 })
 
 describe('names and gates (CV3, CV4, CV8–CV10)', () => {
-  it('names the classes by generation: v3\'s from v19, today\'s before', () => {
+  it('names the classes by generation: v3\'s from v19, v2\'s before', () => {
     expect(rpgClasses(V19).map((c) => rpgClassName(c, V19))).toEqual(['Recruit', 'Duelist', 'Acolyte', 'Caller', 'Initiate', 'Brawler',
       'Arms Spellblade', 'Arms Summoner', 'Paladin', 'Cleric', 'Tome Summoner', 'Tome Spellblade', 'Sorcerer'])
     expect(rpgClasses(V18).map((c) => rpgClassName(c, V18))).toEqual(['Brawler', 'Mage', 'Spell Blade', 'Cleric', 'Summoner', 'Paladin'])
-    // The live default is v18's until H134.
-    expect([rpgClassName('spellblade'), rpgClassName('spellblade', V19)]).toEqual(['Spell Blade', 'Arms Spellblade'])
+    // The live default is v19's since H134.
+    expect([rpgClassName('spellblade'), rpgClassName('spellblade', V18)]).toEqual(['Arms Spellblade', 'Spell Blade'])
   })
 
   it('opens every Tier 0 to every Uma in Tier 1\'s world and a Tier 1 class once held; a closed one says how', () => {
@@ -119,7 +119,8 @@ describe('names and gates (CV3, CV4, CV8–CV10)', () => {
     // Before v19 every class of the generation is open, and the seven don't exist.
     expect(rpgClassGate(fresh, 'paladin', 1, V18)).toBeNull()
     expect(rpgClassGate(fresh, 'recruit', 1, V18)).toBe('No such class')
-    expect(rpgClassGate(fresh, 'recruit')).toBe('No such class')
+    // The live game (v19 since H134) opens her Tier 0 in Tier 1's world.
+    expect(rpgClassGate(fresh, 'recruit')).toBeNull()
   })
 
   it('types the Tier 0 list in the tree\'s order', () => {

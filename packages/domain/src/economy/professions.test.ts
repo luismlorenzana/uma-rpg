@@ -71,16 +71,18 @@ describe('the trade (PP2, PP3)', () => {
     expect(TRADES.flatMap((t) => tradeProfessions(t.id)).sort()).toEqual(PROFESSIONS.map((p) => p.id).sort())
   })
 
-  it('moves a Pace Uma between the Forest · Armorer and Monster Den · Lapidary trades by her pick (CP29)', () => {
-    // An invented Pace Uma, Wit over Power: her pre-selection is the Mage, her other option the Spell Blade.
+  it('moves a Pace Uma between the Forest · Armorer and Monster Den · Lapidary trades by her pick (CP29, to v18)', () => {
+    // An invented Pace Uma, Wit over Power: her pre-selection is the Mage, her other option the Spell Blade. The pick is
+    // v18's; from v19 her Tier 0 names her trade (professions-v19.test.ts).
+    const V18 = 18
     const pace: CallingOutfit = {
       aptitudes: { strategy: { front: 'G', pace: 'A', late: 'G', end: 'G' }, distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } },
       baseStats: { power: 90, wit: 104 },
     }
-    expect(umaTrade(pace)).toBe('magical')
-    expect(umaTrade(pace, 'spellblade')).toBe('physical-hybrid')
+    expect(umaTrade(pace, null, V18)).toBe('magical')
+    expect(umaTrade(pace, 'spellblade', V18)).toBe('physical-hybrid')
     const world = { umas: { a: { calling: { pick: 'spellblade' as const } }, b: { calling: { pick: null } } } }
-    const tradeOf = tradeResolver(world, (id) => (id === 'c' ? undefined : pace))
+    const tradeOf = tradeResolver(world, (id) => (id === 'c' ? undefined : pace), V18)
     expect(['a', 'b', 'c', 'nobody'].map(tradeOf)).toEqual(['physical-hybrid', 'magical', null, null])
   })
 })

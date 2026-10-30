@@ -1,15 +1,16 @@
 // The Paladin's start and one healer a party by generation (H58): both are classes v2 rules, so engine v14 started every
-// Late surger as a Cleric and let two Clerics fight together, and the live game since H61 (D188) doesn't. From v16 (live
-// since H72, D210) her start is her calling (`starting-class-v16.test.ts`), which keeps the Paladin's for a Late surger.
-// `healers-v2.test.ts` holds the live rules where a party fights.
+// Late surger as a Cleric and let two Clerics fight together, and the game since H61 (D188) doesn't. From v16 (live from
+// H72, D210) her start is her calling (`starting-class-v16.test.ts`), which keeps the Paladin's for a Late surger to v18;
+// from v19 (Classes v3, live since H134) she starts as her Acolyte and holds the Paladin once promoted. `healers-v2.test.ts`
+// holds the live rules where a party fights.
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
 import { regionChapter, worldContinent } from '../world/world'
-import { activeClass, chooseClass, healerBlock, ONE_HEALER, startFight, startingClass, styleClass, type BattleOutfit } from './battle'
+import { activeClass, healerBlock, ONE_HEALER, startFight, startingClass, styleClass, type BattleOutfit } from './battle'
 import { T } from './rift-rules.fixture'
 import { setPartySlot, unlockUma, worldOf } from './rules'
 import { armorHalf } from '../economy/grades'
-import { newSave, type Save } from './save'
+import { newSave, type Save, type TierWorld } from './save'
 
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 110, wit = 110): BattleOutfit => ({
   outfitId: id, baseStats: { speed: 110, stamina: 110, power, guts: 110, wit },
@@ -19,12 +20,13 @@ const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 11
 const STYLES = ['front', 'pace', 'late', 'end'] as const
 
 describe('the Paladin’s start (H58, §3.3)', () => {
-  it('is a Late surger whose base Power beats her base Wit, from classes v2 only (and her calling from v16, live since H72)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
+  it('is a Late surger whose base Power beats her base Wit, from classes v2 to v18 (her calling from v16); from v19 her Acolyte', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
     const strong = outfit('1', 'late', 120, 100), even = outfit('2', 'late', 110, 110), wise = outfit('3', 'late', 100, 120)
     expect([strong, even, wise].map((o) => startingClass(o, 15))).toEqual(['paladin', 'cleric', 'cleric'])
     expect([strong, even, wise].map((o) => startingClass(o, 14))).toEqual(['cleric', 'cleric', 'cleric'])
-    expect([strong, even, wise].map((o) => startingClass(o))).toEqual(['paladin', 'cleric', 'cleric'])
+    expect([strong, even, wise].map((o) => startingClass(o, 18))).toEqual(['paladin', 'cleric', 'cleric'])
+    expect([strong, even, wise].map((o) => startingClass(o))).toEqual(['acolyte', 'acolyte', 'acolyte'])
     // The other styles start as before in both generations, whatever their stats.
     expect(STYLES.map((s) => startingClass(outfit('4', s, 120, 100), 15))).toEqual(['brawler', 'mage', 'paladin', 'summoner'])
     expect(STYLES.map((s) => startingClass(outfit('4', s, 120, 100), 14))).toEqual(['brawler', 'mage', 'cleric', 'summoner'])
@@ -47,8 +49,10 @@ describe('the Paladin’s start (H58, §3.3)', () => {
   it('keeps an unpicked Late surger a Cleric in both generations: her style’s class, not her start', () => {
     const strong = outfit('1', 'late', 120, 100)
     expect(styleClass(strong)).toBe('cleric')
-    expect(activeClass(strong, { classId: null })).toBe('cleric')
+    expect([activeClass(strong, { classId: null }, 1, 14), activeClass(strong, { classId: null }, 1, 18)]).toEqual(['cleric', 'cleric'])
     expect(activeClass(strong, { classId: 'mage' })).toBe('mage')
+    // From v19 a null class reads her world: her calling's Tier 0 in Tier 1's (CV10).
+    expect(activeClass(strong, { classId: null })).toBe('acolyte')
   })
 })
 
@@ -61,7 +65,11 @@ describe('one healer a party is a classes v2 rule (H58)', () => {
     let save: Save = newSave('Luis', T(0))
     for (const id of OUTFITS.keys()) save = unlockUma(save, id, T(0))
     ;[...OUTFITS.keys()].forEach((id, slot) => { save = setPartySlot(save, 0, slot, id, T(0)) })
-    save = chooseClass(chooseClass(save, '101', 'cleric', T(1)), '102', 'cleric', T(1))
+    // 101 and 102 Clerics, promoted from the Acolyte (v19's Tier 1 world holds them so); 103, a Late Uma with no class, is
+    // her style's Cleric to v18 and her Acolyte, no healer, from v19.
+    const w: TierWorld = JSON.parse(JSON.stringify(worldOf(save)))
+    for (const id of ['101', '102']) w.umas[id] = { ...w.umas[id]!, classId: 'cleric', ranks: { ...w.umas[id]!.ranks, classes: { acolyte: { rank: 10, exp: 0 }, cleric: { rank: 10, exp: 0 } } } }
+    save = { ...save, tierWorlds: { ...save.tierWorlds, '1': w } }
     const slots = worldOf(save).parties[0]!.slots as string[]
     expect(healerBlock(worldOf(save), slots, OUTFITS, 14)).toBeNull()
     expect(healerBlock(worldOf(save), slots, OUTFITS, 15)).toBe(ONE_HEALER)
