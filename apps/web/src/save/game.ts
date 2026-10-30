@@ -209,9 +209,13 @@ export const chooseCalling = (outfit: BattleOutfit, pick: RpgClass) =>
 /** Makes her calling final (CP29, H69's `confirmCalling`). */
 export const confirmCallingPick = (outfitId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.confirmCalling(s, outfitId, now, t))
 /** Sets several Umas' class weapons in one save (the Rift's guided build, v16, CP7): weapons are owned per kind, so it
- * costs nothing; her equipped skills of a tree she stops slotting leave her loadout (H69). */
-export const wieldWeapons = (members: readonly { outfitId: string; classId: RpgClass; weapons: readonly RpgWeapon[] }[]) =>
-  edit(import('@rpg/domain/battle'), (d, s, now, t) => members.reduce((next, m) => d.setClassWeapons(next, m.outfitId, m.classId, m.weapons, now, t), s))
+ * costs nothing; her equipped skills of a tree she stops slotting leave her loadout (H69). From v19 a member marked
+ * `switch` also fights as that class, one she holds (CV §10.1). */
+export const wieldWeapons = (members: readonly { outfitId: string; classId: RpgClass; weapons: readonly RpgWeapon[]; switch?: boolean }[]) =>
+  edit(import('@rpg/domain/battle'), (d, s, now, t) => members.reduce((next, m) => {
+    const armed = d.setClassWeapons(next, m.outfitId, m.classId, m.weapons, now, t)
+    return m.switch ? d.chooseClass(armed, m.outfitId, m.classId, now, t) : armed
+  }, s))
 /** Equips skills in order, or null to have them chosen for her (D86). */
 export const equip = (outfit: BattleOutfit, classId: RpgClass, loadout: string[] | null) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.equipSkills(s, outfit, classId, loadout, now, t))
 export const beginFight = (region: RpgCampaignChapter, nodeId: string, outfits: ReadonlyMap<string, BattleOutfit>) =>

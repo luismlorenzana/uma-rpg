@@ -1,11 +1,10 @@
 // RPG data and eligibility over the kit's neutral album rows. No list/query implementation lives here.
 import { type AlbumPreset, type AlbumPrefsSchema, type AlbumQuery, type FacetDef, type SortDef, type OutfitRowBase, runAlbumQuery } from '@luismlorenzana/uma-kit/roster'
 import {
-  ACCESSORY_FAMILIES, ACCESSORY_FAMILY_LABEL, activeClass, availableWorkers, BATTLE_ENGINE_VERSION, KEY_LABELS, KNACK_LABEL, RPG_CLASSES, rpgRework, statTotal, STRIDE_LABEL,
-  TRADE_IDS, UMA_KNACKS, UMA_STRIDES, umaTemplate, umaTemplateFacets, tradeOfCalling,
+  ACCESSORY_FAMILIES, ACCESSORY_FAMILY_LABEL, activeClass, availableWorkers, BATTLE_ENGINE_VERSION, KEY_LABELS, KNACK_LABEL, rpgClasses, rpgClassName,
+  rpgRework, statTotal, STRIDE_LABEL, TRADE_IDS, UMA_KNACKS, UMA_ROW_CALLING_V3, UMA_STRIDES, umaTemplate, umaTemplateFacets, tradeOfCalling, type RpgClass,
   type OwnedUma, type RosterOutfit, type TierWorld, type UmaUpgrades, umaPick,
 } from '@rpg/domain'
-import { CLASS_LABEL } from '../battle/labels'
 import type { MasterView } from '../master/master'
 import { tradeLabel } from '../save/trade'
 import type { UmaPickerRow } from '@luismlorenzana/uma-kit/album'
@@ -14,7 +13,7 @@ export interface RpgUmaRow extends UmaPickerRow {
   outfit: RosterOutfit
   base: OutfitRowBase
   uma: OwnedUma | null
-  classId: typeof RPG_CLASSES[number] | null
+  classId: RpgClass | null
   isNew: boolean
   busy: boolean
   /** What she can upgrade now (H34): filled by `withUpgrades` on the Stable only, null elsewhere. */
@@ -33,11 +32,20 @@ const FACETS: readonly FacetDef[] = [
   { key: 'sex', label: 'Real horse', group: 'Collection', kind: 'enum', options: [{ value: 'female', label: 'Mare' }, { value: 'male', label: 'Stallion' }, { value: 'unknown', label: 'Unknown' }] },
   { key: 'new', label: 'New', group: 'Collection', kind: 'boolean' },
   { key: 'free', label: 'Free now', group: 'Collection', kind: 'boolean' },
-  { key: 'class', label: 'Class', group: 'RPG', kind: 'enum', options: RPG_CLASSES.map(value => ({ value, label: CLASS_LABEL[value] })) },
-  { key: 'upgrade', label: 'Can upgrade', group: 'RPG', kind: 'boolean' },
 ]
-const TEMPLATE_FACETS: readonly FacetDef[] = [
-  { key: 'calling', label: 'Calling', group: 'Template', kind: 'enum', options: RPG_CLASSES.map(value => ({ value, label: CLASS_LABEL[value] })) },
+const classOptions = (classes: readonly RpgClass[], engine: number) => classes.map(value => ({ value, label: rpgClassName(value, engine) }))
+/** Class, after the collection facets: the generation's classes, before v19 six; from v19 (Classes v3, CV §14.5; H134) the
+ * thirteen in the tree's order, the five Tier 0s then the eight Tier 1 classes (the kit's facet has no option groups, so the
+ * order groups them). */
+const classFacet = (engine: number): FacetDef => ({ key: 'class', label: 'Class', group: 'RPG', kind: 'enum', options: classOptions(rpgClasses(engine), engine) })
+const UPGRADE_FACET: FacetDef = { key: 'upgrade', label: 'Can upgrade', group: 'RPG', kind: 'boolean' }
+/** Calling: before v19 the live six (an owned Uma's pick counts); from v19 her Tier 0 by running style (CV19), the five in
+ * the style rows' order, no pick. */
+const callingFacet = (engine: number): FacetDef => ({
+  key: 'calling', label: 'Calling', group: 'Template', kind: 'enum',
+  options: classOptions(rpgRework('classes', engine) ? Object.values(UMA_ROW_CALLING_V3) : rpgClasses(engine), engine),
+})
+const STRIDE_KNACK_FACETS: readonly FacetDef[] = [
   { key: 'stride', label: 'Stride', group: 'Template', kind: 'enum', options: UMA_STRIDES.map(value => ({ value, label: STRIDE_LABEL[value] })) },
   { key: 'knack', label: 'Knack', group: 'Template', kind: 'enum', options: UMA_KNACKS.map(value => ({ value, label: KNACK_LABEL[value] })) },
 ]
@@ -48,11 +56,12 @@ export const TRADE_FACET: FacetDef = {
 const SIGNATURE_FACET: FacetDef = { key: 'signature', label: 'Signature', group: 'Template', kind: 'enum',
   options: ACCESSORY_FAMILIES.map(value => ({ value, label: ACCESSORY_FAMILY_LABEL[value] })) }
 /** The Stable's facets: from engine v16 (UT15, H70) a Template group after RPG, her calling (an owned Uma's pick counts),
- * stride and knack; from R2's switch, Signature in Template and Trade after it, on locked outfits too. The boolean
- * overload keeps H80's isolated switch test legible. */
+ * stride and knack; from R2's switch, Signature in Template and Trade after it, on locked outfits too; from v19 Class and
+ * Calling in Classes v3's lists. The boolean overload keeps H80's isolated switch test legible (the live classes). */
 export const stableFacets = (stage: number | boolean = BATTLE_ENGINE_VERSION): readonly FacetDef[] => {
   const economy = typeof stage === 'boolean' ? stage : rpgRework('economy', stage)
-  return [...FACETS, ...TEMPLATE_FACETS, ...(economy ? [SIGNATURE_FACET, TRADE_FACET] : [])]
+  const engine = typeof stage === 'boolean' ? BATTLE_ENGINE_VERSION : stage
+  return [...FACETS, classFacet(engine), UPGRADE_FACET, callingFacet(engine), ...STRIDE_KNACK_FACETS, ...(economy ? [SIGNATURE_FACET, TRADE_FACET] : [])]
 }
 export const STABLE_FACETS: readonly FacetDef[] = stableFacets()
 /** The Filters sheet's quick picks (H34): "Can upgrade" turns that facet on. */
