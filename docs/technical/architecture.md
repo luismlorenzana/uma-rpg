@@ -177,5 +177,7 @@ of `save/battle.ts`, and through it the engine, rendered in the main chunk. H62 
   fight loads the engine at boot through `parseSaveAsync`, as before.
 - **The guard:** `vite.config.ts`'s `chunkModules` writes `dist/.vite/chunks.json` (each chunk's rendered modules; never
   deployed or precached), and `scripts/check-size.mjs` fails the build when the initial JS renders any of
-  `LAZY_MODULES`: the engine, Auto, Limit Breaks, the catalog, the Limit Break table and `save/battle.ts`. A screen in
+  `LAZY_MODULES`: the engine, Auto, Limit Breaks, the catalog, the Limit Break table and `save/battle.ts` (since then
+  also old saves' migrations, save v32's reset rules, the v1 names and Classes v3's class tree tiles,
+  `save/class-tiles.ts`, which the Stable draws; H137). A screen in
   the entry (the Hub, the bars, `battle/labels.tsx`, the album rows, the store) must not import them; a lazy page may.

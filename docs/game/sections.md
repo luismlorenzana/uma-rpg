@@ -163,7 +163,7 @@ world map's party bar).
 - **Can upgrade** (`upgradesFor`, as her active class; `album/upgrades.ts`): a weapon, armor or accessory slot she can
   raise now (its made item in the Warehouse, her level allowing), an accessory slot at G1 or more with no family yet, or
   a jewel in the Warehouse that opens one of her nodes now. From the switch (H134), also a promotion waiting: she fights
-  as a Tier 0 at Rank 10 with a child she doesn't hold (`rpgPromotionWaits`).
+  as a Tier 0 at Rank 10 with a child she doesn't hold (`umaPromotionWaits`).
 
 **Her profile** (`OutfitProfile.tsx` in the kit's `ProfileFrame`; its layout rules are [profile
 UX](../design/profile-ux.md), D229):

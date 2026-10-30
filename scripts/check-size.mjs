@@ -8,7 +8,8 @@ export const MAIN_JS_BUDGET = 230_000
 // H62: the fight engine, the skill catalog and the Limit Break table it reads, and the world map's fight rules load on
 // demand. H136: so do old saves' migration chain (`parseSaveAsync` imports it only for a save older than the current
 // version) and the v1 economy's names (no v28+ world holds a v1 id; only the v1 screens and tests read them). H130: save
-// v32's reset rules (`save/classes-v3.ts`) load with the fight rules, or for the trade step while a record waits. The build's
+// v32's reset rules (`save/classes-v3.ts`) load with the fight rules, or for the trade step while a record waits. H137: the
+// class tree's tiles (`save/class-tiles.ts`) load with the Stable that draws them. The build's
 // chunk map (apps/web/vite.config.ts, `chunkModules`) says what each chunk renders; none of these may render in the
 // initial JS.
 export const LAZY_MODULES = [
@@ -20,6 +21,7 @@ export const LAZY_MODULES = [
   'packages/domain/src/save/battle.ts',
   'packages/domain/src/save/migrations.ts',
   'packages/domain/src/save/classes-v3.ts',
+  'packages/domain/src/save/class-tiles.ts',
   'packages/domain/src/items/families.ts',
   'packages/domain/src/items/names-v1.ts',
 ]
@@ -85,7 +87,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const result = await checkSize(resolve(process.argv[2] ?? 'dist'))
     console.log(`Main JS: ${(result.mainGzip / 1000).toFixed(2)} KB gzip / ${MAIN_JS_BUDGET / 1000} KB budget`)
     console.log(`Initial JS: ${(result.initialGzip / 1000).toFixed(2)} KB gzip across ${result.files.length} static chunk(s)`)
-    console.log(`On demand: none of ${result.lazy} lazy modules (the fight engine, catalog, Limit Breaks, fight rules, old saves' migrations, v1 names) in it`)
+    console.log(`On demand: none of ${result.lazy} lazy modules (the fight engine, catalog, Limit Breaks, fight rules, old saves' migrations, v1 names, the class tree's tiles) in it`)
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)
     process.exitCode = 1
