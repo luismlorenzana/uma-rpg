@@ -162,7 +162,8 @@ world map's party bar).
   catalogue of the day as seen.
 - **Can upgrade** (`upgradesFor`, as her active class; `album/upgrades.ts`): a weapon, armor or accessory slot she can
   raise now (its made item in the Warehouse, her level allowing), an accessory slot at G1 or more with no family yet, or
-  a jewel in the Warehouse that opens one of her nodes now.
+  a jewel in the Warehouse that opens one of her nodes now. From the switch (H134), also a promotion waiting: she fights
+  as a Tier 0 at Rank 10 with a child she doesn't hold (`rpgPromotionWaits`).
 
 **Her profile** (`OutfitProfile.tsx` in the kit's `ProfileFrame`; its layout rules are [profile
 UX](../design/profile-ux.md), D229):
@@ -223,6 +224,37 @@ UX](../design/profile-ux.md), D229):
 - Below: **Inheritance**, with her Hall seat as a Hero ("Brawler Hero · {Limit Break} · Bond 3/10"), or her Heroes'
   Limit Breaks with "Bond 2/10 · 60%" (" · former Hero" for one she left), or "No inheritance yet"; each opens its hall.
   Then **Class Ranks**: six cells, each class's rank and bar.
+- **From the switch (H134)**, Classes v3's rows (`class-view.ts`, `ClassesSheet.tsx`, `PromotionSheet.tsx`; D253; the
+  rules are [Classes v3](../design/classes-v3/classes-v3.md) §2, §7, §14):
+  - The class button reads her rank, a Tier 0's "R7/10". While she fights as a Tier 0 at Rank 10 with a child she
+    doesn't hold, it reads **Promote** with the green Ready dot, the Skills tab carries the same dot, and her roster face
+    the can-upgrade mark (the "Can upgrade" filter finds her). Tapping it opens the promotion sheet; otherwise **Classes**
+    replaces the Class sheet.
+  - **Classes**, the class tree: Warrior · All-Rounder · Mage over five columns, the Tier 0 row (Recruit, Duelist,
+    Acolyte, Caller, Initiate) over the Tier 1 rows (Brawler, Arms Spellblade, Paladin, Arms Summoner, Sorcerer; Tome
+    Spellblade, Cleric, Tome Summoner). Each tile: emblem, name and its word, "R34" (On, the accent fill; or Held,
+    raised), "R7/10" on a Tier 0, **Ready** with a green dot (a child of a Tier 0 she holds at Rank 10), "R1 · free"
+    dashed (a Tier 0 she hasn't started), **Closed** at 40%. A later tier's world has no Tier 0 row and every Tier 1
+    class "R1 · free".
+  - A tap selects (a ring) and writes the line under the tree: "Arms Summoner · Ready", "2 Arms + 1 Tome · Area ·
+    lingers", its three defaults and "Hand · Arms ×0.57 · Tome ×0.46" (a Tier 0: "Any 3 weapons · Drill Strike" and
+    "Promotes to Brawler, Arms Spellblade, Arms Summoner"), and "Party 1: 2 healers" in the warning colour when the
+    selected healer would make two in her party.
+  - The footer acts on the selection: **Fight as Arms Spellblade** or **Start Caller · R1** (free; the sheet stays open,
+    the class On), **Promote to Arms Summoner** (the promotion sheet replaces this one on that child), "Fights as
+    Brawler" on her own class, and on a closed one its gate, "Opens with Duelist R10 or Initiate R10", disabled.
+  - **Class Manuals ›** ("Exchange") opens the Exchange's Manual sheet on her at `/town/exchange/manual/:outfitId`; its
+    Back returns to the Skills tab with Classes open.
+  - **The promotion sheet** ("Promote · Recruit R10", "Free · the others stay open"): one tile a child, **Suggested** on
+    the suggested one (opened on it, or on the Ready tile's child), **Held** on one she holds; each with its slots, three
+    defaults and role, a row the same on every tile left out. Under them "Recruit R10 → Brawler R11" and "Depths 1–2 · 6
+    skills · +400 EXP" (the EXP waiting on her Tier 0 lands at once). **Promote to Brawler** (free, no confirm) closes it
+    and the tab shows the Brawler's first tree; on a held child **Fight as …**. **Classes ›** swaps back to the tree.
+  - **A Tier 0's trees** are one node each, no letters on the weapon buttons and no fork: "Drill Strike · Greatsword",
+    its line at her Class Rank ("one foe · 1 hit · 2.1× · 10 MP") and "R7/10"; its sheet has no pips ("Rank 7 · next at
+    Class Rank 8", "Depth 1 · Trunk"). Under it "Promotion at R10 · 3 to go" with a bar to Rank 10, or at Rank 10
+    "Promotion · +400 EXP waiting" ("Promotion · Ready" with none), which opens the promotion sheet. Her rank row and
+    depths line are left out. **Change** lists all ten weapons for any of her three slots.
 
 **Battle tab** (`umaBattleSheet`, `packages/domain/src/save/sheet.ts`; the rules are
 [combat](combat.md#where-damage-comes-from)):

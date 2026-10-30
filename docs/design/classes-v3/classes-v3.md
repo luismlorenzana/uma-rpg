@@ -868,6 +868,9 @@ Save v32 built in H130 (D247), live from H134.
 
 ## 14. The screens
 
+§14.1's class tree, Tier 0 tree and dot and §14.2's promotion sheet: built in H137 (D253), on today's Skills tab; H120
+moves them into the Class tab. Live from H134.
+
 ### 14.1 The Class tab: what H120 now builds
 
 Profile v2's Class tab ([§4.1](../uma-profile-v2/proposal.md#41-class), UP10) keeps its layout; four pieces change

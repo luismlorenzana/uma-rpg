@@ -51,7 +51,10 @@ export function PromotionSheet({ outfit, uma, tier, from, child = null, onClose,
           {view.tiles.map((t) => <Tile key={t.classId} tile={t} selected={t.classId === pick.classId} onSelect={() => setSelected(t.classId)} />)}
         </div>
         <div className="text-center" data-promotion-plan aria-live="polite">
-          <p className="font-display text-[22px] font-extrabold leading-tight">{view.before}</p>
+          {/* Each side keeps its class and rank together: a long name wraps after the arrow, never before its rank. */}
+          <p className="font-display text-[22px] font-extrabold leading-tight">
+            {view.before.split(' → ').map((side, i) => <span key={side}>{i > 0 && ' → '}<span className="whitespace-nowrap">{side}</span></span>)}
+          </p>
           {view.after && <p className="text-[12.5px] text-ink-soft">{view.after}</p>}
           {footer.block && <p className="text-[12.5px] font-semibold text-warning">{footer.block}</p>}
         </div>
