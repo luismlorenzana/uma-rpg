@@ -54,7 +54,7 @@
 | [H130](tasks/H130-save-v32-class-reset.md) | Save v32, dark: the class reset and refund as Class Marks, trade moves, the healer seats' merge; `toV32` not chained | Claude | M–L | H126, H129, H136 | Done (`2bea968`) |
 | [H131](tasks/H131-classes-v3-balance.md) | Balance on engine v19: Classes v3's S1–S10 and Halls v2's targets, knobs as the designs name them | Claude | M–L | H126, H128, H129 | Done (`598060e`) |
 | [H132](tasks/H132-classes-rebuilt-sheet-exchange.md) | "The classes are rebuilt" sheet and its Account row, the Exchange's Manual sheet | Claude | S–M | H126, H129, H130 | Done (`7890105`) |
-| [H137](tasks/H137-classes-v3-promotion-today.md) | Classes v3: the class tree, the promotion sheet, the Tier 0 tree and the Ready dot on today's Skills tab, as sheets H120 reuses (D252); inert until H134 | Claude | M | — | In progress |
+| [H137](tasks/H137-classes-v3-promotion-today.md) | Classes v3: the class tree, the promotion sheet, the Tier 0 tree and the Ready dot on today's Skills tab, as sheets H120 reuses (D252); inert until H134 | Claude | M | — | Done (`fdec2aa`) |
 | [H134](tasks/H134-classes-v3-switch.md) | **The switch:** engine v19 and save v32 live with `toV32` chained, the kind colours swapped, the manual rewritten | Claude | M | H127, H130, H131, H132, H133, H137 | Waiting |
 
 | Phase | Packets | What it leaves on main | Needs from other groups |
@@ -62,7 +62,7 @@
 | 1. Foundation | H136 → H126 | Main JS back to ~215 KB; the 13 classes, the tree, Tier 0 and promotion in the domain, dark at engine v19 | — |
 | 2. Rules and save | H128 ∥ H130 (both start on H126's reviewed branch; H130's healer-seat step waits for H129) → H129 (on H128's branch) → H131 | Weapon shapes, the twenty Limit Breaks, save v32 and the reset written, balance measured; all dark | H129 is the Halls group's domain packet: Phase 2 builds it, since H130 migrates the healer seats with the classes. H133 (ChatGPT) can start once H128 and H129 merge |
 | 3. The reset's screens | H132 (starts once H130's pull request is up) | "The classes are rebuilt" sheet and the Exchange's Manual sheet, inert | — |
-| 4. The switch | H137 (the promotion on today's Skills tab) → H134 | Engine v19 and save v32 live, the manual rewritten | H133 (Halls, ChatGPT). Not the Uma profile v2 (D252) |
+| 4. The switch | H137 (the promotion on today's Skills tab, done) → H134 | Engine v19 and save v32 live, the manual rewritten | H133 (Halls, ChatGPT). Not the Uma profile v2 (D252) |
 
 **Halls of Heroes v2** (D241):
 
@@ -86,6 +86,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 | Id | Task | Commit |
 |---|---|---|
+| H137 | Classes v3's class tree, promotion sheet, Tier 0 tree and Ready dot on today's Skills tab, inert until H134 (D252, D253): `class-view.ts`, `ClassesSheet.tsx` and `PromotionSheet.tsx` as standalone sheets H120 reuses; the Manuals door to the Exchange with Back to the sheet; the Stable's Promote reason (`umaPromotionWaits`); `umaClassTree` moved to a lazy `save/class-tiles.ts`. Main JS 218.73 KB locally. [#78](https://github.com/luismlorenzana/uma-rpg/pull/78) | `fdec2aa` |
 | H131 | Classes v3's and Halls v2's balance on engine v19, dark (D249), 32 seeds on Auto against v18: every Tier 1 stage still wins (S1, H2: 0 points); the mirrors within 2–6% (S3, S4); the Rift's right builds 91–100% a stage, champions 60–68%, the Convergence 50%. Tuned, v19 only: Tier 0 power ×1.05 (1.60 → 2.31), `HANDS_V19` (Tome Spellblade Arms 0.48, Arms Summoner Tome 0.46, both Summoners' lead 0.57), Light Pierce 0.85, the Limit Break scale 0.95 (healers 0.8), `RIFT_TUNING_V19`. **Recorded misses:** Paladin ÷ Cleric 117% (147% at Lv 30), Limit Breaks above the analytic for the hybrids and Summoners (133–150%: home seats now strike in her own weapons' kinds), Iron's stages 9–11 +16 points, the Arms Spellblade at 79–80% physical from Lv 30, the Bow Barrage and Light Pierce B lines, Lv 20's pace 90%. Main JS 219.44 KB gzip on CI | `598060e` |
 | H127 | Seven Classes v3 emblems, delivered in [uma-platform #56](https://github.com/luismlorenzana/uma-platform/pull/56), P76/D251: five plain Tier 0 motifs and two mirrored channel hybrids, every older UI frame preserved; [uma-art 2.16.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40932890896). H120 pins this version or later and removes the temporary class-emblem fallback. | platform `45bdebb` |
 | H132 | "The classes are rebuilt" and the Exchange's Class Manual sheet (D250): the one-time sheet reads H130's record (each Uma's Manuals and trade, the Healer Sanctum's merge lines) with an Account row; the Manual sheet selects a bar and a count with one footer button (live on v18), and from v19 shows the Tier 0 bars, To Rank 10, her share counting down and EXP waiting past Rank 10 (`R10 · +12,400 EXP waiting`); route `/town/exchange/manual/:outfitId`. Main JS 219.35 KB gzip on CI | `7890105` |

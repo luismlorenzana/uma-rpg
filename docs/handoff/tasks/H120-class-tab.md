@@ -360,3 +360,4 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
 - **D252 (2026-10-29): reuse H137's sheets.** H137 builds `class-view.ts`, `ClassesSheet.tsx` and `PromotionSheet.tsx`
   (the class tree, the promotion sheet, the Tier 0 tree, the Ready dot) on today's Skills tab. This packet moves them into
   the new Class tab instead of building them. H120 is no longer a dependency of the Classes v3 switch.
+  The uma-art 2.16.0 pin and the emblem fallback's removal move to H134 (D252), unless this packet lands first.

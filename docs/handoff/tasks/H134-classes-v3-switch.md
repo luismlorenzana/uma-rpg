@@ -244,3 +244,10 @@ changes the owner's save**, so it's rehearsed on a full-shaped scratch save firs
 - **D252 (2026-10-29): no longer needs H119, H120 or H123.** The class tree and the promotion screen are H137's, on today's
   Skills tab. You retire the calling card yourself, as already planned. Where a step here names H120's or H123's
   screens, use H137's sheets: the local validation promotes a Tier 0 through them.
+- **From H137 (D253), for the flip:** pin uma-art 2.16.0 or later in `apps/web/package.json` and remove H126's
+  `ClassEmblem` fallback, so the Tier 0 and hybrid tiles draw H127's emblems (D251's adoption moved here by D252). The
+  Skills tab's Class Ranks grid under Inheritance would list all thirteen classes at v19 with the Tier 0 bars on the
+  Tier 1 curve: hide the Tier 0s there or draw them to 10 (H120 removes the grid later). The Flourish line reads "No
+  effect as …" for a Tier 0 at v19: check it against the templates' rule (Flourish by family) and fix the wording or the
+  rule's reader.
+
