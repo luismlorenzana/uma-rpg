@@ -1,8 +1,8 @@
 # H134 — The switch: Classes v3 and Halls v2 go live (engine v19, save v32), and the manual rewritten
 
 **uma-rpg · Claude · M · Needs: H130 (save v32), H131 (the balance), H132 (the reset sheet and the Exchange), H133 (the
-Learning and Hall pages), H120 (the Class tab), H123 (the Template tab), H127 (the emblems, pinned); through them H126,
-H128, H129 · Unblocks: the Tier 2 re-plan (D238); H135's own Sanctum becomes visible when it lands**
+Learning and Hall pages), H137 (the class tree and promotion on today's Skills tab; D252), H127 (the emblems, done);
+through them H126, H128, H129 · Unblocks: the Tier 2 re-plan (D238); H135's own Sanctum becomes visible when it lands**
 
 ## Why
 
@@ -241,4 +241,6 @@ changes the owner's save**, so it's rehearsed on a full-shaped scratch save firs
   freed budget.
 - **The Exchange's wording after the flip** is H132's: a Tier 0 that read past Rank 10 shows `R10 · +12,400 EXP waiting`
   (16 Manuals in the worked example), not "Waits for her promotion"; check that line in the local validation.
-
+- **D252 (2026-10-29): no longer needs H119, H120 or H123.** The class tree and the promotion screen are H137's, on today's
+  Skills tab. You retire the calling card yourself, as already planned. Where a step here names H120's or H123's
+  screens, use H137's sheets: the local validation promotes a Tier 0 through them.

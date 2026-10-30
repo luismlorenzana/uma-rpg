@@ -22,7 +22,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H137; decision numbers from D242), in four groups (the owner, 2026-10-29):
+**Queue** (packet ids continue from H138; decision numbers from D253), in four groups (the owner, 2026-10-29):
 
 **Art** (ChatGPT draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art pins it):
 
@@ -37,7 +37,7 @@
 | [H117](tasks/H117-profile-copy-cleanup.md) | Uma profile v2 (D239): the copy cleanup on today's tabs (the 54 strings, the 3 wrong texts, F5, F11–F15), three 44 pt targets, the wording list as `copy.ts` and the copy test, the dead v1 preset sheet | ChatGPT | S–M | — | Ready |
 | [H118](tasks/H118-kit-compact-profile-frame.md) | Both apps: a compact `ProfileFrame` header (`size`, `progress`) and a face door on `SlotRow` (`onFace`), uma-kit 0.16.0; uma-rpg pins it | Claude (uma-platform session) | S | — | Ready |
 | [H119](tasks/H119-profile-frame.md) | Uma profile v2: the frame, four tabs (Class, Gear, Stars, Template) as a skeleton, the compact header and facts row (Party · Work · Details), the Details sheet, routes `outfit/:id/:tab` and the tab key, locked | Claude | M | H117, H118 | Waiting |
-| [H120](tasks/H120-class-tab.md) | Uma profile v2 + Classes v3: the Class tab (live on v18), and the class tree sheet, the promotion sheet, the Tier 0 tree, the promotion dot and the Manuals door (inert until H134) | ChatGPT | M+ | H119, H126, H127, H129 | Waiting |
+| [H120](tasks/H120-class-tab.md) | Uma profile v2 + Classes v3: the Class tab (live on v18), and the class tree sheet, the promotion sheet, the Tier 0 tree, the promotion dot and the Manuals door (inert until H134) | ChatGPT | M | H119, H126, H127, H129, H137 | Waiting |
 | [H121](tasks/H121-gear-tab.md) | Uma profile v2: the Gear tab, nine tiles, raise sheets with before → after, Raise all | ChatGPT | M | H119 | Waiting |
 | [H122](tasks/H122-stars-tab-observatory-door.md) | Uma profile v2: the Stars tab, Set all, and the Observatory as a door (its old route redirects) | ChatGPT | M | H119 | Waiting |
 | [H123](tasks/H123-template-tab.md) | Uma profile v2 + Classes v3: the Template tab without the calling pick; the family Flourish, moon II by root and 5 × 3 templates on v19 | Claude | S–M | H120, H121, H122, H126 | Waiting |
@@ -54,14 +54,15 @@
 | [H130](tasks/H130-save-v32-class-reset.md) | Save v32, dark: the class reset and refund as Class Marks, trade moves, the healer seats' merge; `toV32` not chained | Claude | M–L | H126, H129, H136 | Done (`2bea968`) |
 | [H131](tasks/H131-classes-v3-balance.md) | Balance on engine v19: Classes v3's S1–S10 and Halls v2's targets, knobs as the designs name them | Claude | M–L | H126, H128, H129 | Done (`598060e`) |
 | [H132](tasks/H132-classes-rebuilt-sheet-exchange.md) | "The classes are rebuilt" sheet and its Account row, the Exchange's Manual sheet | Claude | S–M | H126, H129, H130 | Done (`7890105`) |
-| [H134](tasks/H134-classes-v3-switch.md) | **The switch:** engine v19 and save v32 live with `toV32` chained, the kind colours swapped, the manual rewritten | Claude | M | H120, H123, H127, H130, H131, H132, H133 | Waiting |
+| [H137](tasks/H137-classes-v3-promotion-today.md) | Classes v3: the class tree, the promotion sheet, the Tier 0 tree and the Ready dot on today's Skills tab, as sheets H120 reuses (D252); inert until H134 | Claude | M | — | In progress |
+| [H134](tasks/H134-classes-v3-switch.md) | **The switch:** engine v19 and save v32 live with `toV32` chained, the kind colours swapped, the manual rewritten | Claude | M | H127, H130, H131, H132, H133, H137 | Waiting |
 
 | Phase | Packets | What it leaves on main | Needs from other groups |
 |---|---|---|---|
 | 1. Foundation | H136 → H126 | Main JS back to ~215 KB; the 13 classes, the tree, Tier 0 and promotion in the domain, dark at engine v19 | — |
 | 2. Rules and save | H128 ∥ H130 (both start on H126's reviewed branch; H130's healer-seat step waits for H129) → H129 (on H128's branch) → H131 | Weapon shapes, the twenty Limit Breaks, save v32 and the reset written, balance measured; all dark | H129 is the Halls group's domain packet: Phase 2 builds it, since H130 migrates the healer seats with the classes. H133 (ChatGPT) can start once H128 and H129 merge |
 | 3. The reset's screens | H132 (starts once H130's pull request is up) | "The classes are rebuilt" sheet and the Exchange's Manual sheet, inert | — |
-| 4. The switch | H134 | Engine v19 and save v32 live, the manual rewritten | H120 and H123 (Uma profile v2: the Class tab's promotion and the Template tab), H133 (Halls), H127 (Art) merged |
+| 4. The switch | H137 (the promotion on today's Skills tab) → H134 | Engine v19 and save v32 live, the manual rewritten | H133 (Halls, ChatGPT). Not the Uma profile v2 (D252) |
 
 **Halls of Heroes v2** (D241):
 

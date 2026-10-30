@@ -357,3 +357,6 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
 ## Notes from the main session (2026-10-29)
 
 - **Pin uma-art first (owner, 2026-10-29):** ChatGPT publishes H127's release itself; this packet pins `@luismlorenzana/uma-art` at that version in `apps/web/package.json` as its first step and drops H126's `ClassEmblem` fallback.
+- **D252 (2026-10-29): reuse H137's sheets.** H137 builds `class-view.ts`, `ClassesSheet.tsx` and `PromotionSheet.tsx`
+  (the class tree, the promotion sheet, the Tier 0 tree, the Ready dot) on today's Skills tab. This packet moves them into
+  the new Class tab instead of building them. H120 is no longer a dependency of the Classes v3 switch.
