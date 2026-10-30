@@ -28,7 +28,6 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H135](tasks/H135-healer-sanctum-art.md) | **Art, optional** (uma-platform): a Healer Sanctum building; until then the Bastion's frame | ChatGPT (draws and publishes) | S | — | Ready |
 
 **Uma profile v2** (D239):
 
@@ -68,7 +67,7 @@
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | [H129](tasks/H129-halls-v2-limit-breaks.md) | Halls v2 (D241): five halls, the twenty Limit Breaks with their own power, class scale and the 10-hit cap | Claude | M | H126, H128 | Done (`d5cf696`) |
-| [H133](tasks/H133-halls-v2-pages.md) | Halls v2: the Learning page's five halls and the Hall page (home class, shape, power), inert until H134 | ChatGPT | S–M | H128, H129 | Ready |
+| [H133](tasks/H133-halls-v2-pages.md) | Halls v2: the Learning page's five halls and the Hall page (home class, shape, power), inert until H134  **Art ready:** pin uma-art 2.17.0 or later and draw `healer-sanctum` without the keep override. | ChatGPT | S–M | H128, H129 | Ready |
 
 **After hardening:** Tier 2 and Tier 3 are re-planned. Their approved drafts stay in
 [design/tier-rework/](../design/tier-rework/README.md) (Class, Weapon, Extra Stats and Profession Progression, stat
@@ -85,6 +84,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 | Id | Task | Commit |
 |---|---|---|
+| H135 | The Healer Sanctum's original open temple, delivered in [uma-platform #58](https://github.com/luismlorenzana/uma-platform/pull/58), P77/D252: three steps, four columns, a sun pediment and static gold/violet braziers; all 50 older buildings unchanged; [uma-art 2.17.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40978750402). H133 or its first later adopter pins it and draws `healer-sanctum` without the keep override. | platform `bab58c3` |
 | H127 | Seven Classes v3 emblems, delivered in [uma-platform #56](https://github.com/luismlorenzana/uma-platform/pull/56), P76/D251: five plain Tier 0 motifs and two mirrored channel hybrids, every older UI frame preserved; [uma-art 2.16.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40932890896). H120 pins this version or later and removes the temporary class-emblem fallback. | platform `45bdebb` |
 | H132 | "The classes are rebuilt" and the Exchange's Class Manual sheet (D250): the one-time sheet reads H130's record (each Uma's Manuals and trade, the Healer Sanctum's merge lines) with an Account row; the Manual sheet selects a bar and a count with one footer button (live on v18), and from v19 shows the Tier 0 bars, To Rank 10, her share counting down and EXP waiting past Rank 10 (`R10 · +12,400 EXP waiting`); route `/town/exchange/manual/:outfitId`. Main JS 219.35 KB gzip on CI | `7890105` |
 | H130 | Save v32 written dark (D247): `toV32` resets every Uma to her Tier 0 at Rank 1 in Tier 1 (her mapped Tier 1 class elsewhere), refunds each class's EXP plus up to 1,800 as Class Marks rounded up per class with each Uma's share recorded, merges the healer seats into the Healer Sanctum (each Uma keeps her higher Bond), and records it all in `TierWorld.classesV3` for the sheet; trades that move settle on boot (`settleClassResetTrades`); the v32 parse reads `heroLimitIds(19)`. A full-shaped scratch save paid Tier 1 78 Manuals and Tier 2 15, and with a local switch the next fight started on v19 with five Tier 0s. `toV32` sits in the lazy migrations chunk. Main JS 219.01 KB gzip on CI | `2bea968` |
