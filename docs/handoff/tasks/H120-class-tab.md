@@ -1,7 +1,7 @@
 # H120 — Uma profile v2 with Classes v3: the Class tab, the Classes sheet (the class tree), promotion and the Limit line
 
-**uma-rpg · ChatGPT · M+ · Needs: H119 (the frame), H126 (Classes v3 in the domain, engine v19, dark), H129 (the Limit
-Breaks' halls and power), H127 (the seven class emblems) · Unblocks: H123, H134 (the switch), H125's re-run**
+**uma-rpg · ChatGPT · M+ · Needs: H119 (the frame); Classes v3 is live (D257) and its sheets are on `main` (H137) ·
+Unblocks: H123, H125's re-run**
 
 ## Why
 
@@ -80,7 +80,7 @@ the preset, promote).
     web: `vi.mock('../../../../../packages/domain/src/rpg/battle/caps', async (orig) => (await
     import('../../../../../packages/domain/src/rpg/battle/caps-at.fixture')).capsAt(19, await orig()))`, in a file of
     its own.
-- **The packets this builds on** ([tasks/](.)); **where a name below differs from their merged code, theirs wins**:
+- **The packets this builds on** (all merged; their Done rows are in [the archive](../../archive/handoff-history.md)); **where a name below differs from the merged code, the code wins**:
   - **H126** ("Names other packets read"): `rpgRework('classes')`; `rpgClasses(19)`, `RPG_TIER0_CLASSES`, `rpgIsTier0`;
     `rpg/class-tree.ts`'s `RPG_ROOT_NAME`, `RPG_TIER0_ROOT`, `RPG_CLASS_PARENTS`, `RPG_CLASS_CHILDREN`,
     `rpgClassFamily`, `rpgSuggestedPromotion`, `RPG_TIER0_SKILL`, `RPG_TIER0_POWER`, **`rpgClassName(classId, engine)`**

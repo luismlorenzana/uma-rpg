@@ -1,7 +1,7 @@
 # H119 — Uma profile v2: the new frame (four tabs, the compact header and facts row, Details, routes, locked)
 
-**uma-rpg · Claude · M · Needs: H117 (the words), H118 (uma-kit 0.16.0) · Unblocks: H121, H122, H124 (and H120, H123
-after the Classes v3 design)**
+**uma-rpg · Claude · M · Needs: H117 (the words), H118 (uma-kit 0.16.0) · Unblocks: H120, H121, H122, H124; H123 through
+them**
 
 ## Why
 

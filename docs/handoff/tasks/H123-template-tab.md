@@ -1,7 +1,7 @@
 # H123 — Uma profile v2 with Classes v3: the Template tab, her uniqueness in one place, no calling pick
 
-**uma-rpg · Claude · S–M · Needs: H120 (the Class tab), H121 (its accessory sheet), H122 (its node sheet), H126
-(Classes v3 in the domain) · Unblocks: H134 (the switch), H125's re-run**
+**uma-rpg · Claude · S–M · Needs: H120 (the Class tab), H121 (its accessory sheet), H122 (its node sheet) · Unblocks:
+H125's re-run**
 
 ## Why
 
@@ -52,7 +52,7 @@ No rule or save change beyond decision 6's dot reason. Screens and words.
     `roster/template.ts` (`umaCallingRow :108`, `umaCallingPick :143`, `umaTemplate :168`), `economy/professions.ts`
     (`tradeOfCalling :75`);
   - `save/game.ts` (`pickClass :178`).
-- **H126's packet** ([tasks/](.), "Names other packets read"; **where its merged code differs, the code wins**):
+- **H126** (merged; its Done row is in [the archive](../../archive/handoff-history.md); **where a name below differs from the merged code, the code wins**):
   `rpgRework('classes')`; `roster/template.ts`'s `umaCalling(outfit, pick, engine)`, `umaTemplate(outfit, pick,
   engine)` (15 types from v19), `umaFlourishActive(t, classId, engine)` (on as any class of her Tier 0's family),
   `umaCallingRowV3` and `UMA_ROW_CALLING_V3` (the styles-only rows), and `umaCallingPick` returning null from v19 (the
@@ -206,3 +206,10 @@ No rule or save change beyond decision 6's dot reason. Screens and words.
   green and watch the deploy.
 - **Flag it done:** delete this file, add a Done row in [README.md](../README.md) with the merge commit, and note on
   H125's row that its re-run of "How to measure" now covers Class and Template.
+
+## Notes from the main session
+- **2026-10-30: H134 made Classes v3 live (D257) and did part of this packet.** The calling pick is retired everywhere
+  (`CallingCard`, `chooseCalling`, `confirmCallingPick`, `calling-repair.ts`); today's template card reads her calling
+  by her best running styles, the Flourish by family (`umaFlourishActive`) and moon II by root. Build the Template tab on
+  that, for v19 only, and drop any step that only switched these at the flip.
+

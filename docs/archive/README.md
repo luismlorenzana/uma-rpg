@@ -1,7 +1,7 @@
 # The archive
 
 **History, not current rules.** Everything here was true, planned or decided at some point between 2026-10-10 and
-2026-10-28. The game as it is now is [the manual](../game/README.md), the open work is [the handoff](../handoff/README.md),
+2026-10-30. The game as it is now is [the manual](../game/README.md), the open work is [the handoff](../handoff/README.md),
 and new decisions start at D238 in [decisions.md](../decisions.md). Moved here when Tier 1 hardening began (D238), so
 sessions joining the repo don't read old plans as current ones. Nothing was deleted: this folder and git keep it all.
 
@@ -10,7 +10,7 @@ sessions joining the repo don't read old plans as current ones. Nothing was dele
 | Where | What it was |
 |---|---|
 | [decisions-D1-D237.md](decisions-D1-D237.md) | The decision log from D1 to D237. Code comments and older docs cite these numbers: look them up here |
-| [handoff-history.md](handoff-history.md) | The handoff index as it stood on 2026-10-28: every build's packet tables (the slices' tasks, the Rift, classes v2, the Tier rework's R1–R5, the owner's reviews, the farm by line, the Wilds' trios, weaknesses v2) and every Done row with its commit |
+| [handoff-history.md](handoff-history.md) | The handoff index as it stood on 2026-10-28: every build's packet tables (the slices' tasks, the Rift, classes v2, the Tier rework's R1–R5, the owner's reviews, the farm by line, the Wilds' trios, weaknesses v2) and every Done row with its commit; on top, Tier 1 hardening's Classes v3 and Halls v2 packets (H126–H137, archived 2026-10-30) |
 | [open-questions-answered.md](open-questions-answered.md) | Q9, Q10 and Q12–Q17, each answered by the Tier rework (D192–D197) |
 | [design/](design/) | Specs that were built or superseded: the core loop, battles, the class rework and classes v2, combat balance, the forge, gear and targets, items, progression and ranks, after the farm, the game design (v1.0), tiers, and the Tier 2 proposals (advanced classes, weapon arts, the outer ring, the second profession, Tier 2's world) |
 | [design/tier-rework/](design/tier-rework/) | The Tier rework's implementation plan (R1–R5, D198) and its first-round drafts (classes, skill trees, gear, Extra Stats, professions, variance) and the weapon research note. The approved designs stay in [docs/design/tier-rework/](../design/tier-rework/README.md) |
