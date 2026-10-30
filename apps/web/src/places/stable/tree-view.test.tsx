@@ -93,6 +93,19 @@ describe('the Skills tab as a tree (H70)', () => {
     expect(screen.queryByRole('button', { name: /^Learn/ })).toBeNull()
   })
 
+  it('opens today\'s Class sheet from the class button on engine 18: her root and the six, no class tree (H137 is v19\'s)', async () => {
+    show(await brawler())
+    fireEvent.click(screen.getByRole('button', { name: 'Class: Brawler, Rank 22' }))
+    const sheet = await screen.findByRole('dialog', { name: 'Class' })
+    expect(within(sheet).getAllByRole('radio').map((r) => r.textContent)).toEqual([
+      'BrawlerRank 22', 'MageRank 1', 'Spell BladeRank 1', 'ClericRank 1', 'SummonerRank 1', 'PaladinRank 1',
+    ])
+    expect(within(sheet).getByLabelText('Her root')).toBeDefined()
+    expect(screen.queryByRole('dialog', { name: 'Classes' })).toBeNull()
+    expect(within(sheet).queryByRole('button', { name: /Class Manuals/ })).toBeNull()
+    expect(screen.queryByText(/Promot/)).toBeNull()
+  })
+
   it('takes branch A from its sheet, calling the save\'s pickBranch with A, and her tree follows', async () => {
     show(await brawler())
     fireEvent.click(within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')[2]!)
