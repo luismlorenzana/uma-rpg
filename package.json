@@ -12,6 +12,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "node --test scripts/check-size.test.mjs scripts/check-private-content.test.mjs scripts/enemies/*.test.mjs && turbo run test",
+    "test:ci": "node --test scripts/check-size.test.mjs scripts/check-private-content.test.mjs scripts/enemies/*.test.mjs && turbo run test --concurrency=1",
     "enemies:release": "node scripts/enemies/release.mjs",
     "enemies:publish": "bash scripts/enemies/publish.sh",
     "web": "pnpm --filter @rpg/web dev",

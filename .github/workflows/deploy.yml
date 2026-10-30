@@ -60,7 +60,9 @@ jobs:
         run: pnpm lint
 
       - name: Run tests
-        run: pnpm test
+        # One package at a time: on the two-core runner the domain suite beside the web suite starved Vitest's worker
+        # RPC ("Timeout calling onTaskUpdate" after every test passed; D256).
+        run: pnpm test:ci
 
       - name: Build production artifacts
         run: pnpm build
