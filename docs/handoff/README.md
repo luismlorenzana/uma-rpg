@@ -54,7 +54,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v20, save v33; uma-kit 0.15.0, uma-art 2.17.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v20, save v33; uma-kit 0.16.0, uma-art 2.18.0, uma-data 1.1.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 - **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
   "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.
