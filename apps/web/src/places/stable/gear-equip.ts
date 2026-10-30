@@ -1,11 +1,12 @@
 // The Gear tab's two views as data (H107, D219): Equip, what she wears, with one card of one shape for each accessory
 // family; and Upgrade, every slot's grade row and the made item that raises it. Pure, so both views test without React.
 import {
-  ACCESSORY_FAMILY_LABEL, accessoryFlatValue, ARMOR_SLOTS, isRpgElement, rpgTomeOf, signatureBonus, WEAPON_LABEL,
+  ACCESSORY_FAMILY_LABEL, ARMOR_SLOTS, isRpgElement, rpgTomeOf, signatureBonus, WEAPON_LABEL,
   type AccessoryFamily, type AccessorySlotState, type GearTier, type GradeTarget, type RpgClass, type RpgDamageKind, type RpgWeapon,
   type UmaGrades,
 } from '@rpg/domain'
 import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine, type GradeUpgradeView } from './gear-v3'
+import { accessoryEffect, actions, signature as signatureCopy, staleKind } from './copy'
 
 /** A kind a Bell or an Orb can sit on, labelled by her weapon ("Thunder Tome"). */
 export interface KindChoice { kind: RpgDamageKind; label: string }
@@ -35,10 +36,7 @@ export const kindWeaponLabel = (kind: RpgDamageKind): string => WEAPON_LABEL[isR
 
 /** What a family does at a grade (WP20–WP23). */
 export function familyEffect(family: AccessoryFamily, grade: number, tier: GearTier): string {
-  if (family === 'pendant') return `+${accessoryFlatValue('pendant', grade, tier)} on her three kinds`
-  if (family === 'orb') return `+${accessoryFlatValue('orb', grade, tier)} offense on one kind`
-  if (family === 'bell') return `After her Attack, one more hit of that kind at ${(grade / 10).toFixed(1)}`
-  return `+${(grade * 1.5).toFixed(grade % 2 ? 1 : 0)}% on sub-bosses and bosses`
+  return accessoryEffect(family, grade, tier)
 }
 
 /** The four cards for one accessory slot. `kinds` are `accessoryKinds(uma, classId)`, in her weapons' order. */
@@ -52,12 +50,12 @@ export function accessoryCards(slot: AccessorySlotState | undefined, kinds: read
     return {
       family,
       label: ACCESSORY_FAMILY_LABEL[family],
-      signature: family === signature ? `★ Her signature: ATK and M.ATK +${signatureBonus(level, tier)}` : null,
-      effect: grade < 1 ? `From G1: ${familyEffect(family, 1, tier)}` : familyEffect(family, grade, tier),
+      signature: family === signature ? signatureCopy(signatureBonus(level, tier), wearing) : null,
+      effect: grade < 1 ? `G1: ${familyEffect(family, 1, tier)}` : familyEffect(family, grade, tier),
       kinds: family === 'bell' || family === 'orb' ? choices : [],
       wearing,
       wornKind,
-      stale: wornKind && !kinds.includes(wornKind) ? `No ${kindWeaponLabel(wornKind)} in her slots` : null,
+      stale: wornKind && !kinds.includes(wornKind) ? staleKind(kindWeaponLabel(wornKind)) : null,
     }
   })
 }
@@ -70,11 +68,10 @@ export function cardKind(card: AccessoryCard): RpgDamageKind | null {
 
 /** A card's one button for the kind picked on it: Equip, Equipped, or "Switch to Lance" on the family she wears. */
 export function cardButton(card: AccessoryCard, picked: RpgDamageKind | null): { label: string; disabled: boolean } {
-  if (!card.kinds.length) return card.wearing ? { label: 'Equipped', disabled: true } : { label: 'Equip', disabled: false }
-  if (!picked) return { label: 'Equip', disabled: true }
-  if (card.wearing && card.wornKind === picked) return { label: 'Equipped', disabled: true }
-  if (card.wearing) return { label: `Switch to ${kindWeaponLabel(picked)}`, disabled: false }
-  return { label: 'Equip', disabled: false }
+  if (!card.kinds.length) return card.wearing ? { label: actions.set, disabled: true } : { label: actions.set, disabled: false }
+  if (!picked) return { label: actions.set, disabled: true }
+  if (card.wearing && card.wornKind === picked) return { label: actions.set, disabled: true }
+  return { label: actions.set, disabled: false }
 }
 
 export interface UpgradeRow { key: string; target: GradeTarget; text: string; upgrade: GradeUpgradeView }

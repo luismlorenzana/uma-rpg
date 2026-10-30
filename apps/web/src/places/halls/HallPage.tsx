@@ -21,6 +21,7 @@ import { HelpButton } from '../../ui/HelpButton'
 import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
 import { hallHelp, learnerAdds, seatCard, seatTwinSets, TWIN_SET_LABEL } from './hall-view'
+import { bond as bondCopy, bondLevel, heroBond } from '../stable/copy'
 
 export default function HallPage({ place }: PageProps) {
   return <MasterGate>{(view) => <Hall view={view} place={place} />}</MasterGate>
@@ -39,6 +40,7 @@ function Hall({ view, place }: { view: MasterView; place: Place }) {
   const [pick, setPick] = useState<Pick | null>(null)
   const [heroOpen, setHeroOpen] = useState<HeroLimitId | null>(null)
   const [learner, setLearner] = useState<{ seat: HeroLimitId; outfitId: string } | null>(null)
+  const [emptyConfirm, setEmptyConfirm] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const hall = hallOfPlace(place.id)
   if (!world || !hall) return null
@@ -56,7 +58,6 @@ function Hall({ view, place }: { view: MasterView; place: Place }) {
             {hallHelp().map((line) => <p key={line}>{line}</p>)}
           </HelpButton>
         </div>
-        <p className="text-[12px] text-ink-soft">Four Heroes, each with her own Limit Break, and their Learners.</p>
       </section>
       {message && <p className="rounded-sm bg-danger/15 p-2 text-[13px] text-danger">{message}</p>}
       {heroLimitsOfHall(hall).map((limit) => {
@@ -138,23 +139,31 @@ function Hall({ view, place }: { view: MasterView; place: Place }) {
       {heroOpen && world.heroes[heroOpen] && (() => {
         const seat = world.heroes[heroOpen]!
         return (
-          <BottomSheet title={`Hero · ${heroLimit(heroOpen).name}`} onClose={() => setHeroOpen(null)}>
+          <BottomSheet title={`Hero · ${heroLimit(heroOpen).name}`} onClose={() => { setHeroOpen(null); setEmptyConfirm(false) }}>
             <div className="space-y-2">
-              <p className="text-[14px]"><span className="font-semibold">{outfit(seat.hero)?.name ?? seat.hero}</span> uses {heroLimit(heroOpen).name} as her only Limit Break, at full strength.</p>
+              <p className="text-[14px] font-semibold">{outfit(seat.hero)?.name ?? seat.hero}</p>
+              <p className="text-[13px] text-ink-soft">{heroBond()}</p>
               {world.umas[seat.hero] && (() => {
                 const bond = bondOf(world.umas[seat.hero]!, heroOpen)
                 return (
                   <div className="text-[13px]">
-                    <p className="text-ink-soft">Her own Bond with this seat: <span className="font-semibold text-ink">{bond.level}/{BOND_MAX_LEVEL}</span>, kept if she becomes its Learner</p>
+                    <p className="text-ink-soft">Own Bond · <span className="font-semibold text-ink">{bondLevel(bond.level)}</span></p>
                     <Bar className="mt-1" value={bond.level >= BOND_MAX_LEVEL ? 1 : bond.exp} max={bond.level >= BOND_MAX_LEVEL ? 1 : BOND_EXP_TO_NEXT} tone="limit" />
                   </div>
                 )
               })()}
-              <button type="button" onClick={() => { setHeroOpen(null); setPick({ seat: heroOpen, role: 'hero' }) }} className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink">Change Hero</button>
-              <button type="button" onClick={() => run(() => appointHero(heroOpen, null), () => setHeroOpen(null))}
-                className="min-h-12 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft">
-                Empty this seat{seat.learners.length ? ` (its ${seat.learners.length} Learner${seat.learners.length === 1 ? '' : 's'} leave; their Bonds stay)` : ''}
-              </button>
+              {!emptyConfirm ? <>
+                <button type="button" onClick={() => { setHeroOpen(null); setPick({ seat: heroOpen, role: 'hero' }) }} className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink">Change Hero</button>
+                <button type="button" onClick={() => seat.learners.length ? setEmptyConfirm(true) : run(() => appointHero(heroOpen, null), () => setHeroOpen(null))}
+                  className="min-h-12 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft">Empty seat</button>
+              </> : <div className="space-y-2 rounded-sm border border-hairline-strong p-2">
+                <p className="text-[13px] text-ink-soft">Leaves: {seat.learners.map((id) => outfit(id)?.name ?? id).join(', ')}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => setEmptyConfirm(false)} className="min-h-11 rounded-sm bg-raised font-semibold">Cancel</button>
+                  <button type="button" onClick={() => run(() => appointHero(heroOpen, null), () => { setHeroOpen(null); setEmptyConfirm(false) })}
+                    className="min-h-11 rounded-sm bg-accent font-semibold text-accent-ink">Empty seat</button>
+                </div>
+              </div>}
             </div>
           </BottomSheet>
         )
@@ -169,14 +178,13 @@ function Hall({ view, place }: { view: MasterView; place: Place }) {
               <div className="flex items-center gap-3">
                 <span className="w-12 shrink-0"><FaceTile outfitId={learner.outfitId} size={48} label={outfit(learner.outfitId)?.name ?? 'Learner'} round /></span>
                 <div className="min-w-0 flex-1 text-[13px]">
-                  <p className="font-semibold">Bond {bond.level}/{BOND_MAX_LEVEL} · {Math.round(bondCapacity(bond.level) * 100)}% strength</p>
+                  <p className="font-semibold">{bondCopy(bond.level, Math.round(bondCapacity(bond.level) * 100))}</p>
                   <Bar className="mt-1" value={bond.level >= BOND_MAX_LEVEL ? 1 : bond.exp} max={bond.level >= BOND_MAX_LEVEL ? 1 : BOND_EXP_TO_NEXT} tone="limit" />
-                  <p className="mt-1 text-ink-soft">{bond.level >= BOND_MAX_LEVEL ? 'Fully bonded' : `${bond.exp}/${BOND_EXP_TO_NEXT} to Bond ${bond.level + 1}`}</p>
                 </div>
               </div>
-              <p className="text-[13px] text-ink-soft">Inherits {heroLimit(learner.seat).name}{others.length ? `, and ${heroLimit(others[0]!).name} from her other Hero` : ''}.</p>
+              <p className="text-[13px] text-ink-soft">Limit Breaks · {heroLimit(learner.seat).name}{others.length ? ` · ${heroLimit(others[0]!).name}` : ''}</p>
               <button type="button" onClick={() => run(() => removeLearner(learner.seat, learner.outfitId), () => setLearner(null))}
-                className="min-h-12 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft">Leave this Hero (her Bond stays)</button>
+                className="min-h-12 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft">Leave</button>
             </div>
           </BottomSheet>
         )

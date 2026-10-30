@@ -141,7 +141,8 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
           const classId = outfit && uma ? activeClass(outfit, uma, scope.tier) : null
           return (
             <li key={slot}>
-              <button type="button" onClick={() => (outfitId ? setActing(slot) : setPicking(slot))} className="flex min-h-18 w-full items-center gap-3 rounded-md bg-panel p-2 text-left active:bg-raised">
+              <button type="button" onClick={() => (outfitId ? setActing(slot) : setPicking(slot))} aria-label={outfitId ? undefined : `Slot ${slot + 1}, empty`}
+                className="flex min-h-18 w-full items-center gap-3 rounded-md bg-panel p-2 text-left active:bg-raised">
                 <PartyPortrait view={view} outfitId={outfitId} size={56} lead={outfitId !== null && outfitId === lead} />
                 <span className="min-w-0 flex-1">
                   {outfit ? (
@@ -150,7 +151,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
                       <span className="block truncate text-[11px] text-ink-faint">{outfitId === lead ? 'Lead · ' : ''}{classId ? CLASS_LABEL[classId] : outfit.title}</span>
                     </>
                   ) : (
-                    <span className="text-[14px] text-ink-faint">Slot {slot + 1} · add an Uma</span>
+                    <span className="text-[14px] text-ink-faint">Empty</span>
                   )}
                 </span>
               </button>
@@ -197,7 +198,7 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
               const work = workOf(world, party.slots[acting] ?? '')
               return work ? (
                 <button type="button" onClick={() => { void run(recall(work.placeId, work.slot)); setActing(null) }} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
-                  Recall from {placeById(work.placeId)?.name ?? work.placeId} · what's made is kept
+                  Recall
                 </button>
               ) : null
             })()}

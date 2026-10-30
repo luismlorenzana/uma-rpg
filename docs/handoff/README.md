@@ -72,5 +72,7 @@ Each packet stands alone:
 - **Done when:** checks anyone can run;
 - **Deliver:** the commit or pull request, and how to flag it done.
 
+Profile work: the copy test passes; new facts are in the wording list (`apps/web/src/places/stable/copy.ts`) first.
+
 A worker decides anything a packet leaves open, records it under Decisions, and logs the packet's D-decision in
 [decisions.md](../decisions.md) (fetch `main` first for the number).

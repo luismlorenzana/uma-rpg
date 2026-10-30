@@ -3,6 +3,7 @@
 import { classRankOf, RPG_CLASSES, type OwnedUma, type RpgClass } from '@rpg/domain'
 import { CLASS_LABEL } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
+import { classRank } from './copy'
 
 export function ClassPicker({ uma, classId, onPick }: { uma: OwnedUma; classId: RpgClass; onPick: (next: RpgClass) => void }) {
   return (
@@ -13,7 +14,7 @@ export function ClassPicker({ uma, classId, onPick }: { uma: OwnedUma; classId: 
           className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 text-center ${c === classId ? 'bg-accent text-accent-ink' : 'bg-raised text-ink'}`}>
           <ClassEmblem classId={c} />
           <span className="text-[11px] font-semibold leading-tight">{CLASS_LABEL[c]}</span>
-          <span className={`text-[10px] leading-none ${c === classId ? 'text-accent-ink/80' : 'text-ink-faint'}`}>Rank {classRankOf(uma.ranks, c)}</span>
+          <span className={`text-[10px] leading-none ${c === classId ? 'text-accent-ink/80' : 'text-ink-faint'}`}>{classRank(classRankOf(uma.ranks, c))}</span>
         </button>
       ))}
     </div>

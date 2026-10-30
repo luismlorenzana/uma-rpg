@@ -53,11 +53,12 @@ button and footer should stay reachable without horizontal page scrolling, in li
    faces → cards → list, save the view, reload: expect it kept.
 7. **Unlock** (Tier 1). Open a locked outfit, tap **Unlock · 1 Ticket → Unlock for 1 Ticket**. Expect one Ticket spent,
    her profile at Lv 1 as her calling's Tier 0, and the **Owned** count up by one.
-8. **Profile.** Tap the template chip: expect **Her template** with Calling (her running styles: "Pace A, Late A"),
-   Stride and Knack and what each read, her trade, her Flourish and its state ("on" as any class of her calling's
-   family), her Signature and her Moon (an All-Rounder calling's II reads "DEF +4 · M.DEF +4"). No calling card anywhere.
-   Mark her as a target and unmark her. Tap the class cell (Skills opens) and the Party or Working cell (its place
-   opens). (D206, D229, D240)
+8. **Profile.** Expect `Lv n`, `current/next` EXP, `Rn`, `Craft n`, and compact Party/Work facts. Tap the 44 pt template
+   chip: **Her template** uses one row each for Calling, Stride and Knack, her trade, the full ★ Flourish with **On** or
+   **Off**, an always-listed ★ Signature with **Worn** or **Not worn**, and separate ★ Moon I/II rows. An All-Rounder
+   calling's II reads `DEF +4 · M.DEF +4`. No calling card appears. Mark her as a target and unmark her. Tap the class
+   cell (Skills opens) and the Party or Working cell (its place opens). A locked profile has **Unlock · 1 Ticket** and
+   no ticket-balance sentence. (D206, D229, D240, D258)
 9. **Skills tab: Classes.** On a Tier 0, the class button reads "R7/10" and her trees are one node each ("Drill Strike
    · Greatsword", "R7/10") with "Promotion at R10 · 3 to go" under them; **Change** lists all ten weapons. Tap the class
    button: **Classes** shows the tree, Warrior · All-Rounder · Mage over the Tier 0 row and the Tier 1 rows. Tap a
@@ -70,24 +71,24 @@ button and footer should stay reachable without horizontal page scrolling, in li
     **Classes**: her siblings read **Ready**; promote one, then **Fight as** the first again. **Class Manuals ›** opens
     the Exchange's sheet on her, and Back returns to Classes. (D253)
 11. **Skills tab: trees.** On a Tier 1 class, tap each of the three tree buttons. Tap a held node: its sheet shows rank
-    pips, "Rank n · next at Class Rank n" and its line; **Equip** it, then tap it in **Equipped** to take it off. Tap the
-    B square and **Take branch B**: expect the tree's letter to read B and its equipped skills to follow; take A back.
+    pips, `Rank n · next Rn` and `Depth n · Line A/B`; **Equip** it, then tap it in **Equipped** to take it off. Tap the
+    B square and **Take line B**: expect the tree's letter to read B and its equipped skills to follow; take A back.
     Tap **Back to auto** if shown. Tap **Change**: the slot sheet lists the channel's weapons with their grades; pick
     another, expect the tree to change, and put it back. Below, **Class Ranks** lists the five Tier 0s (bars to Rank 10)
     and the Tier 1 classes she holds. (D201, D206, D229)
-12. **Battle tab.** Expect four groups in three columns: Offense (ATK, M.ATK, Might for each weapon, Accessory, and
-    Signature while she wears her family), Defense, Sustain (HP, MP with "+n a round", ★ Flourish, or "No effect as …"
-    outside her calling's family) and Other; gear's part in blue and Extra Stats' in green. (D204, D217)
-13. **Gear → Equip.** Tap **Use standard preset**: expect "Standard preset on". Tap each accessory family: one detail at
+12. **Battle tab.** Expect four groups in three columns: Offense (ATK, M.ATK, Might for each weapon, Accessory, and an
+    always-listed ★ Signature), Defense, Sustain (HP, MP with `+n/round`, and the full ★ Flourish with **On** or **Off**)
+    and Other (`Limit start n/12`); gear's part in blue and Extra Stats' in green. (D204, D217, D258)
+13. **Gear → Equip.** Tap **Standard preset**: expect **Standard preset · On**. Tap each accessory family: one detail at
     a time, her ★ family first with its signature line. On a Bell or an Orb, the kind buttons are her three weapons';
-    **Equip** one, then pick another kind and tap "Switch to …". Check the weapon chips' colours in both themes: the
+    **Set** one, then pick another kind and tap **Replace**. Check the weapon chips' colours in both themes: the
     Katana jade, the Bow rose. (D223)
 14. **Gear → Upgrade.** Expect "Upgrade · n" to match the green marks. Tap a ready pill: the grade goes up by one, one
     made item is spent and the count drops. A blocked row says why ("Needs Lv …", "Needs 1 Arms Gem G…", "Already G10").
-    On a row with several grades in stock, open it, tap **Up to G…**, read the list and **Raise**. Tap **Extra Stats**:
+    On a row with several grades in stock, open it, tap **Raise to G…**, read the list and **Confirm**. Tap **Extra Stats**:
     her Observatory map opens. (D217, D223)
-15. **Work and Racing tabs.** Work shows her job, if any, and "Craft Lv n · {her trade}" with her Craft EXP bar. Racing
-    shows her aptitudes, **Her template**, her racing stats and her unique skill.
+15. **Work and Racing tabs.** Work shows her job, if any, and `Craft n · {her trade}` with compact Craft EXP and grade
+    lines. Racing shows her aptitudes, racing stats and unique skill without a duplicate template block.
 16. **Party Hall.** Open a party, edit its name → **Rename**, and fill five slots: expect the name and **5/5** in the
     list. Pick an Uma from another party: expect "Moves from …" and her gone from the first party. **Make party lead**
     on another member: the ring and flag move and nobody reorders. Put a Paladin and a Cleric in one party: expect "One
@@ -98,10 +99,12 @@ button and footer should stay reachable without horizontal page scrolling, in li
 18. **Halls of Heroes.** Open the Healer Sanctum: its title, four seats each a card with "Seat 1 · Paladin" (its home
     class), its shape and power ("One foe · 4 hits · ×2.0 · Brave 1"), "Answers …" and its lore. Open the Warrior Dojo:
     "One foe · 1 hit · ×2.9" on seat 2, "Volley · 4 + 2 a foe · ×2.2" on seat 4. Seat a Hero with **+ Hero**, then tap
-    **+** for a Learner: the picker shows "Bond n · n/2 Heroes" and "Adds …", and Umas that can't sit there show why.
-    Open the Learner's sheet: her Bond, its strength and **Leave this Hero**. (D106, D241, D255)
-19. **Observatory.** Pick an Uma: expect "Open n of 20 · ★ n of 2" and her map with "★ {her type}". Tap a closed node:
-    its sheet names its value and jewel. Tap **Set** on a ready jewel: the node fills, the counts and totals go up and
+    **+** for a Learner: the picker shows `Bond n/10 · n/2 Heroes` and "Adds …", and Umas that can't sit there show why.
+    Open the Learner's sheet: expect `Bond n/10 · Strength n%` and **Leave**. A Hero's sheet says
+    `Hero · Strength 100%`; emptying its seat uses the compact **Empty seat** confirmation. (D106, D241, D255, D258)
+19. **Observatory.** Pick an Uma: expect `Open n/22` and her map with "★ {her type}". Tap a closed node: its sheet uses
+    compact values such as `+21 · all six`, `HP +100 · MP +20` and `DEF/M.DEF +4`, then names its jewel. Tap **Set** on a
+    ready jewel: the node fills, the counts and totals go up and
     the jewel is spent. A Moon Jewel that fits several nodes asks which. (D217)
 20. **Wilds: gather.** At **Wilds → Mine** (or her trade's gathering place) tap a free slot. Expect Who → How many →
     What: her trade's Umas first with "C{Craft Level}", others greyed "Another trade" (unless the header says "Open

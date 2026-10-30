@@ -30,6 +30,7 @@ import { ClassPicker } from './ClassPicker'
 import { PromotionSheet } from './PromotionSheet'
 import { rootFlourish } from './template-view'
 import { WeaponSheet } from './WeaponSheet'
+import { actions, classRank, depth, equipped, hand as handCopy, line as lineCopy, skillRank } from './copy'
 
 /** Classes v3's sheets on this tab (v19): the class tree, or the promotion sheet from a Tier 0 (on a child, from a Ready
  * tile). One at a time: Promote on a Ready tile and the promotion sheet's "Classes ›" swap them. */
@@ -38,12 +39,12 @@ type V3Sheet = { kind: 'classes' } | { kind: 'promotion'; from: RpgTier0Class; c
 /** Her hand, half by half in her slots' order: "Arms ×0.72 + Tome ×0.44" (a pure class's one half: "Tome ×1"). */
 export function handLine(classId: RpgClass, hand: RpgHand, engine?: number): string {
   const halves = [...new Set(rpgClassSlots(classId, engine).map((s) => (s === 'tome' ? 'tome' : 'arms')))]
-  return halves.map((h) => `${h === 'tome' ? 'Tome' : 'Arms'} ×${+hand[h].toFixed(2)}`).join(' + ')
+  return handCopy(halves.includes('arms') ? hand.arms : 0, halves.includes('tome') ? hand.tome : 0)
 }
-/** A node's rank words: "Rank 3 · next at Class Rank 14", "Rank 5", or its gate while closed ("Class Rank 20"). */
+/** A node's rank words from the profile wording list. */
 export function rankText(node: Pick<RpgTreeViewNode, 'open' | 'rank' | 'nextRankAt' | 'gate'>): string {
-  if (!node.open) return `Class Rank ${node.gate}`
-  return node.nextRankAt === null ? `Rank ${node.rank}` : `Rank ${node.rank} · next at Class Rank ${node.nextRankAt}`
+  if (!node.open) return classRank(node.gate)
+  return skillRank(node.rank, node.nextRankAt)
 }
 /** A node's line at her Skill Rank (CP32): v16's def (Pierce, the Paladin's revive), its power × her rank's factor; from v19
  * a Tier 0's node at her skill's power for her Class Rank (`rpgSkillFactor`, CV6). */
@@ -52,7 +53,7 @@ export function nodeLine(profile: Pick<RpgProfile, 'classId' | 'tier' | 'classRa
   const base = rpgNode(node.id)!
   return skillLine(profile, rpgNodeSkill(base, engine), engine, rpgSkillFactor({ classId: base.classId, depth: node.depth }, profile.classRank, engine))
 }
-const branchTitle = (tree: Pick<RpgTreeViewTree, 'bName'>, branch: RpgBranch) => (branch === 'B' ? `B · ${tree.bName}` : 'A')
+const branchTitle = (tree: Pick<RpgTreeViewTree, 'bName'>, branch: RpgBranch) => lineCopy(branch, branch === 'B' ? tree.bName : undefined)
 
 export function SkillTree({ outfit, uma, world, tier, classId, profile, view, loadout }: {
   outfit: BattleOutfit & TemplateOutfit
@@ -95,7 +96,7 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
   }
   const toggleEquip = (id: string) => {
     if (shown.includes(id)) return run(() => equip(outfit, classId, shown.filter((x) => x !== id)))
-    if (shown.length >= slots) return setError(`All ${slots} skill slots are full: unequip one first`)
+    if (shown.length >= slots) return setError(`Slots full · ${slots}/${slots}`)
     run(() => equip(outfit, classId, [...shown, id]))
   }
   const switchTo = (next: RpgClass) => {
@@ -128,7 +129,7 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
             <p>{CLASS_BLURB[classId]}</p>
             <p>Switching class is free; each class keeps its own weapons, skills and loadout.</p>
             <p>A party fights with one healer at most: a Paladin or a Cleric.</p>
-            <p>Each weapon opens its tree. Depths open at Class Rank 1, 10, 20, 30 and 40. At depth 3 the tree forks: branch A or B, free to swap. Every skill gains a rank every 2 Class Ranks, up to 5. Her Uma Level sets how many skills she can equip; until you pick, they are chosen for her.</p>
+            <p>Each weapon opens its tree. Depths open at R1, R10, R20, R30 and R40. At depth 3, pick line A or B; swapping is free. Every skill gains a rank every 2 ranks, up to 5. Her level sets how many skills she can equip; until you pick, they are chosen for her.</p>
             {graded ? <p>Weapon grades are raised with Arms Gems or Tome Ink on the Gear tab; any grade opens the tree.</p>
               : <p>A Training weapon has no stats, but it opens the tree. A crafted weapon does the same and adds its stats.</p>}
           </HelpButton>
@@ -157,7 +158,7 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
               const mark = better.includes(item.weapon)
               return (
                 <button key={`${i}-${item.weapon}`} type="button" role="tab" aria-selected={item === tree}
-                  aria-label={`${WEAPON_LABEL[item.weapon]}${tier0 ? '' : `, branch ${item.branch}`}${mark ? ', can upgrade' : ''}`}
+                  aria-label={`${WEAPON_LABEL[item.weapon]}${tier0 ? '' : `, line ${item.branch}`}${mark ? ', can upgrade' : ''}`}
                   onClick={() => setTreeIndex(i)}
                   className={`relative flex min-h-14 items-center justify-center rounded-sm border ${item === tree ? 'border-accent bg-panel text-ink shadow-1' : 'border-transparent bg-sunken text-ink-soft'}`}>
                   {mark && <UpgradeMark size={13} className="absolute right-1 top-1" />}
@@ -170,7 +171,7 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
           </div>
         </div>
         <p className={`truncate px-1 text-[10.5px] ${flourish.off ? 'text-ink-faint' : 'font-semibold text-accent'}`}>
-          {flourish.line}{flourish.off ? ` · ${flourish.off}` : ''}
+          {flourish.line}
         </p>
         {/* A Tier 0 (v19) reads her rank on the class button and her ladder on the promotion line, under her tree. */}
         {!tier0 && (
@@ -183,9 +184,9 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
 
       <section className="rounded-sm bg-raised p-2">
         <div className="mb-1 flex min-h-9 items-center justify-between">
-          <h4 className="text-micro">Equipped · {shown.length}/{slots}</h4>
+          <h4 className="text-micro">{equipped(shown.length, slots)}</h4>
           {auto ? <span className="rounded-full bg-panel px-2 py-0.5 text-[10px] font-semibold text-ink-soft">Auto</span>
-            : <button type="button" onClick={() => run(() => equip(outfit, classId, null))} className="min-h-9 px-1 text-[11px] font-semibold text-accent">Back to auto</button>}
+            : <button type="button" onClick={() => run(() => equip(outfit, classId, null))} className="min-h-11 px-1 text-[11px] font-semibold text-accent">Back to auto</button>}
         </div>
         <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${slots}, minmax(0, 1fr))` }} aria-label="Equipped skills">
           {Array.from({ length: slots }, (_, i) => {
@@ -247,9 +248,9 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
             {(['A', 'B'] as const).map((branch) => {
               const mine = tree.branch === branch
               return (
-                <div key={branch} role="group" className="flex min-w-0 flex-col items-center" aria-label={`Branch ${branchTitle(tree, branch)}${mine ? ', hers' : ''}`}>
+                <div key={branch} role="group" className="flex min-w-0 flex-col items-center" aria-label={`${branchTitle(tree, branch)}${mine ? ', held' : ''}`}>
                   <button type="button" onClick={() => setBranchSheet(branch)}
-                    aria-label={`Branch ${branchTitle(tree, branch)}${mine ? ', hers' : ''}`}
+                    aria-label={`${branchTitle(tree, branch)}${mine ? ', held' : ''}`}
                     className={`mb-1 flex size-12 items-center justify-center rounded-sm text-[13px] font-bold ${mine ? 'bg-accent text-accent-ink' : 'border border-hairline-strong bg-page text-ink-soft'}`}>
                     {branch}
                   </button>
@@ -287,7 +288,6 @@ export function SkillTree({ outfit, uma, world, tier, classId, profile, view, lo
                 <span className="font-semibold">{CLASS_LABEL[view.root.classId]}</span>
                 <span className="text-ink-soft">· {handLine(view.root.classId, view.root.hand)}</span>
               </p>
-              <p className={`mt-0.5 text-[11px] ${flourish.off ? 'text-ink-faint' : 'font-semibold text-accent'}`}>{flourish.line}</p>
             </div>
             <ClassPicker uma={uma} classId={classId} onPick={switchTo} />
           </div>
@@ -415,7 +415,7 @@ function SkillNodeSheet({ node, profile, equipped, tier0 = false, onClose, onEqu
           <span className="flex size-12 shrink-0 items-center justify-center rounded-full border-2 border-accent bg-accent/10"><SkillMarks node={node} /></span>
           <div className="min-w-0">
             <p className="flex items-center gap-2 text-[12px] font-semibold">{!tier0 && <RankPips rank={node.open ? node.rank : 0} />} {rankText(node)}</p>
-            <p className="text-[11px] text-ink-faint">Depth {node.depth} · {node.line === 'trunk' ? 'Trunk' : `Branch ${node.line}`}</p>
+            <p className="text-[11px] text-ink-faint">{depth(node.depth, node.line)}</p>
           </div>
         </div>
         <p className="rounded-sm bg-raised p-3 text-[13px] text-ink-soft">{nodeLine(profile, node)}</p>
@@ -424,7 +424,7 @@ function SkillNodeSheet({ node, profile, equipped, tier0 = false, onClose, onEqu
   )
 }
 
-/** A branch's sheet: its three skills; "Take branch B" when it isn't hers (free; her equipped skills follow). */
+/** A line's sheet: its three skills and the action to take the other line. */
 function BranchSheet({ tree, branch, profile, onClose, onTake }: {
   tree: RpgTreeViewTree; branch: RpgBranch; profile: RpgProfile; onClose: () => void; onTake: () => void
 }) {
@@ -433,20 +433,20 @@ function BranchSheet({ tree, branch, profile, onClose, onTake }: {
   return (
     <BottomSheet title={`${WEAPON_LABEL[tree.weapon]} · ${branchTitle(tree, branch)}`} onClose={onClose}
       footer={hers ? undefined : (
-        <button type="button" onClick={onTake} className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink">Take branch {branch}</button>
+        <button type="button" onClick={onTake} className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink">{actions.takeLine(branch)}</button>
       )}>
       <ul className="space-y-1.5">
         {nodes.map((n) => (
           <li key={n.id} className="rounded-sm bg-raised p-2">
             <p className="flex items-center justify-between gap-2 text-[13px] font-semibold">
               <span className="min-w-0 truncate">{n.name}</span>
-              <span className="shrink-0 text-[11px] font-normal text-ink-faint">Depth {n.depth} · Class Rank {n.gate}</span>
+              <span className="shrink-0 text-[11px] font-normal text-ink-faint">{depth(n.depth, branch)} · {classRank(n.gate)}</span>
             </p>
             <p className="text-[11.5px] leading-snug text-ink-soft">{nodeLine(profile, n)}</p>
           </li>
         ))}
       </ul>
-      {hers && <p className="mt-2 text-center text-[12px] text-ink-faint">Her branch</p>}
+      {hers && <p className="mt-2 text-center text-[12px] text-ink-faint">Held</p>}
     </BottomSheet>
   )
 }

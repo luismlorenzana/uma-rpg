@@ -26,8 +26,8 @@ beforeEach(async () => {
 })
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
-const profile = () => <MemoryRouter><MotionRoot features={domAnimation}><AlbumArtProvider art={{ useUrl: () => null }}>
-  <OutfitProfile view={fixture.view} outfitId="81001" place={placeById('stable')!} />
+const profile = (outfitId = '81001') => <MemoryRouter><MotionRoot features={domAnimation}><AlbumArtProvider art={{ useUrl: () => null }}>
+  <OutfitProfile view={fixture.view} outfitId={outfitId} place={placeById('stable')!} />
 </AlbumArtProvider></MotionRoot></MemoryRouter>
 const withWorld = (save: Save, fn: (w: TierWorld) => TierWorld): Save => ({ ...save, tierWorlds: { ...save.tierWorlds, '1': fn(worldOf(save)) } })
 
@@ -40,11 +40,11 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
     const families = within(screen.getByRole('radiogroup', { name: 'Accessory family' })).getAllByRole('radio')
     expect(families).toHaveLength(4)
     expect(families.map((family) => family.getAttribute('aria-label')!.replace('Signature ', '')).sort()).toEqual(['Pendant', 'Bell', 'Orb', 'Insignia'].sort())
-    expect(screen.getAllByRole('button', { name: /^(Equip|Equipped)$/ })).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: 'Set' })).toHaveLength(1)
 
     fireEvent.click(screen.getByRole('radio', { name: 'Orb' }))
     expect(within(screen.getByRole('group', { name: 'Orb: which weapon' })).getAllByRole('button')).toHaveLength(3)
-    expect(screen.getAllByRole('button', { name: /^(Equip|Equipped)$/ })).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: 'Set' })).toHaveLength(1)
   })
 
   it('shows the Gear dot, the grade rows\' marks and the jewels to set, and drops them once used; no skill costs points (v16 on)', () => {
@@ -77,6 +77,28 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeDefined()
     expect(screen.queryByRole('img', { name: 'Can upgrade' })).toBeNull()
     expect(screen.queryByText(/to set/)).toBeNull()
+  })
+
+  it('keeps the compact sheet controls touchable and omits the locked ticket balance', () => {
+    const aster = fixture.world.umas['81001']!
+    fixture.world = { ...fixture.world,
+      heroes: { 'brawler-1': { hero: '81002', learners: ['81001'] } },
+      umas: { ...fixture.world.umas, '81001': { ...aster,
+        classId: 'brawler',
+        classes: { ...aster.classes, brawler: { weapons: ['greatsword', 'axe', 'lance'], lines: {}, loadout: [] } },
+        bonds: { 'brawler-1': { level: 2, exp: 0 } },
+      } },
+    }
+    const ui = render(profile())
+    expect(screen.getByRole('button', { name: /^Template:/ }).className).toContain('min-h-11')
+    expect(screen.getByRole('button', { name: 'Back to auto' }).className).toContain('min-h-11')
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }))
+    expect(screen.getByRole('button', { name: /Bond 2\/10/ }).className).toContain('min-h-11')
+
+    ui.rerender(profile('81006'))
+    expect(screen.getByRole('button', { name: 'Unlock · 1 Ticket' })).toBeDefined()
+    expect(screen.queryByText(/Tickets left/)).toBeNull()
   })
 })
 

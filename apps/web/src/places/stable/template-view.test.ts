@@ -39,12 +39,12 @@ describe('her template on the sheet (H70; Classes v3 from H134)', () => {
         { label: 'Stride', value: 'Middle', source: 'Medium A' },
         { label: 'Knack', value: 'Clever', source: 'Wit +20%' },
       ],
-      flourish: '★ Even pace · as a Duelist · on',
+      flourish: '★ Flourish · Even pace · 1%/round · max 4% · On',
     })
     // On as any class of her Tier 0's family; off outside it.
-    expect(templateCard(C, open, 'tomeblade')!.flourish).toBe('★ Even pace · as a Duelist · on')
-    expect(templateCard(C, open, 'brawler')!.flourish).toBe('★ Even pace · as a Duelist · no effect as Brawler')
-    expect(templateCard(C, null, null)!.flourish).toBe('★ Even pace · as a Duelist')
+    expect(templateCard(C, open, 'tomeblade')!.flourish).toBe('★ Flourish · Even pace · 1%/round · max 4% · On')
+    expect(templateCard(C, open, 'brawler')!.flourish).toBe('★ Flourish · Even pace · 1%/round · max 4% · Off')
+    expect(templateCard(C, null, null)!.flourish).toBe('★ Flourish · Even pace · 1%/round · max 4% · Off')
     // A stored pick isn't read: her calling still comes from her style.
     const picked = templateCard(C, { calling: { pick: 'spellblade', confirmed: false } }, 'spellblade')!
     expect(picked.readings[0]).toEqual({ label: 'Calling', value: 'Duelist', source: 'Pace A' })
@@ -72,18 +72,18 @@ describe('her template on the sheet (H70; Classes v3 from H134)', () => {
   })
 
   it('draws the root plate\'s ★ line, dimmed outside her Tier 0\'s family', () => {
-    expect(rootFlourish(C, open, 'duelist')).toEqual({ line: '★ Even pace · 1% of her max HP a round, up to 4%', off: null })
+    expect(rootFlourish(C, open, 'duelist')).toEqual({ line: '★ Even pace · On', off: null })
     expect(rootFlourish(C, open, 'tomeblade').off).toBeNull()
-    expect(rootFlourish(C, open, 'cleric')).toEqual({ line: '★ Even pace · 1% of her max HP a round, up to 4%', off: 'No effect as Cleric' })
-    expect(flourishLine('late-reserve')).toBe('★ Late reserve · from round 3, 2% of her max HP a round, up to 4%')
-    expect(flourishLine('clean-break')).toBe('★ Clean break · a Barrier of 4% of her max HP at the start')
+    expect(rootFlourish(C, open, 'cleric')).toEqual({ line: '★ Even pace · Off', off: null })
+    expect(flourishLine('late-reserve')).toBe('★ Flourish · Late reserve · round 3+ · 2%/round · max 4% · On')
+    expect(flourishLine('clean-break')).toBe('★ Flourish · Clean break · Barrier 4% · start · On')
   })
 
   it('reads the moon\'s node II by her Tier 0\'s root: a Recruit DEF, an Initiate M.DEF, the All-Rounders both', () => {
     const owned = newOwnedUma('2026-10-29T12:00:00.000Z')
     const two = nodePoints('template:2', 1), half = Math.floor(two / 2)
-    expect(templateCard(A, owned, 'recruit')!.moon).toContain(` · II DEF +${two} (`)
-    expect(templateCard(I, owned, 'apprentice')!.moon).toContain(` · II M.DEF +${two} (`)
-    expect(templateCard(C, owned, 'duelist')!.moon).toContain(` · II DEF +${half} · M.DEF +${two - half} (`)
+    expect(templateCard(A, owned, 'recruit')!.moon?.[1]).toContain(`★ Moon II · DEF +${two} · `)
+    expect(templateCard(I, owned, 'apprentice')!.moon?.[1]).toContain(`★ Moon II · M.DEF +${two} · `)
+    expect(templateCard(C, owned, 'duelist')!.moon?.[1]).toContain(`★ Moon II · DEF +${half} · M.DEF +${two - half} · `)
   })
 })

@@ -150,12 +150,12 @@ describe('a Tier 0 on the Skills tab (v19)', () => {
     const tabs = within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')
     expect(tabs.map((t) => t.getAttribute('aria-label'))).toEqual(['Greatsword', 'Axe', 'Lance'])
     expect(screen.getByRole('button', { name: 'Drill Strike · Greatsword, R7/10, equipped' })).toBeDefined()
-    expect(screen.queryByRole('group', { name: /^Branch/ })).toBeNull()
+    expect(screen.queryByRole('group', { name: /^Line/ })).toBeNull()
     expect(screen.getByText('Promotion at R10 · 3 to go')).toBeDefined()
     fireEvent.click(tabs[2]!)
     fireEvent.click(screen.getByRole('button', { name: 'Drill Strike · Lance, R7/10, equipped' }))
     const node = await screen.findByRole('dialog', { name: 'Drill Strike · Lance' })
-    expect(within(node).getByText('Rank 7 · next at Class Rank 8')).toBeDefined()
+    expect(within(node).getByText('Rank 7 · next R8')).toBeDefined()
     expect(within(node).getByText('Depth 1 · Trunk')).toBeDefined()
     expect(within(node).queryByRole('img', { name: /of 5/ })).toBeNull()
     fireEvent.click(within(node).getByRole('button', { name: 'Close' }))
@@ -179,7 +179,7 @@ describe('a Tier 0 on the Skills tab (v19)', () => {
     expect(her()).toMatchObject({ classId: 'brawler', ranks: { classes: { brawler: { rank: 11, exp: 120 }, recruit: { rank: 10, exp: 0 } } } })
     // Her Brawler tree: the trunk, the fork and both lines; the class button reads her new rank.
     expect(screen.getByRole('button', { name: 'Class: Brawler, R11' })).toBeDefined()
-    expect(screen.getAllByRole('group', { name: /^Branch/ })).toHaveLength(2)
+    expect(screen.getAllByRole('group', { name: /^Line/ })).toHaveLength(2)
     // The Classes sheet now shows the siblings Ready.
     fireEvent.click(screen.getByRole('button', { name: 'Class: Brawler, R11' }))
     await screen.findByRole('dialog', { name: 'Classes' })
