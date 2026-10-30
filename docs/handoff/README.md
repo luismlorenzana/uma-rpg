@@ -32,7 +32,6 @@ pins it. Open now:
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H138](tasks/H138-base-class-emblems.md) | Art: five new base class emblems in place (Warrior, Spellblade, Healer, Summoner, Mage), uma-art 2.18.0, and the uma-rpg pin | ChatGPT | S | — | Ready |
 
 **Uma profile v2** (D239). Engine v19 has been live since H134 (D257): where a packet below builds a screen for both
 generations or "inert until H134", build it for v19 only. The class tree and promotion sheets (H137), the calling card's
@@ -66,6 +65,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H138 | Five base-class family emblems in place and the uma-art 2.18.0 pin (D262, platform P78); all other UI pixels and metadata frozen; actual native Classes-sheet acceptance at both phone widths, light/dark | Art `9dc40f3` ([platform #60](https://github.com/luismlorenzana/uma-platform/pull/60)), [2.18.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/41099542585); RPG pin in this delivery |
 | H117 | Uma profile v2: the live profile's compact copy, one wording list in code, copy enforcement in CI and three 44 pt targets (D258) | `e14a93c` |
 
 ## How a packet reads
