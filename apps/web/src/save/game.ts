@@ -196,6 +196,10 @@ const edit = async <Rules,>(rules: Promise<Rules>, change: (rules: Rules, save: 
 
 /** Switches her active class for free (D86). */
 export const pickClass = (outfitId: string, classId: RpgClass) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.chooseClass(s, outfitId, classId, now, t))
+/** Promotes her from a Tier 0 at Class Rank 10 into one of its children (Classes v3, CV8; H137): free, the child opens at
+ * Class Rank 10 with her waiting EXP, and she fights as it. */
+export const promoteClass = (outfitId: string, from: RpgClass, to: RpgClass) =>
+  edit(import('@rpg/domain/battle'), (d, s, now, t) => d.promoteUma(s, outfitId, from, to, now, t))
 /** Takes line A or B on one of her class's trees (CP18, H69's `pickBranch`): free, her equipped skills follow. */
 export const takeBranch = (outfit: BattleOutfit, classId: RpgClass, weapon: RpgWeapon, branch: RpgBranch) =>
   edit(import('@rpg/domain/battle'), (d, s, now, t) => d.pickBranch(s, outfit, classId, weapon, branch, now, t))

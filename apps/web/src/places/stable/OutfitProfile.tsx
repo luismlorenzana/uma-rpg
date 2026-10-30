@@ -21,7 +21,7 @@ import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
 import { Tabs, UiMark } from '@luismlorenzana/uma-kit/ui'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { seeStableOutfit } from '../../album/preferences'
 import { umaUpgrades } from '../../album/upgrades'
 import { Bar, CLASS_LABEL } from '../../battle/labels'
@@ -46,8 +46,10 @@ const GRADE_COLORS: Record<string, string> = { S: '#f2c94c', A: '#f2994a', B: '#
 const TABS = ['skills', 'battle', 'gear', 'work', 'racing'] as const
 type Tab = (typeof TABS)[number]
 const TAB_LABEL: Record<Tab, string> = { skills: 'Skills', battle: 'Battle', gear: 'Gear', work: 'Work', racing: 'Racing' }
-/** A tab's "Can upgrade" dot (H34): Gear while a piece or Extra Stats can (no skill costs points from engine v16, CP14). */
+/** A tab's "Can upgrade" dot (H34): Gear while a piece or Extra Stats can (no skill costs points from engine v16, CP14).
+ * From v19 Skills carries the Ready dot while a promotion waits (Classes v3's Tier 0 at Rank 10; H137, D253). */
 function tabDot(t: Tab, up: UmaUpgrades | null): { dot?: boolean; dotLabel?: string } {
+  if (up && t === 'skills' && up.promote) return { dot: true, dotLabel: `${TAB_LABEL[t]}, ready` }
   const on = !!up && t === 'gear' && (up.gear > 0 || up.stars > 0)
   return on ? { dot: true, dotLabel: `${TAB_LABEL[t]}, can upgrade` } : {}
 }
@@ -92,7 +94,9 @@ export function OutfitProfile({ view, outfitId, place }: { view: MasterView; out
   useEffect(() => seeStableOutfit(view.roster.map(o => o.outfitId), outfitId), [view, outfitId])
   const owned = world?.umas[outfitId] ?? null
   const bust = useArtUrl(outfit ? imagePath(view.art, 'outfit-busts', outfit.outfitId) ?? imagePath(view.art, 'outfit-portraits', outfit.outfitId) : null)
-  const [tab, setTabState] = useState<Tab>(storedTab)
+  // Back from the Classes sheet's Manuals door (H137) lands on Skills, where the sheet reopens.
+  const location = useLocation()
+  const [tab, setTabState] = useState<Tab>(() => ((location.state as { sheet?: string } | null)?.sheet === 'classes' ? 'skills' : storedTab()))
   const setTab = (t: Tab) => {
     setTabState(t)
     try {

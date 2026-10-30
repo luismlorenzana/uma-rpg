@@ -13,7 +13,7 @@ import { ACCESSORY_SLOTS, ARMOR_SLOTS } from '../economy/ranks'
 import { gradeOf, raiseBlock, type GradeTarget } from '../economy/grades'
 import { GEM_IDENTITIES, gemNodes, nodeGrade } from '../economy/stars'
 import { madeIdentity } from '../items/made-id'
-import type { RpgClass } from '../rpg/rules'
+import { rpgPromotionWaits, type RpgClass } from '../rpg/rules'
 import { classOf } from './battle'
 import { jewelNodes } from './observatory'
 import { gearStock, gearV1, gemStock, isGrades, isStarMap, slotKind, starsV1, type OwnedUma, type TierWorld } from './save'
@@ -32,6 +32,9 @@ export interface UmaUpgrades {
   freeNodes: number
   /** gems + freeNodes. */
   stars: number
+  /** Classes v3 (v19; H137, D253): she fights as a Tier 0 at Class Rank 10 with a child she doesn't hold, so a promotion
+   * waits (`rpgPromotionWaits`): the Stable's mark and the Skills tab's Ready dot. Always false before v19. */
+  promote: boolean
   any: boolean
 }
 
@@ -74,10 +77,12 @@ function better(uma: OwnedUma, stock: Readonly<Record<string, number>>, bound: M
 /**
  * What she can upgrade now, as the class `classId` (the caller passes her active class, as for `targetPlan`, since the
  * domain has no master data). Null for an Uma this world doesn't own. Accessory slots follow the engine's generation (H57).
+ * From v19 a waiting promotion counts too (`promote`; one reason, read by her world's `tier`).
  */
-export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClass, _tier = 1, engine: number = BATTLE_ENGINE_VERSION): UmaUpgrades | null {
+export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClass, tier: number | string = 1, engine: number = BATTLE_ENGINE_VERSION): UmaUpgrades | null {
   const uma = world.umas[outfitId]
   if (!uma) return null
+  const promote = rpgPromotionWaits(uma.ranks, classId, tier, engine)
   if (isGrades(uma.gear) || isStarMap(uma.stars)) {
     const grades: GradeTarget[] = []
     if (isGrades(uma.gear)) {
@@ -100,8 +105,8 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
       .filter(([id, count]) => count > 0 && madeIdentity(id)?.line.startsWith('jewel-') && jewelNodes(map, id, uma.level).length > 0)
       .map(([id]) => id) : []
     return {
-      gearSlots: [], gear: grades.length, grades, gems: 0, jewels, freeNodes: 0, stars: jewels.length,
-      any: grades.length > 0 || jewels.length > 0,
+      gearSlots: [], gear: grades.length, grades, gems: 0, jewels, freeNodes: 0, stars: jewels.length, promote,
+      any: grades.length > 0 || jewels.length > 0 || promote,
     }
   }
   const bound = boundGrades(uma)
@@ -146,6 +151,6 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
   const active = map.active.length
   const freeNodes = Math.max(0, Math.min(activeNodeSlots(uma.level) - active, map.unlocked.length - active))
   const stars = gems + freeNodes
-  return { gearSlots, gear: gearSlots.length, grades: [], gems, jewels: [], freeNodes, stars, any: gearSlots.length > 0 || stars > 0 }
+  return { gearSlots, gear: gearSlots.length, grades: [], gems, jewels: [], freeNodes, stars, promote, any: gearSlots.length > 0 || stars > 0 || promote }
 }
 

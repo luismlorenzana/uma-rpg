@@ -143,7 +143,7 @@ describe('can upgrade (H34)', () => {
 
   it('returns null for an Uma not owned; a fresh Uma with an empty stock has nothing', () => {
     expect(upgradesFor(world(), '999', 'brawler')).toBeNull()
-    expect(up(world())).toEqual({ gearSlots: [], gear: 0, grades: [], gems: 0, jewels: [], freeNodes: 0, stars: 0, any: false })
+    expect(up(world())).toEqual({ gearSlots: [], gear: 0, grades: [], gems: 0, jewels: [], freeNodes: 0, stars: 0, promote: false, any: false })
   })
 
   // A guard against an accidental quadratic blowup, not a micro-benchmark: about 20 ms locally, and shared CI runners can be
