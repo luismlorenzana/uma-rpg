@@ -52,4 +52,8 @@ export class LocalSaveRepository implements SaveRepository {
       return next
     })
   }
+
+  rescue(uid: string, upload: unknown, reason: string): Promise<void> {
+    return this.serialize(() => writeFile(`${this.file}.rescue.json`, JSON.stringify({ uid, reason, upload }, null, 2)))
+  }
 }

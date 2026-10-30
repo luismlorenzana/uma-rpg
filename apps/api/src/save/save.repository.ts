@@ -18,6 +18,8 @@ export interface SaveRepository {
    * isn't older than the stored one (D45); otherwise RevisionConflict with what's stored.
    */
   put(uid: string, baseRevision: number, save: Save, sentSchemaVersion: number): Promise<SaveEnvelope>
+  /** Keeps an upload this server refused, as sent, in place of the one kept before (D260): the device may be its only copy. */
+  rescue(uid: string, upload: unknown, reason: string): Promise<void>
 }
 
 export const SAVE_REPOSITORY = Symbol('SAVE_REPOSITORY')

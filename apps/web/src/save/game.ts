@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  BATTLE_ENGINE_VERSION, markClassesV3Seen, markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass,
+  BATTLE_ENGINE_VERSION, markClassesV3Seen, markGrantSeen, newSave, ownerTier, parseSaveAsync, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass,
   type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
@@ -13,7 +13,7 @@ import { create } from 'zustand'
 import type { AlbumScope } from '../album/rows'
 import { conflictEnvelope, saveApi } from '../api/client'
 import { masterRoster } from '../master/master'
-import { readSaveRow, writeSaveRow } from './db'
+import { addSafetyCopy, readSafetyCopy, readSaveRow, removeSafetyCopy, writeSaveRow } from './db'
 import { reconcile } from './reconcile'
 import { rememberedTier, rememberTier, startTier } from './tier'
 import { tradeOfWorld } from './trade'
@@ -30,20 +30,22 @@ export interface GameState {
   dirty: boolean
   sync: SyncStatus
   lastSyncedAt: string | null
+  /** When a newer save last replaced this device's unsynced changes (D260): a safety copy holds them. */
+  replacedAt: string | null
   /** The tier world on screen (H35). The save always has its world once loaded. */
   activeTier: number
 }
 
-const INITIAL: GameState = { uid: null, status: 'idle', save: null, revision: 0, dirty: false, sync: 'idle', lastSyncedAt: null, activeTier: 1 }
+const INITIAL: GameState = { uid: null, status: 'idle', save: null, revision: 0, dirty: false, sync: 'idle', lastSyncedAt: null, replacedAt: null, activeTier: 1 }
 
 export const useGame = create<GameState>(() => INITIAL)
 
 const nowIso = () => new Date().toISOString()
 
 function persist(): Promise<void> {
-  const { uid, save, revision, dirty } = useGame.getState()
+  const { uid, save, revision, dirty, lastSyncedAt } = useGame.getState()
   if (!uid || !save) return Promise.resolve()
-  return writeSaveRow({ id: 'main', uid, revision, save, dirty })
+  return writeSaveRow({ id: 'main', uid, revision, save, dirty, lastSyncedAt })
 }
 
 /** The tier a loaded save opens on (`asked` first, from a `?tier=` link), remembered on the device. */
@@ -63,7 +65,8 @@ export async function boot(uid: string, askedTier: string | null = null): Promis
   useGame.setState({ ...INITIAL, uid, status: 'booting' })
   const row = await readSaveRow(uid)
   if (row) {
-    useGame.setState({ status: 'ready', save: row.save, revision: row.revision, dirty: row.dirty, activeTier: openTier(row.save, askedTier) })
+    useGame.setState({ status: 'ready', save: row.save, revision: row.revision, dirty: row.dirty, lastSyncedAt: row.lastSyncedAt ?? null,
+      activeTier: openTier(row.save, askedTier) })
     void syncNow()
     return
   }
@@ -478,10 +481,19 @@ async function syncPass(): Promise<void> {
           again = true // edited meanwhile: decide again next pass
           break
         }
+        // Unsynced changes are never replaced without a copy (D260): no copy, no adopt, and the warning shows instead.
+        if (step.replacesUnsynced && local.save) {
+          const kept = await addSafetyCopy({ uid: start.uid, reason: 'replaced', at: nowIso(), revision: local.revision, save: local.save })
+          if (!kept) throw new Error('no safety copy')
+          if (useGame.getState().save !== local.save) {
+            again = true
+            break
+          }
+        }
         // An adopted save keeps the tier on screen when it has its world; otherwise the start rule picks one (H35).
         const adopted = step.envelope.save
         const { activeTier } = useGame.getState()
-        useGame.setState({ save: adopted, revision: step.envelope.revision, dirty: false,
+        useGame.setState({ save: adopted, revision: step.envelope.revision, dirty: false, ...(step.replacesUnsynced ? { replacedAt: nowIso() } : {}),
           ...(adopted.tierWorlds[tierKey(activeTier)] ? {} : { activeTier: openTier(adopted, null) }) })
         await persist()
         break
@@ -499,10 +511,42 @@ async function syncPass(): Promise<void> {
         remote = current // someone else wrote first: reconcile against what's stored now
       }
     }
-    useGame.setState({ sync: 'synced', lastSyncedAt: nowIso() })
+    // Edits left unsent (three conflicts in a row) aren't synced, and the time says when the server last held everything.
+    const { dirty } = useGame.getState()
+    if (dirty && !again) throw new Error('edits left unsent')
+    useGame.setState({ sync: 'synced', ...(dirty ? {} : { lastSyncedAt: nowIso() }) })
+    if (!dirty) await persist()
   } catch {
     useGame.setState({ sync: typeof navigator !== 'undefined' && navigator.onLine === false ? 'offline' : 'error' })
   }
+}
+
+/**
+ * Puts a safety copy back (D260), the player's own choice, so it counts as the newest change and uploads over the server's.
+ * What it replaces becomes a safety copy first, so a restore can be undone. False, changing nothing, when the copy can't
+ * be read or today's save can't be kept.
+ */
+export async function restoreSafetyCopy(id: number): Promise<boolean> {
+  const { uid, save, revision } = useGame.getState()
+  if (!uid || !save) return false
+  const copy = await readSafetyCopy(id)
+  if (copy?.uid !== uid) return false
+  let restored: Save
+  try {
+    restored = await parseSaveAsync(copy.save)
+  } catch {
+    return false
+  }
+  if (!(await addSafetyCopy({ uid, reason: 'restore', at: nowIso(), revision, save }))) return false
+  await removeSafetyCopy(id)
+  useGame.setState({ activeTier: openTier(restored, null), replacedAt: null })
+  await commit({ ...restored, account: { ...restored.account, updatedAt: nowIso() } })
+  return true
+}
+
+/** The warning that a newer save replaced this device's changes has been read (the Account shows their safety copy). */
+export function seeReplaced(): void {
+  useGame.setState({ replacedAt: null })
 }
 
 /** Syncs when the app comes back to the foreground or the network returns. Returns a stop function. */

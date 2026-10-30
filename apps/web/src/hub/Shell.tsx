@@ -13,6 +13,7 @@ import { FeaturedSheet, withoutSheet } from './Featured'
 import { MenuSheet } from './MenuSheet'
 import { dueSheet, shownSheet } from './one-time'
 import { rememberPage } from './start'
+import { SyncWarning } from './SyncWarning'
 import { TierSheet } from './TierSheet'
 
 const GrantSheet = lazy(() => import('../grant/GrantSheet'))
@@ -54,7 +55,7 @@ export function Shell() {
 
   return (
     <AppFrame
-      top={<RpgAccountBar />}
+      top={<><RpgAccountBar /><SyncWarning /></>}
       bottom={<RpgBottomBar active={page} />}
       fullScreen={fullScreen}
       tint={tierLook(tier)}

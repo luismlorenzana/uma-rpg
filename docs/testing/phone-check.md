@@ -36,7 +36,8 @@ button and footer should stay reachable without horizontal page scrolling, in li
    sheet's picker opens; go back. Reload: the sheet doesn't open again. In **Account**, the row "The classes are rebuilt
    · n Class Manuals" reopens it; **Later** closes it. (D247, D250)
 4. **Account.** Tap your initial, edit **Trainer name** and tap **Save**; reopen the Account. Expect the name kept, the
-   **Tier 1 wallet**, the achievements list and the **App build** naming the release. In a world the Tier rework
+   **Tier 1 wallet**, the achievements list and the **App build** naming the release. **Cloud save** reads "Synced" and a
+   time; no red line sits under the top bar (D260). In a world the Tier rework
    migrated, **The Tier rework's grant** row reopens "The Wilds are rebuilt"; **Later** closes it. **Phone only:** if
    **Update ready · Restart** appears, tap Restart and confirm the new build and your save after reopening.
 5. **The Hub.** Swipe through the four pages. Expect Town Hall's plaza (up to five chibis; tap one for her sheet with

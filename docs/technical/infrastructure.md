@@ -7,7 +7,7 @@ Production for uma-rpg. Adapted from uma-racer's setup (itself from uma-planner)
 | GCP project | `uma-rpg` (number 727687479415), billing account `0101E5-D99B49-A8B713`, $5 budget alert |
 | Site | https://uma-rpg.web.app (Firebase Hosting, classic). `/api/**` is rewritten to Cloud Run, so the app is same-origin |
 | API | Cloud Run `rpg-api`, `us-central1`, min 0 / max 1 instances, 512 MiB and 1 CPU, runtime service account `rpg-api-runtime@uma-rpg.iam.gserviceaccount.com` |
-| Saves | Firestore (Native, `us-central1`), `saves/{uid}` = `{ revision, save, updatedAt }` |
+| Saves | Firestore (Native, `us-central1`), `saves/{uid}` = `{ revision, save, updatedAt }`, `save` as JSON text (D260). A refused upload waits in `saveRescues/{uid}` = `{ upload, reason, rescuedAt }`, newest only |
 | Master data | Read-only from `gs://uma-platform-master-data` (project `uma-platform-lm`); the runtime service account has `roles/storage.objectViewer` on that bucket |
 | Private content | `gs://uma-rpg-content` (`us-central1`, uniform access, public access prevented): the enemy release (D135), `enemies.json` and `enemies/<unit>-<face\|art\|splash>.<hash>.webp`, about 105 MB. The runtime service account reads it; `pnpm enemies:publish` writes it with the owner's gcloud login |
 | Images | Artifact Registry `us-central1-docker.pkg.dev/uma-rpg/rpg`, keeps the last 3 |
@@ -63,3 +63,16 @@ Watch a deploy: `gh run watch <id> -R luismlorenzana/uma-rpg --exit-status`.
 
 The installed PWA shows **Update ready · Restart** for a new build. The Account shows the build id and the master data
 release version.
+
+## Editing a production save by hand
+
+A hand edit lost 2.5 days of the owner's play on 2026-10-30 (D260). Before any edit:
+
+1. **Check the save is current.** A stored `updatedAt` older than the owner's last play means the device holds the real
+   save: stop and find out why. `saveRescues/{uid}` may hold the newest upload.
+2. **Never move `save.account.updatedAt`.** A device with unsynced changes keeps them only because the newest save wins;
+   leave it, and at worst the edit is overwritten and redone.
+3. **Keep a copy, then write with a precondition:** a `currentDocument.updateTime` from the read, and `revision` + 1 so a
+   clean device adopts the edit. `save` is JSON text, so an edit replaces the whole field.
+4. **Validate and compare:** run the edit through `parseSave`, and diff the document afterwards against the list of
+   intended changes.

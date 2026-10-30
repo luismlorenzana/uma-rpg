@@ -22,8 +22,16 @@ vi.mock('../api/client', async () => {
   }
 })
 
-const { boot, buyTicket, createAccount, markTarget, nameParty, pickClass, renameAccount, resetGame, setActiveTier, setSlot, syncNow, unlock, useGame, useWorld } = await import('./game')
-const { db } = await import('./db')
+/** Set to make the device refuse a safety copy. */
+const device = { refuseCopies: false }
+vi.mock('./db', async () => {
+  const actual = await vi.importActual<typeof import('./db')>('./db')
+  return { ...actual, addSafetyCopy: async (copy: Parameters<typeof actual.addSafetyCopy>[0]) => !device.refuseCopies && actual.addSafetyCopy(copy) }
+})
+
+const { boot, buyTicket, createAccount, markTarget, nameParty, pickClass, renameAccount, resetGame, restoreSafetyCopy, setActiveTier, setSlot, syncNow, unlock, useGame, useWorld } = await import('./game')
+const { db, safetyCopies } = await import('./db')
+const { saveApi, ApiError } = await import('../api/client')
 
 /** An invented outfit whose best running style is `best`. */
 const outfit = (outfitId: string, best: 'front' | 'pace' | 'late' | 'end' = 'front') => ({
@@ -34,7 +42,9 @@ beforeEach(async () => {
   resetGame()
   server.envelope = { revision: 0, save: null }
   server.puts = 0
+  device.refuseCopies = false
   await db.save.clear()
+  await db.safety.clear()
 })
 
 describe('game store', () => {
@@ -134,6 +144,95 @@ describe('game store', () => {
     const save = useGame.getState().save
     expect(save?.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(save?.tierWorlds['1']?.parties).toHaveLength(20)
+  })
+})
+
+// D260: on 2026-10-30 a server copy days behind was stamped newest, and the one device holding those days adopted it whole.
+describe('saves can\'t be lost to a sync (D260)', () => {
+  const LATER = '2099-01-01T00:00:00.000Z'
+  /** A device in step with the server, then with a change of its own the server never got. */
+  async function unsynced(): Promise<Save> {
+    await boot('u1')
+    await createAccount('Mine')
+    await syncNow()
+    await renameAccount('Days of play')
+    return useGame.getState().save!
+  }
+  /** The server moving on with an older save marked newest, as the hand-edited one was. */
+  const staleServerMarkedNewest = (save: Save) => {
+    server.envelope = { revision: server.envelope.revision + 1,
+      save: { ...save, account: { ...save.account, trainerName: 'Stale', updatedAt: LATER } } }
+  }
+
+  it('keeps unsynced changes before a save marked newer replaces them, and says so', async () => {
+    const mine = await unsynced()
+    vi.mocked(saveApi.put).mockRejectedValueOnce(new ApiError('/api/save', 500, null))
+    await syncNow()
+    expect(useGame.getState()).toMatchObject({ sync: 'error', dirty: true })
+    staleServerMarkedNewest(mine)
+    await syncNow()
+    const state = useGame.getState()
+    expect(state.save!.account.trainerName).toBe('Stale')
+    expect(state.replacedAt).not.toBeNull()
+    const copies = await safetyCopies('u1')
+    expect(copies).toHaveLength(1)
+    expect(copies[0]).toMatchObject({ reason: 'replaced', uid: 'u1' })
+    expect(copies[0]!.save).toMatchObject({ account: { trainerName: 'Days of play' } })
+  })
+
+  it('restores a copy over the server\'s newer save, and keeps what it replaced', async () => {
+    staleServerMarkedNewest(await unsynced())
+    await syncNow()
+    const [copy] = await safetyCopies('u1')
+    await expect(restoreSafetyCopy(copy!.id!)).resolves.toBe(true)
+    await syncNow()
+    expect(useGame.getState()).toMatchObject({ dirty: false, sync: 'synced', replacedAt: null })
+    expect(server.envelope.save!.account.trainerName).toBe('Days of play')
+    const copies = await safetyCopies('u1')
+    expect(copies.map((c) => c.reason)).toEqual(['restore'])
+    expect(copies[0]!.save).toMatchObject({ account: { trainerName: 'Stale' } })
+  })
+
+  it('replaces nothing unsynced when it can\'t keep a copy', async () => {
+    staleServerMarkedNewest(await unsynced())
+    device.refuseCopies = true
+    await syncNow()
+    expect(useGame.getState()).toMatchObject({ sync: 'error', dirty: true, replacedAt: null })
+    expect(useGame.getState().save!.account.trainerName).toBe('Days of play')
+  })
+
+  it('copies nothing when a clean device adopts: it held nothing the server lacked', async () => {
+    await boot('u1')
+    await createAccount('Mine')
+    await syncNow()
+    staleServerMarkedNewest(useGame.getState().save!)
+    await syncNow()
+    expect(useGame.getState().save!.account.trainerName).toBe('Stale')
+    expect(useGame.getState().replacedAt).toBeNull()
+    expect(await safetyCopies('u1')).toEqual([])
+  })
+
+  it('never calls edits left unsent synced', async () => {
+    await unsynced()
+    const before = useGame.getState().lastSyncedAt
+    const put = vi.mocked(saveApi.put)
+    put.mockImplementation(async () => { throw new ApiError('/api/save', 409, { current: structuredClone(server.envelope) }) })
+    server.envelope = { ...server.envelope, revision: server.envelope.revision + 1 }
+    await syncNow()
+    expect(useGame.getState()).toMatchObject({ sync: 'error', dirty: true, lastSyncedAt: before })
+    put.mockReset()
+  })
+
+  it('remembers across a restart when the server last held everything', async () => {
+    await boot('u1')
+    await createAccount('Mine')
+    await syncNow()
+    const { lastSyncedAt } = useGame.getState()
+    expect(lastSyncedAt).not.toBeNull()
+    expect((await db.save.get('main'))?.lastSyncedAt).toBe(lastSyncedAt)
+    resetGame()
+    await boot('u1')
+    expect(useGame.getState().lastSyncedAt).not.toBeNull()
   })
 })
 

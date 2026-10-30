@@ -34,4 +34,12 @@ describe('sync reconcile', () => {
     const newer = renameTrainer(base, 'Newer', T2)
     expect(reconcile({ revision: 3, save: older, dirty: true }, { revision: 4, save: newer }).kind).toBe('adopt')
   })
+
+  it('flags only the adopt that replaces unsynced changes (D260)', () => {
+    const older = renameTrainer(base, 'Older', T1)
+    const newer = renameTrainer(base, 'Newer', T2)
+    expect(reconcile({ revision: 3, save: older, dirty: true }, { revision: 4, save: newer })).toMatchObject({ kind: 'adopt', replacesUnsynced: true })
+    expect(reconcile({ revision: 3, save: older, dirty: false }, { revision: 4, save: newer })).toMatchObject({ kind: 'adopt', replacesUnsynced: false })
+    expect(reconcile({ revision: 0, save: null, dirty: false }, { revision: 4, save: newer })).toMatchObject({ kind: 'adopt', replacesUnsynced: false })
+  })
 })

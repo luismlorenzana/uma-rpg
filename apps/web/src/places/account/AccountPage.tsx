@@ -1,7 +1,8 @@
 // The Account (S1, SD3): the kit's frame (uma-platform P56) with this game's content: the trainer name, the active
 // tier's wallet (H35), Appearance, push notifications, the achievements (H49), the info rows and sign-out. A hidden Town
 // place (D31). A world with the Tier rework's grant (save v28, PP25; H80) keeps a row that reopens its sheet, and one with
-// Classes v3's reset (save v32, CV30; H132) another, each for as long as its record lasts.
+// Classes v3's reset (save v32, CV30; H132) another, each for as long as its record lasts. This device's safety copies
+// (D260) list here, each with its Restore.
 import { useAuth } from '@luismlorenzana/uma-kit/auth'
 import { AccountPage as AccountFrame } from '@luismlorenzana/uma-kit/places'
 import { withParam } from '@luismlorenzana/uma-kit/shell'
@@ -15,6 +16,8 @@ import { useMaster } from '../../master/master'
 import { NotificationsCard } from '../../push/NotificationsCard'
 import { renameAccount, resetGame, useActiveTier, useGame, useWorld } from '../../save/game'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
+import { SafetyCopies } from './SafetyCopies'
+import { dateWords } from './safety-view'
 
 export default function AccountPage() {
   const save = useGame((s) => s.save)
@@ -37,14 +40,15 @@ export default function AccountPage() {
   ] : [laurels, speed, sweep]
   const umas = Object.values(save.tierWorlds).reduce((n, w) => n + Object.keys(w.umas).length, 0)
   const cloud = sync === 'synced' && lastSyncedAt ? `Synced ${new Date(lastSyncedAt).toLocaleTimeString()}`
-    : sync === 'syncing' ? 'Syncing…' : sync === 'offline' ? 'Offline' : sync === 'error' ? 'Paused' : '—'
+    : sync === 'syncing' ? 'Syncing…' : sync === 'offline' ? 'Offline'
+    : sync === 'error' ? (lastSyncedAt ? `Paused · last ${dateWords(lastSyncedAt)}` : 'Paused') : '—'
   return (
     <AccountFrame
       words={{ name: 'Trainer name', wallet: `Tier ${tier} wallet` }}
       rename={{ value: save.account.trainerName, maxLength: TRAINER_NAME_MAX, normalize: normalizeTrainerName, onSave: renameAccount }}
       wallet={shown}
       notifications={<NotificationsCard />}
-      sections={<>{world && <OneTimeRows world={world} />}<AchievementList save={save} /></>}
+      sections={<>{world && <OneTimeRows world={world} />}<SafetyCopies /><AchievementList save={save} /></>}
       info={[
         { label: 'Tier world', value: `Tier ${tier}` },
         { label: 'Trainer since', value: new Date(save.account.createdAt).toLocaleDateString() },

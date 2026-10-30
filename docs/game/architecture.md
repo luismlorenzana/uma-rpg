@@ -187,8 +187,11 @@ lazy pages import it directly, so its rules load with the first command or page 
   vars. The game's private allowlist remains `enemies.json` plus hash-named WebP face, art and splash files; the shared
   modules own traversal checks, content types, cache headers, local-folder sources and bucket reads.
 - **Storage:**
-  - Production uses Firestore: `saves/{uid}` is written in a transaction, and a schema bump first backs the old save up
-    to `saveBackups/{uid}-v{n}` (D69). `push/{uid}` holds push subscriptions.
+  - Production uses Firestore: `saves/{uid}` is written in a transaction, with the save as JSON text (D260: Firestore
+    refuses a list inside a list), and a schema bump first backs the old save up to `saveBackups/{uid}-v{n}` (D69). An
+    upload the server refuses is kept in `saveRescues/{uid}`, newest only. `push/{uid}` holds push subscriptions.
+  - The device keeps a **safety copy** (`SAFETY_COPIES`, five an account) before anything replaces changes the server never
+    got, before a restore, and of a save it can't read. If it can't keep the copy it doesn't replace the save.
   - Local uses a JSON file (`LOCAL_SAVE_FILE`, default `apps/api/.data/save.json`) and in-memory push.
 - **Env vars:** `PORT`, `AUTH_MODE`, `ALLOWED_ORIGIN`, `ALLOWED_EMAIL`, `PERSISTENCE`, `LOCAL_SAVE_FILE`, `MASTER_BUCKET`,
   `MASTER_DIR`, `CONTENT_BUCKET`, `CONTENT_DIR`, `BUILD_ID`, `VAPID_KEYS`, `PUSH_SCHEDULER_EMAIL`, `PUSH_AUDIENCE`.

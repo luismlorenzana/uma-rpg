@@ -1,7 +1,7 @@
 // The production repository's backup on a schema change (D69), against an in-memory Firestore: H134 turns save v32 on
 // (Classes v3's reset and the Healer Sanctum's merge), so the first v32 write over a stored v31 save must keep
 // `saveBackups/{uid}-v31` whole. Invented data only.
-import { newOwnedUma, newSave, parseSavePut, SAVE_SCHEMA_VERSION as V } from '@rpg/domain'
+import { newOwnedUma, newSave, parseSavePut, SAVE_SCHEMA_VERSION as V, type Save } from '@rpg/domain'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FirestoreSaveRepository } from './firestore-save.repository'
 import { RevisionConflict } from './save.repository'
@@ -9,16 +9,24 @@ import { RevisionConflict } from './save.repository'
 type Doc = Record<string, unknown>
 const store = new Map<string, Doc>()
 const SERVER_TIME = { serverTimestamp: true }
+/** Firestore's own refusal (D260): "Property save contains an invalid nested entity". */
+const nestedList = (value: unknown, inList = false): boolean => (Array.isArray(value)
+  ? inList || value.some((v) => nestedList(v, true))
+  : typeof value === 'object' && value !== null && Object.values(value).some((v) => nestedList(v)))
+const strict = (data: Doc): Doc => {
+  if (nestedList(data)) throw new Error('3 INVALID_ARGUMENT: Property save contains an invalid nested entity.')
+  return structuredClone(data)
+}
 
 vi.mock('firebase-admin', () => {
   const snapshot = (path: string) => ({ exists: store.has(path), data: () => (store.has(path) ? structuredClone(store.get(path)) : undefined) })
-  const ref = (path: string) => ({ path, get: async () => snapshot(path) })
+  const ref = (path: string) => ({ path, get: async () => snapshot(path), set: async (data: Doc) => { store.set(path, strict(data)) } })
   const db = {
     collection: (name: string) => ({ doc: (id: string) => ref(`${name}/${id}`) }),
     runTransaction: async <T>(fn: (tx: unknown) => Promise<T>): Promise<T> => {
       const writes: [string, Doc][] = []
       const result = await fn({ get: async (r: { path: string }) => snapshot(r.path), set: (r: { path: string }, data: Doc) => { writes.push([r.path, data]) } })
-      for (const [path, data] of writes) store.set(path, structuredClone(data))
+      for (const [path, data] of writes) store.set(path, strict(data))
       return result
     },
   }
@@ -72,7 +80,8 @@ describe('the Firestore save repository (D45, D69)', () => {
     const next = await repo.put('u', 7, loaded.save!, 32)
     expect(next.revision).toBe(8)
     expect(store.get('saveBackups/u-v31')).toEqual({ ...v31, backedUpAt: SERVER_TIME })
-    expect(store.get('saves/u')).toMatchObject({ revision: 8, save: { schemaVersion: 32, tierWorlds: { '1': RESET } } })
+    expect(store.get('saves/u')).toMatchObject({ revision: 8 })
+    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 32, tierWorlds: { '1': RESET } })
     // A later v32 write over v32 backs nothing up.
     store.delete('saveBackups/u-v31')
     await repo.put('u', 8, loaded.save!, 32)
@@ -88,10 +97,47 @@ describe('the Firestore save repository (D45, D69)', () => {
     expect(sent.sentSchemaVersion).toBe(31)
     expect(sent.save.tierWorlds['1']).toMatchObject(RESET)
     await repo.put('u', 3, sent.save, sent.sentSchemaVersion)
-    expect(store.get('saves/u')).toMatchObject({ revision: 4, save: { schemaVersion: 32, tierWorlds: { '1': RESET } } })
+    expect(store.get('saves/u')).toMatchObject({ revision: 4 })
+    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 32, tierWorlds: { '1': RESET } })
     expect(store.get('saveBackups/u-v31')).toMatchObject({ revision: 3, save: { schemaVersion: 31 } })
     // Now v32 is stored: the old app's next write is refused with what's stored, and nothing changes.
     await expect(repo.put('u', 4, sent.save, 31)).rejects.toBeInstanceOf(RevisionConflict)
     expect(store.get('saves/u')).toMatchObject({ revision: 4 })
+  })
+
+  // D260: the failure that stranded 2026-10-26's saves on the device. Firestore refuses a list inside a list, and an open
+  // Convergence attempt's parties are one, so a map write failed; text can't.
+  it('stores a save holding a list inside a list, which a map write can\'t', async () => {
+    const repo = new FirestoreSaveRepository()
+    const save = { ...newSave('Luis', NOW), parties: [['101', '102'], ['103']] } as unknown as Save
+    await expect(repo.put('u', 0, save, 32)).resolves.toMatchObject({ revision: 1 })
+    expect(store.get('saves/u')).toMatchObject({ revision: 1, updatedAt: SERVER_TIME })
+    expect(JSON.parse(store.get('saves/u')!.save as string)).toEqual(JSON.parse(JSON.stringify(save)))
+  })
+
+  it('reads a save stored as text, and a map stored before it, and converts the map on its next write', async () => {
+    const repo = new FirestoreSaveRepository()
+    const save = newSave('Luis', NOW)
+    store.set('saves/u', { revision: 5, save: JSON.parse(JSON.stringify(save)) as Doc })
+    expect((await repo.load('u')).save?.account.trainerName).toBe('Luis')
+    await repo.put('u', 5, save, 32)
+    expect(typeof store.get('saves/u')!.save).toBe('string')
+    expect(await repo.load('u')).toMatchObject({ revision: 6, save: { account: { trainerName: 'Luis' } } })
+    await expect(repo.put('u', 5, save, 32)).rejects.toBeInstanceOf(RevisionConflict)
+  })
+
+  it('compares a stored text save\'s version as it did a map\'s (D45)', async () => {
+    const repo = new FirestoreSaveRepository()
+    const save = newSave('Luis', NOW)
+    await repo.put('u', 0, save, 32)
+    await expect(repo.put('u', 1, save, 31)).rejects.toBeInstanceOf(RevisionConflict)
+    expect(store.get('saves/u')).toMatchObject({ revision: 1 })
+  })
+
+  it('keeps the newest refused upload as sent, whatever its shape (D260)', async () => {
+    const repo = new FirestoreSaveRepository()
+    await repo.rescue('u', { baseRevision: 3, save: { odd: [[1], [2]] } }, 'first')
+    await repo.rescue('u', { baseRevision: 4, save: { odd: [[3]] } }, 'second')
+    expect(store.get('saveRescues/u')).toEqual({ upload: '{"baseRevision":4,"save":{"odd":[[3]]}}', reason: 'second', rescuedAt: SERVER_TIME })
   })
 })

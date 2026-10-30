@@ -379,7 +379,11 @@ Reached from the top bar's initial (`/town/account`). `places/account/AccountPag
   newest first with "21 Oct · Tier 1 run 2" (the Bestiary has no run), then the rest dimmed with how each is earned. It
   lists Tier 1's four seals and Rift Conquered, every other world's, and the nine titles; a seal reads "Iron Seal · Tier
   1", and Untouched shows its front's crest.
-- **About:** Tier world, Trainer since, Umas unlocked in every world ("26 / 270"), Cloud save, Game data, App build.
+- **Safety copies** (D260, only when this device has one): each row its date, why it was kept and what it held ("Replaced
+  by a newer save · 29 Umas · best Lv 20"). **Restore** confirms in a sheet; the current save becomes a safety copy and
+  the restored one uploads as the newest.
+- **About:** Tier world, Trainer since, Umas unlocked in every world ("26 / 270"), Cloud save ("Paused · last Oct 27, 7:40
+  PM" while uploads fail), Game data, App build.
 - "Update ready · Restart" while a new build waits, and **Sign out**.
 
 **"The Wilds are rebuilt"** (`grant/GrantSheet.tsx`, `grant-lines.ts`; the grant is in
@@ -687,6 +691,9 @@ account, its achievements and each Uma's tier history are shared.
   - the active world's chips: **Laurels**, **Speed Tickets**, and in Tier 1 **Uma Tickets** with the Uma Shards toward
     the next ("34 · 2/5"). Laurels and Speed Tickets open the Exchange, Uma Tickets the Stable;
   - "Offline" or "Sync paused", when it applies.
+  - Under the bar, a red line that opens the Account (D260): "Not backed up since Oct 27, 7:40 PM. Your progress is only on
+    this device." once uploads have failed with unsynced changes for ten minutes, or "A newer save replaced this device’s
+    changes. They’re kept in Account." until the Account is opened.
 - **Bottom bar** (the kit's `BottomBar`): Town Hall · Learning · **Battle** · Wilds · Menu, in five equal slots, docked
   full width to the screen's bottom edge, its panel running under the home indicator (D149). Battle is a disc in the
   tier's accent (gold in Tier 1) rising out of the bar. The active tab has a marker in the tier's accent on the bar's
