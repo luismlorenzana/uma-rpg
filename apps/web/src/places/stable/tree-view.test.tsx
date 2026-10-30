@@ -21,7 +21,8 @@ vi.mock('@rpg/domain/battle', async (orig) => {
 const NOW = '2026-10-25T12:00:00.000Z'
 let outfit: Awaited<ReturnType<typeof albumFixture>>['view']['roster'][number]
 
-/** A Lv 30 Brawler at Class Rank 22 on her three defaults, her Lance on branch B, skills chosen for her. */
+/** A Lv 30 Brawler at Class Rank 22 (held in Tier 1's world from Rank 10) on Greatsword, Axe and Lance, her Lance on
+ * branch B, skills chosen for her. */
 async function brawler(): Promise<Save> {
   const { view } = await albumFixture()
   outfit = view.roster[0]!
@@ -57,13 +58,13 @@ afterEach(() => {
 })
 
 describe('the Skills tab as a tree (H70)', () => {
-  it('runs with weaknesses v2 live on engine 18 (H116)', () => expect(BATTLE_ENGINE_VERSION).toBe(18))
+  it('runs on engine 19: weaknesses v2 (H116) and Classes v3 (H134) live', () => expect(BATTLE_ENGINE_VERSION).toBe(19))
 
   it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Sunder\'s detail on tap', async () => {
     show(await brawler())
     const tabs = within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')
     expect(tabs.map((t) => t.getAttribute('aria-label'))).toEqual(['Greatsword, branch A', 'Axe, branch A', 'Lance, branch B'])
-    expect(screen.getByRole('button', { name: 'Class: Brawler, Rank 22' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Class: Brawler, R22' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Change Greatsword' })).toBeDefined()
 
     // The Greatsword tree: the trunk and A held to depth 3; the node is compact and its tap sheet owns the words.
@@ -91,19 +92,6 @@ describe('the Skills tab as a tree (H70)', () => {
     // No points anywhere, and no Learn.
     expect(screen.queryByText(/point/)).toBeNull()
     expect(screen.queryByRole('button', { name: /^Learn/ })).toBeNull()
-  })
-
-  it('opens today\'s Class sheet from the class button on engine 18: her root and the six, no class tree (H137 is v19\'s)', async () => {
-    show(await brawler())
-    fireEvent.click(screen.getByRole('button', { name: 'Class: Brawler, Rank 22' }))
-    const sheet = await screen.findByRole('dialog', { name: 'Class' })
-    expect(within(sheet).getAllByRole('radio').map((r) => r.textContent)).toEqual([
-      'BrawlerRank 22', 'MageRank 1', 'Spell BladeRank 1', 'ClericRank 1', 'SummonerRank 1', 'PaladinRank 1',
-    ])
-    expect(within(sheet).getByLabelText('Her root')).toBeDefined()
-    expect(screen.queryByRole('dialog', { name: 'Classes' })).toBeNull()
-    expect(within(sheet).queryByRole('button', { name: /Class Manuals/ })).toBeNull()
-    expect(screen.queryByText(/Promot/)).toBeNull()
   })
 
   it('takes branch A from its sheet, calling the save\'s pickBranch with A, and her tree follows', async () => {

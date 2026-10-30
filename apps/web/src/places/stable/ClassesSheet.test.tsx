@@ -1,7 +1,6 @@
-// Classes v3's sheets on today's Skills tab from the switch (H137, D253; classes-v3.md §14.1–§14.2; inert until H134), with
-// the switch mocked to 19: the class button opens the Classes sheet; Fight as and Start call `chooseClass` and the sheet
-// stays open on its new state; Promote on a Ready tile swaps to the promotion sheet on that child and "Classes ›" swaps
-// back; the Manuals door pushes the Exchange's sheet with `{ back: true }` and its Back reopens the Classes sheet; a Tier 0's
+// Classes v3's sheets on the Skills tab (H137, D253; classes-v3.md §14.1–§14.2; live since H134): the class button opens
+// the Classes sheet; Fight as and Start call `chooseClass` and the sheet stays open on its new state; Promote on a Ready
+// tile swaps to the promotion sheet on that child and "Classes ›" swaps back; the Manuals door pushes the Exchange's sheet with `{ back: true }` and its Back reopens the Classes sheet; a Tier 0's
 // tree is one node with the promotion line; at Rank 10 the class button reads Promote and promoting calls `promoteUma`, then
 // the tab shows the child's tree. Invented outfits; the store is the real one, holding a test save.
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
@@ -16,8 +15,6 @@ import { albumFixture } from '../../album/testing'
 import { resetGame, useGame } from '../../save/game'
 import { SkillsPage } from './SkillsPage'
 
-vi.mock('../../../../../packages/domain/src/rpg/battle/caps', async (orig) =>
-  (await import('../../../../../packages/domain/src/rpg/battle/caps-at.fixture')).capsAt(19, await orig()))
 vi.mock('@rpg/domain/battle', async (orig) => {
   const actual = await orig<typeof import('@rpg/domain/battle')>()
   return { ...actual, chooseClass: vi.fn(actual.chooseClass), promoteUma: vi.fn(actual.promoteUma) }

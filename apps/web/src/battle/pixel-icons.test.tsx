@@ -13,19 +13,20 @@ async function renderIcons(content: React.ReactNode, check: (host: HTMLElement) 
   finally { await act(async () => root.unmount()); host.remove(); vi.unstubAllGlobals() }
 }
 describe('class emblems and status glyphs', () => {
-  it('keeps all six full class names alongside decorative, native-size emblems (classes v2, H61)', async () => {
+  it('keeps all thirteen full class names alongside decorative, native-size emblems (Classes v3, live since H134)', async () => {
     const frames: Record<string, { x: number; y: number }> = atlas.frames
-    expect(RPG_CLASSES).toHaveLength(6)
+    const at = (f: { x: number; y: number }) => `${-f.x}px ${-f.y}px`
+    expect(RPG_CLASSES).toHaveLength(13)
+    // uma-art 2.16.0+ draws all thirteen (H127): each her own frame, no fallback.
+    for (const c of RPG_CLASSES) expect(frames[`class/${c}`], c).toBeDefined()
     await renderIcons(<>{RPG_CLASSES.map((c) => <button key={c}><ClassEmblem classId={c} />{CLASS_LABEL[c]}</button>)}</>, (host) => {
       expect([...host.querySelectorAll('button')].map((b) => b.textContent)).toEqual(RPG_CLASSES.map((c) => CLASS_LABEL[c]))
       const emblems = host.querySelectorAll<HTMLElement>('[aria-hidden="true"]')
-      expect(emblems).toHaveLength(6)
+      expect(emblems).toHaveLength(13)
       for (const [i, e] of [...emblems].entries()) {
-        const f = frames[`class/${RPG_CLASSES[i]}`]!
         expect(e.style.width).toBe('24px'); expect(e.style.height).toBe('24px')
         expect(e.style.backgroundSize).toBe(`${atlas.width}px ${atlas.height}px`)
-        // The first five sit in a row; the Paladin's came later, in uma-art 2.12.0 (H54).
-        expect(e.style.backgroundPosition).toBe(i < 5 ? `${-i * 24}px 0px` : `${-f.x}px ${-f.y}px`)
+        expect(e.style.backgroundPosition).toBe(at(frames[`class/${RPG_CLASSES[i]}`]!))
         expect(e.style.imageRendering).toBe('pixelated')
       }
     })

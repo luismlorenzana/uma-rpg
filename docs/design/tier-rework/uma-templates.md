@@ -1,5 +1,9 @@
 # Uma Templates: what makes one Uma unique, in one place
 
+> **Classes v3 (D240, live from H134) replaces the calling pick (CP29) and the six-class callings:** see
+> [Classes v3](../classes-v3/classes-v3.md) §5 and §9 and the
+> [manual](../../game/classes.md#her-calling-and-her-template).
+>
 > **Approved by the owner, 2026-10-25 (D197): every call UT1–UT20 as written.** "One of those things that I prefer
 > testing in action." Its §12 follow-ups are applied to the other docs, the README and the pages
 > ([README §7.1](README.md#71-the-cross-check-2026-10-24), XC30); the versions are re-planned by D198 (§9, §10,

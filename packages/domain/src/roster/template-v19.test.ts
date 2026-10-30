@@ -64,7 +64,9 @@ describe('the calling by running style (CV19, §5)', () => {
     // Before v19 the pick still reads.
     expect(umaCallingPick(pace, V18)).not.toBeNull()
     expect(umaCalling(pace, 'spellblade', V18)).toBe('spellblade')
-    expect(umaCalling(pace)).toBe('mage')
+    expect(umaCalling(pace, null, V18)).toBe('mage')
+    // The live game (v19 since H134) reads her Tier 0.
+    expect([umaCalling(pace), umaCallingPick(pace)]).toEqual(['duelist', null])
   })
 })
 
@@ -107,6 +109,6 @@ describe('templates 5 × 3 (CV21, §9)', () => {
     expect(RPG_TIER0_CLASSES.map((c) => moonChannel(c, V19))).toEqual(['physical', 'both', 'both', 'both', 'magical'])
     expect(moonTemplate(best(['pace']), null, V19).channel).toBe('both')
     // Before v19 her calling's armor half.
-    expect([moonChannel('spellblade', V18), moonChannel('summoner', V18), moonTemplate(best(['pace'])).channel]).toEqual(['physical', 'magical', 'magical'])
+    expect([moonChannel('spellblade', V18), moonChannel('summoner', V18), moonTemplate(best(['pace']), null, V18).channel]).toEqual(['physical', 'magical', 'magical'])
   })
 })

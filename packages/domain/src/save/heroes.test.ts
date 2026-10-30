@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, hallClass, HERO_HALLS, HERO_LIMIT_IDS, heroLimitsOf } from '../rpg/heroes'
+import {
+  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, hallOfPlace, HERO_HALL_PLACES, HERO_LIMIT_IDS, heroLimitIds, heroLimitsOfHall,
+} from '../rpg/heroes'
 import { regionChapter, worldContinent } from '../world/world'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/engine'
 import { startFight, type BattleOutfit } from './battle'
@@ -26,12 +28,15 @@ function stable(): Save {
 const round = (s: Save) => expect(parseSave(JSON.parse(JSON.stringify(s)))).toEqual(s)
 
 describe('Halls of Heroes (D106)', () => {
-  it('has six halls of four seats, one unique Limit Break each (classes v2, D181)', () => {
-    expect(HERO_LIMIT_IDS).toHaveLength(24)
-    expect(heroLimitsOf('cleric').map((l) => l.id)).toEqual(['cleric-1', 'cleric-2', 'cleric-3', 'cleric-4'])
-    expect(heroLimitsOf('paladin').map((l) => l.id)).toEqual(['paladin-1', 'paladin-2', 'paladin-3', 'paladin-4'])
-    expect(hallClass(HERO_HALLS.spellblade)).toBe('spellblade')
-    expect(hallClass('workbench')).toBeNull()
+  it('has five halls of four seats, one unique Limit Break each (Halls v2, live since H134); v15–v18 kept six (classes v2, D181)', () => {
+    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(19))
+    expect(HERO_LIMIT_IDS).toHaveLength(20)
+    expect(heroLimitsOfHall('healer').map((l) => l.id)).toEqual(['healer-1', 'healer-2', 'healer-3', 'healer-4'])
+    expect(heroLimitIds(18)).toHaveLength(24)
+    expect(heroLimitsOfHall('cleric', 18).map((l) => l.id)).toEqual(['cleric-1', 'cleric-2', 'cleric-3', 'cleric-4'])
+    expect(heroLimitsOfHall('paladin', 18).map((l) => l.id)).toEqual(['paladin-1', 'paladin-2', 'paladin-3', 'paladin-4'])
+    expect(hallOfPlace(HERO_HALL_PLACES.healer)).toBe('healer')
+    expect(hallOfPlace('workbench')).toBeNull()
     expect([0, 1, 5, 10, 12].map(bondCapacity)).toEqual([0.5, 0.55, 0.75, 1, 1])
   })
 
@@ -48,18 +53,18 @@ describe('Halls of Heroes (D106)', () => {
   })
 
   it('takes up to two Heroes a Learner and ten Learners a Hero, never a Hero as a Learner or a Learner as a Hero', () => {
-    let s = setHero(setHero(setHero(stable(), 'brawler-1', '201', T(3)), 'mage-2', '202', T(3)), 'cleric-3', '203', T(3))
+    let s = setHero(setHero(setHero(stable(), 'brawler-1', '201', T(3)), 'mage-2', '202', T(3)), 'healer-3', '203', T(3))
     expect(learnerBlock(worldOf(s), 'summoner-1', '101')).toBe('This seat has no Hero')
     s = addLearner(addLearner(s, 'brawler-1', '101', T(4)), 'mage-2', '101', T(4))
     expect(parentsOf(worldOf(s), '101')).toEqual(['brawler-1', 'mage-2'])
-    expect(learnerBlock(worldOf(s), 'cleric-3', '101')).toBe('Already has 2 Heroes')
+    expect(learnerBlock(worldOf(s), 'healer-3', '101')).toBe('Already has 2 Heroes')
     expect(learnerBlock(worldOf(s), 'brawler-1', '202')).toBe('A Hero')
     expect(learnerBlock(worldOf(s), 'mage-2', '101')).toBe('Already learning here')
     expect(heroBlock(worldOf(s), 'summoner-1', '101')).toBe('A Learner: leave her Heroes first')
-    expect(() => addLearner(s, 'cleric-3', '101', T(5))).toThrow(/2 Heroes/)
+    expect(() => addLearner(s, 'healer-3', '101', T(5))).toThrow(/2 Heroes/)
     s = removeLearner(s, 'mage-2', '101', T(5))
-    s = addLearner(s, 'cleric-3', '101', T(5))
-    expect(parentsOf(worldOf(s), '101')).toEqual(['brawler-1', 'cleric-3'])
+    s = addLearner(s, 'healer-3', '101', T(5))
+    expect(parentsOf(worldOf(s), '101')).toEqual(['brawler-1', 'healer-3'])
     round(s)
     // Eleven in one seat is one too many (owned Umas only).
     let big = stable()
@@ -76,10 +81,12 @@ describe('Halls of Heroes (D106)', () => {
       return () => parseSave(raw)
     }
     expect(bad({ 'brawler-5': { hero: '201', learners: [] } })).toThrow(/not a Hero seat/)
+    // v15–v18's Cleric Chapel is no seat of save v32: the migration merges it into the Healer Sanctum.
+    expect(bad({ 'cleric-1': { hero: '201', learners: [] } })).toThrow(/not a Hero seat/)
     expect(bad({ 'brawler-1': { hero: '999', learners: [] } })).toThrow(/owned outfit/)
     expect(bad({ 'brawler-1': { hero: '201', learners: [] }, 'mage-1': { hero: '201', learners: [] } })).toThrow(/another seat/)
     expect(bad({ 'brawler-1': { hero: '201', learners: ['202'] }, 'mage-1': { hero: '202', learners: [] } })).toThrow(/is a Hero/)
-    expect(bad({ 'brawler-1': { hero: '201', learners: ['101'] }, 'mage-1': { hero: '202', learners: ['101'] }, 'cleric-1': { hero: '203', learners: ['101'] } }))
+    expect(bad({ 'brawler-1': { hero: '201', learners: ['101'] }, 'mage-1': { hero: '202', learners: ['101'] }, 'healer-1': { hero: '203', learners: ['101'] } }))
       .toThrow(/more than 2/)
     const raw = JSON.parse(JSON.stringify(stable()))
     raw.tierWorlds['1'].umas['101'].bonds = { 'mage-1': { level: 10, exp: 3 } }
@@ -89,14 +96,14 @@ describe('Halls of Heroes (D106)', () => {
   it('brings her seat or her inherited Limit Breaks, with Bond Levels, into a fight', () => {
     let s = setHero(setHero(stable(), 'brawler-1', '201', T(3)), 'mage-2', '202', T(3))
     s = addLearner(addLearner(s, 'brawler-1', '101', T(4)), 'mage-2', '101', T(4))
-    s = setHero(s, 'cleric-4', '102', T(4))
+    s = setHero(s, 'healer-4', '102', T(4))
     const w = worldOf(s)
     w.umas['101'] = { ...w.umas['101']!, bonds: { 'mage-2': { level: 3, exp: 5 } } }
     expect(heroFields(w, '101')).toEqual({ inherits: [{ limit: 'brawler-1', bond: 0, from: '201' }, { limit: 'mage-2', bond: 3, from: '202' }] })
     const input = worldOf(startFight(s, ura, ura.nodes[1]!.id, OUTFITS, T(5))).world.run.battle!.input
     expect(input.version).toBe(BATTLE_ENGINE_VERSION)
     expect(input.allies.find((a) => a.id === '101')).toMatchObject({ inherits: [{ limit: 'brawler-1', bond: 0 }, { limit: 'mage-2', bond: 3 }] })
-    expect(input.allies.find((a) => a.id === '102')).toMatchObject({ hero: 'cleric-4' })
+    expect(input.allies.find((a) => a.id === '102')).toMatchObject({ hero: 'healer-4' })
     expect(input.allies.find((a) => a.id === '103')).not.toHaveProperty('hero')
   })
 

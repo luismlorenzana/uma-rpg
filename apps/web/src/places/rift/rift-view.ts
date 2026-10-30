@@ -7,7 +7,7 @@ import {
   type TierWorld,
 } from '@rpg/domain'
 import {
-  ASCEND_PURSE, bankedMarks, RIFT_FRONT_SPECS, riftConvergence, riftFight, riftGuidedBuild, type RiftContext, type RiftFightPlan, type RiftFightResult,
+  ASCEND_PURSE, bankedMarks, RIFT_FRONT_SPECS, riftConvergence, riftFight, riftGuidedBuild, riftParty, type RiftContext, type RiftFightPlan, type RiftFightResult,
 } from '@rpg/domain/rift'
 import { CLASS_LABEL } from '../../battle/labels'
 
@@ -63,9 +63,9 @@ export function levelPartyBlock(world: Pick<TierWorld, 'parties' | 'umas'>, inde
   return five.every((id) => atTop(world, id)) ? null : 'Needs five Lv 50 Umas'
 }
 
-/** How many of a party's classes the front's guidance asks for (0–5): a multiset match. */
-export function guidanceMatch(classes: readonly RpgClass[], front: RiftFront): number {
-  const want = [...RIFT_FRONT_SPECS[front].party]
+/** How many of a party's classes the front's guidance asks for (0–5): a multiset match, in an engine's generation. */
+export function guidanceMatch(classes: readonly RpgClass[], front: RiftFront, engine: number = BATTLE_ENGINE_VERSION): number {
+  const want = [...riftParty(front, engine)]
   let n = 0
   for (const c of classes) {
     const at = want.indexOf(c)
@@ -74,11 +74,12 @@ export function guidanceMatch(classes: readonly RpgClass[], front: RiftFront): n
   return n
 }
 
-/** Each member's active class. */
-export function partyClassesOf(world: Pick<TierWorld, 'umas'>, members: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = 1): RpgClass[] {
+/** Each member's active class, in an engine's generation. */
+export function partyClassesOf(world: Pick<TierWorld, 'umas'>, members: readonly string[], outfits: ReadonlyMap<string, BattleOutfit>, tier = 1,
+  engine: number = BATTLE_ENGINE_VERSION): RpgClass[] {
   return members.flatMap((id) => {
     const uma = world.umas[id], outfit = outfits.get(id)
-    return uma && outfit ? [activeClass(outfit, uma, tier)] : []
+    return uma && outfit ? [activeClass(outfit, uma, tier, engine)] : []
   })
 }
 
@@ -197,7 +198,7 @@ export function guidedPlan(held: readonly (readonly RpgClass[])[], front: RiftFr
  * classes' (CV §10.1), so a rebuilt roster isn't 0 of 5. */
 export function partyFit(world: Pick<TierWorld, 'umas'>, members: readonly string[], front: RiftFront, outfits: ReadonlyMap<string, BattleOutfit>,
   tier = 1, engine: number = BATTLE_ENGINE_VERSION): number {
-  if (!rpgRework('classes', engine)) return guidanceMatch(partyClassesOf(world, members, outfits, tier), front)
+  if (!rpgRework('classes', engine)) return guidanceMatch(partyClassesOf(world, members, outfits, tier, engine), front, engine)
   return guidanceFit(partyHeldOf(world, members, outfits, tier, engine), front, engine).filter((m) => m !== null).length
 }
 

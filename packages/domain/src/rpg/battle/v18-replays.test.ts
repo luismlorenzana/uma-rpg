@@ -1,10 +1,16 @@
-// v18 fights replay exactly while Classes v3 and Halls v2 are built dark at engine v19 (H126, D240–D241): the frozen
-// fixture's fights were generated on the live v18 engine before H126 touched it. Every rules call in the engine reads the
-// fight's version, so they replay whatever v19 adds; `v18-replays-live19.test.ts` replays them with the switch at 19.
+// v18 fights replay exactly under Classes v3 and Halls v2 (engine v19, live since H134; D240–D241): the frozen fixture's
+// fights were generated on the live v18 engine before H126 touched it. Every rules call in the engine reads the fight's
+// version, so they replay whatever v19 adds: the thirteen classes, the hands' lead half from data, Tier 0, the weapon
+// shapes and the twenty Limit Breaks leave every older fight as it was. (Until H134 `v18-replays-live19.test.ts`
+// replayed v14–v18's fights with `caps.ts` mocked to 19; this is now that case, live.)
 import { describe, expect, it } from 'vitest'
-import { rpgClasses } from '../rules'
+import { RPG_CLASSES, rpgClasses } from '../rules'
 import { applyBattleAction, BATTLE_ENGINE_VERSION, createBattle, rpgRework } from './engine'
 import type { BattleAction, BattleCue } from './types'
+import { loadV14Replays } from './v14-replays.fixture'
+import { loadV15Replays } from './v15-replays.fixture'
+import { loadV16Replays } from './v16-replays.fixture'
+import { loadV17Replays } from './v17-replays.fixture'
 import { loadV18Replays, regenerateV18Replays, replayV18, type V18Replay } from './v18-replays.fixture'
 
 const replays = process.env.UPDATE_V18 ? regenerateV18Replays() : loadV18Replays()
@@ -22,9 +28,15 @@ const halves = (a: BattleAction): string[] =>
   a.kind === 'guard' || a.kind === 'limit' ? [] : [...(a.kind === 'skill' ? [a.skill.id] : []), ...(a.pair?.skill ? [a.pair.skill.id] : [])]
 
 describe('the frozen v18 replays (H126)', () => {
-  it('runs with weaknesses v2 live while Classes v3 stays dark', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
-    expect([rpgRework('weak'), rpgRework('classes'), rpgRework('t2Weapons')]).toEqual([true, false, false])
+  it('runs Classes v3 live: engine 19, the classes stage on, thirteen classes (H134)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect([rpgRework('weak'), rpgRework('classes'), rpgRework('t2Weapons')]).toEqual([true, true, false])
+    expect(RPG_CLASSES).toHaveLength(13)
+  })
+
+  it('has every older engine from v14 pinned beside it (v14–v17 replay in their own files, live)', () => {
+    const all = [...loadV14Replays(), ...loadV15Replays(), ...loadV16Replays(), ...loadV17Replays(), ...replays]
+    expect([...new Set(all.map((r) => r.input.version))].sort()).toEqual([14, 15, 16, 17, 18])
   })
 
   it.each(replays.map((r) => [r.name, r] as const))('%s replays byte for byte under the live engine', (_, r) => {

@@ -15,8 +15,7 @@ export const WEAPON_LABEL: Readonly<Record<RpgWeapon, string>> = {
   ...WEAPON_KIND_LABEL, 'tome-fire': 'Fire Tome', 'tome-ice': 'Blizzard Tome', 'tome-lightning': 'Thunder Tome', 'tome-light': 'Light Tome', 'tome-dark': 'Dark Tome',
 }
 const ELEMENT_LABEL: Readonly<Record<RpgElement, string>> = { fire: 'Fire', ice: 'Ice', lightning: 'Lightning', light: 'Light', dark: 'Dark' }
-/** Each class's name in the live generation, from the domain's one table (`rpgClassName`, H126): today's six until H134
- * switches Classes v3 on and its names with it. */
+/** Each class's name in the live generation, from the domain's one table (`rpgClassName`, H126): Classes v3's since H134. */
 export const CLASS_LABEL: Readonly<Record<RpgClass, string>> =
   Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, rpgClassName(c)])) as Record<RpgClass, string>
 /** Classes v3's seven (H126): their v19 lines, held by every older table (no older list shows them). */

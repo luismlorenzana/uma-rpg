@@ -1,6 +1,6 @@
 # Game sections
 
-Every screen and what is on it, as the game runs today (engine v18, save v31). This page says where things show; the
+Every screen and what is on it, as the game runs today (engine v19, save v32). This page says where things show; the
 rules and numbers behind them are on the other pages, linked from each section. The place list comes from
 `packages/domain/src/hub/places.ts`. Each place's screens live in `apps/web/src/places/<place>/`, registered in
 `places/registry.tsx`; the shell and the Hub are `apps/web/src/hub/`.
@@ -17,7 +17,8 @@ The kit's `BootGates` with this game's steps (`app/Root.tsx`):
 5. The start page: the last Hub page viewed on this device (`hub/start.ts`), Town Hall the first time. The boot also
    picks the tier on screen ([Tiers](#tiers)).
 
-Once master data and the save are both in, the calling repair (D220) runs once (`CallingRuleRepair`). The kit's
+Once master data and the save are both in, save v32's trade step runs in a world whose class reset still waits for it
+(`ClassResetTrades`, `settleClassesV3Trades`; [loops](loops.md#the-classes-are-rebuilt-save-v32)), once. The kit's
 `UpdateNotice` says "Update ready · Restart" when a new build is out.
 
 ## The Hub
@@ -57,12 +58,10 @@ Phaser).
 **The pages' maps:**
 - **Town Hall:** the Stable and the Party Hall in the top corners, the Warehouse and the Exchange in the bottom ones,
   the plaza between. The Account is a Town Hall place with no building.
-- **Learning:** the six Halls of Heroes face each other in pairs across the road (Brawler Dojo and Mage Tower, Spell
-  Blade Salle and Summoner Circle, the Paladin Bastion and the Cleric Chapel), with the Observatory below (H59).
-  **From the switch (H134)**, Halls v2's five halls, one per family (H133, D255; the rules are
-  [Halls v2](../design/classes-v3/halls-v2.md) §2.1): the Warrior Dojo (the Brawler Dojo's id) and the Mage Tower on top,
-  the Spell Blade Salle and the Summoner Circle below them, the **Healer Sanctum** (`healer-sanctum`, uma-art's own temple)
-  in the middle where the Paladin Bastion and the Cleric Chapel stood, the Observatory under it.
+- **Learning:** the five Halls of Heroes, one per family (Halls v2, H133, D255; [heroes](heroes.md#the-five-halls)):
+  physical-led halls on the left, magic-led on the right. The Warrior Dojo (the Brawler Dojo's id) and the Mage Tower on
+  top, the Spell Blade Salle and the Summoner Circle below them, the **Healer Sanctum** (`healer-sanctum`, uma-art's own
+  temple) in the middle where the Paladin Bastion and the Cleric Chapel stood, the Observatory under it.
 - **Battle:** a drill ground of its own, with flagstone roads, banners, weapon racks, training dummies and torches (H31,
   D148): the Scenario Gate above, the Rift below. The Rift keeps the Tier Finale's id, `tier-finale`, and draws
   uma-art's `rift` building (`Place.frame`, H50).
@@ -90,12 +89,11 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
-| Brawler Dojo | `brawler-dojo` | class-hall | 4 | The Brawler Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Mage Tower | `mage-tower` | class-hall | 4 | The Mage Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Spell Blade Salle | `spell-blade-salle` | class-hall | 4 | The Spell Blade Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Paladin Bastion | `paladin-bastion` | class-hall | 4 | The Paladin Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
-| Cleric Chapel | `cleric-chapel` | class-hall | 4 | The Cleric Hall of Heroes: four Heroes, each with her own Limit Break, and their Learners. |
+| Warrior Dojo | `brawler-dojo` | class-hall | 4 | The Warrior Dojo: power from self-training. Four Heroes, each with her own Limit Break, and their Learners. |
+| Mage Tower | `mage-tower` | class-hall | 4 | The Mage Tower: power from self-study. Four Heroes, each with her own Limit Break, and their Learners. |
+| Spell Blade Salle | `spell-blade-salle` | class-hall | 4 | The Spell Blade Salle: power from pacts with familiars. Four Heroes, each with her own Limit Break, and their Learners. |
+| Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Circle: power from familiars, summoned. Four Heroes, each with her own Limit Break, and their Learners. |
+| Healer Sanctum | `healer-sanctum` | class-hall | 4 | The Healer Sanctum: power from a followed deity. Four Heroes, each with her own Limit Break, and their Learners. |
 | Observatory | `observatory` | town | — | Each Uma's Extra Stats map: a Sun, eight planets and their moons. |
 
 ### Battle (`battle`)
@@ -126,21 +124,12 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 | Lapidary | `lapidary` | station | 4 | Jewel Crafting: Planet and Moon Jewels. |
 <!-- /live -->
 
-**From the switch (H134)**, the Learning page is `learningPlaces`' third generation (H133, D255). Each hall's line is its
-lore and today's tail; its details open with its seats' home classes.
-
-| Place | Id | Home classes | What it is |
-|---|---|---|---|
-| Warrior Dojo | `brawler-dojo` | Brawler | The Warrior Dojo: power from self-training. Four Heroes, each with her own Limit Break, and their Learners. |
-| Mage Tower | `mage-tower` | Sorcerer | The Mage Tower: power from self-study. … |
-| Spell Blade Salle | `spell-blade-salle` | Arms Spellblade 1–2, Tome Spellblade 3–4 | The Spell Blade Salle: power from pacts with familiars. … |
-| Summoner Circle | `summoner-circle` | Arms Summoner 1–2, Tome Summoner 3–4 | The Summoner Circle: power from familiars, summoned. … |
-| Healer Sanctum | `healer-sanctum` | Paladin 1–2, Cleric 3–4 | The Healer Sanctum: power from a followed deity. … |
-| Observatory | `observatory` | — | As today. |
-
-An old link to `/learning/paladin-bastion` or `/learning/cleric-chapel` (a bookmark, an Inheritance row read before the
-switch) lands on `/learning/healer-sanctum`, keeping the rest of the path, the query and the navigation state
-(`movedPlace`, read in `PlaceRoute` only for an id with no place).
+A hall's line is its lore and its tail ("The Warrior Dojo: power from self-training. Four Heroes, each with her own Limit
+Break, and their Learners."), and its details open with its seats' home classes ("Home: Arms Spellblade 1–2, Tome
+Spellblade 3–4"), from `learningPlaces`' engine v19 generation (H133). An old link to `/learning/paladin-bastion` or
+`/learning/cleric-chapel` (a bookmark, an Inheritance row read before save v32) lands on `/learning/healer-sanctum`,
+keeping the rest of the path, the query and the navigation state (`movedPlace`, read in `PlaceRoute` only for an id
+with no place).
 
 ### A place's page
 
@@ -170,9 +159,10 @@ world map's party bar).
 - **Filters**, with a "Can upgrade" quick pick:
   - Collection: rarity, real horse (mare, stallion or unknown), New, Free now;
   - Aptitudes: surface, distance and running style at A or better;
-  - RPG: active class, Can upgrade;
-  - Template: Calling (six; an owned Uma's pick counts), Stride (three), Knack (five) and Signature (Pendant, Orb, Bell,
-    Insignia);
+  - RPG: Class, her active class, the thirteen in the tree's order (the five Tier 0s, then Brawler, Arms Spellblade, Arms
+    Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer); Can upgrade;
+  - Template: Calling (the five Tier 0s, read from her running styles: Recruit, Duelist, Initiate, Caller, Acolyte),
+    Stride (three), Knack (five) and Signature (Pendant, Orb, Bell, Insignia);
   - Trade: "Mine · Weapon Forge", "Forest · Armorer", "Fields · Tome Forge", "Fishery · Charm Forge" and "Monster Den ·
     Lapidary", each with its head count, locked outfits too.
 - **Seven sorts:** Uma Level (the default, highest first), release, name, rarity, total base stats, Craft Level and
@@ -182,80 +172,49 @@ world map's party bar).
   catalogue of the day as seen.
 - **Can upgrade** (`upgradesFor`, as her active class; `album/upgrades.ts`): a weapon, armor or accessory slot she can
   raise now (its made item in the Warehouse, her level allowing), an accessory slot at G1 or more with no family yet, or
-  a jewel in the Warehouse that opens one of her nodes now. From the switch (H134), also a promotion waiting: she fights
-  as a Tier 0 at Rank 10 with a child she doesn't hold (`umaPromotionWaits`).
+  a jewel in the Warehouse that opens one of her nodes now, or a promotion waiting: she fights as a Tier 0 at Rank 10
+  with a child she doesn't hold (`umaPromotionWaits`).
 
 **Her profile** (`OutfitProfile.tsx` in the kit's `ProfileFrame`; its layout rules are [profile
 UX](../design/profile-ux.md), D229):
 - **Header:** "All outfits" (back), her bust, her name and title, "Lv 50 Uma Level", her rarity stars and her **template
   chip**, and the **target** icon top right (up to ten targets; the Wilds plan what maxing them takes, D100).
-- **The template chip** ("★ Clever Spellwright"; locked outfits too; a green dot while an owned Uma's calling is open)
-  opens **Her template** (`TemplateCard.tsx`, `template-view.ts`; [her calling and
-  template](classes.md#her-calling-and-her-template)):
-  - her name, then Calling, Stride and Knack, each with what it read ("Calling ← Pace A, Wit 102 ≥ Power 90", "←
-    picked"; "Stride ← Medium A"; "Knack ← Wit +20%");
+- **The template chip** ("★ Clever Spellwright"; locked outfits too) opens **Her template** (`TemplateCard.tsx`,
+  `template-view.ts`; [her calling and template](classes.md#her-calling-and-her-template)):
+  - her name, then Calling, Stride and Knack, each with what it read ("Calling ← Pace A, Late A", her best running styles;
+    "Stride ← Medium A"; "Knack ← Wit +20%"). Her calling is fixed: there is no pick;
   - her trade: "Trade · Monster Den · Lapidary";
-  - her Flourish and its state: "★ Even pace · as a Mage · on", or "· no effect as Brawler" (a locked outfit's has no
-    state);
+  - her Flourish and its state: "★ Even pace · as a Duelist · on" while she fights as any class of her calling's family
+    (the Duelist, an Arms or a Tome Spellblade), or "· no effect as Brawler" (a locked outfit's has no state);
   - on an owned Uma, her **Signature** ("Signature · Pendant · +10 now · worn", or "Wear a Pendant") and her **Moon**
-    ("Moon · I HP +20 (Lv 16) · II DEF +8 (open)").
-- **Under the header:** her EXP bar ("1,200 / 2,400 EXP", or "Max level · 300 EXP banked"), her calling pick card while
-  it is open, then one row of three: her class ("Mage · Rank 40"; opens Skills), "Craft · Lv 30", and "Party · Party 1",
-  "Working · Mine · 1h 20m", "Fighting · Open fight" or "Party · Free" (opens her place, or the Party Hall).
-- **The calling pick card** (CP29), for a Pace or Late Uma until her calling is confirmed:
-  - "Her calling · choose once" and two tiles: emblem and class, "★ {her name with that pick}", "★ Even pace as a Spell
-    Blade", the trade it gives and its head count in her world ("Forest · Armorer · 8 Umas"), and on the suggested one
-    "Suggested · Power 96 over Wit 88". Her pick is selected; tapping the other picks it.
-  - **Confirm**, and "Her first win confirms it." At Uma Lv 1 a pick moves her class too.
-  - While she has work started or queued, the other tile is off and the card says "Finish her work first": the pick
-    moves her trade.
+    ("Moon · I HP +20 (Lv 16) · II DEF +4 · M.DEF +4 (open)" for an All-Rounder calling, "II DEF +8" for a Recruit,
+    "II M.DEF +8" for an Initiate).
+- **Under the header:** her EXP bar ("1,200 / 2,400 EXP", or "Max level · 300 EXP banked"), then one row of three: her
+  class ("Sorcerer · Rank 40"; opens Skills), "Craft · Lv 30", and "Party · Party 1", "Working · Mine · 1h 20m",
+  "Fighting · Open fight" or "Party · Free" (opens her place, or the Party Hall).
 - **A locked outfit** shows **Unlock · 1 Ticket** and "20 Uma Tickets left", confirmed in the kit's `UnlockConfirm`
   ("Unlock {name}?", Uma Tickets 20 → 19, "Unlocking is final.", **Unlock for 1 Ticket**), and only the Racing tab. An
   outfit another tier's world owns shows "In Tier 2" instead; in a tier above 1, an outfit nobody owns shows "Unlocked
   in Tier 1" (D5).
 - **Tabs:** Skills, Battle, Gear, Work and Racing; the last one opened is remembered on the device. Gear carries a green
-  dot while a slot can be raised or a jewel set.
+  dot while a slot can be raised or a jewel set, and Skills while a promotion waits.
 
-**Skills tab** (`SkillsPage.tsx`, `SkillTree.tsx`, `ClassPicker.tsx`, `WeaponSheet.tsx`; the rules are
-[classes](classes.md#skills-depths-lines-and-ranks) and [skill trees](skill-trees.md)):
-- **Class and trees**, one row of four: her class (emblem, name, "R40") and her three weapon trees (the weapon's glyph,
-  her line's letter A or B, the slot's grade "G3", and the green mark when it can be raised). A tree button shows that
-  tree below.
-- Her ★ Flourish ("★ Even pace · 1% of her max HP a round, up to 4%"), dimmed with "· No effect as Mage" outside her
-  calling's class; her Class Rank bar and "Depths 1–3 open".
-- **The class button** opens **Class**: her root ("Spell Blade · Arms ×0.72 + Tome ×0.44" and her Flourish), then the
-  six classes in two rows of three, each with its emblem and Class Rank. Switching is free.
-- **Equipped · 4/7**: one square per skill slot her Uma Level gives. Each equipped skill shows its kind marks and its
-  rank; a tap unequips it. Empty squares are dashed. **Auto** while the game picks for her, else **Back to auto**.
-- **The tree** ("Lance tree", with **Change**): two trunk nodes, a fork, then branches A and B down to depth 5, each
-  under a square A or B button.
-  - A node is a circle with the skill's kind marks and a badge: its rank, or the Class Rank that opens a closed depth.
-  - Held nodes have an accent ring; equipped ones are filled, with a green dot. The other branch is dimmed and a closed
-    depth faded. The lines fill along her path.
-- **A node's sheet:** its name, five rank pips, "Rank 3 · next at Class Rank 14" ("Rank 5" at the top, "Class Rank 30"
-  while closed), "Depth 4 · Branch B", its line at her Skill Rank ("one foe · 2 hits · 1.4× · 12 MP · cuts through the
-  shield"), and **Equip** or **Unequip** on a held node at an open depth.
-- **A branch's sheet** ("Lance · B · Impale"): its three skills, each with "Depth 3 · Class Rank 20" and its line;
-  **Take branch B** (free; her equipped skills follow), or "Her branch".
-- **Change** opens the slot's sheet ("Slot 1 · Arm"): each weapon of the slot's channel with its grade line ("Lance · G2
-  · Might 4 · weak ×1.3"), Held or Hers, and "swaps with slot 2" when she holds it in another slot. Grades are raised on
-  the Gear tab.
-- Its (i) covers the class, switching, one healer a party, depths, the fork, Skill Ranks, equip slots and weapon grades.
-- Below: **Inheritance**, with her Hall seat as a Hero ("Brawler Hero · {Limit Break} · Bond 3/10"), or her Heroes'
-  Limit Breaks with "Bond 2/10 · 60%" (" · former Hero" for one she left), or "No inheritance yet"; each opens its hall.
-  Then **Class Ranks**: six cells, each class's rank and bar.
-- **From the switch (H134)**, Classes v3's rows (`class-view.ts`, `ClassesSheet.tsx`, `PromotionSheet.tsx`; D253; the
-  rules are [Classes v3](../design/classes-v3/classes-v3.md) §2, §7, §14):
-  - The class button reads her rank, a Tier 0's "R7/10". While she fights as a Tier 0 at Rank 10 with a child she
-    doesn't hold, it reads **Promote** with the green Ready dot, the Skills tab carries the same dot, and her roster face
-    the can-upgrade mark (the "Can upgrade" filter finds her). Tapping it opens the promotion sheet; otherwise **Classes**
-    replaces the Class sheet.
-  - **Classes**, the class tree: Warrior · All-Rounder · Mage over five columns, the Tier 0 row (Recruit, Duelist,
-    Acolyte, Caller, Initiate) over the Tier 1 rows (Brawler, Arms Spellblade, Paladin, Arms Summoner, Sorcerer; Tome
-    Spellblade, Cleric, Tome Summoner). Each tile: emblem, name and its word, "R34" (On, the accent fill; or Held,
-    raised), "R7/10" on a Tier 0, **Ready** with a green dot (a child of a Tier 0 she holds at Rank 10), "R1 · free"
-    dashed (a Tier 0 she hasn't started), **Closed** at 40%. A later tier's world has no Tier 0 row and every Tier 1
-    class "R1 · free".
+**Skills tab** (`SkillsPage.tsx`, `SkillTree.tsx`, `ClassesSheet.tsx`, `PromotionSheet.tsx`, `class-view.ts`,
+`WeaponSheet.tsx`; D253; the rules are [classes](classes.md#the-class-tree) and [skill trees](skill-trees.md)):
+- **Class and trees**, one row of four: the **class button** (emblem, name and her rank, "R34", a Tier 0's "R7/10") and
+  her three weapon trees (the weapon's glyph, her line's letter A or B, the slot's grade "G3", and the green mark when it
+  can be raised). A tree button shows that tree below. While she fights as a Tier 0 at Rank 10 with a child she doesn't
+  hold, the class button reads **Promote** with the green Ready dot, the Skills tab carries the same dot, and her roster
+  face the can-upgrade mark (the "Can upgrade" filter finds her).
+- Her ★ Flourish ("★ Even pace · 1% of her max HP a round, up to 4%"), dimmed with "· No effect as Sorcerer" outside her
+  calling's family; on a Tier 1 class her Class Rank bar and "Depths 1–3 open".
+- **The class button** opens **Classes**, the class tree, or, while a promotion waits, the promotion sheet:
+  - **Classes:** Warrior · All-Rounder · Mage over five columns, the Tier 0 row (Recruit, Duelist, Acolyte, Caller,
+    Initiate) over the Tier 1 rows (Brawler, Arms Spellblade, Paladin, Arms Summoner, Sorcerer; Tome Spellblade, Cleric,
+    Tome Summoner), each Tier 1 class under its All-Rounder parent or its only one. Each tile: emblem, name and its word,
+    "R34" (On, the accent fill; or Held, raised), "R7/10" on a Tier 0, **Ready** with a green dot (a child of a Tier 0 she
+    holds at Rank 10), "R1 · free" dashed (a Tier 0 she hasn't started), **Closed** at 40%. A later tier's world has no
+    Tier 0 row and every Tier 1 class "R1 · free" until she starts it.
   - A tap selects (a ring) and writes the line under the tree: "Arms Summoner · Ready", "2 Arms + 1 Tome · Area ·
     lingers", its three defaults and "Hand · Arms ×0.57 · Tome ×0.46" (a Tier 0: "Any 3 weapons · Drill Strike" and
     "Promotes to Brawler, Arms Spellblade, Arms Summoner"), and "Party 1: 2 healers" in the warning colour when the
@@ -270,15 +229,35 @@ UX](../design/profile-ux.md), D229):
     defaults and role, a row the same on every tile left out. Under them "Recruit R10 → Brawler R11" and "Depths 1–2 · 6
     skills · +400 EXP" (the EXP waiting on her Tier 0 lands at once). **Promote to Brawler** (free, no confirm) closes it
     and the tab shows the Brawler's first tree; on a held child **Fight as …**. **Classes ›** swaps back to the tree.
-  - **A Tier 0's trees** are one node each, no letters on the weapon buttons and no fork: "Drill Strike · Greatsword",
-    its line at her Class Rank ("one foe · 1 hit · 2.1× · 10 MP") and "R7/10"; its sheet has no pips ("Rank 7 · next at
-    Class Rank 8", "Depth 1 · Trunk"). Under it "Promotion at R10 · 3 to go" with a bar to Rank 10, or at Rank 10
-    "Promotion · +400 EXP waiting" ("Promotion · Ready" with none), which opens the promotion sheet. Her rank row and
-    depths line are left out. **Change** lists all ten weapons for any of her three slots.
+- **Equipped · 4/7**: one square per skill slot her Uma Level gives. Each equipped skill shows its kind marks and its
+  rank; a tap unequips it. Empty squares are dashed. **Auto** while the game picks for her, else **Back to auto**.
+- **A Tier 1 class's tree** ("Lance tree", with **Change**): two trunk nodes, a fork, then branches A and B down to depth
+  5, each under a square A or B button.
+  - A node is a circle with the skill's kind marks and a badge: its rank, or the Class Rank that opens a closed depth.
+  - Held nodes have an accent ring; equipped ones are filled, with a green dot. The other branch is dimmed and a closed
+    depth faded. The lines fill along her path.
+- **A node's sheet:** its name, five rank pips, "Rank 3 · next at Class Rank 14" ("Rank 5" at the top, "Class Rank 30"
+  while closed), "Depth 4 · Branch B", its line at her Skill Rank ("one foe · 2 hits · 1.4× · 12 MP · cuts through the
+  shield"), and **Equip** or **Unequip** on a held node at an open depth.
+- **A branch's sheet** ("Lance · B · Impale"): its three skills, each with "Depth 3 · Class Rank 20" and its line;
+  **Take branch B** (free; her equipped skills follow), or "Her branch".
+- **A Tier 0's trees** are one node each, no letters on the weapon buttons and no fork: "Drill Strike · Greatsword", its
+  line at her Class Rank ("one foe · 1 hit · 2.1× · 10 MP") and "R7/10"; its sheet has no pips ("Rank 7 · next at Class
+  Rank 8", "Depth 1 · Trunk"). Under it "Promotion at R10 · 3 to go" with a bar to Rank 10, or at Rank 10 "Promotion ·
+  +400 EXP waiting" ("Promotion · Ready" with none), which opens the promotion sheet. Her rank row and depths line are
+  left out.
+- **Change** opens the slot's sheet ("Slot 1 · Arm"): each weapon of the slot's channel (all ten for a Tier 0) with its
+  grade line ("Lance · G2 · Might 4 · weak ×1.3"), Held or Hers, and "swaps with slot 2" when she holds it in another
+  slot. Grades are raised on the Gear tab.
+- Its (i) covers the class, switching, one healer a party, depths, the fork, Skill Ranks, equip slots and weapon grades.
+- Below: **Inheritance**, with her Hall seat as a Hero ("Paladin Hero · {Limit Break} · Bond 3/10", the seat's home
+  class), or her Heroes' Limit Breaks with "Bond 2/10 · 60%" (" · former Hero" for one she left), or "No inheritance
+  yet"; each opens its hall. Then **Class Ranks**, a cell a class with its rank and bar: in Tier 1's world the five Tier
+  0s (their bars to Rank 10) and the Tier 1 classes she holds; in a later tier the eight Tier 1 classes.
 
 **Battle tab** (`umaBattleSheet`, `packages/domain/src/save/sheet.ts`; the rules are
 [combat](combat.md#where-damage-comes-from)):
-- "Fights as Mage" with "5/7 skills · Party 1" (opens Skills).
+- "Fights as Sorcerer" with "5/7 skills · Party 1" (opens Skills).
 - Four groups in three columns, every row always listed, 0 included:
   - **Offense:** ATK, M.ATK, Might for each of her three weapons ("Fire Tome +8"), Accessory ("Pendant: +2 on her three
     kinds", "Orb: Fire +8", "Bell: Katana 0.4 after her Attack", "Insignia: +6% on sub-bosses and bosses", or "None"),
@@ -297,8 +276,8 @@ UX](../design/profile-ux.md), D229):
 **Equip** first and **Upgrade** ("Upgrade · 12" counts the raises ready and the jewels to set), the choice remembered
 for the session.
 - **Equip**, what she wears:
-  - the standard preset: "Use standard preset · Spell Blade · Physical · Pendant", or "Standard preset on". It sets her
-    class's default weapons and puts her ★ family on its kind; no grade moves.
+  - the standard preset: "Use standard preset · Arms Spellblade · Physical · Pendant", or "Standard preset on". It sets
+    her class's default weapons and puts her ★ family on its kind; no grade moves.
   - **Loadout** ("Set on Skills ›"): her three weapons' icons with their grades, then "Physical armor" or "Magical
     armor" with the five slots' icons and grades. A slot at G0 is an empty frame.
   - **Accessory · G4**: four family buttons in one row, her ★ family first, then Bell, Pendant, Orb and Insignia; the
@@ -323,8 +302,8 @@ The "10 gathered" time is still the old farm's gather (54 → 36 minutes an item
 places use ([loops](loops.md#craft-level)).
 
 **Racing tab:** her aptitudes (Surface, Distance and Style, each grade on a coloured chip), **Her template** (Calling,
-Stride, Knack and Flourish, each with its note: what it read or "Picked"; "Active" or "No effect as Brawler"; a locked
-outfit's "As a Mage"), her racing base stats and growth, and her unique skill (racing).
+Stride, Knack and Flourish, each with its note: what it read, "Pace A · Late A" for her calling; "Active" or "No effect
+as Brawler"; a locked outfit's "As a Duelist"), her racing base stats and growth, and her unique skill (racing).
 
 ### Party Hall
 
@@ -332,7 +311,7 @@ Routes: `/town/party-hall` and `:n` (1–20); `PartyHallPage.tsx`.
 - **The list:** twenty parties, each with its name, "5/5 · Edit" (green when full) and five faces with level, class and
   her signature family ("★ Pendant"). The lead has an accent ring and a flag. A party with two healers says "One healer
   a party" in the warning colour.
-- **The editor:** "All parties" (back), the name with **Rename**, then five slots (face, name and "Lead · Mage"; an
+- **The editor:** "All parties" (back), the name with **Rename**, then five slots (face, name and "Lead · Sorcerer"; an
   empty one "Slot 3 · add an Uma") and the healer note.
 - **An empty slot** opens the shared picker, "Choose an Uma": owned Umas, highest Uma Level first. One in another party
   is dimmed with "Moves from Party 2" and moves here when picked (D46). "In this party" and "In a fight" are disabled.
@@ -362,23 +341,26 @@ Routes: `/town/party-hall` and `:n` (1–20); `PartyHallPage.tsx`.
   grades, "G3 · have 12". One not stocked yet is locked with the win that stocks it: "After the tier's first win"
   (G1–G5) or "After a win on continent 3" (G6–G10).
 - A row's sheet: ×1, ×5, ×10, ×25 or a typed amount, the total, and "Need N more" when the Laurels fall short.
-- **Manuals** (its (i): Class Marks bank past a max Class Rank, and a Manual's price and EXP): **Read a Class Manual**
-  with "Class Marks 3,000". It opens the Class Manual sheet (`manual-view.ts`, D102, D250) at `/town/exchange/manual`:
-  the shared picker (highest Uma Level first, locked Umas disabled), then her bars at `/town/exchange/manual/:outfitId`
-  (a link may open it there; closing the sheet returns to `/town/exchange` and the place's Back still leads where it
-  came from). The head reads "Aster · Class Marks 78,000". Her six classes are one row each (emblem, name, "R34" and its
-  bar; "R50 · Max"), the class she fights as selected first; a tap selects another (its ring). The counts are chips, 1 ·
-  5 · 10 · "Max · 78" (as many as the Marks buy, up to 99); one the Marks can't buy is disabled. The footer shows before →
-  after from the class's own curve ("Brawler R34 → R36", and "+360 Class Marks back" for EXP past Rank 50) and **Read 2
-  · 2,000 Class Marks**, or the reason it can't ("Already at the top rank", "Needs 10,000 Class Marks"). After a read the
-  sheet stays open on the new state; "Choose another Uma" returns to the picker.
-- **From the switch (H134)**, Classes v3's rows: in Tier 1's world the bars are the five Tier 0s, her calling's first
-  ("R1/10 · Calling"), then the Tier 1 classes she holds in the tree's order (a closed one isn't listed); a later tier's
-  world lists the eight Tier 1 classes, her active class first. A Tier 0 at Rank 10 reads "R10 · +400 EXP waiting": its
-  EXP waits for her promotion up to 23,680, and its counts stop at that room ("Room for 4"). The chips add "To Rank 10 ·
-  4" on a Tier 0 below Rank 10 and "Her share · 21" (her reset Manuals not read yet, counting down on any bar she reads;
-  shown in the head too) while the reset's record lists one; the sheet starts on her share. The (i) adds the Tier 0's
-  bank and what her share is.
+- **Manuals** (its (i): Class Marks bank past a max Class Rank, a Manual's price and EXP, a Tier 0's waiting room and
+  what her share is): **Read a Class Manual** with "Class Marks 3,000". It opens the Class Manual sheet (`manual-view.ts`,
+  D102, D250; the rules are in [loops](loops.md#the-exchange)) at `/town/exchange/manual`: the shared picker (highest Uma
+  Level first, locked Umas disabled), then her bars at `/town/exchange/manual/:outfitId` (a link may open it there, as
+  the Skills tab's Class Manuals › does; closing the sheet returns to `/town/exchange` and the place's Back still leads
+  where it came from).
+  - The head reads "Aster · Class Marks 78,000", and "Her share · 21" while she has one.
+  - **Her bars,** one row each (emblem, name, its caption and bar): in Tier 1's world the five Tier 0s, her calling's
+    first ("R1/10 · Calling"), then the Tier 1 classes she holds in the tree's order ("R34", "R50 · Max"); a class she
+    can't fight as yet isn't listed. A later tier's world lists the eight Tier 1 classes, her active class first. The
+    class she fights as is selected first; a tap selects another (its ring). A Tier 0 at Rank 10 with EXP waiting reads
+    "R10 · +12,400 EXP waiting", its bar filling toward the 23,680 her promotion can take.
+  - **The counts** are chips: "Her share · 21" (her reset Manuals not read yet, counting down on any bar she reads; the
+    sheet starts on it while it lasts), "To Rank 10 · 4" on a Tier 0 below Rank 10, then 1 · 5 · 10 · "Max · 78" (as many
+    as the Marks buy, up to 99). One the Marks can't buy is disabled; on a Tier 0 at Rank 10 the counts stop at its room
+    ("Room for 4").
+  - **The footer** shows before → after from the class's own curve ("Brawler R34 → R36"; "Recruit R1 → R10 · +12,400 EXP
+    waiting"; "+360 Class Marks back" for EXP past the top) and **Read 16 · 16,000 Class Marks**, or the reason it can't
+    ("Already at the top rank", "Needs 10,000 Class Marks"). After a read the sheet stays open on the new state; "Choose
+    another Uma" returns to the picker.
 
 ### Account
 
@@ -391,8 +373,8 @@ Reached from the top bar's initial (`/town/account`). `places/account/AccountPag
   blocked, unsupported), and **Send a test** while it is on.
 - **The Tier rework's grant**, only in a world migrated through save v28: "The Tier rework's grant · 63,800 Speed
   Tickets", which reopens "The Wilds are rebuilt".
-- **From the switch (H134), the classes' reset**, only in a world migrated through save v32: "The classes are rebuilt ·
-  78 Class Manuals", which reopens "The classes are rebuilt" (`?sheet=classes`).
+- **The classes' reset**, only in a world migrated through save v32: "The classes are rebuilt · 78 Class Manuals", which
+  reopens "The classes are rebuilt" (`?sheet=classes`).
 - **Achievements** (`achievements/AchievementList.tsx`, [loops](loops.md#achievements)): "3 of 14", the earned ones
   newest first with "21 Oct · Tier 1 run 2" (the Bestiary has no run), then the rest dimmed with how each is earned. It
   lists Tier 1's four seals and Rift Conquered, every other world's, and the nine titles; a seal reads "Iron Seal · Tier
@@ -406,52 +388,50 @@ world-map fight), and from the Account's row (`?sheet=grant`). Its lead (still "
 place."), "+63,800 Speed Tickets" and the hours of work, then What went, What came back, What stays, and By Uma ("Craft
 Lv 30 → 1 · 1,470", with her trade). **To the Wilds** and **Later** both mark it seen.
 
-**"The classes are rebuilt"** (from the switch, H134; `grant/ClassesSheet.tsx`, `classes-lines.ts`, D250; the reset is
-classes-v3.md §8): it opens by itself once per world whose save v32 record is unseen, once the reset's trades have
-settled and never over a world-map fight, after "The Wilds are rebuilt" when both wait; and from the Account's row. "+78
-Class Manuals" and "78,000 Class Marks · Exchange"; "Every Uma starts her class tree at Rank 1 of her Tier 0." with the
-three roots and their Tier 0s; How to rebuild an Uma (Exchange → Read a Class Manual → her Tier 0 → Her share; Her
-profile → Class → Promote at Rank 10); At a glance: Reset, Stays, Weapons, Trades ("2 Umas moved trade · their running
-work finished into the Warehouse") and Halls (the Paladin Bastion and the Cleric Chapel into the Healer Sanctum, each Uma
-whose role moved, "Each Uma keeps her higher Bond"); then each Uma with a share or a moved trade, most Manuals first, with
-her face ("Spell Blade R26 · Mage R8 → Initiate R1 · trade Wood → Stone", her share on the right). A later tier's world
-reads "Every Uma starts again at Rank 1 of her class." with one step and no tree. **To the Exchange** (the Manual sheet's
-picker) and **Later** both mark it seen.
+**"The classes are rebuilt"** (`grant/ClassesSheet.tsx`, `classes-lines.ts`, D250; the reset is in
+[loops](loops.md#the-classes-are-rebuilt-save-v32)): it opens by itself once per world whose save v32 record is unseen,
+once the reset's trades have settled and never over a world-map fight, after "The Wilds are rebuilt" when both wait; and
+from the Account's row. "+78 Class Manuals" and "78,000 Class Marks · Exchange"; "Every Uma starts her class tree at
+Rank 1 of her Tier 0." with the three roots and their Tier 0s; How to rebuild an Uma (Exchange → Read a Class Manual →
+her Tier 0 → Her share; Her profile → Skills → Promote (Rank 10), "EXP past Rank 10 goes with her into the new class");
+At a glance: Reset, Stays, Weapons ("No Weapon Rank since R2: grades stay"), Trades ("2 Umas moved trade · their
+running work finished into the Warehouse") and Halls ("Paladin Bastion · Cleric Chapel → Healer Sanctum", each Uma whose
+role moved, "Hero → Learner · Archdemon's Toll · Bond 7", then "Each Uma keeps her higher Bond"); then each Uma with a
+share or a moved trade, most Manuals first, with her face ("Spell Blade R26 · Mage R8 → Initiate R1 · trade Wood →
+Stone", her share on the right; the names before the arrow are engine v18's). A later tier's world reads "Every Uma
+starts again at Rank 1 of her class." with one step and no tree. **To the Exchange** (the Manual sheet's picker) and
+**Later** both mark it seen.
 
 ## Learning
 
 ### Halls of Heroes
 
-The six halls share `places/halls/HallPage.tsx` (D106; the rules are [Halls of Heroes](heroes.md)).
-- "Brawler Hall of Heroes" with its (i), and "Four Heroes, each with her own Limit Break, and their Learners."
-- **Four seats**, each with: the Hero's bust (or **+ Hero**), "Seat 1 · Limit Break", its name and kind icons, the twin
-  sets it answers ("Answers Fire · Light", CP28), its line, and the Hero's name or "No Hero yet". Under a seated Hero:
-  "Learners 3/10", each a face with her Bond level and bar, and **+** to add one.
+The five halls share `places/halls/HallPage.tsx` (D106; Halls v2's page, H133, D255: `hall-view.ts`'s `seatCard` and
+`hallHelp`; the rules are [Halls of Heroes](heroes.md)).
+- The hall's name ("Warrior Dojo", "Healer Sanctum") with its (i), and "Four Heroes, each with her own Limit Break, and
+  their Learners." The (i), one rule a line: "Five halls, one per family; any Uma sits in any seat." · "A Hero casts her
+  seat's Limit Break at full strength." · "Its power is the seat's (×1.9 to ×2.9), × her class's scale (×0.95; a
+  Paladin's or a Cleric's ×0.8; a Tier 0's ×1), × her deepest skill." · "Up to 10 Learners a Hero, 2 Heroes a Learner,
+  at 50% + 5% a Bond Level." · "A won fight raises each Bond: a stage 2, an elite or a boss 3, 12 a level." · "A Bond
+  stays when she leaves."
+- **Four seats**, each a card: the Hero's bust (or **+ Hero**), "Seat 2 · Brawler" (its home class, faint), the Limit
+  Break's name and kind icons, then its shape and power, read from its casts, never its name: "One foe · 1 hit · ×2.9",
+  "One foe · 6 hits · ×2.2" (a double counts two), "Every foe · 3 hits · ×2.2", "Random · 8 hits · ×1.9", "Volley · 4 +
+  2 a foe · ×2.2" (hits on her foe + splash hits on each other foe); a Healer Sanctum seat adds its stack ("· Brave 1",
+  "· Armor Break 1", "· Faith 1", "· Mind Break 1"). The power is the seat's own (ink, the only weight on the line), not
+  her class's scale; the line wraps under the name, never truncated. Then the twin sets it answers ("Answers Dark ·
+  Twilight", CP28, on the Katana–Light and Bow–Dark pairs), its lore in italics, and the Hero's name or "No Hero yet".
+  Under a seated Hero: "Learners 3/10", each a face with her Bond level and bar, and **+** to add one.
 - **The pickers** ("Hero for {Limit Break}", "Learner for {Limit Break}"; the shared picker, highest Uma Level first):
   Umas that can't take the seat stay listed with why ("Locked", "Already seated here", "Already a Hero", "A Learner:
   leave her Heroes first", "A Hero", "Already learning here", "Already has 2 Heroes", "10 Learners at most"). A Learner
-  candidate shows "Bond 2 · 1/2 Heroes" and the sets the seat adds to her weapons' ("Adds Light, Dark, Twilight").
+  candidate shows "Bond 2 · 1/2 Heroes" and the sets the seat adds to her weapons' ("Adds Light, Twilight").
 - **A Hero's sheet:** she uses the seat's Limit Break at full strength; her own Bond with the seat; **Change Hero**;
   "Empty this seat (its 3 Learners leave; their Bonds stay)".
 - **A Learner's sheet:** "Bond 4/10 · 70% strength", its bar and the EXP to the next, "Inherits {Limit Break}, and
   {another} from her other Hero.", and "Leave this Hero (her Bond stays)".
-- **From the switch (H134)**, Halls v2's page (H133, D255; `hall-view.ts`'s `hallTitle`, `seatCard`, `hallHelpV19`; the
-  rules are [Halls v2](../design/classes-v3/halls-v2.md) §2–§5), for the five halls by family:
-  - The title is the place's name ("Warrior Dojo", "Healer Sanctum").
-  - Each seat card: "Seat 2 · Brawler" (its home class, faint), the name and kind icons, then its shape and power from
-    the Limit Break's casts, never its name: "One foe · 1 hit · ×2.9", "One foe · 6 hits · ×2.2" (a double counts two),
-    "Every foe · 3 hits · ×2.2", "Random · 8 hits · ×1.9", "Volley · 4 + 2 a foe · ×2.2" (hits on her foe + splash hits on
-    each other foe); a Healer Sanctum seat adds its stack ("· Brave 1", "· Armor Break 1", "· Faith 1", "· Mind Break 1").
-    The power is the seat's own (ink, the only weight on the line), not her class's scale. "Answers …" and the Learner
-    picker's "Adds …" read Classes v3's pairs (Katana–Light, Bow–Dark; Twilight stays Bow and Katana). Its line is the
-    seat's lore, in italics, in place of the blurb. The line wraps under the name, never truncated.
-  - The (i), one rule a line: "Five halls, one per family; any Uma sits in any seat." · "A Hero casts her seat’s Limit
-    Break at full strength." · "Its power is the seat’s (×1.9 to ×2.9), × her class’s scale (×0.95; a Paladin’s or a
-    Cleric’s ×0.8; a Tier 0’s ×1), × her deepest skill." · "Up to 10 Learners a Hero, 2 Heroes a Learner, at 50% + 5% a
-    Bond Level." · "A won fight raises each Bond: a stage 2, an elite or a boss 3, 12 a level." · "A Bond stays when she
-    leaves."
-  - The map's pips, the quick look, the Hero and Learner sheets and the pickers are unchanged; the profile's Inheritance
-    row opens the seat's hall (`HERO_HALL_PLACES`) and names its home class ("Paladin Hero · {Limit Break}").
+- The map's pips, the quick look, the Hero and Learner sheets and the pickers are Halls v1's; the profile's Inheritance
+  row opens the seat's hall (`HERO_HALL_PLACES`) and names its home class ("Paladin Hero · {Limit Break}").
 
 ### Observatory
 
@@ -517,7 +497,7 @@ Routes: `/battle/scenario-gate`, then `c/:continent`, `r/:region`, `capital/:con
   ally picked, the damage a tap would deal shows above each foe ("85 −1", "BREAK"; yellow when weak).
 - **The party:** HP and MP bars, "640 HP · Barrier 37" or "KO", status chips, and **LB** when her Limit Break is ready.
 - **Controls:** a line that says what a tap does ("{Uma}: tap a rival to attack with her Lance"; a pair's two halves,
-  "Tap a rival: Fire Tome Attack + Greatsword Attack · 16 MP", a Summoner's Tome half first; "Tap an ally for {Uma} to
+  "Tap a rival: Fire Tome Attack + Greatsword Attack · 16 MP", her lead half first; "Tap an ally for {Uma} to
   guard"). While cues play it reads them ("{Uma} ★ +30 HP", "{Uma}: ★ Barrier 37", "{Uma} +13 MP", "{foe} BREAK!").
   Below: her three weapons, then **Attack**, **Skills (n)** and **Guard**.
 - **The Skills sheet** ("{Uma} · 120 MP"): her equipped skills in weapon order, each with its weapon, kinds, reach,
@@ -547,9 +527,9 @@ Umas (Tiers 1 and 2).
   - "Tier 1 · 21 Lv 50 Umas" (or "Tier 1 · Run 1 · 2 of 4 fronts sealed"), and **Resume the open fight** when a Rift
     fight is open;
   - no run: **Sign up twenty**, disabled with "12 of 20 at Lv 50" until twenty are;
-  - a run: its four **fronts** (crest, name, "5/12" or "Sealed", the party guidance "2 Brawler · 2 Spell Blade ·
-    Paladin") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts", "Fight 2 of 4 ·
-    Arcane", "Won");
+  - a run: its four **fronts** (crest, name, "5/12" or "Sealed", the party guidance "2 Brawler · Arms Spellblade · Arms
+    Summoner · Paladin") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts",
+    "Fight 2 of 4 · Arcane", "Won");
   - a won run: **Ascend to Tier 2**;
   - the **Echoes:** four rows (crest, front) of Lv 45, 50 and 55, "✓" on each won;
   - **Roster:** the run's twenty faces, with **Cancel sign-up** while the run is untouched.
@@ -561,17 +541,21 @@ Umas (Tiers 1 and 2).
   the next ringed (the page opens on it), the rest locked. Any stage opens its **stage sheet**:
   - the foes by wave as the fight will have them (`FoeRow`: tagged Boss or Elite by face, "Acts twice" or "Acts three
     times", "Shield 6 · Weak:" and her icons, the ward);
-  - on the next stage, a party of the roster (the best fit for the front's guidance first; a party that can't fight
-    there, "One healer a party" among the reasons, is disabled), the **guided weapons** (each member's three build
-    weapons under her face, "—" where the build has no place for her; **Use the guided weapons** sets them in one save,
-    or "On the guided weapons"), and **Fight**.
+  - on the next stage, a party of the roster (the best fit for the front's guidance first, counting every class each
+    member holds; a party that can't fight there, "One healer a party" among the reasons, is disabled), the **guided
+    weapons** (each member's three build weapons under her face, matched by any class she holds, "—" where the build
+    has no place for her; **Use the guided weapons** sets them in one save, and switches a member into the guided class
+    she holds when she fights as another; or "On the guided weapons"), and **Fight**;
+  - under the party, each guided class it leaves empty ([loops](loops.md#the-rift)): "Needs an Arms Summoner" ("Needs
+    2 Brawlers"), and up to three roster Umas outside the party who could fill it, those who can promote into it now
+    first ("Ready to promote", in the accent), then those who hold it ("Holds it"); a row opens her Skills tab.
 - **The Convergence:** four rows, Iron, Arcane, Duel and Horde, each with its fight's size, **Foes** and a party
   (suggested from the fronts' guidance; a party picked for another row is disabled). **Begin** when the four cover the
   twenty (else "Missing: …") starts the attempt and its first fight. With an attempt on: its four parties, "Won · 6
   rounds", "Next" or "—", **Fight: Arcane** and **End this attempt** ("The next attempt starts from Iron.").
-- **An Echo's sheet** ("Iron Echo · Lv 55"): its foes, a party of five Lv 50 Umas, its guided weapons, and **Fight**
-  ("Fight again" once won). Once won, **Sweep ×1** and **Sweep ×5** with the Sweep Tickets held; a Sweep's result shows
-  like a win.
+- **An Echo's sheet** ("Iron Echo · Lv 55"): its foes, a party of five Lv 50 Umas, its guided weapons and needs (from
+  the world's Lv 50 Umas), and **Fight** ("Fight again" once won). Once won, **Sweep ×1** and **Sweep ×5** with the
+  Sweep Tickets held; a Sweep's result shows like a win.
 - **The fight:** the shared fight screen on the Twilight Rift's backdrop, titled "Iron front · Stage 5", "Convergence ·
   Fight 2 of 4" or "Echo · Iron · Lv 55". Foes stand and are tagged by their face; a warded foe carries her front's
   crest. Back and the menu return to the Rift ("Give up" ends a Convergence attempt).
@@ -595,23 +579,23 @@ The fifteen places, three to a line: each gathers, processes or makes, for the t
 line](../design/tier-rework/farm-by-line.md)).
 
 <!-- live:facilities -->
-| Place | Profession | Job | What it does | Its trade (callings) |
+| Place | Profession | Job | What it does | Its trade (calling) |
 |---|---|---|---|---|
-| Mine | Mining | Gathering | Gathers metal, G1–G10 | Brawler |
-| Mine Workbench | Smelting | Processing | Processes metal raw into refined, one for one | Brawler |
-| Weapon Forge | Arms Crafting | Making | Makes Arms Gems | Brawler |
-| Fields | Farming | Gathering | Gathers vegetables, G1–G10 | Paladin, Cleric |
-| Fields Workbench | Prepping | Processing | Processes vegetables raw into refined, one for one | Paladin, Cleric |
-| Tome Forge | Tome Crafting | Making | Makes Tome Ink | Paladin, Cleric |
-| Forest | Wood Chopping | Gathering | Gathers wood, G1–G10 | Spell Blade |
-| Forest Workbench | Sawing | Processing | Processes wood raw into refined, one for one | Spell Blade |
-| Armorer | Armor Crafting | Making | Makes Armor Fittings | Spell Blade |
-| Fishery | Fishing | Gathering | Gathers fish, G1–G10 | Summoner |
-| Fishery Workbench | Filleting | Processing | Processes fish raw into refined, one for one | Summoner |
-| Charm Forge | Accessory Crafting | Making | Makes Accessory Settings | Summoner |
-| Monster Den | Hunting | Gathering | Gathers stone, G1–G10 | Mage |
-| Den Workbench | Stonecutting | Processing | Processes stone raw into refined, one for one | Mage |
-| Lapidary | Jewel Crafting | Making | Makes Planet Jewels and Moon Jewels | Mage |
+| Mine | Mining | Gathering | Gathers metal, G1–G10 | Recruit |
+| Mine Workbench | Smelting | Processing | Processes metal raw into refined, one for one | Recruit |
+| Weapon Forge | Arms Crafting | Making | Makes Arms Gems | Recruit |
+| Fields | Farming | Gathering | Gathers vegetables, G1–G10 | Acolyte |
+| Fields Workbench | Prepping | Processing | Processes vegetables raw into refined, one for one | Acolyte |
+| Tome Forge | Tome Crafting | Making | Makes Tome Ink | Acolyte |
+| Forest | Wood Chopping | Gathering | Gathers wood, G1–G10 | Duelist |
+| Forest Workbench | Sawing | Processing | Processes wood raw into refined, one for one | Duelist |
+| Armorer | Armor Crafting | Making | Makes Armor Fittings | Duelist |
+| Fishery | Fishing | Gathering | Gathers fish, G1–G10 | Caller |
+| Fishery Workbench | Filleting | Processing | Processes fish raw into refined, one for one | Caller |
+| Charm Forge | Accessory Crafting | Making | Makes Accessory Settings | Caller |
+| Monster Den | Hunting | Gathering | Gathers stone, G1–G10 | Initiate |
+| Den Workbench | Stonecutting | Processing | Processes stone raw into refined, one for one | Initiate |
+| Lapidary | Jewel Crafting | Making | Makes Planet Jewels and Moon Jewels | Initiate |
 
 Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma works her trade's three places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.
 <!-- /live -->
@@ -620,8 +604,8 @@ Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma w
 `PlaceV3.tsx` (the page), with `PlaceV4.tsx` and `place-view-v4.ts` (the What step, sizes, help and quick look), on the
 kit's `uma-kit/work`.
 - **Header:** "Mine · Mining · 4 slots · ×1.25" and its (i) (what the place does, "Grade g opens at Craft Lv 5g − 4",
-  and the open shop). A place whose trade has no Uma in the world says so: "Open shop: no Brawler in this world" ("no
-  Paladin or Cleric" on the Vegetables row). **Collect here** when work is done; **Finish all · 14 Speed Tickets** when
+  and the open shop). A place whose trade has no Uma in the world says so: "Open shop: no Recruit in this world" (each
+  trade's Tier 0: "no Acolyte" on the Vegetables row). **Collect here** when work is done; **Finish all · 14 Speed Tickets** when
   two or more slots run, which asks "Finish 3 jobs for 14 Speed Tickets?" (Yes, Not now), or says "Needs 14 Speed
   Tickets".
 - **Four slot rows.** A free one ("Free") starts a job. A working one shows her face, the item, "· 1/3", and the time

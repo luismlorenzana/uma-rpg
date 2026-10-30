@@ -25,16 +25,16 @@ const outfits = new Map(classes.map((_, i) => {
   return [outfitId, outfit]
 }))
 
-/** On-time Lv10, Class Rank 10; automatic core loadouts, no gear, side skills or stat points. */
+/** On-time Lv10, Class Rank 10; automatic core loadouts, no gear, side skills or stat points. The ranks come first: from v19
+ * (live since H134) she fights as a Tier 1 class only once she holds it, from Class Rank 10 (CV8). */
 function party(): Save {
   let save = newSave('Finals test', NOW)
-  ;[...outfits.keys()].forEach((id, i) => {
-    save = setPartySlot(unlockUma(save, id, NOW), 0, i, id, NOW)
-    save = chooseClass(save, id, classes[i]!, NOW)
-  })
+  ;[...outfits.keys()].forEach((id, i) => { save = setPartySlot(unlockUma(save, id, NOW), 0, i, id, NOW) })
   const w = worldOf(save)
-  return { ...save, tierWorlds: { '1': { ...w, umas: Object.fromEntries(Object.entries(w.umas).map(([id, u]) =>
+  save = { ...save, tierWorlds: { '1': { ...w, umas: Object.fromEntries(Object.entries(w.umas).map(([id, u]) =>
     [id, { ...u, level: 10, ranks: { ...u.ranks, classes: Object.fromEntries(classes.map((classId) => [classId, { rank: 10, exp: 0 }])) } }])) } } }
+  ;[...outfits.keys()].forEach((id, i) => { save = chooseClass(save, id, classes[i]!, NOW) })
+  return save
 }
 
 function play(save: Save, nodeId: string): ReturnType<typeof actInFight> {

@@ -6,16 +6,17 @@ import { ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld, starMap } from './econom
 import { jewelBlock, jewelNodes, setActiveNodes, setGem, setJewel } from './observatory'
 import { worldOf } from './rules'
 import type { OwnedUma, Save, TierWorld } from './save'
+import { SAVE_SCHEMA_VERSION } from './version'
 
 
-const saveOf = (world: TierWorld): Save => ({ schemaVersion: 31, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {},
+const saveOf = (world: TierWorld): Save => ({ schemaVersion: SAVE_SCHEMA_VERSION, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {},
   defeated: {} }, tierWorlds: { '1': world } })
 const withUma = (uma: Partial<OwnedUma>, items: Record<string, number> = {}): Save =>
   saveOf(gradedWorld({ items, umas: { '101': gradedUma({ stars: starMap(), ...uma }) } }))
 const umaOf = (save: Save) => worldOf(save).umas['101']!
 
 describe('setJewel (EP5, EP17)', () => {
-  it('runs with weaknesses v2 live over R2’s economy', () => expect(BATTLE_ENGINE_VERSION).toBe(18))
+  it('runs with Classes v3 live (H134) over weaknesses v2 and R2’s economy', () => expect(BATTLE_ENGINE_VERSION).toBe(19))
 
   it('a Lv 1 Uma sets a Planet Jewel I on Planet I: the node opens and the count falls', () => {
     const save = setJewel(withUma({ level: 1 }, { 'jewel-planet-1': 2 }), '101', 'jewel-planet-1', 'planet:1', '2026-10-25T13:00:00.000Z')

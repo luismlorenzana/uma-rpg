@@ -122,8 +122,8 @@ export interface OwnedUma {
   /** Her Bond with each Hero seat she has learned under (D106), kept when she leaves it. */
   bonds: Partial<Record<HeroLimitId, BondTrack>>
   /** Save v27 (H69; CP29, UT17): her calling pick and whether it is final; a null pick is the rule's calling, her
-   * pre-selection, and a pick outside her row is ignored (UT4). Save v32 drops it (Classes v3, CV19: no pick; H130, dark
-   * until H134): absent from the classes stage, required before it. Readers go through `umaPick`. */
+   * pre-selection, and a pick outside her row is ignored (UT4). Save v32 drops it (Classes v3, CV19: no pick; H130, live
+   * since H134): absent from the classes stage, required before it. Readers go through `umaPick`. */
   calling?: UmaCalling
 }
 
@@ -194,7 +194,7 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
   /** Save v28 (H78, PP25): the Tier rework's grant, which the world's first launch shows, or null when it had nothing to
    * pay. Always present in v28. */
   grant?: TierGrant | null
-  /** Save v32 (H130, dark until H134): Classes v3's reset in this world, written once by `toV32`; absent in a world made
+  /** Save v32 (H130, live since H134): Classes v3's reset in this world, written once by `toV32`; absent in a world made
    * after it. */
   classesV3?: ClassesV3Record
 }
@@ -203,7 +203,7 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
 export type HealerSeatV18 = `${'paladin' | 'cleric'}-${1 | 2 | 3 | 4}`
 
 /**
- * Save v32's record of the class reset (H130, dark until H134; classes-v3.md §8, CV25–CV30; halls-v2.md §7, HV18–HV19):
+ * Save v32's record of the class reset (H130, live since H134; classes-v3.md §8, CV25–CV30; halls-v2.md §7, HV18–HV19):
  * the refund, each Uma's line and the Healer Sanctum's merge, for the one-time sheet ("The classes are rebuilt", H132)
  * and the Exchange's "Her share". `toV32` writes it once in each world that existed at v31.
  */
@@ -1503,7 +1503,7 @@ export function schemaVersionOf(value: unknown): number {
   return typeof v === 'number' && Number.isSafeInteger(v) ? v : 0
 }
 
-/** Parses a v1–v31 save and always returns v31. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
+/** Parses a v1–v32 save and always returns v32. v10–v17 reset their progress (D105), v18 gains the Halls of Heroes
  * (D106), v20 moves to one profession and Star Gems (D144), v21 to per-Uma work rows (SC3), v22 gains empty achievements,
  * tier history and Rift (D163), v23 gains no defeated faces, no open Rift fight, and empty traces and Convergence attempts
  * (D171), v24 → v25 (D180, D188): the Paladin from the Cleric, the Bastion's seats, typed accessories, and anything older
@@ -1511,7 +1511,8 @@ export function schemaVersionOf(value: unknown): number {
  * the calling pick; v27 → v28 (D214, D218): gear by grade, the Planet and three moons, ten places and the five lines'
  * items, Craft Levels to 1 and the Speed Ticket grant; v28 → v29 (D221): a granted world's materials go, the grant tickets
  * only; v29 → v30 (D224, D228): the farm by line and its stock; v30 → v31 (D230): work settles before the fifteen Wilds
- * places replace the old ten. */
+ * places replace the old ten; v31 → v32 (D247, live from H134): Classes v3's reset (every Uma to her Tier 0 at Rank 1 in
+ * Tier 1's world, her Class EXP back as Class Marks) and the Healer Sanctum's merge, recorded for the one-time sheet. */
 export function parseSave(value: unknown, path = 'save'): Save {
   return parseSaveChecked(value, path, (input, actions, at) => checkReplay(replayBattle, input, actions, at), migrateWorld)
 }

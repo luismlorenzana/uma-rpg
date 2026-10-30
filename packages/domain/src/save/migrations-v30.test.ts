@@ -2,7 +2,7 @@
 // converts R2's sixty types to the farm by line's G1 and G6 by the Craft Level they opened at; everything else stays.
 import { describe, expect, it } from 'vitest'
 import { lineItem } from '../items/lines'
-import { migrateWorld, settleWork, toV30, toV31, V30_TYPES } from './migrations'
+import { migrateWorld, settleWork, toV30, toV31, toV32, V30_TYPES } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type TierWorld } from './save'
 import { R2_TYPES, V29_ALL_STOCK, V29_MADE_STOCK, V29_MATERIAL_STOCK, V29_TIER2_STOCK, v29Save, v29World } from './v29.fixture'
 
@@ -103,20 +103,20 @@ describe('toV30 (FL17–FL19)', () => {
   })
 })
 
-describe('chained (H114)', () => {
-  it('runs once from v29 through v31 and leaves a v31 world untouched', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(31)
+describe('chained (H114; through v32 since H134)', () => {
+  it('runs once from v29 through v32 and leaves a v32 world untouched', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(32)
     const world = raw(v29World())
-    expect(migrateWorld(world, 29)).toEqual(toV31(toV30(raw(v29World()))))
+    expect(migrateWorld(world, 29)).toEqual(toV32(toV31(toV30(raw(v29World())))))
     const v30 = toV30(raw(v29World()))
-    expect(migrateWorld(v30, 30)).toEqual(toV31(v30))
-    const v31 = toV31(toV30(raw(v29World())))
-    expect(migrateWorld(v31, 31)).toBe(v31)
+    expect(migrateWorld(v30, 30)).toEqual(toV32(toV31(v30)))
+    const v32 = toV32(toV31(toV30(raw(v29World()))))
+    expect(migrateWorld(v32, 32)).toBe(v32)
   })
 
-  it('parses a stored v29 save to v31: settled, converted, every world', () => {
+  it('parses a stored v29 save to v32: settled, converted, every world', () => {
     const parsed = parseSave(JSON.parse(JSON.stringify(v29Save())))
-    expect(parsed.schemaVersion).toBe(31)
+    expect(parsed.schemaVersion).toBe(32)
     expect(parsed.tierWorlds['1']!.work).toEqual({})
     expect(parsed.tierWorlds['1']!.items['gold-ingot']).toBe(V29_MATERIAL_STOCK['iron-ingot']! + 6)
     expect(parsed.tierWorlds['2']!.items).toEqual({ 'copper-ore': 4, 'gold-ingot': 3, 'gold-ore': 2, 'carp-fillet': 5 })

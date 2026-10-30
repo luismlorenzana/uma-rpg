@@ -5,8 +5,9 @@
 @import '@luismlorenzana/uma-kit/theme.css';
 
 /* Damage kinds' colors (D234), for the inline glyphs (`KIND_COLOR` in battle/labels.tsx): the elements as uma-art paints
-   their Tomes, each Arm beside its twin element's as uma-art 2.15.0 paints it. Dark mode keeps the art's light tones; light
-   mode takes deeper ones so the pale kinds (Light, Lightning, Ice, the Bow's jade) still read on a white panel. */
+   their Tomes, each Arm beside its twin element's as uma-art 2.15.0 paints it. Classes v3 re-paired the twins to Katana–Light
+   and Bow–Dark (CV13; H134 swapped the two Arms' tones to follow). Dark mode keeps the art's light tones; light mode takes
+   deeper ones so the pale kinds (Light, Lightning, Ice, the Katana's jade) still read on a white panel. */
 :root {
   --kind-fire: #e0562a;
   --kind-ice: #2f8fd8;
@@ -16,8 +17,8 @@
   --kind-greatsword: #d9761a;
   --kind-axe: #5b4fd6;
   --kind-lance: #2f9a43;
-  --kind-bow: #1f9e88;
-  --kind-katana: #c8346f;
+  --kind-bow: #c8346f;
+  --kind-katana: #1f9e88;
 }
 [data-theme='dark'] {
   --kind-fire: #ff8a5c;
@@ -28,8 +29,8 @@
   --kind-greatsword: #f5a54a;
   --kind-axe: #9a86f2;
   --kind-lance: #62cf70;
-  --kind-bow: #7fe0cb;
-  --kind-katana: #ee6a9c;
+  --kind-bow: #ee6a9c;
+  --kind-katana: #7fe0cb;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
@@ -41,8 +42,8 @@
     --kind-greatsword: #f5a54a;
     --kind-axe: #9a86f2;
     --kind-lance: #62cf70;
-    --kind-bow: #7fe0cb;
-    --kind-katana: #ee6a9c;
+    --kind-bow: #ee6a9c;
+    --kind-katana: #7fe0cb;
   }
 }
 @source '../node_modules/@luismlorenzana/uma-kit/dist';

@@ -50,7 +50,7 @@ describe('classesLines (CV §8.6)', () => {
     const lines = classesLines(record(), who, 1)
     expect(lines.steps).toEqual([
       { text: 'Exchange → Read a Class Manual → her Tier 0 → Her share', note: null },
-      { text: 'Her profile → Class → Promote (Rank 10)', note: 'EXP past Rank 10 goes with her into the new class' },
+      { text: 'Her profile → Skills → Promote (Rank 10)', note: 'EXP past Rank 10 goes with her into the new class' },
     ])
     expect(lines.reset).toBe('Class Ranks · weapons per class · lines · equipped skills · callings')
     expect(lines.stays).toBe('Uma Levels · weapon, armor and accessory grades · Extra Stats · Craft Levels · Bonds · Hall seats · Laurels · items')

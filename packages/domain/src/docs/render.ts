@@ -12,7 +12,7 @@ import {
 } from '../economy/accessories'
 import { armorValues, GRADE_MAX, gradeGateLevel, mightAt, TIER_SCALE_TENTHS, type GearTier } from '../economy/grades'
 import { MOON_T1, PLANET_T1, PROWESS_SPLIT, TEMPLATE_T1 } from '../economy/planet'
-import { PLACE_SLOTS_V3, PLACE_SPEED_V3, professionById, TRADES } from '../economy/professions'
+import { PLACE_SLOTS_V3, PLACE_SPEED_V3, professionById, tradeOfCalling, TRADES } from '../economy/professions'
 import { isMakingPlaceV4, isProcessingPlaceV4, PLACES_V4 } from '../economy/places-v4'
 import { stockName } from '../economy/stock'
 import { madeName } from '../items/made'
@@ -30,9 +30,9 @@ import { gradeUnlockLevel } from '../items/catalog'
 import { BATTLE_LIMIT_CHARGE, BATTLE_LIMIT_MAX, BATTLE_LIMIT_NAMES, BATTLE_LIMIT_POWER } from '../rpg/battle/limit'
 import * as K from '../rpg/battle/skills'
 import {
-  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALLS, HERO_LIMIT_POWER,
-  HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, HERO_MAX_LEARNERS, heroLimitFor, heroLimitKinds, heroLimitPower,
-  LEARNER_MAX_PARENTS, type HeroCast, type HeroLimitId,
+  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, HERO_HALL_PLACES, heroHalls, HERO_LIMIT_MAX_HITS,
+  HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, HERO_MAX_LEARNERS, heroLimitFor, heroLimitKinds, heroLimitPower, heroLimitScale,
+  LEARNER_MAX_PARENTS, type HeroCast, type HeroHall, type HeroLimitId,
 } from '../rpg/heroes'
 import {
   RPG_CLERIC_STATUS, RPG_PALADIN_AEGIS, RPG_PALADIN_SHIELD_SHARE, RPG_PIERCE_SCALE, RPG_SKILL_MP, RPG_SKILL_POWER,
@@ -60,9 +60,16 @@ import { classPresetV3 } from '../save/presets'
 import { TIERS } from '../save/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import {
-  FLOURISH_NAMES, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_KNACK_WORDS, UMA_KNACKS, UMA_ROW_CALLING,
-  UMA_ROW_PICK, UMA_STRIDES, UMA_TYPE_NAMES, type UmaCallingClass, type UmaCallingRow,
+  FLOURISH_NAMES, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_KNACK_WORDS, UMA_KNACKS, UMA_ROW_CALLING_V3, UMA_STRIDES, UMA_TYPE_NAMES,
+  type UmaCallingRowV3,
 } from '../roster/template'
+import {
+  RPG_CLASS_PARENTS, RPG_ROOT_NAME, RPG_TIER0_BANK, RPG_TIER0_MAX_RANK, RPG_TIER0_MODEL, RPG_TIER0_ROOT, RPG_TIER0_SKILL, rpgClassFamily,
+  rpgClassName, rpgSuggestedPromotion, rpgTier0ExpToNext, rpgTier0Power,
+} from '../rpg/class-tree'
+import { RPG_ALL_CLASSES, RPG_TIER0_CLASSES, type RpgTier0Class } from '../rpg/kinds'
+import { moonChannel } from '../economy/planet'
+import { RPG_VOLLEY, RPG_VOLLEY_MP } from '../rpg/catalog'
 import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
 import {
   BOSS_WAVES, CONTINENT_LEAN, regionChapter, SPRING_RECHARGE_MS, WAVE_HP, WAVE_PAY, WAVE_STAGES, WORLD_ESCORT,
@@ -80,20 +87,21 @@ const pct = (n: number) => `${Math.round(n * 1000) / 10}%`
 const x = (n: number) => `×${n}`
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-const CLASS_NAME: Readonly<Record<RpgClass, string>> = {
-  brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
-  // Classes v3's seven (H126), their v19 names: no list prints them until H134 makes them live.
-  recruit: 'Recruit', duelist: 'Duelist', acolyte: 'Acolyte', caller: 'Caller', apprentice: 'Initiate', armsummoner: 'Arms Summoner',
-  tomeblade: 'Tome Spellblade',
-}
+/** Each class's live name (Classes v3's from H134: the Sorcerer, the Arms Spellblade, the Tome Summoner, the Initiate). */
+const CLASS_NAME: Readonly<Record<RpgClass, string>> = Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, rpgClassName(c)])) as Record<RpgClass, string>
+/** A class's name when engine v18 and older fights played it (the history lines). */
+const OLD_NAME = (c: RpgClass): string => rpgClassName(c, 18)
+const isTier0 = (c: RpgClass): c is RpgTier0Class => (RPG_TIER0_CLASSES as readonly RpgClass[]).includes(c)
 const weaponName = (w: RpgWeapon): string => WEAPON_LABEL[w]
 const itemName = (id: string) => stockName(id)
 const inputs = (list: Record<string, number>) => Object.entries(list).map(([id, n]) => `${n > 1 ? `${n}× ` : ''}${itemName(id)}`).join(', ')
 
-/** Each kind's one shape in every class (D86). */
+/** Each kind's one shape in every class (D86; Classes v3's five shapes, CV12): Katana and Light a double, Bow and Dark a
+ * volley. */
+const VOLLEY = `A volley: one foe at ${RPG_VOLLEY.target}, a splash of ${RPG_VOLLEY.splash} on every other`
 const SHAPE: Readonly<Record<string, string>> = {
   greatsword: 'One foe, heavy', fire: 'One foe, heavy', axe: 'Every foe', ice: 'Every foe', lance: 'Random foes', lightning: 'Random foes',
-  bow: 'One foe, many hits', light: 'One foe, many hits', katana: 'Twice: the foe and one other', dark: 'Twice: the foe and one other',
+  katana: 'A double: one foe, two hits', light: 'A double: one foe, two hits', bow: VOLLEY, dark: VOLLEY,
 }
 /** The classes' own Limit Breaks, retired by D112: fights from engine v6–v9 still replay with them. */
 const RETIRED_LIMIT_OF: Readonly<Record<RpgClass, string>> = {
@@ -107,19 +115,16 @@ const RETIRED_LIMIT_OF: Readonly<Record<RpgClass, string>> = {
   caller: 'none: she came with engine v19', apprentice: 'none: she came with engine v19', armsummoner: 'none: she came with engine v19',
   tomeblade: 'none: she came with engine v19',
 }
-/** The calling rule's rows in words (uma-templates §2.2, CP29), the first that fits. */
-const CALLING_ROW: Readonly<Record<UmaCallingRow, string>> = {
-  1: 'Front runners', 2: 'Late + End closers', 3: 'End closers',
-  4: 'Pace sprinters, Power over Wit', 5: 'Pace chasers, Power over Wit', 6: 'Pace chasers, Wit at or over Power',
-  7: 'Late surgers, Power over Wit', 8: 'Late surgers, Wit at or over Power',
+/** The calling rule's rows in words (Classes v3, CV19): her best running styles alone (every style at her top grade), the
+ * first that fits; no pick. */
+const CALLING_ROW: Readonly<Record<UmaCallingRowV3, string>> = {
+  1: 'Front among her best styles', 2: 'Pace alone', 3: 'Pace with Late or End', 4: 'End among them (Late + End, or End alone)', 5: 'Late alone',
 }
-/** Her calling, the class a new unlock starts in (engine v16, CP29): the rows that call her class, and "or picked" where
- * another row's pick names it. */
+/** Her calling, the Tier 0 a new unlock starts as in Tier 1's world: the style row that calls it; a Tier 1 class is reached
+ * by promotion. */
 function callingOf(c: RpgClass): string {
-  const rows = (Object.keys(CALLING_ROW).map(Number) as UmaCallingRow[])
-  const own = rows.filter((r) => UMA_ROW_CALLING[r] === c).map((r) => CALLING_ROW[r])
-  const picked = rows.some((r) => UMA_ROW_CALLING[r] !== c && UMA_ROW_PICK[r]?.includes(c))
-  return `${own.join('; ')}${picked ? ', or picked' : ''}`
+  const rows = (Object.keys(CALLING_ROW).map(Number) as UmaCallingRowV3[]).filter((r) => UMA_ROW_CALLING_V3[r] === c)
+  return rows.length ? rows.map((r) => `${r}. ${CALLING_ROW[r]}`).join('; ') : '—'
 }
 
 /** Her weapon slots by channel, the lead channel first: "3 Arms", "2 Arms + 1 Tome", "1 Arm + 2 Tomes" (CP2). */
@@ -138,13 +143,16 @@ function handOf(c: RpgClass): string {
   const h = rpgHand({ classId: c })
   return h.pair ? `${x(h.arms)} Arms, ${x(h.tome)} Tome; MP ${x(h.mp)} a half` : `${x(h.power)}, MP ${x(h.mp)}`
 }
-/** What sets each class apart in classes v2 (§3, §4), with the live numbers. */
+/** What sets each class apart (classes v2 §3, §4; Classes v3 §3), with the live numbers: a pair's lead half from her hand. */
 function special(c: RpgClass): string {
   const h = rpgHand({ classId: c })
+  const lead = h.lead === 'tome' ? 'Tome' : 'Arms', other = h.lead === 'tome' ? 'Arms' : 'Tome'
+  const a = (half: string) => (half === 'Arms' ? 'an Arms' : 'a Tome')
+  if (isTier0(c)) return `Tier 0: one skill, ${RPG_TIER0_SKILL[c]}, on any of her three weapons; promotes at Class Rank ${RPG_TIER0_MAX_RANK}. No healer`
+  if (h.pair && h.linger) return `Every act is ${a(lead)} summon and ${a(other)} summon, the ${lead} half first. The ${lead} summon lingers; when her ` +
+    `next pair comes, it strikes every foe at ${h.linger} × ${K.BATTLE_FAREWELL_FACTOR}. No support`
+  if (h.pair) return `Every act is ${a(lead)} half and ${a(other)} half, the ${lead} half first; ${h.extra ? 'it lands one extra hit' : 'no extra hit'}`
   switch (c) {
-    case 'spellblade': return 'Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit'
-    case 'summoner': return `Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, ` +
-      `it strikes every foe at ${h.linger} × ${K.BATTLE_FAREWELL_FACTOR}. No support`
     case 'paladin': return 'Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. ' +
       'Blizzard spells Barrier every Uma, Greatsword blows give Aegis'
     case 'cleric': return 'Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. ' +
@@ -152,24 +160,51 @@ function special(c: RpgClass): string {
     default: return '—'
   }
 }
+/** The thirteen classes (Classes v3, CV1): the five Tier 0s under their roots, then the eight Tier 1 classes with their
+ * parents (a hybrid has two). */
 function classes(): string {
-  return table(['Class', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP)', 'Limit Break power', 'Her calling (starts as)', 'Starting armor'],
+  return table(['Class', 'Tier', 'Root or parents', 'Slots', 'Trees', 'Hand: power, MP', 'Special', 'Stat lean (HP, ATK, MATK, DEF, MDEF, MP)', 'Limit Break scale',
+    'Her calling (starts as)', 'Starting armor'],
     RPG_CLASSES.map((c) => {
       const s = RPG_CLASS_STATS[c]
-      return [CLASS_NAME[c], slots(c), rpgClassWeapons(c).length, handOf(c), special(c),
-        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp].map((v) => x(v)).join(' '), `${HERO_LIMIT_POWER[c]}× her open depth`, callingOf(c), cap(RPG_CLASS_ARMOR[c])]
+      const from = isTier0(c) ? `${RPG_ROOT_NAME[RPG_TIER0_ROOT[c]]} root` : `Promotes from ${RPG_CLASS_PARENTS[c as RpgTier1Class].map((p) => CLASS_NAME[p]).join(' or ')}`
+      return [CLASS_NAME[c], isTier0(c) ? 0 : 1, from, slots(c), isTier0(c) ? 'Any' : rpgClassWeapons(c).length, handOf(c), special(c),
+        [s.hp, s.atk, s.matk, s.pdef, s.mdef, s.mp].map((v) => x(v)).join(' '), x(heroLimitScale(c)), callingOf(c), cap(RPG_CLASS_ARMOR[c])]
     }))
 }
 
-/** Her template (engine v16, D203, D204): the 18 types by calling and stride, the knack words, the Flourish by stride. */
+/** Tier 0 (CV5–CV11): the five, their one skill, the child each models, the Suggested promotion, and the ladder. */
+function tier0(): string {
+  let total = 0
+  const ladder = Array.from({ length: RPG_TIER0_MAX_RANK }, (_, i) => i + 1).map((r) => {
+    const next = r < RPG_TIER0_MAX_RANK ? rpgTier0ExpToNext(r) : 0
+    const row: Cell[] = [r, next ? next.toLocaleString('en-US') : '—', total.toLocaleString('en-US'), Math.round(rpgTier0Power(r) * 100) / 100]
+    total += next
+    return row
+  })
+  const suggested = (t: RpgTier0Class) => {
+    const kids = [...new Set([rpgSuggestedPromotion(t, { power: 120, wit: 80 }), rpgSuggestedPromotion(t, { power: 80, wit: 120 })])]
+    return kids.length === 1 ? CLASS_NAME[kids[0]!] : `${CLASS_NAME[kids[0]!]} (Power over Wit), ${CLASS_NAME[kids[1]!]} (Wit at or over Power)`
+  }
+  return table(['Tier 0', 'Root', 'Her skill', 'Defaults and form of', 'Promotes into', 'Suggested', 'Her Flourish works as'], RPG_TIER0_CLASSES.map((t) => [
+    CLASS_NAME[t], RPG_ROOT_NAME[RPG_TIER0_ROOT[t]], RPG_TIER0_SKILL[t], CLASS_NAME[RPG_TIER0_MODEL[t]],
+    rpgClassFamily(t).slice(1).map((c) => CLASS_NAME[c]).join(', '), suggested(t), rpgClassFamily(t).map((c) => CLASS_NAME[c]).join(', '),
+  ])) + '\n\n' + table(['Class Rank', 'EXP to next', 'EXP from Rank 1', "Her skill's power"], ladder) +
+    `\n\nAt Rank ${RPG_TIER0_MAX_RANK} her EXP waits for her promotion, up to ${RPG_TIER0_BANK.toLocaleString('en-US')}; past that it banks as Class Marks at half.`
+}
+
+/** Her template (engine v16, D203, D204; Classes v3, CV21): the 15 types by calling (her Tier 0) and stride, the knack words,
+ * the Flourish by stride (on as any class of her Tier 0's family), her moon's node II by her Tier 0's root. */
 function templates(): string {
   const most = pct(BATTLE_FLOURISH_SHARE)
   const flourish = (f: (typeof STRIDE_FLOURISH)[keyof typeof STRIDE_FLOURISH]) => f === 'clean-break' ? `a Barrier of ${most} of her max HP at the start`
     : f === 'even-pace' ? `${pct(BATTLE_FLOURISH_RATE['even-pace'])} of her max HP at each round's end, up to ${most}`
     : `${pct(BATTLE_FLOURISH_RATE['late-reserve'])} of her max HP at each round's end from round ${BATTLE_FLOURISH_FROM}, up to ${most}`
-  return table(['Calling', ...UMA_STRIDES.map((s) => STRIDE_LABEL[s])], RPG_CLASSES.map((c) => [CLASS_NAME[c], ...UMA_STRIDES.map((s) => UMA_TYPE_NAMES[c as UmaCallingClass][s])])) +
+  const moon = (t: RpgTier0Class) => { const ch = moonChannel(t); return ch === 'both' ? 'DEF and M.DEF, half each' : ch === 'magical' ? 'M.DEF' : 'DEF' }
+  return table(['Calling', ...UMA_STRIDES.map((s) => STRIDE_LABEL[s]), 'Moon II'],
+    Object.values(UMA_ROW_CALLING_V3).map((t) => [CLASS_NAME[t], ...UMA_STRIDES.map((s) => UMA_TYPE_NAMES[t][s]), moon(t)])) +
     '\n\n' + table(['Knack: her top growth rate', 'Word'], UMA_KNACKS.map((k) => [cap(KNACK_STAT[k]), UMA_KNACK_WORDS[k]])) +
-    '\n\n' + table(['Stride: her longest distance at her best grade', 'Flourish', 'As her calling'], UMA_STRIDES.map((s) =>
+    '\n\n' + table(['Stride: her longest distance at her best grade', 'Flourish', 'As her calling\'s family'], UMA_STRIDES.map((s) =>
       [`${STRIDE_LABEL[s]} (${s === 'dash' ? 'Sprint or Mile' : s === 'middle' ? 'Medium' : 'Long'})`, FLOURISH_NAMES[STRIDE_FLOURISH[s]], flourish(STRIDE_FLOURISH[s])]))
 }
 
@@ -189,7 +224,7 @@ function weapons(): string {
   return table(['Weapon', 'Id', 'Kind', 'Channel', 'Shape', 'Healer status', 'Classes'], RPG_WEAPONS.map((w) => {
     const kind = rpgWeaponKind(w)
     return [weaponName(w), `\`${w}\``, cap(kind), isRpgTome(w) ? 'Magical' : 'Physical', SHAPE[kind]!, statusName(RPG_CLERIC_STATUS[w]),
-      RPG_CLASSES.filter((c) => rpgClassWeapons(c).includes(w)).map((c) => CLASS_NAME[c]).join(', ')]
+      ['Every Tier 0', ...RPG_CLASSES.filter((c) => !isTier0(c) && rpgClassWeapons(c).includes(w)).map((c) => CLASS_NAME[c])].join(', ')]
   }))
 }
 const STATUS_NAME: Readonly<Record<string, string>> = {
@@ -210,10 +245,11 @@ function depths(): string {
     }))
 }
 
-/** Each of her class's trees as engine v16 plays it (CP13, CP18): the trunk, line A and line B with its name; v16's defs. */
+/** Each of her class's trees as the live engine plays it (CP13, CP18; Classes v3's shapes and lines, CV12–CV14): the trunk,
+ * line A and line B with its name, for the eight Tier 1 classes; a Tier 0's one node a weapon is the Tier 0 block's. */
 function skillTrees(): string {
   const out: string[] = []
-  for (const c of RPG_CLASSES) {
+  for (const c of RPG_CLASSES.filter((k) => !isTier0(k))) {
     const hand = rpgHand({ classId: c })
     const before = hand.pair ? `${x(hand.arms)} on Arms, ${x(hand.tome)} on Tomes` : x(hand.power)
     out.push(`### ${CLASS_NAME[c]}`, '', `${rpgClassWeapons(c).length} trees; her three weapons choose three. Powers below are at Rank 3, before her ` +
@@ -236,47 +272,54 @@ function skillTrees(): string {
   return out.join('\n').trimEnd()
 }
 
-/** D112: Limit Breaks only from the Halls of Heroes; the classes' own replay in older fights. */
+/** D112: Limit Breaks only from the Halls of Heroes; Halls v2's power (HV5, live from H134); older fights replay theirs. */
 function limits(): string {
   const v1 = rpgClasses(14)
   const v14 = (id: HeroLimitId) => heroLimitFor(id, 14)!.name
   return `**Limit Breaks come only from the Halls of Heroes** (D112, engine v10). A Hero always uses her seat's, at 100%; a ` +
     `Learner uses either of her Heroes', at ${bondCapacity(0) * 100}% plus 5% a Bond Level (${bondCapacity(BOND_MAX_LEVEL) * 100}% at ` +
     `Bond ${BOND_MAX_LEVEL}), her inherited hits at the higher of her ATK and M.ATK while their kinds still decide weaknesses ` +
-    `and locks (v15, C3). An Uma who is neither has none, and her gauge has nothing to spend. At 100% a Limit Break is ` +
-    `worth her class's power below, in single-target casts at her open depth:\n\n` +
-    table(['Class', 'Limit Break power'], RPG_CLASSES.map((c) => [CLASS_NAME[c], `${HERO_LIMIT_POWER[c]}×`])) + '\n\n' +
-    `A Limit Break that mends or raises a Barrier does it at ${pct(HERO_LIMIT_SUPPORT_SHARE)} of each Uma's max HP ×${RPG_SUPPORT_ALL}, × her ` +
+    `and locks (v15, C3). An Uma who is neither has none, and her gauge has nothing to spend. **A Limit Break's power is its ` +
+    `own (the [Halls of Heroes](heroes.md) list each seat's) × her class's scale below × her open depth's power** (Halls v2, ` +
+    `engine v19), and it never lands more than ${HERO_LIMIT_MAX_HITS} hits on one foe in one cast:\n\n` +
+    table(['Class', 'Limit Break scale'], RPG_CLASSES.map((c) => [CLASS_NAME[c], x(heroLimitScale(c))])) + '\n\n' +
+    `In fights from v15–v18, a Limit Break that mends or raises a Barrier does it at ${pct(HERO_LIMIT_SUPPORT_SHARE)} of each Uma's max HP ×${RPG_SUPPORT_ALL}, × her ` +
     `healing scale and the cast's strength; its cleanse and its revive land at any strength. ` +
     `The gauge fills to ${BATTLE_LIMIT_MAX}: +${BATTLE_LIMIT_CHARGE.attack} for an Attack, +${BATTLE_LIMIT_CHARGE.skill} for a skill. A Limit Break costs no MP and takes her turn. ` +
-    `Limit Breaks don't rank: their power follows her open depth, never her Skill Ranks. Since engine v16 ${heroLimitFor('paladin-3', 16)!.name} charges with ` +
+    `Limit Breaks don't rank: their power follows her open depth, never her Skill Ranks. ` +
+    `Fights from engines v15–v18 replay with six halls' 24 Limit Breaks, each worth her class's own power at 100% ` +
+    `(${rpgClasses(18).map((c) => `${OLD_NAME(c)} ${heroLimitPower(c, 18)}×`).join(', ')}); from v16 ${heroLimitFor('paladin-3', 16)!.name} charges with ` +
     `an Axe and ${heroLimitFor('cleric-1', 16)!.name} strikes with Light, then Lightning (CP35); fights from v15 replay with ${heroLimitFor('paladin-3', 15)!.name}'s ` +
     `Greatsword and ${heroLimitFor('cleric-1', 15)!.name}' Light twice. ` +
     `Fights from engines v10–v14 replay with five halls' twenty: the Cleric Chapel's seats 3 and 4 ${v14('cleric-3')} and ${v14('cleric-4')}, ` +
     `${v14('spellblade-1')} in one cleave, ${v14('summoner-4')} on one foe, ` +
-    v1.filter((c) => heroLimitPower(c, 14) !== heroLimitPower(c, 15)).map((c) => `the ${CLASS_NAME[c]} at ${heroLimitPower(c, 14)}×`).join(' and ') +
+    v1.filter((c) => heroLimitPower(c, 14) !== heroLimitPower(c, 15)).map((c) => `the ${OLD_NAME(c)} at ${heroLimitPower(c, 14)}×`).join(' and ') +
     `, and a Learner's hits at each kind's own offense. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: ` +
-    v1.map((c) => `${CLASS_NAME[c]} ${RETIRED_LIMIT_OF[c]}`).join('; ') + '.'
+    v1.map((c) => `${OLD_NAME(c)} ${RETIRED_LIMIT_OF[c]}`).join('; ') + '.'
 }
 
-/** The Halls of Heroes (D106, D107): every seat's Limit Break, and the Bond numbers. */
+/** The Halls of Heroes (D106, D107; Halls v2, D241, live from H134): every seat's Limit Break, and the Bond numbers. */
 function heroes(): string {
-  const hall = (c: RpgClass) => placeById(HERO_HALLS[c])?.name ?? c
+  const hall = (h: HeroHall) => placeById(HERO_HALL_PLACES[h])?.name ?? h
+  /** The hits a cast lands: a double's (v19) two. */
+  const landed = (c: HeroCast) => c.hits.reduce((n, h) => n + (h.double ? 2 : 1), 0)
   const shape = (target: string) => (target === 'all' ? 'every foe' : target === 'random' ? 'random foes' : 'one foe')
   const support = (c: HeroCast): string[] => {
     const s = c.support
     return s ? [s.mend ? 'a mend on every ally' : '', s.shield ? 'a Barrier on every ally' : '', s.cleanse ? 'a cleanse' : '', s.revive ? 'the first fallen rises' : ''] : []
   }
-  return table(['Hall', 'Seat', 'Limit Break', 'Kinds', 'What it does', 'Casts'], HERO_LIMITS.map((l) => [
-    `${hall(l.classId)} (${CLASS_NAME[l.classId]})`, l.id.slice(l.id.lastIndexOf('-') + 1), l.name, heroLimitKinds(l).join(', '), l.blurb,
-    l.casts.map((c) => [c.hits.length ? `${c.hits.length} hit${c.hits.length === 1 ? '' : 's'} on ${shape(c.target)}` : '', c.splash ? 'splash' : '',
-      c.status ? `${c.status.key} ${c.status.stacks} on ${c.status.to === 'allies' ? 'every ally' : c.status.to === 'foes' ? 'every foe' : 'the foe'}` : '',
+  return table(['Hall', 'Seat', 'Home class', 'Limit Break', 'Power', 'Kinds', 'What it does', 'Casts'], HERO_LIMITS.map((l) => [
+    hall(l.hall), l.id.slice(l.id.lastIndexOf('-') + 1), CLASS_NAME[l.classId], l.name, l.power ? `${l.power}×` : '—', heroLimitKinds(l).join(', '), l.blurb,
+    l.casts.map((c) => [landed(c) ? `${landed(c)} hit${landed(c) === 1 ? '' : 's'} on ${c.volley ? 'one foe, a volley' : shape(c.target)}` : '', c.splash ? 'splash' : '',
+      c.status ? `${statusName(c.status.key)} ${c.status.stacks} on ${c.status.to === 'allies' ? 'every ally' : c.status.to === 'foes' ? 'every foe' : 'the foe'}` : '',
       ...support(c)]
       .filter(Boolean).join(' + ')).join('; '),
   ])) + '\n\n' + table(['Setting', 'Value'], [
-    ['Seats', `4 per hall, ${RPG_CLASSES.length} halls, ${HERO_LIMITS.length} in all; a Hero sits in one seat`],
+    ['Seats', `4 per hall, ${heroHalls().length} halls, ${HERO_LIMITS.length} in all; a Hero sits in one seat; any Uma may sit in any seat`],
     ['Learners', `${HERO_MAX_LEARNERS} per Hero; ${LEARNER_MAX_PARENTS} Heroes per Learner; a Hero is never a Learner`],
-    ['Power at 100%', `her own class's Limit Break, in single-target casts at her open depth: ${RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${HERO_LIMIT_POWER[c]}×`).join(', ')}`],
+    ['Power at 100%', `the Limit Break's own power × her class's scale (${[...new Set(RPG_CLASSES.map((c) => heroLimitScale(c)))].sort().reverse().map((v) =>
+      `${x(v)} ${RPG_CLASSES.filter((c) => heroLimitScale(c) === v).map((c) => CLASS_NAME[c]).join(', ')}`).join('; ')}) × her open depth's power; ` +
+      `at most ${HERO_LIMIT_MAX_HITS} hits on one foe a cast`],
     ['Learner strength', `${bondCapacity(0) * 100}% at Bond 0, +5% a Bond Level, ${bondCapacity(BOND_MAX_LEVEL) * 100}% at Bond ${BOND_MAX_LEVEL}`],
     ['Bond EXP per won fight', `${BOND_EXP_PER_WIN.fight} a stage, ${BOND_EXP_PER_WIN.boss} an elite or boss, toward each of a Learner's Heroes, or a Hero's own seat; ${BOND_EXP_TO_NEXT} a level (Sweeps and replays count)`],
   ])
@@ -312,16 +355,19 @@ function battleConstants(): string {
     ['`RPG_PALADIN_AEGIS`', RPG_PALADIN_AEGIS, 'v15: Aegis stacks a Paladin\'s Greatsword blow gives each Uma her Barrier reaches'],
     ['`BATTLE_REGEN_SHARE`', K.BATTLE_REGEN_SHARE, 'v15: a Cleric\'s Regen mends this share of her Light spell\'s mend'],
     ['`BATTLE_REGEN_ROUNDS`', BATTLE_REGEN_ROUNDS, 'v15: the round ends a Regen mends at: the spell\'s round and the next'],
-    ['`BATTLE_FAREWELL_FACTOR`', K.BATTLE_FAREWELL_FACTOR, 'v15: a lingering Tome summon\'s farewell strike on each foe, × its linger share × its hits\' power'],
+    ['`BATTLE_FAREWELL_FACTOR`', K.BATTLE_FAREWELL_FACTOR, 'v15: a lingering summon\'s farewell strike on each foe (from v19 her lead half\'s: the Tome Summoner\'s Tome, the Arms Summoner\'s Arms), × its linger share × its hits\' power'],
     ['`HERO_LIMIT_SUPPORT_SHARE`', HERO_LIMIT_SUPPORT_SHARE, `v15: a hall Limit Break's mend or Barrier, as a share of max HP, ×${RPG_SUPPORT_ALL} on every Uma`],
     ['`BATTLE_RALLY_SHARE`', K.BATTLE_RALLY_SHARE, 'v12: share of a foe hit she can Rally back'],
     ['`BATTLE_BREATHER`', K.BATTLE_BREATHER, 'v12: share of max HP every Uma recovers when a new wave enters'],
     ['`BATTLE_LIMIT_MAX`', BATTLE_LIMIT_MAX, 'Limit Break gauge'],
     ['`RPG_SKILL_RANK_FACTOR`', RPG_SKILL_RANK_FACTOR.join(', '), `v16: a skill's power at Skill Ranks 1–${RPG_SKILL_RANK_MAX}, a rank every ${RPG_SKILL_RANK_STEP} Class Ranks from its depth's gate; a healer's mend and Barrier shares too`],
-    ['`RPG_PIERCE_SCALE`', RPG_PIERCE_SCALE, 'v16: a Pierce hit\'s power (the Spell Blade\'s B line, the Brawler\'s Katana B, the Mage\'s Dark B); it ignores the unbroken halving'],
+    ['`RPG_PIERCE_SCALE`', RPG_PIERCE_SCALE, 'v16: a Pierce hit\'s power (from v19 the Spellblades\' B lines, the Brawler\'s Katana B, the Sorcerer\'s Light B); it ignores the unbroken halving'],
+    ['`RPG_VOLLEY`', `${RPG_VOLLEY.target} + ${RPG_VOLLEY.splash}`, 'v19: a Bow or Dark volley\'s share of the depth\'s power on the tapped foe, then one plain splash hit on every other foe'],
+    ['`RPG_VOLLEY_MP`', RPG_VOLLEY_MP, 'v19: a volley\'s extra MP'],
+    ['`HERO_LIMIT_MAX_HITS`', HERO_LIMIT_MAX_HITS, 'v19: the most hits a Limit Break lands on one foe in one cast'],
     ['`RPG_BASE_MP_REGEN`', RPG_BASE_MP_REGEN, `v16: every Uma regains this share of her max MP at each round's end for each skill depth her Class Rank opens, at least 1, beside a Spring's`],
     ['`RPG_BASE_MP_REGEN_DEPTHS`', RPG_BASE_MP_REGEN_DEPTHS, `v16: the depths the base MP regen counts, at most (${pct(RPG_BASE_MP_REGEN * RPG_BASE_MP_REGEN_DEPTHS)} from Class Rank ${RPG_DEPTH_GATES[RPG_BASE_MP_REGEN_DEPTHS - 1]})`],
-    ['`BATTLE_FLOURISH_SHARE`', BATTLE_FLOURISH_SHARE, 'v16: her Flourish gives this share of her max HP a fight, while she fights as her calling\'s class'],
+    ['`BATTLE_FLOURISH_SHARE`', BATTLE_FLOURISH_SHARE, 'v16: her Flourish gives this share of her max HP a fight, while she fights as her calling\'s class (from v19 any class of her Tier 0\'s family)'],
     ['`BATTLE_FLOURISH_RATE`', `Even pace ${BATTLE_FLOURISH_RATE['even-pace']}, Late reserve ${BATTLE_FLOURISH_RATE['late-reserve']}`, 'v16: the share of her max HP those two Flourishes mend at a round\'s end'],
     ['`BATTLE_FLOURISH_FROM`', BATTLE_FLOURISH_FROM, 'v16: the first round whose end Late reserve mends at'],
     ['`RPG_BASE_MP_REGEN_V17`', RPG_BASE_MP_REGEN_V17, `v17: the base MP regen a depth (${pct(RPG_BASE_MP_REGEN_V17 * RPG_BASE_MP_REGEN_DEPTHS)} from Class Rank ${RPG_DEPTH_GATES[RPG_BASE_MP_REGEN_DEPTHS - 1]})`],
@@ -477,10 +523,10 @@ function starMap(): string {
   const n = [1, 2, 3, 4, 5]
   return table(['Body', 'Nodes', 'Opens at Lv', 'Points (Tier 1)', 'To'], [
     ['Planet', 'I–V', n.map((i) => gradeGateLevel(2 * i - 1)).join(', '), PLANET_T1.join(', '), 'all six core stats (HP 5 a point)'],
-    ['Prowess', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), `ATK and M.ATK by her active class: ${RPG_CLASSES.map((c) => `${CLASS_NAME[c]} ${PROWESS_SPLIT[c as RpgTier1Class]}/${100 - PROWESS_SPLIT[c as RpgTier1Class]}`).join(', ')}`],
+    ['Prowess', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), `ATK and M.ATK by her active class: ${RPG_CLASSES.filter((c) => !isTier0(c)).map((c) => `${CLASS_NAME[c]} ${PROWESS_SPLIT[c as RpgTier1Class]}/${100 - PROWESS_SPLIT[c as RpgTier1Class]}`).join(', ')}; a Tier 0 a third for each of her three weapons, by its channel`],
     ['Vigor', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), 'HP and MP'],
     ['Guard', 'I–V', n.map((i) => gradeGateLevel(2 * i)).join(', '), MOON_T1.join(', '), 'DEF and M.DEF'],
-    ['★ Her moon', 'I, II', `${gradeGateLevel(4)}, ${gradeGateLevel(8)}`, TEMPLATE_T1.join(', '), 'I: her knack\'s stat; II: her calling\'s channel\'s defense'],
+    ['★ Her moon', 'I, II', `${gradeGateLevel(4)}, ${gradeGateLevel(8)}`, TEMPLATE_T1.join(', '), 'I: her knack\'s stat; II: her calling\'s root: Warrior DEF, Mage M.DEF, All-Rounder half each'],
   ])
 }
 
@@ -488,9 +534,12 @@ function starMap(): string {
 function ranks(): string {
   const classRows: Cell[][] = [1, 10, 20, 30, 40, 49].map((r) => [r, classExpToNext(r).toLocaleString('en-US')])
   return table(['Bar', 'Ranks', 'Per win worth E Uma EXP', 'Opens'], [
-    ['Class Rank, per class', `1–${CLASS_MAX_RANK}`, `${CLASS_EXP_SHARE}E to the class she fought as`,
+    ['Class Rank, a Tier 0', `1–${RPG_TIER0_MAX_RANK}`, `${CLASS_EXP_SHARE}E to the class she fought as`,
+      `Her skill's power rises each rank; at Rank ${RPG_TIER0_MAX_RANK} her promotion, the EXP past it waiting for it (up to ${RPG_TIER0_BANK.toLocaleString('en-US')})`],
+    ['Class Rank, a Tier 1 class', `1–${CLASS_MAX_RANK} (from ${RPG_TIER0_MAX_RANK} in Tier 1's world)`, `${CLASS_EXP_SHARE}E to the class she fought as`,
       `Its trees' depths at ${RPG_DEPTH_GATES.join(', ')}; ranks every skill she holds, a Skill Rank every ${RPG_SKILL_RANK_STEP} Class Ranks up to ${RPG_SKILL_RANK_MAX}`],
   ]) + '\n\n' + table(['Class Rank', 'EXP to next'], classRows) +
+    `\n\nA Tier 0's ladder is twice the curve to Rank ${RPG_TIER0_MAX_RANK} (${rpgTier0ExpToNext(1)} at Rank 1, ${Array.from({ length: RPG_TIER0_MAX_RANK - 1 }, (_, i) => rpgTier0ExpToNext(i + 1)).reduce((a, b) => a + b, 0).toLocaleString('en-US')} in all).` +
     `\n\nPast the max rank, EXP banks at ${pct(MARKS_SHARE)} as Class Marks. A Class Manual costs ${MANUAL_PRICE.toLocaleString('en-US')} Class Marks and gives ${MANUAL_EXP.toLocaleString('en-US')} EXP to one class of one Uma. ` +
     'Gear has no ranks: a slot\'s grade is what she wears ([materials](materials.md#gear)).'
 }
@@ -547,14 +596,14 @@ function places(): string {
 /** The fifteen places (FL31) and the trades: who works each, and its one job. */
 function facilities(): string {
   const trade = (profession: string) => TRADES.find((t) => t.gathering === profession || t.processing === profession || t.crafting === profession)!
-  const callings: Readonly<Record<string, string>> = { physical: 'Brawler', 'physical-hybrid': 'Spell Blade', healer: 'Paladin, Cleric', 'magical-hybrid': 'Summoner', magical: 'Mage' }
+  const callings: Readonly<Record<string, string>> = Object.fromEntries(Object.values(UMA_ROW_CALLING_V3).map((t) => [tradeOfCalling(t), CLASS_NAME[t]]))
   const does = (id: string): string => {
     const spec = PLACES_V4.find((p) => p.id === id)!
     if (spec.kinds.includes('gather')) return `Gathers ${LINE_NAME[spec.line].toLowerCase()}, G1–G10`
     if (isProcessingPlaceV4(spec)) return `Processes ${LINE_NAME[spec.line].toLowerCase()} raw into refined, one for one`
     return `Makes ${spec.made.filter((m) => m !== 'branch-gem').map((m) => MADE_LINE_NAME[m]).join(' and ')}`
   }
-  return table(['Place', 'Profession', 'Job', 'What it does', 'Its trade (callings)'], PLACES_V4.map((p) => {
+  return table(['Place', 'Profession', 'Job', 'What it does', 'Its trade (calling)'], PLACES_V4.map((p) => {
     const profession = professionById(p.profession)!
     return [placeById(p.id)?.name ?? p.id, profession.name, cap(profession.kind), does(p.id), callings[trade(p.profession).id]!]
   })) + `\n\nEvery place has ${PLACE_SLOTS_V3} slots at ×${PLACE_SPEED_V3} from day one, and nothing to upgrade. An Uma works her trade's three places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.`
@@ -724,7 +773,7 @@ function riftFronts(): string {
     `Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. ` +
     `Rift foes hit harder than the world's: offense ×${t.escort.captain.offense} at stages 1–4, ×${t.elites.offense} for stages 5 and 7's sub-bosses, ` +
     `×${t.boss.offense} for a boss and her guard, ×${t.openers.offense} for an opening foe, ×${t.champion.offense} for a champion, ` +
-    `×${t.duel.offense} on the Duel (her HP ×${t.duel.hp}) and ×${t.horde.offense} on the Horde. Arcane's foes have ×${t.scale.arcane.hp} HP and ×${t.scale.arcane.offense} offense over Iron's. ` +
+    `×${t.duel.offense} on the Duel (her HP ×${t.duel.hp}) and ×${t.horde.offense} on the Horde. Iron's foes have ×${t.scale.iron.hp} HP and ×${t.scale.iron.offense} offense, Arcane's ×${t.scale.arcane.hp} HP and ×${t.scale.arcane.offense} offense. ` +
     (t.champions ? `Champions, and so the Convergence's fights, scale again by front: ${RIFT_FRONTS.filter((f) => t.champions![f]).map((f) => {
       const c = t.champions![f]!
       return `${RIFT_FRONT_SPECS[f].name} ${c.hp === c.offense ? `×${c.hp} HP and offense` : c.hp === 1 ? `×${c.offense} offense` : `×${c.hp} HP and ×${c.offense} offense`}`
@@ -741,7 +790,7 @@ function riftRules(): string {
     ['The Rift opens', `${RIFT_OPEN_AT} Lv ${RPG_TIER_MAX_LEVEL} Umas in the tier's world (Tiers ${RIFT_TIERS.join(' and ')})`],
     ['A run', `${RIFT_ROSTER} Lv ${RPG_TIER_MAX_LEVEL} Umas; ${RIFT_FRONTS.length} fronts of ${RIFT_STAGES} stages, then the Convergence's ${CONVERGENCE_FIGHTS} fights`],
     ['Echoes', `Each front at Lv ${ECHO_LEVELS.join(', ')}`],
-    ['Echo pay', `×${ECHO_RANK_PAY} a stage's Class, Weapon, Armor and Accessory Rank EXP; no Uma EXP, Laurels, Shards or Bonds`],
+    ['Echo pay', `×${ECHO_RANK_PAY} a stage's Class Rank EXP (a Tier 0 at Rank 10 keeps it waiting for her promotion); no Uma EXP, Laurels, Shards or Bonds`],
     ['Class EXP an Echo win, Lv 50 Uma', ECHO_LEVELS.map((l) => `Lv ${l}: ${n(ECHO_RANK_PAY * CLASS_EXP_SHARE * echoE(l))}`).join(' · ')],
     ['Ascension purse, per Uma', `${n(ASCEND_PURSE.laurels)} Laurels and ${ASCEND_PURSE.speedTickets} Speed Tickets (${n(ASCEND_PURSE.laurels * RIFT_ROSTER)} and ${ASCEND_PURSE.speedTickets * RIFT_ROSTER} a run)`],
     ['Banked EXP on Ascend, per Uma', `1 Class Mark per ${BANKED_EXP_PER_MARK} EXP, ${n(BANKED_MARKS_CAP)} at most`],
@@ -774,7 +823,7 @@ function dependencies(pkgs: readonly { path: string; json: PackageJson }[]): str
 /** Every block a doc may embed, by key. */
 export function renderBlock(key: string, context: { packages: readonly { path: string; json: PackageJson }[] }): string | null {
   const blocks: Record<string, () => string> = {
-    classes, templates, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
+    classes, tier0, templates, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
     families, items, gems, gear, 'star-map': starMap, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
     'region-sample': regionSample, world, tiers, achievements, 'rift-fronts': riftFronts, 'rift-rules': riftRules,

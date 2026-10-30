@@ -1,6 +1,6 @@
 // Hall of Heroes ids and Bond numbers (D106), apart from the Limit Breaks themselves so the save parser stays light.
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from './battle/caps'
-import type { RpgClass, RpgV2Class } from './kinds'
+import type { RpgClass } from './kinds'
 
 export const HERO_SEATS = 4
 /** A Hall of Heroes (Halls v2, HV20; H129): a type of its own, no longer a class. Classes v1's five halls (to engine v14),
@@ -32,7 +32,7 @@ export const heroLimitIds = (engine: number = BATTLE_ENGINE_VERSION): readonly H
 /** Every seat of every generation (28): identities. The Paladin Bastion's four join with classes v2 (engine v15), the
  * Healer Sanctum's with Halls v2 (v19). */
 export const ALL_HERO_LIMIT_IDS: readonly HeroLimitId[] = seatsOf(ALL_HALLS)
-/** The live seats: 24 until H134, Halls v2's 20 after. */
+/** The live seats: Halls v2's 20 since H134 (24 v15–v18). */
 export const HERO_LIMIT_IDS: readonly HeroLimitId[] = heroLimitIds()
 /** A seat of an engine's generation (D179): a Paladin seat only v15–v18, a Healer seat only from v19. The save and the
  * engine's `validHeroes` read it (the save the live generation's, the engine the fight's). */
@@ -78,20 +78,3 @@ export const bondCapacity = (level: number): number => Math.round((0.5 + 0.05 * 
 
 // --- Kept for the live web until H133 moves the pages and the registry to the hall-based names (H134 drops these) -------
 
-/** Each class's Hall of Heroes: the Learning District's halls (D106). The Paladin Bastion opens with classes v2 (D179).
- * Classes v3's seven (H126) each take her family hall's place, after the six so `hallClass` finds those first: the Recruit
- * the Dojo, the Initiate the Tower, the Duelist and the Tome Spellblade the Salle, the Caller and the Arms Summoner the
- * Circle, the Acolyte the Bastion. Halls v2's are `HERO_HALL_PLACES` (H129). */
-export const HERO_HALLS: Readonly<Record<RpgClass, string>> = {
-  brawler: 'brawler-dojo', mage: 'mage-tower', spellblade: 'spell-blade-salle', cleric: 'cleric-chapel', summoner: 'summoner-circle',
-  paladin: 'paladin-bastion',
-  recruit: 'brawler-dojo', apprentice: 'mage-tower', duelist: 'spell-blade-salle', tomeblade: 'spell-blade-salle', caller: 'summoner-circle',
-  armsummoner: 'summoner-circle', acolyte: 'paladin-bastion',
-}
-export const hallClass = (placeId: string): RpgClass | null =>
-  (Object.entries(HERO_HALLS).find(([, id]) => id === placeId)?.[0] as RpgClass | undefined) ?? null
-/** A seat's home class in the live generation (`heroSeatHome`): the hall's class until H134. */
-export const heroLimitClass = (id: HeroLimitId): RpgClass => heroSeatHome(id)
-/** The class whose hall's seats a class sits in (H126): her own for the six, her family hall's class for Classes v3's
- * seven (`HERO_HALLS`). */
-export const heroHallClass = (classId: RpgClass): RpgV2Class => hallClass(HERO_HALLS[classId]) as RpgV2Class

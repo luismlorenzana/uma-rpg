@@ -203,13 +203,14 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-/** Every step to v31 for a world of `tier`. */
+/** Every step to v32 for a world of `tier` (v31 → v32, Classes v3's reset and the Healer Sanctum's merge, since H134). */
 export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v27 = migrateWorldToV27(raw, version)
   const v28 = version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
   const v29 = version < 29 && isRecord(v28) ? toV29(v28) : v28
   const v30 = version < 30 && isRecord(v29) ? toV30(v29) : v29
-  return version < 31 && isRecord(v30) ? toV31(v30) : v30
+  const v31 = version < 31 && isRecord(v30) ? toV31(v30) : v30
+  return version < 32 && isRecord(v31) ? toV32(v31, tier) : v31
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the

@@ -1,6 +1,11 @@
 # Halls v2: the Halls of Heroes' Limit Break rework
 
-> **For the owner's review, 2026-10-29. Nothing here is built.** The owner's request of 2026-10-29 ("Hall of Heroes
+> **Built and live (H126–H134, D257).** Approved by the owner on 2026-10-29 (D241) and live from H134 with Classes v3 on
+> engine v19 and save v32; the [manual](../../game/heroes.md) is the game as it plays. The Healer Sanctum stands in its
+> own building, H135's temple (uma-art 2.17.0, D254), drawn by H133; the class scale is H131's (D249): 0.95 for the six
+> Tier 1 damage classes and 0.8 for the Paladin and the Cleric, where §3.1 drafts 1 and 0.75.
+>
+> The owner's request of 2026-10-29 ("Hall of Heroes
 > Improvements"): lore for each hall, the Limit Breaks he named, the rest filled in, and whether a hall still needs four
 > seats now that Classes v3 splits the classes. It is [Classes v3](classes-v3.md)'s companion and is aligned with its
 > draft of the same day: the class list and ids, the twins, the weapon shapes (Katana and Light double, Bow and Dark a

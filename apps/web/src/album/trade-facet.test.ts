@@ -1,11 +1,12 @@
 // The Stable's Trade filter (R2, PP21; H80): a Trade group of five values by their two places, each trade's head count
-// from her calling (an owned Uma's pick counts), on locked outfits too. `stableFacets(true)` is the list from the switch.
+// from her calling (from v19 her Tier 0 by running style, a stored pick ignored), on locked outfits too.
+// `stableFacets(true)` is the list from the switch.
 import { describe, expect, it } from 'vitest'
 import { albumRows, stableFacets, stableResult, STABLE_SCHEMA, TIER_ONE_SCOPE } from './rows'
 import { albumFixture, NOW } from './testing'
 
-/** The six invented outfits: 81001 a front runner (a Brawler), 81002 a Pace Uma with Wit over Power who picked the Spell
- * Blade, the rest Pace Umas with Power (Spell Blades); 81006 isn't owned. */
+/** The six invented outfits: 81001 a front runner (a Recruit), 81002 a Pace Uma with a v18 pick of the Spell Blade that
+ * v19 ignores, the rest Pace Umas; Pace alone makes each a Duelist. 81006 isn't owned. */
 async function templated() {
   const fx = await albumFixture()
   const [brawler, pacer, ...rest] = fx.view.roster

@@ -30,9 +30,9 @@ describe('rpgFoeTierBudget by generation (EP16)', () => {
       expect(rpgFoeTierBudget(l, rate, engine)).toBe(before(l, rate))
     }
     expect(r3(rpgFoeTierBudget(100, HP, 16))).toBeCloseTo(1.955, 3)
-    // Engine v18 keeps v17's economy curve while it changes the weakness lists.
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
-    for (let l = 1; l <= 150; l++) expect(rpgFoeTierBudget(l, HP)).toBe(rpgFoeTierBudget(l, HP, 17))
+    // Engine v18 keeps v17's economy curve while it changes the weakness lists, and v19 (live since H134) keeps it too.
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    for (let l = 1; l <= 150; l++) for (const engine of [18, undefined]) expect(rpgFoeTierBudget(l, HP, engine)).toBe(rpgFoeTierBudget(l, HP, 17))
   })
 
   it('Tier 1 doesn’t move in v17 (m = 1, ℓ = L); later tiers rise by their multiplier on the build part', () => {

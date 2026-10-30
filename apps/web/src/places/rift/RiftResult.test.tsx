@@ -99,7 +99,8 @@ describe('the Rift result', () => {
     show(echo)
     const text = document.querySelector('[data-rift-result]')!.textContent!
     expect(text).toContain('Uma 101')
-    expect(text).toContain('Mage Rank 9')
+    // The mage's v19 name.
+    expect(text).toContain('Sorcerer Rank 9')
     expect(text).toContain('+120 Class Marks')
     expect(text).not.toContain('EXP')
     expect(buttons()).toEqual(['Fight again', 'Back to the Rift'])

@@ -1,5 +1,7 @@
-// The Uma Template rule (uma-templates §2, UT3–UT5; H67). Invented outfits only, as `RosterOutfit` literals: every name,
-// id and profile here is made up, including the worked Umas of uma-templates §6.
+// The Uma Template rule (uma-templates §2, UT3–UT5; H67) of engines v18 and older: the eight calling rows and the calling
+// pick, which a v31 save's migration still reads. Classes v3's calling (live since H134): `template-v19.test.ts`. Invented
+// outfits only, as `RosterOutfit` literals: every name, id and profile here is made up, including the worked Umas of
+// uma-templates §6.
 import type { AptitudeGrade, Aptitudes, Stats } from '@luismlorenzana/uma-data'
 import { describe, expect, it } from 'vitest'
 import type { RosterOutfit } from '../master/roster'
@@ -7,8 +9,10 @@ import { RPG_V2_CLASSES } from '../rpg/kinds'
 import {
   CALLING_NO_PICK, CALLING_SET, FLOURISH_NAMES, KNACK_FAMILY, KNACK_LABEL, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_FAMILIES, UMA_KNACK_WORDS,
   UMA_KNACKS, UMA_STRIDES, UMA_TYPE_NAMES, umaCalling, umaCallingPick, umaCallingPickBlock, umaCallingRow, umaFlourishActive, umaKnack, umaStride,
-  repairUmaCallingChoice, umaTemplate, umaTemplateFacets,
+  umaTemplate, umaTemplateFacets,
 } from './template'
+
+const V18 = 18
 
 type Grades<K extends string> = Partial<Record<K, AptitudeGrade>>
 interface Profile {
@@ -47,7 +51,7 @@ describe('the calling (UT3, the first row that fits)', () => {
       uma({ style: { late: 'A' }, base: pw(90, 110) }),
     ]
     expect(rows.map(umaCallingRow)).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
-    expect(rows.map((o) => umaCalling(o))).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
+    expect(rows.map((o) => umaCalling(o, null, V18))).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
   })
 
   it('gives tied best styles to Front first, then Pace, then Late + End', () => {
@@ -68,39 +72,18 @@ describe('the calling (UT3, the first row that fits)', () => {
   })
 
   it('goes magical when Power equals Wit', () => {
-    expect(umaCalling(uma({ style: { pace: 'A' }, base: pw(100, 100) }))).toBe('mage')
+    expect(umaCalling(uma({ style: { pace: 'A' }, base: pw(100, 100) }), null, V18)).toBe('mage')
     expect(umaCallingRow(uma({ style: { pace: 'A' }, base: pw(100, 100) }))).toBe(6)
-    expect(umaCalling(uma({ style: { late: 'A' }, base: pw(100, 100) }))).toBe('cleric')
+    expect(umaCalling(uma({ style: { late: 'A' }, base: pw(100, 100) }), null, V18)).toBe('cleric')
     expect(umaCallingRow(uma({ style: { late: 'A' }, base: pw(100, 100) }))).toBe(8)
   })
 
   it('makes a Pace sprinter a Brawler only when Sprint is the shortest distance at her best grade', () => {
-    expect(umaCalling(uma({ style: { pace: 'A' }, distance: { sprint: 'A', mile: 'A' }, base: pw(110, 90) }))).toBe('brawler')
-    expect(umaCalling(uma({ style: { pace: 'A' }, distance: { mile: 'A' }, base: pw(110, 90) }))).toBe('spellblade')
-    expect(umaCalling(uma({ style: { pace: 'A' }, distance: { sprint: 'A', mile: 'S' }, base: pw(110, 90) }))).toBe('spellblade')
+    expect(umaCalling(uma({ style: { pace: 'A' }, distance: { sprint: 'A', mile: 'A' }, base: pw(110, 90) }), null, V18)).toBe('brawler')
+    expect(umaCalling(uma({ style: { pace: 'A' }, distance: { mile: 'A' }, base: pw(110, 90) }), null, V18)).toBe('spellblade')
+    expect(umaCalling(uma({ style: { pace: 'A' }, distance: { sprint: 'A', mile: 'S' }, base: pw(110, 90) }), null, V18)).toBe('spellblade')
     // Wit over Power: a Mage whatever her distance.
-    expect(umaCalling(uma({ style: { pace: 'A' }, distance: { sprint: 'A' }, base: pw(90, 110) }))).toBe('mage')
-  })
-})
-
-describe('the D220 calling compatibility repair', () => {
-  it('reopens old fixed closers that now choose, storing the suggestion so confirmation stays final', () => {
-    const paceLate = uma({ style: { pace: 'A', late: 'A' }, base: pw(90, 100) })
-    const repaired = repairUmaCallingChoice(paceLate, { pick: null, confirmed: true })
-    expect(repaired).toEqual({ pick: 'mage', confirmed: false })
-    expect(repairUmaCallingChoice(paceLate, { ...repaired, confirmed: true })).toEqual({ pick: 'mage', confirmed: true })
-    expect(repairUmaCallingChoice(paceLate, { pick: null, confirmed: false })).toEqual({ pick: null, confirmed: false })
-  })
-
-  it('clears the old healer choice when Late + End becomes a fixed Summoner', () => {
-    const lateEnd = uma({ style: { late: 'A', end: 'A' }, base: pw(110, 90) })
-    expect(repairUmaCallingChoice(lateEnd, { pick: 'cleric', confirmed: true })).toEqual({ pick: null, confirmed: true })
-    expect(repairUmaCallingChoice(lateEnd, { pick: 'paladin', confirmed: false })).toEqual({ pick: null, confirmed: true })
-  })
-
-  it('leaves choices whose eligibility did not change untouched', () => {
-    const calling = { pick: 'cleric', confirmed: true } as const
-    expect(repairUmaCallingChoice(uma({ style: { late: 'A' }, base: pw(110, 90) }), calling)).toBe(calling)
+    expect(umaCalling(uma({ style: { pace: 'A' }, distance: { sprint: 'A' }, base: pw(90, 110) }), null, V18)).toBe('mage')
   })
 })
 
@@ -171,14 +154,14 @@ const WORKED = {
 
 describe('the worked Umas (uma-templates §6)', () => {
   it('names §6.1’s two front runners: the knack splits them', () => {
-    expect(umaTemplate(WORKED['6.1 A'])).toMatchObject({ calling: 'brawler', stride: 'stayer', knack: 'tireless', name: 'Tireless Ironhide',
+    expect(umaTemplate(WORKED['6.1 A'], null, V18)).toMatchObject({ calling: 'brawler', stride: 'stayer', knack: 'tireless', name: 'Tireless Ironhide',
       flourish: 'late-reserve', family: 'pendant', row: 1 })
-    expect(umaTemplate(WORKED['6.1 G'])).toMatchObject({ calling: 'brawler', stride: 'stayer', knack: 'fleet', name: 'Fleet Ironhide',
+    expect(umaTemplate(WORKED['6.1 G'], null, V18)).toMatchObject({ calling: 'brawler', stride: 'stayer', knack: 'fleet', name: 'Fleet Ironhide',
       flourish: 'late-reserve', family: 'bell', row: 1 })
   })
 
   it('names §6.2’s one Uma per calling, with their Flourishes and families', () => {
-    const view = (o: RosterOutfit) => { const t = umaTemplate(o); return [t.calling, t.stride, t.name, FLOURISH_NAMES[t.flourish], t.family] }
+    const view = (o: RosterOutfit) => { const t = umaTemplate(o, null, V18); return [t.calling, t.stride, t.name, FLOURISH_NAMES[t.flourish], t.family] }
     expect((['A', 'B', 'C', 'D', 'E', 'F'] as const).map((k) => view(WORKED[k]))).toEqual([
       ['brawler', 'stayer', 'Tireless Ironhide', 'Late reserve', 'pendant'],
       ['spellblade', 'dash', 'Fleet Flashblade', 'Clean break', 'bell'],
@@ -190,7 +173,7 @@ describe('the worked Umas (uma-templates §6)', () => {
   })
 
   it('moves Uma C to a Clever Spellfencer and Uma E to a Mighty Mender by their pick', () => {
-    const c = umaTemplate(WORKED.C, 'spellblade'), e = umaTemplate(WORKED.E, 'cleric')
+    const c = umaTemplate(WORKED.C, 'spellblade', V18), e = umaTemplate(WORKED.E, 'cleric', V18)
     expect(c).toMatchObject({ calling: 'spellblade', type: 'Spellfencer', name: 'Clever Spellfencer', flourish: 'even-pace', family: 'insignia', row: 6 })
     expect(e).toMatchObject({ calling: 'cleric', type: 'Mender', name: 'Mighty Mender', flourish: 'even-pace', family: 'orb', row: 7 })
   })
@@ -198,7 +181,7 @@ describe('the worked Umas (uma-templates §6)', () => {
 
 describe('the calling pick (UT4, CP29)', () => {
   it('offers rows 5–8 their two classes, the suggested one first, and nothing to rows 1–4', () => {
-    expect((['B', 'C', 'E', 'F'] as const).map((k) => umaCallingPick(WORKED[k]))).toEqual([
+    expect((['B', 'C', 'E', 'F'] as const).map((k) => umaCallingPick(WORKED[k], V18))).toEqual([
       { options: ['spellblade', 'mage'], suggested: 'spellblade', power: 96, wit: 84 },
       { options: ['mage', 'spellblade'], suggested: 'mage', power: 90, wit: 102 },
       { options: ['paladin', 'cleric'], suggested: 'paladin', power: 104, wit: 88 },
@@ -207,47 +190,47 @@ describe('the calling pick (UT4, CP29)', () => {
     const fixed = [WORKED.A, WORKED.D, uma({ style: { late: 'A', end: 'A' }, base: pw(90, 100) }),
       uma({ style: { pace: 'A' }, distance: { sprint: 'A' }, base: pw(110, 90) })]
     expect(fixed.map(umaCallingRow)).toEqual([1, 3, 2, 4])
-    expect(fixed.map(umaCallingPick)).toEqual([null, null, null, null])
+    expect(fixed.map((o) => umaCallingPick(o, V18))).toEqual([null, null, null, null])
   })
 
   it('ignores a pick outside her two', () => {
-    expect(umaCalling(WORKED.B, 'paladin')).toBe('spellblade')
-    expect(umaCalling(WORKED.F, 'mage')).toBe('cleric')
-    expect(umaCalling(WORKED.A, 'mage')).toBe('brawler')
-    expect(umaTemplate(WORKED.D, 'summoner').calling).toBe('summoner')
-    expect(umaCalling(WORKED.B, null)).toBe('spellblade')
+    expect(umaCalling(WORKED.B, 'paladin', V18)).toBe('spellblade')
+    expect(umaCalling(WORKED.F, 'mage', V18)).toBe('cleric')
+    expect(umaCalling(WORKED.A, 'mage', V18)).toBe('brawler')
+    expect(umaTemplate(WORKED.D, 'summoner', V18).calling).toBe('summoner')
+    expect(umaCalling(WORKED.B, null, V18)).toBe('spellblade')
   })
 
   it('moves her calling, type, name and the Flourish’s class, never her stride, knack or family', () => {
     for (const k of ['B', 'C', 'E', 'F'] as const) {
-      const pick = umaCallingPick(WORKED[k])!, base = umaTemplate(WORKED[k]), moved = umaTemplate(WORKED[k], pick.options[1])
+      const pick = umaCallingPick(WORKED[k], V18)!, base = umaTemplate(WORKED[k], null, V18), moved = umaTemplate(WORKED[k], pick.options[1], V18)
       expect(moved.calling).toBe(pick.options[1])
       expect(moved.type).not.toBe(base.type)
       expect(moved.name).not.toBe(base.name)
       expect([moved.stride, moved.knack, moved.family, moved.flourish, moved.row]).toEqual([base.stride, base.knack, base.family, base.flourish, base.row])
-      expect([umaFlourishActive(base, pick.options[0]), umaFlourishActive(moved, pick.options[0]), umaFlourishActive(moved, pick.options[1])])
+      expect([umaFlourishActive(base, pick.options[0], V18), umaFlourishActive(moved, pick.options[0], V18), umaFlourishActive(moved, pick.options[1], V18)])
         .toEqual([true, false, true])
     }
   })
 
   it('says why the pick can’t change: no pick for rows 1–4, and a confirmed pick is set', () => {
-    expect(umaCallingPickBlock(WORKED.A)).toBe(CALLING_NO_PICK)
-    expect(umaCallingPickBlock(WORKED.D, { pick: null, confirmed: true })).toBe(CALLING_NO_PICK)
-    expect(umaCallingPickBlock(WORKED.C)).toBeNull()
-    expect(umaCallingPickBlock(WORKED.C, { pick: 'spellblade', confirmed: false })).toBeNull()
-    expect(umaCallingPickBlock(WORKED.C, { pick: 'mage', confirmed: true })).toBe(CALLING_SET)
+    expect(umaCallingPickBlock(WORKED.A, null, V18)).toBe(CALLING_NO_PICK)
+    expect(umaCallingPickBlock(WORKED.D, { pick: null, confirmed: true }, V18)).toBe(CALLING_NO_PICK)
+    expect(umaCallingPickBlock(WORKED.C, null, V18)).toBeNull()
+    expect(umaCallingPickBlock(WORKED.C, { pick: 'spellblade', confirmed: false }, V18)).toBeNull()
+    expect(umaCallingPickBlock(WORKED.C, { pick: 'mage', confirmed: true }, V18)).toBe(CALLING_SET)
     expect([CALLING_NO_PICK, CALLING_SET]).toEqual(['No pick for her', 'Her calling is set'])
   })
 })
 
 describe('what her class gates and what the Stable reads (UT12, UT15)', () => {
   it('works her Flourish only as her calling’s class', () => {
-    const a = umaTemplate(WORKED.A)
-    expect(RPG_V2_CLASSES.filter((c) => umaFlourishActive(a, c))).toEqual(['brawler'])
+    const a = umaTemplate(WORKED.A, null, V18)
+    expect(RPG_V2_CLASSES.filter((c) => umaFlourishActive(a, c, V18))).toEqual(['brawler'])
   })
 
   it('gives the facets her calling, stride, knack and name', () => {
-    expect(umaTemplateFacets(WORKED.C)).toEqual({ calling: 'mage', stride: 'middle', knack: 'clever', name: 'Clever Spellwright' })
-    expect(umaTemplateFacets(WORKED.C, 'spellblade')).toEqual({ calling: 'spellblade', stride: 'middle', knack: 'clever', name: 'Clever Spellfencer' })
+    expect(umaTemplateFacets(WORKED.C, null, V18)).toEqual({ calling: 'mage', stride: 'middle', knack: 'clever', name: 'Clever Spellwright' })
+    expect(umaTemplateFacets(WORKED.C, 'spellblade', V18)).toEqual({ calling: 'spellblade', stride: 'middle', knack: 'clever', name: 'Clever Spellfencer' })
   })
 })

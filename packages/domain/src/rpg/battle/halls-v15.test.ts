@@ -1,4 +1,5 @@
-// Engine v15's six halls, built dark (H56, classes-v2.md §5; C3) and live since H61 (D188; v16's two kinds since H72): 24 Limit Breaks, the Chapel's seats 3–4 moved to the
+// Engine v15's six halls, built dark (H56, classes-v2.md §5; C3) and live from H61 (D188; v16's two kinds since H72) to v18
+// (Halls v2's twenty from v19, live since H134: `rpg/halls-v19.test.ts`): 24 Limit Breaks, the Chapel's seats 3–4 moved to the
 // Paladin Bastion, two new Limit Breaks in each of those halls, Sunfire Edge and Moon Fox reshaped, the hybrids' power at
 // 2.2×, a Limit Break's support at its strength, and a Learner's inherited hits at her higher offense.
 import { createHash } from 'node:crypto'
@@ -6,7 +7,7 @@ import { describe, expect, it } from 'vitest'
 import { rpgFoe } from '../campaign/enemies'
 import { RPG_SKILL_POWER, RPG_SUPPORT_ALL } from '../catalog'
 import {
-  ALL_HERO_LIMIT_IDS, HERO_LIMIT_SUPPORT_SHARE, HERO_LIMITS, heroLimit, heroLimitFor, heroLimitHall, heroLimitIds, heroLimitPower, heroLimitSkills,
+  ALL_HERO_LIMIT_IDS, HERO_LIMIT_SUPPORT_SHARE, heroLimitFor, heroLimitHall, heroLimitIds, heroLimitPower, heroLimitSkills,
   type HeroLimitId,
 } from '../heroes'
 import { projectRpgStats, rpgDefaultWeapons, RPG_V2_CLASSES, rpgOpenDepth, type RpgClass, type RpgProfile } from '../rules'
@@ -67,9 +68,10 @@ describe('the six halls’ table (H56, §5)', () => {
     expect(table(14).every((l) => l.hall === heroLimitHall(l.id))).toBe(true)
     expect(sha(table(14).map(({ hall: _, ...l }) => l))).toBe('72cb9b8facbc49012c92684942f1c9ae')
     expect(sha(table(14).map((l) => heroLimitSkills(l, 10)))).toBe('6f6d2c3e98ed23205d012a1319da59a8')
-    // The live table is v16's since H72 (D210): v15's but Choir of Angels and Rampart Charge (H65, `trees-v16.test.ts`).
-    expect(table(16)).toEqual(HERO_LIMITS)
-    expect(HERO_LIMITS.filter((l) => l !== heroLimitFor(l.id, 15)).map((l) => l.id)).toEqual(['cleric-1', 'paladin-3'])
+    // v16's table since H72 (D210), to v18: v15's but Choir of Angels and Rampart Charge (H65, `trees-v16.test.ts`).
+    const v18 = heroLimitIds(18).map((id) => heroLimitFor(id, 18)!)
+    expect(table(16)).toEqual(v18)
+    expect(v18.filter((l) => l !== heroLimitFor(l.id, 15)).map((l) => l.id)).toEqual(['cleric-1', 'paladin-3'])
     expect(table(15).map((l) => l.id)).toEqual(heroLimitIds(15))
     expect(ALL_HERO_LIMIT_IDS.slice(0, 24)).toEqual(heroLimitIds(15))
     expect(Object.fromEntries(table(15).map((l) => [l.id, l.name]))).toEqual({
@@ -86,14 +88,14 @@ describe('the six halls’ table (H56, §5)', () => {
     for (const l of table(14)) if (!changed.includes(l.id)) expect(heroLimitFor(l.id, 15), l.id).toBe(l)
   })
 
-  it('moves Archangel’s Verdict and Archdemon’s Pact to the Bastion’s seats 1–2; the live table is v15’s', () => {
+  it('moves Archangel’s Verdict and Archdemon’s Pact to the Bastion’s seats 1–2; v18’s table is v15’s there', () => {
     expect(heroLimitFor('cleric-3', 14)!.name).toBe('Archangel’s Verdict')
     expect(heroLimitFor('cleric-3', 15)!.name).toBe('Dawn Hymn')
     expect(heroLimitFor('paladin-1', 15)).toEqual({ ...heroLimitFor('cleric-3', 14)!, id: 'paladin-1', classId: 'paladin', hall: 'paladin' })
     expect(heroLimitFor('paladin-2', 15)).toEqual({ ...heroLimitFor('cleric-4', 14)!, id: 'paladin-2', classId: 'paladin', hall: 'paladin' })
     expect(heroLimitFor('paladin-1', 14)).toBeUndefined()
-    expect(heroLimit('cleric-3').name).toBe('Dawn Hymn')
-    expect(heroLimit('paladin-1').name).toBe('Archangel’s Verdict')
+    expect(heroLimitFor('cleric-3', 18)!.name).toBe('Dawn Hymn')
+    expect(heroLimitFor('paladin-1', 18)!.name).toBe('Archangel’s Verdict')
   })
 
   it('raises the hybrids’ power to 2.2× from v15', () => {

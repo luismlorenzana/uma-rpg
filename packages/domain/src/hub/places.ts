@@ -313,12 +313,12 @@ export function placeById(id: string | undefined): Place | undefined {
   return id === undefined ? undefined : BY_ID.get(id)
 }
 
-/** Places a later generation folded into another (HV21): from the switch the Paladin Bastion and the Cleric Chapel stand
- * as the Healer Sanctum. */
+/** Places a later generation folded into another (HV21): since H134 the Paladin Bastion and the Cleric Chapel stand as the
+ * Healer Sanctum. */
 const MOVED_PLACES: Readonly<Record<string, string>> = { 'paladin-bastion': 'healer-sanctum', 'cleric-chapel': 'healer-sanctum' }
 
 /** Where an old link's place stands now, for an id the live generation has no place for (an old bookmark, an Inheritance
- * row read before the switch): the place it folded into, or undefined. Inert while the old place stands. */
+ * row read before save v32): the place it folded into, or undefined. */
 export function movedPlace(id: string | undefined): Place | undefined {
   return id === undefined || BY_ID.has(id) ? undefined : placeById(MOVED_PLACES[id])
 }

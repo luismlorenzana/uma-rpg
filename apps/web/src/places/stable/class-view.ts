@@ -3,7 +3,7 @@
 // footer; the promotion sheet's children, Suggested and Held, before → after from `promotionPlan`; the Tier 0 tree's node and
 // its promotion line; the class button's word and whether a promotion waits. Pure, on H126's data only (`umaClassTree`,
 // `promotionPlan`, the class tree's tables): it never re-derives a rule, and the sheets only draw what it returns. Built on
-// today's Skills tab (D252), inert until the switch (H134); H120 reuses it in profile v2's Class tab.
+// today's Skills tab (D252), live since the switch (H134); H120 reuses it in profile v2's Class tab.
 //
 // Every new wording lives here, in one place H117's copy test can absorb (C3); the three facts the Exchange shares come from
 // `ui/rank-words.ts`.

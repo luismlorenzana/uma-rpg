@@ -5,7 +5,8 @@ import { rpgNodeIdentity } from './node-identity'
 
 describe('light skill identities (H16)', () => {
   it('matches every generated node and recognizes no extra class/weapon trees', () => {
-    expect(RPG_NODES).toHaveLength(750) // six classes × ten trees × 15 (classes v2, live since H61)
+    // Classes v3's thirteen (live since H134): v18's six classes × ten trees × 15, the two new hybrids' 80 each, the Tier 0s' 10.
+    expect(RPG_NODES).toHaveLength(960)
     const ids = new Set(RPG_NODES.map((n) => n.id))
     for (const n of RPG_NODES) expect(rpgNodeIdentity(n.id)).toEqual({ id: n.id, tree: n.tree, classId: n.classId,
       weapon: n.weapon, depth: n.depth, variant: n.variant, cost: n.cost })

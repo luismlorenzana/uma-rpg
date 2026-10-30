@@ -8,7 +8,7 @@ import { battleDamage } from './engine'
 import { battleHasLimit, battleLimitPlan } from './limit'
 import { autoAction } from './auto'
 import { RPG_AOE_SHARE, RPG_RANDOM_BONUS } from '../catalog'
-import { ALL_HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimitSkills, isHeroLimitId } from '../heroes'
+import { ALL_HERO_LIMIT_IDS, HERO_LIMIT_POWER, heroLimitFor, heroLimitIds, heroLimitSkills, isHeroLimitId } from '../heroes'
 import type { BattleAlly, BattleCue, BattleEnemy, BattleInput, BattleState, BattleStep } from './types'
 import { balanceParty, balanceStage } from '../../world/balance-party'
 import { regionChapter, worldContinent } from '../../world/world'
@@ -408,9 +408,9 @@ describe('battle engine v9: Heroes and inherited Limit Breaks (D106, D107)', () 
     expect(autoAction(ready(createBattle(v9(learner, tough())).state, 'a5'), 'a5')).toMatchObject({ kind: 'limit', hero: 'mage-4' })
   })
 
-  it('makes each Limit Break worth her class’s own at full strength', () => {
+  it('makes each Limit Break worth her class’s own at full strength (v15–v18’s 24; Halls v2’s own power: halls-v19.test.ts)', () => {
     const level = 1.6 // depth 1
-    for (const limit of HERO_LIMITS) {
+    for (const limit of heroLimitIds(18).map((id) => heroLimitFor(id, 18)!)) {
       const total = heroLimitSkills(limit, 10).reduce((n, def) => {
         const factor = def.target === 'all' ? RPG_AOE_SHARE : def.target === 'random' ? RPG_RANDOM_BONUS : 1
         return n + def.hits.reduce((m, h) => m + h.power / factor, 0) + (def.splash ? def.splash.power / RPG_AOE_SHARE : 0)

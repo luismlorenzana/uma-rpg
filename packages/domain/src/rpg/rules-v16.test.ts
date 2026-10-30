@@ -38,12 +38,13 @@ const V16_ROWS = {
 } as const
 
 describe('the Tier rework’s switch (H64)', () => {
-  it('opens each release at its engine, weaknesses v2 live on 18 and the later releases dark', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
-    // H126 (D244): Classes v3's stage at 19, dark until H134; R3–R5's stale stages gone, Tier 2's weapons at no engine.
+  it('opens each release at its engine, Classes v3 live on 19 and Tier 2\'s weapons dark', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    // H126 (D244): Classes v3's stage at 19, live since H134; R3–R5's stale stages gone, Tier 2's weapons at no engine.
     expect(RPG_REWORK_ENGINE).toEqual({ fight: 16, economy: 17, weak: 18, classes: 19, t2Weapons: Infinity })
     const stages = Object.keys(RPG_REWORK_ENGINE) as RpgReworkStage[]
-    expect(stages.map((s) => rpgRework(s))).toEqual([true, true, true, false, false])
+    expect(stages.map((s) => rpgRework(s))).toEqual([true, true, true, true, false])
+    expect(stages.map((s) => rpgRework(s, 18))).toEqual([true, true, true, false, false])
     expect(stages.map((s) => rpgRework(s, V15))).toEqual([false, false, false, false, false])
     expect(stages.map((s) => rpgRework(s, 19))).toEqual([true, true, true, true, false])
     expect([rpgRework('fight', V16), rpgRework('economy', V16)]).toEqual([true, false])
@@ -72,7 +73,8 @@ describe('class rules, v15 and v16 (H64)', () => {
     for (const c of RPG_V2_CLASSES) {
       expect(rpgDefaultWeapons(c, V15), c).toEqual(TODAY.weapons[c])
       expect(rpgDefaultWeapons(c, V16), c).toEqual(V16_ROWS.weapons[c])
-      expect(rpgDefaultWeapons(c), c).toEqual(V16_ROWS.weapons[c])
+      // v16's rows hold to v18; Classes v3's (the Summoner's from v19): classes-v19.test.ts.
+      expect(rpgDefaultWeapons(c, 18), c).toEqual(V16_ROWS.weapons[c])
       for (const v of [V15, V16]) expect(validRpgWeapons(c, rpgDefaultWeapons(c, v), v), `${c} v${v}`).toBe(true)
       expect(validRpgWeapons(c, rpgDefaultWeapons(c, V15), V16), c).toBe(false)
       expect(validRpgWeapons(c, rpgDefaultWeapons(c, V16), V15), c).toBe(false)
@@ -127,12 +129,12 @@ describe('class rules, v15 and v16 (H64)', () => {
     expect(validRpgWeapons('brawler', ['bow', 'katana', 'axe'], V15)).toBe(false)
   })
 
-  it('keeps v2’s hands from v16 but the Summoner’s Arms hand, and raises her live Tome on v18 (H116)', () => {
+  it('keeps v2’s hands from v16 but the Summoner’s Arms hand, and raises her Tome on v18 (H116)', () => {
     const pick = (c: RpgClass, v?: number) => { const h = rpgHand({ classId: c }, v); return { arms: h.arms, tome: h.tome } }
     for (const c of RPG_V2_CLASSES) {
       expect(pick(c, V15), c).toEqual(TODAY.hands[c])
       expect(pick(c, V16), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.58 } : TODAY.hands[c])
-      expect(pick(c), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.62 } : pick(c, V16))
+      expect(pick(c, 18), c).toEqual(c === 'summoner' ? { arms: 0.5, tome: 0.62 } : pick(c, V16))
       const [h15, h16] = [rpgHand({ classId: c }, V15), rpgHand({ classId: c }, V16)]
       expect({ ...h16, arms: h15.arms }, c).toEqual(h15)
     }

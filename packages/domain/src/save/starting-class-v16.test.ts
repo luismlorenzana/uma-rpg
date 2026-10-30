@@ -1,7 +1,8 @@
-// The start by calling with the Tier rework's fight live (H67; CP29, uma-templates §2.3; live since H72, D210). A new
-// unlock starts in her calling, the pick's pre-selection, and the save writes that start as her class, so `activeClass`'s
-// style fallback is left to Umas unlocked before the switch. v15's starts, which `startingClass(…, 15)` still answers:
-// `starting-class-v2.test.ts`. Invented outfits only.
+// The start by calling with the Tier rework's fight (H67; CP29, uma-templates §2.3; live from H72, D210). A new unlock
+// starts in her calling, and the save writes that start as her class, so `activeClass`'s style fallback is left to Umas
+// unlocked before the switch. v16–v18's calling is one class, the pick's pre-selection (engine 18 explicit); from v19
+// (Classes v3, live since H134) her calling's Tier 0 (CV10, CV19). v15's starts, which `startingClass(…, 15)` still
+// answers: `starting-class-v2.test.ts`. Invented outfits only.
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
@@ -33,28 +34,30 @@ const ROWS = [
 ]
 
 describe('the start by calling, engine v16 (H67)', () => {
-  it('runs with the Tier rework’s fight live', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('fight')]).toEqual([18, true])
+  it('runs with the Tier rework’s fight live, and Classes v3 since H134', () => {
+    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), rpgRework('classes')]).toEqual([19, true, true])
   })
 
   it('starts her in her calling, where v15 started her in her style’s class', () => {
-    expect(ROWS.map((o) => startingClass(o))).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
+    expect(ROWS.map((o) => startingClass(o, 18))).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
     expect(ROWS.map((o) => startingClass(o, 15))).toEqual(['brawler', 'paladin', 'summoner', 'mage', 'mage', 'mage', 'paladin', 'cleric'])
     // A Late + End closer, a Pace sprinter with Power, a Late Uma with Power over Wit.
-    expect([ROWS[1]!, ROWS[3]!, ROWS[6]!].map((o) => startingClass(o))).toEqual(['summoner', 'brawler', 'paladin'])
+    expect([ROWS[1]!, ROWS[3]!, ROWS[6]!].map((o) => startingClass(o, 18))).toEqual(['summoner', 'brawler', 'paladin'])
     // Without base stats (never from master data) she reads Power = Wit: magical.
-    expect(startingClass({ aptitudes: ROWS[4]!.aptitudes })).toBe('mage')
+    expect(startingClass({ aptitudes: ROWS[4]!.aptitudes }, 18)).toBe('mage')
+    // From v19 her calling is her Tier 0, by her best running styles alone (`classes-v19.test.ts`).
+    expect(ROWS.map((o) => startingClass(o))).toEqual(['recruit', 'caller', 'caller', 'duelist', 'duelist', 'duelist', 'acolyte', 'acolyte'])
   })
 
   it('writes every start as her class, with its armor', () => {
     let save = newSave('Trainer', T0)
     for (const o of ROWS) save = unlockUma(save, o.outfitId, T0, '1', startingClass(o))
     const { umas } = worldOf(save)
-    expect(ROWS.map((o) => umas[o.outfitId]!.classId)).toEqual(['brawler', 'summoner', 'summoner', 'brawler', 'spellblade', 'mage', 'paladin', 'cleric'])
+    expect(ROWS.map((o) => umas[o.outfitId]!.classId)).toEqual(['recruit', 'caller', 'caller', 'duelist', 'duelist', 'duelist', 'acolyte', 'acolyte'])
     expect(ROWS.map((o) => activeClass(o, umas[o.outfitId]!))).toEqual(ROWS.map((o) => startingClass(o)))
     // v28 (H82): every grade G0, and her armor's half her class's.
     for (const o of ROWS) expect(umas[o.outfitId]!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
-    expect(ROWS.map((o) => armorHalf(umas[o.outfitId]!.classId!))).toEqual(['physical', 'magical', 'magical', 'physical', 'physical', 'magical', 'physical', 'magical'])
+    expect(ROWS.map((o) => armorHalf(umas[o.outfitId]!.classId!))).toEqual(['physical', 'magical', 'magical', 'physical', 'physical', 'physical', 'magical', 'magical'])
   })
 
   it('writes her start as her class, and no start writes no class', () => {

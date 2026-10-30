@@ -22,7 +22,7 @@ vi.mock('../api/client', async () => {
   }
 })
 
-const { boot, buyTicket, createAccount, markTarget, nameParty, pickClass, renameAccount, repairCallingRule, resetGame, setActiveTier, setSlot, syncNow, unlock, useGame, useWorld } = await import('./game')
+const { boot, buyTicket, createAccount, markTarget, nameParty, pickClass, renameAccount, resetGame, setActiveTier, setSlot, syncNow, unlock, useGame, useWorld } = await import('./game')
 const { db } = await import('./db')
 
 /** An invented outfit whose best running style is `best`. */
@@ -44,9 +44,9 @@ describe('game store', () => {
     await unlock(outfit('9000000'))
     const save = useGame.getState().save!
     useGame.setState({ save: { ...save, tierWorlds: { '1': { ...save.tierWorlds['1']!, wallet: { ...save.tierWorlds['1']!.wallet, laurels: 100 } } } } })
-    await Promise.all([pickClass('9000000', 'mage'), buyTicket('time', 1)])
+    await Promise.all([pickClass('9000000', 'duelist'), buyTicket('time', 1)])
     const world = useGame.getState().save!.tierWorlds['1']!
-    expect(world.umas['9000000']!.classId).toBe('mage')
+    expect(world.umas['9000000']!.classId).toBe('duelist')
     expect(world.wallet).toMatchObject({ laurels: 90, timeTickets: 1 })
     resetGame()
     await boot('u1')
@@ -102,7 +102,7 @@ describe('game store', () => {
     await boot('u1')
     await createAccount('Luis')
     await unlock(outfit('100101'))
-    await unlock(outfit('100201', 'pace'))
+    await unlock(outfit('100201', 'late'))
     await setSlot(0, 0, '100101')
     await setSlot(0, 1, '100201')
     await setSlot(4, 2, '100101') // moves her from Party 1 to Party 5
@@ -113,8 +113,9 @@ describe('game store', () => {
     expect(Object.keys(world?.umas ?? {}).sort()).toEqual(['100101', '100201'])
     expect(world?.parties[0]?.slots).toEqual([null, '100201', null, null, null])
     expect(world?.parties[4]).toEqual({ name: 'Front runners', slots: [null, null, '100101', null, null], lead: null })
-    // A pace outfit starts as a Mage, on the magical half; a front one as a Brawler, on the physical (D160 §7; v28: the half
-    // is her class's, every grade G0, H82).
+    // A late outfit starts as an Acolyte, on the magical half; a front one as a Recruit, on the physical (her calling's
+    // Tier 0, CV19; v28: the half is her class's, every grade G0, H82).
+    expect([world!.umas['100201']!.classId, world!.umas['100101']!.classId]).toEqual(['acolyte', 'recruit'])
     expect([world!.umas['100201']!.classId, world!.umas['100101']!.classId].map((c) => armorHalf(c!))).toEqual(['magical', 'physical'])
     expect(world!.umas['100201']!.gear).toEqual({ weapons: {}, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] })
     await expect(unlock(outfit('100101'))).rejects.toThrow(/already/)
@@ -133,30 +134,6 @@ describe('game store', () => {
     const save = useGame.getState().save
     expect(save?.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(save?.tierWorlds['1']?.parties).toHaveLength(20)
-  })
-
-  it('persists the master-data-aware calling repair without moving her active class', async () => {
-    const paceLate = {
-      outfitId: '100201', baseStats: { power: 90, wit: 100 },
-      aptitudes: {
-        strategy: { front: 'G', pace: 'A', late: 'A', end: 'G' } as const,
-        distance: { sprint: 'G', mile: 'G', medium: 'A', long: 'G' } as const,
-      },
-    }
-    await boot('u1')
-    await createAccount('Luis')
-    await unlock(paceLate)
-    const save = structuredClone(useGame.getState().save!)
-    save.tierWorlds['1']!.umas['100201']!.classId = 'summoner'
-    save.tierWorlds['1']!.umas['100201']!.calling = { pick: null, confirmed: true }
-    useGame.setState({ save, dirty: false })
-    await repairCallingRule([paceLate])
-    expect(useGame.getState()).toMatchObject({ dirty: true, save: { tierWorlds: { '1': { umas: {
-      '100201': { classId: 'summoner', calling: { pick: 'mage', confirmed: false } },
-    } } } } })
-    resetGame()
-    await boot('u1')
-    expect(useGame.getState().save!.tierWorlds['1']!.umas['100201']).toMatchObject({ classId: 'summoner', calling: { pick: 'mage', confirmed: false } })
   })
 })
 
@@ -218,10 +195,10 @@ describe('the active tier (H35)', () => {
   it('writes an action to the tier it was called on, even after a switch before its rules load', async () => {
     await boot('u1', '1')
     const before = structuredClone(tier('2'))
-    const pending = pickClass('101', 'mage')
+    const pending = pickClass('101', 'duelist')
     expect(setActiveTier(2)).toBe(true)
     await pending
-    expect(tier('1').umas['101']!.classId).toBe('mage')
+    expect(tier('1').umas['101']!.classId).toBe('duelist')
     expect(tier('2')).toEqual(before)
   })
 

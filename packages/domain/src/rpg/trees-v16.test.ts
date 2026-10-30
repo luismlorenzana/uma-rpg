@@ -1,14 +1,15 @@
 // Tier 1's trees on engine v16 (H65, D201; class-progression.md §6.1, §6.2, §6.5, §6.10, §8.3; CP13–CP18, CP21–CP23,
-// CP32, CP35, CP37, CP42, CP43), live since H72 (D210), so the live lists, names and summaries are v16's: a trunk and one
-// free fork into line A or B, no points, Skill Ranks, Pierce, the Paladin's revive on her Light tree, the Summoner's
-// renamed brutes and the halls' two kinds. (R1's packets ran it with the switch mocked to 16.)
+// CP32, CP35, CP37, CP42, CP43), live from H72 (D210) to v18, so the live lists, names and summaries are v16's but the
+// lines Classes v3 renamed (v19 since H134): a trunk and one free fork into line A or B, no points, Skill Ranks, Pierce,
+// the Paladin's revive on her Light tree, the Summoner's renamed brutes and the halls' two kinds. (R1's packets ran it
+// with the switch mocked to 16.)
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from './battle/caps'
 import { RPG_LINE_B_POWER_V16, RPG_NODES, RPG_PIERCE_SCALE, RPG_SKILL_POWER, rpgNode, rpgNodeSkill, rpgTreeOf, rpgValkyrieOathNode } from './catalog'
-import { HERO_LIMITS, heroLimit, heroLimitKinds } from './heroes'
+import { heroLimitFor, heroLimitIds, heroLimitKinds } from './heroes'
 import {
   RPG_ACTIVE_SLOT_GATES, RPG_V2_CLASSES, RPG_BRANCH_B, RPG_BRANCH_B_NAME, RPG_MAX_ACTIVE_SLOTS, RPG_SKILL_RANK_FACTOR, rpgActiveSlots,
-  rpgAutoLoadout, rpgBranchNode, rpgClassWeapons, rpgDefaultWeapons, rpgHeldSkills, rpgLearnedSkills, rpgNodeLine, rpgSkillRank,
+  rpgAutoLoadout, rpgBranchBName, rpgBranchNode, rpgClassWeapons, rpgDefaultWeapons, rpgHeldSkills, rpgLearnedSkills, rpgNodeLine, rpgSkillRank,
   rpgSkillRankFactor, rpgSkillRankNextAt, rpgSwapBranchLoadout, rpgUsableLoadout, type RpgClass, type RpgV2Class, type RpgLines, type RpgProfile,
   type RpgWeapon,
 } from './rules'
@@ -39,13 +40,19 @@ const B_AT_3: Readonly<Record<RpgV2Class, Readonly<Partial<Record<RpgWeapon, str
     'tome-fire': 'Heavy Bravery', 'tome-ice': 'Heavy Bulwark', 'tome-lightning': 'Heavy Surge', 'tome-light': 'Rebirth', 'tome-dark': 'Heavy Clarity' },
 }
 const TREES = RPG_V2_CLASSES.flatMap((c) => rpgClassWeapons(c).map((w) => [c, w] as const))
+/** The B lines Classes v3 renamed (CV14; `trees-v19-shapes.test.ts`): names are presentation, so the live catalog names them
+ * as v19 plays them since H134. */
+const RENAMED_V19: Readonly<Record<string, string>> = {
+  'brawler-bow.3b': 'Quiver Barrage', 'mage-tome-light.3b': 'Luxaga Pierce', 'mage-tome-dark.3a': 'Noxaga Barrage', 'mage-tome-light.5b': 'Holy Pierce',
+}
 
 describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
-  it('runs with the Tier rework’s fight live (on 18 since H116): seven equipped slots at most', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
+  it('runs with the Tier rework’s fight live (on 19 since H134): seven equipped slots at most', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
     expect(RPG_ACTIVE_SLOT_GATES).toEqual([10, 20, 30, 40])
     expect(RPG_MAX_ACTIVE_SLOTS).toBe(7)
-    expect(RPG_NODES).toHaveLength(750)
+    // v18's six classes' 750 and Classes v3's 210 (`trees-v19.test.ts`).
+    expect(RPG_NODES.filter((n) => (RPG_V2_CLASSES as readonly RpgClass[]).includes(n.classId))).toHaveLength(750)
   })
 
   it('takes branch B from §6.5: every tree’s B line at depth 3, and the spot checks at depth 5', () => {
@@ -53,16 +60,16 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
     for (const [c, w] of TREES) {
       const id = rpgBranchNode(c, w, 3, 'B')
       expect(id, `${c} ${w}`).toBe(`${rpgTreeOf(c, w)}.3${RPG_BRANCH_B[c][w]}`)
-      expect(name(id), id).toBe(B_AT_3[c][w])
+      expect(name(id), id).toBe(RENAMED_V19[id] ?? B_AT_3[c][w])
       expect(rpgBranchNode(c, w, 3, 'A'), id).toBe(`${rpgTreeOf(c, w)}.3`)
     }
     expect(name(rpgBranchNode('brawler', 'greatsword', 5, 'B'))).toBe('Meteor Combo')
     expect(name(rpgBranchNode('brawler', 'lance', 5, 'B'))).toBe('Gungnir')
-    expect(name(rpgBranchNode('mage', 'tome-light', 5, 'B'))).toBe('Holy Cascade')
+    expect(name(rpgBranchNode('mage', 'tome-light', 5, 'B'))).toBe(RENAMED_V19['mage-tome-light.5b'])
     expect(name(rpgBranchNode('summoner', 'tome-fire', 5, 'B'))).toBe('Bonded Phoenix')
     expect(name(rpgBranchNode('summoner', 'bow', 5, 'B'))).toBe('Sagittarius Pack')
-    // The lines' names for the branch sheet.
-    expect([RPG_BRANCH_B_NAME.brawler.greatsword, RPG_BRANCH_B_NAME.brawler.lance, RPG_BRANCH_B_NAME.mage['tome-dark'],
+    // The lines' names for the branch sheet (v16–v18's; the Mage's Dark B is a Barrage from v19, CV14).
+    expect([RPG_BRANCH_B_NAME.brawler.greatsword, RPG_BRANCH_B_NAME.brawler.lance, rpgBranchBName('mage', 'tome-dark', 18),
       RPG_BRANCH_B_NAME.spellblade.bow, RPG_BRANCH_B_NAME.summoner['tome-ice'], RPG_BRANCH_B_NAME.summoner.axe, RPG_BRANCH_B_NAME.cleric.katana])
       .toEqual(['Combo', 'Impale', 'Pierce', 'Pierce', 'Bonded', 'Pack', 'Heavy'])
     // The trunk is the same on either line; a tree her class lacks has no node.
@@ -149,13 +156,15 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
       .toEqual(['Marauder', 'Jotun King', 'Marauder Pack', 'Bonded Jotun King'])
   })
 
-  it('changes the halls’ two kinds live: Rampart Charge with an Axe, Choir of Angels Light then Lightning (CP35)', () => {
-    expect(HERO_LIMITS).toHaveLength(24)
-    expect(heroLimit('paladin-3')).toMatchObject({ name: 'Rampart Charge', blurb: 'One Axe charge on one foe, then a Barrier on every ally' })
-    expect(heroLimitKinds(heroLimit('paladin-3'))).toEqual(['axe'])
-    expect(heroLimit('cleric-1').blurb).toBe('Light on every foe, then Lightning on every foe, then Aegis 2 on every ally')
-    expect(heroLimitKinds(heroLimit('cleric-1'))).toEqual(['light', 'lightning'])
-    expect(HERO_LIMITS.map((l) => l.id).slice(0, 4)).toEqual(['brawler-1', 'brawler-2', 'brawler-3', 'brawler-4'])
+  it('changes the halls’ two kinds v16–v18: Rampart Charge with an Axe, Choir of Angels Light then Lightning (CP35)', () => {
+    // Halls v2's twenty replace these seats from v19 (`halls-v19.test.ts`); a v18 fight still reads them.
+    const seat = (id: Parameters<typeof heroLimitFor>[0]) => heroLimitFor(id, 18)!
+    expect(heroLimitIds(18)).toHaveLength(24)
+    expect(seat('paladin-3')).toMatchObject({ name: 'Rampart Charge', blurb: 'One Axe charge on one foe, then a Barrier on every ally' })
+    expect(heroLimitKinds(seat('paladin-3'))).toEqual(['axe'])
+    expect(seat('cleric-1').blurb).toBe('Light on every foe, then Lightning on every foe, then Aegis 2 on every ally')
+    expect(heroLimitKinds(seat('cleric-1'))).toEqual(['light', 'lightning'])
+    expect(heroLimitIds(18).slice(0, 4)).toEqual(['brawler-1', 'brawler-2', 'brawler-3', 'brawler-4'])
   })
 
   it('holds the trunk and her line at every open depth, no points: Class Rank 1, 10, 25 and 40, on A and on B', () => {

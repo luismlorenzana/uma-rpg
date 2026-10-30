@@ -4,7 +4,7 @@
 // calling (her fight type and, from engine v16, her starting class; CP29), the Flourish (H68), and from R2 her signature
 // family and her moon. The names are this game's own. Nothing here is stored (UT17): only her calling pick, `UmaCalling`,
 // which the save holds from v27 (H69). In the main bundle (the start reads it), so it stays the rule and its tables.
-// Classes v3 (engine v19, D240; H126, dark until H134): her calling is her Tier 0, read from her best running styles alone
+// Classes v3 (engine v19, D240; H126, live since H134): her calling is her Tier 0, read from her best running styles alone
 // (CV19: five rows, no pick); five callings × three strides make 75 templates (CV21); her Flourish works as any class of
 // her Tier 0's family; her moon's node II reads her calling's root (`economy/planet.ts`).
 import type { Aptitudes, AptitudeGrade, Stats, StatKey } from '@luismlorenzana/uma-data'
@@ -144,30 +144,6 @@ export function umaCallingRowV3(outfit: { aptitudes: Pick<Aptitudes, 'strategy'>
   if (styles.includes('pace')) return styles.length === 1 ? 2 : 3
   if (styles.includes('end')) return 4
   return 5
-}
-
-/** D220's compatibility reading: the live rule before the best-style precedence fix. Kept only so current saves can
- * reopen a choice that the old fixed Summoner row had already confirmed, or clear a healer pick that is now fixed. */
-function previousUmaCallingRow(outfit: CallingOutfit): UmaCallingRow {
-  const { strategy, distance } = outfit.aptitudes, { power, wit } = outfit.baseStats
-  const style = bestKey(strategy, STYLES)
-  if (style === 'front') return 1
-  if (wit >= power && (['pace', 'late', 'end'] as const).filter((s) => grade(strategy[s]) <= grade('A')).length >= 2) return 2
-  if (style === 'end') return 3
-  if (style === 'pace') return power > wit ? (atBest(distance, DISTANCES)[0] === 'sprint' ? 4 : 5) : 6
-  return power > wit ? 7 : 8
-}
-
-/** Repairs only the choices whose eligibility changed in D220. An explicitly stored suggestion keeps the repair
- * idempotent after the player confirms it; active class and every other part of the owned Uma stay untouched. */
-export function repairUmaCallingChoice(outfit: CallingOutfit, calling: UmaCalling): UmaCalling {
-  const before = previousUmaCallingRow(outfit), after = umaCallingRow(outfit)
-  const wasPick = UMA_ROW_PICK[before] !== undefined, isPick = UMA_ROW_PICK[after] !== undefined
-  if (!wasPick && isPick && calling.pick === null && calling.confirmed) {
-    return { pick: UMA_ROW_PICK[after]![0], confirmed: false }
-  }
-  if (wasPick && !isPick && (calling.pick !== null || !calling.confirmed)) return { pick: null, confirmed: true }
-  return calling
 }
 
 /** Her calling pick (CP29): null for rows 1–4; for rows 5–8 her row's two classes, the suggested one first. From v19 null

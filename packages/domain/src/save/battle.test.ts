@@ -4,13 +4,14 @@ import { applyBattleAction, battleActionsLeft } from '../rpg/battle/engine'
 import type { BattleAction, BattleState } from '../rpg/battle/types'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import {
-  actInFight, activeClass, chooseClass, classOf, equipSkills, openFightOf, retreat, setActiveParty, setClassWeapons,
+  actInFight, activeClass, chooseClass, classOf, equipSkills, openFightOf, promoteUma, retreat, setActiveParty, setClassWeapons,
   settleFight, startFight, startingClass, umaLoadout, umaProfile, useSpring, worldRun, type BattleOutfit,
 } from './battle'
+import type { RpgTier0Class, RpgTier1Class } from '../rpg/kinds'
 import { umaBattleSheet } from './sheet'
 import { isInFight } from './status'
 import { setPartySlot, SaveRuleError, unlockUma, worldOf } from './rules'
-import { newOwnedUma, newSave, newWorldState, parseSave, SaveParseError, type Save, SAVE_SCHEMA_VERSION } from './save'
+import { newOwnedUma, newSave, newWorldState, parseSave, SaveParseError, type OwnedUma, type Save, SAVE_SCHEMA_VERSION } from './save'
 
 const T = (n: number) => `2026-10-10T12:${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}.000Z`
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
@@ -26,11 +27,12 @@ const OUTFITS = new Map([['101', outfit('101', 'front')], ['102', outfit('102', 
   ['104', outfit('104', 'end')], ['105', outfit('105', 'front')]])
 const o101 = OUTFITS.get('101')!
 
-/** Every class at a Class Rank (D102: depths open at 1, 10, 20, 30, 40). */
+/** Every Tier 0 at a Class Rank (D102: depths open at 1, 10, 20, 30, 40). From v19 (Classes v3) the five Tier 0 are the
+ * classes she holds in Tier 1's world without a promotion; a Tier 1 class is hers from Rank 10 (`promoted`). */
 function ranked(save: Save, rank = 1): Save {
   const w = worldOf(save)
   const t = { rank, exp: 0 }
-  const classes = { brawler: t, mage: t, spellblade: t, cleric: t, summoner: t }
+  const classes = { recruit: t, duelist: t, acolyte: t, caller: t, apprentice: t }
   return { ...save, tierWorlds: { '1': { ...w, umas: Object.fromEntries(Object.entries(w.umas).map(([id, u]) => [id, { ...u, ranks: { ...u.ranks, classes } }])) } } }
 }
 
@@ -39,6 +41,13 @@ function withParty(): Save {
   for (const id of OUTFITS.keys()) save = unlockUma(save, id, T(1))
   ;[...OUTFITS.keys()].forEach((id, slot) => { save = setPartySlot(save, 0, slot, id, T(2)) })
   return ranked(save)
+}
+
+/** Uma `id` with `from` at Class Rank 10 promoted into `to` (CV8): she holds it and fights as it. */
+function promoted(save: Save, id: string, from: RpgTier0Class, to: RpgTier1Class): Save {
+  const w = worldOf(save), u = w.umas[id]!
+  const ranks = { ...u.ranks, classes: { ...u.ranks.classes, [from]: { rank: 10, exp: 0 } } }
+  return promoteUma({ ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, [id]: { ...u, ranks } } } } }, id, from, to, T(3))
 }
 
 /** Each living ally attacks the foe with the least shield until the fight ends. */
@@ -64,17 +73,19 @@ function autoplay(save: Save): { save: Save; result: ReturnType<typeof actInFigh
 }
 
 describe('classes (D86)', () => {
-  it('starts in her best running style’s class, switches freely, and keeps each class’s weapons', () => {
+  it('starts in her calling’s class, switches freely, and keeps each class’s weapons', () => {
     const save = withParty()
     const uma = worldOf(save).umas['102']!
-    expect(activeClass(OUTFITS.get('102')!, uma)).toBe('mage')
-    expect(activeClass(OUTFITS.get('104')!, worldOf(save).umas['104']!)).toBe('summoner')
-    // Her starting class, the one her armor follows at unlock (D160 §7): from v16 her calling (Power = Wit here).
-    expect((['front', 'pace', 'late', 'end'] as const).map((s) => startingClass(outfit('x', s)))).toEqual(['brawler', 'mage', 'cleric', 'summoner'])
-    const switched = chooseClass(save, '102', 'cleric', T(3))
-    expect(activeClass(OUTFITS.get('102')!, worldOf(switched).umas['102']!)).toBe('cleric')
+    expect(activeClass(OUTFITS.get('102')!, uma)).toBe('duelist')
+    expect(activeClass(OUTFITS.get('104')!, worldOf(save).umas['104']!)).toBe('caller')
+    // Her starting class, the one her armor follows at unlock (D160 §7): from v19 her calling's Tier 0 in Tier 1's world
+    // (Power = Wit here; Classes v3, CV10).
+    expect((['front', 'pace', 'late', 'end'] as const).map((s) => startingClass(outfit('x', s)))).toEqual(['recruit', 'duelist', 'acolyte', 'caller'])
+    // Free among the classes she holds: every Tier 0 here (a closed Tier 1 class is `classes-v19.test.ts`'s).
+    const switched = chooseClass(save, '102', 'acolyte', T(3))
+    expect(activeClass(OUTFITS.get('102')!, worldOf(switched).umas['102']!)).toBe('acolyte')
     const profile = umaProfile(o101, worldOf(save).umas['101']!, 1)
-    expect(profile).toMatchObject({ classId: 'brawler', weapons: ['greatsword', 'axe', 'lance'], level: 1, tree: [], lines: {} })
+    expect(profile).toMatchObject({ classId: 'recruit', weapons: ['greatsword', 'axe', 'lance'], level: 1, tree: [], lines: {} })
     expect(profile.growthRates).toEqual({ speed: 0.1, stamina: 0.1, power: 0, guts: 0, wit: 0.2 })
     // From v16 every class picks three, each in a slot of its channel (CP2, CP12): a Cleric and a Summoner two Tomes and an
     // Arm, a Paladin two Arms and a Tome, a Brawler three Arms.
@@ -91,30 +102,32 @@ describe('classes (D86)', () => {
   it('knows every open depth’s core skills for free and chooses her skills until she picks; Class Rank opens depths (D102)', () => {
     const save = withParty()
     const uma = worldOf(save).umas['101']!
-    expect(umaLoadout(o101, uma, 1).map((r) => r.id)).toEqual(['brawler-greatsword.1', 'brawler-axe.1', 'brawler-lance.1'])
-    // Class Rank 10 opens depth 2, whatever her level; Lv 10 alone doesn't.
-    const w = worldOf(save)
-    const lv10: Save = { ...save, tierWorlds: { '1': { ...w, umas: { ...w.umas, '101': { ...uma, level: 10 } } } } }
-    expect(umaLoadout(o101, worldOf(lv10).umas['101']!, 1).map((r) => r.id)[0]).toBe('brawler-greatsword.1')
-    const rank10 = ranked(save, 10)
-    expect(umaLoadout(o101, worldOf(rank10).umas['101']!, 1).map((r) => r.id).slice(0, 2)).toEqual(['brawler-greatsword.2', 'brawler-axe.2'])
+    expect(umaLoadout(o101, uma, 1).map((r) => r.id)).toEqual(['recruit-greatsword.1', 'recruit-axe.1', 'recruit-lance.1'])
+    // From v19 a Tier 0 holds depth 1 at any Class Rank (CV6); a Tier 1 class opens at Rank 10, on depth 2.
+    expect(umaLoadout(o101, worldOf(ranked(save, 10)).umas['101']!, 1).map((r) => r.id)[0]).toBe('recruit-greatsword.1')
+    const brawler = worldOf(promoted(save, '101', 'recruit', 'brawler')).umas['101']!
+    expect(umaLoadout(o101, brawler, 1).map((r) => r.id).slice(0, 2)).toEqual(['brawler-greatsword.2', 'brawler-axe.2'])
+    // Class Rank 20 opens depth 3, whatever her level; Lv 20 alone doesn't.
+    const first = (u: OwnedUma) => umaLoadout(o101, u, 1).map((r) => r.id)[0]
+    expect(first({ ...brawler, level: 20 })).toBe('brawler-greatsword.2')
+    expect(first({ ...brawler, ranks: { ...brawler.ranks, classes: { ...brawler.ranks.classes, brawler: { rank: 20, exp: 0 } } } })).toBe('brawler-greatsword.3')
     // Nothing is learned from v16 (CP14): her line on each tree is `lines-v16.test.ts`'s.
   })
 
   it('equips skills she knows within her slots, or goes back to having them chosen', () => {
     let save = withParty()
-    save = equipSkills(save, o101, 'brawler', ['brawler-lance.1'], T(4))
-    expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toEqual(['brawler-lance.1'])
-    expect(umaLoadout(o101, worldOf(save).umas['101']!, 1).map((r) => r.id)).toEqual(['brawler-lance.1'])
-    expect(() => equipSkills(save, o101, 'brawler', ['brawler-lance.2'], T(5))).toThrow(/knows/)
+    save = equipSkills(save, o101, 'recruit', ['recruit-lance.1'], T(4))
+    expect(classOf(worldOf(save).umas['101']!, 'recruit').loadout).toEqual(['recruit-lance.1'])
+    expect(umaLoadout(o101, worldOf(save).umas['101']!, 1).map((r) => r.id)).toEqual(['recruit-lance.1'])
+    expect(() => equipSkills(save, o101, 'recruit', ['recruit-lance.2'], T(5))).toThrow(/knows/)
     // A tree she doesn't slot isn't hers to equip.
-    expect(() => equipSkills(save, o101, 'brawler', ['brawler-katana.1'], T(5))).toThrow(/knows/)
+    expect(() => equipSkills(save, o101, 'recruit', ['recruit-katana.1'], T(5))).toThrow(/knows/)
     // A fourth equipped skill needs Lv 10 (her Uma Level keeps the slots).
-    expect(() => equipSkills(ranked(save, 10), o101, 'brawler', ['brawler-greatsword.1', 'brawler-axe.1', 'brawler-lance.1', 'brawler-greatsword.2'], T(5)))
+    expect(() => equipSkills(ranked(save, 10), o101, 'recruit', ['recruit-greatsword.1', 'recruit-axe.1', 'recruit-lance.1', 'recruit-greatsword.2'], T(5)))
       .toThrow(/up to 3/)
-    expect(() => equipSkills(save, o101, 'brawler', ['brawler-axe.1', 'brawler-axe.1'], T(5))).toThrow(SaveRuleError)
-    save = equipSkills(save, o101, 'brawler', null, T(6))
-    expect(classOf(worldOf(save).umas['101']!, 'brawler').loadout).toBeNull()
+    expect(() => equipSkills(save, o101, 'recruit', ['recruit-axe.1', 'recruit-axe.1'], T(5))).toThrow(SaveRuleError)
+    save = equipSkills(save, o101, 'recruit', null, T(6))
+    expect(classOf(worldOf(save).umas['101']!, 'recruit').loadout).toBeNull()
   })
 })
 
@@ -148,9 +161,9 @@ describe('fights (D52, D66)', () => {
     // Her Class bar (D102): 2E. R2 retired the Weapon, Armor and Accessory bars (WP3, H74; live since H82): a win pays none.
     const m = fought.result!.members[0]!
     const gain = (kind: string, id: string) => m.ranks.find((g) => g.ref.kind === kind && g.ref.id === id)?.exp ?? 0
-    expect(gain('class', 'brawler')).toBe(2 * m.exp)
+    expect(gain('class', 'recruit')).toBe(2 * m.exp)
     expect(m.ranks.every((g) => g.ref.kind === 'class')).toBe(true)
-    expect(world.umas['101']!.ranks.classes.brawler).toEqual(m.ranks[0]!.after)
+    expect(world.umas['101']!.ranks.classes.recruit).toEqual(m.ranks[0]!.after)
     expect(world.items).toEqual({})
 
     // Lv9 Umas one fight short of Lv10: each earns an Uma Shard, and five Uma Shards make a Ticket.
@@ -189,14 +202,14 @@ describe('fights (D52, D66)', () => {
 
 describe('save parsing', () => {
   it('round-trips classes and an open fight with actions', () => {
-    let save = equipSkills(withParty(), o101, 'brawler', ['brawler-lance.1', 'brawler-axe.1'], T(3))
+    let save = equipSkills(withParty(), o101, 'recruit', ['recruit-lance.1', 'recruit-axe.1'], T(3))
     save = startFight(save, ura, 'w1-1-1-s1', OUTFITS, T(4))
     const action: BattleAction = { kind: 'attack', actorId: '101', targetId: 'foe1' }
     save = actInFight(save, ura, action, T(5)).save
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
     expect(applyBattleAction(rpgRunBattleStep(openFightOf(worldOf(save))!)!.state, action).error).toBe('already-acted')
-    // A Spell Blade's act carries its other half (D86): the save must keep it.
-    let bladed = startFight(chooseClass(withParty(), '102', 'spellblade', T(3)), ura, 'w1-1-1-s1', OUTFITS, T(4))
+    // A Spell Blade's act carries its other half (D86): the save must keep it. From v19 she is one once promoted (CV8).
+    let bladed = startFight(promoted(withParty(), '102', 'recruit', 'spellblade'), ura, 'w1-1-1-s1', OUTFITS, T(4))
     const blade = rpgRunBattleStep(openFightOf(worldOf(bladed))!)!.state.input.allies.find((a) => a.id === '102')!
     const pair: BattleAction = { kind: 'attack', actorId: blade.id, targetId: 'foe1', weapon: blade.weapons.find((w) => !w.startsWith('tome-')),
       pair: { weapon: blade.weapons.find((w) => w.startsWith('tome-')) } }
@@ -205,7 +218,9 @@ describe('save parsing', () => {
   })
 
   it('rejects a line other than B, a skill of another class, wrong weapons, a refused action and an unknown Spring', () => {
-    const save = startFight(equipSkills(withParty(), o101, 'brawler', ['brawler-lance.1'], T(3)), ura, 'w1-1-1-s1', OUTFITS, T(4))
+    // A promoted Brawler: a Tier 0 has no lines and slots any kind (CV6).
+    const brawler = equipSkills(promoted(withParty(), '101', 'recruit', 'brawler'), o101, 'brawler', ['brawler-lance.1'], T(3))
+    const save = startFight(brawler, ura, 'w1-1-1-s1', OUTFITS, T(4))
     const raw = () => JSON.parse(JSON.stringify(save))
     const line = raw()
     line.tierWorlds['1'].umas['101'].classes.brawler.lines = { greatsword: 'A' }
@@ -241,8 +256,10 @@ describe('save parsing', () => {
     old.tierWorlds['1'].world.run.battle.input.version = 5
     const moved = parseSave(old)
     expect(moved.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
-    expect(worldOf(moved).umas['102']).toMatchObject({ classId: 'brawler', classes: {} })
-    expect(worldOf(moved).umas['101']!.classId).toBeNull()
+    // The build's class reaches v31 and v32's reset records it (D247): every Uma then starts again on her Tier 0.
+    expect(worldOf(moved).classesV3!.umas['102']!.classId).toBe('brawler')
+    expect(worldOf(moved).classesV3!.umas['101']!.classId).toBeNull()
+    expect(worldOf(moved).umas['102']).toMatchObject({ classId: null, classes: {} })
     expect(worldRun(worldOf(moved)).battle).toBeNull()
     expect(parseSave(JSON.parse(JSON.stringify(moved)))).toEqual(moved)
   })

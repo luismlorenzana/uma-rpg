@@ -8,9 +8,9 @@ import { loadV17Replays, regenerateV17Replays, replayV17 } from './v17-replays.f
 const replays = process.env.UPDATE_V17 ? regenerateV17Replays() : loadV17Replays()
 
 describe('the frozen v17 replays (H116)', () => {
-  it('runs with weaknesses v2 live while the next release stays dark', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
-    expect([rpgRework('economy'), rpgRework('weak'), rpgRework('t2Weapons')]).toEqual([true, true, false])
+  it('runs with weaknesses v2 and Classes v3 live (H116, H134)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect([rpgRework('economy'), rpgRework('weak'), rpgRework('classes'), rpgRework('t2Weapons')]).toEqual([true, true, true, false])
   })
 
   it.each(replays.map((r) => [r.name, r] as const))('%s replays byte for byte under the live engine', (_, r) => {

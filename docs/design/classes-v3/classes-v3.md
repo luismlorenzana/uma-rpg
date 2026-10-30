@@ -1,6 +1,12 @@
 # Classes v3: the class tree, Tier 0 and the promotion
 
-> **For the owner's review, 2026-10-29. Nothing here is built.** The owner's request of 2026-10-29: after the Paladin and
+> **Built and live (H126–H134, D257).** Approved by the owner on 2026-10-29 (D240) and live from H134 on engine v19 and
+> save v32; the game as it plays is the [manual](../../game/README.md)'s, which wins where this doc differs: the Mage
+> root's Tier 0 reads **Initiate** on screen (its id stays `apprentice`, since "Apprentice" is Tier 1's world name), the
+> class tree and promotion sheet sit on today's Skills tab (H137, D252, D253), and H131's measured numbers (D249) replace
+> the drafts where §12 and §3 say so.
+>
+> The owner's request of 2026-10-29: after the Paladin and
 > Cleric split, split more classes, as **a class tree** with three roots, **Tier 0** introductory classes that promote
 > into the Tier 1 classes, a **promotion screen**, the two hybrids' **inverse classes**, the Light and Dark Tomes
 > reshaped, and a **reset** of every Uma paid back in Class Manuals. It builds on the live game (engine v18, save v31;

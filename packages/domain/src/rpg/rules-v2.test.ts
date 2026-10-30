@@ -1,9 +1,10 @@
 // Class rules by generation (H53, D179): classes v1 to engine v14, classes v2 from v15, the live game on the switch's
-// default (15 since H61, D188; 16, the Tier rework's fight, since H72, D210, whose rows are `rules-v16.test.ts`'s). Every v1
-// row is the old game's exactly; the v2 rows are classes-v2.md §3's.
+// default (15 since H61, D188; 16, the Tier rework's fight, since H72, D210, whose rows are `rules-v16.test.ts`'s; 19,
+// Classes v3, since H134, whose rows are `classes-v19.test.ts`'s). Every v1 row is the old game's exactly; the v2 rows are
+// classes-v2.md §3's.
 import { describe, expect, it } from 'vitest'
 import { RPG_ALL_NODES, RPG_NODES, rpgNode } from './catalog'
-import { ALL_HERO_LIMIT_IDS, hallClass, HERO_HALLS, HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimit, heroLimitFor, heroLimitPower,
+import { ALL_HERO_LIMIT_IDS, hallOfPlace, HERO_HALL_PLACES, HERO_LIMIT_IDS, HERO_LIMIT_POWER, HERO_LIMITS, heroLimit, heroLimitFor, heroLimitIds, heroLimitPower,
   isHeroLimitId } from './heroes'
 import { rpgNodeIdentity } from './node-identity'
 import {
@@ -16,15 +17,16 @@ const V1 = 14, V2 = 15
 const FIVE: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
 
 describe('the one switch (D179)', () => {
-  it('is on engine 18 since H116, with classes v2 from 15', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
+  it('is on engine 19 since H134, with classes v2 from 15', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
     expect(RPG_V2_ENGINE).toBe(15)
     expect([rpgV2(), rpgV2(14), rpgV2(15)]).toEqual([true, false, true])
     expect(BATTLE_HEAL_OFFENSE_SCALE).toBe(300)
   })
 
-  it('lists six live classes, the Paladin last; v1 had five', () => {
-    expect(RPG_CLASSES).toEqual([...FIVE, 'paladin'])
+  it('lists six classes v15–v18, the Paladin last; v1 had five; the live list is Classes v3\'s since H134', () => {
+    expect(rpgClasses(18)).toEqual([...FIVE, 'paladin'])
+    expect(RPG_CLASSES).toEqual(rpgClasses(19))
     // Classes v3's seven join every list last (H126), so no list's order moves.
     expect(RPG_ALL_CLASSES.slice(0, 6)).toEqual([...FIVE, 'paladin'])
     expect(rpgClasses(V1)).toEqual(FIVE)
@@ -129,27 +131,31 @@ describe('class rules by generation (D179)', () => {
 })
 
 describe('the Paladin as an identity (D179)', () => {
-  it('has hero seats from v15: 24 live, 20 in v14, 28 of every generation; the Paladin Bastion; her power; the live Limit Breaks, v1’s in v14', () => {
+  it('has hero seats v15–v18: 24 there, 20 in v14, 28 of every generation; the Paladin Bastion; her power; the live Limit Breaks, v1’s in v14', () => {
     // Every generation's 28 (H129): v14's 20, the Paladin Bastion's four (v15–v18) and Halls v2's Healer Sanctum (v19).
     expect(ALL_HERO_LIMIT_IDS).toHaveLength(28)
-    expect(HERO_LIMIT_IDS).toEqual(ALL_HERO_LIMIT_IDS.slice(0, 24))
-    expect([isHeroLimitId('paladin-1'), isHeroLimitId('paladin-1', V1), isHeroLimitId('paladin-1', V2)]).toEqual([true, false, true])
+    expect(heroLimitIds(18)).toEqual(ALL_HERO_LIMIT_IDS.slice(0, 24))
+    // The live seats are Halls v2's twenty since H134 (`halls-v19.test.ts`).
+    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(19))
+    expect([isHeroLimitId('paladin-1', 18), isHeroLimitId('paladin-1', V1), isHeroLimitId('paladin-1', V2)]).toEqual([true, false, true])
     expect(ALL_HERO_LIMIT_IDS.slice(0, 20).every((id) => isHeroLimitId(id, V1) && isHeroLimitId(id, V2))).toBe(true)
-    expect(HERO_HALLS.paladin).toBe('paladin-bastion')
-    expect(hallClass('paladin-bastion')).toBe('paladin')
+    expect(HERO_HALL_PLACES.paladin).toBe('paladin-bastion')
+    expect(hallOfPlace('paladin-bastion')).toBe('paladin')
     expect(HERO_LIMIT_POWER.paladin).toBe(1.5)
     // v15's table and powers (H56) are `rpg/battle/halls-v15.test.ts`'s.
     for (const c of RPG_ALL_CLASSES) expect(heroLimitPower(c, V2)).toBe(HERO_LIMIT_POWER[c])
     // The live table is the live generation's: v16's since H72 (two kinds moved, `halls-v15.test.ts`).
     for (const l of HERO_LIMITS) expect(heroLimitFor(l.id, BATTLE_ENGINE_VERSION)).toEqual(heroLimit(l.id))
     expect(heroLimitFor('paladin-1', V1)).toBeUndefined()
-    expect(HERO_LIMITS).toHaveLength(24)
+    expect(heroLimitIds(18).filter((id) => heroLimitFor(id, 18))).toHaveLength(24)
+    expect(HERO_LIMITS).toHaveLength(20)
   })
 
-  it('has ten trees of node identities; the live catalog lists the six classes’ 750', () => {
-    // Classes v3 adds 210 nodes (H126): 960 in all; the live list stays the six classes' 750.
+  it('has ten trees of node identities; the live catalog lists the thirteen classes’ 960 since H134', () => {
+    // Classes v3 adds 210 nodes (H126) to the six classes' 750: 960 in all, every one live since H134.
     expect(RPG_ALL_NODES).toHaveLength(960)
-    expect(RPG_NODES).toHaveLength(750)
+    expect(RPG_NODES).toHaveLength(960)
+    expect(RPG_ALL_NODES.filter((n) => rpgClasses(18).includes(n.classId))).toHaveLength(750)
     expect(RPG_NODES).toEqual(RPG_ALL_NODES.filter((n) => RPG_CLASSES.includes(n.classId)))
     expect(RPG_NODES.filter((n) => n.classId === 'paladin')).toHaveLength(150)
     expect(rpgClassWeapons('paladin')).toEqual(RPG_WEAPONS)

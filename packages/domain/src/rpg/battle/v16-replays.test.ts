@@ -8,9 +8,9 @@ import { loadV16Replays, regenerateV16Replays, replayV16 } from './v16-replays.f
 const replays = process.env.UPDATE_V16 ? regenerateV16Replays() : loadV16Replays()
 
 describe('the frozen v16 replays (H82)', () => {
-  it('runs with R2’s economy live (H82)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(18)
-    expect([rpgRework('economy'), rpgRework('t2Weapons')]).toEqual([true, false])
+  it('runs with R2’s economy and Classes v3 live (H82, H134)', () => {
+    expect(BATTLE_ENGINE_VERSION).toBe(19)
+    expect([rpgRework('economy'), rpgRework('classes'), rpgRework('t2Weapons')]).toEqual([true, true, false])
   })
 
   it.each(replays.map((r) => [r.name, r] as const))('%s replays byte for byte under the live engine', (_, r) => {

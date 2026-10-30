@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { SAVE_SCHEMA_VERSION } from './version'
 import { gradeOf, newGrades, type GradeTarget } from '../economy/grades'
 import { RPG_V2_CLASSES } from '../rpg/rules'
 import { accessoryFormBlock, accessoryKinds, raiseGrade, raiseGradeTo, setAccessoryForm } from './forge'
@@ -9,7 +10,7 @@ import { type Save } from './save'
 
 const weapon: GradeTarget = { kind: 'weapon', weapon: 'greatsword' }
 const saveOf = (items: Record<string, number>, level = 1, gear = newGrades(1)): Save => ({
-  schemaVersion: 31,
+  schemaVersion: SAVE_SCHEMA_VERSION,
   account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
   tierWorlds: { '1': gradedWorld({ items, umas: { '101': gradedUma({ level, gear }) } }) },
 })

@@ -1,12 +1,11 @@
 // The Halls' coverage words (the Tier rework's R1, engine v16, CP28, class-progression.md §8.2; H70): the twin sets a
 // seat's Limit Break answers ("Fire · Light"), and what a Learner would add, the sets it answers that her weapons miss
-// ("Adds Light, Dark, Twilight"). Halls v2 (engine v19, D241 HV21, HV25; H133, inert until H134): the hall's title, each
-// seat's card (its home class, its shape and power, its side effect and its lore) and the (i)'s rules, all read from the
-// domain's data, never from a Limit Break's name. Every Halls v2 wording lives here (H117's `copy.ts` isn't on `main`).
+// ("Adds Light, Dark, Twilight"). Halls v2 (engine v19, D241 HV21, HV25; H133, live since H134): each seat's card (its home
+// class, its shape and power, its side effect and its lore) and the (i)'s rules, all read from the domain's data, never from
+// a Limit Break's name. Every Halls v2 wording lives here (H117's `copy.ts` isn't on `main`).
 import {
-  BATTLE_ENGINE_VERSION, BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, bondCapacity, HERO_LIMIT_SCALE, HERO_MAX_LEARNERS, heroHalls, heroLimitKinds,
-  heroLimitsOfHall, heroSeatHome, LEARNER_MAX_PARENTS, RPG_REWORK_ENGINE, rpgAnsweredTwinSets, rpgClassName, rpgRework, type HeroHall,
-  type HeroLimit, type Place, type RpgTwinSet, type RpgWeapon,
+  BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, bondCapacity, HERO_LIMIT_SCALE, HERO_MAX_LEARNERS, heroHalls, heroLimitKinds, heroLimitsOfHall,
+  heroSeatHome, LEARNER_MAX_PARENTS, rpgAnsweredTwinSets, rpgClassName, type HeroLimit, type RpgTwinSet, type RpgWeapon,
 } from '@rpg/domain'
 import { STATUS_LABEL } from '../../battle/labels'
 
@@ -28,20 +27,14 @@ export function learnerAdds(limit: HeroLimit, weapons: readonly RpgWeapon[]): Rp
 
 // --- Halls v2 (H133) ----------------------------------------------------------------------------------------------------
 
-/** A hall page's title: from the switch the place's name ("Warrior Dojo"); before it "Brawler Hall of Heroes". */
-export function hallTitle(place: Place, hall: HeroHall, engine: number = BATTLE_ENGINE_VERSION): string {
-  return rpgRework('classes', engine) ? place.name : `${rpgClassName(heroSeatHome(`${hall}-1`, engine), engine)} Hall of Heroes`
-}
-
-/** A seat's card: its label, then from the switch its shape, power and side effect; its line (v19 its lore, before it
- * its blurb). Before the switch `shape`, `power` and `effect` are null, so the card is today's. */
+/** A seat's card: its label, its shape, power and side effect, and its line (its lore). */
 export interface SeatCard {
-  /** "Seat 2 · Brawler" (its home class); before the switch "Seat 2 · Limit Break". */
+  /** "Seat 2 · Brawler" (its home class). */
   seat: string
   /** "One foe · 1 hit", "Every foe · 3 hits", "Random · 8 hits", "Volley · 4 + 2 a foe". */
-  shape: string | null
+  shape: string
   /** The Limit Break's own power: "×2.9". */
-  power: string | null
+  power: string
   /** A Healer Sanctum seat's stack: "Brave 1". */
   effect: string | null
   line: string
@@ -66,31 +59,27 @@ export function shapeWords(limit: HeroLimit): string {
 /** A Limit Break's power as the seat card and the (i) show it: "×2.9", "×2.0". */
 export const powerWord = (power: number): string => `×${power.toFixed(1)}`
 
-/** A seat's card (HV25): from the switch its home class, shape words, own power, side effect and lore (the blurb tells
- * the shape the shape line already says). Before it, today's: "Seat n · Limit Break" and the blurb. */
-export function seatCard(limit: HeroLimit, engine: number = BATTLE_ENGINE_VERSION): SeatCard {
+/** A seat's card (HV25): its home class, shape words, own power, side effect and lore (the blurb tells the shape the shape
+ * line already says). Halls v2's twenty each have a power (H129); the live halls are theirs since H134. */
+export function seatCard(limit: HeroLimit): SeatCard {
   const n = limit.id.slice(limit.id.lastIndexOf('-') + 1)
-  if (!rpgRework('classes', engine) || limit.power === undefined) {
-    return { seat: `Seat ${n} · Limit Break`, shape: null, power: null, effect: null, line: limit.blurb }
-  }
   const status = limit.casts.find((c) => c.status)?.status
   return {
-    seat: `Seat ${n} · ${rpgClassName(heroSeatHome(limit.id, engine), engine)}`,
+    seat: `Seat ${n} · ${rpgClassName(heroSeatHome(limit.id))}`,
     shape: shapeWords(limit),
-    power: powerWord(limit.power),
+    power: powerWord(limit.power ?? 0),
     effect: status ? `${STATUS_LABEL[status.key]} ${status.stacks}` : null,
     line: limit.lore ?? limit.blurb,
   }
 }
 
-/** The card's shape line, one string: "One foe · 4 hits · ×2.0 · Brave 1"; null before the switch. */
-export const shapeLine = (card: SeatCard): string | null =>
-  card.shape === null ? null : [card.shape, card.power, card.effect].filter((w): w is string => !!w).join(' · ')
+/** The card's shape line, one string: "One foe · 4 hits · ×2.0 · Brave 1". */
+export const shapeLine = (card: SeatCard): string => [card.shape, card.power, card.effect].filter((w): w is string => !!w).join(' · ')
 
-/** The Halls' (i) from the switch, one rule a line (H133 decision 7), every number from the domain's tables: the seats'
- * powers, the class scales (H131's), the Learner caps, the Bond's strength and EXP. */
-export function hallHelpV19(): string[] {
-  const powers = heroHalls(RPG_REWORK_ENGINE.classes).flatMap((h) => heroLimitsOfHall(h, RPG_REWORK_ENGINE.classes)).map((l) => l.power ?? 0)
+/** The Halls' (i), one rule a line (H133 decision 7), every number from the domain's tables: the seats' powers, the class
+ * scales (H131's), the Learner caps, the Bond's strength and EXP. */
+export function hallHelp(): string[] {
+  const powers = heroHalls().flatMap((h) => heroLimitsOfHall(h)).map((l) => l.power ?? 0)
   const pct = (x: number) => Math.round(x * 100)
   const scale = (x: number) => `×${x}`
   return [

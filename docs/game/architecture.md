@@ -1,6 +1,6 @@
 # Architecture and technical setup
 
-How uma-rpg is built and run: engine v18, save v31. Values come from the code and `docs/technical/infrastructure.md`,
+How uma-rpg is built and run: engine v19, save v32. Values come from the code and `docs/technical/infrastructure.md`,
 which holds every production value and is the place to change them.
 
 ## The pieces
@@ -42,7 +42,7 @@ lazy pages import it directly, so its rules load with the first command or page 
 |---|---|---|
 | `@rpg/domain` | `src/index.ts` | The save and its parser, the Hub's readers, ids, gates, caps and types |
 | `/engine` | `rpg/battle/index.ts` | The fight engine, Limit Breaks and Auto (H62) |
-| `/battle` | `save/battle.ts` | The world map's fights, classes, lines and the calling pick |
+| `/battle` | `save/battle.ts` | The world map's fights, classes, promotion and lines; save v32's trade step (`save/classes-v3.ts`) |
 | `/rift` | `rift/index.ts` | The Rift's generator, run rules and Ascend |
 | `/work`, `/forge`, `/exchange`, `/observatory`, `/targets`, `/heroes` | `save/<name>.ts` | Each place's rules |
 
@@ -50,17 +50,17 @@ lazy pages import it directly, so its rules load with the first command or page 
 
 | Folder | What |
 |---|---|
-| `save/` | The save: `version.ts` (`SAVE_SCHEMA_VERSION` 31, in a module with no imports), `save.ts` (the shape and its strict parse: `parseSave` for the API, `parseSaveAsync` for the device) and `migrations.ts` (every step to v31; loaded on demand: `parseSaveAsync` imports it only for an old save, and only the API's `parseSave` imports it statically, H136). Its rules, pure functions that return a new save or throw `SaveRuleError`: `class.ts` (an Uma's starting and active class, her setup per class, one healer a party; main bundle), `battle.ts` (classes, weapons, lines, the calling pick, the world map's fights, rewards, Springs; through `@rpg/domain/battle`, H62), `sheet.ts` (her battle sheet; the Stable's chunk), `status.ts` (where an Uma is: in a fight or at work), `work.ts` (jobs on the shared engine, Finish all, the slot view the screens read), `forge.ts` (raising grades with made items, the accessory's family and kind), `observatory.ts` (setting jewels), `presets.ts` (each class's standard preset), `targets.ts` (targets), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts` (raw items and tickets for Laurels, selling, Class Manuals), `rules.ts` (unlocks, parties, the grant seen), `notify.ts` (push text), `calling-repair.ts` (D220's calling repair), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion; through `@rpg/domain/rift`) |
-| `rpg/` | `kinds.ts` (weapons, damage kinds, twins, statuses), `rules.ts` (classes, stats, levels, hands, lines, Skill Ranks, the base MP regen, each by generation), `node-identity.ts` (node ids, lines and the skill depth tables, light enough for the parse), `catalog.ts` (every skill tree), `tree-view.ts` (the Skills tab's tree model), `heroes.ts` and `hero-id.ts` (the six halls' 24 Limit Breaks, Bonds) |
-| `rpg/battle/` | The fight: `engine.ts` (the deterministic reducer, engine v18), `limit.ts` (Limit Breaks), `skills.ts`, `auto.ts` (Auto's policy), `types.ts`. `caps.ts` holds the switch: `BATTLE_ENGINE_VERSION` 18 and `rpgRework(stage, engine)` over `RPG_REWORK_ENGINE` (`fight` 16, `economy` 17, `weak` 18; `classes` 19, Classes v3 and Halls v2, dark until H134; `t2Weapons` at no engine until the Tier 2 re-plan). A rule outside the engine takes `engine`, defaulting to the live one; the engine passes the fight's own version, so v6–v18 fights replay as they were, pinned by the frozen `v14`- to `v18-replays` fixtures. The engine's functions load through `@rpg/domain/engine`; the main index keeps its types, caps and skill numbers (H62) |
+| `save/` | The save: `version.ts` (`SAVE_SCHEMA_VERSION` 32, in a module with no imports), `save.ts` (the shape and its strict parse: `parseSave` for the API, `parseSaveAsync` for the device) and `migrations.ts` (every step to v32, `toV32` the last; loaded on demand: `parseSaveAsync` imports it only for an old save, and only the API's `parseSave` imports it statically, H136). Its rules, pure functions that return a new save or throw `SaveRuleError`: `class.ts` (an Uma's starting and active class, the classes she holds, her setup per class, one healer a party; main bundle), `class-tiles.ts` (the class tree's tiles; the Stable's chunk), `battle.ts` (switching class, promotion, weapons, lines, the world map's fights, rewards, Springs; through `@rpg/domain/battle`, H62), `classes-v3.ts` (save v32's trade step, `settleClassesV3Trades`; lazy), `sheet.ts` (her battle sheet; the Stable's chunk), `status.ts` (where an Uma is: in a fight or at work), `work.ts` (jobs on the shared engine, Finish all, the slot view the screens read), `forge.ts` (raising grades with made items, the accessory's family and kind), `observatory.ts` (setting jewels), `presets.ts` (each class's standard preset), `targets.ts` (targets), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts` (raw items and tickets for Laurels, selling, Class Manuals), `rules.ts` (unlocks, parties, the grant and the classes' reset seen), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion; through `@rpg/domain/rift`) |
+| `rpg/` | `kinds.ts` (the classes by generation, weapons, damage kinds, twins, statuses), `class-tree.ts` (Classes v3's tree: roots, parents and children, Tier 0's ladder and skill, the suggestion, names by generation, the gates), `rules.ts` (classes, stats, levels, hands, lines, Skill Ranks, the base MP regen, each by generation), `node-identity.ts` (node ids, lines and the skill depth tables, light enough for the parse), `catalog.ts` (every skill tree of every generation), `tree-view.ts` (the Skills tab's tree model), `heroes.ts` and `hero-id.ts` (the five halls' twenty Limit Breaks, and the six halls' 24 for older fights; Bonds) |
+| `rpg/battle/` | The fight: `engine.ts` (the deterministic reducer, engine v19), `limit.ts` (Limit Breaks), `skills.ts`, `auto.ts` (Auto's policy), `types.ts`. `caps.ts` holds the switch: `BATTLE_ENGINE_VERSION` 19 and `rpgRework(stage, engine)` over `RPG_REWORK_ENGINE` (`fight` 16, `economy` 17, `weak` 18, `classes` 19: Classes v3 and Halls v2, live since H134; `t2Weapons` at no engine until the Tier 2 re-plan). A rule outside the engine takes `engine`, defaulting to the live one; the engine passes the fight's own version, so v6–v18 fights replay as they were, pinned by the frozen `v14`- to `v18-replays` fixtures. The engine's functions load through `@rpg/domain/engine`; the main index keeps its types, caps and skill numbers (H62) |
 | `rpg/campaign/` | Foes and their scaling (`enemies.ts`), rewards, Finals and the chapter machinery regions reuse; `weaknesses.ts` deals each stage's foes their own Arms and element lists from v18 (D236) |
 | `rift/` | `state.ts`: the Rift's save shape, constants, achievement ids and selectors (`riftOpen`, `riftLevel50s`, `openRiftRun`; main index); `achievements.ts`: the achievement hook; `fronts.ts`, `picker.ts`, `generate.ts`: the Rift's fronts, faces and fights (`@rpg/domain/rift`, a lazy subpath, through `index.ts`, which also exports `save/rift.ts`); `balance-sim.ts`: test support |
 | `work/` | uma-rpg's side of `@luismlorenzana/uma-work` (SC3): `env-v4.ts` (the fifteen Wilds places as buildings, four slots at ×1.25), `kinds-v4/` (gather and process `material.ts`, make `make.ts`), `kinds-v3/trade.ts` (the trade gate and open shop), `env-v3.ts` (`liveWorkEnv`, the env every work rule builds), `env.ts` (Speed Tickets, Craft EXP, Laurels, who may work), `request.ts`. `kinds/` and `env.ts`' facilities are v1's, kept for old work rows and the v1 tests |
-| `economy/` | `pacing.ts` (times, steps, job sizes, prices, Laurels), `professions.ts` (fifteen professions, five trades by calling), `places-v4.ts` (each place's line and its one kind of job: `PLACES_V4`, `workPlace`, `jobKindV4`), `grades.ts` (gear by grade: the gate, tier scaling, Might, armor), `accessories.ts` (the four families, the signature), `planet.ts` (the Planet, three moons and her moon), `ranks.ts` (Class Ranks and Marks), `bonus.ts` (points), `stock.ts` (Warehouse names: line and made items). v1's `jobs.ts`, `stars.ts`, `gems.ts`, `gear.ts` and `gear-id.ts` serve the migrations and old saves (ids and recipes; their names are `items/names-v1.ts`'); `*.sim.ts` are the pacing ledgers (test support) |
+| `economy/` | `pacing.ts` (times, steps, job sizes, prices, Laurels), `professions.ts` (fifteen professions, five trades, one a Tier 0 calling), `places-v4.ts` (each place's line and its one kind of job: `PLACES_V4`, `workPlace`, `jobKindV4`), `grades.ts` (gear by grade: the gate, tier scaling, Might, armor), `accessories.ts` (the four families, the signature), `planet.ts` (the Planet, three moons and her moon), `ranks.ts` (Class Ranks and Marks), `bonus.ts` (points), `stock.ts` (Warehouse names: line and made items). v1's `jobs.ts`, `stars.ts`, `gems.ts`, `gear.ts` and `gear-id.ts` serve the migrations and old saves (ids and recipes; their names are `items/names-v1.ts`'); `*.sim.ts` are the pacing ledgers (test support) |
 | `items/` | `lines.ts` (five lines of ten grades: the hundred line items), `made-id.ts` (the made items' ids), `made.ts` (their names and places), `made-v4.ts` (one-line recipes), `stock-id.ts` (what a Warehouse may hold). v1's 160 items serve the migrations: `catalog.ts` (ids, families, grades and pairs, built from `identity.ts`) and `kinds.ts`; `names-v1.ts` holds the v1 names (items, families, gear and Star Gems: `itemNameV1` … `stockNameV1`) and is the only reader of `families.ts`; both load on demand (H136) |
 | `world/` | `world.ts` (continents, regions, the stage generator), `biomes.ts`, `capital.ts` (each continent's Finals routes), `roster.ts` (enemy faces by franchise and tier); balance support (`balance-party.ts`, `balance-play.ts`, `balance-measure.ts`) and the `SIM=1` simulations (`balance*.test.ts`) |
 | `hub/places.ts` | Every place on the four Hub pages (Town Hall 5, Learning 7, Battle 2, the Wilds 15), and Town Hall's plaza |
-| `master/`, `roster/` | `master/roster.ts`: master data to the game's roster, by stable id; `roster/template.ts`: the Uma Template and the calling (D203, D220); `aptitudes.ts` and `stats.ts`. Album queries and order live in uma-kit |
+| `master/`, `roster/` | `master/roster.ts`: master data to the game's roster, by stable id; `roster/template.ts`: the Uma Template and the calling (D203; by running style from v19, D240); `aptitudes.ts` and `stats.ts`. Album queries and order live in uma-kit |
 | `docs/` | The renderer for these docs' live blocks (test-only, not built) |
 
 ## Web app
@@ -69,7 +69,7 @@ lazy pages import it directly, so its rules load with the first command or page 
 |---|---|
 | `app/` | `Root.tsx` (the kit's boot gates), `router.tsx`, the Firebase config, the build id |
 | `hub/` | The shell (`Shell.tsx`, `TierShell.tsx`), the bars, the menu, the Tier sheet and veil, the featured Uma, the Hub screen |
-| `places/` | Every place's page and quick look (`work/` for the fifteen Wilds places, `halls/` for the six halls); `registry.tsx` maps them |
+| `places/` | Every place's page and quick look (`work/` for the fifteen Wilds places, `halls/` for the five halls); `registry.tsx` maps them |
 | `battle/` | The fight's stage (`scene/`, Phaser), the fight source, labels and icons, the prefetch |
 | `save/` | The store (`game.ts`), the device copy (`db.ts`), sync (`reconcile.ts`), the active tier (`tier.ts`), her trade (`trade.ts`) |
 | `master/`, `content/` | Master data and the private enemy pack through uma-kit's content client |
@@ -104,8 +104,10 @@ lazy pages import it directly, so its rules load with the first command or page 
     retries up to 3 times. When both sides changed, the save with the newer `account.updatedAt` wins whole.
   - **Boot:** use the device copy at once and sync behind it; with no device copy, fetch the server's or start first
     launch. The device copy is read with `parseSaveAsync`.
-  - **The calling repair** (D220): once the save and master data have both loaded, `repairCallingRule` applies the
-    calling rule's current rows to every Uma's pick (`save/calling-repair.ts`). It is idempotent and changes no class.
+  - **The classes' trade step** (save v32, CV28): once the save and master data have both loaded,
+    `settleClassResetTrades` runs `settleClassesV3Trades` for a world whose reset record hasn't traded yet (its module
+    loads only then): an Uma whose calling's trade moved has her work settled. A second boot changes nothing. (D220's
+    calling repair retired with the calling pick at save v32.)
   - **Her trade** (`save/trade.ts`): built from the master roster once per world and passed to every work action.
   - **The active tier** (H35, `save/tier.ts`): `activeTier` picks the tier world every screen reads (`useWorld()`) and
     every action writes. It's remembered on the device as `rpg.tier`, written on every change, boot included.
@@ -157,7 +159,7 @@ lazy pages import it directly, so its rules load with the first command or page 
   uma-rpg gives it its places, currencies, words and art. `main.tsx` wires the uma-art atlases (`KitArtProvider`),
   the appearance and Motion, the shared `ContentProvider`, `AlbumArtProvider` and `WorkArtProvider` (item icons for the
   work screens). Faces use uma-data's `outfit-faces`, with the icon atlas as fallback; busts and plaza chibis use their
-  own families. Rules, vocabulary, routes and save v31 stay game-owned.
+  own families. Rules, vocabulary, routes and save v32 stay game-owned.
 - **The battle stage** is Phaser (`battle/scene/`). Every number and control is a DOM element laid over the canvas (D33).
   Each damage kind has one color (`KIND_COLOR` in `battle/labels.tsx`, over `index.css`'s `--kind-*` tokens, D234).
 
@@ -193,11 +195,11 @@ lazy pages import it directly, so its rules load with the first command or page 
 
 ## The save
 
-- **Schema v31** (`save/version.ts`, re-exported by `save/save.ts`).
+- **Schema v32** (`save/version.ts`, re-exported by `save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse: `migrations.ts`' `migrateWorld` runs each world's steps in order, and `save.ts` adds the
   account's own. A world older than v10 is reset, keeping its Umas and parties (D69).
-- New fights start on engine v18. An open fight of an older engine replays and settles on its own engine.
+- New fights start on engine v19. An open fight of an older engine replays and settles on its own engine.
 
 ### Save history
 
@@ -255,6 +257,18 @@ Recent steps:
   queues drop, then `work` is empty (`toV31`). Each line now has one gathering place, one workbench and one making
   place, and the parse accepts only each place's one kind of job among the fifteen place ids. Stock, gear, maps,
   levels, parties, targets, battles, Laurels and tickets stay.
+- **v32:** Classes v3's reset and Halls v2's merge (D247; live from H134), once per world (`toV32(world, tier)`; a world
+  with `classesV3` is left as it is). Each Uma's class goes to null in Tier 1's world (she fights as her calling's Tier
+  0) or to her class's Tier 1 class in a later one; every class's Class Rank, weapons, lines and loadout are emptied and
+  `calling` drops. Each class's EXP E on v31's curve comes back as Class Manuals, ⌈(E + min(E, 1,800)) ÷ 1,000⌉ in Tier
+  1's world and ⌈E ÷ 1,000⌉ later, paid as 1,000 Class Marks each into `wallet.classMarks`. The Paladin Bastion's and the
+  Cleric Chapel's seats merge into `healer-1` … `healer-4` (each Uma's higher Bond; the less-bonded of two Heroes keeps
+  the seat, the other its first Learner; ten Learners by Bond, the rest unseated with their Bond). The record
+  `classesV3` (the grant, each Uma's old classes, share and moved trade, the merge's lines, `traded`, `seen`) feeds "The
+  classes are rebuilt". The moved trades settle after the parse, on the first boot with the roster
+  (`settleClassesV3Trades`: her running job into the Warehouse with its Craft EXP, her queue dropped). Grades, maps,
+  levels, Craft Levels, parties, targets, the other seats, the Rift and the open fights stay (their v18 inputs replay and
+  settle on v18, a class she no longer holds paying its family's Tier 0).
 
 At every schema bump the API's GET migrates the stored save without writing it; in Firestore the first write of the
 new version copies the stored document to `saveBackups/{uid}-v{n}` (D69), and an older app's write is refused once
@@ -263,7 +277,7 @@ the newer version is stored (D45).
 ### The shape
 
 ```
-Save { schemaVersion: 31, account, tierWorlds: { "1": TierWorld, … } }
+Save { schemaVersion: 32, account, tierWorlds: { "1": TierWorld, … } }
 account { trainerName, createdAt, updatedAt, achievements { <id>: { at, run | null } },
   history { <outfitId>: [{ tier, at, run }] }, defeated { <castId>: at } }
 TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, sweepTickets, classMarks },
@@ -272,9 +286,12 @@ TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, swe
   items { <line item or made item id>: count }, buildings: {}, work: { <outfitId>: WorkRow }, targets [≤10],
   heroes: { <seat>: { hero, learners[≤10] } },
   rift { runs [RiftRun], echoes { <front>: { <level>: at } }, battle: RiftBattle | null, battles },
-  grant: TierGrant | null }
+  grant: TierGrant | null, classesV3?: ClassesV3Record }
 TierGrant { tickets, floor, umas { <outfitId>: { level, exp, tickets } }, deleted { gear, gems, upgrades },
   back { laurels, items, stock }, seen }
+ClassesV3Record { manuals, marks, umas { <outfitId>: { classId, ranks, pick, manuals, left, trade? { from, to } } },
+  halls [{ outfitId, from, to, was: hero | learner, now: learner | unseated, bond }], traded, seen }
+  (save v32's reset, once; absent in a world made after it)
 RiftRun { id, roster[20], startedAt, fronts { iron, arcane, duel, horde },
   convergence { attempts, open: { parties[4][5], rounds[] } | null }, traces { <front>: [trace] }, wonAt | null,
   ascendedAt | null }
@@ -285,12 +302,13 @@ WorkRow { outfitId, slot { building, slot } | null, entries [Entry], queue [≤3
   dropped { at, slot, requests, short, refused } | null }
 Entry { request { kind: gather | refine | craft | cut, item, count }, seconds[], inputs[], outputs[], exp[], startedAt,
   acceleratedMs, collected, speed, fromQueue }   (times in milliseconds)
-OwnedUma { unlockedAt, level, exp, classId, classes { <class>: { weapons[3], lines { <weapon>: B }, loadout } },
-  (six classes)
+OwnedUma { unlockedAt, level, exp, classId | null, classes { <class>: { weapons[3], lines { <weapon>: B }, loadout } },
+  (thirteen classes: a Tier 0 only in Tier 1's world, with any three weapons, no lines and its one-node skills)
   craft { level, exp }, ranks { classes: { <class>: { rank, exp } } },
+  (a Tier 0's track 1–10, up to 23,680 waiting at 10; a Tier 1 class held in Tier 1's world from rank 10)
   stars { open [node ids], moons [] }, gear { weapons { <weapon>: { grade } }, armor { <slot>: { grade } },
-  accessories [{ grade, family | null, form: base, kind? }] }, bonds { <seat>: { level, exp } },
-  calling { pick: spellblade | mage | paladin | cleric | null, confirmed } }
+  accessories [{ grade, family | null, form: base, kind? }] }, bonds { <seat>: { level, exp } } }
+  (seats `${hall}-${1..4}`: brawler, mage, spellblade, summoner, healer; no `calling` since v32)
 ```
 
 An open fight is stored as `{ input, actions }`: the frozen fight and every action, replayed on load (D52).
@@ -354,8 +372,8 @@ pnpm docs:update             # rewrite these docs' live blocks after a rule chan
 - `.claude/launch.json` runs the same two servers for Claude's preview.
 - Add `?canvas` to a Hub URL to force Phaser's canvas renderer for screenshots.
 - Balance: `SIM=1 npx vitest run src/world/balance.test.ts` in `packages/domain` (`SIM_ENGINE` picks the engine);
-  each release's tables are `world/balance-v16.test.ts` to `balance-v18.test.ts` and `rift/balance-v15.test.ts` to
-  `balance-v17.test.ts`, with `SIM_SEEDS`, `SIM_LEVELS` and `SIM_TARGETS`.
+  each release's tables are `world/balance-v16.test.ts` to `balance-v19.test.ts` and `rift/balance-v15.test.ts` to
+  `balance-v19.test.ts`, with `SIM_SEEDS`, `SIM_LEVELS` and `SIM_TARGETS`.
 
 ## uma-platform
 

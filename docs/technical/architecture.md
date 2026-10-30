@@ -1,7 +1,7 @@
 # Architecture
 
-> **Status: current, 2026-10-28; save v31, engine v18 (weaknesses v2, D235–D237).** The full running-system reference is
-> [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
+> **Status: current, 2026-10-30; save v32, engine v19 (Classes v3 and Halls v2, D240, D241).** The full running-system
+> reference is [the architecture manual](../game/architecture.md) (D92). This page records the boundaries and decisions;
 > production values stay in [infrastructure.md](infrastructure.md).
 > Cross-game rules live in uma-platform `docs/architecture.md`.
 
@@ -21,16 +21,19 @@ Tooling and exact dependency versions are generated in [dependencies](../game/de
 One account has one revisioned snapshot and one local Dexie row (D32). Strict domain parsers validate both device
 and API input. An open fight is frozen input plus actions; replay proves its state (D52).
 
-**Schema v31** (`save/version.ts`; the shape and parse in `save/save.ts`):
+**Schema v32** (`save/version.ts`; the shape and parse in `save/save.ts`):
 - `account`: trainer name, timestamps, achievements, each Uma's tier history and the boss and sub-boss faces defeated
   in Rift fights, shared by every tier (D159, D171).
 - `tierWorlds`: each world's wallet, Umas, twenty parties, world progress, its Warehouse (`items`: the five lines'
   materials and the made items), per-Uma work rows (SC3) on the fifteen places, targets, Hall of Heroes seats, its Rift: runs
   (with each front's traces and the open Convergence attempt), Echo wins, the open Rift fight (replayed like the world
-  map's) and its fight count (D161, D171), and the Tier rework's `grant` (D214).
-- An Uma keeps `classId` and per-class `classes` (three weapons, her `lines`, loadout) for six classes, her calling pick
-  (`calling`, D205), her Craft Level, Class Ranks, her Extra Stats map (`stars`: open nodes), her gear grades (by weapon
-  kind, five armor slots, one accessory slot with its family and kind) and Bonds.
+  map's) and its fight count (D161, D171), the Tier rework's `grant` (D214) and Classes v3's reset record `classesV3`
+  (D247).
+- An Uma keeps `classId` and per-class `classes` (three weapons, her `lines`, loadout) for the thirteen classes (Tier 0s
+  in Tier 1's world only), her Craft Level, Class Ranks (a Tier 0's 1–10 with EXP waiting, a held Tier 1 class's from 10),
+  her Extra Stats map (`stars`: open nodes), her gear grades (by weapon kind, five armor slots, one accessory slot with
+  its family and kind) and Bonds (seats by hall, the Healer Sanctum's `healer-*` from v32). Her calling pick (`calling`,
+  D205) went with v32.
   There are no active `build`/`builds` keys (D86).
 - `world` holds the active party, one run (stage wins, MP per Uma, an open battle) and Spring uses. Per-party chapter
   runs retired in v11 (D72).
@@ -61,8 +64,9 @@ and API input. An open fight is frozen input plus actions; replay proves its sta
 | v29 the grant tickets only: a granted world's materials leave its Warehouse; made items, Laurels and tickets stay | D221 |
 | v30 the farm by line: old material stock converts to the five graded lines and old work settles; each making place processes its own line and makes its item | D224, D228 |
 | v31 the Wilds' trios: old work settles; each line moves to separate gathering, processing and making places | D230, D232 |
+| v32 Classes v3's reset: every Uma to her Tier 0 at Class Rank 1 (a later tier's to its Tier 1 class), her Class EXP back as Class Marks, the calling pick dropped; Halls v2's Healer Sanctum merge; moved trades settle on the next boot; open v18 fights replay on v18 | D247 |
 
-`parseSave` accepts v1–v31 and returns v31; a world older than v10 takes v10's reset (D69), and `migrations.ts` runs the
+`parseSave` accepts v1–v32 and returns v32; a world older than v10 takes v10's reset (D69), and `migrations.ts` runs the
 rest.
 The API rejects an older-schema overwrite and backs up a stored save before a schema upgrade (D45, D69).
 The device writes locally first, syncs after 1.5 seconds and when foreground/online, and resolves concurrent snapshots
@@ -74,8 +78,8 @@ by newer `account.updatedAt` (D32). Exact save shapes, endpoints and local setup
 | Module | Owns |
 |---|---|
 | `save/` | Pure actions over saves, refusals, inputs and reward settlement |
-| `rpg/battle/` | Deterministic combat reducer and cues; engine v18 (weaknesses v2, D235–D237) plays v17's rules with the Summoner's Tome hand ×0.62 (`rpg/rules.ts`), its foes' lists dealt per stage by `rpg/campaign/weaknesses.ts`; v17 is R2's economy on v16's fight; every older version replays as it was; `caps.ts` holds the switch and `rpgRework` |
-| `rpg/catalog.ts`, `rpg/rules.ts`, `rpg/tree-view.ts` | D86 classes, six since classes v2 (D179), fifty trees, class rules by generation; from v16 (live since H72) each tree a trunk and one fork into lines A and B, Skill Ranks and the Skills tab's tree model (D201) |
+| `rpg/battle/` | Deterministic combat reducer and cues; engine v19 (Classes v3 and Halls v2, D240, D241, live since H134) plays the thirteen classes, the hands' lead half, the volley and the double, the re-paired twins and the halls' twenty Limit Breaks; v18 is weaknesses v2 (D235–D237: its foes' lists dealt per stage by `rpg/campaign/weaknesses.ts`), v17 R2's economy on v16's fight; every older version replays as it was; `caps.ts` holds the switch and `rpgRework` |
+| `rpg/catalog.ts`, `rpg/rules.ts`, `rpg/class-tree.ts`, `rpg/tree-view.ts` | D86 classes, six since classes v2 (D179), thirteen in a tree since Classes v3 (D240): five Tier 0 promoting at Class Rank 10 into eight Tier 1; 70 Tier 1 trees and 50 one-node Tier 0 trees, class rules by generation; from v16 (live since H72) each tree a trunk and one fork into lines A and B, Skill Ranks and the Skills tab's tree model (D201) |
 | `world/` | Seeded continents, five-level region climbs, formations and waves (D72, D91, D97); foes by generation, from v18 with each foe's list from the stage dealer (`rpg/campaign/weaknesses.ts`, D235–D237) over Tier 1's shields |
 | `economy/`, `items/` | Professions and the fifteen places, times and prices, gear grades, accessories, the Planet, Class Ranks, points; the five lines' hundred items, the made items and their one-line recipes (D224, D230); v1's catalogs for the migrations |
 | `work/` | uma-rpg's kinds and env on `@luismlorenzana/uma-work` (SC3): gather, process and make, one kind a place, the trade gate |

@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  BATTLE_ENGINE_VERSION, markClassesV3Seen, markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, repairCallingChoices, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingRepairOutfit, type FightResult, type RpgBranch, type RpgClass,
+  BATTLE_ENGINE_VERSION, markClassesV3Seen, markGrantSeen, newSave, ownerTier, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass,
   type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
@@ -117,17 +117,10 @@ export async function createAccount(trainerName: string): Promise<void> {
   await commit(newSave(trainerName, nowIso()))
 }
 
-/** D220: master-data-aware repair for the calling rows whose eligibility changed. Idempotent on every app boot. */
-export async function repairCallingRule(roster: readonly CallingRepairOutfit[]): Promise<void> {
-  const { save } = useGame.getState()
-  if (!save) return
-  const next = repairCallingChoices(save, roster, nowIso())
-  if (next !== save) await commit(next)
-}
-
 /** Save v32's class reset (H130, live from H134): the trades the new calling moved settle once the roster has loaded
- * (`settleClassesV3Trades`, CV28). Its rules load only while a world's record waits for them; until H134 no save has one. */
-export async function settleClassResetTrades(roster: readonly CallingRepairOutfit[]): Promise<void> {
+ * (`settleClassesV3Trades`, CV28). Its rules load only while a world's record waits for them: once, after a save's first
+ * migration to v32. */
+export async function settleClassResetTrades(roster: readonly (CallingOutfit & { outfitId: string })[]): Promise<void> {
   const waiting = (save: Save | null) => !!save && Object.values(save.tierWorlds).some((world) => world.classesV3 && !world.classesV3.traded)
   if (!waiting(useGame.getState().save)) return
   const { settleClassesV3Trades } = await import('@rpg/domain/battle')
@@ -203,11 +196,6 @@ export const promoteClass = (outfitId: string, from: RpgClass, to: RpgClass) =>
 /** Takes line A or B on one of her class's trees (CP18, H69's `pickBranch`): free, her equipped skills follow. */
 export const takeBranch = (outfit: BattleOutfit, classId: RpgClass, weapon: RpgWeapon, branch: RpgBranch) =>
   edit(import('@rpg/domain/battle'), (d, s, now, t) => d.pickBranch(s, outfit, classId, weapon, branch, now, t))
-/** Picks her calling, one of her row's two (CP29, H69's `pickCalling`); at Uma Lv 1 her class follows. */
-export const chooseCalling = (outfit: BattleOutfit, pick: RpgClass) =>
-  edit(import('@rpg/domain/battle'), (d, s, now, t) => d.pickCalling(s, outfit, pick, now, t))
-/** Makes her calling final (CP29, H69's `confirmCalling`). */
-export const confirmCallingPick = (outfitId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.confirmCalling(s, outfitId, now, t))
 /** Sets several Umas' class weapons in one save (the Rift's guided build, v16, CP7): weapons are owned per kind, so it
  * costs nothing; her equipped skills of a tree she stops slotting leave her loadout (H69). From v19 a member marked
  * `switch` also fights as that class, one she holds (CV §10.1). */

@@ -63,7 +63,7 @@ for (const f of rpgRework('economy') ? PLACES_V4 : FACILITIES) {
   PLACE_UI[f.id] = { Peek: FacilityPeek, Page: FacilityPage }
 }
 
-// The live generation's Halls of Heroes share one page (D106): today's six, Halls v2's five from the switch (H133).
+// The live generation's Halls of Heroes share one page (D106): Halls v2's five since H134 (H133).
 const HallPage = lazy(() => import('./halls/HallPage'))
 const HallPeek = lazy(() => import('./halls/HallPage').then((m) => ({ default: m.HallPeek })))
 for (const hall of heroHalls()) PLACE_UI[HERO_HALL_PLACES[hall]] = { Peek: HallPeek, Page: HallPage }

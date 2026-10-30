@@ -1,4 +1,4 @@
-// Halls v2 in the domain (H129; halls-v2.md §0, §2–§5, HV1–HV17, HV20), built dark at engine v19: five halls, their seat
+// Halls v2 in the domain (H129; halls-v2.md §0, §2–§5, HV1–HV17, HV20), engine v19 (live since H134): five halls, their seat
 // ids by generation, the twenty Limit Breaks with their own power, kinds, shapes and statuses, the class scale and the hit
 // cap, checked against the design's tables. The numbers are §3.3's at 100%, scale 1 and an open power of 1, before stats.
 import { describe, expect, it } from 'vitest'
@@ -6,7 +6,7 @@ import { RPG_AOE_SHARE, RPG_RANDOM_BONUS, RPG_VOLLEY, type RpgSkillDef } from '.
 import { RPG_TIER1_CLASSES } from './class-tree'
 import {
   ALL_HERO_LIMIT_IDS, HERO_HALL_PLACES, HERO_LIMIT_IDS, HERO_LIMIT_MAX_HITS, HERO_LIMIT_SCALE, HERO_LIMITS, hallOfPlace, heroHalls,
-  heroLimitClass, heroLimitFor, heroLimitHall, heroLimitIds, heroLimitKinds, heroLimitsOfHall, heroLimitScale, heroLimitSkills, heroSeatHome,
+  heroLimitFor, heroLimitHall, heroLimitIds, heroLimitKinds, heroLimitsOfHall, heroLimitScale, heroLimitSkills, heroSeatHome,
   isHeroLimitId, type HeroHall, type HeroLimit, type HeroLimitId,
 } from './heroes'
 import {
@@ -113,13 +113,13 @@ describe('Halls v2’s halls and seats by generation (HV1, HV3, HV20)', () => {
     expect(ALL_HERO_LIMIT_IDS).toHaveLength(28)
     expect(new Set(ALL_HERO_LIMIT_IDS).size).toBe(28)
     expect(new Set([...heroLimitIds(14), ...heroLimitIds(18), ...heroLimitIds(V19)])).toEqual(new Set(ALL_HERO_LIMIT_IDS))
-    // The live game keeps v18's 24 until H134.
-    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(18))
-    expect(HERO_LIMITS.map((l) => l.id)).toEqual(heroLimitIds(18))
+    // The live game is Halls v2's twenty since H134.
+    expect(HERO_LIMIT_IDS).toEqual(heroLimitIds(V19))
+    expect(HERO_LIMITS.map((l) => l.id)).toEqual(heroLimitIds(V19))
   })
 
   it('reads a seat by generation: `healer-*` only from v19, `paladin-*` and `cleric-*` only before it', () => {
-    expect([isHeroLimitId('healer-1', 18), isHeroLimitId('healer-1', V19), isHeroLimitId('healer-1')]).toEqual([false, true, false])
+    expect([isHeroLimitId('healer-1', 18), isHeroLimitId('healer-1', V19), isHeroLimitId('healer-1')]).toEqual([false, true, true])
     expect([isHeroLimitId('paladin-1', 18), isHeroLimitId('paladin-1', V19), isHeroLimitId('cleric-4', V19)]).toEqual([true, false, false])
     expect([isHeroLimitId('paladin-1', 14), isHeroLimitId('cleric-1', 14), isHeroLimitId('brawler-4', V19)]).toEqual([false, true, true])
     expect(['healer-5', 'warrior-1', 'brawler', 7].some((id) => isHeroLimitId(id, V19))).toBe(false)
@@ -139,8 +139,9 @@ describe('Halls v2’s halls and seats by generation (HV1, HV3, HV20)', () => {
 
   it('names each seat’s hall and home class: Halls v2’s table from v19, the hall’s class before', () => {
     for (const r of ROWS) expect([heroLimitHall(r.id), heroSeatHome(r.id, V19)], r.id).toEqual([r.id.slice(0, r.id.lastIndexOf('-')), r.home])
-    // Before v19 every seat is its hall's class's (the live web's `heroLimitClass`).
-    for (const id of heroLimitIds(18)) expect([heroSeatHome(id, 18), heroLimitClass(id)], id).toEqual([heroLimitHall(id), heroLimitHall(id)])
+    // Before v19 every seat is its hall's class's; the live default reads Halls v2's table since H134.
+    for (const id of heroLimitIds(18)) expect(heroSeatHome(id, 18), id).toBe(heroLimitHall(id))
+    for (const r of ROWS) expect(heroSeatHome(r.id), r.id).toBe(r.home)
     expect([heroSeatHome('spellblade-3', 18), heroSeatHome('spellblade-3', V19)]).toEqual(['spellblade', 'tomeblade'])
     expect([heroSeatHome('summoner-1', 18), heroSeatHome('summoner-1', V19)]).toEqual(['summoner', 'armsummoner'])
     // A hall's seats in order, by generation.
@@ -226,7 +227,7 @@ describe('the twenty Limit Breaks (HV5–HV16, §4)', () => {
       'summoner-1': 3, 'summoner-2': 3, 'summoner-3': 3, 'summoner-4': 3, 'healer-1': 4, 'healer-2': 4, 'healer-3': 4, 'healer-4': 4,
     })
     for (const l of twenty) expect(hitsOnOneFoe(l), l.id).toBeLessThanOrEqual(HERO_LIMIT_MAX_HITS)
-    // Today's most was twelve (Chaos Rain).
+    // v18's most was twelve (Chaos Rain).
     expect(Math.max(...heroLimitIds(18).map((id) => hitsOnOneFoe({ ...heroLimitFor(id, 18)!, power: 1 })))).toBe(12)
   })
 })

@@ -1,20 +1,25 @@
 # Combat
 
-How a fight works today, on **engine v18** (D237). It is Tier 1's fight from the Tier rework (engine v16, D210:
+How a fight works today, on **engine v19**. It is Tier 1's fight from the Tier rework (engine v16, D210:
 [class progression](../design/tier-rework/class-progression.md)), its economy (engine v17, D218:
 [weapon progression](../design/tier-rework/weapon-progression.md) and
-[Extra Stats progression](../design/tier-rework/extra-stats-progression.md)) and
-[weaknesses v2](../design/tier-rework/weaknesses-v2.md) (engine v18, D235–D237). Engine v18 changes the world foes'
-weakness lists and the Summoner's Tome hand (0.58 → 0.62); every other battle rule is v17's. A fight started on an older
-engine (v6–v17) replays and settles on that engine's own rules.
+[Extra Stats progression](../design/tier-rework/extra-stats-progression.md)),
+[weaknesses v2](../design/tier-rework/weaknesses-v2.md) (engine v18, D235–D237), and
+[Classes v3](../design/classes-v3/classes-v3.md) with [Halls v2](../design/classes-v3/halls-v2.md) (engine v19, D240,
+D241). Engine v19 brings the thirteen classes and Tier 0, the hands' lead half, the volley and the double, the re-paired
+twins (Katana–Light, Bow–Dark), the Brawler's and the Sorcerer's new B lines, the Halls' twenty Limit Breaks with their
+own power, and the Rift's builds by family; every other battle rule is v18's. A fight started on an older engine (v6–v18)
+replays and settles on that engine's own rules: fights from v18 and before replay with six classes and the 24 Limit
+Breaks.
 
 Every number below comes from the code. The tables between `live` markers are generated (see
 [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the engine.
 
 Code: `packages/domain/src/rpg/battle/` (`engine.ts` the reducer, `skills.ts` its constants and skill lookup, `limit.ts`,
-`auto.ts`, `types.ts`, and `caps.ts`, which holds `BATTLE_ENGINE_VERSION`), the class rules in `rpg/rules.ts`, the skills
-in `rpg/catalog.ts`, foes in `rpg/campaign/enemies.ts` and their weaknesses in `rpg/campaign/weaknesses.ts`, stages in
-`world/world.ts` ([maps](maps.md)), the Rift's fights in `rift/` (`fronts.ts`, `generate.ts`, `picker.ts`). The screen is
+`auto.ts`, `types.ts`, and `caps.ts`, which holds `BATTLE_ENGINE_VERSION`), the class rules in `rpg/rules.ts` and
+`rpg/class-tree.ts`, the skills in `rpg/catalog.ts`, the Limit Breaks in `rpg/heroes.ts`, foes in
+`rpg/campaign/enemies.ts` and their weaknesses in `rpg/campaign/weaknesses.ts`, stages in `world/world.ts`
+([maps](maps.md)), the Rift's fights in `rift/` (`fronts.ts`, `generate.ts`, `picker.ts`). The screen is
 `apps/web/src/places/scenario-gate/FightScreen.tsx`, which the world map and the Rift share through a fight source
 (`battle/fight-source.ts`, H50).
 
@@ -47,7 +52,8 @@ in `rpg/catalog.ts`, foes in `rpg/campaign/enemies.ts` and their weaknesses in `
     shield; an Attack counts her Bell's follow-up, and against a Rift foe's ward the warded channel counts for less;
   - a healer's support counts too: a mend for the hurt, a Barrier for the threatened, a revive for the fallen (a support
     that uses its whole share is worth 1.5 casts of its depth's damage);
-  - a Spell Blade or a Summoner picks her best leading half, then her best other half with the MP left;
+  - a volley counts its splash on every other standing foe too;
+  - a Spellblade or a Summoner picks her best lead half, then her best other half with the MP left;
   - if the engine refuses the pick, an Attack with her first weapon, then a Guard.
 
   Any tap hands control back, and so does a failed action. Speed plays the animations at 1×, 2× or 4×.
@@ -84,19 +90,32 @@ Break add nothing; Limit points give a head start.
 skills' MP ([classes](classes.md)). A skill costs its own MP × her MP hand, rounded and at least 1, × the tier it
 belongs to.
 
-Class rules change the act ([classes](classes.md)):
-- **Brawler and Mage:** one skill or one Attack an act, at her hand ×1.0.
-- **Spell Blade:** every act is a pair, one Arms half (an Attack or an Arms skill) and one Tome half, at ×0.72 and ×0.44.
-  The Arms half resolves first, whatever order they were picked in, and the MP is the sum of the halves. **Her Arms half
-  lands one extra hit:** its power is spread over one more hit, so an Attack lands as two hits at half power and an
-  n-hit skill as n + 1, the total unchanged. Each weak hit chips a shield point, so with an Attack in each half she chips
-  three an act.
-- **Summoner:** every act is a pair too, a Tome summon and an Arms summon (an Attack can be either half), at ×0.62 and
-  ×0.5; the Tome half resolves first. Her **Tome summon lingers**. When her next pair comes, before either half, it
-  strikes **every living foe** once in farewell, one hit of its kind at its linger share (0.3, or 0.4 on her Tome trees'
-  line B, Bonded) × its hits' power × `BATTLE_FAREWELL_FACTOR` (0.1), then leaves. The farewell can't be intercepted,
-  and a weak one chips a shield. An Arms summon or an Attack leaves nothing. Limit Breaks, Guards and new waves keep the
-  lingering summon; if she falls, it leaves with her. Her skills carry no support.
+Class rules change the act ([classes](classes.md)). A pair class's hand has a **lead half** (D245), the larger, which
+resolves first whatever order the halves were picked in:
+
+| Class | An act | Hands, the lead first | MP |
+|---|---|---|---|
+| A Tier 0 | One skill or Attack | ×1 | ×1 |
+| Brawler, Sorcerer | One skill or Attack | ×1 | ×1 |
+| Arms Spellblade | A pair, the Arms half first, with the extra hit | Arms ×0.72, Tome ×0.44 | ×0.5 a half |
+| Tome Spellblade | A pair, the Tome half first, with the extra hit | Tome ×0.72, Arms ×0.48 | ×0.5 a half |
+| Arms Summoner | A pair, the Arms summon first, lingering | Arms ×0.57, Tome ×0.46 | ×0.5 a half |
+| Tome Summoner | A pair, the Tome summon first, lingering | Tome ×0.57, Arms ×0.5 | ×0.5 a half |
+| Paladin, Cleric | One skill or Attack | ×0.5 | ×0.6 |
+
+- **A Tier 0:** one skill or one Attack an act, at ×1. Her skill is one hit on one foe at her Class Rank's power, 10 MP.
+- **Brawler and Sorcerer:** one skill or one Attack an act, at her hand ×1.0.
+- **The Spellblades:** every act is a pair, one Arms half (an Attack or an Arms skill) and one Tome half (an Attack or a
+  Tome skill), and the MP is the sum of the halves. **Her lead half lands one extra hit:** its power is spread over one
+  more hit, so an Attack lands as two hits at half power and an n-hit skill as n + 1, the total unchanged. Each weak hit
+  chips a shield point, so with an Attack in each half she chips three an act. The Arms Spellblade leads with her Arms,
+  the Tome Spellblade with her Tomes.
+- **The Summoners:** every act is a pair too, an Arms summon and a Tome summon (an Attack can be either half). Her **lead
+  summon lingers**: the Arms Summoner's Arms one, the Tome Summoner's Tome one. When her next pair comes, before either
+  half, it strikes **every living foe** once in farewell, one hit of its kind at its linger share (0.3, or 0.4 on her
+  lead trees' line B, Bonded) × its hits' power × `BATTLE_FAREWELL_FACTOR` (0.1), then leaves. The farewell can't be
+  intercepted, and a weak one chips a shield. Her other half's summon or an Attack leaves nothing. Limit Breaks, Guards
+  and new waves keep the lingering summon; if she falls, it leaves with her. Her skills carry no support.
 - **Paladin and Cleric:** the healers, one skill or Attack an act at ×0.5. Their Arms skills put a debuff on the tapped
   foe and a **Barrier** on the Uma the shown moves threaten most; their Tome skills put a buff on every Uma, **mend** the
   most hurt and **cleanse** one foe status from each. At depth 5 the debuff reaches every foe, and the Barrier and the
@@ -115,18 +134,23 @@ the damage stack, `battleDamage`). For each part of each hit:
      ([below](#her-accessory-and-signature)).
 2. **The hit:** `offense² ÷ (offense + defense) × power` (D141). Defense is the target's DEF against an Arms kind and
    M.DEF against an element. The same ratio gives the same share at every level, and it is never zero. Power is the
-   hit's share of its skill (an Attack 1.0) × her hand for its half × her **Skill Rank**, ×0.95 to ×1.05
-   ([classes](classes.md#skills-depths-lines-and-ranks)); Attacks and Limit Breaks don't rank. A farewell's, a Bell's
-   and a Limit Break's power are their own (above, [below](#her-accessory-and-signature) and [below](#limit-breaks)).
+   hit's share of its skill (an Attack 1.0) × her hand for its half (a pair's lead half the larger,
+   [above](#the-actions)) × her **Skill Rank**, ×0.95 to ×1.05 ([classes](classes.md#skills-depths-lines-and-ranks));
+   Attacks and Limit Breaks don't rank, and a Tier 0's skill takes her Class Rank's power instead. A volley's hits on the
+   tapped foe share 0.8 of its power and its splash hit on each other foe is 0.35 (for 2 MP more than the depth's); a
+   double's two hits on one foe each carry half. A farewell's, a Bell's and a Limit
+   Break's power are their own (above, [below](#her-accessory-and-signature) and [below](#limit-breaks)).
 3. **Weak:** ×1.3 when the hit's kind is on the foe's list ([below](#weaknesses-shields-and-breaks)), or it's Light or
    Dark against a Hexed foe.
 4. **Her Insignia:** ×(1 + 1.5% a grade) on a sub-boss or a boss.
 5. **Statuses** ([below](#statuses)), each its own factor: the attacker's Brave or Faith (+10% a stack, by channel),
    Power-up (+15%), Weaken (−15%) and Enfeeble (−10%); the target's Armor Break or Mind Break (+10%, by channel), Shock
    and Mark (+10%), Ward (−15%) and Aegis (−10%).
-6. **Specials:** `vs-broken` ×1.3 on a Broken foe, `vs-wounded` ×1.3 on a foe below half HP.
-7. **Unbroken foes take ×0.5.** Breaking them is how damage lands. `pierce` skips this step: the Spell Blade's line B,
-   the Brawler's Katana B and the Mage's Dark B, each one hit at ×1.15 of its depth's power.
+6. **Specials:** `vs-broken` ×1.3 on a Broken foe, `vs-wounded` ×1.3 on a foe below half HP. A volley's special and
+   rider land on the tapped foe; its splash is plain: no special, and no rider on a foe only the splash struck.
+7. **Unbroken foes take ×0.5.** Breaking them is how damage lands. `pierce` skips this step: both Spellblades' line B,
+   the Brawler's Katana B and the Sorcerer's Light B, each one hit at ×1.15 of its depth's power (×1.035 the Brawler's,
+   about ×0.98 the Sorcerer's, after their lines' factors).
 8. **The ward:** a Rift foe takes ×0.5 again from the channel she wards, Broken or not, `pierce` or not
    ([below](#weaknesses-shields-and-breaks)).
 9. **Evasion:** an Uma takes less by her evasion, 0.6% a Speed point (from her feet armor and Extra Stats), 50% at most.
@@ -151,6 +175,8 @@ Where the stats come from (`projectRpgStats` in `rpg/rules.ts`):
 | MDEF | (Power + Wit) ÷ 2 | × class lean, … |
 | Initiative | Stamina | Foes act by initiative; Umas act in the order you choose |
 | Healing scale | A Paladin's ATK, a Cleric's M.ATK; anyone else's higher | Her mends, Barriers and revives ×(1 + it ÷ 300) |
+
+A Tier 0 has no class lean (×1 on all six).
 
 Her armor and Extra Stats add flat points on top ([materials](materials.md#gear), [loops](loops.md#extra-stats-and-gear)):
 a point is +1 to its stat (+5 for HP), a Speed point 0.6% evasion and a Limit point 0.4 of a head start on the gauge,
@@ -202,7 +228,7 @@ Flat offense is ×1.8 in Tier 2 and ×2.6 in Tier 3; the Bell and the Insignia a
 - **The Bell's follow-up** (WP21): when her act includes an Attack (either half of a pair; never a skill-only act, a Guard
   or a Limit Break), her weapon of the Bell's kind strikes once more: one hit of its kind at 0.1 a grade × her hand for
   that weapon, on the act's target, or a foe drawn by the seed if it fell. It takes every step of the stack, a guard can
-  intercept it, and a weak one chips a shield and breaks a lock. It never splits (no Spell Blade extra hit), adds
+  intercept it, and a weak one chips a shield and breaks a lock. It never splits (no Spellblade extra hit), adds
   nothing to the Limit gauge, and works only on a kind she slots. The log labels it "Bell".
 - **The Insignia** reads the foe's rank, not her face: the Rift Horde's boss-faced leaders are regulars, so it skips them.
 - **Her signature** (WP33, UT7): while one of her slots holds her knack's family at G1 or above, she adds 0.2 a level ×
@@ -247,6 +273,10 @@ Flat offense is ×1.8 in Tier 2 and ×2.6 in Tier 3; the Bell and the Insignia a
   Arcane's for Arms), the hit line reads "· warded", and foe lists show "Wards Tomes" or "Wards Arms".
 - Elements beat each other in a ring and a pair: **Fire > Ice > Lightning > Fire**, and **Light ⇄ Dark**. The ring leads
   a world foe's element list; the rest of her list is dealt.
+- **The twins** pair each Arm with an element: Greatsword–Fire, Axe–Ice, Lance–Lightning and, from engine v19,
+  **Katana–Light** and **Bow–Dark** (Bow–Light and Katana–Dark before; CV13). The Rift's Duel and Horde draw their
+  weaknesses by twin set ([below](#the-rifts-foes)), and a Hall seat answers by them; weaknesses v2 reads no twin, so the
+  world's lists didn't move.
 
 ## Statuses
 
@@ -254,7 +284,7 @@ Flat offense is ×1.8 in Tier 2 and ×2.6 in Tier 3; the Bell and the Insignia a
 |---|---|---|
 | Armor Break | Paladin and Cleric Greatsword skills; riders on Arms skills (below) | +10% physical damage taken |
 | Mind Break | Paladin and Cleric Lance skills | +10% magical damage taken |
-| Enfeeble | Paladin and Cleric Axe skills (a Paladin's on every foe from depth 4); Ice riders and the Summoner's Dark | −10% damage dealt |
+| Enfeeble | Paladin and Cleric Axe skills (a Paladin's on every foe from depth 4); Ice riders and the Summoners' Dark | −10% damage dealt |
 | Shatter | Paladin and Cleric Bow skills | Removes a shield point a stack, at once |
 | Hex | Paladin and Cleric Katana skills | Weak to Light and Dark while it lasts (one stack) |
 | Shock | Lightning riders | +10% damage taken |
@@ -272,10 +302,11 @@ Flat offense is ×1.8 in Tier 2 and ×2.6 in Tier 3; the Bell and the Insignia a
 - **A healer's statuses** come 1, 1, 2, 2 and 3 stacks at depths 1–5. Her line A (Lasting) makes them last 3 rounds;
   her line B (Heavy) adds a stack. A debuff lands on the tapped foe, on every foe at depth 5 (a Paladin's Enfeeble from
   depth 4); a buff on every Uma.
-- **Riders and specials** sit on depth-5 skills ([skill trees](skill-trees.md) list them): the Brawler's, the Mage's and
-  the Spell Blade's line A, and both of the Summoner's lines. Fire puts Burn on the foes it hits, Ice Enfeeble, Lightning
-  Shock, and every Arm but the Katana Armor Break. The Katana and Light deal ×1.3 to a Broken foe instead, and Dark ×1.3
-  to a foe below half HP; the Summoner's Dark puts on Enfeeble, and her Light has none.
+- **Riders and specials** sit on depth-5 skills ([skill trees](skill-trees.md) list them): the Brawler's, the
+  Sorcerer's and both Spellblades' line A, both Summoners' lines, and the two Barrages. Fire puts Burn on the foes it
+  hits, Ice Enfeeble, Lightning Shock, and every Arm but the Katana Armor Break. The Katana and Light deal ×1.3 to a
+  Broken foe instead, and Dark ×1.3 to a foe below half HP; the Summoners' Dark puts on Enfeeble, and their Light has
+  none. A volley's lands on the tapped foe only. A Tier 0's skill has none.
 - A status adds up to 3 stacks and its rounds refresh to the longer. Statuses count down at the round's end.
 
 Battle badges show the published status glyph and its stack count, with the full name in the accessible label.
@@ -284,8 +315,9 @@ beside decorative glyphs; Shatter and Clarity act immediately, so they do not cr
 
 ## Support
 
-The party's defensive half is its one healer, a Paladin or a Cleric (classes v2's one healer, doubled shares). Brawler,
-Mage, Spell Blade and Summoner deal damage only. Every support comes after the skill's hits.
+The party's defensive half is its one healer, a Paladin or a Cleric (classes v2's one healer, doubled shares). Every
+other class deals damage only, a Tier 0 too (an Acolyte doesn't heal), and no Limit Break mends from engine v19. Every
+support comes after the skill's hits.
 
 | Support | Who | What it does |
 |---|---|---|
@@ -299,21 +331,23 @@ Mage, Spell Blade and Summoner deal damage only. Every support comes after the s
 
 - **Her shares rank:** a mend's and a Barrier's share take her Skill Rank's ×0.95 to ×1.05, as power does.
 - **Her healing scale:** every mend, Barrier and revive ×(1 + offense ÷ 300), offense being a Paladin's ATK and a
-  Cleric's M.ATK (anyone else's higher, for a Limit Break's). An on-curve Lv 50 healer is about ×1.6. Her battle sheet
-  shows it ("Mends ×1.62 (from ATK)"). A Drain doesn't take it.
-- **One healer a party:** a party with two Paladins or Clerics, or one of each, can't start a fight
-  ([classes](classes.md#the-six-classes)).
+  Cleric's M.ATK (anyone else's higher, for a v15–v18 Limit Break's). An on-curve Lv 50 healer is about ×1.6. Her
+  battle sheet shows it ("Mends ×1.62 (from ATK)"). A Drain doesn't take it.
+- **One healer a party:** a party with two Paladins or Clerics, or one of each, can't start a fight; a Tier 0 never
+  counts ([classes](classes.md#the-class-tree)).
 - **Rally:** 30% of the last foe hit an Uma took (after Barriers) shows grey on her HP bar. If the party Breaks or
   defeats that foe before the foe moves again, the Uma wins it back.
 
 ## Sustain: MP and the Flourish
 
 - **The base MP regen** (SB18, D204, D215): at each round's end every Uma standing regains 1% of her max MP for each skill
-  depth her Class Rank opens, five at most (5% from Class Rank 40), rounded, at least 1, one cue ("+15 MP"). A Class
-  Rank 40 Mage with 296 MP regains 15 a round; her Battle tab reads "MP 296 · +15 a round". It never takes her past her
-  max. A Clarity restores MP at once; between fights, Springs refill it ([maps](maps.md)).
-- **The Flourish** (UT6, D204): while she fights as her calling's class, her template gives her 4% of her max HP a
-  fight, in her stride's shape ([classes](classes.md#her-calling-and-her-template)): **Clean break** a Barrier of 4% at
+  depth her Class Rank opens, five at most (5% from Class Rank 40), rounded, at least 1, one cue ("+15 MP"); a Tier 0's
+  is depth 1's, 1%. A Class Rank 40 Sorcerer with 296 MP regains 15 a round; her Battle tab reads "MP 296 · +15 a
+  round". It never takes her past her max. A Clarity restores MP at once; between fights, Springs refill it
+  ([maps](maps.md)).
+- **The Flourish** (UT6, D204, CV21): while she fights as any class of her calling's family (her Tier 0 and its
+  children), her template gives her 4% of her max HP a fight, in her stride's shape
+  ([classes](classes.md#her-calling-and-her-template)): **Clean break** a Barrier of 4% at
   the start, which lapses at round 1's end; **Even pace** 1% at each round's end; **Late reserve** 2% at each round's
   end from round 3, each up to 4%. No healing scale, it never overheals, and a fallen Uma gets none; once a fight, not
   each wave. The log reads "{her name} ★ +30 HP" or "{her name}: ★ Barrier 37".
@@ -336,22 +370,44 @@ Horde's leaders, who are regulars in a captain's or a champion's role.
 
 ## Limit Breaks
 
+From engine v19 (Halls v2, D241, HV5) **a Limit Break carries its own power**: at 100% it is worth that power (×1.9 to
+×2.9, each seat's in [Halls of Heroes](heroes.md#the-twenty-limit-breaks)) × the scale of the class she casts it as × her
+open depth's single-target power (a Tier 0's skill power at her Class Rank), shared among its hits; every-foe hits take
+the area share (0.55 a foe) and random hits ×1.05, as skills do. The scale is H131's (D249): 1 for a Tier 0, 0.95 for the
+six Tier 1 damage classes and 0.8 for the Paladin and the Cleric, so a healer on a Healer Sanctum seat lands 1.6×.
+
+- **Its shapes are the weapons':** a Katana or Light strike is a double, two hits on its foe at half the strike's share
+  each, and a double at random foes lands both on the same drawn foe; a volley cast puts 0.8 of its share on her foe and
+  a 0.35 splash on every other.
+- **At most 10 hits on one foe** a cast (Firefly Pact and Wisp Pact reach it).
+- **No support:** no Limit Break mends, Barriers, cleanses or revives. The Healer Sanctum's four carry one stack for two
+  rounds: a blessing on every ally after the hits (Brave 1, Faith 1), or a curse on the foe before them (Armor Break 1,
+  Mind Break 1), so the cast feels it. A Learner's cast lands its stack whole.
+
 <!-- live:limits -->
-**Limit Breaks come only from the Halls of Heroes** (D112, engine v10). A Hero always uses her seat's, at 100%; a Learner uses either of her Heroes', at 50% plus 5% a Bond Level (100% at Bond 10), her inherited hits at the higher of her ATK and M.ATK while their kinds still decide weaknesses and locks (v15, C3). An Uma who is neither has none, and her gauge has nothing to spend. At 100% a Limit Break is worth her class's power below, in single-target casts at her open depth:
+**Limit Breaks come only from the Halls of Heroes** (D112, engine v10). A Hero always uses her seat's, at 100%; a Learner uses either of her Heroes', at 50% plus 5% a Bond Level (100% at Bond 10), her inherited hits at the higher of her ATK and M.ATK while their kinds still decide weaknesses and locks (v15, C3). An Uma who is neither has none, and her gauge has nothing to spend. **A Limit Break's power is its own (the [Halls of Heroes](heroes.md) list each seat's) × her class's scale below × her open depth's power** (Halls v2, engine v19), and it never lands more than 10 hits on one foe in one cast:
 
-| Class | Limit Break power |
+| Class | Limit Break scale |
 |---|---|
-| Brawler | 2× |
-| Mage | 2.4× |
-| Spell Blade | 2.2× |
-| Cleric | 1.5× |
-| Summoner | 2.2× |
-| Paladin | 1.5× |
+| Recruit | ×1 |
+| Duelist | ×1 |
+| Acolyte | ×1 |
+| Caller | ×1 |
+| Initiate | ×1 |
+| Brawler | ×0.95 |
+| Arms Spellblade | ×0.95 |
+| Arms Summoner | ×0.95 |
+| Paladin | ×0.8 |
+| Cleric | ×0.8 |
+| Tome Summoner | ×0.95 |
+| Tome Spellblade | ×0.95 |
+| Sorcerer | ×0.95 |
 
-A Limit Break that mends or raises a Barrier does it at 66% of each Uma's max HP ×0.4, × her healing scale and the cast's strength; its cleanse and its revive land at any strength. The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn. Limit Breaks don't rank: their power follows her open depth, never her Skill Ranks. Since engine v16 Rampart Charge charges with an Axe and Choir of Angels strikes with Light, then Lightning (CP35); fights from v15 replay with Rampart Charge's Greatsword and Choir of Angels' Light twice. Fights from engines v10–v14 replay with five halls' twenty: the Cleric Chapel's seats 3 and 4 Archangel’s Verdict and Archdemon’s Pact, Sunfire Edge in one cleave, Moon Fox on one foe, the Spell Blade at 2× and the Summoner at 1.8×, and a Learner's hits at each kind's own offense. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: Brawler Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon; Mage Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all; Spell Blade Twin Arts: an Arms skill and a Tome skill, both at full power (no half); Cleric Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks; Summoner Grand Summon: one summon at twice her strength that lingers at twice its share.
+In fights from v15–v18, a Limit Break that mends or raises a Barrier does it at 66% of each Uma's max HP ×0.4, × her healing scale and the cast's strength; its cleanse and its revive land at any strength. The gauge fills to 12: +2 for an Attack, +4 for a skill. A Limit Break costs no MP and takes her turn. Limit Breaks don't rank: their power follows her open depth, never her Skill Ranks. Fights from engines v15–v18 replay with six halls' 24 Limit Breaks, each worth her class's own power at 100% (Brawler 2×, Mage 2.4×, Spell Blade 2.2×, Cleric 1.5×, Summoner 2.2×, Paladin 1.5×); from v16 Rampart Charge charges with an Axe and Choir of Angels strikes with Light, then Lightning (CP35); fights from v15 replay with Rampart Charge's Greatsword and Choir of Angels' Light twice. Fights from engines v10–v14 replay with five halls' twenty: the Cleric Chapel's seats 3 and 4 Archangel’s Verdict and Archdemon’s Pact, Sunfire Edge in one cleave, Moon Fox on one foe, the Spell Blade at 2× and the Summoner at 1.8×, and a Learner's hits at each kind's own offense. Fights from engines v6–v9 replay with the classes' retired Limit Breaks: Brawler Twin Strike: one equipped skill cast twice at full power, or two Attacks with a weapon; Mage Prismatic Nova: a hit of each of the five elements, 2.4× her open depth's power in all; Spell Blade Twin Arts: an Arms skill and a Tome skill, both at full power (no half); Cleric Divine Patrons: a hit with each of her five weapons (1.5× in all), each status at 3 stacks; Summoner Grand Summon: one summon at twice her strength that lingers at twice its share.
 <!-- /live -->
 
-The 24 Limit Breaks themselves, and how Heroes and Learners earn them, are in [Halls of Heroes](heroes.md).
+The block's line on a mend or a Barrier is the 24's, for fights from engines v15–v18. The twenty Limit Breaks
+themselves, and how Heroes and Learners earn them, are in [Halls of Heroes](heroes.md).
 
 ## Foes
 
@@ -431,19 +487,24 @@ weaknesses v2 left the Rift as it was, WK9). A retry meets the same foes, weakne
   not.
 - **Arcane:** weak to elements only (two for a regular, one for a sub-boss or a boss), warding Arms.
 - **Duel:** one boss weak to twin sets, each an Arm and its element (Greatsword + Fire, Axe + Ice, Lance + Lightning,
-  Bow + Light, Katana + Dark): two at stages 1–6, one at 7–12, so to both channels. She acts twice, three times at the
+  Katana + Light, Bow + Dark; Bow + Light and Katana + Dark on engine v18 and before): two at stages 1–6, one at 7–12, so
+  to both channels. She acts twice, three times at the
   champion, and her lock sets are mixed.
 - **Horde:** three waves of 4 to 6 foes, every one regular rank, each weak to one twin set dealt from a deck of the five,
   so a wave repeats none until all five are used.
 - A champion pair's two bosses take kinds the other lacks first. Each foe carries one element, the one her moves carry,
   and it is one she isn't weak to.
-- **The Duel's guard rail** (H51, D176, H71, D218): no single act Breaks a Duel boss. Each class's best own act removes
-  at most 10 shield points (every node of every line at Class Rank 50 and Skill Rank 5), and the best Limit Break 12
-  (Chaos Rain, twelve weak hits, one any Uma can learn), so her shields start at 13. Measured on engines v16 and v17;
-  v18 changes no hit count.
-- **The guided builds** (CP7): each front's guidance is a build, its five classes and every member's three weapons, set
-  in one tap on the stage sheet ([sections](sections.md#the-rift)). Its foes are tuned for those builds (H71, H81:
-  [the Rift](../design/rift.md) §11).
+- **The Duel's guard rail** (H51, D176, H71, D218, H131): no single act Breaks a Duel boss. Each class's best own act
+  removes at most 10 shield points (every node of every line at Class Rank 50 and Skill Rank 5: the Summoners 10, the
+  Spellblades 9, a Tier 0 1–2), and the best Limit Break 10 (Firefly Pact, Wisp Pact; no cast lands more than 10 hits on
+  one foe), so her shields start at 13. Measured on engine v19 (D249); on engines v16–v18 the best Limit Break was 12
+  (Chaos Rain).
+- **The guided builds** (CP7, CV23): each front's guidance is a build, its five classes and every member's three
+  weapons, set in one tap on the stage sheet ([sections](sections.md#the-rift)). From engine v19 each front's build is a
+  family: Iron the Warrior side, Arcane the Mage side, the Duel the Spellblades, the Horde the Summoners, so a run's
+  twenty hold all eight Tier 1 classes. The Duel suits the Spellblades (a mixed lock set alternates an Arm and an element,
+  and every pair act lands one of each), the Horde the Summoners (every act leaves a farewell on every foe). Its foes are
+  tuned for those builds (H71, H81, H131: [the Rift](../design/rift.md) §11).
 - **On screen she reads as her face** (H50): a boss- or sub-boss-faced foe stands at that size on the stage and is
   tagged Boss or Elite in lists, whatever her rank, so the Horde's regular-rank leaders still look like leaders. A
   champion who acts three times says so ("Acts three times").
@@ -451,17 +512,17 @@ weaknesses v2 left the Rift as it was, WK9). A retry meets the same foes, weakne
 <!-- live:rift-fronts -->
 | Front | Weak to | Ward | Stages 1–4 | 5–8 | 9–11 | Champion (12) | Guided build |
 |---|---|---|---|---|---|---|---|
-| Iron | Arms only: 1 for a key, regular, sub-boss or boss; a champion pair's differ | Elements ×0.5 | A sub-boss (acts 2, shield 16) + a key guard (shield 8) | 5, 7: 2 sub-bosses (shield 16); 6, 8: a boss (acts 2, shield 16) + a sub-boss-faced guard (shield 12) | Waves 1–2: a sub-boss-faced foe (shield 12); wave 3: a boss (acts 2, shield 16) + a sub-boss-faced guard (shield 12) | 2 bosses from two packs (shield 16) | Brawler, Brawler (Bow, Katana, Axe), Spell Blade, Spell Blade (Bow, Greatsword, Fire Tome), Paladin |
-| Arcane | Elements only: 2 for a key or regular, 1 for a sub-boss or boss; a champion pair's differ | Arms ×0.5 | A sub-boss (acts 2, shield 16) + a key guard (shield 8) | 5, 7: 2 sub-bosses (shield 16); 6, 8: a boss (acts 2, shield 16) + a sub-boss-faced guard (shield 12) | Waves 1–2: a sub-boss-faced foe (shield 12); wave 3: a boss (acts 2, shield 16) + a sub-boss-faced guard (shield 12) | 2 bosses from two packs (shield 16) | Mage, Mage, Summoner, Summoner, Cleric |
-| Duel | Twin sets (2 at stages 1–6, 1 at stages 7–12); locks mixed | — | A boss (acts 2, shield 13) | A boss (acts 2, shield 14) | A boss (acts 2, shield 15) | A boss (acts 3, shield 15) | Brawler, Brawler (Bow, Katana, Lance), Mage, Mage (Light Tome, Dark Tome, Thunder Tome), Paladin |
-| Horde | One twin set each; a wave repeats none until all five are used | — | Waves 1–2: a sub-boss-faced leader (shield 6) + 3 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 3 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 4 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 4 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 5 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 5 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 5 key foes (shield 3); wave 3: 2 boss-faced leaders from two packs (shield 6) + 4 key foes (shield 3) | Spell Blade, Spell Blade (Greatsword, Axe, Fire Tome), Summoner, Summoner (Blizzard Tome, Fire Tome, Lance), Cleric |
+| Iron | Arms only: 1 for a key, regular, sub-boss or boss; a champion pair's differ | Elements ×0.5 | A sub-boss (acts 2, shield 16) + a key guard (shield 8) | 5, 7: 2 sub-bosses (shield 16); 6, 8: a boss (acts 2, shield 16) + a sub-boss-faced guard (shield 12) | Waves 1–2: a sub-boss-faced foe (shield 12); wave 3: a boss (acts 2, shield 16) + a sub-boss-faced guard (shield 12) | 2 bosses from two packs (shield 16) | Brawler, Brawler (Bow, Katana, Axe), Arms Spellblade, Arms Summoner, Paladin |
+| Arcane | Elements only: 2 for a key or regular, 1 for a sub-boss or boss; a champion pair's differ | Arms ×0.5 | A sub-boss (acts 2, shield 16) + a key guard (shield 8) | 5, 7: 2 sub-bosses (shield 16); 6, 8: a boss (acts 2, shield 16) + a sub-boss-faced guard (shield 12) | Waves 1–2: a sub-boss-faced foe (shield 12); wave 3: a boss (acts 2, shield 16) + a sub-boss-faced guard (shield 12) | 2 bosses from two packs (shield 16) | Sorcerer, Sorcerer (Light Tome, Dark Tome, Fire Tome), Tome Spellblade, Tome Summoner, Cleric |
+| Duel | Twin sets (2 at stages 1–6, 1 at stages 7–12); locks mixed | — | A boss (acts 2, shield 13) | A boss (acts 2, shield 14) | A boss (acts 2, shield 15) | A boss (acts 3, shield 15) | Arms Spellblade, Arms Spellblade (Bow, Greatsword, Fire Tome), Tome Spellblade, Tome Spellblade (Dark Tome, Blizzard Tome, Axe), Paladin |
+| Horde | One twin set each; a wave repeats none until all five are used | — | Waves 1–2: a sub-boss-faced leader (shield 6) + 3 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 3 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 4 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 4 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 5 key foes (shield 3); wave 3: a boss-faced leader (shield 6) + 5 key foes (shield 3) | Waves 1–2: a sub-boss-faced leader (shield 6) + 5 key foes (shield 3); wave 3: 2 boss-faced leaders from two packs (shield 6) + 4 key foes (shield 3) | Arms Summoner, Arms Summoner (Lance, Greatsword, Thunder Tome), Tome Summoner, Tome Summoner (Fire Tome, Thunder Tome, Katana), Cleric |
 
-Front and Convergence foes stand at tier Lv 50. Strength multiplies HP, ATK and M.ATK: stage n ×(1 + 0.1 × (n − 1) ÷ 11), ×1.1 at the champion; a Convergence fight is its front's champion at ×0.99. An Echo is its front's stage 8 at tier Lv 45 or 50 (×1); Lv 55 is the Lv 50 one at ×1.22. Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. Rift foes hit harder than the world's: offense ×1.8 at stages 1–4, ×2 for stages 5 and 7's sub-bosses, ×1.3 for a boss and her guard, ×1.2 for an opening foe, ×2.2 for a champion, ×2.3 on the Duel (her HP ×1.1) and ×4.4 on the Horde. Arcane's foes have ×1.6 HP and ×1.2 offense over Iron's. Champions, and so the Convergence's fights, scale again by front: Iron ×1.15 HP and offense, Arcane ×0.92 offense, Duel ×0.8 HP and offense, Horde ×1.4 HP and offense. A run's 52 fights hold 46 boss, 64 sub-boss and 165 key face slots.
+Front and Convergence foes stand at tier Lv 50. Strength multiplies HP, ATK and M.ATK: stage n ×(1 + 0.1 × (n − 1) ÷ 11), ×1.1 at the champion; a Convergence fight is its front's champion at ×0.99. An Echo is its front's stage 8 at tier Lv 45 or 50 (×1); Lv 55 is the Lv 50 one at ×1.22. Sub-bosses and bosses take the party's reachable skill depth, regular foes the world's regular-foe HP step; every Horde foe is regular rank. Rift foes hit harder than the world's: offense ×1.8 at stages 1–4, ×2 for stages 5 and 7's sub-bosses, ×1.3 for a boss and her guard, ×1.2 for an opening foe, ×2.2 for a champion, ×2.3 on the Duel (her HP ×1.3) and ×4.4 on the Horde. Iron's foes have ×0.88 HP and ×1.6 offense, Arcane's ×1.6 HP and ×1.2 offense. Champions, and so the Convergence's fights, scale again by front: Iron ×1.13 HP and ×1.08 offense, Arcane ×1.01 HP and ×0.94 offense, Duel ×1 HP and offense, Horde ×1.25 HP and offense. A run's 52 fights hold 46 boss, 64 sub-boss and 165 key face slots.
 <!-- /live -->
 
-Iron and Arcane share one shape and each scales it (`riftTuning`'s `scale`): Iron ×1 HP and ×1.6 offense, Arcane ×1.6
-HP and ×1.2 offense. The line above names Arcane's scale alone, so Arcane's foes hit about three quarters as hard as
-Iron's, not harder.
+Iron and Arcane share one shape and each scales it (`riftTuning`'s `scale`, engine v19's `RIFT_TUNING_V19`): Iron ×0.88
+HP and ×1.6 offense (×1 HP before v19), Arcane ×1.6 HP and ×1.2 offense. The line above names Arcane's scale alone, so
+Arcane's foes have about 1.8 times Iron's HP and hit about three quarters as hard, not harder.
 
 **Levels.** The level a Rift fight shows is a tier level: 50 for the fronts and the Convergence, and 45, 50 or 55 for an
 Echo. Its foes' own levels are lifetime (Tier 2's Lv 50 is 100). A tier stops at Lv 50, so the Lv 55 Echo is the Lv 50
@@ -486,8 +547,16 @@ was before the fight. Numbers are in [loops](loops.md#laurels-and-exp).
 ## Constants
 
 The table lists older engines' constants too, for replays. Every row plays today except those marked "before v12" or
-"v12–v14", `BATTLE_BARRIER_PERCENT` (summons' Barriers, to v14) and `RPG_BASE_MP_REGEN` (v16's 0.9%, which
-`RPG_BASE_MP_REGEN_V17` replaces).
+"v12–v14", `BATTLE_BARRIER_PERCENT` (summons' Barriers, to v14), `RPG_BASE_MP_REGEN` (v16's 0.9%, which
+`RPG_BASE_MP_REGEN_V17` replaces) and `HERO_LIMIT_SUPPORT_SHARE` (the 24's support, v15–v18). Three rows read wider from
+engine v19: `BATTLE_FAREWELL_FACTOR` is a Summoner's lead summon's farewell (the Arms Summoner's Arms one),
+`RPG_PIERCE_SCALE` serves both Spellblades, the Brawler's Katana B and the Sorcerer's Light B, and the Flourish works as
+any class of her calling's family.
+
+Engine v19's own numbers: the volley's `RPG_VOLLEY` (the tapped foe 0.8, the splash 0.35) and `RPG_VOLLEY_MP` (+2);
+Tier 0's `RPG_TIER0_POWER` (1.60 → 2.31, the draft × `RPG_TIER0_POWER_FACTOR` 1.05), `RPG_TIER0_MP` (10),
+`RPG_TIER0_MAX_RANK` (10) and `RPG_TIER0_BANK` (23,680) ([classes](classes.md#tier-0-and-promotion)); the Limit Break
+scales `HERO_LIMIT_SCALE` and `HERO_LIMIT_MAX_HITS` (10) ([above](#limit-breaks)).
 
 <!-- live:battle-constants -->
 | Constant | Value | Meaning |
@@ -520,16 +589,19 @@ The table lists older engines' constants too, for replays. Every row plays today
 | `RPG_PALADIN_AEGIS` | 1 | v15: Aegis stacks a Paladin's Greatsword blow gives each Uma her Barrier reaches |
 | `BATTLE_REGEN_SHARE` | 0.2 | v15: a Cleric's Regen mends this share of her Light spell's mend |
 | `BATTLE_REGEN_ROUNDS` | 2 | v15: the round ends a Regen mends at: the spell's round and the next |
-| `BATTLE_FAREWELL_FACTOR` | 0.1 | v15: a lingering Tome summon's farewell strike on each foe, × its linger share × its hits' power |
+| `BATTLE_FAREWELL_FACTOR` | 0.1 | v15: a lingering summon's farewell strike on each foe (from v19 her lead half's: the Tome Summoner's Tome, the Arms Summoner's Arms), × its linger share × its hits' power |
 | `HERO_LIMIT_SUPPORT_SHARE` | 0.66 | v15: a hall Limit Break's mend or Barrier, as a share of max HP, ×0.4 on every Uma |
 | `BATTLE_RALLY_SHARE` | 0.3 | v12: share of a foe hit she can Rally back |
 | `BATTLE_BREATHER` | 0.1 | v12: share of max HP every Uma recovers when a new wave enters |
 | `BATTLE_LIMIT_MAX` | 12 | Limit Break gauge |
 | `RPG_SKILL_RANK_FACTOR` | 0.95, 0.975, 1, 1.025, 1.05 | v16: a skill's power at Skill Ranks 1–5, a rank every 2 Class Ranks from its depth's gate; a healer's mend and Barrier shares too |
-| `RPG_PIERCE_SCALE` | 1.15 | v16: a Pierce hit's power (the Spell Blade's B line, the Brawler's Katana B, the Mage's Dark B); it ignores the unbroken halving |
+| `RPG_PIERCE_SCALE` | 1.15 | v16: a Pierce hit's power (from v19 the Spellblades' B lines, the Brawler's Katana B, the Sorcerer's Light B); it ignores the unbroken halving |
+| `RPG_VOLLEY` | 0.8 + 0.35 | v19: a Bow or Dark volley's share of the depth's power on the tapped foe, then one plain splash hit on every other foe |
+| `RPG_VOLLEY_MP` | 2 | v19: a volley's extra MP |
+| `HERO_LIMIT_MAX_HITS` | 10 | v19: the most hits a Limit Break lands on one foe in one cast |
 | `RPG_BASE_MP_REGEN` | 0.009 | v16: every Uma regains this share of her max MP at each round's end for each skill depth her Class Rank opens, at least 1, beside a Spring's |
 | `RPG_BASE_MP_REGEN_DEPTHS` | 5 | v16: the depths the base MP regen counts, at most (4.5% from Class Rank 40) |
-| `BATTLE_FLOURISH_SHARE` | 0.04 | v16: her Flourish gives this share of her max HP a fight, while she fights as her calling's class |
+| `BATTLE_FLOURISH_SHARE` | 0.04 | v16: her Flourish gives this share of her max HP a fight, while she fights as her calling's class (from v19 any class of her Tier 0's family) |
 | `BATTLE_FLOURISH_RATE` | Even pace 0.01, Late reserve 0.02 | v16: the share of her max HP those two Flourishes mend at a round's end |
 | `BATTLE_FLOURISH_FROM` | 3 | v16: the first round whose end Late reserve mends at |
 | `RPG_BASE_MP_REGEN_V17` | 0.01 | v17: the base MP regen a depth (5% from Class Rank 40) |

@@ -14,10 +14,23 @@ import {
   ECHO_RANK_PAY, echoFoeLevel, leaveRiftFight, riftBattleStep, riftContextFor, riftFightBlock, riftTraces, signUpBlock, signUpRift, startRiftFight,
   sweepEcho, sweepEchoBlock,
 } from './rift'
-import { doom, ids, OUTFITS, play, riftWorldSave, ROSTER, T, TWENTY, weaken } from './rift-rules.fixture'
+import { RPG_CLASS_PARENTS } from '../rpg/class-tree'
+import { rpgIsTier0, type RpgTier1Class } from '../rpg/kinds'
+import { doom, ids, OUTFITS, play, riftWorldSave as balanceWorldSave, ROSTER, T, TWENTY, weaken } from './rift-rules.fixture'
 import { setPartySlot, worldOf } from './rules'
 import { newOwnedUma, newTierWorld, parseSave, type Save, type TierWorld } from './save'
 
+/** The fixture's world with each Uma promoted into her balance-party class (Classes v3, H134): in Tier 1's world a Tier 1
+ * class is held from Class Rank 10, so she holds her first parent Tier 0 and her class at Rank 10. */
+function riftWorldSave(count?: number, level?: number): Save {
+  const save = balanceWorldSave(count, level)
+  for (const uma of Object.values(save.tierWorlds['1']!.umas)) {
+    const c = uma.classId
+    if (!c || rpgIsTier0(c)) continue
+    uma.ranks = { ...uma.ranks, classes: { [RPG_CLASS_PARENTS[c as RpgTier1Class][0]!]: { rank: 10, exp: 0 }, [c]: { rank: 10, exp: 0 }, ...uma.ranks.classes } }
+  }
+  return save
+}
 const IRON1: RiftFightRef = { kind: 'front', front: 'iron', stage: 1 }
 const roundTrip = (save: Save) => expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
 const world1 = (save: Save): TierWorld => worldOf(save, '1')
@@ -144,10 +157,8 @@ describe('front fights (§4–§5, R4)', () => {
     expect(traces.length).toBeGreaterThan(0)
     expect(run.traces).toEqual({ iron: traces })
     expect(won.save.account.defeated).toEqual({ [captain]: won.save.account.updatedAt })
-    // Front fights pay nothing else (D168); a win confirms each fighter's calling (CP29, H69).
-    const fighters = new Set(won.battle.input.allies.map((a) => a.id))
-    expect(world1(won.save).umas).toEqual(Object.fromEntries(Object.entries(world1(started).umas)
-      .map(([id, u]) => [id, fighters.has(id) ? { ...u, calling: { ...u.calling, confirmed: true } } : u])))
+    // Front fights pay nothing else (D168); since v19 a win confirms no calling either (the pick retired, H134).
+    expect(world1(won.save).umas).toEqual(world1(started).umas)
     expect(world1(won.save).wallet).toEqual(world1(started).wallet)
     expect(world1(won.save).rift.battle).toBeNull()
     roundTrip(won.save)

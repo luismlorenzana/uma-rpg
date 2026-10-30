@@ -1,9 +1,10 @@
-// Classes v3's save rules with the switch mocked to 19 (H126; classes-v3.md §2.6, §7, §8.7, §14; CV8–CV11, CV19, CV30), on
-// today's save shape: choosing and promoting, the waiting EXP and its bank, Manuals, the class tree the screens draw, the
-// promotion plan, a null class by world, the calling pick's retirement and Ascend. `classes-v19-live.test.ts` runs the same
-// calls unmocked: the live game as today. Invented outfits only.
-import { describe, expect, it, vi } from 'vitest'
-import { RPG_TIER0_BANK, rpgClassName, type RpgClass } from '../rpg/rules'
+// Classes v3's save rules, live since H134 (H126; classes-v3.md §2.6, §7, §8.7, §14; CV8–CV11, CV19, CV30): choosing and
+// promoting, the waiting EXP and its bank, Manuals, the class tree the screens draw, the promotion plan, a null class by
+// world, the calling pick's retirement and Ascend; and the same reads at engine 18, which v18's open fights and replays
+// keep (folded from `classes-v19-live.test.ts`). Invented outfits only.
+import { describe, expect, it } from 'vitest'
+import { rpgClasses } from '../rpg/kinds'
+import { RPG_TIER0_BANK, rpgClassGate, rpgClassName, type RpgClass } from '../rpg/rules'
 import { autoAction } from '../rpg/battle/auto'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import { regionChapter, worldContinent } from '../world/world'
@@ -18,8 +19,6 @@ import { ascend, signUpRift } from './rift'
 import { riftWorldSave, T as RT, TWENTY } from './rift-rules.fixture'
 import { SaveRuleError, setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, type OwnedUma, type Save, type TierWorld } from './save'
-
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(19, await orig()))
 
 const T = (n: number) => new Date(Date.parse('2026-10-29T12:00:00.000Z') + n * 1000).toISOString()
 type Style = 'front' | 'pace' | 'late' | 'end'
@@ -231,5 +230,25 @@ describe('Ascend (CV10)', () => {
     expect(first.ranks.classes).toEqual({})
     expect(activeClass(outfit(TWENTY[0]!, ['front']), first, 2)).toBe('brawler')
     expect(rpgClassName(activeClass(outfit(TWENTY[0]!, ['late'], true), first, 2))).toBe('Cleric')
+  })
+})
+
+describe('v18\'s class reads, engine 18 explicit (the six classes, no Tier 0, no promotion)', () => {
+  it('starts her in her calling, reads a null class as her style\'s in every world, and holds all six', () => {
+    expect([startingClass(FRONT, 18), startingClass(PACE_LATE, 18)]).toEqual(['brawler', 'spellblade'])
+    expect([activeClass(FRONT, { classId: null }, 1, 18), activeClass(FRONT, { classId: null }, 2, 18)]).toEqual(['brawler', 'brawler'])
+    const uma = { ...her(unlocked()), classId: 'brawler' as const }
+    expect(umaHeldClasses(uma, 1, 18)).toEqual(rpgClasses(18))
+    expect(umaClassTree(uma, FRONT, 1, 18).map((t) => `${t.classId} ${t.state}`)).toEqual([
+      'brawler on', 'mage available', 'spellblade available', 'cleric available', 'summoner available', 'paladin available',
+    ])
+  })
+
+  it('has no Tier 0 or new hybrid, no promotion, and every class of the six open', () => {
+    const uma = her(unlocked())
+    expect(rpgClassGate({ classes: {} }, 'recruit', 1, 18)).toBe('No such class')
+    expect(rpgClassGate({ classes: {} }, 'tomeblade', 1, 18)).toBe('No such class')
+    expect(rpgClasses(18).map((c) => rpgClassGate({ classes: {} }, c, 1, 18))).toEqual(rpgClasses(18).map(() => null))
+    expect(promotionPlan(uma, 'recruit', 'brawler', 1, 18).block).toBe('no class recruit')
   })
 })

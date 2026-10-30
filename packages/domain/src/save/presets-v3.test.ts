@@ -1,6 +1,7 @@
 // R2's standard presets (H75, D212; weapon-progression §5.8 WP25; uma-templates §3.4 UT8 and the main session's ruling,
 // 2026-10-25: UT8 picks the family, SB10 picks the kind). Engine 17 passed explicitly; graded Umas from the v3 fixture.
 import { describe, expect, it } from 'vitest'
+import { SAVE_SCHEMA_VERSION } from './version'
 import { newGrades, type AccessoryFamily, type UmaGrades } from '../economy/grades'
 import { RPG_V2_CLASSES, RPG_CLASS_ARMOR, rpgDefaultWeapons, type RpgClass, type RpgWeapon } from '../rpg/rules'
 import { UMA_KNACKS, umaTemplate, type UmaKnack } from '../roster/template'
@@ -18,7 +19,7 @@ function graded(classId: RpgClass, grades: UmaGrades = newGrades(1), weapons?: R
   return gradedWorld({ umas: { '101': uma } })
 }
 const saveOf = (world: TierWorld): Save => ({
-  schemaVersion: 31, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} }, tierWorlds: { '1': world },
+  schemaVersion: SAVE_SCHEMA_VERSION, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} }, tierWorlds: { '1': world },
 })
 
 describe('R2’s standard presets (WP25)', () => {

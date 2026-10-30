@@ -1,34 +1,49 @@
 # Halls of Heroes and inheritance
 
-The six class halls on the Hub's Learning page are the **Halls of Heroes** (D106) and the **only source of Limit
-Breaks** (D112): an Uma who is neither a Hero nor a Learner has none, and her gauge fills with nothing to spend. Each
-hall has four seats, and each seat teaches its own Limit Break (D107): 24 in all, as engine v18 plays them.
+The five halls on the Hub's Learning page are the **Halls of Heroes** (D106; Halls v2, D241) and the **only source of
+Limit Breaks** (D112): an Uma who is neither a Hero nor a Learner has none, and her gauge fills with nothing to spend.
+There is one hall a family, each with four seats, and each seat teaches its own Limit Break with its own power (D107,
+HV5): twenty in all, as engine v19 plays them. Fights from engine v18 and before replay with six halls' 24 Limit Breaks,
+each worth her class's own power ([combat](combat.md#limit-breaks)).
 
-Code: `packages/domain/src/rpg/heroes.ts` (the Limit Breaks, their power and kinds), `rpg/hero-id.ts` (seat ids, halls,
-Bond numbers), `save/heroes.ts` (seats, Learners, Bonds, what a fight takes), `rpg/battle/limit.ts` (casting),
-`rpg/battle/auto.ts` (Auto's pick), `apps/web/src/places/halls/HallPage.tsx` and `hall-view.ts` (the page).
+Code: `packages/domain/src/rpg/heroes.ts` (the twenty, their power, kinds and shapes, the class scale),
+`rpg/hero-id.ts` (halls, seat ids, home classes, Bond numbers), `save/heroes.ts` (seats, Learners, Bonds, what a fight
+takes), `rpg/battle/limit.ts` (casting), `rpg/battle/auto.ts` (Auto's pick), `hub/places.ts` (the halls on the Learning
+page), `apps/web/src/places/halls/HallPage.tsx` and `hall-view.ts` (the page). Design: [Halls
+v2](../design/classes-v3/halls-v2.md).
 
-## The six Halls
+## The five halls
 
-| Hall | Class | Its Limit Breaks lean on |
-|---|---|---|
-| Brawler Dojo | Brawler | The five Arms |
-| Mage Tower | Mage | The five elements |
-| Spell Blade Salle | Spell Blade | An Arm and an element in one hit |
-| Cleric Chapel | Cleric | The five elements, with blessings, a curse and support |
-| Summoner Circle | Summoner | Beasts that strike with an Arm and its twin element |
-| Paladin Bastion | Paladin | Arms, two of them with Light or Dark, and support |
+| Hall | Its family | Home classes, by seat | Its power comes from | Its Limit Breaks |
+|---|---|---|---|---|
+| **Warrior Dojo** | Recruit | Brawler 1–4 | Self-training | The five Arms, nothing else: a tri attack, an Ultimate, doubles, volleys |
+| **Mage Tower** | Initiate | Sorcerer 1–4 | Self-study | The five elements, nothing else: the Dojo's twin, seat by seat |
+| **Spell Blade Salle** | Duelist | Arms Spellblade 1–2, Tome Spellblade 3–4 | Pacts with familiars | Two kinds, five strikes at random foes |
+| **Summoner Circle** | Caller | Arms Summoner 1–2, Tome Summoner 3–4 | Familiars, summoned | Two kinds, three hits on every foe |
+| **Healer Sanctum** | Acolyte | Paladin 1–2, Cleric 3–4 | A followed deity | An Arm and an element on one foe, and one stack of a blessing or a curse |
 
-A hall's class is its theme, not a rule: any owned Uma may sit in any hall, whatever class she fights as. On the Hub each
-hall shows four pips over its building, a seated Hero's face ringed in the accent color, an empty seat a dot.
+On the Learning page the Warrior Dojo and the Mage Tower stand at the top, the Spell Blade Salle and the Summoner Circle
+below them, the Healer Sanctum in the middle on its own temple, the Observatory under it
+([sections](sections.md#learning)). The Warrior Dojo keeps the Brawler Dojo's id, `brawler-dojo`; the Sanctum is
+`healer-sanctum`, where the Paladin Bastion and the Cleric Chapel stood ([below](#the-merge-save-v32)).
+
+- **Any owned Uma may sit in any seat,** Hero or Learner, whatever class she fights as, a Tier 0 too: there is no Tier 0
+  hall, and a Hero who promotes keeps her seat. A hall's family is its theme and a seat's **home class** its fit, not a
+  rule: a Hero's hits use her own channel's offense, so the class whose channel leads the seat makes its best Hero; a
+  Learner hits with her higher offense, so for her what counts is the kinds the seat adds.
+- **The seat order:** the owner's two first. The Dojo and the Tower read as twins: seat 1 the tri attack, 2 the
+  Ultimate, 3 the doubles, 4 the volleys. In the Salle and the Circle the Arms-led class's two, then the Tome-led
+  class's; in the Sanctum the Paladin's two, then the Cleric's.
+- On the Hub each hall shows four pips over its building, a seated Hero's face ringed in the accent color, an empty seat
+  a dot.
 
 ## Heroes
 
 - **A seat's Hero** is any owned Uma who is not a Hero elsewhere and not a Learner. She sits in one seat at most.
 - **She has no menu:** her Limit Break is always her seat's, at full strength (100%), whatever class she fights as.
-- **Its power** is the Limit Break power of the class she fights as ([classes](classes.md#limit-breaks)), shaped by
-  the seat. Its hits use their own channel's offense, ATK for an Arm and M.ATK for an element, with her Might and flat
-  offense on each kind.
+- **Its power** is the seat's own × the scale of the class she fights as × her open depth's power
+  ([below](#the-twenty-limit-breaks)). Its hits use their own channel's offense, ATK for an Arm and M.ATK for an element,
+  with her Might and flat offense on each kind.
 - **Swapping a Hero** keeps the seat's Learners. **Emptying the seat** sends them away; their Bonds stay with them.
 
 ## Learners
@@ -40,14 +55,16 @@ hall shows four pips over its building, a seated Hero's face ringed in the accen
 - **In a fight** her Limit Break menu lists her Heroes' Limit Breaks, each with its Hero's face, the kinds it deals and
   its strength; picking one plays the Hero's bust in the cut-in.
 - **Strength:** 50% at Bond 0, plus 5% a Bond Level, 100% at Bond 10. It keeps its whole shape at any strength: its
-  weapons and elements (even ones she doesn't carry), its number of hits, its targets and its statuses. Its hits and a
-  mend or Barrier scale with the strength; a cleanse or a revive lands whole.
+  weapons and elements (even ones she doesn't carry), its number of hits, its targets, its doubles and its one stack.
+  Its hits scale with the strength; a stack lands whole.
 - **Her offense** (C3): an inherited Limit Break hits with the higher of her ATK and M.ATK, whatever its kinds. Each kind
-  still decides weaknesses, shield chips and locks, and brings her Might and flat offense on that kind. A Mage can carry
-  an Arms Limit Break to Break a foe weak only to Arms.
-- **Her coverage** (CP28): an inherited Limit Break reaches kinds her three weapons miss. A seat in the hall reads the
-  twin sets its Limit Break answers ("Answers Fire · Light"), and the Learner picker the sets a seat would add to hers
-  ("Adds Light, Dark, Twilight"), by her active class's weapons ([classes](classes.md#weapons)).
+  still decides weaknesses, shield chips and locks, and brings her Might and flat offense on that kind. A Sorcerer can
+  carry an Arms Limit Break to Break a foe weak only to Arms.
+- **Her coverage** (CP28, HV17): an inherited Limit Break reaches kinds her three weapons miss. A seat in the hall reads
+  the twin sets its Limit Break answers ("Answers Dark · Twilight"), and the Learner picker the sets a seat would add to
+  hers ("Adds Light, Twilight"), by her active class's weapons, on engine v19's twins: Katana–Light, Bow–Dark, Twilight
+  the Bow and the Katana ([classes](classes.md#weapons)). Every kind sits in two halls or more, and every Tier 1 class can
+  answer every twin set her default weapons miss with two Heroes, in 23 to 56 ways.
 
 ## Bonds
 
@@ -62,64 +79,117 @@ hall shows four pips over its building, a seated Hero's face ringed in the accen
 - **Her profile's Skills tab** has an Inheritance card: her seat and its Bond, or her Heroes and every Bond she has made,
   each with its strength.
 
-## The 24 Limit Breaks
+## The twenty Limit Breaks
 
-- **Power:** at 100% a Limit Break is worth her class's Limit Break power × her open depth's single-target power (the
-  deepest depth her Class Rank opens), shared among its hits. Every-foe hits and splashes deal the area share (0.55 a
-  foe); random hits get the 1.05 bonus, as skills do. Limit Breaks never take a Skill Rank. The gauge, its charge and
-  the cost are in [combat](combat.md#limit-breaks).
-- **Kinds:** each hit carries one kind, or two at once (Twilight Eclipse, the Spell Blade Salle's four, Cinder Wyrm's
-  bite, Frost Behemoth, Archangel's Verdict and Archdemon's Pact's rends). A two-kind hit lands as two parts at half its
-  power, one of each kind, and each part is weak, chips a shield and breaks a lock on its own.
-- **Support:** four also tend the party. Dawn Hymn mends every Uma, Frost Sanctuary cleanses and Barriers every Uma,
-  Rampart Charge Barriers every Uma, and Valkyrie Lances raises the first fallen. A mend or a Barrier is 66% × 0.4 of
-  each Uma's max HP, × the caster's healing scale ([combat](combat.md#support)) and the cast's strength.
-- **Statuses:** Choir of Angels gives every ally Aegis 2, Legion of Demons hexes every foe before its claws, Archangel's
-  Verdict gives every ally Brave 2 and Faith 2, and Archdemon's Pact puts Armor Break 3 and Mind Break 3 on its foe
-  before its rends. A cast with no hits only casts its status.
+- **Power** (HV5): at 100% a Limit Break is worth **its own power** × **the scale of the class she casts it as** × **her
+  open depth's single-target power** (the deepest depth her Class Rank opens; a Tier 0's skill power at her Class Rank),
+  shared among its hits. The scale is 1 for a Tier 0, 0.95 for the six Tier 1 damage classes and 0.8 for the Paladin and
+  the Cleric (H131's balance, D249), so a healer on a Healer Sanctum seat lands 1.6×. Every-foe hits deal the area share
+  (0.55 a foe); random hits get the 1.05 bonus, as skills do. Limit Breaks never take a Skill Rank. The gauge, its charge
+  and the cost are in [combat](combat.md#limit-breaks).
+- **The ladder** (HV6), the owner's order: the **Ultimates** 2.9× in one hit (Ten Thousand Swings, Ten Thousand Candles);
+  the **tri attacks** 2.5× in three kinds (Triad Onslaught, Triad Tempest), 3.0× on a foe weak to two of them, a little
+  over the Ultimate on a foe not weak to it; the **standard** seats 2.2× (the Dojo's and the Tower's doubles and volleys,
+  the Summoner Circle's four); the **pacts** 1.9× at random foes (2.0× with the random bonus, for their many hits); the
+  **Healer Sanctum's** four 2.0× and one stack. Across the twenty it averages about 2.23×.
+- **Shapes:** one foe (the tri attacks, the Ultimates and the Sanctum's four, four hits each, the lead kind 60%);
+  doubles (Echo Draw and Echo Ray, three strikes each landing twice: 6 hits); volleys (Hundred-Arrow Rain and
+  Hundred-Shadow Rain, two volley casts: 4 hits on her foe and 2 on each other, at the weapons' 0.8 and 0.35); random
+  (the pacts, five strikes with the lead kind three of them, a Katana or Light strike landing twice on the foe it drew: 8
+  or 10 hits); every foe (the Circle's, three hits on every foe, the lead kind twice).
+- **Kinds:** each hit carries one kind, and each is weak, chips a shield and breaks a lock on its own. The halls hold the
+  ten kinds two seats or more each (Ice the fewest: the Tower's tri and the Circle's Frostshade Wyrm).
+- **At most 10 hits on one foe** a cast (Firefly Pact and Wisp Pact reach it), so no Limit Break alone Breaks a Duel
+  boss ([combat](combat.md#the-rifts-foes)).
+- **No support** (HV14): no mend, Barrier, cleanse or revive. The Healer Sanctum's carry one stack for two rounds: the
+  angels bless every ally after the hits (Archangel's Judgment Brave 1, Seraph's Pyre Faith 1), the demons curse the foe
+  before them (Archdemon's Toll Armor Break 1, Thunder Fiend's Barrage Mind Break 1), so the cast feels it. A cast with
+  no hits only casts its status.
+
+What a seat is worth at 100% and a scale of 1, on a Broken foe (an unbroken one halves every row alike), before her
+stats, × her open depth's power; a Tier 1 damage class casts ×0.95 of it, a healer ×0.8, a Learner at Bond 0 half:
+
+| Seats | Power | One foe | One foe, weak | 3 foes in all | 5 foes in all | Most chips on one weak foe |
+|---|---|---|---|---|---|---|
+| The Ultimates | 2.9× | 2.90 | 3.77 | 2.90 | 2.90 | 1 |
+| The tri attacks | 2.5× | 2.50 | 3.00 (two of three weak) | 2.50 | 2.50 | 2 |
+| Echo Draw, Echo Ray | 2.2× | 2.20 | 2.86 | 2.20 | 2.20 | 6 |
+| The Healer Sanctum's | 2.0× | 2.00–2.12 | 2.60–2.76 | 2.00–2.12 | 2.00–2.12 | 4 |
+| The pacts | 1.9× | 2.00 | 2.59 | 2.00 | 2.00 | 8–10 |
+| The volleys | 2.2× | 1.76 | 2.29 | 3.30 | 4.84 | 4, and 2 a foe |
+| The Summoner Circle's | 2.2× | 1.21 | 1.57 | 3.63 | 6.05 | 3 a foe |
+
+The demons' 2.12 counts their own curse. Of the seats that reach every foe, the volleys lead on one or two foes (2.53 on
+two, against a sweep's 2.42) and the Circle's sweeps from three, where they are the best in the game.
 
 <!-- live:heroes -->
-| Hall | Seat | Limit Break | Kinds | What it does | Casts |
-|---|---|---|---|---|---|
-| Brawler Dojo (Brawler) | 1 | Arsenal Rush | greatsword, axe, lance, bow, katana | A blow with every Arm in turn on one foe | 5 hits on one foe |
-| Brawler Dojo (Brawler) | 2 | Iaido Cleave | greatsword, katana | One Greatsword cleave, then two Katana draws, on one foe | 3 hits on one foe |
-| Brawler Dojo (Brawler) | 3 | Spear and Arrow Storm | lance, bow | Eight blows at random foes, Lance and Bow in turn | 8 hits on random foes |
-| Brawler Dojo (Brawler) | 4 | Earthsplitter | axe | Three Axe quakes on every foe | 3 hits on every foe |
-| Mage Tower (Mage) | 1 | Elemental Cascade | fire, ice, lightning, light, dark | A spell of every element in turn on one foe | 5 hits on one foe |
-| Mage Tower (Mage) | 2 | Twilight Eclipse | light, dark | One hit of Light and Dark at once on one foe | 1 hit on one foe |
-| Mage Tower (Mage) | 3 | Trinity Storm | fire, ice, lightning | Three great spells, Fire, Ice and Lightning, on one foe | 3 hits on one foe |
-| Mage Tower (Mage) | 4 | Chaos Rain | light, dark | Twelve bolts at random foes, Light and Dark in turn | 12 hits on random foes |
-| Spell Blade Salle (Spell Blade) | 1 | Sunfire Edge | greatsword, fire | Three Greatsword-and-Fire cleaves on one foe; its flames splash every other foe | 3 hits on one foe + splash |
-| Spell Blade Salle (Spell Blade) | 2 | Rimefang Waltz | katana, ice | Six Katana-and-Ice cuts on one foe | 6 hits on one foe |
-| Spell Blade Salle (Spell Blade) | 3 | Thunder Javelin | lance, lightning | Four Lance-and-Lightning throws at random foes | 4 hits on random foes |
-| Spell Blade Salle (Spell Blade) | 4 | Eclipse Volley | bow, light, dark | Bow volleys on every foe, one of Light, one of Dark | 2 hits on every foe |
-| Cleric Chapel (Cleric) | 1 | Choir of Angels | light, lightning | Light on every foe, then Lightning on every foe, then Aegis 2 on every ally | 2 hits on every foe + aegis 2 on every ally |
-| Cleric Chapel (Cleric) | 2 | Legion of Demons | dark | Hex on every foe, then eight Dark claws at random foes | hex 1 on every foe; 8 hits on random foes |
-| Cleric Chapel (Cleric) | 3 | Dawn Hymn | fire | Fire on every foe, then a mend on every ally | 1 hit on every foe + a mend on every ally |
-| Cleric Chapel (Cleric) | 4 | Frost Sanctuary | ice | Ice on every foe, then a cleanse and a Barrier on every ally | 1 hit on every foe + a Barrier on every ally + a cleanse |
-| Summoner Circle (Summoner) | 1 | Cinder Wyrm | greatsword, fire | A Greatsword-and-Fire bite on one foe, then Fire breath on every foe | 1 hit on one foe; 1 hit on every foe |
-| Summoner Circle (Summoner) | 2 | Frost Behemoth | axe, ice | Two Axe-and-Ice stomps on every foe | 2 hits on every foe |
-| Summoner Circle (Summoner) | 3 | Thunderbird | lance, lightning | Six dives at random foes, Lance and Lightning in turn | 6 hits on random foes |
-| Summoner Circle (Summoner) | 4 | Moon Fox | katana, dark, bow, light | Eight strikes at random foes: Katana, Dark, Bow and Light in turn | 8 hits on random foes |
-| Paladin Bastion (Paladin) | 1 | Archangel’s Verdict | greatsword, light | A Greatsword-and-Light judgment on one foe, then Brave and Faith 2 on every ally | 1 hit on one foe + brave 2 on every ally; faith 2 on every ally |
-| Paladin Bastion (Paladin) | 2 | Archdemon’s Pact | katana, dark | Armor Break and Mind Break 3 on one foe, then three Katana-and-Dark rends | armor-break 3 on the foe; mind-break 3 on the foe; 3 hits on one foe |
-| Paladin Bastion (Paladin) | 3 | Rampart Charge | axe | One Axe charge on one foe, then a Barrier on every ally | 1 hit on one foe + a Barrier on every ally |
-| Paladin Bastion (Paladin) | 4 | Valkyrie Lances | lance | Four Lance hits at random foes, then the first fallen ally rises | 4 hits on random foes + the first fallen rises |
+| Hall | Seat | Home class | Limit Break | Power | Kinds | What it does | Casts |
+|---|---|---|---|---|---|---|---|
+| Warrior Dojo | 1 | Brawler | Triad Onslaught | 2.5× | greatsword, axe, lance | A Greatsword, an Axe and a Lance blow on one foe | 3 hits on one foe |
+| Warrior Dojo | 2 | Brawler | Ten Thousand Swings | 2.9× | greatsword | One Greatsword blow on one foe | 1 hit on one foe |
+| Warrior Dojo | 3 | Brawler | Echo Draw | 2.2× | katana | Three draws on one foe, each Katana cut twice | 6 hits on one foe |
+| Warrior Dojo | 4 | Brawler | Hundred-Arrow Rain | 2.2× | bow | Two Bow volleys: two arrows each on one foe, one on every other foe | 2 hits on one foe, a volley + splash; 2 hits on one foe, a volley + splash |
+| Mage Tower | 1 | Sorcerer | Triad Tempest | 2.5× | fire, ice, lightning | A Fire, an Ice and a Lightning spell on one foe | 3 hits on one foe |
+| Mage Tower | 2 | Sorcerer | Ten Thousand Candles | 2.9× | fire | One Fire blast on one foe | 1 hit on one foe |
+| Mage Tower | 3 | Sorcerer | Echo Ray | 2.2× | light | Three rays on one foe, each Light ray striking twice | 6 hits on one foe |
+| Mage Tower | 4 | Sorcerer | Hundred-Shadow Rain | 2.2× | dark | Two Dark volleys: two bolts each on one foe, one on every other foe | 2 hits on one foe, a volley + splash; 2 hits on one foe, a volley + splash |
+| Spell Blade Salle | 1 | Arms Spellblade | Shrike Pact | 1.9× | katana, lance | Five strikes at random foes, Katana and Lance in turn, each Katana cut twice | 8 hits on random foes |
+| Spell Blade Salle | 2 | Arms Spellblade | Firefly Pact | 1.9× | katana, light | Five strikes at random foes, Katana and Light in turn, each striking twice | 10 hits on random foes |
+| Spell Blade Salle | 3 | Tome Spellblade | Storm Heron Pact | 1.9× | light, lightning | Five strikes at random foes, Light and Lightning in turn, each Light ray twice | 8 hits on random foes |
+| Spell Blade Salle | 4 | Tome Spellblade | Wisp Pact | 1.9× | light, katana | Five strikes at random foes, Light and Katana in turn, each striking twice | 10 hits on random foes |
+| Summoner Circle | 1 | Arms Summoner | Centaur Warband | 2.2× | axe, bow | Axe, Bow, then Axe on every foe | 3 hits on every foe |
+| Summoner Circle | 2 | Arms Summoner | Gargoyle Flock | 2.2× | axe, dark | Axe, Dark, then Axe on every foe | 3 hits on every foe |
+| Summoner Circle | 3 | Tome Summoner | Frostshade Wyrm | 2.2× | dark, ice | Dark, Ice, then Dark on every foe | 3 hits on every foe |
+| Summoner Circle | 4 | Tome Summoner | Night Colossus | 2.2× | dark, axe | Dark, Axe, then Dark on every foe | 3 hits on every foe |
+| Healer Sanctum | 1 | Paladin | Archangel’s Judgment | 2× | lance, light | Two Lance thrusts and a Light double on one foe, then Brave 1 on every ally | 4 hits on one foe + Brave 1 on every ally |
+| Healer Sanctum | 2 | Paladin | Archdemon’s Toll | 2× | axe, dark | Armor Break 1 on one foe, then two Axe and two Dark hits on her | Armor Break 1 on the foe; 4 hits on one foe |
+| Healer Sanctum | 3 | Cleric | Seraph’s Pyre | 2× | fire, greatsword | Two Fire blasts and two Greatsword strokes on one foe, then Faith 1 on every ally | 4 hits on one foe + Faith 1 on every ally |
+| Healer Sanctum | 4 | Cleric | Thunder Fiend’s Barrage | 2× | lightning, bow | Mind Break 1 on one foe, then two Lightning and two Bow hits on her | Mind Break 1 on the foe; 4 hits on one foe |
 
 | Setting | Value |
 |---|---|
-| Seats | 4 per hall, 6 halls, 24 in all; a Hero sits in one seat |
+| Seats | 4 per hall, 5 halls, 20 in all; a Hero sits in one seat; any Uma may sit in any seat |
 | Learners | 10 per Hero; 2 Heroes per Learner; a Hero is never a Learner |
-| Power at 100% | her own class's Limit Break, in single-target casts at her open depth: Brawler 2×, Mage 2.4×, Spell Blade 2.2×, Cleric 1.5×, Summoner 2.2×, Paladin 1.5× |
+| Power at 100% | the Limit Break's own power × her class's scale (×1 Recruit, Duelist, Acolyte, Caller, Initiate; ×0.95 Brawler, Arms Spellblade, Arms Summoner, Tome Summoner, Tome Spellblade, Sorcerer; ×0.8 Paladin, Cleric) × her open depth's power; at most 10 hits on one foe a cast |
 | Learner strength | 50% at Bond 0, +5% a Bond Level, 100% at Bond 10 |
 | Bond EXP per won fight | 2 a stage, 3 an elite or boss, toward each of a Learner's Heroes, or a Hero's own seat; 12 a level (Sweeps and replays count) |
 <!-- /live -->
+
+## The merge (save v32)
+
+Halls v2 came with save v32 (HV18–HV19; H130, D247), once in every tier's world. **Seat n stayed seat n,** id and all,
+in the four halls that continue: `brawler-n`, `mage-n`, `spellblade-n` and `summoner-n` kept their Heroes, Learners and
+Bonds and took the new Limit Break. **The Paladin Bastion and the Cleric Chapel merged into the Healer Sanctum,** two
+old seats into each new one, joined by theme:
+
+| Old seats (engine v18) | Healer Sanctum seat | Its Limit Break |
+|---|---|---|
+| `paladin-1` (first) + `paladin-4` | `healer-1` | Archangel's Judgment |
+| `paladin-2` (first) + `paladin-3` | `healer-2` | Archdemon's Toll |
+| `cleric-1` (first) + `cleric-3` | `healer-3` | Seraph's Pyre |
+| `cleric-2` (first) + `cleric-4` | `healer-4` | Thunder Fiend's Barrage |
+
+- **Bonds:** each Uma kept the higher of her two Bonds (by level, then EXP) as her Bond with the new seat.
+- **Heroes:** a seat with one Hero kept her. Of two Heroes, **the one with the lower Bond on her own old seat kept the
+  seat** (a tie, the first seat's), and **the other became its first Learner** at her Bond, so two Heroes at Bond 10 lost
+  nothing.
+- **Learners:** both lists pooled, each Uma once, the displaced Hero first, then by Bond (a tie kept the first seat's
+  order, then the second's). The first ten sat; anyone past ten kept her Bond and can be seated when a place opens. A
+  Learner who sat under both old seats sat once and gained a free second place. An old seat whose partner was empty moved
+  whole, its Learners in their order.
+- **"The classes are rebuilt"** named every Uma whose role moved ("Hero → Learner · Archdemon's Toll · Bond 7") under
+  "Each Uma keeps her higher Bond" ([sections](sections.md#account)). Nothing in a hall was refunded: nothing there is
+  bought.
+- A fight open across it finished on engine v18 with the old seats' Limit Breaks, and paid its Bonds to the merged
+  seats. An old link to the Paladin Bastion or the Cleric Chapel lands on the Healer Sanctum.
 
 ## In the engine
 
 - **A fight's input** (`BattleAlly`): an ally may carry `hero` (her seat) or `inherits` (one or two seats, each with
   her Bond Level and the Hero's outfit id), never both; `save/heroes.ts`' `heroFields` builds them from the world when a
   fight starts. A `limit` action names `hero`: a Hero only her own seat, a Learner one of hers.
+- **Seat ids** are `${hall}-${n}` (`brawler`, `mage`, `spellblade`, `summoner` and from engine v19 `healer`, n 1–4);
+  `paladin-*` and `cleric-*` exist for engines v15–v18 only (`heroLimitIds(engine)`, `isHeroLimitId`).
 - **An ally with neither** has no Limit Break: her gauge fills, the "LB" badge never shows, and a `limit` action is
   refused.
 - **Auto** (`rpg/battle/auto.ts`) fires a Hero's own Limit Break, and a Learner's with the strongest Bond (the first of

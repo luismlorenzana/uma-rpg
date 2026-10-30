@@ -1,12 +1,11 @@
-// "Can upgrade"'s Promote reason with the switch mocked to 19 (H137, D253; classes-v3.md §14.1's dot): a Tier 0 she fights
-// as at Class Rank 10 with a child she doesn't hold counts, so the Stable's mark and filter find her. Nothing else moves; at
-// engine 18 (the live game) the reason is never there. Invented Umas only.
-import { describe, expect, it, vi } from 'vitest'
+// "Can upgrade"'s Promote reason, live since H134 (H137, D253; classes-v3.md §14.1's dot): a Tier 0 she fights as at Class
+// Rank 10 with a child she doesn't hold counts, so the Stable's mark and filter find her. Nothing else moves; at engine 18
+// (v18's six classes, no promotion) the reason is never there. `upgrades.test.ts` is the v1 economy's record (mocked to
+// 16), so this file stays apart. Invented Umas only.
+import { describe, expect, it } from 'vitest'
 import type { RpgClass } from '../rpg/rules'
 import { gradedUma, gradedWorld } from './economy-v3.fixture'
 import { umaPromotionWaits, upgradesFor } from './upgrades'
-
-vi.mock('../rpg/battle/caps', async (orig) => (await import('../rpg/battle/caps-at.fixture')).capsAt(19, await orig()))
 
 type Tracks = Partial<Record<RpgClass, { rank: number; exp: number }>>
 /** Uma '101' fighting as `classId` with these Class Ranks, nothing else to raise. */
