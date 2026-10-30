@@ -78,7 +78,7 @@ function before(line: ClassesV3Line): string[] {
     .map(({ id, track }) => `${rpgClassName(id, BEFORE)} ${classRankWord(track.rank)}`)
 }
 
-/** One Uma's line: "Spell Blade R26 · Mage R8 → Initiate R1 · trade Wood → Stone"; "No Class EXP → Duelist R1". */
+/** One Uma's line: "Spell Blade R26 · Mage R8 → Mage R1 · trade Wood → Stone"; "No Class EXP → Spellblade R1". */
 function umaLine(line: ClassesV3Line, after: RpgClass | null): string {
   const was = before(line)
   const to = after ? ` → ${rpgClassName(after, AFTER)} ${classRankWord(1)}` : ''

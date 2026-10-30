@@ -14,8 +14,8 @@ const outfit = (style: Grades<keyof Aptitudes['strategy']>, distance: Grades<key
   growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0, ...growth },
   aptitudes: { strategy: { front: 'C', pace: 'C', late: 'C', end: 'C', ...style }, distance: { sprint: 'C', mile: 'C', medium: 'C', long: 'C', ...distance } },
 })
-/** uma-templates §6.2's made-up Umas, by Classes v3's calling: C a Pace Uma (a Duelist; Wit over Power, which no longer
- * counts), D a Late and End one (a Caller), A a front runner (a Recruit), I a Pace and Late one (an Initiate). */
+/** uma-templates §6.2's made-up Umas, by Classes v3's calling: C a Pace Uma (a Spellblade; Wit over Power, which no longer
+ * counts), D a Late and End one (a Summoner), A a front runner (a Warrior), I a Pace and Late one (a Mage). */
 const C = outfit({ pace: 'A' }, { medium: 'A' }, 90, 102, { wit: 20 })
 const D = outfit({ late: 'A', end: 'A' }, { long: 'A' }, 104, 88, { power: 20 })
 const A = outfit({ front: 'A' }, { medium: 'A', long: 'A' }, 88, 86, { stamina: 20 })
@@ -35,7 +35,7 @@ describe('her template on the sheet (H70; Classes v3 from H134)', () => {
     expect(templateCard(C, open, 'duelist')).toEqual({
       name: 'Clever Spellfencer',
       readings: [
-        { label: 'Calling', value: 'Duelist', source: 'Pace A' },
+        { label: 'Calling', value: 'Spellblade', source: 'Pace A' },
         { label: 'Stride', value: 'Middle', source: 'Medium A' },
         { label: 'Knack', value: 'Clever', source: 'Wit +20%' },
       ],
@@ -47,28 +47,28 @@ describe('her template on the sheet (H70; Classes v3 from H134)', () => {
     expect(templateCard(C, null, null)!.flourish).toBe('★ Flourish · Even pace · 1%/round · max 4% · Off')
     // A stored pick isn't read: her calling still comes from her style.
     const picked = templateCard(C, { calling: { pick: 'spellblade', confirmed: false } }, 'spellblade')!
-    expect(picked.readings[0]).toEqual({ label: 'Calling', value: 'Duelist', source: 'Pace A' })
+    expect(picked.readings[0]).toEqual({ label: 'Calling', value: 'Spellblade', source: 'Pace A' })
     // A front runner's calling reads her style; the longest distance at her best grade is her stride.
     expect(templateCard(A, open, 'recruit')!.readings).toEqual([
-      { label: 'Calling', value: 'Recruit', source: 'Front A' },
+      { label: 'Calling', value: 'Warrior', source: 'Front A' },
       { label: 'Stride', value: 'Stayer', source: 'Long A' },
       { label: 'Knack', value: 'Tireless', source: 'Stamina +20%' },
     ])
-    expect(templateCard(D, open, 'caller')!.readings[0]).toEqual({ label: 'Calling', value: 'Caller', source: 'Late A, End A' })
-    expect(templateCard(I, open, 'apprentice')!.readings[0]).toEqual({ label: 'Calling', value: 'Initiate', source: 'Pace A, Late A' })
+    expect(templateCard(D, open, 'caller')!.readings[0]).toEqual({ label: 'Calling', value: 'Summoner', source: 'Late A, End A' })
+    expect(templateCard(I, open, 'apprentice')!.readings[0]).toEqual({ label: 'Calling', value: 'Mage', source: 'Pace A, Late A' })
   })
 
   it('fills the Racing tab\'s "Her template", Active or no effect', () => {
     expect(racingTemplate(C, open, 'duelist')).toEqual([
-      { label: 'Calling', value: 'Duelist', note: 'Pace A' },
+      { label: 'Calling', value: 'Spellblade', note: 'Pace A' },
       { label: 'Stride', value: 'Middle', note: 'Medium A' },
       { label: 'Knack', value: 'Clever', note: 'Wit +20%' },
       { label: 'Flourish', value: 'Even pace', note: 'Active' },
     ])
     expect(racingTemplate(C, open, 'spellblade')![3]!.note).toBe('Active')
     expect(racingTemplate(C, open, 'brawler')![3]!.note).toBe('No effect as Brawler')
-    expect(racingTemplate(C, { calling: { pick: 'spellblade', confirmed: true } }, 'spellblade')![0]).toEqual({ label: 'Calling', value: 'Duelist', note: 'Pace A' })
-    expect(racingTemplate(C, null, null)![3]!.note).toBe('As a Duelist')
+    expect(racingTemplate(C, { calling: { pick: 'spellblade', confirmed: true } }, 'spellblade')![0]).toEqual({ label: 'Calling', value: 'Spellblade', note: 'Pace A' })
+    expect(racingTemplate(C, null, null)![3]!.note).toBe('As a Spellblade')
   })
 
   it('draws the root plate\'s ★ line, dimmed outside her Tier 0\'s family', () => {
@@ -79,7 +79,7 @@ describe('her template on the sheet (H70; Classes v3 from H134)', () => {
     expect(flourishLine('clean-break')).toBe('★ Flourish · Clean break · Barrier 4% · start · On')
   })
 
-  it('reads the moon\'s node II by her Tier 0\'s root: a Recruit DEF, an Initiate M.DEF, the All-Rounders both', () => {
+  it('reads the moon\'s node II by her Tier 0\'s root: a Warrior DEF, a Mage M.DEF, the All-Rounders both', () => {
     const owned = newOwnedUma('2026-10-29T12:00:00.000Z')
     const two = nodePoints('template:2', 1), half = Math.floor(two / 2)
     expect(templateCard(A, owned, 'recruit')!.moon?.[1]).toContain(`★ Moon II · DEF +${two} · `)

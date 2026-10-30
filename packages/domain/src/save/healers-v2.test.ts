@@ -1,6 +1,6 @@
 // One healer a party and the Paladin's start with the switch on (H58, classes v2 C8 and §3.3), the live game since H61
 // (D188); `starting-class-v2.test.ts` holds the same rules at engine 14. Classes v3 keeps one healer a party (CV22, live
-// since H134): the Paladin and the Cleric are Tier 1 classes, held once promoted from the Acolyte, and a Tier 0 is no
+// since H134): the Paladin and the Cleric are Tier 1 classes, held once promoted from the Healer, and a Tier 0 is no
 // healer. The Paladin's start is v15–v18's, engine 18 explicit.
 import { describe, expect, it } from 'vitest'
 import type { RpgClass, RpgTier0Class, RpgTier1Class } from '../rpg/kinds'
@@ -16,7 +16,7 @@ import { gearV1, newOwnedUma, newSave, type OwnedUma, type Save, type TierWorld 
 const cast = Array.from({ length: 7 }, (_, i) => ({ id: `cast${i}`, name: `Rival ${i}` }))
 const ura = regionChapter(worldContinent({ name: 'Test Circuit', order: 1 }).regions[0]!, cast)
 const S1 = 'w1-1-1-s1'
-// Invented outfits only: 103 is a Late surger with Power and Wit even, so she starts as an Acolyte (to v18 a Cleric).
+// Invented outfits only: 103 is a Late surger with Power and Wit even, so she starts as a Healer (to v18 a Cleric).
 const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 110): BattleOutfit => ({
   outfitId: id, baseStats: { speed: 110, stamina: 110, power, guts: 110, wit: 110 },
   growthRatePercents: { speed: 10, stamina: 10, power: 0, guts: 0, wit: 20 },
@@ -62,7 +62,7 @@ describe('one healer a party, with the switch on (H58, C8; CV22)', () => {
     expect(healerBlock(worldOf(save), ['101', '102', '103', '104', '105'], OUTFITS)).toBe(ONE_HEALER)
     expect(ONE_HEALER).toBe('One healer a party')
     expect(() => startFight(save, ura, S1, OUTFITS, T(2))).toThrow('One healer a party')
-    // Back on her Acolyte, 103 is no healer (a Tier 0 is none).
+    // Back on her Healer, 103 is no healer (a Tier 0 is none).
     const one = startFight(chooseClass(save, '103', 'acolyte', T(2)), ura, S1, OUTFITS, T(3))
     const input = worldOf(one).world.run.battle!.input
     expect(input.version).toBe(19)
@@ -123,7 +123,7 @@ describe('the Paladin’s start, v15–v18 (H58, §3.3), engine 18 explicit', ()
     expect(activeClass(strong, uma, 1, 18)).toBe('paladin')
     // An Uma who never picked keeps her style's class at the switch: a Late surger stays a Cleric.
     expect(activeClass(strong, { classId: null }, 1, 18)).toBe('cleric')
-    // From v19 she starts as her Acolyte in Tier 1's world, read as the Paladin (her suggested promotion) in a later one.
+    // From v19 she starts as her Healer in Tier 1's world, read as the Paladin (her suggested promotion) in a later one.
     expect([startingClass(strong), startingClass(strong, 19, 2)]).toEqual(['acolyte', 'paladin'])
   })
 })

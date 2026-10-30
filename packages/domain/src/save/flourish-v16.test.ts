@@ -28,10 +28,10 @@ const outfit = (outfitId: string, style: Grades<keyof Aptitudes['strategy']>, di
   growthRatePercents: { speed: 10, stamina: 0, power: 0, guts: 0, wit: 0 },
   aptitudes: { strategy: { front: 'G', pace: 'G', late: 'G', end: 'G', ...style }, distance: { sprint: 'G', mile: 'G', medium: 'G', long: 'G', ...distance } },
 })
-// 201 a Pace Uma with Wit over Power (v18: calling Mage, her pick Mage or Spell Blade; v19: Duelist), Medium A: a Middle
-// stride, Even pace. 202 a front runner at Sprint (Brawler; Recruit. Dash: Clean break); 203 an End closer at Long
-// (Summoner; Caller. Stayer: Late reserve); 204 a front runner at Medium (Brawler; Recruit. Even pace); 205 a Late Uma with
-// Power over Wit at Mile (Paladin; Acolyte. Clean break).
+// 201 a Pace Uma with Wit over Power (v18: calling Mage, her pick Mage or Spell Blade; v19: Spellblade), Medium A: a Middle
+// stride, Even pace. 202 a front runner at Sprint (Brawler; Warrior. Dash: Clean break); 203 an End closer at Long
+// (Summoner; Summoner. Stayer: Late reserve); 204 a front runner at Medium (Brawler; Warrior. Even pace); 205 a Late Uma with
+// Power over Wit at Mile (Paladin; Healer. Clean break).
 const OUTFITS = new Map([
   outfit('201', { pace: 'A' }, { medium: 'A' }), outfit('202', { front: 'A' }, { sprint: 'A' }), outfit('203', { end: 'A' }, { long: 'A' }),
   outfit('204', { front: 'A' }, { medium: 'A' }), outfit('205', { late: 'A' }, { mile: 'A' }, 110, 100),
@@ -133,14 +133,14 @@ describe('the Flourish as her Tier 0\'s family, live since H134 (CV21)', () => {
     expect(flourishes(input.allies)).toEqual({ 201: 'even-pace', 202: 'clean-break', 203: 'late-reserve', 204: 'even-pace', 205: 'clean-break' })
     const opening = createBattle(input).cues.flatMap((c) => (c.kind === 'cover' ? [[c.targetId, c.label]] : []))
     expect(opening).toEqual([['202', 'Flourish'], ['205', 'Flourish']])
-    // As a Recruit, another Tier 0's family, 201 fights without hers.
+    // As a Warrior, another Tier 0's family, 201 fights without hers.
     const off = worldOf(startFight(chooseClass(worldMap(), '201', 'recruit', T0), region, S1, OUTFITS, T0)).world.run.battle!.input
     expect(flourishes(off.allies)['201']).toBeNull()
   })
 
   it('freezes it into a Rift fight’s input too, as any class of her family', () => {
-    // The Rift fixture's Umas are front runners at Medium: Recruit callings, Even pace. Party 0 as a Brawler, a Sorcerer, an
-    // Arms Spellblade, a Cleric and a Tome Summoner, each promoted: the Brawler and the Spellblade are the Recruit's children.
+    // The Rift fixture's Umas are front runners at Medium: Warrior callings, Even pace. Party 0 as a Brawler, a Sorcerer, an
+    // Arms Spellblade, a Cleric and a Tome Summoner, each promoted: the Brawler and the Spellblade are the Warrior's children.
     const promoted: [string, RpgTier0Class, RpgTier1Class][] = [['101', 'recruit', 'brawler'], ['102', 'apprentice', 'mage'],
       ['103', 'recruit', 'spellblade'], ['104', 'acolyte', 'cleric'], ['105', 'caller', 'summoner']]
     const save = edit(signUpRift(riftWorldSave(), TWENTY, RT(1)), (w) => {

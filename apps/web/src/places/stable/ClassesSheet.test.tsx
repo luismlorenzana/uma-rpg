@@ -34,7 +34,7 @@ async function saveWith(classId: RpgClass, classes: Tracks, level = 30): Promise
   worldOf(save).umas[outfit.outfitId] = uma
   return save
 }
-/** The promotion page's Uma C: a Brawler R34 who holds Arms Spellblade R12, her Recruit at 10, an Acolyte started at R4. */
+/** The promotion page's Uma C: a Brawler R34 who holds Arms Spellblade R12, her Warrior at 10, a Healer started at R4. */
 const umaC = () => saveWith('brawler', { brawler: { rank: 34, exp: 0 }, spellblade: { rank: 12, exp: 0 }, recruit: { rank: 10, exp: 0 }, acolyte: { rank: 4, exp: 0 } })
 
 function Probe() {
@@ -104,10 +104,10 @@ describe('the Classes sheet on the Skills tab (v19)', () => {
     show(await umaC())
     fireEvent.click(screen.getByRole('button', { name: 'Class: Brawler, R34' }))
     fireEvent.click(tile('tomeblade'))
-    expect(footer().textContent).toBe('Opens with Duelist R10 or Initiate R10')
+    expect(footer().textContent).toBe('Opens with Spellblade R10 or Mage R10')
     expect(footer().disabled).toBe(true)
     fireEvent.click(tile('caller'))
-    expect(footer().textContent).toBe('Start Caller · R1')
+    expect(footer().textContent).toBe('Start Summoner · R1')
     await act(async () => { fireEvent.click(footer()) })
     await waitFor(() => expect(vi.mocked(battle.chooseClass)).toHaveBeenCalledWith(expect.anything(), outfit.outfitId, 'caller', expect.any(String), '1'))
     await waitFor(() => expect(tile('caller').dataset.state).toBe('on'))
@@ -119,11 +119,11 @@ describe('the Classes sheet on the Skills tab (v19)', () => {
     fireEvent.click(tile('armsummoner'))
     expect(footer().textContent).toBe('Promote to Arms Summoner')
     fireEvent.click(footer())
-    const promotion = await screen.findByRole('dialog', { name: 'Promote · Recruit R10' })
+    const promotion = await screen.findByRole('dialog', { name: 'Promote · Warrior R10' })
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Classes' })).toBeNull())
     expect(within(promotion).getByRole('radio', { name: 'Arms Summoner' }).getAttribute('aria-checked')).toBe('true')
     expect(within(promotion).getByRole('radio', { name: 'Brawler, Held' })).toBeDefined()
-    expect(plan()).toBe('Recruit R10 → Arms Summoner R10')
+    expect(plan()).toBe('Warrior R10 → Arms Summoner R10')
     fireEvent.click(within(promotion).getByRole('button', { name: /^Classes/ }))
     expect(await screen.findByRole('dialog', { name: 'Classes' })).toBeDefined()
     await waitFor(() => expect(screen.queryByRole('dialog', { name: /^Promote/ })).toBeNull())
@@ -160,18 +160,18 @@ describe('a Tier 0 on the Skills tab (v19)', () => {
     expect(within(node).queryByRole('img', { name: /of 5/ })).toBeNull()
     fireEvent.click(within(node).getByRole('button', { name: 'Close' }))
     // Below Rank 10 the class button opens the tree.
-    fireEvent.click(screen.getByRole('button', { name: 'Class: Recruit, R7/10' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Class: Warrior, R7/10' }))
     expect(await screen.findByRole('dialog', { name: 'Classes' })).toBeDefined()
   })
 
   it('at R10 reads Promote; the promotion sheet opens on the Suggested child; Promote lands her on its tree', async () => {
     show(await saveWith('recruit', { recruit: { rank: 10, exp: 400 } }, 10))
     expect(screen.getByRole('button', { name: /^Promotion · \+400 EXP waiting/ })).toBeDefined()
-    fireEvent.click(screen.getByRole('button', { name: 'Class: Recruit, promotion ready' }))
-    const promotion = await screen.findByRole('dialog', { name: 'Promote · Recruit R10' })
+    fireEvent.click(screen.getByRole('button', { name: 'Class: Warrior, promotion ready' }))
+    const promotion = await screen.findByRole('dialog', { name: 'Promote · Warrior R10' })
     expect(within(promotion).getByText('Free · the others stay open')).toBeDefined()
     expect(within(promotion).getByRole('radio', { name: 'Brawler, Suggested' }).getAttribute('aria-checked')).toBe('true')
-    expect(plan()).toBe('Recruit R10 → Brawler R11')
+    expect(plan()).toBe('Warrior R10 → Brawler R11')
     expect(within(promotion).getByText('Depths 1–2 · 6 skills · +400 EXP')).toBeDefined()
     await act(async () => { fireEvent.click(within(promotion).getByRole('button', { name: 'Promote to Brawler' })) })
     await waitFor(() => expect(vi.mocked(battle.promoteUma)).toHaveBeenCalledWith(expect.anything(), outfit.outfitId, 'recruit', 'brawler', expect.any(String), '1'))

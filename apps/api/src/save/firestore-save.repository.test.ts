@@ -41,7 +41,7 @@ const storedV31 = (name: string): Doc => {
 }
 /** Her refund (CV §8.2): Brawler R12 bar 0 is 2,376 EXP, + the first 1,800 again, ⌈4,176 ÷ 1,000⌉ = 5 Class Manuals. */
 const MANUALS = 5
-/** What the reset leaves: a Recruit (class null: her calling's Tier 0), no Class Ranks, the Healer Sanctum's seat 1. */
+/** What the reset leaves: a Warrior (class null: her calling's Tier 0), no Class Ranks, the Healer Sanctum's seat 1. */
 const RESET = {
   umas: { 101: { level: 12, classId: null, ranks: { classes: {} }, bonds: { 'healer-1': { level: 3, exp: 0 } } } },
   heroes: { 'healer-1': { hero: '101', learners: [] } },
@@ -83,7 +83,7 @@ describe('the Firestore save repository (D45, D69)', () => {
     const repo = new FirestoreSaveRepository()
     store.set('saves/u', { revision: 3, save: storedV31('Luis') })
     // The API parses every save it's sent to the current version (`parseSavePut`), so a v31 app's body arrives as v32:
-    // her reset applied (a Recruit, the Healer Sanctum's Hero, her Manuals in the wallet).
+    // her reset applied (a Warrior, the Healer Sanctum's Hero, her Manuals in the wallet).
     const sent = parseSavePut({ baseRevision: 3, save: storedV31('Luis') })
     expect(sent.sentSchemaVersion).toBe(31)
     expect(sent.save.tierWorlds['1']).toMatchObject(RESET)

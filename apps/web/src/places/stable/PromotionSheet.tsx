@@ -1,6 +1,6 @@
 // The promotion sheet: the owner's "class promotion screen" (D240 CV8, classes-v3.md §14.2; H137, D253). A Tier 0 at Class
 // Rank 10: her children as tiles (Suggested on one, Held on one she holds; each its slots, three defaults and role where
-// they differ), before → after in one line ("Recruit R10 → Brawler R10", "Depths 1–2 · 6 skills · +400 EXP"), one footer
+// they differ), before → after in one line ("Warrior R10 → Brawler R10", "Depths 1–2 · 6 skills · +400 EXP"), one footer
 // "Promote to …" (free, no confirm), and a "Classes ›" row that swaps back to the Classes sheet. Standalone (props in): the
 // caller closes it after Promote and owns the swap. The model is `class-view.ts`.
 import { SaveRuleError, type BattleOutfit, type OwnedUma, type RpgTier0Class, type RpgTier1Class } from '@rpg/domain'

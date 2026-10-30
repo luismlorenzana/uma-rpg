@@ -67,7 +67,7 @@ describe('save v32\'s parse (H130), the classes stage live', () => {
     refused((w) => { w['1'].umas[UMA.A]!.ranks.classes = { recruit: { rank: 3, exp: 2 * (120 + 16 * 3) } } }, /classes\.recruit\.exp: more than the rank needs/)
     // A Tier 1 class is held from Rank 10 in Tier 1's world; she fights only as a class she holds.
     refused((w) => { w['1'].umas[UMA.A]!.ranks.classes = { brawler: { rank: 9, exp: 0 } } }, /classes\.brawler\.rank: a Tier 1 class is held from Rank 10/)
-    refused((w) => { w['1'].umas[UMA.A]!.classId = 'brawler' }, /umas\.100\.classId: not a class she may fight as here: Opens with Recruit R10/)
+    refused((w) => { w['1'].umas[UMA.A]!.classId = 'brawler' }, /umas\.100\.classId: not a class she may fight as here: Opens with Warrior R10/)
     // A Tier 0 setup: three different weapons, no line.
     refused((w) => { w['1'].umas[UMA.A]!.classes = { recruit: { ...tier0, weapons: ['axe', 'axe', 'bow'] } } }, /classes\.recruit\.weapons: duplicate ids/)
     refused((w) => { w['1'].umas[UMA.A]!.classes = { recruit: { ...tier0, lines: { axe: 'B' } } } }, /classes\.recruit\.lines: a Tier 0 has no lines/)

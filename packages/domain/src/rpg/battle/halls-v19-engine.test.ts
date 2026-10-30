@@ -72,12 +72,12 @@ describe('engine v19: a Limit Break’s own power × her class’s scale × her 
     expect(total(hero('brawler-2', 'paladin'), 'brawler-2')).toBeCloseTo(2.9 * healer * open, 2)
     expect(total(hero('brawler-2', 'paladin'), 'brawler-2') / total(hero('brawler-2', 'brawler'), 'brawler-2'))
       .toBeCloseTo(healer * open / (heroLimitScale('brawler', V19) * rpgOpenPower({ classId: 'brawler', classRank: 20 }, V19)), 3)
-    // A Cleric's too; an Acolyte is no healer (CV22), so hers is whole.
+    // A Cleric's too; a Healer is no healer (CV22), so hers is whole.
     expect(total(hero('brawler-2', 'cleric'), 'brawler-2')).toBeCloseTo(2.9 * heroLimitScale('cleric', V19) * rpgOpenPower({ classId: 'cleric', classRank: 20 }, V19), 2)
     expect(total(hero('brawler-2', 'acolyte', { classRank: 10 }), 'brawler-2')).toBeCloseTo(2.9 * RPG_TIER0_POWER[9]!, 2)
   })
 
-  it('casts a Recruit Hero’s at her skill’s power at Class Rank 4 (1.75 × H131’s 1.05)', () => {
+  it('casts a Warrior Hero’s at her skill’s power at Class Rank 4 (1.75 × H131’s 1.05)', () => {
     const r4 = RPG_TIER0_POWER[3]!
     expect(rpgOpenPower({ classId: 'recruit', classRank: 4 }, V19)).toBe(r4)
     expect(total(hero('brawler-2', 'recruit', { classRank: 4 }), 'brawler-2')).toBeCloseTo(2.9 * r4, 2)

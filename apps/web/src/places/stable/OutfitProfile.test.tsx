@@ -48,7 +48,7 @@ describe('her profile says what she can upgrade (H34; R2\'s grades and jewels si
   })
 
   it('shows the Gear dot, the grade rows\' marks and the jewels to set, and drops them once used; no skill costs points (v16 on)', () => {
-    // Aster: a Recruit at Class Rank 5, and a Weapon Gem G1 and a Planet Jewel I in the Warehouse.
+    // Aster: a Warrior at Class Rank 5, and a Weapon Gem G1 and a Planet Jewel I in the Warehouse.
     let save = withWorld(fixture.save, (w) => {
       const aster = w.umas['81001']!
       return { ...w, items: { 'weapon-gem-g1': 1, 'jewel-planet-1': 1 }, umas: { ...w.umas, '81001': { ...aster,

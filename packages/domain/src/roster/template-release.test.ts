@@ -94,7 +94,7 @@ describe.skipIf(!HAS_RELEASE)('Classes v3\'s calling and templates against the l
   const roster: RosterOutfit[] = HAS_RELEASE ? buildRoster({ characters: load<Character>('characters'), outfits: load<Outfit>('outfits') }) : []
   const V19 = 19
 
-  it('gives §5\'s callings: Recruit 47 · Duelist 72 · Initiate 72 · Caller 33 · Acolyte 46, by §5.2\'s combinations', () => {
+  it('gives §5\'s callings: Warrior 47 · Spellblade 72 · Mage 72 · Summoner 33 · Healer 46, by §5.2\'s combinations', () => {
     const callings = tally(RPG_TIER0_CLASSES)
     const combos: Record<string, number> = {}
     for (const outfit of roster) {
@@ -156,7 +156,7 @@ describe.skipIf(!HAS_RELEASE)('Classes v3\'s calling and templates against the l
     // Either apostrophe: the data's typographic one and a plain one.
     const names = heroLimitIds(V19).map((id) => heroLimitFor(id, V19)!.name)
     const ours = [...new Set([...names, ...names.map((n) => n.replace(/’/g, "'")),
-      'Warrior Dojo', 'Mage Tower', 'Spell Blade Salle', 'Summoner Circle', 'Healer Sanctum'])]
+      'Warrior Dojo', 'Mage Tower', 'Spellblade Salle', 'Summoner Circle', 'Healer Sanctum'])]
     expect(names).toHaveLength(20)
     const exact = ours.filter((n) => taken.has(n.toLowerCase()))
     const escape = (n: string) => n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

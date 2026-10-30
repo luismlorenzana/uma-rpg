@@ -83,7 +83,7 @@ describe('class-view on v18', () => {
 const C = outfit('81003')
 type Tracks = Partial<Record<RpgClass, { rank: number; exp: number }>>
 const uma = (classId: RpgClass, classes: Tracks): OwnedUma => ({ ...newOwnedUma(NOW), classId, ranks: { classes } })
-/** The promotion page's Uma C: a Brawler R34 who holds Arms Spellblade R12, has her Recruit at Rank 10 and started an Acolyte. */
+/** The promotion page's Uma C: a Brawler R34 who holds Arms Spellblade R12, has her Warrior at Rank 10 and started a Healer. */
 const UMA_C = uma('brawler', { brawler: { rank: 34, exp: 0 }, spellblade: { rank: 12, exp: 0 }, recruit: { rank: 10, exp: 0 }, acolyte: { rank: 4, exp: 0 } })
 const worldC = (): TierWorld => ({ ...newTierWorld(NOW, 3), umas: { [C.outfitId]: UMA_C } })
 
@@ -95,7 +95,7 @@ describe('the Classes sheet from v19 (Uma C)', () => {
 
   it('draws every class in the state language with its word', () => {
     expect(classTiles(C, UMA_C).map((t) => `${t.name} ${t.state} ${t.word}`)).toEqual([
-      'Recruit available R10/10', 'Duelist open R1 · free', 'Acolyte available R4/10', 'Caller open R1 · free', 'Initiate open R1 · free',
+      'Warrior available R10/10', 'Spellblade open R1 · free', 'Healer available R4/10', 'Summoner open R1 · free', 'Mage open R1 · free',
       'Brawler on R34', 'Arms Spellblade available R12', 'Arms Summoner ready Ready',
       'Paladin closed Closed', 'Cleric closed Closed', 'Tome Summoner closed Closed', 'Tome Spellblade closed Closed', 'Sorcerer closed Closed',
     ])
@@ -116,11 +116,11 @@ describe('the Classes sheet from v19 (Uma C)', () => {
     const footer = (id: RpgClass) => classFooter(classTiles(C, UMA_C).find((t) => t.classId === id)!)
     expect(footer('brawler')).toEqual({ label: 'Fights as Brawler', act: null })
     expect(footer('spellblade')).toEqual({ label: 'Fight as Arms Spellblade', act: 'switch' })
-    expect(footer('acolyte')).toEqual({ label: 'Fight as Acolyte', act: 'switch' })
+    expect(footer('acolyte')).toEqual({ label: 'Fight as Healer', act: 'switch' })
     expect(footer('armsummoner')).toEqual({ label: 'Promote to Arms Summoner', act: 'promote' })
-    expect(footer('duelist')).toEqual({ label: 'Start Duelist · R1', act: 'start' })
-    expect(footer('tomeblade')).toEqual({ label: 'Opens with Duelist R10 or Initiate R10', act: null })
-    expect(footer('paladin')).toEqual({ label: 'Opens with Acolyte R10', act: null })
+    expect(footer('duelist')).toEqual({ label: 'Start Spellblade · R1', act: 'start' })
+    expect(footer('tomeblade')).toEqual({ label: 'Opens with Spellblade R10 or Mage R10', act: null })
+    expect(footer('paladin')).toEqual({ label: 'Opens with Healer R10', act: null })
   })
 
   it('writes the selection\'s line: name and state, slots and role, defaults and hand; a Tier 0 its skill and children', () => {
@@ -128,10 +128,10 @@ describe('the Classes sheet from v19 (Uma C)', () => {
     expect(classLine(tile('armsummoner'))).toEqual({ title: 'Arms Summoner · Ready', facts: ['2 Arms + 1 Tome · Area · lingers'],
       weapons: ['bow', 'axe', 'tome-dark'], hand: 'Hand · Arms ×0.57 · Tome ×0.46' })
     expect(classLine(tile('brawler'))).toMatchObject({ title: 'Brawler · On', facts: ['3 Arms · One act ×1'], hand: 'Hand · Arms ×1' })
-    expect(classLine(tile('recruit'))).toEqual({ title: 'Recruit · Held',
+    expect(classLine(tile('recruit'))).toEqual({ title: 'Warrior · Held',
       facts: ['Any 3 weapons · Drill Strike', 'Promotes to Brawler, Arms Spellblade, Arms Summoner'], weapons: [], hand: 'Hand · Arms ×1 · Tome ×1' })
     expect(classLine(tile('cleric')).facts).toEqual(['2 Tomes + 1 Arm · Healer · M.ATK'])
-    expect(classesSheet(C, UMA_C, worldC(), 1, 'duelist')).toMatchObject({ selected: { classId: 'duelist' }, footer: { label: 'Start Duelist · R1' } })
+    expect(classesSheet(C, UMA_C, worldC(), 1, 'duelist')).toMatchObject({ selected: { classId: 'duelist' }, footer: { label: 'Start Spellblade · R1' } })
   })
 
   it('in a later tier draws the eight Tier 1 classes, open from R1, with no Tier 0 row', () => {
@@ -154,17 +154,17 @@ describe('the promotion sheet from v19', () => {
       return [sheet.title, sheet.tiles.map((t) => `${t.name}${t.badge ? ` · ${t.badge}` : ''}`), sheet.selected.name]
     }
     const power = outfit('81004'), wit = outfit('81005', true)
-    expect(rows('recruit', wit)).toEqual(['Promote · Recruit R10', ['Brawler · Suggested', 'Arms Spellblade', 'Arms Summoner'], 'Brawler'])
-    expect(rows('apprentice', power)).toEqual(['Promote · Initiate R10', ['Sorcerer · Suggested', 'Tome Spellblade', 'Tome Summoner'], 'Sorcerer'])
-    expect(rows('duelist', power)).toEqual(['Promote · Duelist R10', ['Arms Spellblade · Suggested', 'Tome Spellblade'], 'Arms Spellblade'])
-    expect(rows('duelist', wit)).toEqual(['Promote · Duelist R10', ['Arms Spellblade', 'Tome Spellblade · Suggested'], 'Tome Spellblade'])
+    expect(rows('recruit', wit)).toEqual(['Promote · Warrior R10', ['Brawler · Suggested', 'Arms Spellblade', 'Arms Summoner'], 'Brawler'])
+    expect(rows('apprentice', power)).toEqual(['Promote · Mage R10', ['Sorcerer · Suggested', 'Tome Spellblade', 'Tome Summoner'], 'Sorcerer'])
+    expect(rows('duelist', power)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade · Suggested', 'Tome Spellblade'], 'Arms Spellblade'])
+    expect(rows('duelist', wit)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade', 'Tome Spellblade · Suggested'], 'Tome Spellblade'])
     expect(rows('caller', power)[1]).toEqual(['Arms Summoner · Suggested', 'Tome Summoner'])
     expect(rows('caller', wit)[1]).toEqual(['Arms Summoner', 'Tome Summoner · Suggested'])
     expect(rows('acolyte', power)[1]).toEqual(['Paladin · Suggested', 'Cleric'])
     expect(rows('acolyte', wit)[1]).toEqual(['Paladin', 'Cleric · Suggested'])
   })
 
-  it('leaves out a row the same on every tile: the Duelist\'s and the Caller\'s roles', () => {
+  it('leaves out a row the same on every tile: the Spellblade\'s and the Summoner\'s roles', () => {
     const tiles = (tier0: 'recruit' | 'duelist' | 'acolyte' | 'caller') => promotionSheet(C, at10(tier0), 1, tier0).tiles.map((t) => [t.slots, t.role])
     expect(tiles('recruit')).toEqual([['3 Arms', 'One act ×1'], ['2 Arms + 1 Tome', 'Multi-hit'], ['2 Arms + 1 Tome', 'Area · lingers']])
     expect(tiles('duelist')).toEqual([['2 Arms + 1 Tome', null], ['2 Tomes + 1 Arm', null]])
@@ -175,12 +175,12 @@ describe('the promotion sheet from v19', () => {
 
   it('says before → after: no waiting EXP, then 17,400 landing at R42 with every depth', () => {
     expect(promotionSheet(C, at10('recruit'), 1, 'recruit')).toMatchObject({
-      caption: 'Free · the others stay open', before: 'Recruit R10 → Brawler R10', after: 'Depths 1–2 · 6 skills',
+      caption: 'Free · the others stay open', before: 'Warrior R10 → Brawler R10', after: 'Depths 1–2 · 6 skills',
       footer: { label: 'Promote to Brawler', act: 'promote', block: null },
     })
-    expect(promotionSheet(C, at10('recruit', 400), 1, 'recruit')).toMatchObject({ before: 'Recruit R10 → Brawler R11', after: 'Depths 1–2 · 6 skills · +400 EXP' })
+    expect(promotionSheet(C, at10('recruit', 400), 1, 'recruit')).toMatchObject({ before: 'Warrior R10 → Brawler R11', after: 'Depths 1–2 · 6 skills · +400 EXP' })
     expect(promotionSheet(C, at10('recruit', 17_400), 1, 'recruit', 'armsummoner')).toMatchObject({
-      before: 'Recruit R10 → Arms Summoner R42', after: 'Depths 1–5 · 15 skills · +17,400 EXP', footer: { label: 'Promote to Arms Summoner' },
+      before: 'Warrior R10 → Arms Summoner R42', after: 'Depths 1–5 · 15 skills · +17,400 EXP', footer: { label: 'Promote to Arms Summoner' },
     })
   })
 
@@ -209,7 +209,7 @@ describe('the promotion sheet from v19', () => {
 describe('the Skills tab\'s pieces from v19', () => {
   it('reads the class button: R34, a Tier 0\'s R7/10, and Promote while a promotion waits', () => {
     expect(classButton(C, UMA_C)).toEqual({ classId: 'brawler', name: 'Brawler', word: 'R34', promote: null })
-    expect(classButton(C, uma('recruit', { recruit: { rank: 7, exp: 0 } }))).toEqual({ classId: 'recruit', name: 'Recruit', word: 'R7/10', promote: null })
+    expect(classButton(C, uma('recruit', { recruit: { rank: 7, exp: 0 } }))).toEqual({ classId: 'recruit', name: 'Warrior', word: 'R7/10', promote: null })
     expect(classButton(C, uma('recruit', { recruit: { rank: 10, exp: 400 } }))).toMatchObject({ word: 'Promote', promote: 'recruit' })
   })
 

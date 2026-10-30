@@ -223,7 +223,7 @@ export interface ClassesV3Record {
 }
 /** One Uma's line in the record. */
 export interface ClassesV3Line {
-  /** Her v31 class (a v31 id), for "Summoner R50 · Mage R15 → Caller R1". */
+  /** Her v31 class (a v31 id), for "Summoner R50 · Mage R15 → Summoner R1". */
   classId: string | null
   /** Her v31 Class Ranks, by v31 id. */
   ranks: Partial<Record<string, { rank: number; exp: number }>>

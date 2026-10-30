@@ -14,7 +14,7 @@ const outfit = (outfitId: string, style: 'front' | 'late'): BattleOutfit => ({
   outfitId, baseStats: stats, growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0 },
   aptitudes: { strategy: { front: 'B', pace: 'B', late: 'B', end: 'B', [style]: 'A' }, distance: { sprint: 'B', mile: 'B', medium: 'A', long: 'B' } },
 })
-/** Front A: her calling's Tier 0 is the Recruit. */
+/** Front A: her calling's Tier 0 is the Warrior. */
 const OUTFIT = outfit(ID, 'front')
 
 /** Tier 1 with her: a Brawler R34 (no bar yet) and a Paladin at Rank 50, both held, 78,000 Class Marks. */
@@ -31,7 +31,7 @@ describe('the Manual sheet on a Tier 1 class she holds', () => {
   it('lists the five Tier 0s, then her held Tier 1 classes: "R34" with its bar; Rank 50 reads Max', () => {
     const bars = manualBars(OUTFIT, world().umas[ID]!, 1)
     expect(bars.map((b) => b.ref.id)).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice', 'brawler', 'paladin'])
-    expect(bars.map((b) => b.name)).toEqual(['Recruit', 'Duelist', 'Acolyte', 'Caller', 'Initiate', 'Brawler', 'Paladin'])
+    expect(bars.map((b) => b.name)).toEqual(['Warrior', 'Spellblade', 'Healer', 'Summoner', 'Mage', 'Brawler', 'Paladin'])
     const of = (id: string) => bars.find((b) => b.ref.id === id)!
     expect(of('brawler')).toMatchObject({ caption: 'R34', fill: { value: 0, max: 120 + 16 * 34 }, calling: false })
     expect(of('duelist').caption).toBe('R1/10')
@@ -103,14 +103,14 @@ function read(w: TierWorld, ref: { kind: 'class'; id: RpgClass }, n: number): Ti
 }
 
 describe('the Manual sheet from v19, Tier 1\'s world after the reset', () => {
-  it('lists the five Tier 0s, her calling\'s Recruit first "R1/10 · Calling", and no Tier 1 class she doesn\'t hold', () => {
+  it('lists the five Tier 0s, her calling\'s Warrior first "R1/10 · Calling", and no Tier 1 class she doesn\'t hold', () => {
     const bars = manualBars(OUTFIT, resetWorld().umas[A]!, 1)
     expect(bars.map((b) => [b.name, b.caption])).toEqual([
-      ['Recruit', 'R1/10 · Calling'], ['Duelist', 'R1/10'], ['Acolyte', 'R1/10'], ['Caller', 'R1/10'], ['Initiate', 'R1/10'],
+      ['Warrior', 'R1/10 · Calling'], ['Spellblade', 'R1/10'], ['Healer', 'R1/10'], ['Summoner', 'R1/10'], ['Mage', 'R1/10'],
     ])
     expect(bars[0]!.fill).toEqual({ value: 0, max: 272 })
-    // A Late A Uma's calling is the Acolyte: hers comes first.
-    expect(manualBars(outfit('81002', 'late'), resetWorld().umas[A]!, 1)[0]!.name).toBe('Acolyte')
+    // A Late A Uma's calling is the Healer: hers comes first.
+    expect(manualBars(outfit('81002', 'late'), resetWorld().umas[A]!, 1)[0]!.name).toBe('Healer')
   })
 
   it('counts 1, 5, 10, To Rank 10 · 4, Her share · 21 and Max · 78, and starts on her share', () => {
@@ -122,8 +122,8 @@ describe('the Manual sheet from v19, Tier 1\'s world after the reset', () => {
     expect(manualHead('Uma A', resetWorld(), A)).toMatchObject({ line: 'Uma A · Class Marks 78,000', share: 'Her share · 21' })
   })
 
-  it('reads her share on her Recruit to Rank 10 with the rest waiting: Recruit R1 → R10 · +17,400 EXP waiting', () => {
-    expect(manualStep(resetWorld().umas[A]!, recruit, 21).text).toBe('Recruit R1 → R10 · +17,400 EXP waiting')
+  it('reads her share on her Warrior to Rank 10 with the rest waiting: Warrior R1 → R10 · +17,400 EXP waiting', () => {
+    expect(manualStep(resetWorld().umas[A]!, recruit, 21).text).toBe('Warrior R1 → R10 · +17,400 EXP waiting')
     expect(manualFooter(resetWorld(), A, recruit, 21, 1)).toMatchObject({ label: 'Read 21 · 21,000 Class Marks', block: null })
   })
 
@@ -152,7 +152,7 @@ describe('the Manual sheet from v19, Tier 1\'s world after the reset', () => {
     expect(manualCounts(tight, A, recruit, 1).map((c) => [c.label, c.block])).toEqual([
       ['1', null], ['5', 'Room for 4'], ['10', 'Room for 4'], ['Her share · 21', 'Room for 4'], ['Max · 4', null],
     ])
-    expect(manualStep(tight.umas[A]!, recruit, 4).text).toBe('Recruit R10 → R10 · +23,680 EXP waiting · +160 Class Marks back')
+    expect(manualStep(tight.umas[A]!, recruit, 4).text).toBe('Warrior R10 → R10 · +23,680 EXP waiting · +160 Class Marks back')
     const full = resetWorld({ recruit: { rank: 10, exp: 23_680 } })
     expect(manualFooter(full, A, recruit, 1, 1)).toEqual({ step: null, label: 'Already at the top rank', block: 'Already at the top rank' })
   })

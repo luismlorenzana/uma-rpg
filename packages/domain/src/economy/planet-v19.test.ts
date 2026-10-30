@@ -22,7 +22,7 @@ describe('Prowess by her slots (CV7)', () => {
     // Half up: 5 points, 2 Arms → 3.33 → 3; 1 Arm → 1.67 → 2; 4 points, 1 Arm → 1.33 → 1; 2 Arms → 2.67 → 3.
     expect([prowessSplit(5, 'recruit', ARMS2), prowessSplit(5, 'recruit', ARMS1), prowessSplit(4, 'recruit', ARMS1), prowessSplit(4, 'recruit', ARMS2)])
       .toEqual([{ atk: 3, matk: 2 }, { atk: 2, matk: 3 }, { atk: 1, matk: 3 }, { atk: 3, matk: 1 }])
-    // Without her weapons, her class's defaults (the Recruit's three Arms, the Caller's one).
+    // Without her weapons, her class's defaults (the Warrior's three Arms, the Summoner's one).
     expect([prowessSplit(9, 'recruit'), prowessSplit(9, 'caller')]).toEqual([{ atk: 9, matk: 0 }, { atk: 3, matk: 6 }])
   })
 

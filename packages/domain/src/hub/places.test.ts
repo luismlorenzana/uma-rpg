@@ -108,7 +108,7 @@ describe('the Learning page by generation (H59, D178)', () => {
     const v19 = learningPlaces(19)
     expect(v19.map((p) => [p.id, p.name, p.at.x, p.at.y, p.frame ?? null])).toEqual([
       ['brawler-dojo', 'Warrior Dojo', 0.24, 0.1, null], ['mage-tower', 'Mage Tower', 0.76, 0.11, null],
-      ['spell-blade-salle', 'Spell Blade Salle', 0.22, 0.33, null], ['summoner-circle', 'Summoner Circle', 0.78, 0.33, null],
+      ['spell-blade-salle', 'Spellblade Salle', 0.22, 0.33, null], ['summoner-circle', 'Summoner Circle', 0.78, 0.33, null],
       // Its own building (uma-art 2.17.0, H135): no frame override, so the map draws `healer-sanctum`.
       ['healer-sanctum', 'Healer Sanctum', 0.5, 0.56, null],
       ['observatory', 'Observatory', 0.5, 0.84, null],
@@ -126,7 +126,7 @@ describe('the Learning page by generation (H59, D178)', () => {
     expect(learningPlaces(19).filter((p) => p.kind === 'class-hall').map((p) => [p.blurb, p.details[0]])).toEqual([
       ['The Warrior Dojo: power from self-training. Four Heroes, each with her own Limit Break, and their Learners.', 'Home: Brawler'],
       ['The Mage Tower: power from self-study. Four Heroes, each with her own Limit Break, and their Learners.', 'Home: Sorcerer'],
-      ['The Spell Blade Salle: power from pacts with familiars. Four Heroes, each with her own Limit Break, and their Learners.',
+      ['The Spellblade Salle: power from pacts with familiars. Four Heroes, each with her own Limit Break, and their Learners.',
         'Home: Arms Spellblade 1–2, Tome Spellblade 3–4'],
       ['The Summoner Circle: power from familiars, summoned. Four Heroes, each with her own Limit Break, and their Learners.',
         'Home: Arms Summoner 1–2, Tome Summoner 3–4'],

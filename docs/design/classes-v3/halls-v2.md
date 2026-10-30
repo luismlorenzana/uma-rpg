@@ -113,6 +113,8 @@ Built in H129 (D248), live from H134.
 
 ### 2.1 Five halls, one per family (HV1)
 
+> **D259 (2026-10-30):** the Tier 0s now show their family names (Warrior, Mage, Spellblade, Summoner, Healer), and the hall shows as the **Spellblade Salle**, one word as its classes are. The ids stay.
+
 | Hall | The owner's hall · its Tier 0 | Home classes (Tier 1), seats | Lore: where the power comes from | Hall and place ids |
 |---|---|---|---|---|
 | **Warrior Dojo** | Fighter Hall · Recruit | Brawler, 1–4 | **Self-training.** Each Limit Break is a technique drilled until it became one motion: the Arms, nothing else | `brawler`, `brawler-dojo` (kept) |

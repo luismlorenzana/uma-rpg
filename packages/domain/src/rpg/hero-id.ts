@@ -14,7 +14,7 @@ export type HeroLimitId = `${HeroHall}-${1 | 2 | 3 | 4}`
 const ALL_HALLS: readonly HeroHall[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'paladin', 'healer']
 const HALLS_V1: readonly HeroHall[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
 const HALLS_V2: readonly HeroHall[] = [...HALLS_V1, 'paladin']
-/** Halls v2's five in the design's order (§2.1): the Warrior Dojo, the Mage Tower, the Spell Blade Salle, the Summoner
+/** Halls v2's five in the design's order (§2.1): the Warrior Dojo, the Mage Tower, the Spellblade Salle, the Summoner
  * Circle and the Healer Sanctum. */
 const HALLS_V19: readonly HeroHall[] = ['brawler', 'mage', 'spellblade', 'summoner', 'healer']
 /** The halls of an engine's generation: classes v1's five to v14, six v15–v18 (the Paladin Bastion, D179), Halls v2's five

@@ -1,7 +1,7 @@
 // The Paladin's start and one healer a party by generation (H58): both are classes v2 rules, so engine v14 started every
 // Late surger as a Cleric and let two Clerics fight together, and the game since H61 (D188) doesn't. From v16 (live from
 // H72, D210) her start is her calling (`starting-class-v16.test.ts`), which keeps the Paladin's for a Late surger to v18;
-// from v19 (Classes v3, live since H134) she starts as her Acolyte and holds the Paladin once promoted. `healers-v2.test.ts`
+// from v19 (Classes v3, live since H134) she starts as her Healer and holds the Paladin once promoted. `healers-v2.test.ts`
 // holds the live rules where a party fights.
 import { describe, expect, it } from 'vitest'
 import { BATTLE_ENGINE_VERSION } from '../rpg/battle/caps'
@@ -20,7 +20,7 @@ const outfit = (id: string, style: 'front' | 'pace' | 'late' | 'end', power = 11
 const STYLES = ['front', 'pace', 'late', 'end'] as const
 
 describe('the Paladin’s start (H58, §3.3)', () => {
-  it('is a Late surger whose base Power beats her base Wit, from classes v2 to v18 (her calling from v16); from v19 her Acolyte', () => {
+  it('is a Late surger whose base Power beats her base Wit, from classes v2 to v18 (her calling from v16); from v19 her Healer', () => {
     expect(BATTLE_ENGINE_VERSION).toBe(19)
     const strong = outfit('1', 'late', 120, 100), even = outfit('2', 'late', 110, 110), wise = outfit('3', 'late', 100, 120)
     expect([strong, even, wise].map((o) => startingClass(o, 15))).toEqual(['paladin', 'cleric', 'cleric'])
@@ -65,8 +65,8 @@ describe('one healer a party is a classes v2 rule (H58)', () => {
     let save: Save = newSave('Luis', T(0))
     for (const id of OUTFITS.keys()) save = unlockUma(save, id, T(0))
     ;[...OUTFITS.keys()].forEach((id, slot) => { save = setPartySlot(save, 0, slot, id, T(0)) })
-    // 101 and 102 Clerics, promoted from the Acolyte (v19's Tier 1 world holds them so); 103, a Late Uma with no class, is
-    // her style's Cleric to v18 and her Acolyte, no healer, from v19.
+    // 101 and 102 Clerics, promoted from the Healer (v19's Tier 1 world holds them so); 103, a Late Uma with no class, is
+    // her style's Cleric to v18 and her Healer, no healer, from v19.
     const w: TierWorld = JSON.parse(JSON.stringify(worldOf(save)))
     for (const id of ['101', '102']) w.umas[id] = { ...w.umas[id]!, classId: 'cleric', ranks: { ...w.umas[id]!.ranks, classes: { acolyte: { rank: 10, exp: 0 }, cleric: { rank: 10, exp: 0 } } } }
     save = { ...save, tierWorlds: { ...save.tierWorlds, '1': w } }

@@ -58,7 +58,7 @@ export interface UmaTemplate {
 /** What the Stable's Template facets and search read (UT15; H70 wires them). */
 export interface UmaTemplateFacets { calling: UmaCallingClass; stride: UmaStride; knack: UmaKnack; name: string }
 
-/** Her type by calling and stride: 18 words (UT5); from v19 (CV21) 15, each Tier 0 her model's three, the Acolyte the
+/** Her type by calling and stride: 18 words (UT5); from v19 (CV21) 15, each Tier 0 her model's three, the Healer the
  * Cleric's (Shieldrunner, Warden and Stalwart retire with the Paladin's calling). */
 export const UMA_TYPE_NAMES: Readonly<Record<UmaCallingClass, Readonly<Record<UmaStride, string>>>> = {
   brawler: { dash: 'Charger', middle: 'Bruiser', stayer: 'Ironhide' },

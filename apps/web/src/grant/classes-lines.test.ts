@@ -40,9 +40,9 @@ describe('classesLines (CV §8.6)', () => {
 
   it('draws the tree small: three roots over the five Tier 0s, by v19\'s names', () => {
     expect(classesLines(record(), who, 1).tree).toEqual([
-      { root: 'Warrior', classes: [{ classId: 'recruit', name: 'Recruit' }] },
-      { root: 'All-Rounder', classes: [{ classId: 'duelist', name: 'Duelist' }, { classId: 'acolyte', name: 'Acolyte' }, { classId: 'caller', name: 'Caller' }] },
-      { root: 'Mage', classes: [{ classId: 'apprentice', name: 'Initiate' }] },
+      { root: 'Warrior', classes: [{ classId: 'recruit', name: 'Warrior' }] },
+      { root: 'All-Rounder', classes: [{ classId: 'duelist', name: 'Spellblade' }, { classId: 'acolyte', name: 'Healer' }, { classId: 'caller', name: 'Summoner' }] },
+      { root: 'Mage', classes: [{ classId: 'apprentice', name: 'Mage' }] },
     ])
   })
 
@@ -61,11 +61,11 @@ describe('classesLines (CV §8.6)', () => {
     const umas = classesLines(record(), who, 1).umas
     expect(umas.map((u) => [u.name, u.manuals])).toEqual([['Uma E', 34], ['Uma A', 21], ['Uma B', 13], ['Uma C', 10], ['Uma D', 0]])
     const of = (id: string) => umas.find((u) => u.outfitId === id)!.line
-    expect(of('e')).toBe('Summoner R50 · Mage R15 → Caller R1')
-    expect(of('a')).toBe('Brawler R34 · Paladin R12 → Recruit R1')
-    expect(of('b')).toBe('Spell Blade R26 · Mage R8 → Initiate R1 · trade Wood → Stone')
-    expect(of('c')).toBe('Cleric R24 → Acolyte R1')
-    expect(of('d')).toBe('No Class EXP → Duelist R1 · trade Stone → Wood')
+    expect(of('e')).toBe('Summoner R50 · Mage R15 → Summoner R1')
+    expect(of('a')).toBe('Brawler R34 · Paladin R12 → Warrior R1')
+    expect(of('b')).toBe('Spell Blade R26 · Mage R8 → Mage R1 · trade Wood → Stone')
+    expect(of('c')).toBe('Cleric R24 → Healer R1')
+    expect(of('d')).toBe('No Class EXP → Spellblade R1 · trade Stone → Wood')
   })
 
   it('counts the moved trades, one Uma or many, and leaves the part out when none moved', () => {

@@ -17,10 +17,10 @@ export const tradeLabel = (trade: TradeId): string => {
   return [places[0], places.at(-1)!].map(placeNameV3).join(' · ')
 }
 
-/** Who a trade's Umas are, by calling: the open shop's header names them ("Open shop: no Recruit in this world"). From
+/** Who a trade's Umas are, by calling: the open shop's header names them ("Open shop: no Warrior in this world"). From
  * Classes v3 (H134) each trade is one Tier 0's (CV20). */
 export const TRADE_CLASS_WORDS: Readonly<Record<TradeId, string>> = {
-  physical: 'Recruit', 'physical-hybrid': 'Duelist', healer: 'Acolyte', 'magical-hybrid': 'Caller', magical: 'Initiate',
+  physical: 'Warrior', 'physical-hybrid': 'Spellblade', healer: 'Healer', 'magical-hybrid': 'Summoner', magical: 'Mage',
 }
 
 let last: { world: TierWorld; roster: readonly RosterOutfit[]; tradeOf: TradeOf } | null = null

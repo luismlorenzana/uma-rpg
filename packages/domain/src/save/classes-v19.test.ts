@@ -62,9 +62,9 @@ describe('the start and the switch (CV9, CV10, CV19)', () => {
       save = chooseClass(save, '101', c, T(1))
       expect(her(save).classId).toBe(c)
     }
-    expect(message(() => chooseClass(save, '101', 'armsummoner', T(2)))).toBe('Opens with Recruit R10 or Caller R10')
-    expect(message(() => chooseClass(save, '101', 'mage', T(2)))).toBe('Opens with Initiate R10')
-    expect(message(() => chooseClass(track(save, '101', 'recruit', 10), '101', 'brawler', T(2)))).toBe('Promote from Recruit')
+    expect(message(() => chooseClass(save, '101', 'armsummoner', T(2)))).toBe('Opens with Warrior R10 or Summoner R10')
+    expect(message(() => chooseClass(save, '101', 'mage', T(2)))).toBe('Opens with Mage R10')
+    expect(message(() => chooseClass(track(save, '101', 'recruit', 10), '101', 'brawler', T(2)))).toBe('Promote from Warrior')
     expect(umaHeldClasses(her(save))).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'])
     expect(umaHeldClasses(her(track(save, '101', 'mage', 12)))).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice', 'mage'])
     expect(umaHeldClasses(her(save), 2)).toEqual(['brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage'])
@@ -99,16 +99,16 @@ describe('promotion (CV8, §2.6)', () => {
 
   it('refuses outside her Tier 0\'s children, below Rank 10, a class she holds, and outside Tier 1\'s world', () => {
     const save = unlocked()
-    expect(message(() => promoteUma(save, '101', 'recruit', 'brawler', T(1)))).toBe('Needs Recruit R10')
+    expect(message(() => promoteUma(save, '101', 'recruit', 'brawler', T(1)))).toBe('Needs Warrior R10')
     const ready = track(save, '101', 'recruit', 10)
     expect(message(() => promoteUma(ready, '101', 'recruit', 'cleric', T(1)))).toBe('Not one of her Tier 0’s children')
     expect(message(() => promoteUma(ready, '101', 'recruit', 'duelist', T(1)))).toBe('Not one of her Tier 0’s children')
     expect(message(() => promoteUma(track(ready, '101', 'brawler', 14), '101', 'recruit', 'brawler', T(1)))).toBe('Already hers')
     expect(promotionPlan(her(ready), 'recruit', 'brawler', 2).block).toBe('Tier 0 is Tier 1’s')
-    expect(promotionPlan(her(ready), 'duelist', 'tomeblade').block).toBe('Needs Duelist R10')
+    expect(promotionPlan(her(ready), 'duelist', 'tomeblade').block).toBe('Needs Spellblade R10')
   })
 
-  it('rebuilds §8.7\'s Uma A: 16 Manuals on Recruit, then the Brawler at R35', () => {
+  it('rebuilds §8.7\'s Uma A: 16 Manuals on Warrior, then the Brawler at R35', () => {
     const save = marks(unlocked(), 21_000)
     const read = readManuals(save, '101', { kind: 'class', id: 'recruit' }, 16, T(1))
     expect(her(read).ranks.classes.recruit).toEqual({ rank: 10, exp: 12_400 })
@@ -117,7 +117,7 @@ describe('promotion (CV8, §2.6)', () => {
     expect(her(brawler).ranks.classes.brawler).toEqual({ rank: 35, exp: 600 })
   })
 
-  it('rebuilds §8.7\'s Uma E: 28 Manuals on Caller bank 23,680 and return 720 EXP as 360 Marks; the Tome Summoner at R50', () => {
+  it('rebuilds §8.7\'s Uma E: 28 Manuals on Summoner bank 23,680 and return 720 EXP as 360 Marks; the Tome Summoner at R50', () => {
     const save = marks(unlocked(), 28_000)
     expect(manualBlock(worldOf(save), '104', { kind: 'class', id: 'caller' }, 28)).toBeNull()
     const read = readManuals(save, '104', { kind: 'class', id: 'caller' }, 28, T(1))
@@ -152,8 +152,8 @@ describe('Class EXP on a Tier 0 (CV5, CV8)', () => {
   it('reads Manuals onto a Tier 0 at Rank 10 until her bank is full; refuses a closed class with its gate', () => {
     const world = (save: Save) => worldOf(marks(save, 50_000))
     const save = unlocked()
-    expect(manualBlock(world(save), '101', { kind: 'class', id: 'armsummoner' })).toBe('Opens with Recruit R10 or Caller R10')
-    expect(manualBlock(world(track(save, '101', 'recruit', 10)), '101', { kind: 'class', id: 'brawler' })).toBe('Promote from Recruit')
+    expect(manualBlock(world(save), '101', { kind: 'class', id: 'armsummoner' })).toBe('Opens with Warrior R10 or Summoner R10')
+    expect(manualBlock(world(track(save, '101', 'recruit', 10)), '101', { kind: 'class', id: 'brawler' })).toBe('Promote from Warrior')
     expect(manualBlock(world(track(save, '101', 'recruit', 10, 5_000)), '101', { kind: 'class', id: 'recruit' })).toBeNull()
     expect(manualBlock(world(track(save, '101', 'recruit', 10, RPG_TIER0_BANK)), '101', { kind: 'class', id: 'recruit' })).toBe('Already at the top rank')
     expect(manualBlock(world(track(save, '101', 'brawler', 50)), '101', { kind: 'class', id: 'brawler' })).toBe('Already at the top rank')
@@ -169,14 +169,14 @@ describe('her class tree (§14.1, UP23)', () => {
     expect(tiles(save)).toEqual([
       'recruit 0 on R10 +400', 'duelist 0 open R1', 'acolyte 0 open R1', 'caller 0 available R3', 'apprentice 0 open R1',
       'brawler 1 ready R1 · Suggested', 'spellblade 1 ready R1', 'armsummoner 1 ready R1',
-      'paladin 1 closed R1 · Opens with Acolyte R10', 'cleric 1 closed R1 · Opens with Acolyte R10',
-      'summoner 1 closed R1 · Opens with Caller R10 or Initiate R10', 'tomeblade 1 closed R1 · Opens with Duelist R10 or Initiate R10',
-      'mage 1 closed R1 · Opens with Initiate R10',
+      'paladin 1 closed R1 · Opens with Healer R10', 'cleric 1 closed R1 · Opens with Healer R10',
+      'summoner 1 closed R1 · Opens with Summoner R10 or Mage R10', 'tomeblade 1 closed R1 · Opens with Spellblade R10 or Mage R10',
+      'mage 1 closed R1 · Opens with Mage R10',
     ])
     save = promoteUma(save, '101', 'recruit', 'brawler', T(1))
     expect(tiles(save).slice(0, 8)).toEqual(['recruit 0 available R10', 'duelist 0 open R1', 'acolyte 0 open R1', 'caller 0 available R3',
       'apprentice 0 open R1', 'brawler 1 on R11', 'spellblade 1 ready R1', 'armsummoner 1 ready R1'])
-    // A Wit-led Duelist at 10: the Tome Spellblade carries the badge, the Arms one doesn't.
+    // A Wit-led Spellblade at 10: the Tome Spellblade carries the badge, the Arms one doesn't.
     const duel = umaClassTree(her(track(unlocked(), '102', 'duelist', 10), '102'), PACE)
     expect(duel.filter((t) => t.suggested).map((t) => t.classId)).toEqual(['tomeblade'])
     // A Tier 2 world: the eight, open from Rank 1.
@@ -187,7 +187,7 @@ describe('her class tree (§14.1, UP23)', () => {
 
 describe('a v19 fight from the save (§13)', () => {
   const region = regionChapter(worldContinent({ name: 'Synthetic', order: 1 }).regions[0]!, Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `C${i}` })))
-  it('starts five Tier 0 Umas as engine v19 allies, an Acolyte no healer, and pays her Class EXP onto her Tier 0', () => {
+  it('starts five Tier 0 Umas as engine v19 allies, a Healer no healer, and pays her Class EXP onto her Tier 0', () => {
     let save = unlocked()
     ;['101', '102', '103', '104', '105'].forEach((id, i) => { save = setPartySlot(save, 0, i, id, T(1)) })
     const members = partyMembers(worldOf(save), ['101', '102', '103', '104', '105'], OUTFITS)

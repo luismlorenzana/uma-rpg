@@ -82,8 +82,8 @@ describe('one Uma, one tier world in the album (H35)', () => {
 })
 
 describe('the Stable\'s Template filters (UT15, H70)', () => {
-  /** The six invented outfits re-shaped: 81001 a front runner at Long (a Recruit, an Ironhide), 81002 a Pace Uma at Medium
-   * (a Duelist, a Spellfencer; owned, with a v18 pick of the Spell Blade that v19 ignores), the rest Pace Umas at Mile
+  /** The six invented outfits re-shaped: 81001 a front runner at Long (a Warrior, an Ironhide), 81002 a Pace Uma at Medium
+   * (a Spellblade, a Spellfencer; owned, with a v18 pick of the Spell Blade that v19 ignores), the rest Pace Umas at Mile
    * (Duelists). */
   async function templated() {
     const fx = await albumFixture()
@@ -102,7 +102,7 @@ describe('the Stable\'s Template filters (UT15, H70)', () => {
     const at = STABLE_FACETS.findIndex((f) => f.group === 'Template')
     expect(STABLE_FACETS[at - 1]!.group).toBe('RPG')
     expect(STABLE_FACETS.slice(at).map((f) => [f.group, f.key, f.options!.map((o) => o.label)])).toEqual([
-      ['Template', 'calling', ['Recruit', 'Duelist', 'Initiate', 'Caller', 'Acolyte']],
+      ['Template', 'calling', ['Warrior', 'Spellblade', 'Mage', 'Summoner', 'Healer']],
       ['Template', 'stride', ['Dash', 'Middle', 'Stayer']],
       ['Template', 'knack', ['Fleet', 'Mighty', 'Tireless', 'Gritty', 'Clever']],
       ['Template', 'signature', ['Pendant', 'Orb', 'Bell', 'Insignia']],
@@ -116,7 +116,7 @@ describe('the Stable\'s Template filters (UT15, H70)', () => {
     const found = stableResult(rows, { ...STABLE_SCHEMA.fallback, search: 'ironhide' }).rows.map((r) => r.id)
     expect(found).toEqual(['81001'])
     expect(rows[0]!.facets).toMatchObject({ calling: ['recruit'], stride: ['stayer'] })
-    // Pace alone makes her a Duelist (a Spellfencer by name); her old pick no longer counts.
+    // Pace alone makes her a Spellblade (a Spellfencer by name); her old pick no longer counts.
     expect(rows[1]!.facets.calling).toEqual(['duelist'])
     expect(rows[1]!.search).toContain('spellfencer')
     const duelists = stableResult(rows, { ...STABLE_SCHEMA.fallback, filters: { calling: ['duelist'] } })
@@ -129,8 +129,8 @@ describe('the Stable’s Calling and Class facets (v19; CV §14.5, H134)', () =>
   const labels = (key: string, facets = STABLE_FACETS) => facets.find((f) => f.key === key)!.options!.map((o) => o.label)
 
   it('lists the five Tier 0s as callings and the thirteen classes, Tier 0 first', () => {
-    expect(labels('calling')).toEqual(['Recruit', 'Duelist', 'Initiate', 'Caller', 'Acolyte'])
-    expect(labels('class')).toEqual(['Recruit', 'Duelist', 'Acolyte', 'Caller', 'Initiate',
+    expect(labels('calling')).toEqual(['Warrior', 'Spellblade', 'Mage', 'Summoner', 'Healer'])
+    expect(labels('class')).toEqual(['Warrior', 'Spellblade', 'Healer', 'Summoner', 'Mage',
       'Brawler', 'Arms Spellblade', 'Arms Summoner', 'Paladin', 'Cleric', 'Tome Summoner', 'Tome Spellblade', 'Sorcerer'])
     // The groups and their order stay: Class and Can upgrade in RPG, Calling first in Template.
     expect(STABLE_FACETS.map((f) => f.key)).toEqual(['ownership', 'rarity', 'surface', 'distance', 'strategy', 'sex', 'new', 'free', 'class', 'upgrade',

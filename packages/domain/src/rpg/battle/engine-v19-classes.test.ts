@@ -84,7 +84,7 @@ describe('engine v19: who may fight as what (CV8, CV10)', () => {
     expect(() => createBattle(input(party({ ...member('a3', 'recruit', { classRank: 5 }), lines: {} })))).not.toThrow()
   })
 
-  it('counts an Acolyte as no healer: an Acolyte with a Cleric is a party, a Paladin with a Cleric isn\'t (CV22)', () => {
+  it('counts a Healer as no healer: a Healer with a Cleric is a party, a Paladin with a Cleric isn\'t (CV22)', () => {
     const cleric = member('a5', 'cleric')
     expect(() => createBattle(input(party(member('a3', 'acolyte', { classRank: 10 }), cleric)))).not.toThrow()
     expect(refused(input(party(member('a3', 'paladin'), cleric)))).toThrow('Invalid battle party')
@@ -92,7 +92,7 @@ describe('engine v19: who may fight as what (CV8, CV10)', () => {
 })
 
 describe('engine v19: a Tier 0\'s one skill (CV6)', () => {
-  it('lands a Recruit\'s Drill Strike at her Attack\'s damage × her Rank\'s power (§2.2 × H131\'s 1.05) at Rank 1 and 10, for 10 MP', () => {
+  it('lands a Warrior\'s Drill Strike at her Attack\'s damage × her Rank\'s power (§2.2 × H131\'s 1.05) at Rank 1 and 10, for 10 MP', () => {
     const strike = (classRank: number) => {
       const a3 = member('a3', 'recruit', { classRank, level: 30 })
       const s = start(input(party({ ...a3, stats: { ...a3.stats, atk: 3000 } })))

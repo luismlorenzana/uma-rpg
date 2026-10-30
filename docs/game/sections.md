@@ -60,7 +60,7 @@ Phaser).
   the plaza between. The Account is a Town Hall place with no building.
 - **Learning:** the five Halls of Heroes, one per family (Halls v2, H133, D255; [heroes](heroes.md#the-five-halls)):
   physical-led halls on the left, magic-led on the right. The Warrior Dojo (the Brawler Dojo's id) and the Mage Tower on
-  top, the Spell Blade Salle and the Summoner Circle below them, the **Healer Sanctum** (`healer-sanctum`, uma-art's own
+  top, the Spellblade Salle and the Summoner Circle below them, the **Healer Sanctum** (`healer-sanctum`, uma-art's own
   temple) in the middle where the Paladin Bastion and the Cleric Chapel stood, the Observatory under it.
 - **Battle:** a drill ground of its own, with flagstone roads, banners, weapon racks, training dummies and torches (H31,
   D148): the Scenario Gate above, the Rift below. The Rift keeps the Tier Finale's id, `tier-finale`, and draws
@@ -91,7 +91,7 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 |---|---|---|---|---|
 | Warrior Dojo | `brawler-dojo` | class-hall | 4 | The Warrior Dojo: power from self-training. Four Heroes, each with her own Limit Break, and their Learners. |
 | Mage Tower | `mage-tower` | class-hall | 4 | The Mage Tower: power from self-study. Four Heroes, each with her own Limit Break, and their Learners. |
-| Spell Blade Salle | `spell-blade-salle` | class-hall | 4 | The Spell Blade Salle: power from pacts with familiars. Four Heroes, each with her own Limit Break, and their Learners. |
+| Spellblade Salle | `spell-blade-salle` | class-hall | 4 | The Spellblade Salle: power from pacts with familiars. Four Heroes, each with her own Limit Break, and their Learners. |
 | Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Circle: power from familiars, summoned. Four Heroes, each with her own Limit Break, and their Learners. |
 | Healer Sanctum | `healer-sanctum` | class-hall | 4 | The Healer Sanctum: power from a followed deity. Four Heroes, each with her own Limit Break, and their Learners. |
 | Observatory | `observatory` | town | — | Each Uma's Extra Stats: a Planet, three moons and her own moon. |
@@ -161,7 +161,7 @@ world map's party bar).
   - Aptitudes: surface, distance and running style at A or better;
   - RPG: Class, her active class, the thirteen in the tree's order (the five Tier 0s, then Brawler, Arms Spellblade, Arms
     Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer); Can upgrade;
-  - Template: Calling (the five Tier 0s, read from her running styles: Recruit, Duelist, Initiate, Caller, Acolyte),
+  - Template: Calling (the five Tier 0s, read from her running styles: Warrior, Spellblade, Mage, Summoner, Healer),
     Stride (three), Knack (five) and Signature (Pendant, Orb, Bell, Insignia);
   - Trade: "Mine · Weapon Forge", "Forest · Armorer", "Fields · Tome Forge", "Fishery · Charm Forge" and "Monster Den ·
     Lapidary", each with its head count, locked outfits too.
@@ -184,11 +184,11 @@ UX](../design/profile-ux.md), D229):
   - her name, then Calling, Stride and Knack, each with what it read ("Calling ← Pace A, Late A", her best running styles;
     "Stride ← Medium A"; "Knack ← Wit +20%"). Her calling is fixed: there is no pick;
   - her trade: "Trade · Monster Den · Lapidary";
-  - her Flourish and its state: "★ Even pace · as a Duelist · on" while she fights as any class of her calling's family
-    (the Duelist, an Arms or a Tome Spellblade), or "· no effect as Brawler" (a locked outfit's has no state);
+  - her Flourish and its state: "★ Even pace · as a Spellblade · on" while she fights as any class of her calling's family
+    (the Spellblade, an Arms or a Tome Spellblade), or "· no effect as Brawler" (a locked outfit's has no state);
   - on an owned Uma, her **Signature** ("Signature · Pendant · +10 now · worn", or "Wear a Pendant") and her **Moon**
-    ("Moon · I HP +20 (Lv 16) · II DEF +4 · M.DEF +4 (open)" for an All-Rounder calling, "II DEF +8" for a Recruit,
-    "II M.DEF +8" for an Initiate).
+    ("Moon · I HP +20 (Lv 16) · II DEF +4 · M.DEF +4 (open)" for an All-Rounder calling, "II DEF +8" for a Warrior,
+    "II M.DEF +8" for a Mage).
 - **Under the header:** her EXP bar ("1,200 / 2,400 EXP", or "Max level · 300 EXP banked"), then one row of three: her
   class ("Sorcerer · Rank 40"; opens Skills), "Craft · Lv 30", and "Party · Party 1", "Working · Mine · 1h 20m",
   "Fighting · Open fight" or "Party · Free" (opens her place, or the Party Hall).
@@ -209,8 +209,8 @@ UX](../design/profile-ux.md), D229):
 - Her ★ Flourish ("★ Even pace · 1% of her max HP a round, up to 4%"), dimmed with "· No effect as Sorcerer" outside her
   calling's family; on a Tier 1 class her Class Rank bar and "Depths 1–3 open".
 - **The class button** opens **Classes**, the class tree, or, while a promotion waits, the promotion sheet:
-  - **Classes:** Warrior · All-Rounder · Mage over five columns, the Tier 0 row (Recruit, Duelist, Acolyte, Caller,
-    Initiate) over the Tier 1 rows (Brawler, Arms Spellblade, Paladin, Arms Summoner, Sorcerer; Tome Spellblade, Cleric,
+  - **Classes:** Warrior · All-Rounder · Mage over five columns, the Tier 0 row (Warrior, Spellblade, Healer, Summoner,
+    Mage) over the Tier 1 rows (Brawler, Arms Spellblade, Paladin, Arms Summoner, Sorcerer; Tome Spellblade, Cleric,
     Tome Summoner), each Tier 1 class under its All-Rounder parent or its only one. Each tile: emblem, name and its word,
     "R34" (On, the accent fill; or Held, raised), "R7/10" on a Tier 0, **Ready** with a green dot (a child of a Tier 0 she
     holds at Rank 10), "R1 · free" dashed (a Tier 0 she hasn't started), **Closed** at 40%. A later tier's world has no
@@ -219,14 +219,14 @@ UX](../design/profile-ux.md), D229):
     lingers", its three defaults and "Hand · Arms ×0.57 · Tome ×0.46" (a Tier 0: "Any 3 weapons · Drill Strike" and
     "Promotes to Brawler, Arms Spellblade, Arms Summoner"), and "Party 1: 2 healers" in the warning colour when the
     selected healer would make two in her party.
-  - The footer acts on the selection: **Fight as Arms Spellblade** or **Start Caller · R1** (free; the sheet stays open,
+  - The footer acts on the selection: **Fight as Arms Spellblade** or **Start Summoner · R1** (free; the sheet stays open,
     the class On), **Promote to Arms Summoner** (the promotion sheet replaces this one on that child), "Fights as
-    Brawler" on her own class, and on a closed one its gate, "Opens with Duelist R10 or Initiate R10", disabled.
+    Brawler" on her own class, and on a closed one its gate, "Opens with Spellblade R10 or Mage R10", disabled.
   - **Class Manuals ›** ("Exchange") opens the Exchange's Manual sheet on her at `/town/exchange/manual/:outfitId`; its
     Back returns to the Skills tab with Classes open.
-  - **The promotion sheet** ("Promote · Recruit R10", "Free · the others stay open"): one tile a child, **Suggested** on
+  - **The promotion sheet** ("Promote · Warrior R10", "Free · the others stay open"): one tile a child, **Suggested** on
     the suggested one (opened on it, or on the Ready tile's child), **Held** on one she holds; each with its slots, three
-    defaults and role, a row the same on every tile left out. Under them "Recruit R10 → Brawler R11" and "Depths 1–2 · 6
+    defaults and role, a row the same on every tile left out. Under them "Warrior R10 → Brawler R11" and "Depths 1–2 · 6
     skills · +400 EXP" (the EXP waiting on her Tier 0 lands at once). **Promote to Brawler** (free, no confirm) closes it
     and the tab shows the Brawler's first tree; on a held child **Fight as …**. **Classes ›** swaps back to the tree.
 - **Equipped · 4/7**: one square per skill slot her Uma Level gives. Each equipped skill shows its kind marks and its
@@ -303,7 +303,7 @@ places use ([loops](loops.md#craft-level)).
 
 **Racing tab:** her aptitudes (Surface, Distance and Style, each grade on a coloured chip), **Her template** (Calling,
 Stride, Knack and Flourish, each with its note: what it read, "Pace A · Late A" for her calling; "Active" or "No effect
-as Brawler"; a locked outfit's "As a Duelist"), her racing base stats and growth, and her unique skill (racing).
+as Brawler"; a locked outfit's "As a Spellblade"), her racing base stats and growth, and her unique skill (racing).
 
 ### Party Hall
 
@@ -357,7 +357,7 @@ Routes: `/town/party-hall` and `:n` (1–20); `PartyHallPage.tsx`.
     sheet starts on it while it lasts), "To Rank 10 · 4" on a Tier 0 below Rank 10, then 1 · 5 · 10 · "Max · 78" (as many
     as the Marks buy, up to 99). One the Marks can't buy is disabled; on a Tier 0 at Rank 10 the counts stop at its room
     ("Room for 4").
-  - **The footer** shows before → after from the class's own curve ("Brawler R34 → R36"; "Recruit R1 → R10 · +12,400 EXP
+  - **The footer** shows before → after from the class's own curve ("Brawler R34 → R36"; "Warrior R1 → R10 · +12,400 EXP
     waiting"; "+360 Class Marks back" for EXP past the top) and **Read 16 · 16,000 Class Marks**, or the reason it can't
     ("Already at the top rank", "Needs 10,000 Class Marks"). After a read the sheet stays open on the new state; "Choose
     another Uma" returns to the picker.
@@ -397,7 +397,7 @@ her Tier 0 → Her share; Her profile → Skills → Promote (Rank 10), "EXP pas
 At a glance: Reset, Stays, Weapons ("No Weapon Rank since R2: grades stay"), Trades ("2 Umas moved trade · their
 running work finished into the Warehouse") and Halls ("Paladin Bastion · Cleric Chapel → Healer Sanctum", each Uma whose
 role moved, "Hero → Learner · Archdemon's Toll · Bond 7", then "Each Uma keeps her higher Bond"); then each Uma with a
-share or a moved trade, most Manuals first, with her face ("Spell Blade R26 · Mage R8 → Initiate R1 · trade Wood →
+share or a moved trade, most Manuals first, with her face ("Spell Blade R26 · Mage R8 → Mage R1 · trade Wood →
 Stone", her share on the right; the names before the arrow are engine v18's). A later tier's world reads "Every Uma
 starts again at Rank 1 of her class." with one step and no tree. **To the Exchange** (the Manual sheet's picker) and
 **Later** both mark it seen.
@@ -581,21 +581,21 @@ line](../design/tier-rework/farm-by-line.md)).
 <!-- live:facilities -->
 | Place | Profession | Job | What it does | Its trade (calling) |
 |---|---|---|---|---|
-| Mine | Mining | Gathering | Gathers metal, G1–G10 | Recruit |
-| Mine Workbench | Smelting | Processing | Processes metal raw into refined, one for one | Recruit |
-| Weapon Forge | Arms Crafting | Making | Makes Arms Gems | Recruit |
-| Fields | Farming | Gathering | Gathers vegetables, G1–G10 | Acolyte |
-| Fields Workbench | Prepping | Processing | Processes vegetables raw into refined, one for one | Acolyte |
-| Tome Forge | Tome Crafting | Making | Makes Tome Ink | Acolyte |
-| Forest | Wood Chopping | Gathering | Gathers wood, G1–G10 | Duelist |
-| Forest Workbench | Sawing | Processing | Processes wood raw into refined, one for one | Duelist |
-| Armorer | Armor Crafting | Making | Makes Armor Fittings | Duelist |
-| Fishery | Fishing | Gathering | Gathers fish, G1–G10 | Caller |
-| Fishery Workbench | Filleting | Processing | Processes fish raw into refined, one for one | Caller |
-| Charm Forge | Accessory Crafting | Making | Makes Accessory Settings | Caller |
-| Monster Den | Hunting | Gathering | Gathers stone, G1–G10 | Initiate |
-| Den Workbench | Stonecutting | Processing | Processes stone raw into refined, one for one | Initiate |
-| Lapidary | Jewel Crafting | Making | Makes Planet Jewels and Moon Jewels | Initiate |
+| Mine | Mining | Gathering | Gathers metal, G1–G10 | Warrior |
+| Mine Workbench | Smelting | Processing | Processes metal raw into refined, one for one | Warrior |
+| Weapon Forge | Arms Crafting | Making | Makes Arms Gems | Warrior |
+| Fields | Farming | Gathering | Gathers vegetables, G1–G10 | Healer |
+| Fields Workbench | Prepping | Processing | Processes vegetables raw into refined, one for one | Healer |
+| Tome Forge | Tome Crafting | Making | Makes Tome Ink | Healer |
+| Forest | Wood Chopping | Gathering | Gathers wood, G1–G10 | Spellblade |
+| Forest Workbench | Sawing | Processing | Processes wood raw into refined, one for one | Spellblade |
+| Armorer | Armor Crafting | Making | Makes Armor Fittings | Spellblade |
+| Fishery | Fishing | Gathering | Gathers fish, G1–G10 | Summoner |
+| Fishery Workbench | Filleting | Processing | Processes fish raw into refined, one for one | Summoner |
+| Charm Forge | Accessory Crafting | Making | Makes Accessory Settings | Summoner |
+| Monster Den | Hunting | Gathering | Gathers stone, G1–G10 | Mage |
+| Den Workbench | Stonecutting | Processing | Processes stone raw into refined, one for one | Mage |
+| Lapidary | Jewel Crafting | Making | Makes Planet Jewels and Moon Jewels | Mage |
 
 Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma works her trade's three places; a place whose trade has no Uma in the world is an open shop, taking everyone until one arrives.
 <!-- /live -->
@@ -604,8 +604,8 @@ Every place has 4 slots at ×1.25 from day one, and nothing to upgrade. An Uma w
 `PlaceV3.tsx` (the page), with `PlaceV4.tsx` and `place-view-v4.ts` (the What step, sizes, help and quick look), on the
 kit's `uma-kit/work`.
 - **Header:** "Mine · Mining · 4 slots · ×1.25" and its (i) (what the place does, "Grade g opens at Craft Lv 5g − 4",
-  and the open shop). A place whose trade has no Uma in the world says so: "Open shop: no Recruit in this world" (each
-  trade's Tier 0: "no Acolyte" on the Vegetables row). **Collect here** when work is done; **Finish all · 14 Speed Tickets** when
+  and the open shop). A place whose trade has no Uma in the world says so: "Open shop: no Warrior in this world" (each
+  trade's Tier 0: "no Healer" on the Vegetables row). **Collect here** when work is done; **Finish all · 14 Speed Tickets** when
   two or more slots run, which asks "Finish 3 jobs for 14 Speed Tickets?" (Yes, Not now), or says "Needs 14 Speed
   Tickets".
 - **Four slot rows.** A free one ("Free") starts a job. A working one shows her face, the item, "· 1/3", and the time

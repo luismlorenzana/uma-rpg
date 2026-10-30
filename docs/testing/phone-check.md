@@ -32,7 +32,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
    Manuals" and "n,000 Class Marks · Exchange"; "Every Uma starts her class tree at Rank 1 of her Tier 0." with Warrior ·
    All-Rounder · Mage and the five Tier 0s; the two steps; Reset, Stays, Weapons, Trades (if any moved) and the Halls
    line ("Paladin Bastion · Cleric Chapel → Healer Sanctum"); then each Uma's line, most Manuals first ("Spell Blade
-   R26 · Mage R8 → Initiate R1 · trade Wood → Stone", her share on the right). Tap **To the Exchange**: the Manual
+   R26 · Mage R8 → Mage R1 · trade Wood → Stone", her share on the right). Tap **To the Exchange**: the Manual
    sheet's picker opens; go back. Reload: the sheet doesn't open again. In **Account**, the row "The classes are rebuilt
    · n Class Manuals" reopens it; **Later** closes it. (D247, D250)
 4. **Account.** Tap your initial, edit **Trainer name** and tap **Save**; reopen the Account. Expect the name kept, the
@@ -41,7 +41,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
    **Update ready · Restart** appears, tap Restart and confirm the new build and your save after reopening.
 5. **The Hub.** Swipe through the four pages. Expect Town Hall's plaza (up to five chibis; tap one for her sheet with
    **Fight**, **Profile** and **Feature another**, and feature another to see her step in front), Learning's five halls
-   (the Warrior Dojo and the Mage Tower on top, the Spell Blade Salle and the Summoner Circle below, the Healer Sanctum's
+   (the Warrior Dojo and the Mage Tower on top, the Spellblade Salle and the Summoner Circle below, the Healer Sanctum's
    temple in the middle) and the Observatory under them, Battle's Scenario Gate and Rift (locked with "Opens at five Lv
    50 Umas · n/5" until five are), and the Wilds' fifteen buildings in five rows, each tappable on its own at 375×667.
    Tap the Stable: its quick look opens in the side panel with **Enter Stable**; swipe it away. Tap the Scenario Gate:
@@ -62,11 +62,11 @@ button and footer should stay reachable without horizontal page scrolling, in li
 9. **Skills tab: Classes.** On a Tier 0, the class button reads "R7/10" and her trees are one node each ("Drill Strike
    · Greatsword", "R7/10") with "Promotion at R10 · 3 to go" under them; **Change** lists all ten weapons. Tap the class
    button: **Classes** shows the tree, Warrior · All-Rounder · Mage over the Tier 0 row and the Tier 1 rows. Tap a
-   closed Tier 1 tile: its line and the gate ("Opens with Recruit R10 or Caller R10"), disabled. Tap another Tier 0:
-   **Start Caller · R1**; start it, expect it On, then switch back with **Fight as …**. (D253)
+   closed Tier 1 tile: its line and the gate ("Opens with Warrior R10 or Summoner R10"), disabled. Tap another Tier 0:
+   **Start Summoner · R1**; start it, expect it On, then switch back with **Fight as …**. (D253)
 10. **Promotion and a reclass.** On a Tier 0 at Rank 10 (read her share at the Exchange first, step 24, if none is),
     expect **Promote** with the green dot on the class button, the Skills tab and her roster face. Tap it: the promotion
-    sheet ("Promote · Recruit R10", Suggested on one child) with "Recruit R10 → Brawler R…" and "Depths 1–2 · 6 skills ·
+    sheet ("Promote · Warrior R10", Suggested on one child) with "Warrior R10 → Brawler R…" and "Depths 1–2 · 6 skills ·
     +n EXP". **Promote to …**: she fights as the child at Rank 10 or more, on its first tree with its lines. Reopen
     **Classes**: her siblings read **Ready**; promote one, then **Fight as** the first again. **Class Manuals ›** opens
     the Exchange's sheet on her, and Back returns to Classes. (D253)
@@ -92,7 +92,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
 16. **Party Hall.** Open a party, edit its name → **Rename**, and fill five slots: expect the name and **5/5** in the
     list. Pick an Uma from another party: expect "Moves from …" and her gone from the first party. **Make party lead**
     on another member: the ring and flag move and nobody reorders. Put a Paladin and a Cleric in one party: expect "One
-    healer a party" on its card and in the editor, and picking never refused; an Acolyte never counts. Restore the party.
+    healer a party" on its card and in the editor, and picking never refused; a Healer never counts. Restore the party.
 17. **Reload and sync.** Reload, then reopen the Stable and the Party Hall: expect the unlock, names, slots, grades and
     promotions kept. **Phone only:** open the live game in another signed-in browser and expect the same save after
     cloud sync.

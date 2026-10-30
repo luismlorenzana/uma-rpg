@@ -26,7 +26,7 @@ export const RPG_CLASS_CHILDREN: Readonly<Record<RpgTier0Class, readonly RpgTier
   caller: ['armsummoner', 'summoner'],
   apprentice: ['mage', 'tomeblade', 'summoner'],
 }
-/** Each Tier 1 class's parents, in its gate text's order ("Opens with Recruit R10 or Caller R10"): a hybrid has two, its
+/** Each Tier 1 class's parents, in its gate text's order ("Opens with Warrior R10 or Summoner R10"): a hybrid has two, its
  * All-Rounder Tier 0 and its channel's root class (CV1). */
 export const RPG_CLASS_PARENTS: Readonly<Record<RpgTier1Class, readonly RpgTier0Class[]>> = {
   brawler: ['recruit'],
@@ -40,7 +40,7 @@ export const RPG_CLASS_PARENTS: Readonly<Record<RpgTier1Class, readonly RpgTier0
 }
 /** A Tier 0's family: itself and its children (CV21: her Flourish works as any of them). */
 export const rpgClassFamily = (tier0: RpgTier0Class): readonly RpgClass[] => [tier0, ...RPG_CLASS_CHILDREN[tier0]]
-/** The child carrying the Suggested badge (CV11): Recruit the Brawler, Initiate the Sorcerer; for a two-way choice the
+/** The child carrying the Suggested badge (CV11): Warrior the Brawler, Mage the Sorcerer; for a two-way choice the
  * Arms child (or the Paladin) when her base Power beats her base Wit, else the Tome child (or the Cleric). */
 export function rpgSuggestedPromotion(tier0: RpgTier0Class, stats: { power: number; wit: number }): RpgTier1Class {
   const arms = stats.power > stats.wit
@@ -95,11 +95,11 @@ export function rpgThirdsSplit(points: number, armsSlots: number): { atk: number
 
 const NAME_V2: Readonly<Record<RpgClass, string>> = {
   brawler: 'Brawler', mage: 'Mage', spellblade: 'Spell Blade', cleric: 'Cleric', summoner: 'Summoner', paladin: 'Paladin',
-  recruit: 'Recruit', duelist: 'Duelist', acolyte: 'Acolyte', caller: 'Caller', apprentice: 'Initiate',
+  recruit: 'Warrior', duelist: 'Spellblade', acolyte: 'Healer', caller: 'Summoner', apprentice: 'Mage',
   armsummoner: 'Arms Summoner', tomeblade: 'Tome Spellblade',
 }
 /** Classes v3's names (§0): today's Mage is the Sorcerer, the Spell Blade the Arms Spellblade, the Summoner the Tome
- * Summoner; ids stay. */
+ * Summoner. D259: the five Tier 0s show their halls' family names (`apprentice` is the Mage, `mage` the Sorcerer). Ids stay. */
 const NAME_V3: Readonly<Record<RpgClass, string>> = { ...NAME_V2, mage: 'Sorcerer', spellblade: 'Arms Spellblade', summoner: 'Tome Summoner' }
 /** A class's player-facing name in an engine's generation: v3's from v19, today's before (a new class's row holds its v3
  * name, unreachable before v19). Every screen reads this; no screen shows a v3 name before H134. */
@@ -116,7 +116,7 @@ export const TIER0_TIER1_ONLY = 'Tier 0 is Tier 1’s'
 const rankIn = (ranks: RpgClassRanks, classId: RpgClass): number => ranks.classes[classId]?.rank ?? 1
 /** A Tier 1 class she holds in Tier 1's world (CV9 R5): one with a Class Rank track, always Rank 10 or more. */
 export const rpgHoldsTier1 = (ranks: RpgClassRanks, classId: RpgTier1Class): boolean => (ranks.classes[classId]?.rank ?? 0) >= RPG_TIER0_MAX_RANK
-/** A Tier 1 class's closed gate (CV9 R4): "Opens with Recruit R10 or Caller R10", her parents in the table's order. */
+/** A Tier 1 class's closed gate (CV9 R4): "Opens with Warrior R10 or Summoner R10", her parents in the table's order. */
 export const rpgClassClosedText = (classId: RpgTier1Class): string =>
   `Opens with ${RPG_CLASS_PARENTS[classId].map((p) => `${NAME_V3[p]} R${RPG_TIER0_MAX_RANK}`).join(' or ')}`
 /** Her parent Tier 0 at Class Rank 10 she can promote into this Tier 1 class from, the first in the table's order, or null. */
@@ -126,8 +126,8 @@ export const rpgReadyParent = (ranks: RpgClassRanks, classId: RpgTier1Class): Rp
 /**
  * Why she can't fight as a class now, or null (CV8–CV10). Before v19 every class of the generation is open. From v19, in
  * Tier 1's world every Tier 0 is open to every Uma and a Tier 1 class only once she holds it (promoted into, Rank 10 or
- * more): a child she can promote into now says "Promote from Recruit", any other its gate, "Opens with Recruit R10 or
- * Caller R10". In a Tier 2 or 3 world every Tier 1 class is open from Rank 1 and no Tier 0 exists.
+ * more): a child she can promote into now says "Promote from Warrior", any other its gate, "Opens with Warrior R10 or
+ * Summoner R10". In a Tier 2 or 3 world every Tier 1 class is open from Rank 1 and no Tier 0 exists.
  */
 export function rpgClassGate(ranks: RpgClassRanks, classId: RpgClass, tier: number | string = 1,
   engine: number = BATTLE_ENGINE_VERSION): string | null {

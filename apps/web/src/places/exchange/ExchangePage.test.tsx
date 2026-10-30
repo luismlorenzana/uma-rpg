@@ -96,7 +96,7 @@ describe('the Manual sheet\'s route (H132, H120)', () => {
     expect(document.querySelector('[data-manual-bar="duelist"]')!.getAttribute('aria-pressed')).toBe('true')
     expect(document.querySelector<HTMLButtonElement>('[data-manual-count="10"]')!.disabled).toBe(true)
     // A Tier 0's own curve: 272 + 304 + 336 = 912 of 1,000.
-    expect(document.querySelector('[data-manual-step]')!.getAttribute('data-manual-step')).toBe('Duelist R1 → R4')
+    expect(document.querySelector('[data-manual-step]')!.getAttribute('data-manual-step')).toBe('Spellblade R1 → R4')
   })
 
   it('closing it lands on /town/exchange with the navigation state kept; Choose another Uma goes back to the picker', async () => {

@@ -140,7 +140,7 @@ export function manualCounts(world: TierWorld, outfitId: string, ref: ClassRef, 
 /** The count chip selected first: "Her share" while it shows, else 1. */
 export const firstCount = (counts: readonly ManualCount[]): CountKey => (counts.some((c) => c.key === 'share') ? 'share' : '1')
 
-/** Before → after for `n` Manuals, from the domain's track grant on the class's own curve: "Brawler R34 → R36"; "Recruit R1
+/** Before → after for `n` Manuals, from the domain's track grant on the class's own curve: "Brawler R34 → R36"; "Warrior R1
  * → R10 · +17,400 EXP waiting"; EXP past a bar's top that banks back: "· +360 Class Marks back". */
 export function manualStep(uma: Pick<OwnedUma, 'ranks'>, ref: ClassRef, n: number): NonNullable<ManualFooter['step']> {
   const before = trackOf(uma.ranks, ref)

@@ -316,7 +316,7 @@ beside decorative glyphs; Shatter and Clarity act immediately, so they do not cr
 ## Support
 
 The party's defensive half is its one healer, a Paladin or a Cleric (classes v2's one healer, doubled shares). Every
-other class deals damage only, a Tier 0 too (an Acolyte doesn't heal), and no Limit Break mends from engine v19. Every
+other class deals damage only, a Tier 0 too (the Tier 0 Healer heals only once she promotes), and no Limit Break mends from engine v19. Every
 support comes after the skill's hits.
 
 | Support | Who | What it does |
@@ -389,11 +389,11 @@ six Tier 1 damage classes and 0.8 for the Paladin and the Cleric, so a healer on
 
 | Class | Limit Break scale |
 |---|---|
-| Recruit | ×1 |
-| Duelist | ×1 |
-| Acolyte | ×1 |
-| Caller | ×1 |
-| Initiate | ×1 |
+| Warrior | ×1 |
+| Spellblade | ×1 |
+| Healer | ×1 |
+| Summoner | ×1 |
+| Mage | ×1 |
 | Brawler | ×0.95 |
 | Arms Spellblade | ×0.95 |
 | Arms Summoner | ×0.95 |

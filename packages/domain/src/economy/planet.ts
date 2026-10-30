@@ -14,7 +14,7 @@
 // - EP14 with UT10, her moon: `template:1` (Lv 16, Moon Jewel II) +4 points × tier to her knack's stat (Tireless HP,
 //   Clever MP, Mighty DEF and M.DEF, Fleet 4 Speed points, Gritty 4 Limit points, the last two every tier);
 //   `template:2` (Lv 36, Moon Jewel IV) +8 × tier to her calling channel's defense, DEF if physical, M.DEF if magical;
-//   from v19 by her calling's root (CV21, H126): a Recruit DEF, an Initiate M.DEF, an All-Rounder half each.
+//   from v19 by her calling's root (CV21, H126): a Warrior DEF, a Mage M.DEF, an All-Rounder half each.
 //   Both count in every class, outside the foe budget.
 // - Classes v3 (CV7, H126): a Tier 0's Prowess splits by her slots instead, a third a slot to its channel.
 // - EP16: the foes' build budget × the tier's multiplier is `rpg/campaign/enemies.ts`' `rpgFoeTierBudget`; the balance
@@ -105,7 +105,7 @@ export function prowessSplit(points: number, classId: RpgClass, weapons?: readon
  * calling's `both` (CV21): half on DEF, half on M.DEF. */
 export interface MoonTemplate { knack: UmaKnack; channel: 'physical' | 'magical' | 'both' }
 /** Her moon's node II channel by her calling (UT10): her calling's armor half; from v19 her Tier 0's root (CV21): the
- * Warrior's Recruit physical, the Mage's Initiate magical, the All-Rounder's Duelist, Caller and Acolyte both. */
+ * Warrior physical, the Mage magical, the All-Rounders' Spellblade, Summoner and Healer both. */
 export function moonChannel(calling: UmaCallingClass, engine: number = BATTLE_ENGINE_VERSION): MoonTemplate['channel'] {
   if (!rpgRework('classes', engine) || !rpgIsTier0(calling)) return RPG_CLASS_ARMOR[calling]
   const root = RPG_TIER0_ROOT[calling]

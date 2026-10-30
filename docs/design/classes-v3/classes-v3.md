@@ -179,6 +179,8 @@ Built in H126 (D245), live from H134.
 
 ### 2.1 Five classes, and their names
 
+> **Superseded on screen by D259 (2026-10-30):** the owner chose the family names after all. The five show as **Warrior** (`recruit`), **Spellblade** (`duelist`), **Healer** (`acolyte`), **Summoner** (`caller`) and **Mage** (`apprentice`), and CV3's "don't repeat the roots" no longer holds. The ids stay. The rest of this doc keeps the names it was written with.
+
 The owner asked for better names than Fighter, Mage, Spell Blade, Summoner and Healer. The Tier 0 names must not repeat
 the roots (Mage would be a root, a Tier 0 and a former Tier 1 name at once), must read as **beginners** of what they
 promote into, and must not match a master-data name (checked against every string in the release, exact and inside a

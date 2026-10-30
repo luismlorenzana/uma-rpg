@@ -15,11 +15,11 @@ const outfit = (outfitId: string, styles: Partial<Record<'front' | 'pace' | 'lat
   outfitId, baseStats: { power, wit },
   aptitudes: { strategy: { front: 'B', pace: 'B', late: 'B', end: 'B', ...styles }, distance: { sprint: 'B', mile: 'B', medium: 'A', long: 'B' } },
 })
-// B: Pace A, Late A, Power 96 > Wit 88, Medium; her v31 pick the Spell Blade (Wood), her Tier 0 the Initiate (Stone).
+// B: Pace A, Late A, Power 96 > Wit 88, Medium; her v31 pick the Spell Blade (Wood), her Tier 0 the Mage (Stone).
 const B = outfit(UMA.B, { pace: 'A', late: 'A' }, 96, 88)
-// D: Pace A, Wit ≥ Power; v31's Mage (Stone), her Tier 0 the Duelist (Wood).
+// D: Pace A, Wit ≥ Power; v31's Mage (Stone), her Tier 0 the Spellblade (Wood).
 const D = outfit(UMA.D, { pace: 'A' }, 90, 100)
-// F: Front A; the Brawler and the Recruit, both Metal.
+// F: Front A; the Brawler and the Warrior, both Metal.
 const F = outfit(UMA.F, { front: 'A' }, 110, 90)
 
 /** The v31 save through `toV32` and v32's parse (labelled 32, so the chain doesn't run again). */

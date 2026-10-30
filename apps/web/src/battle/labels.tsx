@@ -20,8 +20,10 @@ export const CLASS_LABEL: Readonly<Record<RpgClass, string>> =
   Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, rpgClassName(c)])) as Record<RpgClass, string>
 /** Classes v3's seven (H126): their v19 lines, held by every older table (no older list shows them). */
 const TIER0_BLURB = 'Any three weapons, one act a turn. Promotes at Class Rank 10.'
+/** D259: the names promise more than a Tier 0 does yet, so these two say when it starts. */
+const tier0Promise = (what: string) => `Any three weapons, one act a turn. ${what} once she promotes, at Class Rank 10.`
 const BLURBS_V19_NEW = {
-  recruit: TIER0_BLURB, duelist: TIER0_BLURB, acolyte: TIER0_BLURB, caller: TIER0_BLURB, apprentice: TIER0_BLURB,
+  recruit: TIER0_BLURB, duelist: TIER0_BLURB, acolyte: tier0Promise('Heals'), caller: tier0Promise('Summons'), apprentice: TIER0_BLURB,
   armsummoner: 'Two Arms and a Tome: an Arms summon that lingers and strikes every foe as it leaves, and a Tome summon.',
   tomeblade: 'Two Tomes and an Arm: a spell and a blade each turn, the spell striking twice.',
 } as const

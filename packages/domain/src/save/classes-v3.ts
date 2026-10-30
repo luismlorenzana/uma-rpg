@@ -9,9 +9,9 @@ import { umaCalling, type CallingOutfit } from '../roster/template'
 import type { ClassesV3Line, Save, TierWorld } from './save'
 
 /**
- * Each v31 class's Tier 0, its own family's (classes-v3.md §1): the Brawler the Recruit, the Mage (the Sorcerer) the
- * Initiate, the Spell Blade (the Arms Spellblade) the Duelist, the Summoner (the Tome Summoner) the Caller, the Paladin
- * and the Cleric the Acolyte. A fight open across the reset replays on v18 with her v31 class, which in Tier 1's world is
+ * Each v31 class's Tier 0, its own family's (classes-v3.md §1): the Brawler the Warrior, the Mage (now the Sorcerer) the
+ * Mage, the Spell Blade (now the Arms Spellblade) the Spellblade, the Summoner (now the Tome Summoner) the Summoner, the
+ * Paladin and the Cleric the Healer. A fight open across the reset replays on v18 with her v31 class, which in Tier 1's world is
  * no class she holds, so from the classes stage its class share pays this Tier 0 (`fillRanks`). No master data.
  */
 export const RPG_RESET_TIER0: Readonly<Record<RpgV2Class, RpgTier0Class>> = {

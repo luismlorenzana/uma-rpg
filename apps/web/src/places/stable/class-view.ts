@@ -66,8 +66,8 @@ export interface ClassGrid { roots: { name: string; span: number }[] | null; col
 export function classTiles(outfit: BattleOutfit, uma: Uma, tier: number | string = 1, engine: number = BATTLE_ENGINE_VERSION): ClassTileView[] {
   return umaClassTree(uma, outfit, tier, engine).map((t) => ({ ...t, name: rpgClassName(t.classId, engine), word: tileWord(t) }))
 }
-/** The Tier 0 whose column a Tier 1 class sits in: its All-Rounder parent, else its only one (Brawler under Recruit,
- * Sorcerer under Initiate, each All-Rounder's two under it, the Arms child above the Tome one). */
+/** The Tier 0 whose column a Tier 1 class sits in: its All-Rounder parent, else its only one (Brawler under Warrior,
+ * Sorcerer under Mage, each All-Rounder's two under it, the Arms child above the Tome one). */
 const columnOf = (classId: RpgTier1Class): number => {
   const parents = RPG_CLASS_PARENTS[classId]
   const home = parents.find((p) => RPG_TIER0_ROOT[p] === 'all-rounder') ?? parents[0]!
@@ -182,7 +182,7 @@ export interface PromotionView {
   caption: string
   tiles: PromotionTileView[]
   selected: PromotionTileView
-  /** "Recruit R10 → Brawler R10" (22 px), or a held child's "Brawler R14". */
+  /** "Warrior R10 → Brawler R10" (22 px), or a held child's "Brawler R14". */
   before: string
   /** "Depths 1–2 · 6 skills · +400 EXP", or null on a held child. */
   after: string | null

@@ -133,8 +133,8 @@ const V18_HALL: Readonly<Record<RpgClass, RpgV2Class>> = {
  * family hall's, `V18_HALL`, H126). From v19 her class's first home seat in Halls v2 (`heroSeatHome`: the Brawler
  * `brawler-1`, the Sorcerer `mage-1`, the Arms Spellblade `spellblade-1`, the Tome Spellblade `spellblade-3`, the Arms
  * Summoner `summoner-1`, the Tome Summoner `summoner-3`, the Paladin `healer-1`, the Cleric `healer-3`); a Tier 0, who has
- * no home seat, her family hall's seat 1 (the hall of her model child's seats: the Recruit `brawler-1`, the Duelist
- * `spellblade-1`, the Acolyte `healer-1`, the Caller `summoner-1`, the Apprentice `mage-1`). HV3's order makes seat 1 of a
+ * no home seat, her family hall's seat 1 (the hall of her model child's seats: the Warrior `brawler-1`, the Spellblade
+ * `spellblade-1`, the Healer `healer-1`, the Summoner `summoner-1`, the Apprentice `mage-1`). HV3's order makes seat 1 of a
  * class's two her own, so v18 and v19 compare seat for seat (halls-v2 §3.5).
  */
 export function balanceSeat(classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION): HeroLimitId {

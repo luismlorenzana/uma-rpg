@@ -214,10 +214,10 @@ const rebuilt = (classId: RpgClass | null, ranks: Ranks): OwnedUma => ({
 })
 
 /**
- * Tier 1 after the reset, rebuilt (every outfit a Front runner, her Tier 0 the Recruit): party 0 (101–105) fights as Tier
+ * Tier 1 after the reset, rebuilt (every outfit a Front runner, her Tier 0 the Warrior): party 0 (101–105) fights as Tier
  * 0s: 101 holds the Brawler, 102 the Brawler and the Arms Spellblade, 104 the Paladin; 103 and 105 hold no Tier 1 class.
- * Party 1 (106–110) are five Recruits at Rank 1. The roster's others: 111 holds the Arms Summoner, 112 a Recruit at R10 and
- * 113 a Caller at R10 (both Ready for it), 114 a Recruit at R9.
+ * Party 1 (106–110) are five Recruits at Rank 1. The roster's others: 111 holds the Arms Summoner, 112 a Warrior at R10 and
+ * 113 a Summoner at R10 (both Ready for it), 114 a Warrior at R9.
  */
 function rebuiltFixture(): { world: TierWorld; roster: string[] } {
   const world = newSave('Rift v19', NOW).tierWorlds['1']!
@@ -291,7 +291,7 @@ describe('the Rift’s guidance by held classes (CV §10.1, H134)', () => {
     expect(fresh.map((n) => [n.classId, n.count])).toEqual([['brawler', 2], ['spellblade', 1], ['armsummoner', 1], ['paladin', 1]])
     expect(needLine(fresh[0]!, () => 'Brawler')).toBe('Needs 2 Brawlers')
     expect(needLine(fresh[3]!, () => 'Paladin')).toBe('Needs a Paladin')
-    // Ready first (112, a Recruit at R10), then the roster's Brawlers in its order (101, 102: party 0, not this one).
+    // Ready first (112, a Warrior at R10), then the roster's Brawlers in its order (101, 102: party 0, not this one).
     expect(fresh[0]!.umas.map((u) => u.outfitId)).toEqual(['112', '101', '102'])
   })
 

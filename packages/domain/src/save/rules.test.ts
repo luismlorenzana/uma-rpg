@@ -36,7 +36,7 @@ describe('collection rules', () => {
     expect((err as SaveRuleError).reason).toBe('no-ticket')
   })
 
-  it('starts a new Acolyte, Caller or Initiate in magical armor and a Recruit or Duelist in physical (D160, D180; v28: her class’s half, H82; from v19 her Tier 0, CV10)', () => {
+  it('starts a new Healer, Summoner or Mage in magical armor and a Warrior or Spellblade in physical (D160, D180; v28: her class’s half, H82; from v19 her Tier 0, CV10)', () => {
     const want: Record<RpgTier0Class, 'physical' | 'magical'> = { recruit: 'physical', duelist: 'physical', acolyte: 'magical', caller: 'magical', apprentice: 'magical' }
     const before = unlocked('100101')
     for (const c of RPG_TIER0_CLASSES) {

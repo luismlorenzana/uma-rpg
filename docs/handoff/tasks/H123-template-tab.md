@@ -32,7 +32,7 @@ No rule or save change beyond decision 6's dot reason. Screens and words.
   [Template page](../../design/uma-profile-v2/previews/template-tab.html) draws four Umas, every piece and state, and the
   dot rule.
 - **Classes v3** ([classes-v3.md](../../design/classes-v3/classes-v3.md), D240): **§5** (the calling by styles, four
-  rows, no pick), §6 (one trade a Tier 0), **§9 (templates: 5 × 3, the Acolyte's three names, the Flourish as any class
+  rows, no pick), §6 (one trade a Tier 0), **§9 (templates: 5 × 3, the Healer's three names, the Flourish as any class
   of her Tier 0 family, moon II by root)**, **§14.4 (what this packet changes)**; CV19, CV20, CV21, CV32. The
   [promotion page](../../design/classes-v3/previews/promotion.html)'s last table lists H123's changes.
 - **The code on `main` at `b9ce7c5`** (no code changed since `6a6996f`; H117, H119, H120, H121 and H122 change these
@@ -75,21 +75,21 @@ No rule or save change beyond decision 6's dot reason. Screens and words.
 | Row | Reads (v18) | Reads (v19) | Tap |
 |---|---|---|---|
 | **Name** (first row, 22 px, ★ in the accent) and (i) | `★ Fleet Bruiser` | `★ Fleet Charger` (15 types) | — |
-| **Readings**, three tiles: value, then `from {source}` | Calling `Brawler · from Front A` (a Pace or Late row adds its Power and Wit, as H117 wrote it); Stride `Middle · from Medium A`; Knack `Fleet · from Speed +20% · Bell` (the knack names her signature family) | Calling `Recruit · from Front A`; **styles only** (every style at her top grade: `from Pace A · Late A`) | — |
-| **Calling** and her trade, one row | `Calling · Brawler · fixed` · `Mine · Weapon Forge`; a confirmed pick `Calling · Mage · Picked` | **Always** `Calling · Recruit · fixed` · `Mine · Weapon Forge` | — (her place is the header's Work cell) |
+| **Readings**, three tiles: value, then `from {source}` | Calling `Brawler · from Front A` (a Pace or Late row adds its Power and Wit, as H117 wrote it); Stride `Middle · from Medium A`; Knack `Fleet · from Speed +20% · Bell` (the knack names her signature family) | Calling `Warrior · from Front A`; **styles only** (every style at her top grade: `from Pace A · Late A`) | — |
+| **Calling** and her trade, one row | `Calling · Brawler · fixed` · `Mine · Weapon Forge`; a confirmed pick `Calling · Mage · Picked` | **Always** `Calling · Warrior · fixed` · `Mine · Weapon Forge` | — (her place is the header's Work cell) |
 | **★ Flourish** | `★ Flourish · Even pace · 1%/round · max 4% · On`; `Off · as Mage` (faint, never a dot) | On as **any class of her Tier 0 family**; `Off · as Sorcerer` | **Flourish sheet** |
 | **★ Signature** | `★ Signature · ATK/M.ATK +8 · Worn` / `Not worn` (Ready dot at G1+) / `G1 first` at G0 | The same | **H121's accessory sheet**, on her ★ family |
 | **★ Moon I** | `★ Moon I · Evasion +2.4% · Open` / `Ready` / `Lv 16` | The same | **H122's node sheet** |
-| **★ Moon II** | `★ Moon II · DEF +8 · …` (M.DEF for a magical calling) | **By root:** Recruit `DEF +8`, Apprentice `M.DEF +8`, Duelist, Caller, Acolyte `DEF/M.DEF +4` | H122's node sheet |
+| **★ Moon II** | `★ Moon II · DEF +8 · …` (M.DEF for a magical calling) | **By root:** Warrior `DEF +8`, Mage `M.DEF +8`, Spellblade, Summoner, Healer `DEF/M.DEF +4` | H122's node sheet |
 | **Racing** | Aptitude chips (Surface, Distance, Style), **the three sources ringed** (her calling's style or styles, her stride's distance, her knack's growth); growth `Speed +20% · Power +10%` | The same; the ringed styles are every style the calling read | — |
 | **Racing skill** | `Racing skill ›` | The same | A sheet: its name and text (master data at runtime) |
 
-- **The Flourish sheet** (§5.3): `{shape} · {number}` at 22 px; `Works as · Brawler` (v19: `Works as · Recruit, Brawler,
+- **The Flourish sheet** (§5.3): `{shape} · {number}` at 22 px; `Works as · Brawler` (v19: `Works as · Warrior, Brawler,
   Arms Spellblade, Arms Summoner`); `Now · On` or `Now · Off · as Sorcerer`. Off: her family's classes she can fight as
   are chips (Selected ring), and the footer **Fight as Brawler** (free, `pickClass`); a Tier 0 she hasn't started reads
-  **Start Recruit · R1**. On: no footer.
+  **Start Warrior · R1**. On: no footer.
 - **Locked** (§3.4, UP29; CV §14.4): the same rows with numbers and no states, no taps; the calling reads v18's `Pick on
-  unlock · Spell Blade or Mage` (H117) and v19's **`Calling on unlock · Duelist`**.
+  unlock · Spell Blade or Mage` (H117) and v19's **`Calling on unlock · Spellblade`**.
 - **The dot** (§5.5 without the pick): the Template tab's dot while **her signature family isn't worn and her accessory
   slot is G1 or more**; on v18 also while her calling pick is open (until the switch drops it). Never for the Flourish
   being off; her moon's jewel is Stars' dot and shows `Ready` inline.
@@ -100,7 +100,7 @@ No rule or save change beyond decision 6's dot reason. Screens and words.
 
 ### Build decisions (log them in the D-row)
 
-1. **The design's shorthands give way to the wording list** (C3, as H119 decision 7 did): CV §14.4's "Calling Recruit ·
+1. **The design's shorthands give way to the wording list** (C3, as H119 decision 7 did): CV §14.4's "Calling Warrior ·
    fixed · Trade Metal" shows its trade as the list's `{place} · {maker}` (`Mine · Weapon Forge`); its "DEF +4 · M.DEF
    +4" is the list's Guard value `DEF/M.DEF +4` (the same fact: both +4).
 2. **No calling pick is built.** On v18, a Pace or Late Uma with an open pick keeps H119's interim calling card (today's
@@ -155,11 +155,11 @@ No rule or save change beyond decision 6's dot reason. Screens and words.
      worn, `G1 first`; Moon I and II Open, Ready, `Lv 16`); the rings; locked `Pick on unlock · Spell Blade or Mage`;
      the Flourish sheet's chips and footer.
    - `places/stable/template-view.v19.test.ts` (the switch mocked to 19 with `capsAt`, as H120's v19 tests): an
-     Apprentice's reading `from Pace A · Late A` (no Power or Wit); `Calling · Recruit · fixed`; the 15 types (one name
-     each of a Recruit, a Duelist and an Acolyte: the Acolyte's three are Lamplighter, Mender and Pilgrim); a Recruit
-     calling's Flourish `On` as Arms Spellblade and `Off · as Sorcerer`, `Works as · Recruit, Brawler, Arms Spellblade,
-     Arms Summoner`; moon II `DEF +8` (Recruit), `M.DEF +8` (Apprentice), `DEF/M.DEF +4` (Duelist); locked `Calling on
-     unlock · Duelist`; `callingCard` null for every outfit (no pick).
+     Mage's reading `from Pace A · Late A` (no Power or Wit); `Calling · Warrior · fixed`; the 15 types (one name
+     each of a Warrior, a Spellblade and a Healer: the Healer's three are Lamplighter, Mender and Pilgrim); a Warrior
+     calling's Flourish `On` as Arms Spellblade and `Off · as Sorcerer`, `Works as · Warrior, Brawler, Arms Spellblade,
+     Arms Summoner`; moon II `DEF +8` (Warrior), `M.DEF +8` (Mage), `DEF/M.DEF +4` (Spellblade); locked `Calling on
+     unlock · Spellblade`; `callingCard` null for every outfit (no pick).
    - `places/stable/profile-tabs.test.ts`: `signatureDot` true at G1 with a Pendant on a Bell Uma and with no family,
      false at G0 and when worn; the Template dot on v18 also for an open pick; the roster facet set by any tab's dot.
    - The domain's `save/upgrades.test.ts`: a G1+ accessory with no family no longer counts as a raise.
@@ -178,7 +178,7 @@ No rule or save change beyond decision 6's dot reason. Screens and words.
    `API_PROXY_TARGET=http://localhost:8095`), on a scratch save (a Front Uma with a Pendant at G3 and a Bell family, a
    Late Uma fighting outside her calling, an open Pace pick, a locked Pace outfit): every row, every sheet, the dots on
    the tab and the roster. Then **flip the switch locally** (H134's three lines, H126 decision 6: `caps.ts` 19,
-   `version.ts` 32, `migrateWorld` chaining `toV32`), restart, let the save migrate, and walk an Apprentice, a Duelist and a locked Uma. **Revert the flip before you
+   `version.ts` 32, `migrateWorld` chaining `toV32`), restart, let the save migrate, and walk an Mage, a Spellblade and a locked Uma. **Revert the flip before you
    commit.**
 9. **Log the D-row** (fetch `main` first): "H123: the profile's Template tab, without the calling pick", decisions 1–11.
 

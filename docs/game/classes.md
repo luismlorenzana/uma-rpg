@@ -31,19 +31,19 @@ promotion from a parent at Class Rank 10; a hybrid has two parents, its All-Roun
 ```
              WARRIOR    │                 ALL-ROUNDER                   │     MAGE
 ────────────────────────┼───────────────────────────────────────────────┼──────────────
- Tier 0      Recruit    │  Duelist          Acolyte       Caller        │   Initiate
+ Tier 0      Warrior    │  Spellblade          Healer       Summoner        │   Mage
 ────────────────────────┼───────────────────────────────────────────────┼──────────────
  Tier 1      Brawler    │  Arms Spellblade  Paladin       Arms Summoner │   Sorcerer
-             ◄ Recruit  │  ◄ Recruit        ◄ Acolyte     ◄ Recruit     │   ◄ Initiate
-                        │  ◄ Duelist                      ◄ Caller      │
+             ◄ Warrior  │  ◄ Warrior        ◄ Healer     ◄ Warrior     │   ◄ Mage
+                        │  ◄ Spellblade                      ◄ Summoner      │
                         │  Tome Spellblade  Cleric        Tome Summoner │
-                        │  ◄ Duelist        ◄ Acolyte     ◄ Caller      │
-                        │  ◄ Initiate                     ◄ Initiate    │
+                        │  ◄ Spellblade        ◄ Healer     ◄ Summoner      │
+                        │  ◄ Mage                     ◄ Mage    │
 ```
 
 | Class | Plays like |
 |---|---|
-| **A Tier 0** (Recruit, Duelist, Acolyte, Caller, Initiate) | An introduction: one skill on any three weapons, one foe and one hit, its power rising with every Class Rank to 10. No lean, no support ([below](#tier-0-and-promotion)) |
+| **A Tier 0** (Warrior, Spellblade, Healer, Summoner, Mage) | An introduction: one skill on any three weapons, one foe and one hit, its power rising with every Class Rank to 10. No lean, no support ([below](#tier-0-and-promotion)) |
 | **Brawler** | Pure physical. Three Arms, one full act a turn |
 | **Sorcerer** | Pure magic. Three Tomes, one full cast a turn. Engine v18's Mage, renamed (her id stays `mage`) |
 | **Arms Spellblade** | Two Arms and a Tome, physical-led multi-hit. Every act is an Arms half and a Tome half, the Arms half the larger and first; it lands one extra hit (the same total), so she chips shields fast. All her skills strike one foe; her line B, Pierce, cuts through a standing shield. Engine v18's Spell Blade, renamed |
@@ -56,7 +56,7 @@ promotion from a parent at Class Rank 10; a hybrid has two parents, its All-Roun
 Every class but the Paladin and the Cleric deals damage only. The two healers act at half power and carry the party's
 support ([combat](combat.md#support)).
 
-**One healer a party** (C8, D178): a party fights with one Paladin or Cleric at most. A Tier 0 is no healer, the Acolyte
+**One healer a party** (C8, D178): a party fights with one Paladin or Cleric at most. A Tier 0 is no healer, the Healer
 included. A party with two shows "One healer a party" in the Party Hall, on the world map's party bar and in the Rift's
 party slots, and can't start a fight until one of them changes class; the engine refuses such a party too. Party edits
 and class switches are never refused, and Sweeps don't fight, so they don't check.
@@ -64,19 +64,19 @@ and class switches are never refused, and Sweeps don't fight, so they don't chec
 <!-- live:classes -->
 | Class | Tier | Root or parents | Slots | Trees | Hand: power, MP | Special | Stat lean (HP, ATK, MATK, DEF, MDEF, MP) | Limit Break scale | Her calling (starts as) | Starting armor |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Recruit | 0 | Warrior root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Drill Strike, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 1. Front among her best styles | Physical |
-| Duelist | 0 | All-Rounder root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Feint, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 2. Pace alone | Physical |
-| Acolyte | 0 | All-Rounder root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Vigil, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 5. Late alone | Magical |
-| Caller | 0 | All-Rounder root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Beckon, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 4. End among them (Late + End, or End alone) | Magical |
-| Initiate | 0 | Mage root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Primer, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 3. Pace with Late or End | Magical |
-| Brawler | 1 | Promotes from Recruit | 3 Arms | 5 | ×1, MP ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | ×0.95 | — | Physical |
-| Arms Spellblade | 1 | Promotes from Recruit or Duelist | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
-| Arms Summoner | 1 | Promotes from Recruit or Caller | 2 Arms + 1 Tome | 10 | ×0.57 Arms, ×0.46 Tome; MP ×0.5 a half | Every act is an Arms summon and a Tome summon, the Arms half first. The Arms summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
-| Paladin | 1 | Promotes from Acolyte | 2 Arms + 1 Tome | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Blizzard spells Barrier every Uma, Greatsword blows give Aegis | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | ×0.8 | — | Physical |
-| Cleric | 1 | Promotes from Acolyte | 2 Tomes + 1 Arm | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Light spells leave Regen, Dark spells drain | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | ×0.8 | — | Magical |
-| Tome Summoner | 1 | Promotes from Caller or Initiate | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.57 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
-| Tome Spellblade | 1 | Promotes from Duelist or Initiate | 2 Tomes + 1 Arm | 10 | ×0.48 Arms, ×0.72 Tome; MP ×0.5 a half | Every act is a Tome half and an Arms half, the Tome half first; it lands one extra hit | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
-| Sorcerer | 1 | Promotes from Initiate | 3 Tomes | 5 | ×1, MP ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | ×0.95 | — | Magical |
+| Warrior | 0 | Warrior root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Drill Strike, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 1. Front among her best styles | Physical |
+| Spellblade | 0 | All-Rounder root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Feint, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 2. Pace alone | Physical |
+| Healer | 0 | All-Rounder root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Vigil, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 5. Late alone | Magical |
+| Summoner | 0 | All-Rounder root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Beckon, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 4. End among them (Late + End, or End alone) | Magical |
+| Mage | 0 | Mage root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Primer, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 3. Pace with Late or End | Magical |
+| Brawler | 1 | Promotes from Warrior | 3 Arms | 5 | ×1, MP ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | ×0.95 | — | Physical |
+| Arms Spellblade | 1 | Promotes from Warrior or Spellblade | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
+| Arms Summoner | 1 | Promotes from Warrior or Summoner | 2 Arms + 1 Tome | 10 | ×0.57 Arms, ×0.46 Tome; MP ×0.5 a half | Every act is an Arms summon and a Tome summon, the Arms half first. The Arms summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
+| Paladin | 1 | Promotes from Healer | 2 Arms + 1 Tome | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Blizzard spells Barrier every Uma, Greatsword blows give Aegis | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | ×0.8 | — | Physical |
+| Cleric | 1 | Promotes from Healer | 2 Tomes + 1 Arm | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Light spells leave Regen, Dark spells drain | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | ×0.8 | — | Magical |
+| Tome Summoner | 1 | Promotes from Summoner or Mage | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.57 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
+| Tome Spellblade | 1 | Promotes from Spellblade or Mage | 2 Tomes + 1 Arm | 10 | ×0.48 Arms, ×0.72 Tome; MP ×0.5 a half | Every act is a Tome half and an Arms half, the Tome half first; it lands one extra hit | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
+| Sorcerer | 1 | Promotes from Mage | 3 Tomes | 5 | ×1, MP ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | ×0.95 | — | Magical |
 <!-- /live -->
 
 - **Tier, Root or parents:** a Tier 0's root column; a Tier 1 class's parents, the Tier 0s she promotes from.
@@ -101,6 +101,11 @@ and class switches are never refused, and Sweeps don't fight, so they don't chec
 
 ## Tier 0 and promotion
 
+Each Tier 0 carries its family's name, the word in its hall's name (D259): the **Warrior**, the **Spellblade**, the **Healer**,
+the **Summoner** and the **Mage**. Their ids stay `recruit`, `duelist`, `acolyte`, `caller` and `apprentice`, and the id
+`mage` is the Sorcerer. The name says the family, not what she does yet: a Tier 0 Healer strikes and a Tier 0 Summoner
+calls nothing until she promotes.
+
 Five introductory classes, one per Tier 1 family (CV5–CV11). Every Uma starts as one, her calling's, and **every Tier 0
 is open to every Uma** at Class Rank 1, free.
 
@@ -109,11 +114,11 @@ is open to every Uma** at Class Rank 1, free.
   Strike · Greatsword", "Drill Strike · Fire Tome"): one hit on one foe, an Arm's with ATK on DEF, a Tome's with M.ATK on
   M.DEF, weak where its kind is. **Its power is her Class Rank's**, 1.60 at Rank 1 to 2.31 at Rank 10 (H131's ×1.05 on
   the design's 1.52 → 2.20, D249), with no Skill Rank on top, and it costs 10 MP. No rider, special, status or support;
-  the Acolyte's deals damage like the rest. Her three equipped slots at Lv 1 hold all three; the fourth (Lv 10) waits for
+  the Healer's deals damage like the rest. Her three equipped slots at Lv 1 hold all three; the fourth (Lv 10) waits for
   her promotion.
 - **Three slots, any of the ten weapons,** three different kinds. Each Tier 0 starts on the defaults of the child it
-  models (the Recruit the Brawler's, the Duelist the Arms Spellblade's, the Acolyte the Cleric's, the Caller the Tome
-  Summoner's, the Initiate the Sorcerer's) and wears that child's accessory form in its preset. A party of the five Tier
+  models (the Warrior the Brawler's, the Spellblade the Arms Spellblade's, the Healer the Cleric's, the Summoner the Tome
+  Summoner's, the Mage the Sorcerer's) and wears that child's accessory form in its preset. A party of the five Tier
   0s on defaults holds all ten kinds.
 - **Her hand is ×1** on both channels, one act a turn, MP ×1. **No stat lean.** Her armor's offense and her Prowess go a
   third a slot to its channel (three Arms all ATK, two Arms and a Tome two thirds ATK).
@@ -126,11 +131,11 @@ is open to every Uma** at Class Rank 1, free.
 <!-- live:tier0 -->
 | Tier 0 | Root | Her skill | Defaults and form of | Promotes into | Suggested | Her Flourish works as |
 |---|---|---|---|---|---|---|
-| Recruit | Warrior | Drill Strike | Brawler | Brawler, Arms Spellblade, Arms Summoner | Brawler | Recruit, Brawler, Arms Spellblade, Arms Summoner |
-| Duelist | All-Rounder | Feint | Arms Spellblade | Arms Spellblade, Tome Spellblade | Arms Spellblade (Power over Wit), Tome Spellblade (Wit at or over Power) | Duelist, Arms Spellblade, Tome Spellblade |
-| Acolyte | All-Rounder | Vigil | Cleric | Paladin, Cleric | Paladin (Power over Wit), Cleric (Wit at or over Power) | Acolyte, Paladin, Cleric |
-| Caller | All-Rounder | Beckon | Tome Summoner | Arms Summoner, Tome Summoner | Arms Summoner (Power over Wit), Tome Summoner (Wit at or over Power) | Caller, Arms Summoner, Tome Summoner |
-| Initiate | Mage | Primer | Sorcerer | Sorcerer, Tome Spellblade, Tome Summoner | Sorcerer | Initiate, Sorcerer, Tome Spellblade, Tome Summoner |
+| Warrior | Warrior | Drill Strike | Brawler | Brawler, Arms Spellblade, Arms Summoner | Brawler | Warrior, Brawler, Arms Spellblade, Arms Summoner |
+| Spellblade | All-Rounder | Feint | Arms Spellblade | Arms Spellblade, Tome Spellblade | Arms Spellblade (Power over Wit), Tome Spellblade (Wit at or over Power) | Spellblade, Arms Spellblade, Tome Spellblade |
+| Healer | All-Rounder | Vigil | Cleric | Paladin, Cleric | Paladin (Power over Wit), Cleric (Wit at or over Power) | Healer, Paladin, Cleric |
+| Summoner | All-Rounder | Beckon | Tome Summoner | Arms Summoner, Tome Summoner | Arms Summoner (Power over Wit), Tome Summoner (Wit at or over Power) | Summoner, Arms Summoner, Tome Summoner |
+| Mage | Mage | Primer | Sorcerer | Sorcerer, Tome Spellblade, Tome Summoner | Sorcerer | Mage, Sorcerer, Tome Spellblade, Tome Summoner |
 
 | Class Rank | EXP to next | EXP from Rank 1 | Her skill's power |
 |---|---|---|---|
@@ -153,12 +158,12 @@ At Rank 10 her EXP waits for her promotion, up to 23,680; past that it banks as 
 | Rule | |
 |---|---|
 | **When** | Her Tier 0 reaches Class Rank 10, by fights, Sweeps, Echoes or Class Manuals |
-| **What it opens** | Each child: the Recruit's three, the Initiate's three, the Duelist's, the Caller's and the Acolyte's two. A child she can promote into now is **Ready**; she can't switch to it or read Manuals onto it before she promotes |
+| **What it opens** | Each child: the Warrior's three, the Mage's three, the Spellblade's, the Summoner's and the Healer's two. A child she can promote into now is **Ready**; she can't switch to it or read Manuals onto it before she promotes |
 | **Promoting** | Free and final, from the promotion sheet. The child opens **at Class Rank 10** with depths 1 and 2 open (six skills on her three weapons), on its default weapons and lines, and she fights as it from then |
 | **The waiting EXP** | Everything her Tier 0 earned past Rank 10 flows into the new class's bar at once (past Rank 50 it banks as Class Marks at half). Her Tier 0 stays at Rank 10 with nothing waiting |
 | **More children** | Promoting into a sibling later is free too: it opens at Rank 10 with whatever waits then |
 | **Never** | Closes a class, costs anything, or moves her calling, trade or template |
-| **Suggested** | One child carries a "Suggested" badge: the Recruit's Brawler, the Initiate's Sorcerer; for the Duelist, the Caller and the Acolyte the Arms child (or the Paladin) when her base Power beats her base Wit, else the Tome child (or the Cleric) |
+| **Suggested** | One child carries a "Suggested" badge: the Warrior's Brawler, the Mage's Sorcerer; for the Spellblade, the Summoner and the Healer the Arms child (or the Paladin) when her base Power beats her base Wit, else the Tome child (or the Cleric) |
 
 **Why Rank 10, not Rank 1:** the world's sub-bosses and bosses are built for the depth a level can reach (depth 2 from Lv
 10, 3 from 20, 4 from 30, 5 from 40). Opened at Rank 10, a Tier 1 class carries on the same ladder, so an Uma who fights
@@ -175,17 +180,17 @@ The class tree is the reclass map, on the Classes sheet ([sections](sections.md#
 
 - **The classes she holds switch freely,** outside fights: the five Tier 0s and every Tier 1 class she has promoted
   into, each with its own Class Rank, weapons, lines and equipped skills.
-- **Every Tier 0 is open to every Uma,** at Class Rank 1, free ("Start Caller · R1"). Her calling's is where she starts,
+- **Every Tier 0 is open to every Uma,** at Class Rank 1, free ("Start Summoner · R1"). Her calling's is where she starts,
   not a lock.
 - **A Tier 1 class opens by promotion** from either parent at Class Rank 10, and is hers for good: a Tier 1 class she
   holds in Tier 1's world is one with a Class Rank, always 10 or more. A closed one says how it opens ("Opens with
-  Recruit R10 or Caller R10").
+  Warrior R10 or Summoner R10").
 
 | From | To | What it takes |
 |---|---|---|
-| Brawler | Arms Spellblade or Arms Summoner | Nothing: her Recruit is at Rank 10, so its other children are one tap |
-| Brawler | Tome Spellblade | A Duelist or an Initiate to Rank 10: 3,600 Class EXP, 4 Class Manuals or the first continent's fights |
-| Brawler | Cleric | An Acolyte to Rank 10: the same 3,600 |
+| Brawler | Arms Spellblade or Arms Summoner | Nothing: her Warrior is at Rank 10, so its other children are one tap |
+| Brawler | Tome Spellblade | A Spellblade or a Mage to Rank 10: 3,600 Class EXP, 4 Class Manuals or the first continent's fights |
+| Brawler | Cleric | A Healer to Rank 10: the same 3,600 |
 | Any | A class she holds | Nothing |
 | Any | Gear | Only the new class's weapons she hasn't raised: a grade belongs to the weapon and serves every class |
 
@@ -198,18 +203,18 @@ Wit or distance, and no pick. The first row that fits:
 
 | # | Her best styles | Her calling | Outfits on the release |
 |---|---|---|---|
-| 1 | **Front** among them | **Recruit** | 47 |
-| 2 | **Pace** alone | **Duelist** | 72 |
-| 3 | **Pace with Late or End** | **Initiate** | 72 |
-| 4 | **End** among them (Late + End, or End alone) | **Caller** | 33 |
-| 5 | **Late** alone | **Acolyte** | 46 |
+| 1 | **Front** among them | **Warrior** | 47 |
+| 2 | **Pace** alone | **Spellblade** | 72 |
+| 3 | **Pace with Late or End** | **Mage** | 72 |
+| 4 | **End** among them (Late + End, or End alone) | **Summoner** | 33 |
+| 5 | **Late** alone | **Healer** | 46 |
 
 The counts are the 270 outfits of the master-data release the design read (counts only).
 
 - **She starts in it.** A new Uma is written as her calling's Tier 0 in Tier 1's world, as its suggested promotion in a
   later one. An Uma with no class written fights as the same: in Tier 1's world save v32's reset left every Uma so.
 - **No calling pick:** the promotion is the pick. A pure Late Uma chooses the Paladin or the Cleric on her promotion
-  sheet, a Pace Uma her Spellblade or her Initiate's three, and she can take the other later. Save v32 dropped the stored
+  sheet, a Pace Uma her Spellblade or her Mage's three, and she can take the other later. Save v32 dropped the stored
   picks ([loops](loops.md#the-classes-are-rebuilt-save-v32)).
 
 **Her template** (UT2–UT6, D203, D204; CV21): three readings of her racing profile name her "{knack word} {type}", one of
@@ -220,11 +225,11 @@ stride give her type, her knack its word: "Clever Spellwright". Five callings ×
 <!-- live:templates -->
 | Calling | Dash | Middle | Stayer | Moon II |
 |---|---|---|---|---|
-| Recruit | Charger | Bruiser | Ironhide | DEF |
-| Duelist | Flashblade | Spellfencer | Longblade | DEF and M.DEF, half each |
-| Initiate | Flarecaster | Spellwright | Starkeeper | M.DEF |
-| Caller | Beckoner | Binder | Shepherd | DEF and M.DEF, half each |
-| Acolyte | Lamplighter | Mender | Pilgrim | DEF and M.DEF, half each |
+| Warrior | Charger | Bruiser | Ironhide | DEF |
+| Spellblade | Flashblade | Spellfencer | Longblade | DEF and M.DEF, half each |
+| Mage | Flarecaster | Spellwright | Starkeeper | M.DEF |
+| Summoner | Beckoner | Binder | Shepherd | DEF and M.DEF, half each |
+| Healer | Lamplighter | Mender | Pilgrim | DEF and M.DEF, half each |
 
 | Knack: her top growth rate | Word |
 |---|---|
@@ -244,8 +249,8 @@ stride give her type, her knack its word: "Clever Spellwright". Five callings ×
 Its four pieces all work in Tier 1:
 
 - **★ Her Flourish** works while she fights as any class of her calling's family: her Tier 0 and its children ("No
-  effect as Sorcerer" otherwise). A Spellblade or a Summoner belongs to two families, so a Recruit-calling Uma and a
-  Duelist-calling Uma both keep it as an Arms Spellblade. It gives 4% of her max HP a fight, in her stride's shape. Clean
+  effect as Sorcerer" otherwise). A Spellblade or a Summoner belongs to two families, so a Warrior-calling Uma and a
+  Spellblade-calling Uma both keep it as an Arms Spellblade. It gives 4% of her max HP a fight, in her stride's shape. Clean
   break's Barrier lapses at round 1's end. Not a heal skill: no healing scale, it never overheals, and a fallen Uma gets
   none. Once a fight, not each wave ([combat](combat.md#sustain-mp-and-the-flourish)).
 - **★ Her signature** (UT7, D212): her knack names an accessory family: Fleet the Bell, Mighty the Orb, Tireless the
@@ -255,11 +260,11 @@ Its four pieces all work in Tier 1:
 - **★ Her moon** (UT10, D213): two nodes beside her Extra Stats map, opened by a Moon Jewel II (Lv 16) and IV (Lv 36).
   Node I gives +4 × the tier to her knack's stat: Tireless HP, Clever MP, Mighty DEF and M.DEF, Fleet 4 Speed points
   (2.4% evasion) and Gritty 4 Limit points (a starting charge of 1), those two in every tier. Node II gives +8 × the tier
-  to her calling's root's defense: DEF +8 for a Recruit (Warrior), M.DEF +8 for an Initiate (Mage), DEF +4 and M.DEF +4
-  for a Duelist, a Caller or an Acolyte (All-Rounder). Both count whatever class she fights as
+  to her calling's root's defense: DEF +8 for a Warrior, M.DEF +8 for a Mage, DEF +4 and M.DEF +4
+  for a Spellblade, a Summoner or a Healer (All-Rounder). Both count whatever class she fights as
   ([loops](loops.md#extra-stats-and-gear)).
-- **Her trade** (PP2, CV20): her calling names her trade, one material line's three Wilds places: the Recruit Metal, the
-  Duelist Wood, the Acolyte Vegetables, the Caller Fish, the Initiate Stone ([loops](loops.md#craft-level)). A class
+- **Her trade** (PP2, CV20): her calling names her trade, one material line's three Wilds places: the Warrior Metal, the
+  Spellblade Wood, the Healer Vegetables, the Summoner Fish, the Mage Stone ([loops](loops.md#craft-level)). A class
   switch or a promotion never moves it.
 - **Nothing else moves:** a template adds no damage kind, lean, hand or rule, and never takes anything away.
 
@@ -369,11 +374,11 @@ a tree the preset takes out of her slots leave her loadout.
 <!-- live:presets -->
 | Class | Weapons | Armor | Accessory |
 |---|---|---|---|
-| Recruit | Greatsword, Axe, Lance | Physical | Bell (Greatsword) |
-| Duelist | Katana, Lance, Thunder Tome | Physical | Pendant |
-| Acolyte | Light Tome, Blizzard Tome, Bow | Magical | Orb (Blizzard Tome) |
-| Caller | Dark Tome, Blizzard Tome, Axe | Magical | Orb (Blizzard Tome) |
-| Initiate | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Pendant |
+| Warrior | Greatsword, Axe, Lance | Physical | Bell (Greatsword) |
+| Spellblade | Katana, Lance, Thunder Tome | Physical | Pendant |
+| Healer | Light Tome, Blizzard Tome, Bow | Magical | Orb (Blizzard Tome) |
+| Summoner | Dark Tome, Blizzard Tome, Axe | Magical | Orb (Blizzard Tome) |
+| Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Pendant |
 | Brawler | Greatsword, Axe, Lance | Physical | Bell (Greatsword) |
 | Arms Spellblade | Katana, Lance, Thunder Tome | Physical | Pendant |
 | Arms Summoner | Bow, Axe, Dark Tome | Physical | Orb (Bow) |

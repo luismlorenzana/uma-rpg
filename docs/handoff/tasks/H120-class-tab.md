@@ -121,7 +121,7 @@ the preset, promote).
 | Sheet | Detail | Choices | Footer |
 |---|---|---|---|
 | **Classes** (the class tree, CV32) | v19: three root columns, `Warrior` · `All-Rounder` · `Mage`, rows `Tier 0` and `Tier 1`, as the promotion page draws them (below). v18: the six classes in two rows of three. Each tile: emblem, name, its state's word. Under the tiles, **one line for the selection**: its name and state, `{slots} · {role}` with its three default weapons (a Tier 0: `Any 3 weapons · {skill}` and `Promotes to {A}, {B}, {C}`), and `Hand · …`. `Party 1: 2 healers` in the warning colour when the selected class is a healer and her party already fights with one. Then the row **`Class Manuals ›`** (`Exchange`, faint) | Tap a tile: it is Selected (2 px ring); the footer follows | By the selection's state (below) |
-| **Promotion** (`Promote · Recruit R10`, CV §14.2) | `Free · the others stay open`; one tile a child: emblem, name, `Suggested` or `Held`, its slots, its three defaults, its role (**a row the same on every tile is left out**); before → after: `Recruit R10 → Brawler R10` at 22 px, then `Depths 1–2 · 6 skills · +400 EXP`; a row **`Classes ›`** | Tap a tile: Selected; on a Held child the footer is `Fight as …` | **Promote to Brawler** (free, no confirm) |
+| **Promotion** (`Promote · Warrior R10`, CV §14.2) | `Free · the others stay open`; one tile a child: emblem, name, `Suggested` or `Held`, its slots, its three defaults, its role (**a row the same on every tile is left out**); before → after: `Warrior R10 → Brawler R10` at 22 px, then `Depths 1–2 · 6 skills · +400 EXP`; a row **`Classes ›`** | Tap a tile: Selected; on a Held child the footer is `Fight as …` | **Promote to Brawler** (free, no confirm) |
 | **Weapon** (`Slot 3 · Arms`; a Tier 0's `Slot 3 · Any`) | The slot's kinds, one row each: `Axe · G6 · Might 26`, then `Held` or `Slot 2`; a Tier 0's: all ten, Arms first | Tap a weapon: she holds it (one in another slot swaps) | — |
 | **Line** (`Lance · Line B · Impale`) | Its three skills: name, `Depth 3 · R20`, its skill line | — | **Take line B** (free; equipped skills follow), or `Held` disabled |
 | **Node** (the skill's name) | Five rank pips (none on a Tier 0 node), `Rank 3 · next R36`, `Depth 4 · Line B` (`Trunk`), its skill line | — | **Equip** · **Unequip** · at a full loadout **Replace**: the equipped skills listed by name, a tap swaps · on the other line **Take line A** · closed `Opens · R40` disabled |
@@ -131,7 +131,7 @@ the preset, promote).
 
 | | Warrior | All-Rounder | | | Mage |
 |---|---|---|---|---|---|
-| **Tier 0** | Recruit | Duelist | Acolyte | Caller | Apprentice |
+| **Tier 0** | Warrior | Spellblade | Healer | Summoner | Mage |
 | **Tier 1** | Brawler | Arms Spellblade | Paladin | Arms Summoner | Sorcerer |
 | | — | Tome Spellblade | Cleric | Tome Summoner | — |
 
@@ -142,14 +142,14 @@ the preset, promote).
 | **On** | Her active class | `R34` (`R7/10`) | Accent fill | **Standard preset** (`Greatsword · Axe · Lance · ★ Bell` under it); `Standard preset · On` disabled when matched |
 | **Available** | A class she holds (a Tier 0 she started; a Tier 1 class she promoted into) | `R12` (`R4/10`) | Raised | **Fight as Arms Spellblade** (free) |
 | **Ready** | A child she doesn't hold of a Tier 0 she holds at R10 | `Ready` | 6 px green dot | **Promote to Arms Summoner**: closes this sheet and opens the promotion sheet on that child |
-| **Open** | A Tier 0 she hasn't started | `R1 · free` | Dashed outline | **Start Caller · R1** (free) |
-| **Closed** | Any other Tier 1 class | `Closed` | 40% | Disabled: `Opens with Duelist R10 or Apprentice R10` (R4) |
+| **Open** | A Tier 0 she hasn't started | `R1 · free` | Dashed outline | **Start Summoner · R1** (free) |
+| **Closed** | Any other Tier 1 class | `Closed` | 40% | Disabled: `Opens with Spellblade R10 or Mage R10` (R4) |
 
 On v18 a tile is On or Available, nothing else. **In a Tier 2 or Tier 3 world** (R6, CV10): no Tier 0 row, no
 promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`, footer **Start Brawler · R1**).
 
-- **Suggested** (CV11): Recruit → Brawler; Apprentice → Sorcerer; Duelist and Caller → the Arms child with Power over Wit,
-  the Tome child otherwise; Acolyte → the Paladin with Power over Wit, the Cleric otherwise. The promotion sheet opens on
+- **Suggested** (CV11): Warrior → Brawler; Mage → Sorcerer; Spellblade and Summoner → the Arms child with Power over Wit,
+  the Tome child otherwise; Healer → the Paladin with Power over Wit, the Cleric otherwise. The promotion sheet opens on
   the Suggested child unless it was opened from a Ready tile (that child).
 - **Promotion** (CV8): free, closes nothing; the child opens at R10 with its defaults; the waiting EXP lands in it at
   once; she fights as it. **The dot** (CV §14.1, UP18): on the Class tab while she **fights as** a Tier 0 at R10 with a
@@ -179,8 +179,8 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
      tree is never out of reach.
    - **The promotion sheet's caption** is `Free · the others stay open`: CV §14.2's "Choose her class. Free; the others
      stay open." is a sentence with "her" (C2; the copy test fails it).
-   - **The tile's role** shows only where siblings differ (the TC:76–77 rule, as H117 decision 7): Duelist's and
-     Caller's children share theirs, so those sheets show slots and defaults only.
+   - **The tile's role** shows only where siblings differ (the TC:76–77 rule, as H117 decision 7): Spellblade's and
+     Summoner's children share theirs, so those sheets show slots and defaults only.
 3. **`places/stable/class-view.ts`** (pure, tested) is the one home for the tab's rules, **on H126's data, never
    re-deriving a rule**: `classTile(outfit, uma, tier)`; `classesSheet(outfit, uma, world, tier, selected)` lays
    `umaClassTree`'s tiles into the grid (v19) or two rows of three (v18: every tile `on` or `available`), with each
@@ -193,7 +193,7 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
    draw what it returns.
 4. **The promotion's parent.** The sheet's Tier 0 (its title, its children, its waiting EXP) is the one she fights as
    when it is a Tier 0; from a Ready tile with two parents at R10, the parent she fights as if it is one, else the first
-   in `RPG_TIER0_CLASSES`' order (Recruit, Duelist, Acolyte, Caller, Apprentice). The action is H126's `promoteUma`
+   in `RPG_TIER0_CLASSES`' order (Warrior, Spellblade, Healer, Summoner, Mage). The action is H126's `promoteUma`
    through a new `save/game.ts` wrapper, `promoteClass(outfitId, from, to)` (the `pickClass` pattern); its refusals
    (`promotionPlan`'s `block`) show in the sheet.
 5. **The Exchange door** is a route, shared with H132 word for word: **`/town/exchange/manual/:outfitId`** opens the
@@ -215,8 +215,8 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
    nothing the Inheritance card showed is lost. **Its hall** uses H129's hall-based names, never `HERO_HALLS`,
    `hallClass` or `heroLimitClass` (H134 drops them): her seat's `heroLimitHall(id)` → `HERO_HALL_PLACES` → the place's
    name; with no seat, **her class's hall**, `classHall(classId)` in `class-view.ts`: v18 the hall named after her class;
-   v19 the hall holding a seat whose `heroSeatHome` is her class (a Tier 0 reads its `RPG_TIER0_MODEL`'s: Recruit the
-   Warrior Dojo, Duelist the Spell Blade Salle, Acolyte the Healer Sanctum, Caller the Summoner Circle, Apprentice the
+   v19 the hall holding a seat whose `heroSeatHome` is her class (a Tier 0 reads its `RPG_TIER0_MODEL`'s: Warrior the
+   Warrior Dojo, Spellblade the Spellblade Salle, Healer the Healer Sanctum, Summoner the Summoner Circle, Mage the
    Mage Tower, as Halls v2 §2.1 pairs them). **Power** is v19's only: `limit.power`, and her active class's
    `heroLimitScale` when it isn't 1.
 10. **The Tier 0 node sheet** uses the wording list as it is: `Rank 7 · next R8` (her Class Rank is the skill's rank),
@@ -230,12 +230,12 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
     | Promotion line | `Promotion at R10 · {k} to go`; at R10 `Promotion · +{n} EXP waiting` (no waiting EXP: `Promotion · Ready`) | Promotion at R10 · 3 to go |
     | Waiting EXP | `+{n} EXP waiting` (shared with H132) | +17,400 EXP waiting |
     | Tree tile | `R{n}` · `R{n}/10` · `Ready` · `R1 · free` · `Closed` | — |
-    | Class gate | `Opens with {A} R10` · `Opens with {A} R10 or {B} R10` | Opens with Recruit R10 or Caller R10 |
+    | Class gate | `Opens with {A} R10` · `Opens with {A} R10 or {B} R10` | Opens with Warrior R10 or Summoner R10 |
     | Roots and rows | `Warrior` · `All-Rounder` · `Mage`; `Tier 0` · `Tier 1` | — |
     | Slots | `3 Arms` · `3 Tomes` · `2 Arms + 1 Tome` · `2 Tomes + 1 Arm` · `Any 3 weapons` | — |
     | Role | Brawler `One act ×1` · Sorcerer `One cast ×1` · both Spellblades `Multi-hit` · both Summoners `Area · lingers` · Paladin `Healer · ATK` · Cleric `Healer · M.ATK` | — |
     | Promotes to | `Promotes to {A}, {B}, {C}` | — |
-    | Promotion before → after | `{Tier 0} R10 → {class} R{n}`; `Depths 1–{d} · {s} skills · +{n} EXP` | Recruit R10 → Brawler R10 |
+    | Promotion before → after | `{Tier 0} R10 → {class} R{n}`; `Depths 1–{d} · {s} skills · +{n} EXP` | Warrior R10 → Brawler R10 |
     | Badges | `Suggested` · `Held` | — |
     | Caption | `Free · the others stay open` | — |
     | Healer note | `Party {n}: 2 healers` | Party 1: 2 healers |
@@ -285,12 +285,12 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
      for a Hero, a Learner under one Hero and under two (the strongest first, ` · +1`), none (her class's hall), and a
      former Hero's Bond listed; `classDot` false; `firstDotTab` with Class first.
    - `places/stable/class-view.v19.test.ts` (the switch mocked to 19 with `capsAt`): the tree's rows and columns in the
-     order above; **Uma C** of the promotion page (Brawler R34 On, Arms Spellblade R12 held, Recruit at R10, an Acolyte
-     started at R4): Brawler On, Arms Spellblade Available, **Arms Summoner Ready**, Acolyte Available `R4/10`, Duelist
-     Open `R1 · free`, Tome Spellblade Closed `Opens with Duelist R10 or Apprentice R10`; each state's footer label;
+     order above; **Uma C** of the promotion page (Brawler R34 On, Arms Spellblade R12 held, Warrior at R10, a Healer
+     started at R4): Brawler On, Arms Spellblade Available, **Arms Summoner Ready**, Healer Available `R4/10`, Spellblade
+     Open `R1 · free`, Tome Spellblade Closed `Opens with Spellblade R10 or Mage R10`; each state's footer label;
      a Tier 0 tile `R7/10` and at R10 `R10 · Promote`; `promotionSheet` for each Tier 0 (its children; Suggested with a
-     Power-over-Wit outfit and a Wit-over-Power one; `Held` on a held child; the role row left out for the Duelist's and
-     the Caller's); before → after with 0 and with 17,400 EXP waiting (the rank after it lands, its depths and skills);
+     Power-over-Wit outfit and a Wit-over-Power one; `Held` on a held child; the role row left out for the Spellblade's and
+     the Summoner's); before → after with 0 and with 17,400 EXP waiting (the rank after it lands, its depths and skills);
      `Promotion at R10 · 3 to go`; `classDot` true for a Tier 0 at R10 with an unheld child, false holding every child,
      false as a Tier 1 class; `limitView`'s hall `Warrior Dojo` for a Brawler with no seat, `Healer Sanctum · Seat 3` for
      a `healer-3` Learner, and `×2.9 · ×0.75 as Paladin`.
@@ -303,7 +303,7 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
    - `places/stable/ClassTab.v19.test.tsx` (mocked to 19): a Tier 0 tab (one node, no line squares, the promotion line,
      no letters on the weapon tiles; the weapon sheet lists ten); a Tier 0 at R10: the tab's dot, the tile opens the
      promotion sheet, Promote calls the promotion action and the sheet closes on the new class's tree; the Classes
-     sheet's Ready tile swaps to the promotion sheet on that child, and `Classes ›` swaps back; `Start Caller · R1` calls
+     sheet's Ready tile swaps to the promotion sheet on that child, and `Classes ›` swaps back; `Start Summoner · R1` calls
      `pickClass(…, 'caller')`.
    - `exchange`: `/town/exchange/manual/81001` opens the Manual sheet on that Uma (if this packet adds the route).
    - H117's copy test passes, with this packet's `.tsx` files in its JSX list.

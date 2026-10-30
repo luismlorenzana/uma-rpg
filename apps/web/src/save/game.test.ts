@@ -113,7 +113,7 @@ describe('game store', () => {
     expect(Object.keys(world?.umas ?? {}).sort()).toEqual(['100101', '100201'])
     expect(world?.parties[0]?.slots).toEqual([null, '100201', null, null, null])
     expect(world?.parties[4]).toEqual({ name: 'Front runners', slots: [null, null, '100101', null, null], lead: null })
-    // A late outfit starts as an Acolyte, on the magical half; a front one as a Recruit, on the physical (her calling's
+    // A late outfit starts as a Healer, on the magical half; a front one as a Warrior, on the physical (her calling's
     // Tier 0, CV19; v28: the half is her class's, every grade G0, H82).
     expect([world!.umas['100201']!.classId, world!.umas['100101']!.classId]).toEqual(['acolyte', 'recruit'])
     expect([world!.umas['100201']!.classId, world!.umas['100101']!.classId].map((c) => armorHalf(c!))).toEqual(['magical', 'physical'])

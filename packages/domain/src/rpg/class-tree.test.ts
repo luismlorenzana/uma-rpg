@@ -16,7 +16,7 @@ const ranks = (classes: Partial<Record<RpgClass, number>>) =>
 describe('the class tree (CV1, §1)', () => {
   it('draws §1\'s parent matrix exactly: a hybrid has two parents, its All-Rounder Tier 0 and its channel\'s root class', () => {
     const matrix = Object.fromEntries(RPG_TIER1_CLASSES.map((c) => [c, RPG_TIER0_CLASSES.map((p) => (RPG_CLASS_PARENTS[c].includes(p) ? '●' : ''))]))
-    // Columns: Recruit, Duelist, Acolyte, Caller, Initiate.
+    // Columns: Warrior, Spellblade, Healer, Summoner, Mage.
     expect(matrix).toEqual({
       brawler: ['●', '', '', '', ''],
       spellblade: ['●', '●', '', '', ''],
@@ -92,7 +92,7 @@ describe('Tier 0 (CV5, CV6)', () => {
 
 describe('names and gates (CV3, CV4, CV8–CV10)', () => {
   it('names the classes by generation: v3\'s from v19, v2\'s before', () => {
-    expect(rpgClasses(V19).map((c) => rpgClassName(c, V19))).toEqual(['Recruit', 'Duelist', 'Acolyte', 'Caller', 'Initiate', 'Brawler',
+    expect(rpgClasses(V19).map((c) => rpgClassName(c, V19))).toEqual(['Warrior', 'Spellblade', 'Healer', 'Summoner', 'Mage', 'Brawler',
       'Arms Spellblade', 'Arms Summoner', 'Paladin', 'Cleric', 'Tome Summoner', 'Tome Spellblade', 'Sorcerer'])
     expect(rpgClasses(V18).map((c) => rpgClassName(c, V18))).toEqual(['Brawler', 'Mage', 'Spell Blade', 'Cleric', 'Summoner', 'Paladin'])
     // The live default is v19's since H134.
@@ -102,14 +102,14 @@ describe('names and gates (CV3, CV4, CV8–CV10)', () => {
   it('opens every Tier 0 to every Uma in Tier 1\'s world and a Tier 1 class once held; a closed one says how', () => {
     const fresh = ranks({})
     for (const t of RPG_TIER0_CLASSES) expect(rpgClassGate(fresh, t, 1, V19), t).toBeNull()
-    expect(rpgClassGate(fresh, 'armsummoner', 1, V19)).toBe('Opens with Recruit R10 or Caller R10')
+    expect(rpgClassGate(fresh, 'armsummoner', 1, V19)).toBe('Opens with Warrior R10 or Summoner R10')
     expect(RPG_TIER1_CLASSES.map(rpgClassClosedText)).toEqual([
-      'Opens with Recruit R10', 'Opens with Recruit R10 or Duelist R10', 'Opens with Recruit R10 or Caller R10', 'Opens with Acolyte R10',
-      'Opens with Acolyte R10', 'Opens with Caller R10 or Initiate R10', 'Opens with Duelist R10 or Initiate R10', 'Opens with Initiate R10',
+      'Opens with Warrior R10', 'Opens with Warrior R10 or Spellblade R10', 'Opens with Warrior R10 or Summoner R10', 'Opens with Healer R10',
+      'Opens with Healer R10', 'Opens with Summoner R10 or Mage R10', 'Opens with Spellblade R10 or Mage R10', 'Opens with Mage R10',
     ])
     // Ready to promote: the gate names the parent; held from Rank 10.
     const ready = ranks({ recruit: 10 })
-    expect(rpgClassGate(ready, 'brawler', 1, V19)).toBe('Promote from Recruit')
+    expect(rpgClassGate(ready, 'brawler', 1, V19)).toBe('Promote from Warrior')
     expect(rpgClassGate(ranks({ recruit: 10, brawler: 11 }), 'brawler', 1, V19)).toBeNull()
     expect(rpgClassOpen(ranks({ brawler: 10 }), 'brawler', 1, V19)).toBe(true)
     expect(rpgClassOpen(ranks({ brawler: 9 }), 'brawler', 1, V19)).toBe(false)

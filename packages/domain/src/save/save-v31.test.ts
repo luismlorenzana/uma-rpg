@@ -11,7 +11,7 @@ const json = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T
 const base = (): Save => ({
   schemaVersion: SAVE_SCHEMA_VERSION,
   account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
-  // A Recruit: the fixture's Brawler is held only from Rank 10 since Classes v3 (H134), and work doesn't read her class.
+  // A Warrior: the fixture's Brawler is held only from Rank 10 since Classes v3 (H134), and work doesn't read her class.
   tierWorlds: { '1': gradedWorld({ items: { 'copper-ore': 4, 'copper-ingot': 7 }, umas: { '101': gradedUma({ classId: 'recruit', craft: { level: 50, exp: 0 } }) } }) },
 })
 

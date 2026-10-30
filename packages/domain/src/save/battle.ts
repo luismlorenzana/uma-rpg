@@ -94,7 +94,7 @@ function withClass(save: Save, outfitId: string, classId: RpgClass, next: ClassL
 
 /** Switches the class she fights as. Free at any time; each class keeps its own weapons and skills. From v19 (Classes v3,
  * CV9) only to a class she holds: every Tier 0 in Tier 1's world, a Tier 1 class once promoted into; a closed one is
- * refused with its gate ("Opens with Recruit R10 or Caller R10"). */
+ * refused with its gate ("Opens with Warrior R10 or Summoner R10"). */
 export function chooseClass(save: Save, outfitId: string, classId: RpgClass, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   const uma = ownedOf(world, outfitId)
@@ -148,7 +148,7 @@ export function promotionPlan(uma: Pick<OwnedUma, 'ranks'>, from: RpgTier0Class,
  * her Tier 0's waiting EXP flows into it at once (past Rank 50 it banks as Class Marks); her Tier 0 stays at Rank 10 with
  * nothing waiting; she fights as the child, on its defaults (weapons, lines, equipped skills). A sibling later opens the
  * same way, with whatever waits then. Never closes a class or moves her calling, trade or template. Refused outside Tier
- * 1's world ("Tier 0 is Tier 1's"), for a class that isn't `from`'s child, a Tier 0 below 10 ("Needs Recruit R10") and a
+ * 1's world ("Tier 0 is Tier 1's"), for a class that isn't `from`'s child, a Tier 0 below 10 ("Needs Warrior R10") and a
  * class she holds ("Already hers").
  */
 export function promoteUma(save: Save, outfitId: string, from: RpgClass, to: RpgClass, now: string, tier = TIER_ONE): Save {

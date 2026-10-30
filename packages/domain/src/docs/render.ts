@@ -87,7 +87,7 @@ const pct = (n: number) => `${Math.round(n * 1000) / 10}%`
 const x = (n: number) => `×${n}`
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-/** Each class's live name (Classes v3's from H134: the Sorcerer, the Arms Spellblade, the Tome Summoner, the Initiate). */
+/** Each class's live name (Classes v3's from H134: the Sorcerer, the Arms Spellblade, the Tome Summoner; D259's Tier 0 names). */
 const CLASS_NAME: Readonly<Record<RpgClass, string>> = Object.fromEntries(RPG_ALL_CLASSES.map((c) => [c, rpgClassName(c)])) as Record<RpgClass, string>
 /** A class's name when engine v18 and older fights played it (the history lines). */
 const OLD_NAME = (c: RpgClass): string => rpgClassName(c, 18)

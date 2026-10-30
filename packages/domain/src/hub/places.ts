@@ -202,7 +202,7 @@ function hallV19(heroHall: HeroHall, name: string, lore: string, at: { x: number
  * Bastion (uma-art's `knights-bastion` keep) and pairs the mirrors across the trunk road: physical-led halls on the left,
  * magic-led on the right (Brawler and Mage, Spell Blade and Summoner, Paladin and Cleric), the Observatory below. Halls
  * v2 (engine v19, HV1, HV21; H133) folds them into five, one per family: the Warrior Dojo (the Brawler Dojo's id) and the
- * Mage Tower on top, the Spell Blade Salle and the Summoner Circle below them, the Healer Sanctum (uma-art's own
+ * Mage Tower on top, the Spellblade Salle and the Summoner Circle below them, the Healer Sanctum (uma-art's own
  * `healer-sanctum` temple, 2.17.0) in the middle where the Paladin Bastion and the Cleric Chapel stood, the Observatory
  * under it. */
 export function learningPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
@@ -210,7 +210,7 @@ export function learningPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] 
     return [
       hallV19('brawler', 'Warrior Dojo', 'self-training', { x: 0.24, y: 0.1 }, engine),
       hallV19('mage', 'Mage Tower', 'self-study', { x: 0.76, y: 0.11 }, engine),
-      hallV19('spellblade', 'Spell Blade Salle', 'pacts with familiars', { x: 0.22, y: 0.33 }, engine),
+      hallV19('spellblade', 'Spellblade Salle', 'pacts with familiars', { x: 0.22, y: 0.33 }, engine),
       hallV19('summoner', 'Summoner Circle', 'familiars, summoned', { x: 0.78, y: 0.33 }, engine),
       hallV19('healer', 'Healer Sanctum', 'a followed deity', { x: 0.5, y: 0.56 }, engine),
       OBSERVATORY,

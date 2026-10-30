@@ -19,7 +19,7 @@ const GRADES: readonly AptitudeGrade[] = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G'
 const DISTANCES = ['sprint', 'mile', 'medium', 'long'] as const
 const STYLES = ['front', 'pace', 'late', 'end'] as const
 const rank = (g: AptitudeGrade) => GRADES.indexOf(g)
-/** "a Brawler", "an Initiate". */
+/** "a Brawler", "a Mage". */
 const aClass = (classId: RpgClass) => `${/^[AEIOU]/.test(CLASS_LABEL[classId]) ? 'an' : 'a'} ${CLASS_LABEL[classId]}`
 
 /** Her calling pick as the save holds it, when the world owns her. */

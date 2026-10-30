@@ -12,7 +12,7 @@ import type { OwnedUma } from './save'
  * she may start at Rank 1 (a Tier 0 in Tier 1's world, a Tier 1 class in a later one); `closed` with its gate. */
 export type RpgClassTileState = 'on' | 'available' | 'ready' | 'open' | 'closed'
 /** One class on her class tree (H120's Classes sheet). `rank` is her Class Rank in it (1 with no track); `waiting` the EXP a
- * Tier 0 at Rank 10 holds for her next promotion; `gate` a closed class's ("Opens with Recruit R10 or Caller R10");
+ * Tier 0 at Rank 10 holds for her next promotion; `gate` a closed class's ("Opens with Warrior R10 or Summoner R10");
  * `suggested` a Ready class that is the suggested promotion (CV11) of a parent she has at Rank 10. */
 export interface RpgClassTile {
   classId: RpgClass

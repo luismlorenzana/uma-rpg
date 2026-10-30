@@ -23,10 +23,16 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H138; decision numbers from D259). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H139; decision numbers from D260). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it. Open now:
+
+**Base class emblems** (D259). The five Tier 0s took their families' names; their icons follow.
+
+| Id | Task | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| [H138](tasks/H138-base-class-emblems.md) | Art: five new base class emblems in place (Warrior, Spellblade, Healer, Summoner, Mage), uma-art 2.18.0, and the uma-rpg pin | ChatGPT | S | — | Ready |
 
 **Uma profile v2** (D239). Engine v19 has been live since H134 (D257): where a packet below builds a screen for both
 generations or "inert until H134", build it for v19 only. The class tree and promotion sheets (H137), the calling card's

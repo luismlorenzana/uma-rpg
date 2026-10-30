@@ -16,13 +16,13 @@ v2](../design/classes-v3/halls-v2.md).
 
 | Hall | Its family | Home classes, by seat | Its power comes from | Its Limit Breaks |
 |---|---|---|---|---|
-| **Warrior Dojo** | Recruit | Brawler 1–4 | Self-training | The five Arms, nothing else: a tri attack, an Ultimate, doubles, volleys |
-| **Mage Tower** | Initiate | Sorcerer 1–4 | Self-study | The five elements, nothing else: the Dojo's twin, seat by seat |
-| **Spell Blade Salle** | Duelist | Arms Spellblade 1–2, Tome Spellblade 3–4 | Pacts with familiars | Two kinds, five strikes at random foes |
-| **Summoner Circle** | Caller | Arms Summoner 1–2, Tome Summoner 3–4 | Familiars, summoned | Two kinds, three hits on every foe |
-| **Healer Sanctum** | Acolyte | Paladin 1–2, Cleric 3–4 | A followed deity | An Arm and an element on one foe, and one stack of a blessing or a curse |
+| **Warrior Dojo** | Warrior | Brawler 1–4 | Self-training | The five Arms, nothing else: a tri attack, an Ultimate, doubles, volleys |
+| **Mage Tower** | Mage | Sorcerer 1–4 | Self-study | The five elements, nothing else: the Dojo's twin, seat by seat |
+| **Spellblade Salle** | Spellblade | Arms Spellblade 1–2, Tome Spellblade 3–4 | Pacts with familiars | Two kinds, five strikes at random foes |
+| **Summoner Circle** | Summoner | Arms Summoner 1–2, Tome Summoner 3–4 | Familiars, summoned | Two kinds, three hits on every foe |
+| **Healer Sanctum** | Healer | Paladin 1–2, Cleric 3–4 | A followed deity | An Arm and an element on one foe, and one stack of a blessing or a curse |
 
-On the Learning page the Warrior Dojo and the Mage Tower stand at the top, the Spell Blade Salle and the Summoner Circle
+On the Learning page the Warrior Dojo and the Mage Tower stand at the top, the Spellblade Salle and the Summoner Circle
 below them, the Healer Sanctum in the middle on its own temple, the Observatory under it
 ([sections](sections.md#learning)). The Warrior Dojo keeps the Brawler Dojo's id, `brawler-dojo`; the Sanctum is
 `healer-sanctum`, where the Paladin Bastion and the Cleric Chapel stood ([below](#the-merge-save-v32)).
@@ -133,10 +133,10 @@ two, against a sweep's 2.42) and the Circle's sweeps from three, where they are 
 | Mage Tower | 2 | Sorcerer | Ten Thousand Candles | 2.9× | fire | One Fire blast on one foe | 1 hit on one foe |
 | Mage Tower | 3 | Sorcerer | Echo Ray | 2.2× | light | Three rays on one foe, each Light ray striking twice | 6 hits on one foe |
 | Mage Tower | 4 | Sorcerer | Hundred-Shadow Rain | 2.2× | dark | Two Dark volleys: two bolts each on one foe, one on every other foe | 2 hits on one foe, a volley + splash; 2 hits on one foe, a volley + splash |
-| Spell Blade Salle | 1 | Arms Spellblade | Shrike Pact | 1.9× | katana, lance | Five strikes at random foes, Katana and Lance in turn, each Katana cut twice | 8 hits on random foes |
-| Spell Blade Salle | 2 | Arms Spellblade | Firefly Pact | 1.9× | katana, light | Five strikes at random foes, Katana and Light in turn, each striking twice | 10 hits on random foes |
-| Spell Blade Salle | 3 | Tome Spellblade | Storm Heron Pact | 1.9× | light, lightning | Five strikes at random foes, Light and Lightning in turn, each Light ray twice | 8 hits on random foes |
-| Spell Blade Salle | 4 | Tome Spellblade | Wisp Pact | 1.9× | light, katana | Five strikes at random foes, Light and Katana in turn, each striking twice | 10 hits on random foes |
+| Spellblade Salle | 1 | Arms Spellblade | Shrike Pact | 1.9× | katana, lance | Five strikes at random foes, Katana and Lance in turn, each Katana cut twice | 8 hits on random foes |
+| Spellblade Salle | 2 | Arms Spellblade | Firefly Pact | 1.9× | katana, light | Five strikes at random foes, Katana and Light in turn, each striking twice | 10 hits on random foes |
+| Spellblade Salle | 3 | Tome Spellblade | Storm Heron Pact | 1.9× | light, lightning | Five strikes at random foes, Light and Lightning in turn, each Light ray twice | 8 hits on random foes |
+| Spellblade Salle | 4 | Tome Spellblade | Wisp Pact | 1.9× | light, katana | Five strikes at random foes, Light and Katana in turn, each striking twice | 10 hits on random foes |
 | Summoner Circle | 1 | Arms Summoner | Centaur Warband | 2.2× | axe, bow | Axe, Bow, then Axe on every foe | 3 hits on every foe |
 | Summoner Circle | 2 | Arms Summoner | Gargoyle Flock | 2.2× | axe, dark | Axe, Dark, then Axe on every foe | 3 hits on every foe |
 | Summoner Circle | 3 | Tome Summoner | Frostshade Wyrm | 2.2× | dark, ice | Dark, Ice, then Dark on every foe | 3 hits on every foe |
@@ -150,7 +150,7 @@ two, against a sweep's 2.42) and the Circle's sweeps from three, where they are 
 |---|---|
 | Seats | 4 per hall, 5 halls, 20 in all; a Hero sits in one seat; any Uma may sit in any seat |
 | Learners | 10 per Hero; 2 Heroes per Learner; a Hero is never a Learner |
-| Power at 100% | the Limit Break's own power × her class's scale (×1 Recruit, Duelist, Acolyte, Caller, Initiate; ×0.95 Brawler, Arms Spellblade, Arms Summoner, Tome Summoner, Tome Spellblade, Sorcerer; ×0.8 Paladin, Cleric) × her open depth's power; at most 10 hits on one foe a cast |
+| Power at 100% | the Limit Break's own power × her class's scale (×1 Warrior, Spellblade, Healer, Summoner, Mage; ×0.95 Brawler, Arms Spellblade, Arms Summoner, Tome Summoner, Tome Spellblade, Sorcerer; ×0.8 Paladin, Cleric) × her open depth's power; at most 10 hits on one foe a cast |
 | Learner strength | 50% at Bond 0, +5% a Bond Level, 100% at Bond 10 |
 | Bond EXP per won fight | 2 a stage, 3 an elite or boss, toward each of a Learner's Heroes, or a Hero's own seat; 12 a level (Sweeps and replays count) |
 <!-- /live -->

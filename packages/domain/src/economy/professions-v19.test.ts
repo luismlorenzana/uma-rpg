@@ -12,7 +12,7 @@ const outfit = (style: 'front' | 'pace' | 'late' | 'end', also?: 'late' | 'end')
 }) as const
 
 describe('trades by Tier 0 (CV20)', () => {
-  it('gives each Tier 0 one trade: Recruit Metal, Duelist Wood, Acolyte Vegetables, Caller Fish, Initiate Stone', () => {
+  it('gives each Tier 0 one trade: Warrior Metal, Spellblade Wood, Healer Vegetables, Summoner Fish, Mage Stone', () => {
     expect(Object.fromEntries(RPG_TIER0_CLASSES.map((c) => [c, tradeOfCalling(c)]))).toEqual({
       recruit: 'physical', duelist: 'physical-hybrid', acolyte: 'healer', caller: 'magical-hybrid', apprentice: 'magical',
     })
@@ -25,7 +25,7 @@ describe('trades by Tier 0 (CV20)', () => {
     const pace = outfit('pace')
     expect([umaTrade(pace, null, V19), umaTrade(pace, 'mage', V19), umaTrade(pace, 'spellblade', V19)]).toEqual(['physical-hybrid', 'physical-hybrid', 'physical-hybrid'])
     expect([umaTrade(pace, 'spellblade', V18), umaTrade(pace, null, V18), umaTrade(pace)]).toEqual(['physical-hybrid', 'physical-hybrid', 'physical-hybrid'])
-    // Pace + Late with Power over Wit: today the Spell Blade's Wood, from v19 the Initiate's Stone.
+    // Pace + Late with Power over Wit: today the Spell Blade's Wood, from v19 the Mage's Stone.
     expect([umaTrade(outfit('pace', 'late'), null, V19), umaTrade(outfit('pace', 'late'), null, V18)]).toEqual(['magical', 'physical-hybrid'])
     expect(umaTrade(outfit('front'), null, V19)).toBe('physical')
     expect(umaTrade(outfit('late'), null, V19)).toBe('healer')

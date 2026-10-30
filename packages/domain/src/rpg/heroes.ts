@@ -190,7 +190,7 @@ const T = 1 / 3
 const HALLS_V2: readonly HeroLimit[] = [
   // The Warrior Dojo (HV8): self-training, the five Arms.
   seat('brawler-1', 'Triad Onslaught', 2.5, 'A Greatsword, an Axe and a Lance blow on one foe',
-    'The first form every Recruit drills: the three heavy Arms in one unbroken motion.',
+    'The first form every Warrior drills: the three heavy Arms in one unbroken motion.',
     [{ target: 'one', hits: [one('greatsword', T), one('axe', T), one('lance', T)] }]),
   seat('brawler-2', 'Ten Thousand Swings', 2.9, 'One Greatsword blow on one foe', 'Every practice swing she ever made, in one blow.',
     [{ target: 'one', hits: [one('greatsword', 1)] }]),
@@ -200,7 +200,7 @@ const HALLS_V2: readonly HeroLimit[] = [
     'Two volleys: two arrows into her mark, one into every other foe.', [volley('bow'), volley('bow')]),
   // The Mage Tower (HV9): self-study, the Dojo's twin seat by seat.
   seat('mage-1', 'Triad Tempest', 2.5, 'A Fire, an Ice and a Lightning spell on one foe',
-    'The first lesson every Apprentice copies out: the ring’s three elements in one breath.',
+    'The first lesson every Mage copies out: the ring’s three elements in one breath.',
     [{ target: 'one', hits: [one('fire', T), one('ice', T), one('lightning', T)] }]),
   seat('mage-2', 'Ten Thousand Candles', 2.9, 'One Fire blast on one foe', 'Every candle burned down over a book, in one fire.',
     [{ target: 'one', hits: [one('fire', 1)] }]),
@@ -208,7 +208,7 @@ const HALLS_V2: readonly HeroLimit[] = [
     [{ target: 'one', hits: [twice('light', T), twice('light', T), twice('light', T)] }]),
   seat('mage-4', 'Hundred-Shadow Rain', 2.2, 'Two Dark volleys: two bolts each on one foe, one on every other foe',
     'Two downpours of shadow: the heaviest on her mark, the rest over the field.', [volley('dark'), volley('dark')]),
-  // The Spell Blade Salle (HV10): familiar pacts, five strikes at random foes, the lead kind three (60%).
+  // The Spellblade Salle (HV10): familiar pacts, five strikes at random foes, the lead kind three (60%).
   seat('spellblade-1', 'Shrike Pact', 1.9, 'Five strikes at random foes, Katana and Lance in turn, each Katana cut twice',
     'The shrike pins its prey: her Lance throws fix them, her Katana cuts twice.',
     [{ target: 'random', hits: [twice('katana', 0.2), one('lance', 0.2), twice('katana', 0.2), one('lance', 0.2), twice('katana', 0.2)] }]),

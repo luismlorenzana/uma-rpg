@@ -85,7 +85,7 @@ describe('save v28\'s parse (H78), the economy stage live', () => {
     const world = save.tierWorlds['1']!
     expect(world).toMatchObject({ items: {}, buildings: {}, work: {}, grant: null })
     expect('gear' in world || 'gems' in world || 'gearMarks' in world.wallet).toBe(false)
-    // Since Classes v3 she starts as a Tier 0 (a Mage is held only from Rank 10): the Mage line's Initiate.
+    // Since Classes v3 she starts as a Tier 0 (a Mage is held only from Rank 10): the Mage line's Mage.
     const unlocked = unlockUma(save, '9000', '2026-10-25T12:00:00.000Z', '1', 'apprentice')
     expect(unlocked.tierWorlds['1']!.umas['9000']).toMatchObject({
       classId: 'apprentice', craft: { level: 1, exp: 0 }, ranks: { classes: {} }, stars: { open: [], moons: [] },

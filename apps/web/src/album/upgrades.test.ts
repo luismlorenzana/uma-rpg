@@ -40,7 +40,7 @@ describe('Can upgrade on the Stable (H34)', () => {
 /** "Can upgrade" from v19 (H137, D253): a Tier 0 she fights as at Class Rank 10 with a child she doesn't hold carries the
  * mark and the filter finds her (one reason, Promote); below Rank 10, or once she fights as a Tier 1 class, nothing. */
 describe('Can upgrade: Promote (v19)', () => {
-  it('marks a Recruit at R10 and the preset keeps her; a Recruit at R9 and a Brawler stay unmarked', async () => {
+  it('marks a Warrior at R10 and the preset keeps her; a Warrior at R9 and a Brawler stay unmarked', async () => {
     const { view, world } = await albumFixture()
     const set = (id: string, classId: 'recruit' | 'brawler', classes: Record<string, { rank: number; exp: number }>) => {
       world.umas[id] = { ...world.umas[id]!, classId, ranks: { classes } }

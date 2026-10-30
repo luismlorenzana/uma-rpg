@@ -13,7 +13,7 @@ describe('materials (D86)', () => {
   it('has every Uma use all eight families about equally, whatever her class, armor or accessories (D139)', () => {
     // Classes v2's healers' spreads (D179: the Paladin's Greatsword, Axe, Lance, Blizzard and Fire; the Cleric's Light,
     // Dark, Thunder, Katana and Bow) lean two units further than the rest's four (H61, D188). Classes v3's defaults (CV16,
-    // live since H134): the Caller's and the Tome Summoner's Dark, Blizzard and Axe and the Tome Spellblade's Light,
+    // live since H134): the Summoner's and the Tome Summoner's Dark, Blizzard and Axe and the Tome Spellblade's Light,
     // Thunder and Katana lean as far.
     const wide = (classId: RpgClass, engine: number) => (engine >= 19 ? ['caller', 'summoner', 'tomeblade'].includes(classId) : rpgIsHealer(classId, engine))
     for (const engine of [18, 19]) for (const classId of rpgClasses(engine)) for (const armor of [PHYSICAL, MAGICAL])

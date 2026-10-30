@@ -177,7 +177,7 @@ one bar of one Uma, 1,000 Class Marks each, at once:
 - **A Tier 0 at Rank 10** keeps taking Manuals into her waiting EXP, up to the 23,680 her promotion can take; her bar
   reads it, `R10 · +12,400 EXP waiting`. Its counts stop at that room ("Room for 4"), the last Manual allowed to pass it;
   what passes comes back as Class Marks at half, and the footer says so ("+n Class Marks back"), as on a bar at Rank 50.
-- **The worked example** (Classes v3 §8.7): Uma A's share is 21 Manuals. On her Recruit at Rank 1, To Rank 10 reads 4;
+- **The worked example** (Classes v3 §8.7): Uma A's share is 21 Manuals. On her Warrior at Rank 1, To Rank 10 reads 4;
   reading 16 takes her to `R10 · +12,400 EXP waiting`, and promoting to the Brawler makes her a Brawler R35 at once.
 
 ### The Warehouse
@@ -257,25 +257,25 @@ first time the save opened as v32 ([Classes v3](../design/classes-v3/classes-v3.
 - **Halls:** the Paladin Bastion and the Cleric Chapel merged into the Healer Sanctum, each Uma keeping her higher Bond
   ([heroes](heroes.md#the-merge-save-v32)). No other seat or Bond moved.
 - **Open fights** finished on engine v18 with the classes they started with; the class EXP they paid to a class she
-  could no longer fight as went to its family's Tier 0 (the Brawler's to the Recruit, the Mage's to the Initiate, the
-  Spell Blade's to the Duelist, the Summoner's to the Caller, the Paladin's and the Cleric's to the Acolyte). The next
+  could no longer fight as went to its family's Tier 0 (the Brawler's to the Warrior, the Mage's, the Spell Blade's
+  and the Summoner's to their namesakes, the Paladin's and the Cleric's to the Healer). The next
   fight started on engine v19.
 
 | Uma (made up) | Before | Class EXP | Manuals | A rebuild |
 |---|---|---|---|---|
-| A, Front A | Brawler R34 (bar 300), Paladin R12 (bar 100) | 13,236 · 2,476 | 16 + 5 = **21** | 16 on her Recruit, promote: a Brawler R35; 5 on an Acolyte, promote: a Paladin R14 |
-| B, Pace A and Late A | Spell Blade R26, Mage R8 (bar 50) | 8,200 · 1,338 | 10 + 3 = **13** | 10 on a Duelist, promote: an Arms Spellblade R26; 3 on her Initiate: R8 |
-| C, Late A | Cleric R24 (bar 200) | 7,376 | **10** | 10 on her Acolyte, promote: a Cleric R26 |
+| A, Front A | Brawler R34 (bar 300), Paladin R12 (bar 100) | 13,236 · 2,476 | 16 + 5 = **21** | 16 on her Warrior, promote: a Brawler R35; 5 on a Healer, promote: a Paladin R14 |
+| B, Pace A and Late A | Spell Blade R26, Mage R8 (bar 50) | 8,200 · 1,338 | 10 + 3 = **13** | 10 on a Spellblade, promote: an Arms Spellblade R26; 3 on her Mage: R8 |
+| C, Late A | Cleric R24 (bar 200) | 7,376 | **10** | 10 on her Healer, promote: a Cleric R26 |
 | D, Pace A, Lv 1 | No Class EXP | 0 | **0** | — |
-| E, Late A and End A | Summoner R50, Mage R15 | 25,480 · 3,360 | 28 + 6 = **34** | 28 on her Caller, promote: a Tome Summoner R50; 6 on an Initiate, promote: a Sorcerer R17 |
+| E, Late A and End A | Summoner R50, Mage R15 | 25,480 · 3,360 | 28 + 6 = **34** | 28 on her Summoner, promote: a Tome Summoner R50; 6 on a Mage, promote: a Sorcerer R17 |
 
-That world got 78 Manuals, 78,000 Class Marks. B's calling became the Initiate, so her trade moved Wood → Stone and her
-template Spellfencer → Spellwright; D's became the Duelist, Stone → Wood.
+That world got 78 Manuals, 78,000 Class Marks. B's calling became the Mage, so her trade moved Wood → Stone and her
+template Spellfencer → Spellwright; D's became the Spellblade, Stone → Wood.
 
 The first time each such world opens, the sheet **"The classes are rebuilt"** shows it: "+78 Class Manuals" and
 "78,000 Class Marks · Exchange", the tree's three roots and five Tier 0s, how to rebuild an Uma (read her share onto her
 Tier 0, then promote at Rank 10), what reset and what stayed, the moved trades, the Halls line, and each Uma's line
-("Spell Blade R26 · Mage R8 → Initiate R1 · trade Wood → Stone", her share on the right). Both of its buttons, To the
+("Spell Blade R26 · Mage R8 → Mage R1 · trade Wood → Stone", her share on the right). Both of its buttons, To the
 Exchange and Later, close it for good; the Account's row **"The classes are rebuilt · 78 Class Manuals"** reopens it
 ([sections](sections.md#account)).
 
@@ -289,11 +289,11 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
 
 | Her calling | Line | Gather | Process | Make |
 |---|---|---|---|---|
-| Recruit | Metal | Mine (Mining) | Mine Workbench (Smelting) | Weapon Forge (Arms Crafting): Arms Gems |
-| Acolyte | Vegetables | Fields (Farming) | Fields Workbench (Prepping) | Tome Forge (Tome Crafting): Tome Ink |
-| Duelist | Wood | Forest (Wood Chopping) | Forest Workbench (Sawing) | Armorer (Armor Crafting): Armor Fittings |
-| Caller | Fish | Fishery (Fishing) | Fishery Workbench (Filleting) | Charm Forge (Accessory Crafting): Accessory Settings |
-| Initiate | Stone | Monster Den (Hunting) | Den Workbench (Stonecutting) | Lapidary (Jewel Crafting): Planet and Moon Jewels |
+| Warrior | Metal | Mine (Mining) | Mine Workbench (Smelting) | Weapon Forge (Arms Crafting): Arms Gems |
+| Healer | Vegetables | Fields (Farming) | Fields Workbench (Prepping) | Tome Forge (Tome Crafting): Tome Ink |
+| Spellblade | Wood | Forest (Wood Chopping) | Forest Workbench (Sawing) | Armorer (Armor Crafting): Armor Fittings |
+| Summoner | Fish | Fishery (Fishing) | Fishery Workbench (Filleting) | Charm Forge (Accessory Crafting): Accessory Settings |
+| Mage | Stone | Monster Den (Hunting) | Den Workbench (Stonecutting) | Lapidary (Jewel Crafting): Planet and Moon Jewels |
 
 - **Her calling sets her trade,** never her active class: a class switch or a promotion moves no job. A trade works
   three places, twelve slots. Another trade's places refuse her ("Another trade"), unless the world has no Uma of that
@@ -476,7 +476,7 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
     defaults, every grade G0, an empty Extra Stats map, Craft Lv 1 and no Bonds. Each keeps her class and her accessory
     slot's family and kind; her calling is her racing profile's, as always. A later tier has no Tier 0 and every Tier 1
     class is open there from Class Rank 1 (CV10), so an Uma who ascends as a Tier 0 arrives as her **suggested
-    promotion** (the Recruit a Brawler, the Initiate a Sorcerer; a Duelist, a Caller or an Acolyte her Arms child or the
+    promotion** (the Warrior a Brawler, the Mage a Sorcerer; a Spellblade, a Summoner or a Healer her Arms child or the
     Paladin with Power over Wit, else her Tome child or the Cleric), at Class Rank 1.
   - **The new world** gets the purse, 1,000 Laurels and 5 Speed Tickets an Uma, and their banked EXP as Class Marks. A
     party whose five all ascend moves, with its name, into its first empty party; the rest fill the next empty parties,
