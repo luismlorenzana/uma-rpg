@@ -65,6 +65,8 @@ const her = () => worldOf(useGame.getState().save!).umas[outfit.outfitId]!
 const sheet = (name: string | RegExp) => screen.getByRole('dialog', { name })
 const tile = (id: string) => document.querySelector<HTMLElement>(`[data-class-tile="${id}"]`)!
 const footer = () => document.querySelector<HTMLButtonElement>('[data-classes-footer]')!
+/** The promotion sheet's before → after line (each side a span of its own, so it wraps after the arrow). */
+const plan = () => document.querySelector('[data-promotion-plan] p')!.textContent
 
 beforeEach(() => {
   const rows = new Map<string, string>()
@@ -124,7 +126,7 @@ describe('the Classes sheet on the Skills tab (v19)', () => {
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Classes' })).toBeNull())
     expect(within(promotion).getByRole('radio', { name: 'Arms Summoner' }).getAttribute('aria-checked')).toBe('true')
     expect(within(promotion).getByRole('radio', { name: 'Brawler, Held' })).toBeDefined()
-    expect(within(promotion).getByText('Recruit R10 → Arms Summoner R10')).toBeDefined()
+    expect(plan()).toBe('Recruit R10 → Arms Summoner R10')
     fireEvent.click(within(promotion).getByRole('button', { name: /^Classes/ }))
     expect(await screen.findByRole('dialog', { name: 'Classes' })).toBeDefined()
     await waitFor(() => expect(screen.queryByRole('dialog', { name: /^Promote/ })).toBeNull())
@@ -172,7 +174,7 @@ describe('a Tier 0 on the Skills tab (v19)', () => {
     const promotion = await screen.findByRole('dialog', { name: 'Promote · Recruit R10' })
     expect(within(promotion).getByText('Free · the others stay open')).toBeDefined()
     expect(within(promotion).getByRole('radio', { name: 'Brawler, Suggested' }).getAttribute('aria-checked')).toBe('true')
-    expect(within(promotion).getByText('Recruit R10 → Brawler R11')).toBeDefined()
+    expect(plan()).toBe('Recruit R10 → Brawler R11')
     expect(within(promotion).getByText('Depths 1–2 · 6 skills · +400 EXP')).toBeDefined()
     await act(async () => { fireEvent.click(within(promotion).getByRole('button', { name: 'Promote to Brawler' })) })
     await waitFor(() => expect(vi.mocked(battle.promoteUma)).toHaveBeenCalledWith(expect.anything(), outfit.outfitId, 'recruit', 'brawler', expect.any(String), '1'))

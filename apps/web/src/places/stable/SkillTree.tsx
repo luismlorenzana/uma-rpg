@@ -318,7 +318,8 @@ function Tier0Node({ node, title, line, equippedIn, onOpen }: {
     <button type="button" onClick={onOpen} data-node={node.id} data-held={node.held || undefined}
       aria-label={`${title}, ${tier0RankWord(node.rank)}${equippedIn ? ', equipped' : ''}`}
       className="flex min-h-14 w-full items-center gap-2.5 rounded-sm text-left">
-      <span className={`relative flex size-12 shrink-0 items-center justify-center rounded-full border-2 ${equippedIn ? 'border-accent bg-accent text-accent-ink shadow-2' : 'border-accent bg-accent/10'}`}>
+      {/* Her three are always equipped (three slots from Lv 1): the ring keeps the kind's colour readable; the dot says equipped. */}
+      <span className="relative flex size-12 shrink-0 items-center justify-center rounded-full border-2 border-accent bg-accent/10">
         <SkillMarks node={node} />
         {equippedIn && <span aria-hidden className="absolute -bottom-0.5 -left-0.5 size-2.5 rounded-full border-2 border-panel bg-success" />}
       </span>

@@ -97,7 +97,7 @@ export function ClassesSheet({ outfit, uma, world, tier, outfits, onClose, onPro
         {footer.label}
       </button>
     }>
-      <div className="space-y-2" data-classes-sheet>
+      <div className="space-y-1.5" data-classes-sheet>
         <Tree grid={view.grid} selected={pick.classId} onSelect={setSelected} />
         <Selection line={view.line} />
         <button type="button" onClick={door} data-manuals-door
@@ -140,13 +140,16 @@ function Tree({ grid, selected, onSelect }: { grid: ClassGrid; selected: RpgClas
 
 function Tile({ tile, selected, onSelect }: { tile: ClassTileView; selected: boolean; onSelect: () => void }) {
   return (
+    // The ring sits on the button and the state's look on the face inside, so a Closed tile fades and its ring doesn't.
     <button type="button" role="radio" aria-checked={selected} onClick={onSelect} data-class-tile={tile.classId} data-state={tile.state}
       aria-label={`${tile.name}, ${tile.word}${tile.suggested ? ', Suggested' : ''}`}
-      className={`relative flex min-h-16 min-w-0 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 py-1 text-center ${LOOK[tile.state]} ${selected ? 'ring-2 ring-accent ring-offset-1 ring-offset-panel' : ''}`}>
+      className={`relative flex min-w-0 rounded-sm ${selected ? 'ring-2 ring-accent ring-offset-1 ring-offset-panel' : ''}`}>
+      <span className={`flex min-h-[60px] w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-sm px-0.5 py-1 text-center ${LOOK[tile.state]}`}>
+        <ClassEmblem classId={tile.classId} />
+        <span className="text-[11px] font-semibold leading-tight">{tile.name}</span>
+        <span className={`text-[11px] leading-tight ${WORD_TONE[tile.state]}`}>{tile.word}</span>
+      </span>
       {tile.state === 'ready' && <span aria-hidden className="absolute right-1 top-1 size-1.5 rounded-full bg-success" />}
-      <ClassEmblem classId={tile.classId} />
-      <span className="text-[11px] font-semibold leading-tight">{tile.name}</span>
-      <span className={`text-[11px] leading-tight ${WORD_TONE[tile.state]}`}>{tile.word}</span>
     </button>
   )
 }
@@ -154,7 +157,7 @@ function Tile({ tile, selected, onSelect }: { tile: ClassTileView; selected: boo
 /** The selection's line: its name and state, slots and role, its three defaults, its hand, the healer note. */
 function Selection({ line }: { line: ClassLine }) {
   return (
-    <div className="space-y-0.5 rounded-sm bg-raised px-3 py-2" data-class-line aria-live="polite">
+    <div className="space-y-0.5 rounded-sm bg-raised px-3 py-1.5" data-class-line aria-live="polite">
       <p className="text-[14px] font-semibold">{line.title}</p>
       {line.facts.map((f) => <p key={f} className="text-[12.5px] text-ink-soft">{f}</p>)}
       {line.weapons.length > 0 && (
