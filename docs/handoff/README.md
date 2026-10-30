@@ -28,7 +28,6 @@
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H135](tasks/H135-healer-sanctum-art.md) | **Art, optional** (uma-platform): a Healer Sanctum building; until then the Bastion's frame | ChatGPT (draws and publishes) | S | — | Ready |
 
 **Uma profile v2** (D239):
 
@@ -69,7 +68,7 @@
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | [H129](tasks/H129-halls-v2-limit-breaks.md) | Halls v2 (D241): five halls, the twenty Limit Breaks with their own power, class scale and the 10-hit cap | Claude | M | H126, H128 | Done (`d5cf696`) |
-| [H133](tasks/H133-halls-v2-pages.md) | Halls v2: the Learning page's five halls and the Hall page (home class, shape, power), inert until H134 | ChatGPT | S–M | H128, H129 | Ready |
+| [H133](tasks/H133-halls-v2-pages.md) | Halls v2: the Learning page's five halls and the Hall page (home class, shape, power), inert until H134  **Art ready:** pin uma-art 2.17.0 or later and draw `healer-sanctum` without the keep override. | ChatGPT | S–M | H128, H129 | Ready |
 
 **After hardening:** Tier 2 and Tier 3 are re-planned. Their approved drafts stay in
 [design/tier-rework/](../design/tier-rework/README.md) (Class, Weapon, Extra Stats and Profession Progression, stat
@@ -87,6 +86,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 | Id | Task | Commit |
 |---|---|---|
 | H137 | Classes v3's class tree, promotion sheet, Tier 0 tree and Ready dot on today's Skills tab, inert until H134 (D252, D253): `class-view.ts`, `ClassesSheet.tsx` and `PromotionSheet.tsx` as standalone sheets H120 reuses; the Manuals door to the Exchange with Back to the sheet; the Stable's Promote reason (`umaPromotionWaits`); `umaClassTree` moved to a lazy `save/class-tiles.ts`. Main JS 218.73 KB locally. [#78](https://github.com/luismlorenzana/uma-rpg/pull/78) | `fdec2aa` |
+| H135 | The Healer Sanctum's original open temple, delivered in [uma-platform #58](https://github.com/luismlorenzana/uma-platform/pull/58), P77/D254: three steps, four columns, a sun pediment and static gold/violet braziers; all 50 older buildings unchanged; [uma-art 2.17.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40978750402). H133 or its first later adopter pins it and draws `healer-sanctum` without the keep override. | platform `bab58c3` |
 | H131 | Classes v3's and Halls v2's balance on engine v19, dark (D249), 32 seeds on Auto against v18: every Tier 1 stage still wins (S1, H2: 0 points); the mirrors within 2–6% (S3, S4); the Rift's right builds 91–100% a stage, champions 60–68%, the Convergence 50%. Tuned, v19 only: Tier 0 power ×1.05 (1.60 → 2.31), `HANDS_V19` (Tome Spellblade Arms 0.48, Arms Summoner Tome 0.46, both Summoners' lead 0.57), Light Pierce 0.85, the Limit Break scale 0.95 (healers 0.8), `RIFT_TUNING_V19`. **Recorded misses:** Paladin ÷ Cleric 117% (147% at Lv 30), Limit Breaks above the analytic for the hybrids and Summoners (133–150%: home seats now strike in her own weapons' kinds), Iron's stages 9–11 +16 points, the Arms Spellblade at 79–80% physical from Lv 30, the Bow Barrage and Light Pierce B lines, Lv 20's pace 90%. Main JS 219.44 KB gzip on CI | `598060e` |
 | H127 | Seven Classes v3 emblems, delivered in [uma-platform #56](https://github.com/luismlorenzana/uma-platform/pull/56), P76/D251: five plain Tier 0 motifs and two mirrored channel hybrids, every older UI frame preserved; [uma-art 2.16.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/40932890896). H120 pins this version or later and removes the temporary class-emblem fallback. | platform `45bdebb` |
 | H132 | "The classes are rebuilt" and the Exchange's Class Manual sheet (D250): the one-time sheet reads H130's record (each Uma's Manuals and trade, the Healer Sanctum's merge lines) with an Account row; the Manual sheet selects a bar and a count with one footer button (live on v18), and from v19 shows the Tier 0 bars, To Rank 10, her share counting down and EXP waiting past Rank 10 (`R10 · +12,400 EXP waiting`); route `/town/exchange/manual/:outfitId`. Main JS 219.35 KB gzip on CI | `7890105` |
