@@ -217,7 +217,7 @@ UX](../design/profile-ux.md), D229):
     holds at Rank 10), "R1 · free" dashed (a Tier 0 she hasn't started), **Closed** at 40%. A later tier's world has no
     Tier 0 row and every Tier 1 class "R1 · free" until she starts it.
   - A tap selects (a ring) and writes the line under the tree: "Arms Summoner · Ready", "2 Arms + 1 Tome · Area ·
-    lingers", its three defaults and "Hand · Arms ×0.57 · Tome ×0.46" (a Tier 0: "Any 3 weapons · Drill Strike" and
+    lingers", its preset's weapons and "Hand · Arms ×0.57 · Tome ×0.46" (a Tier 0: "Any 3 weapons · Drill Strike" and
     "Promotes to Brawler, Arms Spellblade, Arms Summoner"), and "Party 1: 2 healers" in the warning colour when the
     selected healer would make two in her party.
   - The footer acts on the selection: **Fight as Arms Spellblade** or **Start Summoner · R1** (free; the sheet stays open,
@@ -226,8 +226,8 @@ UX](../design/profile-ux.md), D229):
   - **Class Manuals ›** ("Exchange") opens the Exchange's Manual sheet on her at `/town/exchange/manual/:outfitId`; its
     Back returns to the Skills tab with Classes open.
   - **The promotion sheet** ("Promote · Warrior R10", "Free · the others stay open"): one tile a child, **Suggested** on
-    the suggested one (opened on it, or on the Ready tile's child), **Held** on one she holds; each with its slots, three
-    defaults and role, a row the same on every tile left out. Under them "Warrior R10 → Brawler R11" and "Depths 1–2 · 6
+    the suggested one (opened on it, or on the Ready tile's child), **Held** on one she holds; each with its slots, the
+    preset she lands on and role, a row the same on every tile left out. Under them "Warrior R10 → Brawler R11" and "Depths 1–2 · 6
     skills · +400 EXP" (the EXP waiting on her Tier 0 lands at once). **Promote to Brawler** (free, no confirm) closes it
     and the tab shows the Brawler's first tree; on a held child **Fight as …**. **Classes ›** swaps back to the tree.
 - **Equipped · 4/7**: one square per skill slot her Uma Level gives. Each equipped skill shows its kind marks and its
@@ -277,8 +277,10 @@ UX](../design/profile-ux.md), D229):
 **Equip** first and **Upgrade** ("Upgrade · 12" counts the raises ready and the jewels to set), the choice remembered
 for the session.
 - **Equip**, what she wears:
-  - the standard preset: "Use standard preset · Arms Spellblade · Physical · Pendant", or "Standard preset on". It sets
-    her class's default weapons and puts her ★ family on its kind; no grade moves.
+  - the standard preset (`presetRows`; D263): one row, "Standard preset" or "Standard preset · On", with her class's
+    emblem and "Lance · Greatsword · Light Tome · Pendant" under it. A Tier 0 shows a "Standard preset" heading and one row
+    for each class it promotes into, each with that class's emblem and name ("Paladin", "Cleric · On"). A tap sets those
+    weapons and puts her ★ family on its kind; no grade moves ([classes](classes.md#standard-presets)).
   - **Loadout** ("Set on Skills ›"): her three weapons' icons with their grades, then "Physical armor" or "Magical
     armor" with the five slots' icons and grades. A slot at G0 is an empty frame.
   - **Accessory · G4**: four family buttons in one row, her ★ family first, then Bell, Pendant, Orb and Insignia; the

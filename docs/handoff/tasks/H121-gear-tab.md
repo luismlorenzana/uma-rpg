@@ -76,7 +76,8 @@ No rule or save change: every raise is today's `raiseGradeTo`, every family pick
 
 1. **The standard preset moves to the top of the Class tab for now** (main session, 2026-10-29: if H120 has landed first, the preset is already the Classes sheet's footer; skip this decision and only remove it from Gear). The proposal puts it in the Class sheet's footer
    (H120), which waits for the Classes v3 design; Gear has no room for it under B2 (+52 px is 1.05 screens). So
-   `PresetButton` (H117's wording, `Standard preset` / `Standard preset · On`) becomes the first row of the Class tab's
+   `PresetButton` (H117's wording, `Standard preset` / `Standard preset · On`; since D263 a Tier 0 lists one row a child, so
+   it moves whole) becomes the first row of the Class tab's
    skeleton until H120 moves it. *Why:* its destination tab, and nothing lost meanwhile.
 2. **The Can upgrade reasons stay as `upgradesFor` builds them**, including "an accessory slot at G1+ with no family"
    in Gear's count, until H123 moves the signature's reason to Template (§5.5). The accessory tile's Ready dot then means

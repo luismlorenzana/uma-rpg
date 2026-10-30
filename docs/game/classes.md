@@ -118,8 +118,8 @@ is open to every Uma** at Class Rank 1, free.
   her promotion.
 - **Three slots, any of the ten weapons,** three different kinds. Each Tier 0 starts on the defaults of the child it
   models (the Warrior the Brawler's, the Spellblade the Arms Spellblade's, the Healer the Cleric's, the Summoner the Tome
-  Summoner's, the Mage the Sorcerer's) and wears that child's accessory form in its preset. A party of the five Tier
-  0s on defaults holds all ten kinds.
+  Summoner's, the Mage the Sorcerer's), and a party of the five on defaults holds all ten kinds. Its standard presets are
+  its children's, one each, so she can start on the weapons she'll keep ([below](#standard-presets)).
 - **Her hand is ×1** on both channels, one act a turn, MP ×1. **No stat lean.** Her armor's offense and her Prowess go a
   third a slot to its channel (three Arms all ATK, two Arms and a Tome two thirds ATK).
 - **Her base MP regen** is depth 1's, 1% of her max MP a round; her Limit Break's power reads her skill's power at her
@@ -159,7 +159,7 @@ At Rank 10 her EXP waits for her promotion, up to 23,680; past that it banks as 
 |---|---|
 | **When** | Her Tier 0 reaches Class Rank 10, by fights, Sweeps, Echoes or Class Manuals |
 | **What it opens** | Each child: the Warrior's three, the Mage's three, the Spellblade's, the Summoner's and the Healer's two. A child she can promote into now is **Ready**; she can't switch to it or read Manuals onto it before she promotes |
-| **Promoting** | Free and final, from the promotion sheet. The child opens **at Class Rank 10** with depths 1 and 2 open (six skills on her three weapons), on its default weapons and lines, and she fights as it from then |
+| **Promoting** | Free and final, from the promotion sheet. The child opens **at Class Rank 10** with depths 1 and 2 open (six skills on her three weapons), on its [weapon preset](#standard-presets) with every line on A, and she fights as it from then |
 | **The waiting EXP** | Everything her Tier 0 earned past Rank 10 flows into the new class's bar at once (past Rank 50 it banks as Class Marks at half). Her Tier 0 stays at Rank 10 with nothing waiting |
 | **More children** | Promoting into a sibling later is free too: it opens at Rank 10 with whatever waits then |
 | **Never** | Closes a class, costs anything, or moves her calling, trade or template |
@@ -334,7 +334,7 @@ The table's **Shape** is the kind's shape above.
 first: a Brawler three Arms, a Sorcerer three Tomes; an Arms Spellblade, an Arms Summoner and a Paladin two Arms and a
 Tome; a Tome Spellblade, a Tome Summoner and a Cleric two Tomes and an Arm. A Tier 0's three slots take any weapon. Every
 class picks: any kind of a slot's channel fits it, three different kinds, and swaps within a channel are free. The weapon
-in each slot opens its tree. A class she hasn't set up holds its three defaults (the presets below). When she stops
+in each slot opens its tree. A class she hasn't set up holds its three defaults ([below](#standard-presets)). When she stops
 slotting a kind, her equipped skills of its tree leave her loadout (a loadout left empty goes back to auto); her line on
 that tree stays.
 
@@ -363,40 +363,72 @@ says so. She sets it on the Gear tab's Equip view: four cards of one shape, her 
 
 ### Standard presets
 
-**Each class has one (D164, WP25).** "Use standard preset", on the Gear tab's Equip view, puts her active class on its
-three default weapons (the owner's, CP3, CV16) and sets her accessory slot's form: her ★ signature family, an Orb or a
-Bell on her first weapon's kind (a hybrid's on the kind of her lead half that twins her lone weapon: the Arms
-Spellblade's Lance, the Tome Spellblade's Light, the Arms Summoner's Bow, the Tome Summoner's Blizzard Tome), a Pendant or
-an Insignia with none. When her family is already the class's own, she gets the class's form below. A Tier 0 takes the
-child it models: its weapons and its form. Grades don't move and nothing is spent. Her lines stay; her equipped skills of
-a tree the preset takes out of her slots leave her loadout.
+**Each Tier 1 class has one, and a Tier 0 picks among its children's (D263, D164, WP25).** The Gear tab's Equip view lists
+them: a Tier 1 class's "Standard preset", or one row for each class a Tier 0 promotes into, so she starts on the weapons she
+means to keep: three rows for the Warrior and the Mage, two for the Spellblade, the Summoner and the Healer.
+
+A tap puts her active class on those three weapons and sets her accessory slot's form: her ★ signature family, an Orb or a
+Bell on her first weapon's kind (a hybrid's on the kind of her lead half that twins her lone weapon when she holds it, else
+her lead half's first: the Arms Summoner's Bow, the Tome Summoner's Dark), a Pendant or an Insignia with none. With no ★
+family she gets the class's form below. Grades don't move and nothing is spent. Her lines stay; her equipped skills of a tree
+the preset takes out of her slots leave her loadout. Nothing else is stored: a row reads **On** while she wears that preset.
+
+**A promotion lands on the child's preset,** whatever her Tier 0 held. **The defaults** are what a class holds until she
+picks: no Uma's weapons move until she taps a row, so an Uma promoted before D263 keeps the weapons she has. A grade belongs
+to the weapon, so it follows her from a Tier 0 into a class whose preset slots that weapon.
 
 <!-- live:presets -->
-| Class | Weapons | Armor | Accessory |
-|---|---|---|---|
-| Warrior | Greatsword, Axe, Lance | Physical | Bell (Greatsword) |
-| Spellblade | Katana, Lance, Thunder Tome | Physical | Pendant |
-| Healer | Light Tome, Blizzard Tome, Bow | Magical | Orb (Blizzard Tome) |
-| Summoner | Dark Tome, Blizzard Tome, Axe | Magical | Orb (Blizzard Tome) |
-| Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Pendant |
-| Brawler | Greatsword, Axe, Lance | Physical | Bell (Greatsword) |
-| Arms Spellblade | Katana, Lance, Thunder Tome | Physical | Pendant |
-| Arms Summoner | Bow, Axe, Dark Tome | Physical | Orb (Bow) |
-| Paladin | Greatsword, Axe, Light Tome | Physical | Pendant |
-| Cleric | Light Tome, Blizzard Tome, Bow | Magical | Orb (Blizzard Tome) |
-| Tome Summoner | Dark Tome, Blizzard Tome, Axe | Magical | Orb (Blizzard Tome) |
-| Tome Spellblade | Light Tome, Thunder Tome, Katana | Magical | Pendant |
-| Sorcerer | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Pendant |
+| Class | Offered by | Weapons | Armor | Accessory |
+|---|---|---|---|---|
+| Brawler | Warrior | Greatsword, Axe, Lance | Physical | Bell (Greatsword) |
+| Arms Spellblade | Warrior, Spellblade | Katana, Axe, Thunder Tome | Physical | Pendant |
+| Arms Summoner | Warrior, Summoner | Bow, Axe, Dark Tome | Physical | Orb (Bow) |
+| Paladin | Healer | Lance, Greatsword, Light Tome | Physical | Pendant |
+| Cleric | Healer | Light Tome, Fire Tome, Lance | Magical | Orb (Light Tome) |
+| Tome Summoner | Summoner, Mage | Dark Tome, Blizzard Tome, Bow | Magical | Orb (Dark Tome) |
+| Tome Spellblade | Spellblade, Mage | Thunder Tome, Blizzard Tome, Katana | Magical | Pendant |
+| Sorcerer | Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Pendant |
+
+| Class | Holds until she picks |
+|---|---|
+| Warrior | Greatsword, Axe, Lance |
+| Spellblade | Katana, Lance, Thunder Tome |
+| Healer | Light Tome, Blizzard Tome, Bow |
+| Summoner | Dark Tome, Blizzard Tome, Axe |
+| Mage | Fire Tome, Blizzard Tome, Thunder Tome |
+| Brawler | Greatsword, Axe, Lance |
+| Arms Spellblade | Katana, Lance, Thunder Tome |
+| Arms Summoner | Bow, Axe, Dark Tome |
+| Paladin | Greatsword, Axe, Light Tome |
+| Cleric | Light Tome, Blizzard Tome, Bow |
+| Tome Summoner | Dark Tome, Blizzard Tome, Axe |
+| Tome Spellblade | Light Tome, Thunder Tome, Katana |
+| Sorcerer | Fire Tome, Blizzard Tome, Thunder Tome |
 <!-- /live -->
 
-The table's **Accessory** is the class's own form, which the balance simulation wears. The defaults follow each class's
-identity: the Brawler's and the Sorcerer's are the ring (Fire, Ice and Lightning's twins, one channel each); the
-Spellblades hold multi-hit kinds and the Summoners area kinds, and each hybrid holds one twin set in both halves, so both
-halves land weak on a foe weak to it (the Arms Spellblade the Lightning set, the Tome Spellblade the Light set, the Arms
-Summoner the Dark set, the Tome Summoner the Ice set); the Paladin keeps her Barriers, Aegis and Enfeeble on the
-Greatsword and the Axe and her revive on the Light Tome. The balance party (Brawler, Sorcerer, Arms Spellblade, Tome
-Summoner, Cleric) holds all ten kinds; so do the Brawler, the Sorcerer, the Tome Spellblade, the Arms Summoner and a
-Paladin, and the five Tier 0s. The Rift's fronts suggest guided weapons on top of them ([loops](loops.md#the-rift)).
+The presets are the owner's two parties, **Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Paladin** and **Brawler,
+Sorcerer, Tome Spellblade, Arms Summoner, Cleric**. The Brawler and the Sorcerer keep the ring. The Paladin and the Cleric
+hold the Lance and Light, both Spellblades the Katana and Thunder, both Summoners Dark and the Bow, and the middle slot
+flexes: the Spellblades' is the kind that reaches two hits soonest (Axe, Blizzard), the Summoners' their area kind (Blizzard,
+Axe), the Paladin's the Greatsword (her Aegis) and the Cleric's Fire (Brave), which are also the Arm and the element of their
+second Hall seats. Each party holds all ten kinds:
+
+| Party | Greatsword | Axe | Lance | Bow | Katana | Fire | Blizzard | Thunder | Light | Dark |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Arms Spellblade, Tome Summoner, Paladin | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 1 | 1 |
+| Tome Spellblade, Arms Summoner, Cleric | 1 | 2 | 2 | 1 | 1 | 2 | 2 | 2 | 1 | 1 |
+
+The second party has no Aegis: only the Cleric's and the Paladin's Blizzard and the Paladin's Greatsword give it, and the
+Cleric's preset holds Fire instead.
+
+The defaults follow each class's identity: the Brawler's and the Sorcerer's are the ring (Fire, Ice and Lightning's twins,
+one channel each); the Spellblades hold multi-hit kinds and the Summoners area kinds, and each hybrid holds one twin set in
+both halves, so both halves land weak on a foe weak to it (the Arms Spellblade the Lightning set, the Tome Spellblade the Light
+set, the Arms Summoner the Dark set, the Tome Summoner the Ice set); the Paladin keeps her Barriers, Aegis and Enfeeble on the
+Greatsword and the Axe and her revive on the Light Tome. The balance simulation wears them, with each class's accessory
+form before D263. The balance party (Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Cleric) holds all ten kinds; so do the
+Brawler, the Sorcerer, the Tome Spellblade, the Arms Summoner and a Paladin, and the five Tier 0s. The Rift's fronts suggest
+guided weapons on top of them ([loops](loops.md#the-rift)).
 
 ## Skills: depths, lines and ranks
 

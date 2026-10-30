@@ -84,6 +84,8 @@ export const heroBond = (): string => 'Hero · Strength 100%'
 export const hand = (arms: number, tome: number): string => `Hand${arms ? ` · Arms ×${+arms.toFixed(2)}` : ''}${tome ? ` · Tome ×${+tome.toFixed(2)}` : ''}`
 /** C7: the standard class preset. */
 export const standardPreset = (on = false): string => `Standard preset${on ? ' · On' : ''}`
+/** C7: one of a Tier 0's presets, by the class it leads to (D263). */
+export const classPresetName = (name: string, on = false): string => `${name}${on ? ' · On' : ''}`
 
 export type UnlockState = { kind: 'ticket' } | { kind: 'tier'; tier: number } | { kind: 'tier-one' } | { kind: 'pick'; a: string; b: string }
 /** C7/C9: the four unlock wordings. */

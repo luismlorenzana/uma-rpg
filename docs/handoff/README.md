@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-10-30, after D261.** Tier 1 is built and live: engine v20, save v33. That covers the Tier rework's R1
+> **Status: 2026-10-30, after D263.** Tier 1 is built and live: engine v20, save v33. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, and **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H139; decision numbers from D263). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H139; decision numbers from D264). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it. Open now:

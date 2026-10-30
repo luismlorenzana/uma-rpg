@@ -1,6 +1,6 @@
-import { newGrades, type AccessorySlotState } from '@rpg/domain'
+import { newGrades, newOwnedUma, newSave, worldOf, type AccessorySlotState, type OwnedUma, type RpgClass, type RpgWeapon, type TierWorld } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { accessoryCards, cardButton, cardKind, readyCount, upgradeRows } from './gear-equip'
+import { accessoryCards, cardButton, cardKind, presetRows, readyCount, upgradeRows } from './gear-equip'
 
 const slot = (grade: number, family: AccessorySlotState['family'] = null, kind?: AccessorySlotState['kind']): AccessorySlotState =>
   ({ grade, family, form: 'base', ...(kind ? { kind } : {}) })
@@ -58,5 +58,34 @@ describe('the Upgrade view (H107)', () => {
     expect(rows[0]!.upgrade).toMatchObject({ ready: true, label: 'G0 → G1 · Arms Gem G1 ×1' })
     expect(rows.at(-1)!.upgrade).toMatchObject({ ready: false })
     expect(readyCount(rows)).toBe(8)
+  })
+})
+
+describe('the standard presets (D263)', () => {
+  const world = (classId: RpgClass, weapons?: RpgWeapon[]): TierWorld => {
+    const uma: OwnedUma = { ...newOwnedUma('2026-10-30T00:00:00.000Z'), classId, gear: newGrades(1),
+      ...(weapons ? { classes: { [classId]: { weapons, lines: {}, loadout: null } } } : {}) }
+    return { ...worldOf(newSave('Presets', '2026-10-30T00:00:00.000Z')), umas: { '101': uma } }
+  }
+
+  it('shows a Tier 1 class its one preset, under the standard name', () => {
+    expect(presetRows(world('paladin'), '101', 'paladin', 'pendant')).toEqual([
+      { pick: 'paladin', title: 'Standard preset', detail: 'Lance · Greatsword · Light Tome · Pendant', on: false },
+    ])
+    expect(presetRows(world('paladin', ['lance', 'greatsword', 'tome-light']), '101', 'paladin', 'bell')[0]!.detail).toBe('Lance · Greatsword · Light Tome · Bell')
+  })
+
+  it('shows a Tier 0 one preset for each class it promotes into, named after it', () => {
+    expect(presetRows(world('duelist'), '101', 'duelist', 'pendant')).toEqual([
+      { pick: 'spellblade', title: 'Arms Spellblade', detail: 'Katana · Axe · Thunder Tome · Pendant', on: false },
+      { pick: 'tomeblade', title: 'Tome Spellblade', detail: 'Thunder Tome · Blizzard Tome · Katana · Pendant', on: false },
+    ])
+    expect(presetRows(world('recruit'), '101', 'recruit', 'bell').map((r) => r.title)).toEqual(['Brawler', 'Arms Spellblade', 'Arms Summoner'])
+  })
+
+  it('marks the one she wears', () => {
+    const on = { ...world('acolyte', ['tome-light', 'tome-fire', 'lance']) }
+    on.umas['101'] = { ...on.umas['101']!, gear: { ...newGrades(1), accessories: [{ grade: 0, family: 'orb', form: 'base', kind: 'light' }] } }
+    expect(presetRows(on, '101', 'acolyte', 'orb').map((r) => [r.title, r.on])).toEqual([['Paladin', false], ['Cleric · On', true]])
   })
 })

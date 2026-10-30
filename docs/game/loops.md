@@ -405,9 +405,9 @@ Every made item and value is in [materials](materials.md#gear); `economy/grades.
 - **The accessory slot:** its family (Pendant, Orb, Bell, Insignia), and an Orb's or a Bell's kind (one of her three
   weapons' kinds), change freely on the Gear tab's Equip view; the grade is the slot's and stays, raised on its Upgrade
   view.
-- **Standard preset (D164):** "Use the standard preset", at the top of the Gear tab, puts on her active class's preset
-  ([classes](classes.md#weapons)): the class's three default weapons and her accessory slot's family (her signature's ★
-  family when she has one, else the class's form). Grades don't move.
+- **Standard preset (D164, D263):** at the top of the Gear tab, a tap puts on her active class's preset
+  ([classes](classes.md#standard-presets)), or a Tier 0's pick among the classes it promotes into: three weapons and her
+  accessory slot's family (her signature's ★ family when she has one, else the class's form). Grades don't move.
 
 ## Springs, replays and Sweeps
 

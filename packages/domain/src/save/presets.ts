@@ -5,13 +5,15 @@
 // the other half, other accessory types or weapons outside the spread. Pure, like the rest of the save rules.
 // R2 (H75; WP25, UT8, SB10): a graded Uma's preset is her class's three weapons and her accessory slot's form (its family
 // and kind), her grades untouched and nothing bound (`classPresetV3`, `presetAccessory`).
+// D263: the owner's weapon presets, one for each Tier 1 class (`weaponPreset`). A Tier 0 picks one of its children's, so a
+// Healer can start gearing as a Paladin or as a Cleric. `classPresetV3` stays what the sims wear.
 import { ACCESSORY_SLOTS, ARMOR_SLOTS, armorKindFor, type AccessorySlot, type ArmorKind, type ArmorSlot } from '../economy/ranks'
 import { gearId, gearIdentity, gearLevel, type AmuletType, type EquipType, type GearSlot, type OrbType, type TalismanType } from '../economy/gear-id'
 import type { AccessoryFamily, AccessorySlotState, UmaGrades } from '../economy/grades'
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import {
-  isRpgTome, RPG_CLASS_ARMOR, RPG_TIER0_MODEL, rpgClasses, rpgDefaultWeapons, rpgHand, rpgIsTier0, rpgTwinKind, rpgWeaponKind, type RpgClass,
-  type RpgDamageKind, type RpgWeapon,
+  isRpgTome, RPG_CLASS_ARMOR, RPG_TIER0_MODEL, rpgClasses, rpgDefaultWeapons, rpgHand, rpgIsTier0, rpgPresetClasses, rpgPresetWeapons, rpgTwinKind,
+  rpgWeaponKind, type RpgClass, type RpgDamageKind, type RpgTier1Class, type RpgWeapon,
 } from '../rpg/rules'
 import { classOf, withClassWeapons } from './battle'
 import { ownGear } from './forge'
@@ -131,6 +133,28 @@ export function presetAccessory(classId: RpgClass, weapons: readonly RpgWeapon[]
   return family === 'orb' || family === 'bell' ? { family, kind: presetKind(classId, weapons, engine) } : { family }
 }
 
+/** A Tier 1 class's weapon preset (D263): its three weapons, its armor half and her accessory form, her ★ `family` when she
+ * has one, else the class's own, an Orb or a Bell on `presetKind`'s kind of those weapons (the Tome Summoner's Orb on Dark,
+ * the twin of her Bow; the Cleric's on Light, her first slot). */
+export function weaponPreset(classId: RpgTier1Class, family?: AccessoryFamily | null, engine: number = BATTLE_ENGINE_VERSION): ClassPresetV3 {
+  const weapons = rpgPresetWeapons(classId, engine)
+  const worn = family ?? classPresetAccessory(classId, engine).family
+  return { classId, weapons, armor: RPG_CLASS_ARMOR[classId],
+    accessory: worn === 'orb' || worn === 'bell' ? { family: worn, kind: presetKind(classId, weapons, engine) } : { family: worn } }
+}
+
+/** The preset `classId` wears: from `presets` the picked Tier 1 class's (D263; one of `rpgPresetClasses`, by default her own,
+ * or a Tier 0's model child), before them her class's row in her family. */
+function presetFor(classId: RpgClass, family: AccessoryFamily | null | undefined, engine: number, pick?: RpgTier1Class): ClassPresetV3 {
+  if (!rpgRework('presets', engine)) {
+    const preset = classPresetV3(classId, engine)
+    return { ...preset, accessory: presetAccessory(classId, preset.weapons, family, engine) }
+  }
+  const to = pick ?? (rpgIsTier0(classId) ? RPG_TIER0_MODEL[classId] : classId)
+  if (!rpgPresetClasses(classId).includes(to)) throw new SaveRuleError('bad-class', `no ${to} preset for ${classId}`)
+  return weaponPreset(to, family, engine)
+}
+
 /** What applying a preset does to her. */
 export interface PresetPlan {
   classId: RpgClass
@@ -150,11 +174,12 @@ export interface PresetPlan {
   accessory?: PresetAccessory
 }
 
-/** R2 (H75): the plan for a graded Uma: her class's three weapons (counted by position, as v1's) and her accessory slot's
+/** R2 (H75): the plan for a graded Uma: the preset's three weapons (counted by position, as v1's) and her accessory slot's
  * form; her grades untouched, nothing bound. */
-function classPresetPlanV3(uma: OwnedUma, grades: UmaGrades, classId: RpgClass, engine: number, family?: AccessoryFamily | null): PresetPlan {
-  const preset = classPresetV3(classId, engine)
-  const accessory = presetAccessory(classId, preset.weapons, family, engine)
+function classPresetPlanV3(uma: OwnedUma, grades: UmaGrades, classId: RpgClass, engine: number, family?: AccessoryFamily | null,
+  pick?: RpgTier1Class): PresetPlan {
+  const preset = presetFor(classId, family, engine, pick)
+  const { accessory } = preset
   const current = classOf(uma, classId).weapons
   const slot = grades.accessories[0]
   const kinds = Object.fromEntries(ARMOR_SLOTS.map((s) => [s, armorKindFor(s, preset.armor)])) as Record<ArmorSlot, ArmorKind>
@@ -182,13 +207,14 @@ function bestReachable(uma: OwnedUma, stock: Readonly<Record<string, number>>, t
 }
 
 /** What her class's standard preset would do to her (pure), in an engine's generation. Throws `not-owned` or `bad-class`.
- * A graded Uma (R2, H75) takes R2's preset, its accessory in her signature `family` (her template's, from the caller). */
+ * A graded Uma (R2, H75) takes R2's preset, its accessory in her signature `family` (her template's, from the caller); `pick`
+ * is the Tier 1 class whose preset a Tier 0 wears (D263). */
 export function classPresetPlan(world: TierWorld, outfitId: string, classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION,
-  family?: AccessoryFamily | null): PresetPlan {
+  family?: AccessoryFamily | null, pick?: RpgTier1Class): PresetPlan {
   const uma = world.umas[outfitId]
   if (!uma) throw new SaveRuleError('not-owned', 'not unlocked')
   if (!rpgClasses(engine).includes(classId)) throw new SaveRuleError('bad-class', `no class ${classId}`)
-  if (isGrades(uma.gear)) return classPresetPlanV3(uma, uma.gear, classId, engine, family)
+  if (isGrades(uma.gear)) return classPresetPlanV3(uma, uma.gear, classId, engine, family, pick)
   const preset = classPreset(classId, engine)
   const currentGear = gearV1(uma)
   const worn = (slot: GearSlot): string | null => currentGear.equipped[slot] ?? null
@@ -230,8 +256,8 @@ export function classPresetPlan(world: TierWorld, outfitId: string, classId: Rpg
  * locker, what she wears and all five armor kinds. The same world when nothing would change. A graded Uma (R2, H75): the
  * class's weapons and her accessory slot's form in her signature `family`; every grade stays where it was. */
 export function applyClassPreset(world: TierWorld, outfitId: string, classId: RpgClass, engine: number = BATTLE_ENGINE_VERSION,
-  family?: AccessoryFamily | null): TierWorld {
-  const plan = classPresetPlan(world, outfitId, classId, engine, family)
+  family?: AccessoryFamily | null, pick?: RpgTier1Class): TierWorld {
+  const plan = classPresetPlan(world, outfitId, classId, engine, family, pick)
   if (plan.changes === 0) return world
   const uma = world.umas[outfitId]!
   if (isGrades(uma.gear) && plan.accessory) return applyPresetV3(world, outfitId, uma, uma.gear, plan.weapons, plan.accessory, classId)
@@ -267,11 +293,11 @@ function applyPresetV3(world: TierWorld, outfitId: string, uma: OwnedUma, grades
 }
 
 /** Puts on her class's standard preset; the same save when nothing would change. A graded Uma's in her signature `family`
- * (R2, H75: the web passes her template's). */
+ * (R2, H75: the web passes her template's), a Tier 0's the Tier 1 class she `pick`s (D263). */
 export function wearClassPreset(save: Save, outfitId: string, classId: RpgClass, now: string, tier = TIER_ONE,
-  engine: number = BATTLE_ENGINE_VERSION, family?: AccessoryFamily | null): Save {
+  engine: number = BATTLE_ENGINE_VERSION, family?: AccessoryFamily | null, pick?: RpgTier1Class): Save {
   const world = worldOf(save, tier)
-  const next = applyClassPreset(world, outfitId, classId, engine, family)
+  const next = applyClassPreset(world, outfitId, classId, engine, family, pick)
   if (next === world) return save
   return { ...save, account: { ...save.account, updatedAt: now }, tierWorlds: { ...save.tierWorlds, [tier]: next } }
 }

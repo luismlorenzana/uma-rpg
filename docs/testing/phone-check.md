@@ -80,7 +80,9 @@ button and footer should stay reachable without horizontal page scrolling, in li
 12. **Battle tab.** Expect four groups in three columns: Offense (ATK, M.ATK, Might for each weapon, Accessory, and an
     always-listed ★ Signature), Defense, Sustain (HP, MP with `+n/round`, and the full ★ Flourish with **On** or **Off**)
     and Other (`Limit start n/12`); gear's part in blue and Extra Stats' in green. (D204, D217, D258)
-13. **Gear → Equip.** Tap **Standard preset**: expect **Standard preset · On**. Tap each accessory family: one detail at
+13. **Gear → Equip.** On a promoted Uma, tap **Standard preset**: expect **Standard preset · On** and her preset's weapons. On a
+    Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it to read **· On** and Loadout to show its three
+    weapons; a Warrior or a Mage shows three rows. Tap each accessory family: one detail at
     a time, her ★ family first with its signature line. On a Bell or an Orb, the kind buttons are her three weapons';
     **Set** one, then pick another kind and tap **Replace**. Check the weapon chips' colours in both themes: the
     Katana jade, the Bow rose. (D223)

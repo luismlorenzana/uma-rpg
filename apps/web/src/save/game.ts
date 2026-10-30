@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  BATTLE_ENGINE_VERSION, markClassesV3Seen, markGrantSeen, newSave, ownerTier, parseSaveAsync, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass,
+  BATTLE_ENGINE_VERSION, markClassesV3Seen, markGrantSeen, newSave, ownerTier, parseSaveAsync, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass, type RpgTier1Class,
   type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
@@ -332,11 +332,11 @@ export const wearArmorPiece = (outfitId: string, slot: ArmorSlot, kind: ArmorKin
 /** Puts an accessory in one of her two accessory slots, or empties it (null) (D124). */
 export const wearAccessoryPiece = (outfitId: string, slot: AccessorySlot, gearId: string | null) =>
   edit(import('@rpg/domain/forge'), (d, s, now, t) => d.wearAccessory(s, outfitId, slot, gearId, now, t))
-/** Puts on a class's standard preset (H33, D164): weapons, armor and accessories, binding what it takes from the stock. */
-export async function wearPreset(outfitId: string, classId: RpgClass, family?: AccessoryFamily | null): Promise<void> {
+/** Puts on a class's standard preset (H33, D164), a Tier 0 the one she `pick`s (D263): her weapons and accessory form. */
+export async function wearPreset(outfitId: string, classId: RpgClass, family?: AccessoryFamily | null, pick?: RpgTier1Class): Promise<void> {
   const { save } = useGame.getState()
   if (!save) return
-  const next = wearClassPreset(save, outfitId, classId, nowIso(), activeKey(), undefined, family)
+  const next = wearClassPreset(save, outfitId, classId, nowIso(), activeKey(), undefined, family, pick)
   if (next !== save) await commit(next)
 }
 /** Raises one R2 gear slot, or several grades after the sheet's confirmation. */

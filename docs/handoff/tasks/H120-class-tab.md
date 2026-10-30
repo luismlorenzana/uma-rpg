@@ -204,7 +204,8 @@ promotion and no dot; a Tier 1 class she doesn't hold is **Open** (`R1 · free`,
 6. **Back to the open Classes sheet:** before pushing the Exchange, the door replaces the profile's entry with its state
    plus `sheet: 'classes'`; the profile opens the Classes sheet when it reads `sheet: 'classes'` and replaces it away.
    `profile-tabs.ts`'s nav state becomes `{ back: true, list?, sheet? }` (H119 decision 4's one shape, extended).
-7. **The standard preset** is the Classes sheet's footer on her active class (`wearPreset`, H117's wording); the
+7. **The standard preset** is the Classes sheet's footer on her active class (`wearPreset`, H117's wording; since D263
+   `PresetButton` lists one row a child on a Tier 0, so move it whole, its rows and `presetRows`); the
    interim row H121 put at the top of the Class tab goes. **If this packet lands before H121**, there is no interim row
    to remove, and H121's decision 1 is moot: say so in H121's thread (the main session updates the packet).
 8. **Dots:** `classDot` joins H119's `tabDots` (`dotLabel` "Class, ready"); `firstDotTab` becomes Class, Gear, Stars,

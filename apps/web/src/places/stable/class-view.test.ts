@@ -171,6 +171,8 @@ describe('the promotion sheet from v19', () => {
     expect(tiles('caller')).toEqual([['2 Arms + 1 Tome', null], ['2 Tomes + 1 Arm', null]])
     expect(tiles('acolyte')).toEqual([['2 Arms + 1 Tome', 'Healer · ATK'], ['2 Tomes + 1 Arm', 'Healer · M.ATK']])
     expect(promotionSheet(C, at10('recruit'), 1, 'recruit').tiles[2]!.weapons).toEqual(['bow', 'axe', 'tome-dark'])
+    // D263: each tile shows the preset she lands on.
+    expect(promotionSheet(C, at10('recruit'), 1, 'recruit').tiles[1]!.weapons).toEqual(['katana', 'axe', 'tome-lightning'])
   })
 
   it('says before → after: no waiting EXP, then 17,400 landing at R42 with every depth', () => {

@@ -1,12 +1,26 @@
 // The Gear tab's two views as data (H107, D219): Equip, what she wears, with one card of one shape for each accessory
 // family; and Upgrade, every slot's grade row and the made item that raises it. Pure, so both views test without React.
 import {
-  ACCESSORY_FAMILY_LABEL, ARMOR_SLOTS, isRpgElement, rpgTomeOf, signatureBonus, WEAPON_LABEL,
-  type AccessoryFamily, type AccessorySlotState, type GearTier, type GradeTarget, type RpgClass, type RpgDamageKind, type RpgWeapon,
-  type UmaGrades,
+  ACCESSORY_FAMILY_LABEL, ARMOR_SLOTS, classPresetPlan, isRpgElement, rpgClassName, rpgPresetClasses, rpgTomeOf, signatureBonus, WEAPON_LABEL,
+  type AccessoryFamily, type AccessorySlotState, type GearTier, type GradeTarget, type RpgClass, type RpgDamageKind, type RpgTier1Class,
+  type RpgWeapon, type TierWorld, type UmaGrades,
 } from '@rpg/domain'
 import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine, type GradeUpgradeView } from './gear-v3'
-import { accessoryEffect, actions, signature as signatureCopy, staleKind } from './copy'
+import { accessoryEffect, actions, classPresetName, signature as signatureCopy, standardPreset, staleKind } from './copy'
+
+/** One standard preset (D263): the class it's for, its name, its weapons and accessory, and whether she wears it. */
+export interface PresetRow { pick: RpgTier1Class; title: string; detail: string; on: boolean }
+/** The presets her class offers: a Tier 1 class its one, named "Standard preset", and a Tier 0 one for each class it promotes
+ * into, named after that class. */
+export function presetRows(world: TierWorld, outfitId: string, classId: RpgClass, family: AccessoryFamily): PresetRow[] {
+  const picks = rpgPresetClasses(classId)
+  return picks.map((pick) => {
+    const plan = classPresetPlan(world, outfitId, classId, undefined, family, pick)
+    const on = plan.changes === 0
+    return { pick, on, title: picks.length > 1 ? classPresetName(rpgClassName(pick), on) : standardPreset(on),
+      detail: [...plan.weapons.map((w) => WEAPON_LABEL[w]), ACCESSORY_FAMILY_LABEL[plan.accessory?.family ?? family]].join(' · ') }
+  })
+}
 
 /** A kind a Bell or an Orb can sit on, labelled by her weapon ("Thunder Tome"). */
 export interface KindChoice { kind: RpgDamageKind; label: string }

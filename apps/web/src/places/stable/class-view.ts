@@ -10,7 +10,7 @@
 import {
   activeClass, BATTLE_ENGINE_VERSION, classTrack, healerBlock, partyOf, promotionPlan, RPG_CLASS_CHILDREN, RPG_CLASS_PARENTS, RPG_CLASS_ROOTS,
   RPG_ROOT_NAME, RPG_TIER0_CLASSES, RPG_TIER0_MAX_RANK, RPG_TIER0_ROOT, RPG_TIER0_SKILL, RPG_TIER1_CLASSES, rpgClassExpToNext, rpgClassName,
-  rpgClassSlots, rpgDefaultWeapons, rpgHand, rpgHoldsTier1, rpgIsHealer, rpgIsTier0, rpgReadyParent, rpgRework,
+  rpgClassSlots, rpgHand, rpgHoldsTier1, rpgIsHealer, rpgIsTier0, rpgPresetWeapons, rpgReadyParent, rpgRework,
   rpgSuggestedPromotion, umaClassTree, umaPromotionWaits, type BattleOutfit, type OwnedUma, type RpgClass, type RpgClassTile, type RpgClassTileState,
   type RpgSlotKind, type RpgTier0Class, type RpgTier1Class, type RpgWeapon, type TierWorld,
 } from '@rpg/domain'
@@ -98,7 +98,7 @@ export function classGrid(tiles: readonly ClassTileView[], engine: number = BATT
 }
 
 /** The selection's line under the tree: its name and state, its slots and role (a Tier 0: any three weapons and her skill,
- * then what it promotes to), its default weapons (none for a Tier 0), its hand, and the healer note. */
+ * then what it promotes to), its preset's weapons (none for a Tier 0), its hand, and the healer note. */
 export interface ClassLine { title: string; facts: string[]; weapons: RpgWeapon[]; hand: string; healer: string | null }
 /** What the footer does: switch to a held class, start an open one at Rank 1, or promote (the promotion sheet). */
 export type ClassAct = 'switch' | 'start' | 'promote'
@@ -124,7 +124,7 @@ export function classLine(tile: ClassTileView, engine: number = BATTLE_ENGINE_VE
       `Promotes to ${RPG_CLASS_CHILDREN[tile.classId].map((c) => rpgClassName(c, engine)).join(', ')}`], weapons: [], hand: handWord(tile.classId, engine) }
   }
   const role = rpgRework('classes', engine) ? ROLE[tile.classId as RpgTier1Class] : null
-  return { title, facts: [role ? `${slots} · ${role}` : slots], weapons: rpgDefaultWeapons(tile.classId, engine), hand: handWord(tile.classId, engine) }
+  return { title, facts: [role ? `${slots} · ${role}` : slots], weapons: rpgPresetWeapons(tile.classId as RpgTier1Class, engine), hand: handWord(tile.classId, engine) }
 }
 /** The footer for a tile, by its state: On "Fights as …" (disabled; H120 puts the standard preset here), a held class
  * "Fight as …", a Ready one "Promote to …", an open one "Start … · R1", a closed one its gate, disabled. */
@@ -190,7 +190,7 @@ export interface PromotionView {
 }
 /**
  * Her promotion from `from` (a Tier 0 at Rank 10): one tile a child, Suggested on `rpgSuggestedPromotion`'s, Held on one she
- * holds, each with its slots, three defaults and role where they differ; the selection `selected`, else the Suggested
+ * holds, each with its slots, the preset she lands on and role where they differ; the selection `selected`, else the Suggested
  * child she doesn't hold, else the first she doesn't hold; before → after from `promotionPlan` (the rank after the waiting
  * EXP lands, its depths and skills, the EXP and any Class Marks past Rank 50); the footer "Promote to …" (free, no
  * confirm; `block` from the plan), or on a held child "Fight as …".
@@ -205,7 +205,7 @@ export function promotionSheet(outfit: BattleOutfit, uma: Uma, tier: number | st
   const tiles = children.map((c, i): PromotionTileView => {
     const held = rpgHoldsTier1(uma.ranks, c)
     return { classId: c, name: rpgClassName(c, engine), badge: held ? 'Held' : c === suggested ? 'Suggested' : null, held,
-      slots: differs(slots) ? slots[i]! : null, weapons: rpgDefaultWeapons(c, engine), role: differs(roles) ? roles[i]! : null }
+      slots: differs(slots) ? slots[i]! : null, weapons: rpgPresetWeapons(c, engine), role: differs(roles) ? roles[i]! : null }
   })
   const pick = tiles.find((t) => t.classId === selected) ?? tiles.find((t) => t.classId === suggested && !t.held) ?? tiles.find((t) => !t.held) ?? tiles[0]!
   const fromName = rpgClassName(from, engine)

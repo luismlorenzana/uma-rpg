@@ -16,7 +16,7 @@ import { rpgNode } from '../rpg/catalog'
 import { isRpgTome, rpgWeaponKind } from '../rpg/kinds'
 import {
   grantRpgExp, RPG_CLASS_CHILDREN, RPG_CLASS_SLOTS, RPG_CLASSES, RPG_TIER0_MAX_RANK, rpgActiveSlots, rpgAutoLoadout, rpgClassGate, rpgClassName, rpgClassOpen,
-  rpgClassWeapons, rpgIsTier0, rpgLineOf, rpgOpenDepth, rpgPicksWeapons, rpgSwapBranchLoadout, rpgUsableLoadout, TIER0_TIER1_ONLY,
+  rpgClassWeapons, rpgIsTier0, rpgLineOf, rpgOpenDepth, rpgPicksWeapons, rpgPresetWeapons, rpgSwapBranchLoadout, rpgUsableLoadout, TIER0_TIER1_ONLY,
   validRpgWeapons, type RpgBranch, type RpgClass, type RpgLines, type RpgNodeRef, type RpgProfile, type RpgTier0Class, type RpgTier1Class, type RpgV2Class,
   type RpgWeapon,
 } from '../rpg/rules'
@@ -146,8 +146,8 @@ export function promotionPlan(uma: Pick<OwnedUma, 'ranks'>, from: RpgTier0Class,
 /**
  * Promotes her from a Tier 0 at Class Rank 10 into one of its children (CV8): free. The child opens at Class Rank 10 and
  * her Tier 0's waiting EXP flows into it at once (past Rank 50 it banks as Class Marks); her Tier 0 stays at Rank 10 with
- * nothing waiting; she fights as the child, on its defaults (weapons, lines, equipped skills). A sibling later opens the
- * same way, with whatever waits then. Never closes a class or moves her calling, trade or template. Refused outside Tier
+ * nothing waiting; she fights as the child, on its weapon preset (D263), every line on A and her skills chosen for her. A
+ * sibling later opens the same way, with whatever waits then. Never closes a class or moves her calling, trade or template. Refused outside Tier
  * 1's world ("Tier 0 is Tier 1's"), for a class that isn't `from`'s child, a Tier 0 below 10 ("Needs Warrior R10") and a
  * class she holds ("Already hers").
  */
@@ -158,8 +158,7 @@ export function promoteUma(save: Save, outfitId: string, from: RpgClass, to: Rpg
   if (block) throw new SaveRuleError('bad-class', block)
   const plan = promotionPlan(uma, from as RpgTier0Class, to as RpgTier1Class, tier)
   const ranks = withTrack(withTrack(uma.ranks, { kind: 'class', id: to }, plan.after), { kind: 'class', id: from }, { rank: RPG_TIER0_MAX_RANK, exp: 0 })
-  const classes = { ...uma.classes }
-  delete classes[to]
+  const classes = { ...uma.classes, [to]: { weapons: rpgPresetWeapons(to as RpgTier1Class), lines: {}, loadout: null } }
   const next: OwnedUma = { ...uma, classId: to, ranks, classes }
   return withWorld(save, tier, { ...world, umas: { ...world.umas, [outfitId]: next },
     wallet: { ...world.wallet, classMarks: world.wallet.classMarks + plan.marks } }, now)

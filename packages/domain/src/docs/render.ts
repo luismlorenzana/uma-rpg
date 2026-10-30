@@ -56,7 +56,7 @@ import { riftStrength } from '../rift/generate'
 import { RIFT_RUN_FIGHTS, riftShapeOf } from '../rift/picker'
 import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, RIFT_OPEN_AT, RIFT_ROSTER, RIFT_STAGES, RIFT_TIERS } from '../rift/state'
 import { ASCEND_PURSE, BANKED_EXP_PER_MARK, BANKED_MARKS_CAP, ECHO_RANK_PAY, echoFoeLevel } from '../save/rift'
-import { classPresetV3 } from '../save/presets'
+import { weaponPreset } from '../save/presets'
 import { TIERS } from '../save/rules'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import {
@@ -208,14 +208,15 @@ function templates(): string {
       [`${STRIDE_LABEL[s]} (${s === 'dash' ? 'Sprint or Mile' : s === 'middle' ? 'Medium' : 'Long'})`, FLOURISH_NAMES[STRIDE_FLOURISH[s]], flourish(STRIDE_FLOURISH[s])]))
 }
 
-/** Each class's standard preset (H33, D164; R2's, WP25, live since H82): her three weapons, her armor half and her one
- * accessory slot's form. */
+/** The weapon presets (D263): each Tier 1 class's three weapons, the Tier 0s that offer it, its armor half and its accessory
+ * form; then what each class holds until she picks. */
 function presets(): string {
-  return table(['Class', 'Weapons', 'Armor', 'Accessory'], RPG_CLASSES.map((c) => {
-    const p = classPresetV3(c)
+  return table(['Class', 'Offered by', 'Weapons', 'Armor', 'Accessory'], RPG_CLASSES.filter((c): c is RpgTier1Class => !isTier0(c)).map((c) => {
+    const p = weaponPreset(c)
     const a = p.accessory
-    return [CLASS_NAME[c], p.weapons.map(weaponName).join(', '), cap(p.armor), `${ACCESSORY_FAMILY_LABEL[a.family]}${a.kind ? ` (${kindName(a.kind)})` : ''}`]
-  }))
+    return [CLASS_NAME[c], RPG_CLASS_PARENTS[c].map((t) => CLASS_NAME[t]).join(', '), p.weapons.map(weaponName).join(', '), cap(p.armor),
+      `${ACCESSORY_FAMILY_LABEL[a.family]}${a.kind ? ` (${kindName(a.kind)})` : ''}`]
+  })) + '\n\n' + table(['Class', 'Holds until she picks'], RPG_CLASSES.map((c) => [CLASS_NAME[c], rpgDefaultWeapons(c).map(weaponName).join(', ')]))
 }
 /** A damage kind's name: a weapon's, or a Tome's element. */
 const kindName = (k: string): string => WEAPON_LABEL[(isRpgWeaponKind(k) ? k : `tome-${k}`) as RpgWeapon]
