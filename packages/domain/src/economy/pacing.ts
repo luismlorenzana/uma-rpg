@@ -71,9 +71,13 @@ export const REFINE_BATCHES = [1, 4, 8, 20, 40] as const
 export const JOB_SIZES = [1, 2, 3, 5, 10, 15, 20, 30] as const
 /** A job's longest size, in steps: about 8 hours. */
 export const JOB_STEPS_MOST = 30
-/** The sizes offered for an item of `steps` steps (1 to gather or process; a made item's refined items): those up to
- * about 8 hours, so an Arms Gem (10) offers 1, 2 and 3, Armor Fittings (3) up to 10, a Setting or a jewel (5) up to 5. */
-export const jobSizes = (steps: number): number[] => JOB_SIZES.filter((n) => n <= Math.max(1, Math.round(JOB_STEPS_MOST / steps)))
+/** The sizes offered for an item of `steps` steps (1 to gather or process; a made item's refined items): the brackets below
+ * its longest, then the longest, about 8 hours at every forge (D273), so an Arms Gem (10) offers 1, 2 and 3, Armor Fittings (3)
+ * up to 10, a Setting or a jewel (5) up to 6. */
+export function jobSizes(steps: number): number[] {
+  const most = Math.max(1, Math.round(JOB_STEPS_MOST / steps))
+  return [...JOB_SIZES.filter((n) => n < most), most]
+}
 /** The most items one new job of a kind makes (a gather 30 since D264; a process keeps v1's 40 for queued jobs). */
 export const maxJobCount = (kind: 'gather' | 'refine' | 'craft' | 'cut'): number =>
   kind === 'refine' ? REFINE_BATCHES.at(-1)! : kind === 'gather' ? JOB_SIZES.at(-1)! : MAX_JOB_COUNT

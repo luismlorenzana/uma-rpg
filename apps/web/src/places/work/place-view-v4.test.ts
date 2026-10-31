@@ -42,11 +42,12 @@ describe('the farm by line\'s What step (FL22)', () => {
     expect(jobSizesV4('tin-ore')).toEqual([1, 2, 3, 5, 10, 15, 20, 30])
     expect(jobSizesV4('copper-ingot')).toEqual([1, 2, 3, 5, 10, 15, 20, 30])
     expect(jobSizesV4('armor-fittings-g1')).toEqual([1, 2, 3, 5, 10])
-    expect(jobSizesV4('jewel-moon-1')).toEqual([1, 2, 3, 5])
+    expect(jobSizesV4('jewel-moon-1')).toEqual([1, 2, 3, 5, 6])
+    expect(jobSizesV4('jewel-planet-1')).toEqual([1, 2, 3, 5, 6])
     expect(jobSizesV4('weapon-gem-g4')).toEqual([1, 2, 3])
     expect(jobSizesV4('tome-ink-g1')).toEqual([1, 2, 3])
-    expect(jobSizesV4('accessory-setting-g1')).toEqual([1, 2, 3, 5])
-    expect(jobSizesV4('jewel-planet-1')).toEqual([1, 2, 3, 5])
+    expect(jobSizesV4('accessory-setting-g1')).toEqual([1, 2, 3, 5, 6])
+    expect(jobSizesV4('jewel-planet-1')).toEqual([1, 2, 3, 5, 6])
   })
 
   it('opens on the highest grade she can take', () => {

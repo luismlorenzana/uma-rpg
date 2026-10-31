@@ -316,8 +316,8 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
     supplies its kinds (gather, process, make), its fifteen places and its Craft Level.
   - **Sizes (D233, D264):** every step takes the same time, so sizes are brackets of steps: ×1, ×2, ×3, ×5, ×10, ×15, ×20
     or ×30 to gather or process, about a quarter of an hour, ½, ¾, 1¼, 2¾, 4, 5½ and 8 hours at mid Craft Level. A make offers
-    the sizes up to about 30 steps: Armor Fittings (3 steps) to ×10, an Accessory Setting or a jewel (5) to ×5, an Arms Gem
-    or Tome Ink (10) to ×3. Each size shows its time.
+    the sizes up to 30 steps, so every forge's longest job is the same (D273): Armor Fittings (3 steps) to ×10, an Accessory
+    Setting or a jewel (5) to ×6, an Arms Gem or Tome Ink (10) to ×3. Each size shows its time.
   - Inputs leave the Warehouse when the job starts. Outputs go to the Warehouse when collected.
 - **Queues:** up to three more jobs wait behind the current one, for the same Uma at the same place. Each starts the
   moment the one before ends and takes its inputs then, so a chain catches up however late it's collected. If the
@@ -355,7 +355,7 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
 | Make one item | one step for each refined item in it: an Arms Gem or Tome Ink 10, Armor Fittings 3, an Accessory Setting 5, a Planet Jewel 5, a Moon Jewel 5 (an Arms Gem 4 h at Lv1, 2.7 h at Lv50) |
 | Opens | grade g at Craft Lv 5g − 4, to gather, to process and to make |
 | Craft EXP | 2 per minute of the job at her level, before the place's speed |
-| Sizes | ×1, ×2, ×3, ×5, ×10, ×15, ×20, ×30 to gather or process; a make up to about 30 steps (8 h at Craft Lv25): Armor Fittings ×10, a Moon Jewel ×5, an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×5 |
+| Sizes | ×1, ×2, ×3, ×5, ×10, ×15, ×20, ×30 to gather or process; a make up to about 30 steps (8 h at Craft Lv25): Armor Fittings ×10, a Moon Jewel ×6, an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×6 |
 | Jobs queued after it | 3 |
 | Places | 4 Uma slots each, speed ×1.25, from day one; no upgrades |
 | Extra Stats and armor points | +1 to its stat per point (+5 HP); Speed 0.6% evasion; Limit +0.4 starting charge |

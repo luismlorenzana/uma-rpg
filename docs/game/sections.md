@@ -653,8 +653,8 @@ kit's `uma-kit/work`.
     Craft Level ("C30"). Anyone else is greyed "Another trade", unless the place is an open shop. Locked and busy Umas
     say why. Fighting doesn't block work (D119).
   - **How many** follows the picked job (D233), each size with its time: ×1, ×2, ×3, ×5, ×10, ×15, ×20 or ×30 to gather or
-    process (about half an hour to 8 hours); a make's sizes stop near 8 hours (Armor Fittings to ×10, a Moon Jewel ×5,
-    an Arms Gem or Tome Ink ×3, an Accessory Setting or a Planet Jewel ×2). A targets link keeps its own count. A chosen
+    process (about half an hour to 8 hours); a make's sizes all reach the same longest job, 8 hours at Craft Lv 25 (Armor Fittings to
+    ×10, an Accessory Setting or a jewel ×6, an Arms Gem or Tome Ink ×3). A targets link keeps its own count. A chosen
     size stays while What changes.
   - **What:** a gathering place's ten raw items, or a workbench's ten refined ones, G1–G10 in two rows of five (a locked
     one "From Craft Lv 31"), with the picked item's card ("Gold Ore", "Have 40", "Metal · G6 · raw · Refines into Gold

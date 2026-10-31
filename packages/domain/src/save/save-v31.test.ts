@@ -38,7 +38,7 @@ describe('save v31 work', () => {
 
   it('takes the Wilds\' job sizes: a gather or a process up to ×30, about 8 hours (D233, D264)', () => {
     expect(JOB_SIZES).toEqual([1, 2, 3, 5, 10, 15, 20, 30])
-    expect([1, 3, 5, 10].map(jobSizes)).toEqual([JOB_SIZES, [1, 2, 3, 5, 10], [1, 2, 3, 5], [1, 2, 3]])
+    expect([1, 3, 5, 10].map(jobSizes)).toEqual([JOB_SIZES, [1, 2, 3, 5, 10], [1, 2, 3, 5, 6], [1, 2, 3]])
     // Thirty steps at Craft Lv 25 and the place's speed: about 8 hours.
     expect((30 * stepMinutes(25) * MINUTE) / PLACE_SPEED_V3 / HOUR).toBeCloseTo(8, 1)
     const gather = (count: number) => json(startJob(base(), 'mine', 0, { outfitId: '101' }, 'copper-ore', count, NOW))

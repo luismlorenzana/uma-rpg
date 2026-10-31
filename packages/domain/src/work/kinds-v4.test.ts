@@ -3,7 +3,7 @@
 // refined item. Read from `rpgWorkEnvV4`, the live env since H112.
 import { isRefusal, kindRules, type PlannedItem, type Refusal, type WorkEnv } from '@luismlorenzana/uma-work'
 import { describe, expect, it } from 'vitest'
-import { jobExp, makeMinutesV4, stepMinutes } from '../economy/pacing'
+import { jobExp, jobSizes, makeMinutesV4, stepMinutes } from '../economy/pacing'
 import { jobKindV4, PLACES_V4, placeSpecV4, PROFESSION_NAMES_V4 } from '../economy/places-v4'
 import { PLACE_IDS_V3, PROFESSIONS, tradeOfCalling, type TradeOf } from '../economy/professions'
 import { madeRecipeV4, madeNameV4, madeRefinedV4 } from '../items/made-v4'
@@ -37,6 +37,21 @@ const first = (result: readonly PlannedItem[] | Refusal): PlannedItem => {
 }
 const seconds = (minutes: number) => Math.round((minutes * 60) / SPEED)
 const NOT_HERE = "That isn't made here."
+/** Every forge's item, and the place and kind that make it. */
+const FORGES = [['weapon-forge', 'craft', gradeItem('weapon-gem', 1)], ['tome-forge', 'craft', gradeItem('tome-ink', 1)], ['armorer', 'craft', gradeItem('armor-fittings', 1)],
+  ['charm-forge', 'craft', gradeItem('accessory-setting', 1)], ['lapidary', 'cut', jewelId('planet', 1)], ['lapidary', 'cut', jewelId('moon', 1)]] as const
+
+describe('every forge\'s longest batch (D273)', () => {
+  it('reaches the same 8 hours at Craft Lv 25, through the real planner', () => {
+    for (const [place, kind, item] of FORGES) {
+      const most = jobSizes(madeRefinedV4(item)).at(-1)!
+      const planned = plan(worldOf({ 101: 25 }), place, kind, item, { count: most })
+      if (isRefusal(planned)) throw new Error(refusalText(planned, 0))
+      expect(planned.reduce((n, job) => n + job.seconds, 0), item).toBe(planned.length * seconds(makeMinutesV4(25, madeRefinedV4(item))))
+      expect(most * madeRefinedV4(item), item).toBe(30)
+    }
+  })
+})
 
 describe('the farm by line\'s places and env (FL1–FL3)', () => {
   it('has fifteen places, slots and speed, each one line and one kind', () => {
