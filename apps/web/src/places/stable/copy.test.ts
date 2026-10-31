@@ -9,7 +9,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
-import { mapNodeValue } from '../observatory/ObservatoryPage'
+import { mapNodeValue } from '../observatory/StarsPanel'
 import * as copy from './copy'
 import { accessoryCards, cardButton, upgradeRows } from './gear-equip'
 import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine } from './gear-v3'
@@ -78,9 +78,18 @@ describe('the profile wording list (H117)', () => {
     expect(copy.reading('Mage', 'Pace A · Wit 102 ≥ Power 90')).toBe('Mage · from Pace A · Wit 102 ≥ Power 90')
     expect(copy.reading('Spell Blade', 'Picked')).toBe('Spell Blade · Picked')
     expect(copy.trade('Forest', 'Armorer')).toBe('Forest · Armorer')
+    expect(copy.profileFacts).toEqual({ party: 'Party', work: 'Work', details: 'Details' })
     expect(copy.party(null)).toBe('No party')
+    expect(copy.party('fighting')).toBe('Fighting')
     expect(copy.party(3)).toBe('Party 3')
+    expect(copy.work(null)).toBe('Idle')
     expect(copy.work('Mine', 'done')).toBe('Mine · Done')
+    expect(copy.statParts(42, 8, 3, 1)).toBe('base 42 · gear 8 · Stars 3 · ★ 1')
+    expect(copy.statParts(42, 0, 0, 0)).toBe('base 42')
+    expect(copy.coreSource(102, 20)).toBe('102 · +20%')
+    expect(copy.coreSource(90, 0)).toBe('90')
+    expect(copy.gradeGate(1, { grade: 2, craft: 6 })).toBe('G1 open · G2 at Craft 6')
+    expect(copy.statFormulaLines).toHaveLength(7)
     expect(copy.equipped(7, 7)).toBe('Equipped 7/7')
     expect(copy.line('B', 'Impale')).toBe('Line B · Impale')
     expect(copy.skillRank(3, 14)).toBe('Rank 3 · next R14')
@@ -154,12 +163,17 @@ describe('the profile wording list (H117)', () => {
   })
 
   it('keeps literal JSX terse outside help sheets', () => {
-    const files = ['OutfitProfile', 'TemplateCard', 'SkillTree', 'SkillsPage', 'WeaponSheet', 'GearCardV3', 'PresetButton', 'ClassPicker']
+    const files = [
+      'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'TemplateTab.tsx',
+      'SkillTree.tsx', 'SkillsPage.tsx', 'WeaponSheet.tsx', 'GearCardV3.tsx', 'PresetButton.tsx', 'ClassPicker.tsx',
+      '../observatory/StarsPanel.tsx',
+    ]
     const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.'])
     const root = path.dirname(new URL(import.meta.url).pathname)
     const failures: string[] = []
-    for (const name of files) {
-      const file = path.join(root, `${name}.tsx`)
+    for (const relative of files) {
+      const name = path.basename(relative, '.tsx')
+      const file = path.join(root, relative)
       const source = ts.createSourceFile(file, fs.readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
       const walk = (node: ts.Node, inHelp = false) => {
         const tag = ts.isJsxElement(node) ? node.openingElement.tagName : ts.isJsxSelfClosingElement(node) ? node.tagName : null

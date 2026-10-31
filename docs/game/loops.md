@@ -442,7 +442,7 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   tap, and switches a member into the guided class she holds when she fights as another. A guided class the chosen party
   leaves empty says so, "Needs an Arms Summoner" ("Needs 2 Brawlers"), with up to three roster Umas outside the party who
   could fill it: those who can promote into it now first ("Ready to promote"), then those who hold it ("Holds it"); a
-  row opens her Skills tab. A front, Echo or Convergence fight takes one healer at most, as the world map does.
+  row opens her Class tab. A front, Echo or Convergence fight takes one healer at most, as the world map does.
 - **Fronts and seals:** Iron, Arcane, Duel and Horde, twelve stages each. The fronts go in any order, a front's stages
   in order: only its next stage can be fought, and a cleared stage isn't replayed. A front fight takes one of the
   world's twenty parties, full, all five on the roster. Its 12th stage seals the front.

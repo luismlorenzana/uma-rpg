@@ -54,32 +54,32 @@ button and footer should stay reachable without horizontal page scrolling, in li
    faces → cards → list, save the view, reload: expect it kept.
 7. **Unlock** (Tier 1). Open a locked outfit, tap **Unlock · 1 Ticket → Unlock for 1 Ticket**. Expect one Ticket spent,
    her profile at Lv 1 as her calling's Tier 0, and the **Owned** count up by one.
-8. **Profile.** Expect `Lv n`, `current/next` EXP, `Rn`, `Craft n`, and compact Party/Work facts. Tap the 44 pt template
-   chip: **Her template** uses one row each for Calling, Stride and Knack, her trade, the full ★ Flourish with **On** or
-   **Off**, an always-listed ★ Signature with **Worn** or **Not worn**, and separate ★ Moon I/II rows. An All-Rounder
-   calling's II reads `DEF +4 · M.DEF +4`. No calling card appears. Mark her as a target and unmark her. Tap the class
-   cell (Skills opens) and the Party or Working cell (its place opens). A locked profile has **Unlock · 1 Ticket** and
-   no ticket-balance sentence. (D206, D229, D240, D258)
-9. **Skills tab: Classes.** On a Tier 0, the class button reads "R7/10" and her trees are one node each ("Drill Strike
+8. **Profile frame.** Expect the compact bust, name, title and stars, `Lv n` with `current/next` EXP, then the Party,
+   Work and Details doors and the four tabs **Class · Gear · Stars · Template**. The tab bar starts within 150 px of
+   the profile main. Tap Party and Work, then Back: expect the same profile tab. Mark her as a target and unmark her.
+   Open **Details**: every battle row, 0 included, appears in two columns with Core, Work and Since; **How stats add up**
+   expands in place and the sheet fits without its own scroll at 390×844. A locked profile has **Unlock · 1 Ticket**,
+   Template content, no level, no tabs and no ticket-balance sentence. (D206, D229, D240, D258)
+9. **Class tab: Classes.** On a Tier 0, the class button reads "R7/10" and her trees are one node each ("Drill Strike
    · Greatsword", "R7/10") with "Promotion at R10 · 3 to go" under them; **Change** lists all ten weapons. Tap the class
    button: **Classes** shows the tree, Warrior · All-Rounder · Mage over the Tier 0 row and the Tier 1 rows. Tap a
    closed Tier 1 tile: its line and the gate ("Opens with Warrior R10 or Summoner R10"), disabled. Tap another Tier 0:
    **Start Summoner · R1**; start it, expect it On, then switch back with **Fight as …**. (D253)
 10. **Promotion and a reclass.** On a Tier 0 at Rank 10 (read her share at the Exchange first, step 24, if none is),
-    expect **Promote** with the green dot on the class button, the Skills tab and her roster face. Tap it: the promotion
+    expect **Promote** with the green dot on the class button and her roster face. Tap it: the promotion
     sheet ("Promote · Warrior R10", Suggested on one child) with "Warrior R10 → Brawler R…" and "Depths 1–2 · 6 skills ·
     +n EXP". **Promote to …**: she fights as the child at Rank 10 or more, on its first tree with its lines. Reopen
     **Classes**: her siblings read **Ready**; promote one, then **Fight as** the first again. **Class Manuals ›** opens
     the Exchange's sheet on her, and Back returns to Classes. (D253)
-11. **Skills tab: trees.** On a Tier 1 class, tap each of the three tree buttons. Tap a held node: its sheet shows rank
+11. **Class tab: trees.** On a Tier 1 class, tap each of the three tree buttons. Tap a held node: its sheet shows rank
     pips, `Rank n · next Rn` and `Depth n · Line A/B`; **Equip** it, then tap it in **Equipped** to take it off. Tap the
     B square and **Take line B**: expect the tree's letter to read B and its equipped skills to follow; take A back.
     Tap **Back to auto** if shown. Tap **Change**: the slot sheet lists the channel's weapons with their grades; pick
     another, expect the tree to change, and put it back. Below, **Class Ranks** lists the five Tier 0s (bars to Rank 10)
     and the Tier 1 classes she holds. (D201, D206, D229)
-12. **Battle tab.** Expect four groups in three columns: Offense (ATK, M.ATK, Might for each weapon, Accessory, and an
-    always-listed ★ Signature), Defense, Sustain (HP, MP with `+n/round`, and the full ★ Flourish with **On** or **Off**)
-    and Other (`Limit start n/12`); gear's part in blue and Extra Stats' in green. (D204, D217, D258)
+12. **Stars and Template tabs.** Stars is the Observatory body without its picker: map, Prowess, six totals, Set list
+    and node sheets. Template has Calling, Stride and Knack, her trade, full ★ Flourish, ★ Signature, separate ★ Moon
+    I/II rows, aptitudes and unique racing skill. An All-Rounder Moon II reads `DEF +4 · M.DEF +4`. (D204, D217, D258)
 13. **Gear → Equip.** On a promoted Uma, tap **Standard preset**: expect **Standard preset · On** and her preset's weapons. On a
     Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it to read **· On** and Loadout to show its three
     weapons; a Warrior or a Mage shows three rows. Expect **Accessory 1**, **2** and **3**, her old slot's grade on the first.
@@ -90,8 +90,9 @@ button and footer should stay reachable without horizontal page scrolling, in li
     made item is spent and the count drops. A blocked row says why ("Needs Lv …", "Needs 1 Arms Gem G…", "Already G10").
     On a row with several grades in stock, open it, tap **Raise to G…**, read the list and **Confirm**. Tap **Extra Stats**:
     her Observatory map opens. (D217, D223)
-15. **Work and Racing tabs.** Work shows her job, if any, and `Craft n · {her trade}` with compact Craft EXP and grade
-    lines. Racing shows her aptitudes, racing stats and unique skill without a duplicate template block.
+15. **Facts and Details.** A working Uma's Work fact shows her place and time or Done; an idle one reads Idle and opens
+    her trade's first place. Details shows Craft Level and EXP, grade gates and trade. Template holds her aptitudes and
+    unique skill.
 16. **Party Hall.** Open a party, edit its name → **Rename**, and fill five slots: expect the name and **5/5** in the
     list. Pick an Uma from another party: expect "Moves from …" and her gone from the first party. **Make party lead**
     on another member: the ring and flag move and nobody reorders. Put a Paladin and a Cleric in one party: expect "One
@@ -164,7 +165,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
     family ("2 Brawler · Arms Spellblade · Arms Summoner · Paladin"). Open an Echo: its foes ("Shield n · Weak:" and the
     ward), a party, its guided weapons with **Use the guided weapons**, and under them each guided class the party
     lacks ("Needs an Arms Summoner") with the Umas who could fill it, "Ready to promote" first, then "Holds it"; a row
-    opens her Skills tab. **Fight**; win or give up, and expect "Back to the Rift". If a run is on, open a front's chain
+    opens her Class tab. **Fight**; win or give up, and expect "Back to the Rift". If a run is on, open a front's chain
     (the next stage ringed), its stage sheet and the Convergence card. Sign up twenty only for a run you mean to play.
     (H50, D206, CV23)
 33. **Tiers.** Tap the crest: the Tier sheet shows one card per tier, a tier with no world locked with "Promote Umas

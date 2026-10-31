@@ -146,8 +146,9 @@ A shut place's page sends you to its quick look.
 
 ### Stable
 
-Routes: `/town/stable`, then `outfit/:id` (her profile) and `outfit/:id/skills` (her Skills alone, reached from the
-world map's party bar).
+Routes: `/town/stable`, then `outfit/:id/:tab` (her profile's Class, Gear, Stars or Template tab) and
+`outfit/:id/skills` (her Class content alone, reached from the world map's party bar). A bare `outfit/:id` opens the
+last profile tab used on this device; a tab named in the route wins.
 
 **The roster** (`StablePage.tsx` on the kit's `AlbumChrome` and `AlbumGrid`; rows and facets in `album/rows.ts`):
 - "Stable" and "26/270 owned", then All, Owned and Locked tabs with counts. Tier 1 also lists the outfits nobody owns,
@@ -176,36 +177,29 @@ world map's party bar).
   a jewel in the Warehouse that opens one of her nodes now, or a promotion waiting: she fights as a Tier 0 at Rank 10
   with a child she doesn't hold (`umaPromotionWaits`).
 
-**Her profile** (`OutfitProfile.tsx` in the kit's `ProfileFrame`; its layout rules are [profile
+**Her profile** (`OutfitProfile.tsx` in the kit's compact `ProfileFrame`; its layout rules are [profile
 UX](../design/profile-ux.md), D229):
-- **Header:** "All outfits" (back), her bust, her name and title, "Lv 50 Uma Level", her rarity stars and her **template
-  chip**, and the **target** icon top right (up to ten targets; the Wilds plan what maxing them takes, D100).
-- **The template chip** ("★ Clever Spellwright"; locked outfits too) opens **Her template** (`TemplateCard.tsx`,
-  `template-view.ts`; [her calling and template](classes.md#her-calling-and-her-template)):
-  - her name, then Calling, Stride and Knack, each with what it read ("Calling ← Pace A, Late A", her best running styles;
-    "Stride ← Medium A"; "Knack ← Wit +20%"). Her calling is fixed: there is no pick;
-  - her trade: "Trade · Monster Den · Lapidary";
-  - her Flourish and its state: "★ Even pace · as a Spellblade · on" while she fights as any class of her calling's family
-    (the Spellblade, an Arms or a Tome Spellblade), or "· no effect as Brawler" (a locked outfit's has no state);
-  - on an owned Uma, her **Signature** ("Signature · Pendant · +10 now · worn", or "Wear a Pendant") and her **Moon**
-    ("Moon · I HP +20 (Lv 16) · II DEF +4 · M.DEF +4 (open)" for an All-Rounder calling, "II DEF +8" for a Warrior,
-    "II M.DEF +8" for a Mage).
-- **Under the header:** her EXP bar ("1,200 / 2,400 EXP", or "Max level · 300 EXP banked"), then one row of three: her
-  class ("Sorcerer · Rank 40"; opens Skills), "Craft · Lv 30", and "Party · Party 1", "Working · Mine · 1h 20m",
-  "Fighting · Open fight" or "Party · Free" (opens her place, or the Party Hall).
-- **A locked outfit** shows **Unlock · 1 Ticket** and "20 Uma Tickets left", confirmed in the kit's `UnlockConfirm`
-  ("Unlock {name}?", Uma Tickets 20 → 19, "Unlocking is final.", **Unlock for 1 Ticket**), and only the Racing tab. An
-  outfit another tier's world owns shows "In Tier 2" instead; in a tier above 1, an outfit nobody owns shows "Unlocked
-  in Tier 1" (D5).
-- **Tabs:** Skills, Battle, Gear, Work and Racing; the last one opened is remembered on the device. Gear carries a green
-  dot while a slot can be raised or a jewel set, and Skills while a promotion waits.
+- **Header:** a 64 px bust, her name, title and rarity stars, "Lv 50", the EXP bar and the **target** icon (up to ten
+  targets; the Wilds plan what maxing them takes, D100). The place header's Back is the only Back.
+- **Facts:** one row of three 44 pt doors. **Party** reads "Party 1", "Fighting" or "No party" and opens the party
+  editor or list. **Work** reads "Mine · 1h 20m", "Mine · Done" or "Idle" and opens that place (an idle Uma opens her
+  trade's first place). **Details** opens her read-only battle, core and work ledger. Back from Party or Work returns to
+  this profile and tab.
+- **Details:** two columns. Offense, Defense, Sustain and Other preserve every row of `umaBattleSheet`, including 0;
+  stat rows show their base, gear and Stars parts, with her Moon marked ★. Core lists Speed, Stamina, Power, Guts and
+  Wit with the racing base and growth. Work lists Craft Level and EXP, grades and trade; Since lists her unlock date.
+  **How stats add up** expands the formula one source a line.
+- **A locked outfit** has a dimmed portrait, no level and no tabs. Its facts row becomes **Unlock · 1 Ticket**, "In
+  Tier 2" or "Unlock in Tier 1"; its Template content remains below. The unlock uses the kit's `UnlockConfirm`.
+- **Tabs:** Class, Gear, Stars and Template, always in that order; the last one used is remembered on the device. Gear
+  carries a Ready dot while a grade can rise, Stars while a jewel can be set. Class never carries a dot.
 
-**Skills tab** (`SkillsPage.tsx`, `SkillTree.tsx`, `ClassesSheet.tsx`, `PromotionSheet.tsx`, `class-view.ts`,
+**Class tab** (`SkillsPage.tsx`, `SkillTree.tsx`, `ClassesSheet.tsx`, `PromotionSheet.tsx`, `class-view.ts`,
 `WeaponSheet.tsx`; D253; the rules are [classes](classes.md#the-class-tree) and [skill trees](skill-trees.md)):
 - **Class and trees**, one row of four: the **class button** (emblem, name and her rank, "R34", a Tier 0's "R7/10") and
   her three weapon trees (the weapon's glyph, her line's letter A or B, the slot's grade "G3", and the green mark when it
   can be raised). A tree button shows that tree below. While she fights as a Tier 0 at Rank 10 with a child she doesn't
-  hold, the class button reads **Promote** with the green Ready dot, the Skills tab carries the same dot, and her roster
+  hold, the class button reads **Promote** with the green Ready dot, and her roster
   face the can-upgrade mark (the "Can upgrade" filter finds her).
 - Her ★ Flourish ("★ Even pace · 1% of her max HP a round, up to 4%"), dimmed with "· No effect as Sorcerer" outside her
   calling's family; on a Tier 1 class her Class Rank bar and "Depths 1–3 open".
@@ -224,7 +218,7 @@ UX](../design/profile-ux.md), D229):
     the class On), **Promote to Arms Summoner** (the promotion sheet replaces this one on that child), "Fights as
     Brawler" on her own class, and on a closed one its gate, "Opens with Spellblade R10 or Mage R10", disabled.
   - **Class Manuals ›** ("Exchange") opens the Exchange's Manual sheet on her at `/town/exchange/manual/:outfitId`; its
-    Back returns to the Skills tab with Classes open.
+    Back returns to the Class tab with Classes open.
   - **The promotion sheet** ("Promote · Warrior R10", "Free · the others stay open"): one tile a child, **Suggested** on
     the suggested one (opened on it, or on the Ready tile's child), **Held** on one she holds; each with its slots, the
     preset she lands on and role, a row the same on every tile left out. Under them "Warrior R10 → Brawler R11" and "Depths 1–2 · 6
@@ -256,25 +250,9 @@ UX](../design/profile-ux.md), D229):
   yet"; each opens its hall. Then **Class Ranks**, a cell a class with its rank and bar: in Tier 1's world the five Tier
   0s (their bars to Rank 10) and the Tier 1 classes she holds; in a later tier the eight Tier 1 classes.
 
-**Battle tab** (`umaBattleSheet`, `packages/domain/src/save/sheet.ts`; the rules are
-[combat](combat.md#where-damage-comes-from)):
-- "Fights as Sorcerer" with "5/7 skills · Party 1" (opens Skills).
-- Four groups in three columns, every row always listed, 0 included:
-  - **Offense:** ATK, M.ATK, Might for each of her three weapons ("Fire Tome +8"), Accessory 1–3 ("Pendant · ATK +3",
-    "Charm · M.ATK +3", "Orb · Fire +4", "Insignia · Bosses +2.5%", or "None"), and Signature ("+10 ★") while she wears her family;
-  - **Defense:** DEF, M.DEF, Evasion;
-  - **Sustain:** HP, a healer's Mends ("×1.33 (from M.ATK)" for a Cleric, "(from ATK)" for a Paladin), MP with what she
-    regains a round ("296 · +13 a round"), and ★ Flourish ("Even pace · 1% a round, up to 4%", or "No effect as
-    Brawler");
-  - **Other:** Limit Break head start ("1 / 12").
-- The six core battle stats show their total, then in brackets what gear adds (blue) and what Extra Stats add (green),
-  her moon's points starred. Its (i) gives the stat formula in words.
-- Then her five core stats (Speed, Stamina, Power, Guts, Wit) and the date she was unlocked.
-
 **Gear tab** (`GearCardV3.tsx`, `gear-equip.ts`, `gear-v3.ts`, `PresetButton.tsx`; H107, D223; the rules are
-[classes](classes.md#armor-and-the-accessory), [loops](loops.md#gear) and [materials](materials.md#gear)): two views,
-**Equip** first and **Upgrade** ("Upgrade · 12" counts the raises ready and the jewels to set), the choice remembered
-for the session.
+[classes](classes.md#armor-and-the-accessory), [loops](loops.md#gear) and [materials](materials.md#gear)): **Equip** and
+then **Upgrade** ("Upgrade · 12" counts the raises ready and the jewels to set), stacked in one scroll.
 - **Equip**, what she wears:
   - the standard preset (`presetRows`; D263): one row, "Standard preset" or "Standard preset · On", with her class's
     emblem and "Lance · Greatsword · Light Tome" under it. A Tier 0 shows a "Standard preset" heading and one row
@@ -297,14 +275,12 @@ for the session.
   - **Extra Stats:** "3 to set" while jewels can be set, "8/22 open · map ›" (her Observatory map), and "Total with
     armor: HP +55 · …".
 
-**Work tab:** her job ("Working at Mine", the item, "1/3" and the time left; opens the place), then "Craft Lv 30 · Mine
-· Weapon Forge" (her trade), "10 gathered in 7h 13m", her Craft EXP bar, and "grade 6 open · grade 7 at Craft Lv 31".
-The "10 gathered" time is still the old farm's gather (54 → 36 minutes an item, no ×1.25), not the trios' steps the
-places use ([loops](loops.md#craft-level)).
+**Stars tab** (`StarsPanel.tsx`): the Observatory's live body without its Uma picker: the planet-and-moons map, Prowess,
+the six totals, Set list and node sheet. The Observatory and profile share this one body.
 
-**Racing tab:** her aptitudes (Surface, Distance and Style, each grade on a coloured chip), **Her template** (Calling,
-Stride, Knack and Flourish, each with its note: what it read, "Pace A · Late A" for her calling; "Active" or "No effect
-as Brawler"; a locked outfit's "As a Spellblade"), her racing base stats and growth, and her unique skill (racing).
+**Template tab** (`TemplateTab.tsx`, `template-view.ts`): her template name, Calling, Stride and Knack readings; trade;
+★ Flourish, ★ Signature and ★ Moon I and II; Surface, Distance and Style aptitudes; and her racing unique skill. It
+is also the only body shown for a locked or elsewhere outfit.
 
 ### Party Hall
 
@@ -346,7 +322,7 @@ Routes: `/town/party-hall` and `:n` (1–20); `PartyHallPage.tsx`.
   what her share is): **Read a Class Manual** with "Class Marks 3,000". It opens the Class Manual sheet (`manual-view.ts`,
   D102, D250; the rules are in [loops](loops.md#the-exchange)) at `/town/exchange/manual`: the shared picker (highest Uma
   Level first, locked Umas disabled), then her bars at `/town/exchange/manual/:outfitId` (a link may open it there, as
-  the Skills tab's Class Manuals › does; closing the sheet returns to `/town/exchange` and the place's Back still leads
+  the Class tab's Class Manuals › does; closing the sheet returns to `/town/exchange` and the place's Back still leads
   where it came from).
   - The head reads "Aster · Class Marks 78,000", and "Her share · 21" while she has one.
   - **Her bars,** one row each (emblem, name, its caption and bar): in Tier 1's world the five Tier 0s, her calling's
@@ -553,7 +529,7 @@ Umas (Tiers 1 and 2).
     she holds when she fights as another; or "On the guided weapons"), and **Fight**;
   - under the party, each guided class it leaves empty ([loops](loops.md#the-rift)): "Needs an Arms Summoner" ("Needs
     2 Brawlers"), and up to three roster Umas outside the party who could fill it, those who can promote into it now
-    first ("Ready to promote", in the accent), then those who hold it ("Holds it"); a row opens her Skills tab.
+    first ("Ready to promote", in the accent), then those who hold it ("Holds it"); a row opens her Class tab.
 - **The Convergence:** four rows, Iron, Arcane, Duel and Horde, each with its fight's size, **Foes** and a party
   (suggested from the fronts' guidance; a party picked for another row is disabled). **Begin** when the four cover the
   twenty (else "Missing: …") starts the attempt and its first fight. With an attempt on: its four parties, "Won · 6
