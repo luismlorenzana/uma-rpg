@@ -1,6 +1,9 @@
 # Uma profile UX
 
-**Status:** built (D229). This page is the visual and interaction contract for the Stable's Uma profile.
+> Superseded by the Uma profile v2 (D239): [the proposal's §9](uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229) is the
+> profile's contract.
+
+**Status:** superseded (D239). This page was the visual and interaction contract for the Stable's Uma profile.
 
 ## Goal
 

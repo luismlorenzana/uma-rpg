@@ -1,6 +1,10 @@
 # Uma profile v2: the proposal
 
-> **For the owner's review, 2026-10-28. Nothing here is built.** The rework of the Uma profile the owner asked for
+> **Approved (D239) and built: H117–H125 (D258, D265, D267–D272), measured in H125 ([§10](#10-before-and-after)).** Later
+> decisions changed three things this doc says: Classes v3 (D240) removed the calling pick; D264 gave her three accessory
+> slots, took the jewels off her moon and made a Planet node take three; D266 made an accessory a one-tap list and left a ★ her
+> weapons can't use off the preset, so its dot follows (D270). Where they differ, the code and [the manual](../../game/sections.md#stable)
+> win. The rework of the Uma profile the owner asked for
 > (2026-10-28): a full review of the compaction passes and ChatGPT's guideline (D229), the AI slop cleaned out of every
 > profile string, one consistent structure for display, visuals and changes, and her uniqueness in one place with every
 > pick. It builds on [audit.md](audit.md) (today's profile, measured) and [research.md](research.md) (seventeen games,
@@ -848,29 +852,33 @@ kit's real sizes (the tab bar is 64 px with its padding); H125 measures the buil
 
 ### 10.1 Header
 
-| | Today | Proposed |
-|---|---|---|
-| Tab bar starts, 390×844 | 284 px, **42%** of the first screen | **144 px, 21%** |
-| … with an open calling | 532 px, **78%** | **144 px, 21%** (the card is in Template) |
-| Tab bar starts, 375×667 | 284 px, 56% | 144 px, 28% |
-| … with an open calling | 546 px, **108%** (below the fold) | 144 px, 28% |
-| Portrait | 112 px | 64 px |
-| Rows above the tabs | Back row, bust block, EXP bar, caption, [card], summary row | Header block, facts row |
+| | Today | Proposed | Measured (H125, 2026-10-31) |
+|---|---|---|---|
+| Tab bar starts, 390×844 | 284 px, **42%** of the first screen | **144 px, 21%** | **144 px** |
+| … with an open calling | 532 px, **78%** | **144 px, 21%** (the card is in Template) | No calling pick since D240 |
+| Tab bar starts, 375×667 | 284 px, 56% | 144 px, 28% | **144 px** |
+| … with an open calling | 546 px, **108%** (below the fold) | 144 px, 28% | No calling pick since D240 |
+| Portrait | 112 px | 64 px | 64 px |
+| Rows above the tabs | Back row, bust block, EXP bar, caption, [card], summary row | Header block, facts row | Header block, facts row |
 
 ### 10.2 Scroll
 
 Screens = (header + tab bar + content + the frame's 96 px) ÷ 683 (506 at 375×667), the audit's formula. The proposed
 header and tab bar together are 208 px (144 + 64).
 
-| Tab | Today, 390×844 | Proposed | Today, 375×667 | Proposed | Content under the tab bar (proposed, as drawn) |
-|---|---|---|---|---|---|
-| Skills → **Class** | 2.04–2.08 | **1.35** | 2.80 | 1.82 | Class row 64 · equipped 76 · tree 372 · Limit 48 · gaps 56 = 616 px |
-| Equip + Upgrade → **Gear** | 1.50–1.57 + 1.73–1.77 | **0.97** | 2.12 + 2.39 | 1.31 | First row 44 · weapons 88 · armor 88 · accessory 72 · gaps 66 = 358 px |
-| Observatory (outside) → **Stars** | 1.16 | **1.16** | — | 1.56 | First row 44 · map 300 · totals 93 · ★ line 15 · gaps 34 = 486 px |
-| Racing → **Template** | 1.45–1.49 | **1.31** (1.57 with an open pick) | 2.05 | 1.77 | Name 44 · readings 59 · calling 52 (228 with an open pick) · four ★ rows 192 · racing 99 · racing skill 48 · gaps 96 = 590 px |
-| Battle → **Details** sheet | 1.58–1.65 | **0.97** (a 660 px sheet, no scroll) | 2.21 | ≈1.3 | Six sections in two columns |
-| Work → header cell | 1.00 | 0 | 1.08 | 0 | — |
-| **Everything about her** | **9.5** (11.4 open calling) | **≈ 5.8** (6.0) | 12.7 (15.7) | ≈ 7.8 | — |
+| Tab | Today, 390×844 | Proposed | **Measured** | Today, 375×667 | Proposed | **Measured** | Content under the tab bar (proposed, as drawn) |
+|---|---|---|---|---|---|---|---|
+| Skills → **Class** | 2.04–2.08 | **1.35** | **1.38** (a Tier 0 1.05) | 2.80 | 1.82 | **1.87** | Class row 64 · equipped 76 · tree 372 · Limit 48 · gaps 56 = 616 px |
+| Equip + Upgrade → **Gear** | 1.50–1.57 + 1.73–1.77 | **0.97** | **1.00** | 2.12 + 2.39 | 1.31 | **1.25** | First row 44 · weapons 88 · armor 88 · accessory 72 · gaps 66 = 358 px (three accessory tiles since D264) |
+| Observatory (outside) → **Stars** | 1.16 | **1.16** | **1.16** (with her ★ line 1.19) | — | 1.56 | **1.53** (1.58) | First row 44 · map 300 · totals 93 · ★ line 15 · gaps 34 = 486 px |
+| Racing → **Template** | 1.45–1.49 | **1.31** (1.57 with an open pick) | **1.28** | 2.05 | 1.77 | **1.78** | Name 44 · readings 59 · calling 52 · four ★ rows 192 · racing 99 · racing skill 48 · gaps 96 = 590 px |
+| Battle → **Details** sheet | 1.58–1.65 | **0.97** (a 660 px sheet, no scroll) | **0.91** (a 620 px sheet, no scroll) | 2.21 | ≈1.3 | **1.21** (a 614 px sheet; its body scrolls 6 px) | Six sections in two columns |
+| Work → header cell | 1.00 | 0 | 0 | 1.08 | 0 | 0 | — |
+| **Everything about her** | **9.5** (11.4 open calling) | **≈ 5.8** (6.0) | **5.73** | 12.7 (15.7) | ≈ 7.8 | **7.64** | — |
+
+A locked profile, which has no tab bar: 1.59 at 375×667. Every sheet (Details; Classes; promotion; node; line; weapon, ten rows on a
+Tier 0; Limit, with two blocks; Gear's raise, accessory and Raise all; Stars' node and Set all; the Flourish; the racing skill) fits
+without scrolling at 390×844.
 
 Gear and the Details sheet fit on one screen; every other tab is one screen and a third. The Observatory's map costs
 the same as it did, but no longer costs a round trip (+4 taps back to her).
@@ -879,22 +887,39 @@ the same as it did, but no longer costs a round trip (+4 taps back to her).
 
 From her profile, on another tab than the one needed (the audit's method):
 
-| Task | Today | Proposed | Path |
-|---|---|---|---|
-| See every uniqueness bonus with its number | 1 (no numbers, read-only) | **1** | Template |
-| Make her calling pick | 1–2 (card above the tabs) | 3–4 | Template → (tile) → Confirm → Confirm once. **Two more taps, once per Uma:** the confirm shows what the choice changes before it is final, and the header stops paying 248 px for it on every visit |
-| Wear her signature family | 3–5 | **3** | Template → Signature → ★ Bell |
-| Set her moon's jewel | 4–5, and **+4 to come back** | **3** | Stars → ★ node → Set (or from Template) |
-| Raise a weapon as far as the Warehouse allows | 3 (one grade), 5 (several) | **3** | Gear → tile → Raise to G8 (with before → after); one grade only when more are covered: 4 (tap G7 first) |
-| Raise every ready slot (N slots) | 2 + N | **3** | Gear → Raise all → Raise N |
-| Change her class | 3 | 3 | Class → class tile → class |
-| Change a tree's line | 3–4 | 3–4 | Class → (tree) → square → Take line B |
-| Equip a skill at 7/7 | 4–5, one blind unequip | **4** | Class → node → Replace → slot |
-| See her stats | 1 | 1 | Details |
-| The next Uma, same tab | 3 (Back → face) | **1** | › |
-| Five Umas' ready raises, from the Stable | ≈ 34 | **≈ 15** | Can upgrade on → face (opens Gear) → Raise all → Raise → › … |
-| Back to her after her party or place | 4 (Town → Stable → Enter → face) | **1** | Back |
-| Seat her as a Learner | 5+ (no link) | 5 | Class → Limit → her hall → + → her |
+| Task | Today | Proposed | **Measured** | Path |
+|---|---|---|---|---|
+| See every uniqueness bonus with its number | 1 (no numbers, read-only) | **1** | **1** | Template |
+| Make her calling pick | 1–2 (card above the tabs) | 3–4 | None | The pick retired with Classes v3 (D240) |
+| Wear her signature family | 3–5 | **3** | **3** | Template → Signature → ★ row |
+| Set her moon's jewel | 4–5, and **+4 to come back** | **3** | None | Her moon takes no jewel since D264 |
+| Raise a weapon as far as the Warehouse allows | 3 (one grade), 5 (several) | **3** | **3** | Gear → tile → Raise to G8 (with before → after); one grade only when more are covered: 4 (tap G7 first) |
+| Raise every ready slot (N slots) | 2 + N | **3** | **3** | Gear → Raise all → Raise N |
+| Change her class | 3 | 3 | **4** | Class → class tile → tile → Fight as (a tap selects, CV32) |
+| Change a tree's line | 3–4 | 3–4 | **3–4** | Class → (tree) → square → Take line B |
+| Equip a skill at 7/7 | 4–5, one blind unequip | **4** | **4** | Class → node → Replace → slot |
+| See her stats | 1 | 1 | **1** | Details |
+| The next Uma, same tab | 3 (Back → face) | **1** | **1** | › |
+| Five Umas' ready raises, from the Stable | ≈ 34 | **≈ 15** | **15** with Can upgrade on | Face (opens Gear) → Raise all → Raise → › … |
+| Back to her after her party or place | 4 (Town → Stable → Enter → face) | **1** | **1** | Back |
+| Seat her as a Learner | 5+ (no link) | 5 | **5** | Class → Limit → Open her hall → + → her |
+
+### 10.4 How to measure
+
+On a scratch save, never the owner's, at 390×844 and 375×667, light and dark. With a profile tab open, in the browser console:
+
+```js
+const main = document.querySelector('[data-place-page] main')
+const bar = document.querySelector('[data-kit="profile"] [role="tablist"]')?.parentElement
+;({ tabBarTop: bar && Math.round(bar.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop),
+   screens: +(main.scrollHeight / main.clientHeight).toFixed(2) })
+// With a sheet open: true when its body fits without scrolling.
+const body = document.querySelector('[data-kit="sheet"] .overflow-y-auto'); body?.scrollHeight <= body?.clientHeight
+```
+
+Then check the page for text under 11 px (`getComputedStyle(el).fontSize`), any button under 44 px tall, any `.truncate` whose
+`scrollWidth` passes its `clientWidth`, and green on anything but a Ready dot. "Everything about her" sums the four tabs and the
+Details sheet's height over the visible height. `copy.test.ts` runs in CI.
 
 ## 11. Kit changes
 

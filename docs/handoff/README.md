@@ -1,8 +1,8 @@
 # Handoff: open work
 
-> **Status: 2026-10-31, after D271.** Tier 1 is built and live: engine v20, save v34. That covers the Tier rework's R1
-> and R2, the farm by line, the Wilds' trios, weaknesses v2, and **Classes v3 with Halls v2** (thirteen classes in a tree,
-> Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
+> **Status: 2026-10-31, after D272.** Tier 1 is built and live: engine v20, save v34. That covers the Tier rework's R1
+> and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
+> Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
 > Tier 2 and Tier 3 are reworked.
 >
@@ -23,23 +23,12 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H139; decision numbers from D272). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H139; decision numbers from D273). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
-pins it. Open now:
+pins it.
 
-**Base class emblems** (D259). The five Tier 0s took their families' names; their icons follow.
-
-| Id | Task | Who | Size | Needs | State |
-|---|---|---|---|---|---|
-
-**Uma profile v2** (D239). Engine v19 has been live since H134 (D257): where a packet below builds a screen for both
-generations or "inert until H134", build it for v19 only. The class tree and promotion sheets (H137), the calling card's
-retirement and the hall-based names are already on `main`.
-
-| Id | Task | Who | Size | Needs | State |
-|---|---|---|---|---|---|
-| [H125](tasks/H125-profile-measure-close.md) | Uma profile v2: the built screens measured against B1–B4, the phone check, profile-ux.md superseded, the manual read through | Claude | S | H117, H118, H119, H121, H122, H124 | Ready |
+No packets are open: the queue waits on the owner's next feedback, and the audit's bugs and the Hall issues have no packet yet.
 
 **After hardening:** Tier 2 and Tier 3 are re-planned. Their approved drafts stay in
 [design/tier-rework/](../design/tier-rework/README.md) (Class, Weapon, Extra Stats and Profession Progression, stat
@@ -58,11 +47,12 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
-| H124 | Uma profile v2: every door opens a tab, Back returns to it, ‹ n/N › (D271) | See the commit of D271 |
-| H123 | Uma profile v2: the Template tab, no calling pick (D270); B2 1.28 at 390×844 | See the commit of D270 |
-| H122 | Uma profile v2: the Stars tab, Set all and the Observatory as a door (D269); B2 1.16 at 390×844 | See the commit of D269 |
-| H121 | Uma profile v2: the Gear tab, eleven tiles, raise sheets, Raise all (D268); B2 1.00 at 390×844 | See the commit of D268 |
-| H120 | Uma profile v2: the Class tab, the class tree, promotion and the Limit line (D267); B2 1.38 at 390×844 | See the commit of D267 |
+| H125 | Uma profile v2 measured: everything about her 5.73 screens from 9.5; the phone check; D229 superseded (D272) | See this commit's D272 |
+| H124 | Uma profile v2: every door opens a tab, Back returns to it, ‹ n/N › (D271) | `518557f` |
+| H123 | Uma profile v2: the Template tab, no calling pick (D270); B2 1.28 at 390×844 | `36ee376` |
+| H122 | Uma profile v2: the Stars tab, Set all and the Observatory as a door (D269); B2 1.16 at 390×844 | `81e536f` |
+| H121 | Uma profile v2: the Gear tab, eleven tiles, raise sheets, Raise all (D268); B2 1.00 at 390×844 | `39e8be4` |
+| H120 | Uma profile v2: the Class tab, the class tree, promotion and the Limit line (D267); B2 1.38 at 390×844 | `6c5df6e` |
 | H119 | Uma profile v2: the frame, four tabs, the compact header, the facts row and Details (D265) | `1b807d4` ([#86](https://github.com/luismlorenzana/uma-rpg/pull/86)) |
 | H118 | Compact `ProfileFrame`/progress and optional worker face doors (platform P79), uma-kit 0.16.0 [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41116447663) and pinned; both games' full checks, default markup frozen, four native size/theme checks and a 44pt worker-face tap. RPG keeps its existing display until H119/H124; H119 is Ready after H117 and H118. | Kit `5662009` ([platform #62](https://github.com/luismlorenzana/uma-platform/pull/62)); RPG pin `d5c733a` ([#84](https://github.com/luismlorenzana/uma-rpg/pull/84)), [production workflow](https://github.com/luismlorenzana/uma-rpg/actions/runs/41117831299) |
 | H138 | Five base-class family emblems in place and the uma-art 2.18.0 pin (D262, platform P78); all other UI pixels and metadata frozen; actual native Classes-sheet acceptance at both phone widths, light/dark | Art `9dc40f3` ([platform #60](https://github.com/luismlorenzana/uma-platform/pull/60)), [2.18.0 published](https://github.com/luismlorenzana/uma-platform/actions/runs/41099542585); RPG pin `d48ed93` ([#83](https://github.com/luismlorenzana/uma-rpg/pull/83)) |

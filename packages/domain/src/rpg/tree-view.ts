@@ -36,7 +36,7 @@ export interface RpgTreeViewNode {
 /** One weapon slot's tree: its line (`branch`) and branch B's name, and its eight nodes: the trunk, A, then B. A Tier 0's
  * (v19): line A, no B name (''), and its one node. */
 export interface RpgTreeViewTree { weapon: RpgWeapon; tree: RpgTreeId; branch: RpgBranch; bName: string; nodes: RpgTreeViewNode[] }
-/** The Skills tab's model: the root (her class, its tier of class and hand; H68 and H70 add the Flourish) and her three
+/** The Class tab's model: the root (her class, its tier of class and hand; H68 and H70 add the Flourish) and her three
  * trees in slot order. `tier` is 0 for a Tier 0 from v19, else 1. */
 export interface RpgTreeView { root: { classId: RpgClass; tier: 0 | 1; hand: RpgHand }; trees: RpgTreeViewTree[] }
 /** Whether she is a Tier 0 in an engine's generation (only from v19). */
@@ -45,7 +45,7 @@ const tier0At = (classId: RpgClass, engine: number): boolean => rpgRework('class
 const tier0Rank = (classRank: number): number => Math.min(RPG_TIER0_MAX_RANK, Math.max(1, classRank))
 
 /** Her trees from v16, one per weapon slot, with her `loadout` marked; null before v16, where the trees are rows of five
- * depths with side skills bought with points (today's Skills tab). */
+ * depths with side skills bought with points (the old Skills tab). */
 export function rpgTreeView(profile: RpgProfile, loadout: readonly RpgNodeRef[], engine: number = BATTLE_ENGINE_VERSION): RpgTreeView | null {
   if (!rpgRework('fight', engine)) return null
   const held = new Set(rpgHeldSkills(profile, engine).map(rpgNodeKey))

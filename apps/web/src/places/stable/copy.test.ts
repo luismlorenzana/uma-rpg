@@ -216,7 +216,7 @@ describe('the profile wording list (H117)', () => {
   it('keeps literal JSX terse outside help sheets', () => {
     const files = [
       'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'TemplateTab.tsx', 'GearTab.tsx',
-      'ClassTab.tsx', 'class-sheets.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'PresetButton.tsx',
+      'ClassTab.tsx', 'class-sheets.tsx', 'StableCounter.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'PresetButton.tsx',
       '../observatory/StarsPanel.tsx', '../observatory/ObservatoryPage.tsx',
     ]
     const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.', 'Unlock an Uma first.'])

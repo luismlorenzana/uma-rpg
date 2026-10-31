@@ -191,7 +191,7 @@ export function ClassTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: Ow
       <button type="button" onClick={() => setSheet({ kind: 'limit' })} data-limit-line aria-label={`Limit: ${limit.line}`}
         className="flex min-h-11 w-full items-center gap-2 rounded-sm bg-raised px-2.5 text-left">
         <span className="text-micro shrink-0">Limit</span>
-        <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold">{limit.line}</span>
+        <span className="min-w-0 flex-1 text-[12.5px] font-semibold leading-tight">{limit.line}</span>
         <span className="shrink-0 text-ink-faint">›</span>
       </button>
 

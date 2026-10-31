@@ -56,7 +56,7 @@ export function DetailsSheet({ open, onClose, outfit, uma, tier }: DetailsSheetP
             How stats add up {formula ? '−' : '+'}
           </button>
           {formula && (
-            <div className="space-y-1 text-[10px] leading-tight text-ink-faint" data-stat-formula>
+            <div className="space-y-1 text-[11px] leading-tight text-ink-faint" data-stat-formula>
               {copy.statFormulaLines.map((line) => <p key={line}>{line}</p>)}
             </div>
           )}
@@ -87,7 +87,7 @@ function BattleRow({ row }: { row: SheetRow }) {
 function DetailSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section>
-      <h3 className="mb-0.5 text-[10px] font-bold uppercase tracking-wide text-ink-faint">{title}</h3>
+      <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wide text-ink-faint">{title}</h3>
       <div className="divide-y divide-hairline/50">{children}</div>
     </section>
   )

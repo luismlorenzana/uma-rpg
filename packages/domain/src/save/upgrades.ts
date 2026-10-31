@@ -33,7 +33,7 @@ export interface UmaUpgrades {
   /** gems + freeNodes. */
   stars: number
   /** Classes v3 (v19; H137, D253): she fights as a Tier 0 at Class Rank 10 with a child she doesn't hold, so a promotion
-   * waits (`umaPromotionWaits`): the Stable's mark and the Skills tab's Ready dot. Always false before v19. */
+   * waits (`umaPromotionWaits`): the Stable's mark and the Class tab's Ready dot. Always false before v19. */
   promote: boolean
   any: boolean
 }

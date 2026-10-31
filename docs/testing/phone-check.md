@@ -11,7 +11,7 @@ grades, setting jewels, reading Manuals, promoting and spending tickets are real
 you are away, or with Speed Tickets (step 22).
 
 **Phone only** means an installed iPhone app or the production service is required; local auth-off previews cannot check
-it. Check the other steps at 390×844, then repeat the busy screens at 375×667: the Wilds page, the Class, Gear and Stars tabs,
+it. Check the other steps at 390×844, then repeat the busy screens at 375×667: the Wilds page, the profile's four tabs and Details,
 the Classes and promotion sheets, a Wilds job sheet, the Learning page, the fight and the Exchange's Manual sheet. Every
 button and footer should stay reachable without horizontal page scrolling, in light and dark.
 
@@ -50,7 +50,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
 6. **Stable roster.** Tap **Town → Stable → Enter Stable**. Expect Uma Level, highest first, by default, with owned Umas
    before locked in either sort direction. Open **Filters**: **Class** lists the thirteen (the five Tier 0s first) and
    **Calling** the five Tier 0s; pick a Calling, then a **Trade** ("Mine · Weapon Forge"): expect only matching Umas
-   and a head count on each value. Search the last word of an Uma's template chip: expect every Uma of that type. Switch
+   and a head count on each value. Search the last word of an Uma's template name: expect every Uma of that type. Switch
    faces → cards → list, save the view, reload: expect it kept.
 7. **Unlock** (Tier 1). Open a locked outfit, tap **Unlock · 1 Ticket → Unlock for 1 Ticket**. Expect one Ticket spent,
    her profile at Lv 1 as her calling's Tier 0, and the **Owned** count up by one.
@@ -98,9 +98,16 @@ button and footer should stay reachable without horizontal page scrolling, in li
     each slot and "Uses n items"; **Raise n** raises them. Tap an accessory tile: a list, her ★ family first, an Orb for each weapon
     she holds. Tap a row: the sheet closes and the tile shows it at once; a slot at G0 reads "Off". Set the same accessory in
     two slots, leave and come back: both stick. (D217, D223, D266, D268)
-15. **Facts and Details.** A working Uma's Work fact shows her place and time or Done; an idle one reads Idle and opens
-    her trade's first place. Details shows Craft Level and EXP, grade gates and trade. Template holds her aptitudes and
-    unique skill.
+15. **Facts, Details and doors.** A working Uma's Work fact shows her place and time or Done; an idle one reads Idle and opens
+    her trade's first place. Details shows Craft Level and EXP, grade gates and trade. **Doors:** from the roster, a face opens the
+    remembered tab; with **Can upgrade** on, the first tab with a dot. Expect **‹ n/N ›** in the place header (near the notch): › keeps
+    the tab, closes any sheet and wraps at the end; Back returns to the roster at the same scroll. Open her from the Party Hall's
+    **View profile** and the world map's party bar (Class, ‹ › through the party), a Hall's **Profile** in a Hero's or a Learner's
+    sheet (Class, ‹ › through the seat), a Wilds worker's face and the plaza's **Profile**: each Back returns there. Party, Work and the
+    Limit sheet's hall come back to her on the same tab. A locked profile has no stepper. (D271)
+    **Across the profile, at both sizes, light and dark:** target marks readable on every portrait; nothing clipped on long names;
+    the four tabs, the class row and the armor tiles fit with no horizontal scroll; sheets fit above the bar; green only on Ready
+    dots. The budgets and the type sizes are checked locally: [How to measure](../design/uma-profile-v2/proposal.md#104-how-to-measure).
 16. **Party Hall.** Open a party, edit its name → **Rename**, and fill five slots: expect the name and **5/5** in the
     list. Pick an Uma from another party: expect "Moves from …" and her gone from the first party. **Make party lead**
     on another member: the ring and flag move and nobody reorders. Put a Paladin and a Cleric in one party: expect "One

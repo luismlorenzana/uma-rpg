@@ -49,8 +49,8 @@ export function FactsRow({ outfit, uma, world, tier, onDetails }: FactsRowProps)
 function Fact({ label, value, accent = false, onClick }: { label: string; value: string; accent?: boolean; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} className="min-h-11 min-w-0 rounded-md bg-panel px-1.5 text-center active:bg-raised">
-      <span className="block text-[10px] font-semibold uppercase tracking-wide text-ink-faint">{label}</span>
-      <span className={`block truncate text-[11px] font-semibold ${accent ? 'text-success' : 'text-ink-soft'}`}>{value}</span>
+      <span className="block text-[11px] font-semibold uppercase tracking-wide text-ink-faint">{label}</span>
+      <span className={`block truncate text-[11px] font-semibold ${accent ? 'text-accent' : 'text-ink-soft'}`}>{value}</span>
     </button>
   )
 }

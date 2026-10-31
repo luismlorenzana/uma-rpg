@@ -78,7 +78,7 @@ export function GearTab({ outfit, uma, world, tier, upgrades }: { outfit: Roster
                 {slot.family
                   ? <ItemIcon id={accessoryIconId({ ...slot, grade: Math.max(1, slot.grade) })} size={28} />
                   : <span className="size-7 rounded-xs border border-dashed border-hairline-strong" />}
-                <span className={`w-full truncate text-[11px] font-semibold ${tile.stale ? 'text-warning' : ''}`}>{tile.stale ?? tile.text}</span>
+                <span className={`w-full text-[11px] font-semibold leading-tight ${tile.stale ? 'text-warning' : ''}`}>{tile.stale ?? tile.text}</span>
                 <GradeBadge grade={tile.grade} />
               </button>
             )

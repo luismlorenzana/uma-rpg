@@ -128,7 +128,7 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 A hall's line is its lore and its tail ("The Warrior Dojo: power from self-training. Four Heroes, each with her own Limit
 Break, and their Learners."), and its details open with its seats' home classes ("Home: Arms Spellblade 1–2, Tome
 Spellblade 3–4"), from `learningPlaces`' engine v19 generation (H133). An old link to `/learning/paladin-bastion` or
-`/learning/cleric-chapel` (a bookmark, an Inheritance row read before save v32) lands on `/learning/healer-sanctum`,
+`/learning/cleric-chapel` (a bookmark from before save v32) lands on `/learning/healer-sanctum`,
 keeping the rest of the path, the query and the navigation state (`movedPlace`, read in `PlaceRoute` only for an id
 with no place).
 
@@ -196,8 +196,8 @@ hides with one Uma in the list and on a locked profile. Arrows only, no swipe.
   item in the Warehouse, her level allowing), a jewel in the Warehouse that opens one of her nodes now, or the Template tab's
   signature dot.
 
-**Her profile** (`OutfitProfile.tsx` in the kit's compact `ProfileFrame`; its layout rules are [profile
-UX](../design/profile-ux.md), D229):
+**Her profile** (`OutfitProfile.tsx` in the kit's compact `ProfileFrame`; its contract is [Uma profile
+v2](../design/uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229), D239):
 - **Header:** a 64 px bust, her name, title and rarity stars, "Lv 50", the EXP bar and the **target** icon (up to ten
   targets; the Wilds plan what maxing them takes, D100). The place header's Back is the only Back.
 - **Facts:** one row of three 44 pt doors. **Party** reads "Party 1", "Fighting" or "No party" and opens the party
@@ -350,7 +350,7 @@ Routes: `/town/party-hall` and `:n` (1–20); `PartyHallPage.tsx`.
   empty one "Slot 3 · add an Uma") and the healer note.
 - **An empty slot** opens the shared picker, "Choose an Uma": owned Umas, highest Uma Level first. One in another party
   is dimmed with "Moves from Party 2" and moves here when picked (D46). "In this party" and "In a fight" are disabled.
-- **A filled slot** opens her sheet: **Make party lead** (or "Party lead"), **Swap with another Uma**, **View profile**,
+- **A filled slot** opens her sheet: **Make party lead** (or "Party lead"), **Swap with another Uma**, **View profile** (her Class tab; ‹ › step through the party),
   "Recall from Mine · what's made is kept" while she works, and **Remove from Party 1**. Picking a lead never moves
   anyone; a party without one leads with its first member. Working Umas fight like the rest (D119).
 
@@ -432,7 +432,7 @@ Lv 30 → 1 · 1,470", with her trade). **To the Wilds** and **Later** both mark
 once the reset's trades have settled and never over a world-map fight, after "The Wilds are rebuilt" when both wait; and
 from the Account's row. "+78 Class Manuals" and "78,000 Class Marks · Exchange"; "Every Uma starts her class tree at
 Rank 1 of her Tier 0." with the three roots and their Tier 0s; How to rebuild an Uma (Exchange → Read a Class Manual →
-her Tier 0 → Her share; Her profile → Skills → Promote (Rank 10), "EXP past Rank 10 goes with her into the new class");
+her Tier 0 → Her share; Her profile → Class → Promote (Rank 10), "EXP past Rank 10 goes with her into the new class");
 At a glance: Reset, Stays, Weapons ("No Weapon Rank since R2: grades stay"), Trades ("2 Umas moved trade · their
 running work finished into the Warehouse") and Halls ("Paladin Bastion · Cleric Chapel → Healer Sanctum", each Uma whose
 role moved, "Hero → Learner · Archdemon's Toll · Bond 7", then "Each Uma keeps her higher Bond"); then each Uma with a
@@ -467,10 +467,9 @@ The five halls share `places/halls/HallPage.tsx` (D106; Halls v2's page, H133, D
   candidate shows "Bond 2 · 1/2 Heroes" and the sets the seat adds to her weapons' ("Adds Light, Twilight").
 - **A Hero's sheet:** "Hero · Strength 100%"; her own Bond with the seat; **Profile**; **Change Hero**; **Empty seat**, which lists
   the Learners who'd leave before it confirms.
-- **A Learner's sheet:** "Bond 4/10 · 70% strength", its bar and the EXP to the next, "Inherits {Limit Break}, and
-  {another} from her other Hero.", and "Leave this Hero (her Bond stays)".
-- The map's pips, the quick look, the Hero and Learner sheets and the pickers are Halls v1's; the profile's Inheritance
-  row opens the seat's hall (`HERO_HALL_PLACES`) and names its home class ("Paladin Hero · {Limit Break}").
+- **A Learner's sheet:** "Bond 4/10 · Strength 70%", its bar, "Limit Breaks · {Limit Break} · {another}", **Profile** and **Leave**.
+- The map's pips, the quick look, the Hero and Learner sheets and the pickers are Halls v1's; her profile's Limit sheet opens the
+  seat's hall (`HERO_HALL_PLACES`).
 
 ### Observatory
 
