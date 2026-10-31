@@ -24,7 +24,7 @@ export default function StablePage({ place, rest }: PageProps) {
     if (!outfitId) return <Roster view={view} place={place} />
     const outfit = view.roster.find(o => o.outfitId === outfitId)
     if (sub === 'skills' && outfit) return <SkillsRoute outfit={outfit} place={place} />
-    return <OutfitProfile view={view} outfitId={outfitId} place={place} />
+    return <OutfitProfile view={view} outfitId={outfitId} place={place} route={sub} />
   }}</MasterGate>
 }
 

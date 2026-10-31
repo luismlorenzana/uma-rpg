@@ -340,7 +340,7 @@ support comes after the skill's hits.
 
 - **The base MP regen** (SB18, D204, D215): at each round's end every Uma standing regains 1% of her max MP for each skill
   depth her Class Rank opens, five at most (5% from Class Rank 40), rounded, at least 1, one cue ("+15 MP"); a Tier 0's
-  is depth 1's, 1%. A Class Rank 40 Sorcerer with 296 MP regains 15 a round; her Battle tab reads "MP 296 · +15 a
+  is depth 1's, 1%. A Class Rank 40 Sorcerer with 296 MP regains 15 a round; her Details sheet reads "MP 296 · +15 a
   round". It never takes her past her max. A Clarity restores MP at once; between fights, Springs refill it
   ([maps](maps.md)).
 - **The Flourish** (UT6, D204, CV21): while she fights as any class of her calling's family (her Tier 0 and its

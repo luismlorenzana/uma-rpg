@@ -436,7 +436,7 @@ guided weapons on top of them ([loops](loops.md#the-rift)).
 A Tier 0's trees are one node each ([above](#tier-0-and-promotion)). A Tier 1 class's:
 
 - **Five depths a tree, eight nodes** (CP13, CP18). Depths 1 and 2 are the **trunk**, always hers. At depth 3 the tree
-  **forks** into **line A** and **line B** (the Skills tab calls them branches), and her line runs on through depths 4
+  **forks** into **line A** and **line B** (the Class tab calls them branches), and her line runs on through depths 4
   and 5. In Tier 1's world a Tier 1 class opens at Class Rank 10, so its trunk is whole from the start.
 - **Nothing is learned and nothing costs points** (CP14). A depth opens when her **Class Rank** in that class reaches
   its gate (D102, CP16), and every node there on her path is hers at once.

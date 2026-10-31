@@ -1,4 +1,4 @@
-// The Uma profile's wording list (D258, H117; proposal C1–C10 / UP25–UP27).
+// The Uma profile's wording list (D258, H117–H119; proposal C1–C10 / UP25–UP27).
 // Every fact printed by today's profile enters here first. Screens split a returned line into cells when useful,
 // but never invent a second wording. Rules and confirms remain in HelpButton or confirmation sheets.
 import type { AccessoryFamily, ArmorSlot, GearTier, RpgBranch, RpgDamageKind, RpgFlourish } from '@rpg/domain'
@@ -64,10 +64,32 @@ export const itemCount = (item: string, count: number, held?: number): string =>
 export const reading = (value: string, source: string): string => `${value} · ${source === 'Picked' ? 'Picked' : `from ${source}`}`
 /** C3: a trade. */
 export const trade = (place: string, maker: string): string => `${place} · ${maker}`
+/** C7: the three compact profile facts. */
+export const profileFacts = { party: 'Party', work: 'Work', details: 'Details' } as const
 /** C7: party state. */
 export const party = (value: number | 'fighting' | null): string => value === null ? 'No party' : value === 'fighting' ? 'Fighting' : `Party ${n(value)}`
 /** C7: work state. */
 export const work = (place: string | null, state?: string | 'done'): string => !place ? 'Idle' : `${place} · ${state === 'done' ? 'Done' : state ?? ''}`.replace(/ · $/, '')
+/** C7: a stat's compact source line in Details. */
+export function statParts(base: number, gear = 0, stars = 0, moon = 0): string {
+  return [base ? `base ${n(base)}` : '', gear ? `gear ${n(gear)}` : '', stars ? `Stars ${n(stars)}` : '', moon ? `★ ${n(moon)}` : '']
+    .filter(Boolean).join(' · ')
+}
+/** C7: a core stat's base and growth. */
+export const coreSource = (base: number, growth: number): string => `${n(base)}${growth ? ` · +${n(growth)}%` : ''}`
+/** C7: the open grade and its next Craft gate. */
+export const gradeGate = (open: number, next?: { grade: number; craft: number } | null): string =>
+  `${grade(open)} open${next ? ` · ${grade(next.grade)} at ${craftLevel(next.craft)}` : ''}`
+/** C7: the collapsed Details formula's lines. */
+export const statFormulaLines = [
+  'Core · base/5 + levels × 1.5 × (1 + growth)',
+  'HP · class × (100 + 5 Stamina + 2 Power + Guts)',
+  'MP · class × (20 + 1.5 Wit)',
+  'ATK/M.ATK · Speed × class',
+  'DEF · Power × class',
+  'M.DEF · (Power + Wit)/2 × class',
+  'Totals · core + gear + Stars + moon',
+] as const
 /** C7: equipped skills. */
 export const equipped = (value: number, slots: number): string => `Equipped ${n(value)}/${n(slots)}`
 /** C7: one weapon tree line. */
