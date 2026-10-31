@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Details Sheet</title>
+<!-- Profile polish (docs/design/profile-polish/proposal.md): the Details sheet with damage first and the raw stats a tap away.
+     Self-contained: uma-kit's tokens, light and dark, phone mocks inside a desktop page. Every Uma here is made up; the first one's
+     numbers are the owner's screenshot of 2026-10-31. The sums are the engine's (battleDamage's step 1). -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
+    --src-atk: #c2410c; --src-matk: #1d6fd1; --src-might: #3f4b5c; --src-accessory: #a23ac8; --src-star: #8f6410; --src-stars: #0e7490;
+    --kind-fire: #e0562a; --kind-ice: #2f8fd8; --kind-lightning: #b98900; --kind-greatsword: #d9761a; --kind-lance: #2f9a43; --kind-axe: #5b4fd6;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a;
+      --success: #4fb37a; --danger: #e0645c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --scrim: rgb(0 0 0 / 0.55);
+      --src-atk: #ff8f5e; --src-matk: #5fb2ff; --src-might: #c3ccd8; --src-accessory: #d48cf0; --src-star: #e8b65a; --src-stars: #7fd4e8;
+      --kind-fire: #ff8a5c; --kind-ice: #8fd3ff; --kind-lightning: #ffd84d; --kind-greatsword: #f5a54a; --kind-lance: #62cf70; --kind-axe: #9a86f2;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a;
+    --success: #4fb37a; --danger: #e0645c;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --scrim: rgb(0 0 0 / 0.55);
+    --src-atk: #ff8f5e; --src-matk: #5fb2ff; --src-might: #c3ccd8; --src-accessory: #d48cf0; --src-star: #e8b65a; --src-stars: #7fd4e8;
+    --kind-fire: #ff8a5c; --kind-ice: #8fd3ff; --kind-lightning: #ffd84d; --kind-greatsword: #f5a54a; --kind-lance: #62cf70; --kind-axe: #9a86f2;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.5 Inter, system-ui, -apple-system, sans-serif; }
+  .display { font-family: 'SF Pro Rounded', ui-rounded, system-ui, sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 28px 24px 72px; }
+  h1 { font-size: 30px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -.01em; }
+  h2 { font-size: 21px; margin: 44px 0 6px; }
+  p.lede { color: var(--ink-soft); margin: 0 0 14px; max-width: 78ch; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+  .seg { display: inline-flex; background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 10px; overflow: hidden; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 13px/1 Inter, system-ui, sans-serif; padding: 9px 12px; min-height: 36px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  .cap { font-weight: 700; font-size: 13px; color: var(--ink-soft); margin: 0 0 8px; }
+  .card { background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px; padding: 14px 16px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  .card ul { margin: 6px 0 0; padding-left: 20px; }
+  .card li { margin: 4px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.ok { color: var(--success); font-weight: 700; }
+  td.no { color: var(--danger); font-weight: 700; }
+  code { font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  .phone { width: calc(var(--w, 390px) + 20px); padding: 10px; background: var(--bezel); border-radius: 38px; flex: none; }
+  .screen { position: relative; width: var(--w, 390px); height: var(--h, 844px); background: var(--page); border-radius: 28px; overflow: hidden; }
+  .scrim { position: absolute; inset: 0; background: var(--scrim); display: flex; align-items: flex-end; }
+  .sheet { width: 100%; max-height: 88%; display: flex; flex-direction: column; background: var(--panel); border-radius: 18px 18px 0 0; padding: 8px 0 0; }
+  .grip { width: 38px; height: 4px; border-radius: 2px; background: var(--hairline-strong); margin: 0 auto 4px; flex: none; }
+  .sheet > header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; min-height: 44px; flex: none; }
+  .sheet > header b { font-size: 20px; }
+  .x { font-size: 22px; color: var(--ink-soft); width: 44px; height: 44px; display: grid; place-items: center; margin-right: -12px; }
+  .sb { overflow: auto; padding: 4px 16px 16px; }
+
+  /* Damage. */
+  .sec { display: flex; align-items: center; justify-content: space-between; min-height: 22px; margin: 0 0 4px; }
+  .sec h3 { margin: 0; font: 700 11px/1 Inter, system-ui, sans-serif; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-soft); }
+  .chip { font-size: 11px; font-weight: 700; color: var(--src-accessory); }
+  .wrow { display: grid; grid-template-columns: 30px 46px 1fr; column-gap: 8px; align-items: center; padding: 6px 0 7px; }
+  .wrow + .wrow { border-top: 1px solid var(--hairline); }
+  .wrow svg { grid-row: span 2; }
+  .tot { font-size: 24px; font-weight: 800; line-height: 1; text-align: right; font-variant-numeric: tabular-nums; }
+  .parts { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink-faint); white-space: nowrap; }
+  .parts i { font-style: normal; margin: 0 1.5px; }
+  .strip { grid-column: 2 / -1; display: flex; gap: 2px; height: 4px; margin-top: 5px; }
+  .strip i { display: block; height: 100%; min-width: 2px; }
+  .strip i:first-child { border-radius: 2px 0 0 2px; }
+  .strip i:last-child { border-radius: 0 2px 2px 0; }
+  .key { display: flex; flex-wrap: wrap; gap: 2px 10px; margin: 6px 0 0; font-size: 11px; color: var(--ink-soft); }
+  .key span { display: inline-flex; align-items: center; gap: 4px; }
+  .key i { width: 8px; height: 8px; border-radius: 2px; }
+  .src { margin: 6px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-soft); }
+  .src b { font-weight: 700; }
+  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .tiles.six { grid-template-columns: repeat(3, 1fr); }
+  .tiles span { background: var(--raised); border-radius: 6px; padding: 6px 2px 7px; text-align: center; font-size: 11px; color: var(--ink-soft); }
+  .tiles b { display: block; font: 700 16px/1.2 'SF Pro Rounded', ui-rounded, system-ui, sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .more { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 44px; margin-top: 12px; padding: 0 12px; border: 0; border-radius: 10px; background: var(--raised); color: var(--ink); font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; }
+  .back { display: inline-flex; align-items: center; min-height: 44px; border: 0; background: none; color: var(--ink-soft); font: 600 13px Inter, system-ui, sans-serif; padding: 0; cursor: pointer; }
+
+  /* All stats, and today's sheet. */
+  .rs { font-size: 13px; }
+  .rs h4 { margin: 10px 0 2px; font: 700 11px/1.3 Inter, system-ui, sans-serif; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint); }
+  .rw { padding: 3px 0; border-bottom: 1px solid var(--hairline); }
+  .rw div { display: flex; justify-content: space-between; gap: 8px; }
+  .rw div span { color: var(--ink-soft); white-space: nowrap; }
+  .rw div b { font-weight: 600; text-align: right; }
+  .rw small { display: block; font-size: 11px; line-height: 1.25; color: var(--ink-faint); }
+  .armor { color: var(--src-might); } .acc { color: var(--src-accessory); } .stars { color: var(--src-stars); } .moon { color: var(--src-star); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; font-size: 13px; line-height: 14px; }
+  .two .rw { padding: 2px 0; }
+  .two .rw div span { white-space: nowrap; }
+  .two h4 { margin: 6px 0 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Details: damage first</h1>
+  <p class="lede">The Details sheet opens on what her hits are made of. Every raw number stays, one tap behind <b>All stats</b>. Each weapon's number is the exact sum a fight uses
+    before the foe's defense, in the order you asked for: her ATK or M.ATK, the weapon's Might, her accessory, then anything extra.</p>
+  <div class="bar">
+    <span class="seg" id="theme"><button data-v="">System</button><button data-v="light">Light</button><button data-v="dark">Dark</button></span>
+    <span class="seg" id="width"><button data-v="390">390 × 844</button><button data-v="375">375 × 667</button></span>
+  </div>
+  <div class="row" id="phones"></div>
+
+  <h2>What each number is</h2>
+  <p class="lede">The top sum is what the engine adds, so it can't drift from a fight. The line under it opens up the one stat that hides armor.</p>
+  <div class="cards">
+    <div class="card"><h3>Every row adds up</h3><table id="sums"></table></div>
+    <div class="card"><h3>Your questions</h3>
+      <ul>
+        <li><b>Is damage always one of the ten kinds?</b> Yes: every Uma hit has a kind, and each row is one of her three.</li>
+        <li><b>Did armor lose its ATK?</b> No. Each piece still adds 1–5, by grade, to ATK or M.ATK by her class's half. It was hidden inside "gear 13", which was armor 10 + Charm 3.</li>
+        <li><b>Why did the colors go?</b> The old Battle tab colored gear blue and Extra Stats green. Details (H119) printed them plain, and no decision asked for that. They come back, and ATK and M.ATK get their own.</li>
+        <li><b>Why didn't the text cleanup catch this?</b> H117 cut sentences to labels and numbers. "Might · Fire Tome +8" passes that test: the fault was too many rows, not too many words.</li>
+      </ul>
+    </div>
+    <div class="card"><h3>What this is not</h3>
+      <ul>
+        <li><b>Not the hit you'll see in a fight.</b> A hit is this number² ÷ (this number + the foe's DEF), × the skill's power, weakness and the rest. It's the number you can raise.</li>
+        <li><b>Bosses +3% stays apart:</b> the Insignia multiplies, so it can't be added in. It shows beside the title, only when she has one.</li>
+        <li><b>A healer's Mends</b> joins the tiles below: it's the number a Paladin or a Cleric is built on.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>The colors, measured</h2>
+  <p class="lede">Each color is on the panel and the raised card, in both themes, as 11 px text. Neighbours stay apart under colour-blind simulation, and the order never changes, so nothing depends on colour alone.</p>
+  <div class="card"><table id="colors"></table></div>
+</main>
+
+<script>
+// Damage kinds' glyphs, as `KindMark` draws them (battle/labels.tsx).
+const ELEMENT = {
+  fire: 'M10 2c1 4-3 5-1 8 1-2 3-2 4-5 6 7 1 13-3 13S2 15 5 10c0 3 2 3 2 3-2-4 0-7 3-11Z',
+  ice: 'M10 1v18M2 5l16 10M18 5 2 15M7 3l3 3 3-3M7 17l3-3 3 3',
+  lightning: 'm11 1-7 10h6l-1 8 7-11h-6l1-7Z',
+}
+const element = (k) => `<svg viewBox="0 0 20 20" width="26" height="26" fill="none" stroke="var(--kind-${k})" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-label="${k}"><path d="${ELEMENT[k]}"/></svg>`
+const ART = {
+  greatsword: '<g transform="rotate(45 12 12)"><path fill-rule="evenodd" d="M12 .5 15 4v11H9V4Zm-.6 4v9h1.2v-9Z"/><rect x="4.500" y="15" width="15" height="2.200" rx="1.100"/><rect x="11" y="17.200" width="2" height="4.300"/><circle cx="12" cy="22.600" r="1.500"/></g>',
+  lance: '<g transform="rotate(45 12 12)"><path d="M12 .5c2.400 3 2.600 6.300.9 9.100h-1.800C9.400 6.800 9.600 3.500 12 .5Z"/><rect x="10.600" y="9.600" width="2.800" height="1.600" rx=".5"/><rect x="11.350" y="11.200" width="1.300" height="12.600" rx=".6"/></g>',
+}
+const weapon = (k) => `<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" style="color:var(--kind-${k})" aria-label="${k}">${ART[k]}</svg>`
+const icon = (k) => ELEMENT[k] ? element(k) : weapon(k)
+
+// The Umas. `stats` is the line under the sum; each weapon adds Might, an Orb and her signature to the stat of its channel.
+const SORCERER = {
+  name: 'Sorcerer', bosses: 3, signature: 2,
+  stats: { 'M.ATK': { total: 70, base: 52, armor: 10, acc: 3, stars: 5 } },
+  weapons: [{ kind: 'fire', stat: 'M.ATK', might: 8, orb: 6 }, { kind: 'ice', stat: 'M.ATK', might: 8, orb: 0 }, { kind: 'lightning', stat: 'M.ATK', might: 8, orb: 0 }],
+  tiles: [['HP', '553'], ['MP', '103'], ['DEF', '65'], ['M.DEF', '64'], ['Evasion', '3.6%']],
+}
+const HYBRID = {
+  name: 'Arms Spellblade', bosses: 0, signature: 4,
+  stats: { ATK: { total: 150, base: 100, armor: 20, acc: 10, stars: 20 }, 'M.ATK': { total: 98, base: 90, armor: 0, acc: 0, stars: 8 } },
+  weapons: [{ kind: 'greatsword', stat: 'ATK', might: 45, orb: 14 }, { kind: 'lance', stat: 'ATK', might: 35, orb: 0 }, { kind: 'fire', stat: 'M.ATK', might: 35, orb: 0 }],
+  tiles: [['HP', '1,140'], ['MP', '120'], ['DEF', '151'], ['M.DEF', '129'], ['Evasion', '8.4%']],
+}
+const total = (u, w) => u.stats[w.stat].total + w.might + w.orb + u.signature
+const color = (stat) => (stat === 'ATK' ? 'var(--src-atk)' : 'var(--src-matk)')
+
+function damage(u) {
+  const top = Math.max(...u.weapons.map((w) => total(u, w)))
+  const rows = u.weapons.map((w) => {
+    const t = total(u, w), s = u.stats[w.stat].total
+    const parts = [[s, color(w.stat), false], [w.might, 'var(--src-might)', true], [w.orb, 'var(--src-accessory)', true], [u.signature, 'var(--src-star)', true]].filter(([n]) => n)
+    const strip = parts.map(([n, c]) => `<i style="flex:${n} 0 0;background:${c}"></i>`).join('')
+    return `<div class="wrow">${icon(w.kind)}<span class="tot display">${t}</span>
+      <span class="parts">(${parts.map(([n, c, plus]) => `<i style="color:${c}">${plus ? '+' : ''}${n}</i>`).join(' ')})</span>
+      <span class="strip" style="width:${(t / top) * 100}%">${strip}</span></div>`
+  }).join('')
+  const stats = [...new Set(u.weapons.map((w) => w.stat))]
+  const key = [...stats.map((s) => [s, color(s)]), ['Might', 'var(--src-might)'], ['Accessory', 'var(--src-accessory)'], ['★ Signature', 'var(--src-star)']]
+  const src = stats.map((s) => { const v = u.stats[s]; return `<p class="src"><b style="color:${color(s)}">${s} ${v.total}</b> · base ${v.base}${v.armor ? ` · <span class="armor">armor ${v.armor}</span>` : ''}${v.acc ? ` · <span class="acc">accessory ${v.acc}</span>` : ''}${v.stars ? ` · <span class="stars">Stars ${v.stars}</span>` : ''}</p>` }).join('')
+  return `<div class="sec"><h3>Damage</h3>${u.bosses ? `<span class="chip">Bosses +${u.bosses}%</span>` : ''}</div>${rows}
+    <p class="key">${key.map(([t, c]) => `<span><i style="background:${c}"></i>${t}</span>`).join('')}</p>${src}`
+}
+const survive = (u) => `<div class="sec" style="margin-top:14px"><h3>Stats</h3></div><div class="tiles ${u.tiles.length > 5 ? 'six' : ''}">${u.tiles.map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join('')}</div>`
+const sheet = (title, body, back = '') => `<div class="scrim"><div class="sheet"><div class="grip"></div><header><b class="display">${title}</b><span class="x">×</span></header><div class="sb">${back}${body}</div></div></div>`
+const details = (u, id) => sheet('Details', `${damage(u)}${survive(u)}<button class="more" data-more="${id}">All stats <span>›</span></button>`)
+
+const rw = (label, value, parts = '') => `<div class="rw"><div><span>${label}</span><b>${value}</b></div>${parts ? `<small>${parts}</small>` : ''}</div>`
+const allStats = () => sheet('All stats', `<div class="rs">
+  <h4 style="margin-top:0">Offense</h4>
+  ${rw('ATK', '55', 'base 52 · <span class="stars">Stars 3</span>')}
+  ${rw('M.ATK', '70', 'base 52 · <span class="armor">armor 10</span> · <span class="acc">accessory 3</span> · <span class="stars">Stars 5</span>')}
+  ${rw('Might', 'Fire Tome +8')}${rw('Might', 'Blizzard Tome +8')}${rw('Might', 'Thunder Tome +8')}
+  ${rw('Accessory 1', 'Charm · M.ATK +3')}${rw('Accessory 2', 'Orb · Fire +6')}${rw('Accessory 3', 'Insignia · Bosses +3%')}
+  ${rw('★ Signature', 'ATK/M.ATK +2 · Worn')}
+  <h4>Defense</h4>${rw('DEF', '65', 'base 48 · <span class="armor">armor 12</span> · <span class="stars">Stars 5</span>')}${rw('M.DEF', '64', 'base 47 · <span class="armor">armor 12</span> · <span class="stars">Stars 5</span>')}${rw('Evasion', '3.6%')}
+  <h4>Sustain</h4>${rw('HP', '553', 'base 483 · <span class="armor">armor 45</span> · <span class="stars">Stars 25</span>')}${rw('MP', '103 · +1/round', 'base 89 · <span class="armor">armor 9</span> · <span class="stars">Stars 5</span>')}${rw('★ Flourish', 'Even pace · 1%/round · max 4% · On')}
+  <h4>Other</h4>${rw('Limit start', '0/12')}
+  <h4>Core</h4>${rw('Speed', '52', '104 · +10%')}${rw('Stamina', '48', '83 · +10%')}${rw('Power', '48', '83 · +10%')}${rw('Guts', '47', '91')}${rw('Wit', '46', '89')}
+  <h4>Work</h4>${rw('Craft', 'Craft 32')}${rw('EXP', '1,714/1,905')}${rw('Grades', 'G7 open · G8 at Craft 36')}${rw('Trade', 'Monster Den · Lapidary')}
+  <h4>Since</h4>${rw('Unlocked', '10 Oct 2026')}
+  <button class="more">How stats add up <span>+</span></button></div>`, '<button class="back" data-back>‹ Details</button>')
+const today = () => sheet('Details', `<div class="two rs">
+  <div><h4 style="margin-top:0">Offense</h4>${rw('ATK', '55', 'base 52 · Stars 3')}${rw('M.ATK', '70', 'base 52 · gear 13 · Stars 5')}${rw('Might', 'Fire Tome +8')}${rw('Might', 'Blizzard Tome +8')}${rw('Might', 'Thunder Tome +8')}${rw('Accessory 1', 'Charm · M.ATK +3')}${rw('Accessory 2', 'Orb · Fire +6')}${rw('Accessory 3', 'Insignia · Bosses +3%')}${rw('★ Signature', 'ATK/M.ATK +2 · Worn')}
+    <h4>Defense</h4>${rw('DEF', '65', 'base 48 · gear 12 · Stars 5')}${rw('M.DEF', '64', 'base 47 · gear 12 · Stars 5')}${rw('Evasion', '3.6%')}
+    <h4>Sustain</h4>${rw('HP', '553', 'base 483 · gear 45 · Stars 25')}${rw('MP', '103 · +1/round', 'base 89 · gear 9 · Stars 5')}${rw('★ Flourish', 'Even pace · 1%/round · max 4% · On')}<h4>Other</h4>${rw('Limit start', '0/12')}</div>
+  <div><h4 style="margin-top:0">Core</h4>${rw('Speed', '52', '104 · +10%')}${rw('Stamina', '48', '83 · +10%')}${rw('Power', '48', '83 · +10%')}${rw('Guts', '47', '91')}${rw('Wit', '46', '89')}
+    <h4>Work</h4>${rw('Craft', 'Craft 32')}${rw('EXP', '1,714/1,905')}${rw('Grades', 'G7 open · G8 at Craft 36')}${rw('Trade', 'Monster Den · Lapidary')}<h4>Since</h4>${rw('Unlocked', '10 Oct 2026')}<button class="more">How stats add up <span>+</span></button></div></div>`)
+
+const PHONES = [['Today', today()], ['Proposed: a Sorcerer (your screenshot)', details(SORCERER, 'a')], ['Proposed: a hybrid, ATK and M.ATK apart', details(HYBRID, 'b')], ['All stats, one tap down', allStats()]]
+document.getElementById('phones').innerHTML = PHONES.map(([cap, html], i) => `<div><p class="cap">${cap}</p><div class="phone"><div class="screen" data-phone="${i}">${html}</div></div></div>`).join('')
+document.querySelectorAll('[data-more]').forEach((b) => b.onclick = () => { const s = b.closest('.screen'), was = s.innerHTML; s.innerHTML = allStats(); s.querySelector('[data-back]').onclick = () => { s.innerHTML = was } })
+
+// The sums, and the colors' contrast.
+const rows = [...SORCERER.weapons.map((w) => ['Sorcerer', w, SORCERER]), ...HYBRID.weapons.map((w) => ['Spellblade', w, HYBRID])]
+document.getElementById('sums').innerHTML = `<tr><th>Uma</th><th>Kind</th><th>Stat</th><th>Might</th><th>Orb</th><th>★</th><th>Total</th></tr>` +
+  rows.map(([n, w, u]) => `<tr><td>${n}</td><td>${w.kind}</td><td>${u.stats[w.stat].total}</td><td>${w.might}</td><td>${w.orb}</td><td>${u.signature}</td><td><b>${total(u, w)}</b></td></tr>`).join('')
+const lum = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2] }
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + .05) / (y + .05) }
+const COLORS = [['ATK', '#c2410c', '#ff8f5e'], ['M.ATK', '#1d6fd1', '#5fb2ff'], ['Might', '#3f4b5c', '#c3ccd8'], ['Accessory', '#a23ac8', '#d48cf0'], ['★', '#8f6410', '#e8b65a'], ['Stars', '#0e7490', '#7fd4e8']]
+document.getElementById('colors').innerHTML = `<tr><th>Source</th><th>Light</th><th>on panel · raised</th><th>Dark</th><th>on panel · raised</th><th></th></tr>` + COLORS.map(([n, l, d]) => {
+  const v = [ratio(l, '#ffffff'), ratio(l, '#f3f6fa'), ratio(d, '#17202b'), ratio(d, '#1f2a37')], ok = v.every((x) => x >= 4.5)
+  return `<tr><td>${n}</td><td><code>${l}</code></td><td>${v[0].toFixed(1)} · ${v[1].toFixed(1)}</td><td><code>${d}</code></td><td>${v[2].toFixed(1)} · ${v[3].toFixed(1)}</td><td class="${ok ? 'ok' : 'no'}">${ok ? '≥ 4.5' : 'Low'}</td></tr>`
+}).join('')
+
+function seg(host, current, pick) {
+  const el = document.getElementById(host)
+  const paint = (v) => el.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)))
+  el.querySelectorAll('button').forEach((b) => b.onclick = () => { paint(b.dataset.v); pick(b.dataset.v) })
+  paint(current)
+}
+seg('theme', '', (v) => { if (v) document.documentElement.dataset.theme = v; else delete document.documentElement.dataset.theme })
+seg('width', '390', (v) => document.querySelectorAll('.phone').forEach((p) => { p.style.setProperty('--w', `${v}px`); p.style.setProperty('--h', v === '375' ? '667px' : '844px') }))
+</script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Star Chart</title>
+<!-- Profile polish (docs/design/profile-polish/proposal.md): the Stars tab's Extra Stats map as a star chart. Self-contained:
+     uma-kit's tokens, light and dark, phone mocks inside a desktop page. Every Uma here is made up; the rules, gates and values
+     are the live game's (economy/planet.ts). The icons are drafts: the brief for the art packet, not the final art. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a;
+      --success: #4fb37a; --danger: #e0645c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --scrim: rgb(0 0 0 / 0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a;
+    --success: #4fb37a; --danger: #e0645c;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --scrim: rgb(0 0 0 / 0.55);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.5 Inter, system-ui, -apple-system, sans-serif; }
+  .display { font-family: 'SF Pro Rounded', ui-rounded, system-ui, sans-serif; }
+  main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 72px; }
+  h1 { font-size: 30px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -.01em; }
+  h2 { font-size: 21px; margin: 44px 0 6px; }
+  p.lede { color: var(--ink-soft); margin: 0 0 14px; max-width: 76ch; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 18px; }
+  .seg { display: inline-flex; background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 10px; overflow: hidden; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 13px/1 Inter, system-ui, sans-serif; padding: 9px 12px; min-height: 36px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .row { display: flex; flex-wrap: wrap; gap: 26px; align-items: flex-start; }
+  .col { flex: 1 1 340px; min-width: 300px; }
+  .cap { font-weight: 700; font-size: 13px; color: var(--ink-soft); margin: 0 0 8px; }
+  .card { background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px; padding: 14px 16px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; }
+  .card ol, .card ul { margin: 6px 0 0; padding-left: 20px; }
+  .card li { margin: 4px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.ok { color: var(--success); font-weight: 700; }
+  td.no { color: var(--danger); font-weight: 700; }
+  code { font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  /* The phone. */
+  .phone { width: calc(var(--w, 390px) + 20px); padding: 10px; background: var(--bezel); border-radius: 38px; flex: none; }
+  .screen { position: relative; width: var(--w, 390px); height: 760px; background: var(--page); border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; }
+  .top { padding: 12px 16px 8px; background: var(--panel); border-bottom: 1px solid var(--hairline); }
+  .who { display: flex; align-items: center; gap: 10px; }
+  .who i { width: 44px; height: 44px; border-radius: 50%; background: var(--raised); display: block; flex: none; }
+  .who b { font-size: 16px; display: block; line-height: 1.2; }
+  .who span { font-size: 12.5px; color: var(--ink-soft); }
+  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: var(--raised); border-radius: 10px; padding: 3px; margin-top: 10px; }
+  .tabs span { text-align: center; font: 600 13px/1 Inter, system-ui, sans-serif; padding: 11px 0; color: var(--ink-soft); border-radius: 8px; }
+  .tabs span.on { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .14); }
+  .body { flex: 1; overflow: auto; padding: 8px 16px 16px; }
+  .first { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; font-size: 12.5px; font-weight: 600; }
+  .setall { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; min-height: 44px; padding: 0 12px; font: 700 12.5px Inter, system-ui, sans-serif; }
+  .hinfo { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--ink-soft); color: var(--ink-soft); display: inline-grid; place-items: center; font: 700 13px Georgia, serif; margin-left: 4px; }
+  .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
+  .totals span { display: flex; align-items: center; justify-content: center; gap: 5px; background: var(--raised); border-radius: 6px; padding: 5px 2px; font-size: 12.5px; }
+  .totals svg { width: 16px; height: 16px; flex: none; color: var(--ink-soft); }
+  .totals b { font-weight: 600; }
+  .totals em { font-style: normal; color: var(--ink-soft); }
+  .starline { text-align: center; font-size: 12.5px; font-weight: 600; color: var(--accent-strong); margin: 6px 0 0; }
+
+  /* The chart: always the night sky, the stage under the fights. */
+  .chart { display: block; width: 100%; height: auto; border-radius: 14px; }
+  .chart .tap { cursor: pointer; outline: none; }
+  .chart .tap:focus-visible .focus { opacity: 1; }
+  .chart .focus { opacity: 0; }
+  .chart text { font-family: 'SF Pro Rounded', ui-rounded, Inter, system-ui, sans-serif; }
+  @keyframes pulse { 0%, 100% { opacity: .15; r: 15; } 50% { opacity: .75; r: 18; } }
+  .pulse { animation: pulse 1.8s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .pulse { animation: none; opacity: .45; } }
+
+  /* The sheet. */
+  .scrim { position: absolute; inset: 0; background: var(--scrim); display: flex; align-items: flex-end; z-index: 5; }
+  .sheet { width: 100%; background: var(--panel); border-radius: 18px 18px 0 0; padding: 8px 16px 16px; }
+  .grip { width: 38px; height: 4px; border-radius: 2px; background: var(--hairline-strong); margin: 0 auto 8px; }
+  .sheet header { display: flex; align-items: center; justify-content: space-between; min-height: 40px; }
+  .sheet header b { font-size: 19px; }
+  .close { border: 0; background: none; color: var(--ink-soft); font-size: 22px; width: 44px; height: 44px; margin-right: -12px; cursor: pointer; }
+  .steps { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; margin: 4px 0 10px; position: relative; }
+  .step { position: relative; border: 0; background: none; color: inherit; padding: 2px 0 4px; min-height: 58px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font: inherit; }
+  .step::before { content: ''; position: absolute; top: 17px; left: -50%; width: 100%; height: 2px; background: var(--hairline-strong); }
+  .step:first-child::before { display: none; }
+  .step.lit::before { background: var(--c); }
+  .dot { position: relative; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 700 12px 'SF Pro Rounded', ui-rounded, Inter, system-ui, sans-serif; background: var(--panel); border: 1.5px solid var(--hairline-strong); color: var(--ink-soft); }
+  .step.open .dot { background: var(--c); border-color: var(--c); color: #101a24; }
+  .step.next .dot, .step.ready .dot { border: 2px solid var(--c); color: var(--ink); }
+  .step.ready .dot::after { content: ''; position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--success); border: 2px solid var(--panel); }
+  .step.sel .dot { box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--ink-soft); }
+  .step small { font-size: 11px; line-height: 1.1; color: var(--ink-soft); white-space: nowrap; }
+  .step.sel small { color: var(--ink); font-weight: 700; }
+  .nsheet { text-align: center; }
+  .nsheet p { margin: 2px 0; }
+  .nsheet .val { font-size: 14px; font-weight: 600; }
+  .nsheet .big { font-size: 22px; font-weight: 800; line-height: 1.2; }
+  .nsheet .soft { font-size: 12.5px; color: var(--ink-soft); }
+  .nsheet .open { font-size: 14px; font-weight: 600; color: var(--accent-strong); }
+  .sheetbtn { width: 100%; min-height: 48px; margin-top: 12px; border: 0; border-radius: 10px; font: 700 15px 'SF Pro Rounded', ui-rounded, Inter, system-ui, sans-serif; background: var(--raised); color: var(--ink-soft); }
+  .sheetbtn.go { background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+
+  /* Icons. */
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 10px; }
+  .icon { background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 10px 6px; text-align: center; font-size: 12px; color: var(--ink-soft); }
+  .icon svg { display: block; margin: 0 auto 6px; color: var(--ink); }
+  .legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+  .legend .card { display: flex; gap: 10px; align-items: center; padding: 10px 12px; }
+  .legend svg { flex: none; }
+  .legend b { display: block; font-size: 13.5px; }
+  .legend span { font-size: 12.5px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<main>
+  <h1>The star chart</h1>
+  <p class="lede">The Stars tab's Extra Stats map, redrawn: every body a true constellation, every node numbered and tappable, nothing
+    placed by eye. The rules, gates and values on this page are the live game's. Tap any star or the middle of a body.</p>
+  <div class="bar">
+    <span class="seg" id="theme"><button data-v="">System</button><button data-v="light">Light</button><button data-v="dark">Dark</button></span>
+    <span class="seg" id="width"><button data-v="390">390 × 844</button><button data-v="375">375 × 667</button></span>
+    <span class="seg" id="preset"></span>
+  </div>
+
+  <div class="row">
+    <div><p class="cap">Today, as live</p><div class="phone"><div class="screen" id="old"></div></div></div>
+    <div><p class="cap">Proposed</p><div class="phone"><div class="screen" id="new"></div></div></div>
+    <div class="col">
+      <div class="card">
+        <h3>What was wrong</h3>
+        <ol>
+          <li><b>The big loop isn't a circle.</b> Three arcs of one radius forced through three points that aren't equally far from the Planet, so it bulges and cuts through Prowess's label.</li>
+          <li><b>The stars sit off their rings.</b> The Planet's ring has radius 34 and its nodes radius 38. Prowess's label is centred 10 px away from its own nodes.</li>
+          <li><b>★ Longblade overflows its ring</b>, and the longest template name is longer.</li>
+          <li><b>Nothing says what comes next.</b> Twenty-two identical circles: no order, no numerals, no line between stars.</li>
+          <li><b>The map tells you nothing without a tap.</b> A name is the only text, and the totals below it are detached from it.</li>
+        </ol>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3>What the chart does instead</h3>
+        <ul>
+          <li>Each body draws its own figure: <b>Prowess a spearhead, Vigor a pentagon, Guard a shield,</b> the Planet a true ring.</li>
+          <li><b>Numerals on the stars</b> are the jewels' numerals: a Moon Jewel III opens a III.</li>
+          <li><b>Lines light up</b> as nodes open, always clockwise from I. A finished body closes its figure.</li>
+          <li><b>One tap on a star or a body</b> opens its sheet, with all five values and the jewel.</li>
+          <li><b>Green stays Ready's</b>, and only Ready pulses.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2>Four states, and only four</h2>
+  <p class="lede">Colour says which body; fill says how far along. A tired eye can read the chart by shape alone.</p>
+  <div class="legend" id="legend"></div>
+
+  <h2>Iconography: the brief for the art packet</h2>
+  <p class="lede">Drafts, to fix the silhouettes. The art packet draws them as pixel art in uma-art's <code>ui</code> atlas, in the house style of the class
+    emblems: five 24 px crests and eight 16 px stat marks.</p>
+  <div class="icons" id="icons"></div>
+
+  <h2>The geometry, checked</h2>
+  <p class="lede">Computed on this page from the same table the packet ships. At 375 wide the chart is 343 px, so a viewBox unit is 0.95 px.</p>
+  <div class="card"><table id="checks"></table></div>
+  <div class="card" style="margin-top:12px"><table id="coords"></table></div>
+</main>
+
+<script>
+// --- The rules, as the live game has them (economy/planet.ts) ---------------------------------------------------------
+const ROMAN = ['I', 'II', 'III', 'IV', 'V']
+const PLANET = [1, 2, 4, 6, 8], MOON = [2, 4, 6, 8, 10]
+const gate = (body, n) => 5 * (body === 'planet' ? 2 * n - 1 : body === 'template' ? 4 * n : 2 * n) - 4
+const VALUE = {
+  planet: (n) => `+${PLANET[n - 1]} · all six`,
+  prowess: (n) => `M.ATK +${MOON[n - 1]}`,
+  vigor: (n) => `HP +${MOON[n - 1] * 5} · MP +${MOON[n - 1]}`,
+  guard: (n) => `DEF/M.DEF +${MOON[n - 1]}`,
+  template: (n) => n === 1 ? 'Evasion +2.4%' : 'DEF/M.DEF +4',
+}
+const SHORT = { planet: (n) => `+${PLANET[n - 1]}`, prowess: (n) => `+${MOON[n - 1]}`, vigor: (n) => `+${MOON[n - 1] * 5}`, guard: (n) => `+${MOON[n - 1]}`, template: (n) => n === 1 ? '+2.4%' : '+4' }
+
+// --- The geometry: the table the packet ships. A viewBox of 360 × 350 ----------------------------------------------------
+const W = 360, H = 350, PLANET_AT = [180, 208], ORBIT = 132, NODE_R = 13, TARGET = 22
+const moonAt = (deg) => [PLANET_AT[0] + Math.cos(deg * Math.PI / 180) * ORBIT, PLANET_AT[1] + Math.sin(deg * Math.PI / 180) * ORBIT]
+const round = (p) => [Math.round(p[0] * 10) / 10, Math.round(p[1] * 10) / 10]
+const regular = (radius) => Array.from({ length: 5 }, (_, i) => [Math.cos((-90 + i * 72) * Math.PI / 180) * radius, Math.sin((-90 + i * 72) * Math.PI / 180) * radius])
+const BODIES = {
+  planet: { name: 'Planet', count: 5, at: PLANET_AT, color: '#ffd84d', figure: regular(44), label: [180, 276], ring: 44 },
+  prowess: { name: 'Prowess', count: 5, at: moonAt(-90), color: '#ff9a6b', figure: [[0, -58], [35, -12], [25, 34], [-25, 34], [-35, -12]], label: [86, 60] },
+  vigor: { name: 'Vigor', count: 5, at: moonAt(150), color: '#ff8fb6', figure: regular(44), label: [66, 208] },
+  guard: { name: 'Guard', count: 5, at: moonAt(30), color: '#8fd3ff', figure: [[-40, -34], [40, -34], [46, 12], [0, 52], [-46, 12]], label: [294, 216] },
+  template: { name: 'Spellfencer', count: 2, at: [304, 62], color: '#f0b8ff', figure: [[-32, 0], [32, 0]], label: [352, 96], anchor: 'end' },
+}
+const nodePoints = (id) => BODIES[id].figure.map(([x, y]) => round([BODIES[id].at[0] + x, BODIES[id].at[1] + y]))
+
+// --- The presets --------------------------------------------------------------------------------------------------------
+const PRESETS = {
+  'Lv 8': { level: 8, open: { planet: 1, prowess: 0, vigor: 0, guard: 0, template: 0 }, jewels: { planet: 0, moon: 2 }, totals: { HP: 5, MP: 1, ATK: 1, 'M.ATK': 1, DEF: 1, 'M.DEF': 1 } },
+  'Lv 38': { level: 38, open: { planet: 3, prowess: 3, vigor: 3, guard: 3, template: 1 }, jewels: { planet: 3, moon: 1 }, totals: { HP: 95, MP: 19, ATK: 7, 'M.ATK': 19, DEF: 19, 'M.DEF': 19 } },
+  Complete: { level: 50, open: { planet: 5, prowess: 5, vigor: 5, guard: 5, template: 2 }, jewels: { planet: 0, moon: 0 }, totals: { HP: 255, MP: 51, ATK: 21, 'M.ATK': 51, DEF: 51, 'M.DEF': 51 } },
+}
+let preset = 'Lv 38', selected = null
+const state = (body, n) => {
+  const p = PRESETS[preset], open = p.open[body]
+  if (n <= open) return 'open'
+  if (n > open + 1) return 'later'
+  if (body === 'template') return 'next'
+  const held = body === 'planet' ? p.jewels.planet >= 3 : p.jewels.moon >= 1
+  return p.level >= gate(body, n) && held ? 'ready' : 'next'
+}
+
+// --- Drafts of the icons ------------------------------------------------------------------------------------------------
+const CREST = {
+  planet: '<circle cx="12" cy="12" r="6.6"/><ellipse cx="12" cy="12" rx="11" ry="3.5" transform="rotate(-24 12 12)" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+  prowess: '<path d="M12 1 14.6 4.6V15H9.4V4.6Z"/><rect x="6" y="15" width="12" height="2.2" rx="1.1"/><rect x="11" y="17.2" width="2" height="3.8"/><circle cx="12" cy="22" r="1.5"/><path d="m19.5 3 .9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6L16 6.500l2.600-.9Z"/>',
+  vigor: '<path d="M12 21.500C5.300 16.300 2 12.700 2 8.600A5.200 5.200 0 0 1 12 6.500a5.200 5.200 0 0 1 10 2.100c0 4.100-3.300 7.700-10 12.900Z"/>',
+  guard: '<path d="M12 1.800 20.800 5v6.800c0 4.900-3.700 8.500-8.800 10.400-5.100-1.900-8.800-5.500-8.800-10.400V5Z"/>',
+  template: '<path d="M15.500 2.200a10 10 0 1 0 6.300 16.100A8.300 8.300 0 0 1 15.500 2.200Z"/><path d="m17.500 6.500.8 2.200 2.200.8-2.200.8-.8 2.200-.8-2.200-2.200-.8 2.200-.8Z"/>',
+}
+const STAT = {
+  HP: '<path d="M8 14.300C3.400 10.800 1.300 8.300 1.300 5.600A3.500 3.500 0 0 1 8 4.300a3.500 3.500 0 0 1 6.700 1.300c0 2.700-2.100 5.200-6.700 8.700Z"/>',
+  MP: '<path d="M8 1.200S3 7 3 10.200a5 5 0 0 0 10 0C13 7 8 1.200 8 1.200Z"/>',
+  ATK: '<g transform="rotate(45 8 8)"><path d="M8 .3 9.800 3v7.500H6.200V3Z"/><rect x="3.800" y="10.500" width="8.400" height="1.700" rx=".8"/><rect x="7.200" y="12.200" width="1.600" height="3"/></g>',
+  'M.ATK': '<path d="m8 .8 1.900 5.300L15.200 8l-5.300 1.900L8 15.200l-1.900-5.300L.8 8l5.300-1.900Z"/>',
+  DEF: '<path d="M8 1 14 3.200v4.600c0 3.300-2.500 5.800-6 7.200-3.500-1.400-6-3.900-6-7.200V3.200Z"/>',
+  'M.DEF': '<path fill-rule="evenodd" d="M8 1 14 3.200v4.600c0 3.300-2.500 5.800-6 7.200-3.500-1.400-6-3.900-6-7.200V3.200Zm0 2.800L6.900 6.900 3.800 8l3.100 1.100L8 12.200l1.100-3.100L12.200 8 9.100 6.900Z"/>',
+  Evasion: '<path d="M1 12.500C5 12 9 9 10.500 2c1 1.800 1.500 3.300 1.500 4.800 1-.5 2-.7 3-.7-.5 3.800-3.500 7.400-14 6.400Z"/>',
+  Limit: '<path d="m8 .6 1.400 3.900 3.600-1.800-1.800 3.600L15.100 8l-3.900 1.400 1.800 3.600-3.600-1.800L8 15.100l-1.400-3.900-3.600 1.800 1.800-3.600L.9 8l3.900-1.400L3 3l3.600 1.800Z"/>',
+}
+const svg = (inner, size, box) => `<svg viewBox="0 0 ${box} ${box}" width="${size}" height="${size}" fill="currentColor" aria-hidden="true">${inner}</svg>`
+
+// --- The chart ----------------------------------------------------------------------------------------------------------
+const STARS = (() => { let seed = 42; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647
+  return Array.from({ length: 64 }, () => [+(r() * W).toFixed(1), +(r() * H).toFixed(1), +(0.5 + r() * 0.8).toFixed(2), +(0.18 + r() * 0.42).toFixed(2)]) })()
+
+function arc(cx, cy, radius, from, to) {
+  const p = (d) => [cx + Math.cos(d * Math.PI / 180) * radius, cy + Math.sin(d * Math.PI / 180) * radius]
+  const [x0, y0] = p(from), [x1, y1] = p(to)
+  return `M${x0.toFixed(1)} ${y0.toFixed(1)}A${radius} ${radius} 0 ${to - from > 180 ? 1 : 0} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`
+}
+/** A line between two stars, stopped at their edges. */
+function link(a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy), t = (NODE_R + 1) / d
+  return `M${(a[0] + dx * t).toFixed(1)} ${(a[1] + dy * t).toFixed(1)}L${(b[0] - dx * t).toFixed(1)} ${(b[1] - dy * t).toFixed(1)}`
+}
+function body(id) {
+  const b = BODIES[id], points = nodePoints(id), p = PRESETS[preset], done = p.open[id] >= b.count
+  let lines = ''
+  for (let i = 0; i < b.count - (b.count === 2 ? 1 : 0); i++) {
+    const next = (i + 1) % b.count, closing = next === 0
+    const lit = closing ? done : i + 2 <= p.open[id]
+    if (closing && !done) { lines += `<path d="${link(points[i], points[next])}" stroke="rgb(255 255 255 / .1)" stroke-width="1" stroke-dasharray="1 5" stroke-linecap="round" fill="none"/>`; continue }
+    const d = b.ring ? (() => { const off = 19, from = -90 + i * 72 + off, to = from + 72 - 2 * off; return arc(b.at[0], b.at[1], b.ring, from, to) })() : link(points[i], points[next])
+    lines += `<path d="${d}" fill="none" stroke-linecap="round" ${lit ? `stroke="${b.color}" stroke-width="2.5"` : 'stroke="rgb(255 255 255 / .26)" stroke-width="1.25" stroke-dasharray="3 5"'}/>`
+  }
+  const hubR = id === 'planet' ? 24 : id === 'template' ? 0 : 21
+  const [hx, hy] = id === 'prowess' ? [b.at[0], b.at[1] - 2] : b.at
+  const hub = `<g class="tap" role="button" tabindex="0" data-hub="${id}" aria-label="${b.name}, ${p.open[id]} of ${b.count} open">
+    <circle cx="${hx}" cy="${hy}" r="${id === 'template' ? 18 : 22}" fill="transparent"/>
+    ${hubR ? `<circle cx="${hx}" cy="${hy}" r="${hubR}" fill="url(#hub-${id})" stroke="${b.color}" stroke-opacity="${done ? .9 : .35}" stroke-width="1"/>` : ''}
+    <g color="${b.color}" transform="translate(${hx - 12} ${hy - 12})" pointer-events="none"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">${CREST[id]}</svg></g>
+    <circle class="focus" cx="${hx}" cy="${hy}" r="${(hubR || 18) + 3}" fill="none" stroke="#fff" stroke-width="2"/>
+  </g>`
+  const stars = points.map(([x, y], i) => {
+    const n = i + 1, s = state(id, n), nid = `${id}:${n}`
+    const fill = s === 'open' ? b.color : '#16222e'
+    const stroke = s === 'later' ? '#5b6b7e' : b.color
+    const ink = s === 'open' ? '#101a24' : s === 'later' ? '#93a3b5' : '#f2f6fa'
+    const title = id === 'template' ? `★ ${b.name}'s moon ${ROMAN[i]}` : `${b.name} ${ROMAN[i]}`
+    return `<g class="tap" role="button" tabindex="0" data-node="${nid}" aria-label="${title}, ${s}">
+      <circle cx="${x}" cy="${y}" r="${TARGET}" fill="transparent"/>
+      ${s === 'ready' ? `<circle class="pulse" cx="${x}" cy="${y}" r="16" fill="none" stroke="${b.color}" stroke-width="2"/>` : ''}
+      ${s === 'open' ? `<circle cx="${x}" cy="${y}" r="${NODE_R + 4}" fill="${b.color}" opacity=".2"/>` : ''}
+      <circle cx="${x}" cy="${y}" r="${NODE_R}" fill="${fill}" stroke="${stroke}" stroke-width="${s === 'ready' ? 2 : 1.5}"/>
+      <text x="${x}" y="${y + 4}" text-anchor="middle" font-size="12" font-weight="800" fill="${ink}" pointer-events="none">${ROMAN[i]}</text>
+      ${s === 'ready' ? `<circle cx="${x + 10}" cy="${y - 10}" r="5" fill="#4fb37a" stroke="#101a24" stroke-width="2" pointer-events="none"/>` : ''}
+      <circle class="focus" cx="${x}" cy="${y}" r="${NODE_R + 3}" fill="none" stroke="#fff" stroke-width="2"/>
+    </g>`
+  }).join('')
+  const name = id === 'template' ? `★ ${b.name}` : b.name
+  const label = `<text data-label="${id}" x="${b.label[0]}" y="${b.label[1]}" text-anchor="${b.anchor ?? 'middle'}" font-size="12" font-weight="700" fill="${b.color}">${name}<tspan fill="#a8b6c6" font-weight="600" dx="5">${p.open[id]}/${b.count}</tspan></text>`
+  return `<g data-body="${id}">${lines}${hub}${stars}${label}</g>`
+}
+function chart() {
+  const orbit = [[-90, 30], [30, 150], [150, 270]].map(([a, b]) => arc(PLANET_AT[0], PLANET_AT[1], ORBIT, a + 27, b - 27))
+  const defs = Object.entries(BODIES).map(([id, b]) => `<radialGradient id="hub-${id}"><stop offset="0" stop-color="${b.color}" stop-opacity=".28"/><stop offset="1" stop-color="${b.color}" stop-opacity=".06"/></radialGradient>`).join('')
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="group" aria-label="Extra Stats chart">
+    <defs>${defs}<radialGradient id="sky" cx="50%" cy="58%" r="72%"><stop offset="0" stop-color="#1c2b3c"/><stop offset="1" stop-color="#101a24"/></radialGradient></defs>
+    <rect width="${W}" height="${H}" rx="14" fill="url(#sky)"/>
+    ${STARS.map(([x, y, r, o]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${o}"/>`).join('')}
+    ${orbit.map((d) => `<path d="${d}" fill="none" stroke="rgb(255 255 255 / .13)" stroke-width="1" stroke-dasharray="1 6" stroke-linecap="round"/>`).join('')}
+    ${Object.keys(BODIES).map(body).join('')}
+  </svg>`
+}
+
+// --- The old map, as the live code draws it (StarsPanel.tsx, layout-v3.ts) -----------------------------------------------
+function oldChart() {
+  const ring = (cx, cy, radius, n, orbit, start = -Math.PI / 2) => Array.from({ length: n }, (_, i) => ({ x: cx + Math.cos(start + i * Math.PI * 2 / n) * radius, y: cy + Math.sin(start + i * Math.PI * 2 / n) * radius, orbit }))
+  const nodes = [...ring(180, 180, 38, 5, 'p'), ...ring(180, 68, 38, 5, 's'), ...ring(92, 276, 38, 5, 's'), ...ring(268, 276, 38, 5, 's'), ...ring(302, 112, 23, 2, 't')]
+  return `<svg viewBox="0 0 360 360" style="display:block;width:100%;border-radius:14px;background:var(--sunken);color:var(--ink)">
+    <circle cx="180" cy="180" r="34" fill="none" stroke="rgb(255 216 77 / .25)"/><circle cx="180" cy="180" r="18" fill="#ffd84d" opacity=".18"/>
+    <path d="M180 58 A142 142 0 0 1 268 276 A142 142 0 0 1 92 276 A142 142 0 0 1 180 58" fill="none" stroke="currentColor" stroke-opacity=".12"/>
+    <circle cx="302" cy="112" r="30" fill="none" stroke="rgb(240 184 255 / .4)"/>
+    ${[['Planet', 180, 180], ['Prowess', 180, 58], ['Vigor', 92, 276], ['Guard', 268, 276], ['★ Longblade', 302, 112]].map(([t, x, y]) => `<text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">${t}</text>`).join('')}
+    ${nodes.map((n, i) => `<circle cx="${n.x}" cy="${n.y}" r="7" fill="${i === 0 ? '#d6a23e' : 'transparent'}" opacity="${i === 0 ? 1 : .4}" stroke="${n.orbit === 't' ? '#f0b8ff' : '#d6a23e'}" stroke-width="1.5"/>`).join('')}
+  </svg>`
+}
+
+// --- The screens --------------------------------------------------------------------------------------------------------
+const header = () => `<div class="top"><div class="who"><i></i><div><b class="display">Aster</b><span>Sorcerer · Lv ${PRESETS[preset].level}</span></div></div>
+  <div class="tabs"><span>Class</span><span>Gear</span><span class="on">Stars</span><span>Template</span></div></div>`
+const count = () => Object.values(PRESETS[preset].open).reduce((a, b) => a + b, 0)
+const readyCount = () => Object.keys(BODIES).filter((id) => BODIES[id].count === 5 && state(id, PRESETS[preset].open[id] + 1) === 'ready').length
+
+function renderNew() {
+  const p = PRESETS[preset], ready = readyCount()
+  const plan = Math.min(ready, (p.jewels.planet >= 3 ? 1 : 0) + p.jewels.moon)
+  document.getElementById('new').innerHTML = `${header()}<div class="body">
+    <div class="first"><span>Extra Stats · Open ${count()}/22${plan ? ` · ${plan} ready` : ''}</span><span style="display:flex;align-items:center">${plan ? '<button class="setall">Set all</button>' : ''}<span class="hinfo">i</span></span></div>
+    ${chart()}
+    <div class="totals">${Object.entries(p.totals).map(([k, v]) => `<span>${svg(STAT[k], 16, 16)}<b>${k}</b><em>+${v}</em></span>`).join('')}</div>
+    ${p.open.template ? `<p class="starline">★ Evasion +2.4%${p.open.template > 1 ? ' · DEF/M.DEF +4' : ''}</p>` : ''}
+  </div>${selected ? sheet() : ''}`
+  document.querySelectorAll('#new [data-node]').forEach((el) => el.onclick = () => { selected = el.dataset.node; renderNew() })
+  document.querySelectorAll('#new [data-hub]').forEach((el) => el.onclick = () => { const id = el.dataset.hub; selected = `${id}:${Math.min(PRESETS[preset].open[id] + 1, BODIES[id].count)}`; renderNew() })
+  document.querySelectorAll('#new [data-step]').forEach((el) => el.onclick = () => { selected = el.dataset.step; renderNew() })
+  const close = document.querySelector('#new .close'); if (close) close.onclick = () => { selected = null; renderNew() }
+  const set = document.querySelector('#new .sheetbtn.go'); if (set) set.onclick = () => { const [id] = selected.split(':'); PRESETS[preset].open[id]++; renderNew() }
+  document.querySelectorAll('#new .tap').forEach((el) => el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click() } })
+}
+function sheet() {
+  const [id, raw] = selected.split(':'), n = Number(raw), b = BODIES[id], p = PRESETS[preset], s = state(id, n)
+  const title = id === 'template' ? `★ ${b.name}'s moon ${ROMAN[n - 1]}` : `${b.name} ${ROMAN[n - 1]}`
+  const jewel = id === 'template' ? null : id === 'planet' ? `Planet Jewel ${ROMAN[n - 1]} ×3 · ${p.jewels.planet} held` : `Moon Jewel ${ROMAN[n - 1]} ×1 · ${p.jewels.moon} held`
+  const prior = n > 1 && p.open[id] < n - 1 ? `${b.name} ${ROMAN[n - 2]} first` : null
+  const footer = id === 'template' ? 'With its moons' : prior ?? (p.level < gate(id, n) ? `Lv ${gate(id, n)}` : s === 'ready' ? 'Set' : jewel.replace(/ ×\d · /, ' ×').replace(' held', ''))
+  const steps = Array.from({ length: b.count }, (_, i) => {
+    const m = i + 1, st = state(id, m)
+    return `<button class="step ${st} ${m === n ? 'sel' : ''} ${m <= p.open[id] ? 'lit' : ''}" data-step="${id}:${m}" aria-label="${ROMAN[i]}, ${st}"><span class="dot">${ROMAN[i]}</span><small>${SHORT[id](m)}</small></button>`
+  }).join('')
+  const change = s === 'open' ? '' : id === 'planet' ? `HP ${553} → ${553 + PLANET[n - 1] * 5}` : id === 'prowess' ? `M.ATK 70 → ${70 + MOON[n - 1]}` : id === 'vigor' ? `HP 553 → ${553 + MOON[n - 1] * 5}` : id === 'guard' ? `DEF 65 → ${65 + MOON[n - 1]}` : 'Evasion 3.6% → 6.0%'
+  const rest = s === 'open' ? '' : id === 'planet' ? 'MP · ATK · M.ATK · DEF · M.DEF' : id === 'vigor' ? `MP 103 → ${103 + MOON[n - 1]}` : id === 'guard' ? `M.DEF 64 → ${64 + MOON[n - 1]}` : ''
+  return `<div class="scrim"><div class="sheet" style="--c:${b.color === '#ffd84d' ? '#d6a23e' : b.color}"><div class="grip"></div>
+    <header><b class="display">${title}</b><button class="close" aria-label="Close">×</button></header>
+    <div class="steps">${steps}</div>
+    <div class="nsheet"><p class="val">${VALUE[id](n)}</p>${change ? `<p class="big display">${change}</p>` : ''}${rest ? `<p class="soft">${rest}</p>` : ''}${jewel && s !== 'open' ? `<p class="soft">${jewel}</p>` : ''}${s === 'open' ? '<p class="open">Open</p>' : ''}</div>
+    ${s === 'open' ? '' : `<button class="sheetbtn ${footer === 'Set' ? 'go' : ''}" ${footer === 'Set' ? '' : 'disabled'}>${footer}</button>`}
+  </div></div>`
+}
+function renderOld() {
+  document.getElementById('old').innerHTML = `<div class="top"><div class="who"><i></i><div><b class="display">Aster</b><span>Sorcerer · Lv 8</span></div></div>
+    <div class="tabs"><span>Class</span><span>Gear</span><span class="on">Stars</span><span>Template</span></div></div>
+    <div class="body"><div class="first"><span>Extra Stats · Open 1/22</span><span class="hinfo">i</span></div>${oldChart()}
+    <div class="totals">${Object.entries({ HP: 5, MP: 1, ATK: 1, 'M.ATK': 1, DEF: 1, 'M.DEF': 1 }).map(([k, v]) => `<span><b>${k}</b><em>+${v}</em></span>`).join('')}</div></div>`
+}
+
+// --- The page's own parts -----------------------------------------------------------------------------------------------
+function legend() {
+  const sample = (fill, stroke, ink, extra = '', width = 1.5) => `<svg viewBox="0 0 44 44" width="44" height="44" style="background:#101a24;border-radius:10px"><circle cx="22" cy="22" r="13" fill="${fill}" stroke="${stroke}" stroke-width="${width}"/><text x="22" y="26" text-anchor="middle" font-size="12" font-weight="800" fill="${ink}" font-family="ui-rounded,system-ui">III</text>${extra}</svg>`
+  const rows = [
+    [sample('#8fd3ff', '#8fd3ff', '#101a24'), 'Open', 'Filled, and the line to it lit'],
+    [sample('#16222e', '#8fd3ff', '#f2f6fa', '<circle cx="32" cy="12" r="5" fill="#4fb37a" stroke="#101a24" stroke-width="2"/>', 2), 'Ready', 'A jewel you hold opens it now: green dot, a slow pulse'],
+    [sample('#16222e', '#8fd3ff', '#f2f6fa'), 'Next', 'Next in line, but it needs a level or a jewel'],
+    [sample('#16222e', '#5b6b7e', '#93a3b5'), 'Later', 'Behind the next one'],
+  ]
+  document.getElementById('legend').innerHTML = rows.map(([s, t, d]) => `<div class="card">${s}<div><b>${t}</b><span>${d}</span></div></div>`).join('')
+}
+function icons() {
+  const crest = Object.entries({ planet: 'Planet', prowess: 'Prowess', vigor: 'Vigor', guard: 'Guard', template: '★ Her moon' }).map(([k, n]) => `<div class="icon">${svg(CREST[k], 48, 24)}${n}<br><code>star/${k}</code> · 24 px</div>`)
+  const stat = Object.keys(STAT).map((k) => `<div class="icon">${svg(STAT[k], 32, 16)}${k}<br><code>stat/${k.toLowerCase().replace('.', '')}</code> · 16 px</div>`)
+  document.getElementById('icons').innerHTML = [...crest, ...stat].join('')
+}
+function checks() {
+  const all = Object.keys(BODIES).flatMap((id) => nodePoints(id).map((p, i) => ({ id: `${id}:${i + 1}`, p })))
+  let closest = { d: Infinity }
+  for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const d = Math.hypot(all[i].p[0] - all[j].p[0], all[i].p[1] - all[j].p[1]); if (d < closest.d) closest = { d, a: all[i].id, b: all[j].id } }
+  const edge = Math.min(...all.flatMap(({ p }) => [p[0], p[1], W - p[0], H - p[1]])) - NODE_R
+  const hubs = Object.entries(BODIES).filter(([id]) => id !== 'template')
+  const orbitOff = Math.max(...['prowess', 'vigor', 'guard'].map((id) => Math.abs(Math.hypot(BODIES[id].at[0] - PLANET_AT[0], BODIES[id].at[1] - PLANET_AT[1]) - ORBIT)))
+  const ringOff = Math.max(...nodePoints('planet').map((p) => Math.abs(Math.hypot(p[0] - PLANET_AT[0], p[1] - PLANET_AT[1]) - 44)))
+  const scale = 343 / 360
+  const labelHits = Object.keys(BODIES).flatMap((id) => {
+    const t = document.querySelector(`#new [data-label="${id}"]`); if (!t) return []
+    const box = t.getBBox(), bad = all.filter(({ p }) => p[0] + NODE_R > box.x && p[0] - NODE_R < box.x + box.width && p[1] + NODE_R > box.y && p[1] - NODE_R < box.y + box.height)
+    return [{ id, box, bad }]
+  })
+  const hits = labelHits.filter((l) => l.bad.length)
+  const overflow = labelHits.filter(({ box }) => box.x < 4 || box.x + box.width > W - 4 || box.y < 4 || box.y + box.height > H - 4)
+  const rows = [
+    ['Closest two stars, centre to centre', `${closest.d.toFixed(1)} units (${closest.a}, ${closest.b})`, closest.d * scale >= 44, '≥ 44 pt at 375 wide: every target stands alone'],
+    ['Star nearest an edge', `${edge.toFixed(1)} units`, edge >= 4, '≥ 4'],
+    ['Planet stars off their ring', ringOff.toFixed(2), ringOff < 0.1, 'on it'],
+    ['Moons off the orbit', orbitOff.toFixed(2), orbitOff < 0.1, 'on it: one true circle'],
+    ['Smallest text at 375 wide', `${(12 * scale).toFixed(1)} px`, 12 * scale >= 11, '≥ 11 px'],
+    ['Labels over a star', hits.length ? hits.map((h) => h.id).join(', ') : 'none', hits.length === 0, 'none'],
+    ['Labels past the chart', overflow.length ? overflow.map((h) => h.id).join(', ') : 'none', overflow.length === 0, 'none'],
+  ]
+  document.getElementById('checks').innerHTML = `<tr><th>Check</th><th>Measured</th><th>Target</th><th></th></tr>` + rows.map(([a, b, ok, t]) => `<tr><td>${a}</td><td>${b}</td><td>${t}</td><td class="${ok ? 'ok' : 'no'}">${ok ? 'Pass' : 'Fail'}</td></tr>`).join('')
+  document.getElementById('coords').innerHTML = `<tr><th>Body</th><th>Centre</th><th>I</th><th>II</th><th>III</th><th>IV</th><th>V</th></tr>` +
+    Object.keys(BODIES).map((id) => { const r = nodePoints(id).map((p) => `<td><code>${p[0]}, ${p[1]}</code></td>`).join(''); return `<tr><td>${BODIES[id].name}</td><td><code>${round(BODIES[id].at).join(', ')}</code></td>${r}${id === 'template' ? '<td></td><td></td><td></td>' : ''}</tr>` }).join('')
+}
+
+// --- The controls -------------------------------------------------------------------------------------------------------
+function seg(host, values, current, pick) {
+  const el = document.getElementById(host)
+  el.innerHTML = el.innerHTML || values.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join('')
+  const paint = (v) => el.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)))
+  el.querySelectorAll('button').forEach((b) => b.onclick = () => { paint(b.dataset.v); pick(b.dataset.v) })
+  paint(current)
+}
+seg('theme', [], '', (v) => { if (v) document.documentElement.dataset.theme = v; else delete document.documentElement.dataset.theme })
+seg('width', [], '390', (v) => document.querySelectorAll('.phone').forEach((p) => { p.style.setProperty('--w', `${v}px`); p.querySelector('.screen').style.height = v === '375' ? '667px' : '760px' }))
+seg('preset', Object.keys(PRESETS).map((k) => [k, k]), preset, (v) => { preset = v; selected = null; renderNew() })
+renderOld(); renderNew(); legend(); icons(); checks()
+</script>
+</body>
+</html>
