@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { SAVE_SCHEMA_VERSION } from './version'
-import { gradeOf, newGrades, type GradeTarget } from '../economy/grades'
+import { gradeOf, newGrades, type GradeTarget, type UmaGrades } from '../economy/grades'
 import { RPG_V2_CLASSES } from '../rpg/rules'
 import { accessoryFormBlock, accessoryKinds, raiseGrade, raiseGradeTo, setAccessoryForm } from './forge'
 import { classPresetV3 } from './presets'
 import { accessorySlot, ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { SaveRuleError } from './rules'
-import { type Save } from './save'
+import { parseSave, type Save } from './save'
 
 const weapon: GradeTarget = { kind: 'weapon', weapon: 'greatsword' }
 const saveOf = (items: Record<string, number>, level = 1, gear = newGrades(1)): Save => ({
@@ -90,6 +90,17 @@ describe('setting the accessory slot’s form (R2, H75)', () => {
     save = setAccessoryForm(save, '101', 'brawler', 0, null, undefined, NOW)
     expect(slotOf(save)).toEqual([accessorySlot(null, 6)])
     expect(world(save).items).toEqual({})
+  })
+
+  it('keeps every slot’s form through a save and a load (D266)', () => {
+    const start = saveOf({}, 30)
+    const recruit = world(start).umas['101']!
+    let save: Save = { ...start, tierWorlds: { '1': { ...world(start), umas: { '101': { ...recruit, classId: 'recruit' } } } } }
+    save = setAccessoryForm(save, '101', 'recruit', 1, 'orb', 'greatsword', NOW)
+    save = setAccessoryForm(save, '101', 'recruit', 2, 'insignia', undefined, NOW)
+    save = setAccessoryForm(save, '101', 'recruit', 0, 'bell', undefined, NOW)
+    const loaded = parseSave(JSON.parse(JSON.stringify(save)))
+    expect((world(loaded).umas['101']!.gear as UmaGrades).accessories).toEqual([accessorySlot('bell', 0), accessorySlot('orb', 0, 'greatsword'), accessorySlot('insignia', 0)])
   })
 
   it('checks an Orb against the class she names since H107 (WP22, D219): only a kind she can hit with', () => {

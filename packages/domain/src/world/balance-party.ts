@@ -11,16 +11,16 @@ import { heroLimitHall, heroLimitIds, heroSeatHome, type HeroLimitId } from '../
 import { RPG_TIER0_MAX_RANK, RPG_TIER0_MODEL } from '../rpg/class-tree'
 import type { RpgLines } from '../rpg/node-identity'
 import {
-  learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgExpToNext, rpgLearnBlock, rpgLearnedSkills, rpgProfileTrees,
-  type RpgClass, type RpgNodeRef, type RpgProfile, type RpgWeapon,
+  learnRpgNode, projectRpgStats, rpgActiveSlots, rpgDefaultWeapons, rpgExpToNext, rpgLearnBlock, rpgLearnedSkills, rpgPresetWeapons, rpgProfileTrees,
+  type RpgClass, type RpgNodeRef, type RpgProfile, type RpgTier1Class, type RpgWeapon,
 } from '../rpg/rules'
 import { applyPoints, addPoints, noPoints } from '../economy/bonus'
 import { starPoints } from '../economy/stars'
 import { CORE_NODES, mapNodeGate, mapPoints, moonChannel } from '../economy/planet'
 import { armorHalf, gradeMight, gradePoints, newGrades, type GearTier, type UmaGrades } from '../economy/grades'
-import { accessoryParts, signatureBonus, signatureWorn } from '../economy/accessories'
+import { accessoryOffense, accessoryParts, accessorySlotsParts, signatureBonus, signatureWorn } from '../economy/accessories'
 import { rpgPartyAllies, type RpgPartyMember } from '../rpg/campaign/run'
-import { classPresetV3, presetAccessory, type PresetAccessory } from '../save/presets'
+import { classPresetV3, presetAccessory, weaponPreset, type PresetAccessory } from '../save/presets'
 import { KNACK_FAMILY, STRIDE_FLOURISH, umaFlourishActive, type UmaCallingClass, type UmaKnack, type UmaStride } from '../roster/template'
 import { equippedAccessories, equippedMight, equippedPoints } from '../economy/gear'
 import { accessoryFightFields, type GearSlot } from '../economy/gear-id'
@@ -171,6 +171,8 @@ export interface BalanceOptions {
   template?: BalanceTemplate
   /** From v17 (H81, item 7): her accessory slot's form instead of the preset's, or null for an empty slot. */
   accessory?: PresetAccessory | null
+  /** From v20 (D264, D266): her three slots' forms instead of the preset's; null empties one. */
+  accessories?: readonly (PresetAccessory | null)[]
 }
 
 /** An invented template for a matched member (UT3's three readings, chosen rather than read from an outfit): her knack
@@ -189,6 +191,7 @@ const templateNodes = (level: number): string[] => ['template:1', 'template:2'].
  * Prowess at her split, and, matched, her moon's two nodes and her signature while she wears her family and her Flourish
  * as her calling. Built by the game's own path (`rpgPartyAllies` at the engine), so her input is what a graded save's
  * fight would freeze; full MP, the base regen the engine's (SB18), no MP accessory.
+ * From v20 (D264, D266) three slots, each on curve, in her class's preset (`weaponPreset`, a Tier 0 her model child's).
  */
 function v17Member(classId: RpgClass, profile: RpgProfile, loadout: RpgNodeRef[], inherits: RpgPartyMember['inherits'], options: BalanceOptions,
   engine: number): BattleAlly {
@@ -199,22 +202,26 @@ function v17Member(classId: RpgClass, profile: RpgProfile, loadout: RpgNodeRef[]
   const family = template ? KNACK_FAMILY[template.knack] : null
   const form = options.accessory !== undefined ? options.accessory
     : template ? presetAccessory(classId, profile.weapons, family, engine) : classPresetV3(classId, engine).accessory
+  const three = rpgRework('presets', engine)
+  const model = (rpgIsTier0(classId) ? RPG_TIER0_MODEL[classId] : classId) as RpgTier1Class
+  const forms = !three ? [form] : options.accessories ?? weaponPreset(model, family, engine).accessories
   const grades: UmaGrades = options.gear ? {
     weapons: Object.fromEntries(profile.weapons.map((w) => [w, { grade }])),
     armor: Object.fromEntries(ARMOR_SLOTS.map((slot) => [slot, { grade }])),
-    accessories: [{ grade, family: form?.family ?? null, form: 'base', ...(form?.kind ? { kind: form.kind } : {}) }],
+    accessories: forms.map((f) => ({ grade, family: f?.family ?? null, form: 'base', ...(f?.kind ? { kind: f.kind } : {}) })),
   } : newGrades(tier)
   const moon = template ? { knack: template.knack, channel: moonChannel(template.calling, engine) } : undefined
   const open = options.stars ? [...onCurveStars(classId, level, engine), ...(template ? templateNodes(level) : [])] : []
   // A Tier 0's armor offense and Prowess by her slots (CV7, H126).
   const thirds = rpgIsTier0(classId) ? profile.weapons.filter((w) => !isRpgTome(w)).length : undefined
-  const points = addPoints(options.gear ? gradePoints(grades, armorHalf(classId), tier, thirds) : noPoints(),
+  const offense = three && options.gear ? accessoryOffense(grades.accessories, tier) : { atk: 0, matk: 0 }
+  const points = addPoints(addPoints(options.gear ? gradePoints(grades, armorHalf(classId), tier, thirds) : noPoints(), { ...noPoints(), ...offense }),
     mapPoints(open, classId, tier, moon, profile.weapons))
-  const signature = family && signatureWorn(grades, family) ? signatureBonus(level, tier) : 0
+  const signature = family && signatureWorn(grades, family) ? signatureBonus(level, tier, engine) : 0
   const flourish = template && umaFlourishActive({ calling: template.calling }, classId, engine) ? STRIDE_FLOURISH[template.stride ?? 'middle'] : undefined
   const member: RpgPartyMember = {
     profile, loadout, points, might: options.gear ? gradeMight(grades, profile.weapons, tier) : {},
-    accessory: accessoryParts(grades.accessories[0], profile.weapons, tier), ...(signature ? { signature } : {}),
+    accessory: three ? accessorySlotsParts(grades.accessories, tier) : accessoryParts(grades.accessories[0], profile.weapons, tier), ...(signature ? { signature } : {}),
     ...(inherits ? { inherits } : {}), ...(flourish ? { flourish } : {}),
   }
   return rpgPartyAllies([member], (p, pts) => applyPoints(projectRpgStats(p, engine), pts ?? noPoints()).stats.mp, engine)[0]!
@@ -230,7 +237,8 @@ export function balanceMember(classId: RpgClass, i: number, level: number, optio
   const engine = options.engine ?? BATTLE_ENGINE_VERSION
   const v2 = rpgV2(engine)
   const v16 = rpgRework('fight', engine)
-  const weapons = v16 && options.weapons ? [...options.weapons] : rpgDefaultWeapons(classId, engine)
+  // From v20 (D263) a Tier 1 class's preset weapons, the owner's two party comps.
+  const weapons = v16 && options.weapons ? [...options.weapons] : rpgIsTier0(classId) ? rpgDefaultWeapons(classId, engine) : rpgPresetWeapons(classId as RpgTier1Class, engine)
   // Her lines on the weapons she holds (a line on a tree she doesn't slot means nothing).
   const held = v16 ? Object.entries(options.lines ?? {}).filter(([w]) => weapons.includes(w as RpgWeapon)) : []
   const lines: RpgLines | undefined = held.length ? Object.fromEntries(held) : undefined

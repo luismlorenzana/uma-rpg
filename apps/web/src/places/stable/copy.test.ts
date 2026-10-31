@@ -11,7 +11,7 @@ import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { mapNodeValue } from '../observatory/StarsPanel'
 import * as copy from './copy'
-import { accessoryCards, cardButton, upgradeRows } from './gear-equip'
+import { accessoryChoices, accessoryTile, upgradeRows } from './gear-equip'
 import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine } from './gear-v3'
 import { handLine, rankText } from './SkillTree'
 import { flourishLine, rootFlourish, templateCard } from './template-view'
@@ -62,8 +62,8 @@ describe('the profile wording list (H117)', () => {
     expect(copy.might(44)).toBe('Might 44')
     expect(copy.armorStat('DEF', 32)).toBe('DEF 32')
     expect(copy.armorHalf('physical')).toBe('Physical')
-    expect(copy.accessoryEffect('bell', 8, 1)).toBe('M.ATK +5')
-    expect(copy.accessoryEffect('pendant', 8, 1)).toBe('ATK +5')
+    expect(copy.accessoryEffect('bell', 8, 1)).toBe('M.ATK +8')
+    expect(copy.accessoryEffect('pendant', 8, 1)).toBe('ATK +8')
     expect(copy.accessoryEffect('bell', 0, 1)).toBe('Off')
     expect(copy.staleKind('Greatsword')).toBe('Greatsword not held')
     expect(copy.signature(10, true)).toBe('★ Signature · ATK/M.ATK +10 · Worn')
@@ -147,8 +147,8 @@ describe('the profile wording list (H117)', () => {
     for (const family of ['bell', 'pendant', 'orb', 'insignia'] as AccessoryFamily[]) {
       for (const grade of [0, 1, 10]) {
         const slot = { grade, family, form: 'base' as const, kind: 'greatsword' as const }
-        const cards = accessoryCards(slot, ['greatsword', 'axe', 'lance'], family, 50, 1)
-        values.push({ source: `accessoryCards ${family} G${grade}`, value: [cards, ...cards.map((card) => cardButton(card, card.kinds[0]?.kind ?? null))] })
+        const kinds = ['greatsword', 'axe', 'lance'] as const
+        values.push({ source: `accessoryChoices ${family} G${grade}`, value: [accessoryChoices(slot, kinds, family, 1), accessoryTile(slot, kinds, 1)] })
         values.push({ source: `accessoryGradeLine ${family} G${grade}`, value: accessoryGradeLine(slot, ['greatsword', 'axe', 'lance'], 1, family, 50) })
         values.push({ source: `accessoryEffect ${family} G${grade}`, value: [copy.accessoryEffect(family, grade, 1), copy.accessoryEffect(family, grade, 1, 'greatsword')] })
       }

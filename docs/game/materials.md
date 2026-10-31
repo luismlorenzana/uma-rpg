@@ -224,8 +224,8 @@ Accessory Ranks retired in R2, D218).
   own. An Orb takes one of her active class's three kinds (D223); one left on a kind she no longer holds stays set. G0 does
   nothing. A fight keeps the forms and grades she had when it began.
 - **Her signature** (WP33, UT7): her knack names one family ([classes](classes.md#her-calling-and-her-template)). While
-  she wears it at G1 or above, her ATK and M.ATK rise 0.2 a level × the tier. The Gear tab puts that family first, marked
-  ★, and her standard preset wears it.
+  she wears it at G1 or above, her ATK and M.ATK rise 0.1 a level × the tier. A slot's list puts that family first, marked
+  ★, and her standard preset wears it unless her weapons can't use it (D266).
 - **On Ascend** every grade starts at G0 in the new tier, and the made items her grades used go back to the old world's
   Warehouse ([loops](loops.md#the-rift)).
 
@@ -270,12 +270,12 @@ What raises a slot one grade, in every world:
 
 Accessory families (three slots, each with its own grade, family and kind, set freely outside fights; the same family can fill more than one):
 
-| Family | Base form | G1 → G10 (Tier 1) |
+| Family | Base form | A slot, Tier 1 |
 |---|---|---|
-| Pendant | +ATK | 1, 1, 2, 2, 3, 3, 4, 5, 5, 6 |
-| Charm | +M.ATK | 1, 1, 2, 2, 3, 3, 4, 5, 5, 6 |
-| Orb | Flat offense on one kind she sets, one of her three weapons’ kinds | 1, 1, 2, 3, 4, 5, 6, 7, 8, 9 |
-| Insignia | Her hits on sub-bosses and bosses hit harder | +0.5% a grade (+5% at G10) |
+| Pendant | +ATK | +1 a grade (+10 at G10) |
+| Charm | +M.ATK | +1 a grade (+10 at G10) |
+| Orb | Flat offense on one kind she sets, one of her three weapons’ kinds | +2 a grade (+20 at G10) |
+| Insignia | Her hits on sub-bosses and bosses hit harder | +1% a grade (+10% at G10) |
 
-Her signature: while she wears her knack's family, ATK and M.ATK +2 · +6 · +10 at Lv 10 · 30 · 50 (0.2 a level × the tier).
+Her signature: while she wears her knack's family, ATK and M.ATK +1 · +3 · +5 at Lv 10 · 30 · 50 (0.1 a level × the tier).
 <!-- /live -->

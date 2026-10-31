@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { rpgDefaultWeapons } from '../rpg/rules'
 import { KNACK_FAMILY, UMA_KNACKS } from '../roster/template'
 import {
-  ACCESSORY_FAMILY_LABEL, accessoryFlatValue, accessoryParts, BELL_PERMILLE_PER_GRADE, INSIGNIA_PERMILLE_PER_GRADE, ORB_T1, PENDANT_T1,
-  signatureBonus, signatureWorn,
+  ACCESSORY_FAMILY_LABEL, accessoryFlatValue, accessoryParts, accessorySlotsParts, accessorySlotValue, BELL_PERMILLE_PER_GRADE, INSIGNIA_PERMILLE_PER_GRADE,
+  ORB_T1, PENDANT_T1, signatureBonus, signatureWorn,
 } from './accessories'
 import { ORB_OFFENSE_BY_GRADE } from './gear'
-import { ACCESSORY_FAMILIES, newGrades, type AccessorySlotState, type GearTier } from './grades'
+import { ACCESSORY_FAMILIES, newGrades, type AccessoryFamily, type AccessorySlotState, type GearTier } from './grades'
 
 const GRADES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const row = (family: 'pendant' | 'orb', tier: GearTier) => GRADES.map((g) => accessoryFlatValue(family, g, tier))
@@ -81,13 +81,29 @@ describe('accessoryParts', () => {
   })
 })
 
+describe('a slot’s rows (D266)', () => {
+  it('are linear, so every raise counts', () => {
+    for (let grade = 1; grade <= 10; grade++) {
+      expect(accessorySlotValue('pendant', grade, 1)).toBe(grade)
+      expect(accessorySlotValue('bell', grade, 1)).toBe(grade)
+      expect(accessorySlotValue('orb', grade, 1)).toBe(2 * grade)
+    }
+    expect(accessorySlotsParts([slot('insignia', 10), slot('insignia', 5)], 1).insignia).toEqual({ value: 150 })
+    expect(['pendant', 'orb'].map((family) => accessorySlotValue(family as AccessoryFamily, 10, 3))).toEqual([26, 52])
+    expect(accessorySlotValue('insignia', 10, 1)).toBe(0)
+    expect(accessorySlotValue('pendant', 0, 1)).toBe(0)
+  })
+})
+
 describe('the signature (WP33, UT7, SB15)', () => {
-  it('is 0.2 a level × tier', () => {
-    expect([10, 30, 50].map((level) => signatureBonus(level, 1))).toEqual([2, 6, 10])
-    expect(signatureBonus(50, 2)).toBe(18)
-    expect(signatureBonus(50, 3)).toBe(26)
-    expect(signatureBonus(10, 2)).toBe(4)
-    expect(signatureBonus(1, 1)).toBe(0)
+  it('is 0.1 a level × tier (D266), twice that to v19', () => {
+    expect([10, 30, 50].map((level) => signatureBonus(level, 1))).toEqual([1, 3, 5])
+    expect(signatureBonus(50, 2)).toBe(9)
+    expect(signatureBonus(50, 3)).toBe(13)
+    expect(signatureBonus(10, 2)).toBe(2)
+    expect(signatureBonus(1, 1)).toBe(1)
+    expect(signatureBonus(50, 1, 19)).toBe(10)
+    expect(signatureBonus(1, 1, 19)).toBe(0)
   })
 
   it('is worn from G1 of her family, in any slot', () => {

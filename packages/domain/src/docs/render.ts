@@ -8,7 +8,7 @@ import {
 } from '../economy/pacing'
 import { MAX_QUEUE } from '@luismlorenzana/uma-work'
 import {
-  ACCESSORY_FAMILY_LABEL, BELL_PERMILLE_PER_GRADE, INSIGNIA_SLOT_PERMILLE, OFFENSE_SLOT_T1, ORB_SLOT_T1, signatureBonus,
+  ACCESSORY_FAMILY_LABEL, BELL_PERMILLE_PER_GRADE, INSIGNIA_SLOT_PERMILLE, OFFENSE_SLOT_PER_GRADE, ORB_SLOT_PER_GRADE, signatureBonus,
 } from '../economy/accessories'
 import { armorValues, GRADE_MAX, gradeGateLevel, mightAt, TIER_SCALE_TENTHS, type GearTier } from '../economy/grades'
 import { MOON_T1, PLANET_T1, PROWESS_SPLIT, TEMPLATE_T1 } from '../economy/planet'
@@ -373,7 +373,7 @@ function battleConstants(): string {
     ['`RPG_BASE_MP_REGEN_V17`', RPG_BASE_MP_REGEN_V17, `v17: the base MP regen a depth (${pct(RPG_BASE_MP_REGEN_V17 * RPG_BASE_MP_REGEN_DEPTHS)} from Class Rank ${RPG_DEPTH_GATES[RPG_BASE_MP_REGEN_DEPTHS - 1]})`],
     ['`BELL_PERMILLE_PER_GRADE`', BELL_PERMILLE_PER_GRADE, 'v17–v20: a Bell\'s follow-up, per mille of an Attack a grade, × her hand; only fights already open, D264'],
     ['`INSIGNIA_SLOT_PERMILLE`', INSIGNIA_SLOT_PERMILLE, 'an Insignia slot\'s extra damage on sub-bosses and bosses, per mille a grade (D264)'],
-    ['Signature', '0.2 a level × tier', 'v17: her ATK and M.ATK while she wears her knack\'s family'],
+    ['Signature', '0.1 a level × tier', 'v17: her ATK and M.ATK while she wears her knack\'s family'],
   ]
   return table(['Constant', 'Value', 'Meaning'], rows)
 }
@@ -425,7 +425,7 @@ function damageSources(): string {
     table(['Level', 'Uma stats only', '+ Extra Stats (HP, DEF)', '+ armor (HP, DEF)', 'All (on curve)'], taken) +
     '\n\nThe Brawler leans ATK ×1.1 and DEF ×1.1; her map is the core her level opens, Prowess all to ATK; her armor is the ' +
     'physical half. Her preset\'s Bell adds a follow-up Attack rather than offense; a Pendant or an Orb would add its flat offense ' +
-    'on her kinds, and her signature +0.2 a level while she wears her knack\'s family.'
+    'on her kinds, and her signature +0.1 a level while she wears her knack\'s family.'
 }
 
 function foeScaling(): string {
@@ -506,17 +506,18 @@ function gear(): string {
   const made = table(['Grade', 'Arms Gem (an Arms weapon)', 'Tome Ink (a Tome)', 'Armor Fittings', 'Accessory Setting'], grades.map((g) => [g,
     inputs(madeRecipeV4(`weapon-gem-g${g}`)), inputs(madeRecipeV4(`tome-ink-g${g}`)), inputs(madeRecipeV4(`armor-fittings-g${g}`)),
     inputs(madeRecipeV4(`accessory-setting-g${g}`))]))
-  const forms = table(['Family', 'Base form', 'G1 → G10 (Tier 1)'], [
-    [ACCESSORY_FAMILY_LABEL.pendant, '+ATK', OFFENSE_SLOT_T1.join(', ')],
-    [ACCESSORY_FAMILY_LABEL.bell, '+M.ATK', OFFENSE_SLOT_T1.join(', ')],
-    [ACCESSORY_FAMILY_LABEL.orb, 'Flat offense on one kind she sets, one of her three weapons’ kinds', ORB_SLOT_T1.join(', ')],
+  const perGrade = (n: number) => `+${n} a grade (+${n * GRADE_MAX} at G10)`
+  const forms = table(['Family', 'Base form', 'A slot, Tier 1'], [
+    [ACCESSORY_FAMILY_LABEL.pendant, '+ATK', perGrade(OFFENSE_SLOT_PER_GRADE)],
+    [ACCESSORY_FAMILY_LABEL.bell, '+M.ATK', perGrade(OFFENSE_SLOT_PER_GRADE)],
+    [ACCESSORY_FAMILY_LABEL.orb, 'Flat offense on one kind she sets, one of her three weapons’ kinds', perGrade(ORB_SLOT_PER_GRADE)],
     [ACCESSORY_FAMILY_LABEL.insignia, 'Her hits on sub-bosses and bosses hit harder', `+${INSIGNIA_SLOT_PERMILLE / 10}% a grade (+${(INSIGNIA_SLOT_PERMILLE * GRADE_MAX) / 10}% at G10)`],
   ])
   return values +
     `\n\nEach armor piece adds its offense to ATK on a physical Uma and to M.ATK on a magical one (her class's half), and its slot's stat. Armor's values × ${TIERS_123.map((t) => TIER_SCALE_TENTHS[t] / 10).join(', ')} in Tiers 1, 2 and 3 (Feet Speed doesn't scale).\n\n` +
     'What raises a slot one grade, in every world:\n\n' + made +
     '\n\nAccessory families (three slots, each with its own grade, family and kind, set freely outside fights; the same family can fill more than one):\n\n' + forms +
-    `\n\nHer signature: while she wears her knack's family, ATK and M.ATK +${signatureBonus(10, 1)} · +${signatureBonus(30, 1)} · +${signatureBonus(50, 1)} at Lv 10 · 30 · 50 (0.2 a level × the tier).`
+    `\n\nHer signature: while she wears her knack's family, ATK and M.ATK +${signatureBonus(10, 1)} · +${signatureBonus(30, 1)} · +${signatureBonus(50, 1)} at Lv 10 · 30 · 50 (0.1 a level × the tier).`
 }
 /** The Planet and three moons (EP1–EP8, EP23) and her moon (UT10): what a node gives in Tier 1. */
 function starMap(): string {

@@ -4,6 +4,8 @@
 
 > **D264 (2026-10-30):** an Uma has three accessory slots, each with its own grade and family, so Gear is **eleven tiles**, not
 > nine; the Bell is the Charm (+M.ATK, no kind) and `accessoryFlatValue` is `accessorySlotValue`. Read this packet with that.
+> **D266 (2026-10-31):** the Equip view already draws those accessory tiles, and a tile's list wears a row on one tap, with no
+> Set button (`AccessorySheet`, `accessoryChoices`, `accessoryTile`; `AccessoryPicker` and `accessoryCards` are gone). Keep that.
 
 ## Why
 

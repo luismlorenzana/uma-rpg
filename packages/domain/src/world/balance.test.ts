@@ -122,7 +122,7 @@ describe('world balance', () => {
       const foe = rpgFoe({ id: 'f', castId: 'c', element: 'fire', role: 'striker', rank: 'regular', level, shield: 2, weaknesses: { weapons: [], elements: [] } })
       // The three offense leans: Brawler high ATK, Spell Blade even, Mage high M.ATK.
       const boosts = (['brawler', 'spellblade', 'mage'] as const).map((c) => {
-        const a = balanceMember(c, 0, level, { gear: true, stars: true })
+        const a = balanceMember(c, 0, level, { gear: true, stars: true, accessories: [] }) // D142 reads her before accessories
         const [o, d] = c === 'mage' ? [a.stats.matk, foe.stats.mdef] : [a.stats.atk, foe.stats.pdef]
         const f = (x: number) => (x * x) / (x + d)
         return f(o + MIGHT_BY_GRADE[g]!) / f(o) - 1

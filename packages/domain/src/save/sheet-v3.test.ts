@@ -20,14 +20,14 @@ describe('R2 battle sheet', () => {
     const offense = groups.find((group) => group.title === 'Offense')!.rows
     expect(offense.filter((row) => row.label === 'Might').map((row) => row.value)).toEqual(['Greatsword +68', 'Axe +68', 'Lance +68'])
     expect(offense.filter((row) => row.label.startsWith('Accessory')).map((row) => [row.label, row.value])).toEqual([
-      ['Accessory 1', 'Charm · M.ATK +6'], ['Accessory 2', 'None'], ['Accessory 3', 'None']])
-    expect(offense.find((row) => row.label === '★ Signature')!.value).toBe('ATK/M.ATK +10 · Worn')
+      ['Accessory 1', 'Charm · M.ATK +10'], ['Accessory 2', 'None'], ['Accessory 3', 'None']])
+    expect(offense.find((row) => row.label === '★ Signature')!.value).toBe('ATK/M.ATK +5 · Worn')
     expect(groups.find((group) => group.title === 'Defense')!.rows.map((row) => row.label)).toEqual(['DEF', 'M.DEF', 'Evasion'])
   })
 
   it('scales Tier 2 Might and signature', () => {
     const offense = sheet(2).find((group) => group.title === 'Offense')!.rows
     expect(offense.filter((row) => row.label === 'Might').map((row) => row.value)).toEqual(['Greatsword +122', 'Axe +122', 'Lance +122'])
-    expect(offense.find((row) => row.label === '★ Signature')!.value).toBe('ATK/M.ATK +18 · Worn')
+    expect(offense.find((row) => row.label === '★ Signature')!.value).toBe('ATK/M.ATK +9 · Worn')
   })
 })

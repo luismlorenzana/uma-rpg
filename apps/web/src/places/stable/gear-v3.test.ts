@@ -13,7 +13,7 @@ describe('R2 gear rows', () => {
     expect(armorGradeLine(grades, 'head', 'brawler', 1)).toBe('Head · Physical · G4 · DEF 16 · ATK 2')
     expect(armorGradeLine(grades, 'feet', 'brawler', 1)).toBe('Feet · Physical · G4 · Evasion 4.8% · ATK 2')
     expect(accessoryGradeLine(grades.accessories[0], ['greatsword', 'axe', 'lance'], 1, 'bell', 30))
-      .toBe('Charm · G6 · M.ATK +3 · ★ +6')
+      .toBe('Charm · G6 · M.ATK +6 · ★ +3')
     expect(accessoryGradeLine({ grade: 1, family: null, form: 'base' }, ['greatsword'], 1, 'bell', 30))
       .toBe('None · G0')
     expect(accessoryGradeLine({ grade: 0, family: 'bell', form: 'base' }, ['katana'], 1, 'bell', 50))

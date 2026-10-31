@@ -1,25 +1,25 @@
 // The Gear tab's two views (H107, D219; R2's grades, H79): **Equip**, what she wears (the preset, her weapons, her armor
-// half, and her accessory slot as four cards of one shape, ★ on her signature family), and **Upgrade**, every slot's
-// grade row with the made item that raises it, then Extra Stats. The data is `gear-equip.ts`'.
+// half, and a tile for each accessory slot that opens its list, D266), and **Upgrade**, every slot's grade row with the
+// made item that raises it, then Extra Stats. The data is `gear-equip.ts`'.
 import {
   ACCESSORY_FAMILY_LABEL, accessorySlotValue, ARMOR_SLOTS, ARMOR_SLOT_LABEL, accessoryKinds, activeClass, armorHalf, armorKindFor, armorValues, classOf,
-  gradeOf, isGrades, madeName, mightAt, raisePlan, starMapOf, umaTemplate, WEAPON_LABEL,
-  type AccessoryFamily, type ArmorSlot, type GearTier, type GradeTarget, type OwnedUma, type RosterOutfit, type RpgClass,
+  gradeOf, INSIGNIA_SLOT_PERMILLE, isGrades, madeName, mightAt, raisePlan, signatureBonus, signatureWorn, starMapOf, umaTemplate, WEAPON_LABEL,
+  type AccessoryFamily, type AccessorySlotState, type ArmorSlot, type GearTier, type GradeTarget, type OwnedUma, type RosterOutfit, type RpgClass,
   type RpgDamageKind, type TierWorld, type UmaUpgrades, umaPick,
 } from '@rpg/domain'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { KindMark, WeaponGlyph } from '../../battle/labels'
+import { WeaponGlyph } from '../../battle/labels'
 import { accessoryIconId } from '../../items/frames'
 import { ItemIcon } from '../../items/ItemIcon'
 import { chooseAccessoryForm, raiseGear } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
 import { UpgradeMark } from '../../ui/UpgradeMark'
-import { accessoryCards, cardButton, cardKind, upgradeRows, type AccessoryCard, type UpgradeRow } from './gear-equip'
+import { accessoryChoices, accessoryTile, upgradeRows, type AccessoryChoice, type UpgradeRow } from './gear-equip'
 import { gradeUpgradeView } from './gear-v3'
 import { PresetButton } from './PresetButton'
-import { accessoryEffect, actions, armorHalf as armorHalfCopy, armorSlot, armorStat, extraStatsCount, grade, gradeStep, itemCount, maxGrade, might } from './copy'
+import { accessoryEffect, actions, armorHalf as armorHalfCopy, armorSlot, armorStat, extraStatsCount, grade, gradeStep, itemCount, maxGrade, might, signature } from './copy'
 
 const armorStatLine = (slot: ArmorSlot, gradeValue: number, tier: GearTier, classId: RpgClass) => {
   const values = armorValues(slot, gradeValue, tier)
@@ -109,72 +109,43 @@ function GradeSheet({ outfitId, uma, world, tier, classId, target, onClose }: {
 
 // --- Equip ------------------------------------------------------------------------------------------------------------
 
-function AccessoryPicker({ cards, grade, onEquip }: { cards: AccessoryCard[]; grade: number; onEquip: (family: AccessoryFamily, kind?: RpgDamageKind) => void }) {
-  const initial = cards.find((card) => card.wearing) ?? cards[0]!
-  const [family, setFamily] = useState<AccessoryFamily>(initial.family)
-  const [kinds, setKinds] = useState<Partial<Record<AccessoryFamily, RpgDamageKind | null>>>(() => Object.fromEntries(
-    cards.map((card) => [card.family, cardKind(card)]),
-  ))
-  const card = cards.find((item) => item.family === family) ?? initial
-  const picked = kinds[card.family] ?? cardKind(card)
-  const button = cardButton(card, picked)
+/** One slot's list (D266): a tap wears the row and closes the sheet, so what the tile shows is what the save holds. */
+function AccessorySheet({ index, slot, choices, signatureLine, onPick, onClose }: {
+  index: number; slot: AccessorySlotState; choices: AccessoryChoice[]; signatureLine: string
+  onPick: (family: AccessoryFamily, kind?: RpgDamageKind) => Promise<void>; onClose: () => void
+}) {
+  const [error, setError] = useState<string | null>(null)
+  const pick = (choice: AccessoryChoice) => (choice.worn ? onClose() : void onPick(choice.family, choice.kind ?? undefined)
+    .then(onClose, (err: unknown) => setError(err instanceof Error ? err.message : 'That didn’t work.')))
   return (
-    <div className="space-y-1.5">
-      <div className="grid grid-cols-4 gap-1" role="radiogroup" aria-label="Accessory family">
-        {cards.map((item) => {
-          const itemKind = kinds[item.family] ?? cardKind(item)
-          return (
-            <button key={item.family} type="button" role="radio" aria-checked={item.family === card.family}
-              aria-label={`${item.signature ? 'Signature ' : ''}${item.label}${item.wearing ? ', equipped' : ''}`}
-              onClick={() => setFamily(item.family)} data-accessory={item.family}
-              className={`relative flex min-h-14 items-center justify-center rounded-sm border ${item.family === card.family ? 'border-accent bg-panel' : 'border-transparent bg-sunken'} ${item.wearing ? 'ring-2 ring-accent ring-inset' : ''}`}>
-              {item.signature && <span aria-hidden className="absolute left-1 top-0.5 text-[11px] font-bold text-accent">★</span>}
-              <ItemIcon id={accessoryIconId({ grade: Math.max(1, grade), family: item.family, form: 'base', ...(itemKind ? { kind: itemKind } : {}) })} size={36} />
-              {item.wearing && <span aria-hidden className="absolute bottom-1 right-1 size-1.5 rounded-full bg-accent" />}
-            </button>
-          )
-        })}
+    <BottomSheet title={`Accessory ${index + 1} · ${grade(slot.grade)}`} onClose={onClose}>
+      <div className="space-y-1">
+        <p className="text-[11px] text-ink-soft">{signatureLine}</p>
+        {slot.grade < 1 && <p className="text-[11px] font-semibold text-warning">Off until G1</p>}
+        {choices.map((choice) => (
+          <button key={`${choice.family}-${choice.kind}`} type="button" aria-pressed={choice.worn} onClick={() => pick(choice)}
+            className={`flex min-h-11 w-full items-center gap-2 rounded-sm bg-raised px-2 text-left text-[13px] ${choice.worn ? 'ring-2 ring-accent ring-inset' : ''}`}>
+            <ItemIcon id={accessoryIconId({ grade: Math.max(1, slot.grade), family: choice.family, form: 'base', ...(choice.kind ? { kind: choice.kind } : {}) })} size={28} />
+            <span className="min-w-0 flex-1 truncate"><span className="font-semibold">{choice.signature ? '★ ' : ''}{choice.label}</span> <span className="text-ink-soft">{choice.effect}</span></span>
+            {choice.worn && <span aria-hidden className="shrink-0 font-bold text-accent">✓</span>}
+          </button>
+        ))}
+        {error && <p className="text-[13px] text-danger">{error}</p>}
       </div>
-      <div className="rounded-sm bg-panel p-2">
-        <div className="flex items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-semibold">{card.signature ? '★ ' : ''}{card.label}</p>
-            <p className="text-[10.5px] leading-snug text-ink-soft">{card.effect}</p>
-            {card.signature && <p className="text-[10.5px] font-semibold text-accent">{card.signature}</p>}
-            {card.stale && <p className="text-[10.5px] font-semibold text-warning">{card.stale}</p>}
-          </div>
-          {card.kinds.length > 0 && (
-            <div role="group" aria-label={`${card.label}: which weapon`} className="grid grid-cols-3 gap-1">
-              {card.kinds.map(({ kind, label }) => (
-                <button key={kind} type="button" aria-label={label} aria-pressed={picked === kind}
-                  onClick={() => setKinds((current) => ({ ...current, [card.family]: kind }))}
-                  className={`flex size-11 items-center justify-center rounded-sm border ${picked === kind ? 'border-accent bg-accent/10' : 'border-transparent bg-sunken'}`}>
-                  <KindMark kind={kind} size={20} />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <button type="button" disabled={button.disabled} onClick={() => onEquip(card.family, card.kinds.length ? picked ?? undefined : undefined)}
-          className="mt-2 min-h-11 w-full rounded-sm px-3 text-[12px] font-semibold enabled:bg-accent enabled:text-accent-ink disabled:bg-sunken disabled:text-ink-soft">
-          {button.label}
-        </button>
-      </div>
-    </div>
+    </BottomSheet>
   )
 }
 
 /** Equip: what she wears, nothing to spend. */
 export function EquipView({ outfit, uma, world, tier, onSkills }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; tier: GearTier; onSkills: () => void }) {
-  const [error, setError] = useState<string | null>(null)
+  const [picking, setPicking] = useState<number | null>(null)
   if (!isGrades(uma.gear)) return null
   const grades = uma.gear
   const active = activeClass(outfit, uma, tier)
   const weapons = classOf(uma, active).weapons
   const kinds = accessoryKinds(uma, active)
-  const signature = umaTemplate(outfit, umaPick(uma)).family
-  const equip = (slot: number) => (family: AccessoryFamily, kind?: RpgDamageKind) => chooseAccessoryForm(outfit.outfitId, active, slot, family, kind)
-    .then(() => setError(null), (err: unknown) => setError(err instanceof Error ? err.message : 'That didn’t work.'))
+  const family = umaTemplate(outfit, umaPick(uma)).family
+  const value = (of: AccessoryFamily) => accessorySlotValue(of, 10, tier)
   return (
     <div className="space-y-2">
       <PresetButton outfit={outfit} uma={uma} world={world} />
@@ -212,24 +183,37 @@ export function EquipView({ outfit, uma, world, tier, onSkills }: { outfit: Rost
             )
           })}
         </div>
+        <div className="flex items-center justify-between pt-0.5">
+          <h4 className="text-micro">Accessories</h4>
+          <HelpButton title="Accessories">
+            <p>Pendant · ATK +{value('pendant')} at G10</p>
+            <p>Charm · M.ATK +{value('bell')} at G10</p>
+            <p>Orb · +{value('orb')} on one kind at G10</p>
+            <p>Insignia · +{INSIGNIA_SLOT_PERMILLE / 10}% a grade on sub-bosses and bosses</p>
+            <p>Three slots, each with its own grade. The same one can fill more than one, and they add up.</p>
+          </HelpButton>
+        </div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {grades.accessories.map((slot, i) => {
+            const tile = accessoryTile(slot, kinds, tier)
+            return (
+              <button key={i} type="button" onClick={() => setPicking(i)} aria-label={`Accessory ${i + 1}, ${tile.text}, grade ${slot.grade}`}
+                className="relative flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-sm bg-panel px-1 py-1 text-center">
+                {slot.family
+                  ? <ItemIcon id={accessoryIconId({ ...slot, grade: Math.max(1, slot.grade) })} size={28} />
+                  : <span className="size-7 rounded-xs border border-dashed border-hairline-strong" />}
+                <span className={`w-full truncate text-[10px] font-semibold ${tile.stale ? 'text-warning' : ''}`}>{tile.stale ?? tile.text}</span>
+                <span className="absolute right-1 top-1 rounded-full bg-page/90 px-1 text-[9px] font-bold text-ink">G{slot.grade}</span>
+              </button>
+            )
+          })}
+        </div>
       </section>
-      {grades.accessories.map((slot, i) => (
-        <section key={i} className="space-y-1.5 rounded-sm bg-raised p-2">
-          <div className="flex items-center justify-between">
-            <h4 className="text-micro">Accessory {i + 1} · {grade(slot.grade)}</h4>
-            <HelpButton title="Accessory">
-              <p>Pendant · ATK +{accessorySlotValue('pendant', Math.max(1, slot.grade), tier)}</p>
-              <p>Charm · M.ATK +{accessorySlotValue('bell', Math.max(1, slot.grade), tier)}</p>
-              <p>Orb · +{accessorySlotValue('orb', Math.max(1, slot.grade), tier)} on one kind</p>
-              <p>Insignia · +0.5% a grade on sub-bosses and bosses</p>
-              <p>Three slots, each with its own grade. The same accessory can fill more than one.</p>
-              <p>The form changes freely outside fights. Its strength follows the slot’s grade, raised on Upgrade.</p>
-            </HelpButton>
-          </div>
-          <AccessoryPicker cards={accessoryCards(slot, kinds, signature, uma.level, tier)} grade={slot.grade} onEquip={equip(i)} />
-        </section>
-      ))}
-      {error && <p className="text-[13px] text-danger">{error}</p>}
+      {picking !== null && (
+        <AccessorySheet index={picking} slot={grades.accessories[picking]!} choices={accessoryChoices(grades.accessories[picking], kinds, family, tier)}
+          signatureLine={signature(signatureBonus(uma.level, tier), signatureWorn(grades, family))}
+          onPick={(picked, kind) => chooseAccessoryForm(outfit.outfitId, active, picking, picked, kind)} onClose={() => setPicking(null)} />
+      )}
     </div>
   )
 }

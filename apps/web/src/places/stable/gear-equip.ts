@@ -1,15 +1,16 @@
-// The Gear tab's two views as data (H107, D219): Equip, what she wears, with one card of one shape for each accessory
-// family; and Upgrade, every slot's grade row and the made item that raises it. Pure, so both views test without React.
+// The Gear tab's two views as data (H107, D219): Equip, what she wears, with a tile for each accessory slot and the list a
+// tile opens (D266); and Upgrade, every slot's grade row and the made item that raises it. Pure, so both views test without
+// React.
 import {
-  ACCESSORY_FAMILY_LABEL, ARMOR_SLOTS, classPresetPlan, isRpgElement, rpgClassName, rpgPresetClasses, rpgTomeOf, signatureBonus, WEAPON_LABEL,
+  ACCESSORY_FAMILY_LABEL, ARMOR_SLOTS, classPresetPlan, isRpgElement, rpgClassName, rpgPresetClasses, rpgTomeOf, WEAPON_LABEL,
   type AccessoryFamily, type AccessorySlotState, type GearTier, type GradeTarget, type RpgClass, type RpgDamageKind, type RpgTier1Class,
   type RpgWeapon, type TierWorld, type UmaGrades,
 } from '@rpg/domain'
 import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine, type GradeUpgradeView } from './gear-v3'
-import { accessoryEffect, actions, classPresetName, signature as signatureCopy, standardPreset, staleKind } from './copy'
+import { accessoryEffect, classPresetName, standardPreset, staleKind } from './copy'
 
-/** One standard preset (D263): the class it's for, its name, its weapons, and whether she wears it. */
-export interface PresetRow { pick: RpgTier1Class; title: string; detail: string; on: boolean }
+/** One standard preset (D263): the class it's for, its name, its weapons and accessories, and whether she wears it. */
+export interface PresetRow { pick: RpgTier1Class; title: string; detail: string; accessories: string; on: boolean }
 /** The presets her class offers: a Tier 1 class its one, named "Standard preset", and a Tier 0 one for each class it promotes
  * into, named after that class. */
 export function presetRows(world: TierWorld, outfitId: string, classId: RpgClass, family: AccessoryFamily): PresetRow[] {
@@ -18,74 +19,53 @@ export function presetRows(world: TierWorld, outfitId: string, classId: RpgClass
     const plan = classPresetPlan(world, outfitId, classId, undefined, family, pick)
     const on = plan.changes === 0
     return { pick, on, title: picks.length > 1 ? classPresetName(rpgClassName(pick), on) : standardPreset(on),
-      detail: plan.weapons.map((w) => WEAPON_LABEL[w]).join(' · ') }
+      detail: plan.weapons.map((w) => WEAPON_LABEL[w]).join(' · '),
+      accessories: (plan.accessories ?? []).map((form) => ACCESSORY_FAMILY_LABEL[form.family]).join(' · ') }
   })
 }
 
-/** A kind an Orb can sit on, labelled by her weapon ("Thunder Tome"). */
-export interface KindChoice { kind: RpgDamageKind; label: string }
-
-export interface AccessoryCard {
-  family: AccessoryFamily
-  label: string
-  /** Her signature family's line ("★ Her signature: ATK and M.ATK +10"), null on the others. */
-  signature: string | null
-  /** Its effect at the slot's grade; at G0, what G1 gives. */
-  effect: string
-  /** An Orb's kinds: the ones she can hit with. A Pendant, a Charm or an Insignia has none. */
-  kinds: readonly KindChoice[]
-  /** She wears this family in the slot. */
-  wearing: boolean
-  /** The kind she wears it on, when it takes one. */
-  wornKind: RpgDamageKind | null
-  /** An Orb left on a kind she no longer holds ("No Greatsword in her slots"). */
+/** What a slot shows on its tile: its effect at the slot's grade, or why it does nothing. */
+export interface AccessoryTile {
+  /** "ATK +6", "Greatsword +20"; "Pendant · Off" at G0, where a form waits for G1; "Empty" without a family. */
+  text: string
+  /** An Orb left on a kind she no longer holds ("Greatsword not held"). */
   stale: string | null
 }
+export function accessoryTile(slot: AccessorySlotState | undefined, kinds: readonly RpgDamageKind[], tier: GearTier): AccessoryTile {
+  if (!slot?.family) return { text: 'Empty', stale: null }
+  const stale = slot.kind && !kinds.includes(slot.kind) ? staleKind(kindWeaponLabel(slot.kind)) : null
+  if (slot.grade < 1) return { text: `${ACCESSORY_FAMILY_LABEL[slot.family]} · Off`, stale }
+  return { text: accessoryEffect(slot.family, slot.grade, tier, slot.kind), stale }
+}
 
-/** The card order: her signature family first, then Pendant, Charm (id `bell`), Orb, Insignia. */
+/** One row of a slot's list: a family, or for an Orb one kind. One tap wears it. */
+export interface AccessoryChoice {
+  family: AccessoryFamily
+  kind: RpgDamageKind | null
+  label: string
+  /** Its effect at the slot's grade; at G0, what G1 gives. */
+  effect: string
+  signature: boolean
+  worn: boolean
+}
+
+/** The row order: her signature family first, then Pendant, Charm (id `bell`), Orb, Insignia. */
 const ORDER: readonly AccessoryFamily[] = ['pendant', 'bell', 'orb', 'insignia']
 
 /** A kind's weapon name: an element reads as its Tome. */
 export const kindWeaponLabel = (kind: RpgDamageKind): string => WEAPON_LABEL[isRpgElement(kind) ? rpgTomeOf(kind) : kind]
 
-/** What a family does at a grade (WP20–WP23). */
-export function familyEffect(family: AccessoryFamily, grade: number, tier: GearTier): string {
-  return accessoryEffect(family, grade, tier)
-}
-
-/** The four cards for one accessory slot. `kinds` are `accessoryKinds(uma, classId)`, in her weapons' order. */
-export function accessoryCards(slot: AccessorySlotState | undefined, kinds: readonly RpgDamageKind[], signature: AccessoryFamily,
-  level: number, tier: GearTier): AccessoryCard[] {
+/** Everything a slot can wear, an Orb once for each of `kinds` (`accessoryKinds(uma, classId)`, in her weapons' order). */
+export function accessoryChoices(slot: AccessorySlotState | undefined, kinds: readonly RpgDamageKind[], signature: AccessoryFamily, tier: GearTier): AccessoryChoice[] {
   const grade = slot?.grade ?? 0
-  const choices = kinds.map((kind) => ({ kind, label: kindWeaponLabel(kind) }))
-  return [signature, ...ORDER.filter((family) => family !== signature)].map((family) => {
-    const wearing = slot?.family === family
-    const wornKind = wearing && slot?.kind ? slot.kind : null
-    return {
-      family,
-      label: ACCESSORY_FAMILY_LABEL[family],
-      signature: family === signature ? signatureCopy(signatureBonus(level, tier), wearing) : null,
-      effect: grade < 1 ? `G1: ${familyEffect(family, 1, tier)}` : familyEffect(family, grade, tier),
-      kinds: family === 'orb' ? choices : [],
-      wearing,
-      wornKind,
-      stale: wornKind && !kinds.includes(wornKind) ? staleKind(kindWeaponLabel(wornKind)) : null,
-    }
-  })
-}
-
-/** The kind a card's chips start on: the one she wears it on if she still holds it, else her first. */
-export function cardKind(card: AccessoryCard): RpgDamageKind | null {
-  if (!card.kinds.length) return null
-  return card.wornKind && card.kinds.some((k) => k.kind === card.wornKind) ? card.wornKind : card.kinds[0]!.kind
-}
-
-/** A card's one button for the kind picked on it: Equip, Equipped, or "Switch to Lance" on the family she wears. */
-export function cardButton(card: AccessoryCard, picked: RpgDamageKind | null): { label: string; disabled: boolean } {
-  if (!card.kinds.length) return card.wearing ? { label: actions.set, disabled: true } : { label: actions.set, disabled: false }
-  if (!picked) return { label: actions.set, disabled: true }
-  if (card.wearing && card.wornKind === picked) return { label: actions.set, disabled: true }
-  return { label: actions.set, disabled: false }
+  return [signature, ...ORDER.filter((family) => family !== signature)].flatMap((family) => (family === 'orb' ? kinds : [null]).map((kind) => ({
+    family,
+    kind,
+    label: ACCESSORY_FAMILY_LABEL[family],
+    effect: grade < 1 ? `G1: ${accessoryEffect(family, 1, tier, kind)}` : accessoryEffect(family, grade, tier, kind),
+    signature: family === signature,
+    worn: slot?.family === family && (kind === null || slot.kind === kind),
+  })))
 }
 
 export interface UpgradeRow { key: string; target: GradeTarget; text: string; upgrade: GradeUpgradeView }

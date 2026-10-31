@@ -1,44 +1,40 @@
 import { newGrades, newOwnedUma, newSave, worldOf, type AccessorySlotState, type OwnedUma, type RpgClass, type RpgWeapon, type TierWorld } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { accessoryCards, cardButton, cardKind, presetRows, readyCount, upgradeRows } from './gear-equip'
+import { accessoryChoices, accessoryTile, presetRows, readyCount, upgradeRows } from './gear-equip'
 
 const slot = (grade: number, family: AccessorySlotState['family'] = null, kind?: AccessorySlotState['kind']): AccessorySlotState =>
   ({ grade, family, form: 'base', ...(kind ? { kind } : {}) })
 const SPELL_BLADE = ['katana', 'lance', 'lightning'] as const
 
-describe('the Equip view (H107)', () => {
-  it('draws four cards of one shape: her signature first with ★, then Pendant, Charm, Orb, Insignia', () => {
-    const cards = accessoryCards(slot(1, 'pendant'), SPELL_BLADE, 'orb', 50, 1)
-    expect(cards.map((c) => c.family)).toEqual(['orb', 'pendant', 'bell', 'insignia'])
-    expect(cards.map((c) => c.signature)).toEqual(['★ Signature · ATK/M.ATK +10 · Not worn', null, null, null])
-    // A kind row only on the Orb: her three, labelled by weapon.
-    expect(cards.map((c) => c.kinds.map((k) => k.label))).toEqual([['Katana', 'Lance', 'Thunder Tome'], [], [], []])
-    expect(cards.filter((c) => c.wearing).map((c) => c.family)).toEqual(['pendant'])
+describe('the Equip view (H107, D266)', () => {
+  it('lists every choice as one row: her signature first with ★, then Pendant, Charm, an Orb a kind, Insignia', () => {
+    const rows = accessoryChoices(slot(1, 'pendant'), SPELL_BLADE, 'orb', 1)
+    expect(rows.map((r) => [r.family, r.kind])).toEqual([['orb', 'katana'], ['orb', 'lance'], ['orb', 'lightning'], ['pendant', null], ['bell', null], ['insignia', null]])
+    expect(rows.filter((r) => r.signature).map((r) => r.family)).toEqual(['orb', 'orb', 'orb'])
+    expect(rows.filter((r) => r.worn).map((r) => r.family)).toEqual(['pendant'])
   })
 
-  it('says what each family does at the slot\'s grade, and what G1 gives at G0', () => {
-    const at = (grade: number) => accessoryCards(slot(grade), SPELL_BLADE, 'bell', 30, 1).map((c) => c.effect)
-    expect(at(3)).toEqual(['M.ATK +2', 'ATK +2', 'Kind +2', 'Bosses +1.5%'])
+  it('says what each row does at the slot\'s grade, and what G1 gives at G0', () => {
+    const at = (grade: number) => accessoryChoices(slot(grade), SPELL_BLADE, 'bell', 1).map((r) => r.effect)
+    expect(at(3)).toEqual(['M.ATK +3', 'ATK +3', 'Katana +6', 'Lance +6', 'Lightning +6', 'Bosses +3%'])
     expect(at(0)[0]).toBe('G1: M.ATK +1')
   })
 
-  it('gives every card one button: Equip, Equipped, or Switch on the family she wears', () => {
-    const [orb0, pendant] = accessoryCards(slot(2, 'orb', 'lance'), SPELL_BLADE, 'orb', 30, 1)
-    expect(cardKind(orb0!)).toBe('lance')
-    expect(cardButton(orb0!, 'lance')).toEqual({ label: 'Set', disabled: true })
-    expect(cardButton(orb0!, 'katana')).toEqual({ label: 'Set', disabled: false })
-    expect(cardButton(pendant!, null)).toEqual({ label: 'Set', disabled: false })
-    const insignia = accessoryCards(slot(2, 'insignia'), SPELL_BLADE, 'bell', 30, 1).find((c) => c.family === 'insignia')!
-    expect(cardButton(insignia, null)).toEqual({ label: 'Set', disabled: true })
-    const orb = accessoryCards(slot(2), SPELL_BLADE, 'bell', 30, 1).find((c) => c.family === 'orb')!
-    expect([cardKind(orb), cardButton(orb, 'katana')]).toEqual(['katana', { label: 'Set', disabled: false }])
+  it('marks only the kind an Orb is worn on', () => {
+    const worn = accessoryChoices(slot(2, 'orb', 'lance'), SPELL_BLADE, 'orb', 1).filter((r) => r.worn)
+    expect(worn.map((r) => r.kind)).toEqual(['lance'])
   })
 
-  it('flags an Orb left on a kind she no longer holds, and starts its chips on her first', () => {
-    const orb = accessoryCards(slot(4, 'orb', 'dark'), SPELL_BLADE, 'bell', 30, 1).find((c) => c.family === 'orb')!
-    expect(orb.stale).toBe('Dark Tome not held')
-    expect(cardKind(orb)).toBe('katana')
-    expect(cardButton(orb, 'katana')).toEqual({ label: 'Set', disabled: false })
+  it('draws a tile for what the slot holds, says Off at G0 and Empty without a family', () => {
+    expect(accessoryTile(slot(4, 'pendant'), SPELL_BLADE, 1)).toEqual({ text: 'ATK +4', stale: null })
+    expect(accessoryTile(slot(4, 'orb', 'lance'), SPELL_BLADE, 1)).toEqual({ text: 'Lance +8', stale: null })
+    expect(accessoryTile(slot(0, 'bell'), SPELL_BLADE, 1)).toEqual({ text: 'Charm · Off', stale: null })
+    expect(accessoryTile(slot(0), SPELL_BLADE, 1)).toEqual({ text: 'Empty', stale: null })
+  })
+
+  it('flags an Orb left on a kind she no longer holds', () => {
+    expect(accessoryTile(slot(4, 'orb', 'dark'), SPELL_BLADE, 1).stale).toBe('Dark Tome not held')
+    expect(accessoryChoices(slot(4, 'orb', 'dark'), SPELL_BLADE, 'bell', 1).some((r) => r.worn)).toBe(false)
   })
 })
 
@@ -63,15 +59,15 @@ describe('the standard presets (D263)', () => {
 
   it('shows a Tier 1 class its one preset, under the standard name', () => {
     expect(presetRows(world('paladin'), '101', 'paladin', 'pendant')).toEqual([
-      { pick: 'paladin', title: 'Standard preset', detail: 'Lance · Greatsword · Light Tome', on: false },
+      { pick: 'paladin', title: 'Standard preset', detail: 'Lance · Greatsword · Light Tome', accessories: 'Pendant · Pendant · Orb', on: false },
     ])
     expect(presetRows(world('paladin', ['lance', 'greatsword', 'tome-light']), '101', 'paladin', 'bell')[0]!.detail).toBe('Lance · Greatsword · Light Tome')
   })
 
   it('shows a Tier 0 one preset for each class it promotes into, named after it', () => {
     expect(presetRows(world('duelist'), '101', 'duelist', 'pendant')).toEqual([
-      { pick: 'spellblade', title: 'Arms Spellblade', detail: 'Katana · Axe · Thunder Tome', on: false },
-      { pick: 'tomeblade', title: 'Tome Spellblade', detail: 'Thunder Tome · Blizzard Tome · Katana', on: false },
+      { pick: 'spellblade', title: 'Arms Spellblade', detail: 'Katana · Axe · Thunder Tome', accessories: 'Pendant · Pendant · Orb', on: false },
+      { pick: 'tomeblade', title: 'Tome Spellblade', detail: 'Thunder Tome · Blizzard Tome · Katana', accessories: 'Pendant · Charm · Orb', on: false },
     ])
     expect(presetRows(world('recruit'), '101', 'recruit', 'bell').map((r) => r.title)).toEqual(['Brawler', 'Arms Spellblade', 'Arms Summoner'])
   })

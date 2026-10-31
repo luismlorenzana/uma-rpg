@@ -142,7 +142,7 @@ the damage stack, `battleDamage`). For each part of each hit:
    Break's power are their own (above, [below](#her-accessory-and-signature) and [below](#limit-breaks)).
 3. **Weak:** ×1.3 when the hit's kind is on the foe's list ([below](#weaknesses-shields-and-breaks)), or it's Light or
    Dark against a Hexed foe.
-4. **Her Insignia:** ×(1 + 1.5% a grade) on a sub-boss or a boss.
+4. **Her Insignias:** ×(1 + 1% a grade, slots added) on a sub-boss or a boss.
 5. **Statuses** ([below](#statuses)), each its own factor: the attacker's Brave or Faith (+10% a stack, by channel),
    Power-up (+15%), Weaken (−15%) and Enfeeble (−10%); the target's Armor Break or Mind Break (+10%, by channel), Shock
    and Mark (+10%), Ward (−15%) and Aegis (−10%).
@@ -192,11 +192,11 @@ multiplies whatever offense she has.
 <!-- live:damage-sources -->
 | Level | Gear grade, skill depth | Uma stats (level) | Extra Stats | Weapon Might | Armor | Offense | Hit without Extra Stats | Hit without the weapon | Hit without armor | All three vs her stats alone | Skill depth vs depth 1 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Lv 1 | G1, 1 | 24 (77%) | 1 (3%) | 1 (3%) | 5 (16%) | 31 | −4% | −4% | −22% | ×1.43 | ×1.00 |
-| Lv 10 | G2, 2 | 41 (77%) | 3 (6%) | 4 (8%) | 5 (9%) | 53 | −8% | −10% | −13% | ×1.43 | ×1.38 |
-| Lv 25 | G5, 3 | 68 (59%) | 13 (11%) | 19 (17%) | 15 (13%) | 115 | −15% | −22% | −18% | ×2.13 | ×1.81 |
-| Lv 40 | G8, 5 | 95 (49%) | 33 (17%) | 45 (23%) | 20 (10%) | 193 | −24% | −32% | −15% | ×2.91 | ×2.87 |
-| Lv 50 | G10, 5 | 113 (44%) | 51 (20%) | 68 (26%) | 25 (10%) | 257 | −28% | −37% | −14% | ×3.60 | ×2.87 |
+| Lv 1 | G1, 1 | 24 (73%) | 1 (3%) | 1 (3%) | 7 (21%) | 33 | −4% | −4% | −28% | ×1.56 | ×1.00 |
+| Lv 10 | G2, 2 | 41 (72%) | 3 (5%) | 4 (7%) | 9 (16%) | 57 | −7% | −9% | −21% | ×1.58 | ×1.38 |
+| Lv 25 | G5, 3 | 68 (54%) | 13 (10%) | 19 (15%) | 25 (20%) | 125 | −14% | −20% | −26% | ×2.38 | ×1.81 |
+| Lv 40 | G8, 5 | 95 (45%) | 33 (16%) | 45 (22%) | 36 (17%) | 209 | −22% | −29% | −24% | ×3.26 | ×2.87 |
+| Lv 50 | G10, 5 | 113 (41%) | 51 (18%) | 68 (25%) | 45 (16%) | 277 | −26% | −34% | −23% | ×4.01 | ×2.87 |
 
 A regular foe's 100% physical hit, as a share of her HP:
 
@@ -208,31 +208,36 @@ A regular foe's 100% physical hit, as a share of her HP:
 | Lv 40 | 27% | 21% | 22% | 18% |
 | Lv 50 | 31% | 23% | 25% | 19% |
 
-The Brawler leans ATK ×1.1 and DEF ×1.1; her map is the core her level opens, Prowess all to ATK; her armor is the physical half. Her preset's Bell adds a follow-up Attack rather than offense; a Pendant or an Orb would add its flat offense on her kinds, and her signature +0.2 a level while she wears her knack's family.
+The Brawler leans ATK ×1.1 and DEF ×1.1; her map is the core her level opens, Prowess all to ATK; her armor is the physical half. Her preset's Bell adds a follow-up Attack rather than offense; a Pendant or an Orb would add its flat offense on her kinds, and her signature +0.1 a level while she wears her knack's family.
 <!-- /live -->
 
 ## Her accessory and signature
 
 Three accessory slots in every tier, each with its own grade and one of four families' base forms, repeats allowed (D264,
-was one; [materials](materials.md#gear)). A slot at G0 or without a family does nothing. Values are Tier 1's at G1 → G10, one
-slot:
+was one; [materials](materials.md#gear)). A slot at G0 or without a family does nothing. Every value is linear, so every raise
+counts (D266). Tier 1's, one slot:
 
-| Family | In a fight | G1 → G10 |
+| Family | In a fight | A grade · G10 |
 |---|---|---|
-| **Pendant** | +ATK, a real stat: it counts on every Arms hit, a Paladin's mends and an inherited Limit Break | +1 → +6 |
-| **Charm** | +M.ATK, the same way | +1 → +6 |
-| **Orb** | Flat offense on its one kind, which must be one of her weapons' when she sets it; it counts on any hit of that kind, a Limit Break's too | +1 → +9 |
-| **Insignia** | Her hits on sub-bosses and bosses ×(1 + 0.5% a grade) | ×1.005 → ×1.05 |
+| **Pendant** | +ATK, a real stat: it counts on every Arms hit, a Paladin's mends and an inherited Limit Break | +1 · +10 |
+| **Charm** | +M.ATK, the same way | +1 · +10 |
+| **Orb** | Flat offense on its one kind, which must be one of her weapons' when she sets it; it counts on any hit of that kind, a Limit Break's too | +2 · +20 |
+| **Insignia** | Her hits on sub-bosses and bosses ×(1 + 1% a grade) | +1% · ×1.10 |
 
-Slots add up: three G10 Orbs on one kind are +27 and three G10 Insignias ×1.15. The Pendant, the Charm and the Orb are ×1.8 in
+Slots add up: three G10 Orbs on one kind are +60 and three G10 Insignias ×1.30. The Pendant, the Charm and the Orb are ×1.8 in
 Tier 2 and ×2.6 in Tier 3; the Insignia is the same in every tier.
+
+**What wins (D266, measured on Auto at Lv 50):** three of her stat on the Brawler, the Sorcerer, the Paladin and the Tome
+Spellblade; Orbs on the hybrids whose damage leans on one kind and on the Cleric; Insignias on sub-bosses. No mix wins more than
+half the cases. The preset (her stat twice and an Orb) is a good all-round set in every class, not the best in any one fight.
 
 - **A fight already open** keeps what it started with, a Bell's follow-up hit too: only fights started before D264 have one.
 - **The Insignia** reads the foe's rank, not her face: the Rift Horde's boss-faced leaders are regulars, so it skips them.
-- **Her signature** (WP33, UT7): while one of her slots holds her knack's family at G1 or above, she adds 0.2 a level ×
-  the tier's multiplier (×1, ×1.8, ×2.6) to her ATK and M.ATK on her hits: +10 at Tier 1 Lv 50
+- **Her signature** (WP33, UT7, D266): while one of her slots holds her knack's family at G1 or above, she adds 0.1 a level
+  × the tier's multiplier (×1, ×1.8, ×2.6), at least 1, to her ATK and M.ATK on her hits: +5 at Tier 1 Lv 50
   ([classes](classes.md#her-calling-and-her-template)).
-- **None of it heals:** mends, Barriers and revives read her ATK or M.ATK without them.
+- **Only the Pendant and the Charm heal:** they are real stats. Mends, Barriers and revives read her ATK or M.ATK without an
+  Orb, an Insignia or her signature.
 
 ## Weaknesses, shields and Breaks
 
@@ -604,6 +609,6 @@ scales `HERO_LIMIT_SCALE` and `HERO_LIMIT_MAX_HITS` (10) ([above](#limit-breaks)
 | `BATTLE_FLOURISH_FROM` | 3 | v16: the first round whose end Late reserve mends at |
 | `RPG_BASE_MP_REGEN_V17` | 0.01 | v17: the base MP regen a depth (5% from Class Rank 40) |
 | `BELL_PERMILLE_PER_GRADE` | 100 | v17–v20: a Bell's follow-up, per mille of an Attack a grade, × her hand; only fights already open, D264 |
-| `INSIGNIA_SLOT_PERMILLE` | 5 | an Insignia slot's extra damage on sub-bosses and bosses, per mille a grade (D264) |
-| Signature | 0.2 a level × tier | v17: her ATK and M.ATK while she wears her knack's family |
+| `INSIGNIA_SLOT_PERMILLE` | 10 | an Insignia slot's extra damage on sub-bosses and bosses, per mille a grade (D264) |
+| Signature | 0.1 a level × tier | v17: her ATK and M.ATK while she wears her knack's family |
 <!-- /live -->

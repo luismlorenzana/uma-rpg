@@ -255,19 +255,20 @@ UX](../design/profile-ux.md), D229):
 then **Upgrade** ("Upgrade · 12" counts the raises ready and the jewels to set), stacked in one scroll.
 - **Equip**, what she wears:
   - the standard preset (`presetRows`; D263): one row, "Standard preset" or "Standard preset · On", with her class's
-    emblem and "Lance · Greatsword · Light Tome" under it. A Tier 0 shows a "Standard preset" heading and one row
+    emblem, "Lance · Greatsword · Light Tome" and "Pendant · Pendant · Orb" under it. A Tier 0 shows a "Standard preset" heading and one row
     for each class it promotes into, each with that class's emblem and name ("Paladin", "Cleric · On"). A tap sets those
     weapons and all three accessory slots, her ★ family first; no grade moves ([classes](classes.md#standard-presets)).
   - **Loadout** ("Set on Skills ›"): her three weapons' icons with their grades, then "Physical armor" or "Magical
-    armor" with the five slots' icons and grades. A slot at G0 is an empty frame.
-  - **Accessory 1 · G4**, **Accessory 2** and **Accessory 3**, a section a slot: four family buttons in one row, her ★
-    family first, then Pendant, Charm, Orb and Insignia; the one she wears is ringed. Below, the selected family only: its
-    name; what it does at the slot's grade ("ATK +3"; "G1: ATK +1" at G0); "★ Signature · ATK/M.ATK +10 · Worn" on her
-    family; "Greatsword not held" on an Orb left on a kind she no longer holds; for an Orb, one kind button per weapon she
-    holds; and one button, **Set**.
+    armor" with the five slots' icons and grades. A slot at G0 is an empty frame. Then **Accessories** (i), three tiles the
+    size of her weapons' (D266): the icon, the grade, and what the slot does ("ATK +4", "Lance +8", "Bosses +4%"), "Charm ·
+    Off" at G0, "Empty" with no family, or "Greatsword not held" on an Orb left on a kind she no longer holds.
+  - A tile opens **Accessory 1 · G4**: "★ Signature · ATK/M.ATK +5 · Worn", "Off until G1" at G0, and one row a choice, her ★
+    family first, then Pendant, Charm, an Orb for each weapon she holds, and Insignia, with what each does at the slot's
+    grade ("ATK +4"; "G1: ATK +1" at G0). The row she wears is ringed with a ✓. **A tap wears the row and closes the sheet:**
+    there is no Set button, so what a tile shows is what the save holds.
 - **Upgrade**, what she spends:
   - **Grades**, in three groups: Weapons ("Greatsword · G3 · Might 8 · weak ×1.3"), Armor ("Head · Helm · G2 · DEF +8")
-    and Accessory, one row a slot ("Pendant · G4 · ATK +2 · ★ +10", "Charm · G0 · Off", "None · G0"). Each row's pill raises it at once ("G3 → G4 · 1 Arms Gem G4"; Tome Ink on a Tome), with the
+    and Accessory, one row a slot ("Pendant · G4 · ATK +4 · ★ +5", "Charm · G0 · Off", "None · G0"). Each row's pill raises it at once ("G3 → G4 · 1 Arms Gem G4"; Tome Ink on a Tome), with the
     green mark, or says why not ("Needs Lv 16", "Needs 1 Arms Gem G4", "Already G10").
   - A row's sheet: "Now · G3 · Might 8 · weak ×1.3", "Next · …", an armor slot's half ("Her class's half · Helm"), the
     raise button, and **Up to G6** when the Warehouse holds several grades, which lists the items and asks Cancel or

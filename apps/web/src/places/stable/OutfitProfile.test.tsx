@@ -166,6 +166,16 @@ describe('the Uma profile v2 frame (H119)', () => {
     expect(within(document.querySelector('[data-profile-details]') as HTMLElement).getByText('Mends')).toBeDefined()
   })
 
+  it('shows three accessory tiles, and a tile’s list holds every choice a tap away (D266)', async () => {
+    render(profile('/town/stable/outfit/81001/gear'))
+    const tiles = screen.getAllByRole('button', { name: /^Accessory \d/ })
+    expect(tiles).toHaveLength(3)
+    expect(screen.queryByRole('button', { name: 'Set' })).toBeNull()
+    fireEvent.click(tiles[1]!)
+    expect(await screen.findAllByRole('button', { name: /^(★ )?Orb/ })).toHaveLength(3)
+    expect(screen.getByRole('button', { name: /^(★ )?Insignia/ })).toBeDefined()
+  })
+
   it('keeps Gear stacked, embeds the shared Stars body and renders Template inline', () => {
     const ui = render(profile('/town/stable/outfit/81001/gear'))
     expect(screen.getByRole('heading', { name: 'Equip' })).toBeDefined()

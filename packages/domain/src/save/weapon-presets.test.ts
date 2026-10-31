@@ -66,22 +66,25 @@ describe('the weapon presets (D263)', () => {
     for (const c of RPG_TIER1_CLASSES) for (const t of RPG_CLASS_PARENTS[c]) expect(rpgPresetClasses(t), t).toContain(c)
   })
 
-  it('wear three slots: her channels and an Orb on a kind she holds, her ★ family first (D264)', () => {
+  it('wear three slots: her armor half’s stat twice and an Orb on a kind she holds, her ★ family first (D266)', () => {
     const forms = (c: RpgTier1Class, family?: 'orb' | 'bell' | 'pendant' | 'insignia') => weaponPreset(c, family).accessories.map((a) => a.kind ? `${a.family} ${a.kind}` : a.family)
     expect(forms('brawler')).toEqual(['pendant', 'pendant', 'orb greatsword'])
     expect(forms('paladin')).toEqual(['pendant', 'pendant', 'orb lance'])
     expect(forms('mage')).toEqual(['bell', 'bell', 'orb fire'])
     expect(forms('cleric')).toEqual(['bell', 'bell', 'orb light'])
-    expect(forms('spellblade')).toEqual(['pendant', 'bell', 'orb katana'])
-    expect(forms('armsummoner')).toEqual(['pendant', 'bell', 'orb bow'])
-    expect(forms('tomeblade')).toEqual(['bell', 'pendant', 'orb lightning'])
-    expect(forms('summoner')).toEqual(['bell', 'pendant', 'orb dark'])
+    expect(forms('spellblade')).toEqual(['pendant', 'pendant', 'orb katana'])
+    expect(forms('armsummoner')).toEqual(['pendant', 'pendant', 'orb bow'])
+    expect(forms('tomeblade')).toEqual(['bell', 'bell', 'orb lightning'])
+    expect(forms('summoner')).toEqual(['bell', 'bell', 'orb dark'])
     // Her ★ family leads: in the place of one of its own, else of slot 1.
     expect(forms('brawler', 'orb')).toEqual(['orb greatsword', 'pendant', 'pendant'])
     expect(forms('brawler', 'pendant')).toEqual(['pendant', 'pendant', 'orb greatsword'])
     expect(forms('brawler', 'insignia')).toEqual(['insignia', 'pendant', 'orb greatsword'])
-    expect(forms('mage', 'pendant')).toEqual(['pendant', 'bell', 'orb fire'])
     expect(forms('spellblade', 'bell')).toEqual(['bell', 'pendant', 'orb katana'])
+    // Unless her weapons can't use it: a Pendant on three Tomes would cost her a slot for half a slot's ★.
+    expect(forms('mage', 'pendant')).toEqual(['bell', 'bell', 'orb fire'])
+    expect(forms('brawler', 'bell')).toEqual(['pendant', 'pendant', 'orb greatsword'])
+    expect(forms('cleric', 'pendant')).toEqual(['pendant', 'bell', 'orb light'])
     for (const c of RPG_TIER1_CLASSES) for (const { kind } of weaponPreset(c).accessories) {
       if (kind) expect(RPG_WEAPON_PRESETS[c].map(rpgWeaponKind), c).toContain(kind)
     }

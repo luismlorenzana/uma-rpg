@@ -133,23 +133,20 @@ export function presetAccessory(classId: RpgClass, weapons: readonly RpgWeapon[]
   return family === 'orb' || family === 'bell' ? { family, kind: presetKind(classId, weapons, engine) } : { family }
 }
 
-/** Each Tier 1 class's three accessory slots (D264): her channel's stat, and an Orb. A pure channel its stat twice, a hybrid
- * one of each with her lead channel's first. The id `bell` is the Charm. */
-const PRESET_SLOTS: Readonly<Record<RpgTier1Class, readonly AccessoryFamily[]>> = {
-  brawler: ['pendant', 'pendant', 'orb'], paladin: ['pendant', 'pendant', 'orb'],
-  mage: ['bell', 'bell', 'orb'], cleric: ['bell', 'bell', 'orb'],
-  spellblade: ['pendant', 'bell', 'orb'], armsummoner: ['pendant', 'bell', 'orb'],
-  tomeblade: ['bell', 'pendant', 'orb'], summoner: ['bell', 'pendant', 'orb'],
-}
+/** Whether her weapons can use a family: a Pendant needs an Arm, a Charm (id `bell`) a Tome. */
+const familyUsable = (family: AccessoryFamily, weapons: readonly RpgWeapon[]): boolean =>
+  (family === 'pendant' ? weapons.some((w) => !isRpgTome(w)) : family === 'bell' ? weapons.some(isRpgTome) : true)
 /** A weapon preset: a class's weapons and armor half, and one accessory form a slot. */
 export interface WeaponPreset { classId: RpgClass; weapons: RpgWeapon[]; armor: 'physical' | 'magical'; accessories: PresetAccessory[] }
-/** A Tier 1 class's weapon preset (D263, D264): its three weapons, its armor half and her three accessory forms: the class's,
- * with her ★ `family` first in the place of one of its own or else of slot 1, and an Orb on `presetKind`'s kind of those
- * weapons (the Tome Summoner's on Dark, the twin of her Bow; the Cleric's on Light, her first slot). */
+/** A Tier 1 class's weapon preset (D263, D266): its three weapons, its armor half and her three accessory forms: her armor
+ * half's stat twice (a Pendant for ATK, a Charm for M.ATK) and an Orb on `presetKind`'s kind of those weapons (the Tome
+ * Summoner's on Dark, the twin of her Bow; the Cleric's on Light, her first slot). Her ★ `family` goes first, in the place of
+ * one of its own or else of slot 1, unless her weapons can't use it: the ★ is worth half a slot of her stat. */
 export function weaponPreset(classId: RpgTier1Class, family?: AccessoryFamily | null, engine: number = BATTLE_ENGINE_VERSION): WeaponPreset {
   const weapons = rpgPresetWeapons(classId, engine)
-  const slots = [...PRESET_SLOTS[classId]]
-  if (family) { slots.splice(Math.max(0, slots.indexOf(family)), 1); slots.unshift(family) }
+  const stat: AccessoryFamily = RPG_CLASS_ARMOR[classId] === 'physical' ? 'pendant' : 'bell'
+  const slots: AccessoryFamily[] = [stat, stat, 'orb']
+  if (family && familyUsable(family, weapons)) { slots.splice(Math.max(0, slots.indexOf(family)), 1); slots.unshift(family) }
   const accessories = slots.map((f): PresetAccessory => (f === 'orb' ? { family: f, kind: presetKind(classId, weapons, engine) } : { family: f }))
   return { classId, weapons, armor: RPG_CLASS_ARMOR[classId], accessories }
 }

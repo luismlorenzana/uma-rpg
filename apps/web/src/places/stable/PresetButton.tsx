@@ -1,4 +1,4 @@
-// The live grades preset: one tap puts on a class's weapons and template accessory. A Tier 1 class has one; a Tier 0 lists
+// The live grades preset: one tap puts on a class's weapons and all three accessories. A Tier 1 class has one; a Tier 0 lists
 // one for each class it promotes into, so gear can start on the weapons she'll keep (D263).
 // Save-v27 binding confirmations retired with the old profile sheet (H117).
 import {
@@ -32,6 +32,7 @@ export function PresetButton({ outfit, uma, world }: { outfit: RosterOutfit; uma
           <span className="min-w-0 flex-1">
             <span className="block truncate text-[12px] font-semibold">{row.title}</span>
             <span className="block truncate text-[10.5px] text-ink-soft">{row.detail}</span>
+            {row.accessories && <span className="block truncate text-[10.5px] text-ink-soft">{row.accessories}</span>}
           </span>
           {!row.on && <span className="shrink-0 text-ink-faint">›</span>}
         </button>

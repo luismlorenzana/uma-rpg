@@ -192,12 +192,12 @@ describe('a graded Uma’s accessory and signature in the fight (R2, H75)', () =
   }
   const three = (...slots: AccessorySlotState[]) => threeParty(...slots)[0]!
 
-  it('brings a Fleet Brawler’s G10 Charm as M.ATK and her signature +10 (D264)', () => {
+  it('brings a Fleet Brawler’s G10 Charm as M.ATK and her signature +5 (D266)', () => {
     const none = fight(accessorySlot(null, 10), 'fleet').ally
     const { member, ally, allies } = fight(accessorySlot('bell', 10), 'fleet')
-    expect(member).toMatchObject({ accessory: { flat: {} }, signature: 10 })
-    expect(ofFields(ally)).toEqual({ signature: 10 })
-    expect(ally.stats.matk - none.stats.matk).toBe(6)
+    expect(member).toMatchObject({ accessory: { flat: {} }, signature: 5 })
+    expect(ofFields(ally)).toEqual({ signature: 5 })
+    expect(ally.stats.matk - none.stats.matk).toBe(10)
     expect(ally.stats.atk).toBe(none.stats.atk)
     expect(() => createBattle({ version: 17, seed: 75, allies, enemies: [foe] })).not.toThrow()
   })
@@ -206,7 +206,7 @@ describe('a graded Uma’s accessory and signature in the fight (R2, H75)', () =
     const none = fight(accessorySlot(null, 10), 'fleet').ally
     const { ally, allies } = fight(accessorySlot('pendant', 10), 'fleet')
     expect(ofFields(ally)).toEqual({})
-    expect(ally.stats.atk - none.stats.atk).toBe(6)
+    expect(ally.stats.atk - none.stats.atk).toBe(10)
     expect(ally.might).toEqual({ greatsword: 68, axe: 68, lance: 68 })
     expect(() => createBattle({ version: 17, seed: 75, allies, enemies: [foe] })).not.toThrow()
   })
@@ -220,20 +220,20 @@ describe('a graded Uma’s accessory and signature in the fight (R2, H75)', () =
   })
 
   it('brings an Orb on a kind she doesn’t wield, an Insignia, and her signature on another class’s family', () => {
-    expect(ofFields(fight(accessorySlot('orb', 10, 'dark'), 'mighty').ally)).toEqual({ flat: { dark: 9 }, signature: 10 })
-    expect(ofFields(fight(accessorySlot('insignia', 4), 'clever').ally)).toEqual({ insignia: { value: 20 }, signature: 10 })
+    expect(ofFields(fight(accessorySlot('orb', 10, 'dark'), 'mighty').ally)).toEqual({ flat: { dark: 20 }, signature: 5 })
+    expect(ofFields(fight(accessorySlot('insignia', 4), 'clever').ally)).toEqual({ insignia: { value: 40 }, signature: 5 })
   })
 
   it('adds up three slots of one family, each at its own grade, and takes any mix to a v20 fight', () => {
     const stacked = three(accessorySlot('orb', 10, 'greatsword'), accessorySlot('orb', 8, 'greatsword'), accessorySlot('orb', 5, 'axe'))
-    expect(stacked.flat).toEqual({ greatsword: 9 + 7, axe: 4 })
+    expect(stacked.flat).toEqual({ greatsword: 20 + 16, axe: 10 })
     const bosses = three(accessorySlot('insignia', 10), accessorySlot('insignia', 10), accessorySlot('insignia', 10))
-    expect(bosses.insignia).toEqual({ value: 150 })
+    expect(bosses.insignia).toEqual({ value: 300 })
     const base = three().stats
     const rings = three(accessorySlot('pendant', 10), accessorySlot('pendant', 10), accessorySlot('bell', 10)).stats
-    expect([rings.atk - base.atk, rings.matk - base.matk]).toEqual([12, 6])
+    expect([rings.atk - base.atk, rings.matk - base.matk]).toEqual([20, 10])
     const mix = three(accessorySlot('orb', 10, 'axe'), accessorySlot('insignia', 10), accessorySlot('bell', 10))
-    expect(ofFields(mix)).toMatchObject({ flat: { axe: 9 }, insignia: { value: 50 } })
+    expect(ofFields(mix)).toMatchObject({ flat: { axe: 20 }, insignia: { value: 100 } })
     const party = threeParty(accessorySlot('orb', 10, 'axe'), accessorySlot('insignia', 10), accessorySlot('bell', 10))
     expect(() => createBattle({ version: BATTLE_ENGINE_VERSION, seed: 75, allies: party, enemies: [foe] })).not.toThrow()
     expect(() => createBattle({ version: 19, seed: 75, allies: party, enemies: [foe] })).toThrow()
