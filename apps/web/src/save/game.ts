@@ -310,20 +310,12 @@ export const sell = (shelf: Shelf, id: string, quantity: number) => edit(import(
 /** Reads Manuals for one Uma's bar: 1,000 Marks for 1,000 EXP each (D102). */
 export const readManual = (outfitId: string, ref: RankRef, count: number) => edit(import('@rpg/domain/exchange'), (d, s, now, t) => d.readManuals(s, outfitId, ref, count, now, t))
 
-/** She sets a Star Gem: one node opens on her map (D144). Returns the node. */
-export async function setStarGem(outfitId: string, gemId: string): Promise<string> {
-  const tier = activeKey()
-  const { setGem } = await import('@rpg/domain/observatory')
-  const { save } = useGame.getState()
-  if (!save) throw new Error('No save loaded')
-  const r = setGem(save, outfitId, gemId, nowIso(), tier)
-  await commit(r.save)
-  return r.node
-}
-export const activate = (outfitId: string, nodes: string[]) => edit(import('@rpg/domain/observatory'), (d, s, now, t) => d.setActiveNodes(s, outfitId, nodes, now, t))
 /** Opens one v3 Extra Stats node with a jewel from the Warehouse. */
 export const setMapJewel = (outfitId: string, jewelId: string, node: string) =>
   edit(import('@rpg/domain/observatory'), (d, s, now, t) => d.setJewel(s, outfitId, jewelId, node, now, t))
+/** Set all (H122): every jewel in one save write; a step the rules refuse aborts it with its message. */
+export const setJewels = (outfitId: string, steps: readonly { jewel: string; node: string }[]) => edit(import('@rpg/domain/observatory'), (d, s, now, t) =>
+  steps.reduce((next, step) => d.setJewel(next, outfitId, step.jewel, step.node, now, t), s))
 export const wear = (outfitId: string, gearId: string) => edit(import('@rpg/domain/forge'), (d, s, now, t) => d.equipGear(s, outfitId, gearId, now, t))
 export const takeOff = (outfitId: string, slot: GearSlot) => edit(import('@rpg/domain/forge'), (d, s, now, t) => d.unequipGear(s, outfitId, slot, now, t))
 /** Puts an armor kind in one of her five armor slots: its Training piece (null) or a crafted one (D103). */

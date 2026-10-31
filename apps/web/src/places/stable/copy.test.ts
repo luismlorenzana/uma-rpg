@@ -9,7 +9,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
-import { mapNodeValue } from '../observatory/StarsPanel'
+import { mapNodeValue, nodeSheet, setAllLines, setAllPlan } from '../observatory/stars-view'
 import * as copy from './copy'
 import { accessoryChoices, accessoryTile } from './gear-equip'
 import { accessoryGradeLine, weaponGradeLine } from './gear-v3'
@@ -24,7 +24,7 @@ const NAMES = [
   ...Object.values(KNACK_LABEL), ...Object.values(KEY_LABELS), ...RPG_CLASSES, ...RPG_ALL_CLASSES.map((c) => rpgClassName(c)),
   ...Object.values(RPG_ROOT_NAME), ...Object.values(RPG_TIER0_SKILL), 'Warrior Dojo', 'Mage Tower', 'Spellblade Salle', 'Summoner Circle', 'Healer Sanctum',
   'Spell Blade', 'Greatsword', 'Thunder Tome', 'Even pace', 'Late reserve', 'Clean break', 'Weapon Forge', 'Tome Forge',
-  'Charm Forge', 'Armor Fittings G5', 'Arms Gem G10', 'Accessory Setting', 'Armor Fittings', 'Arms Gem', 'Tome Ink', 'Planet Jewel I', 'Clever Spellwright', 'Clever Spellfencer',
+  'Charm Forge', 'Armor Fittings G5', 'Arms Gem G10', 'Accessory Setting', 'Armor Fittings', 'Arms Gem', 'Tome Ink', 'Planet Jewel', 'Moon Jewel', 'Clever Spellwright', 'Clever Spellfencer',
   'Aster', 'Beryl', 'Fire', 'Blizzard', 'Thunder', 'Dark', 'Light', 'Physical', 'Magical',
 ].sort((a, b) => b.length - a.length)
 const numberPattern = /[+−-]?\d[\d,.]*(?:%|×\d+(?:\.\d+)?)?/g
@@ -74,6 +74,10 @@ describe('the profile wording list (H117)', () => {
     expect(copy.flourish('even-pace', true)).toBe('★ Flourish · Even pace · 1%/round · max 4% · On')
     expect(copy.moonNode('I', 'Evasion +2.4%', 'Open')).toBe('★ Moon I · Evasion +2.4% · Open')
     expect(copy.extraStatsCount(17)).toBe('Open 17/22')
+    expect(copy.extraStatsRow(13, 2)).toBe('Open 13/22 · 2 ready')
+    expect(copy.extraStatsRow(4, 0)).toBe('Open 4/22')
+    expect(copy.extraStats(13, 2)).toBe('Extra Stats · Open 13/22 · 2 ready')
+    expect(copy.setLine('Moon Jewel IV', 'Guard IV', 'DEF/M.DEF +8')).toBe('Moon Jewel IV → Guard IV · DEF/M.DEF +8')
     expect(copy.nodeValue({ kind: 'planet', value: 21 })).toBe('+21 · all six')
     expect(copy.nodeValue({ kind: 'vigor', hp: 100, mp: 20 })).toBe('HP +100 · MP +20')
     expect(copy.nodeValue({ kind: 'guard', value: 4 })).toBe('DEF/M.DEF +4')
@@ -188,6 +192,12 @@ describe('the profile wording list (H117)', () => {
     values.push({ source: 'class tree', value: [classTiles(outfit, tiered).map((t) => t.word), RPG_CLASSES.map((c) => classesSheet(outfit, tiered, world, 1, c).line),
       RPG_CLASSES.map((c) => classesSheet(outfit, tiered, world, 1, c).footer.label), promotionSheet(outfit, tiered, 1, 'recruit'), promotionLine(tiered, 'duelist')] })
     values.push({ source: 'limit', value: limitView(world, '81001', 'recruit', () => 'Aster') })
+    const starred = { ...owned, classId: 'brawler' as const, stars: { open: ['planet:1', 'prowess:1', 'vigor:1', 'guard:1'], moons: [] as [] } }
+    const stock = { 'jewel-moon-2': 3, 'jewel-planet-2': 3 }
+    const steps = setAllPlan(starred.stars, stock, 50)
+    expect(steps.length).toBeGreaterThan(0)
+    values.push({ source: 'stars tab', value: [setAllLines(steps, outfit, starred, 'brawler', ['greatsword', 'axe', 'lance'], 1),
+      ['planet:2', 'guard:2', 'guard:3', 'planet:5', 'template:1', 'template:2'].map((id) => { const { jewelId: _, ...view } = nodeSheet(outfit, starred, id, 'brawler', ['greatsword', 'axe', 'lance'], 1, stock); return view })] })
     for (const classId of RPG_CLASSES) values.push({ source: `battle sheet ${classId}`, value: umaBattleSheet(outfit, { ...owned, classId }, classId, 1, BATTLE_ENGINE_VERSION) })
     for (const entry of values) for (const value of strings(entry.value)) check(value, entry.source)
   })
@@ -196,9 +206,9 @@ describe('the profile wording list (H117)', () => {
     const files = [
       'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'TemplateTab.tsx',
       'ClassTab.tsx', 'class-sheets.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'GearTab.tsx', 'PresetButton.tsx',
-      '../observatory/StarsPanel.tsx',
+      '../observatory/StarsPanel.tsx', '../observatory/ObservatoryPage.tsx',
     ]
-    const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.'])
+    const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.', 'Unlock an Uma first.'])
     const root = path.dirname(new URL(import.meta.url).pathname)
     const failures: string[] = []
     for (const relative of files) {

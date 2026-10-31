@@ -206,11 +206,11 @@ export function AccessorySheet({ outfit, uma, world, tier, slot, onClose }: { ou
   )
 }
 
-/** Raise all: every line, what it uses, and one button. */
+/** Raise all: every line, what it uses, and one button. It closes when done: nothing is left to list. */
 function RaiseAllSheet({ outfitId, world, weapons, onClose }: { outfitId: string; world: TierWorld; weapons: readonly RpgWeapon[]; onClose: () => void }) {
   const [error, setError] = useState<string | null>(null)
   const plan = raiseAllPlan(world, outfitId, weapons)
-  const go = () => void raiseAll(outfitId, plan.steps).then(() => setError(null), (err: unknown) => setError(failed(err)))
+  const go = () => void raiseAll(outfitId, plan.steps).then(onClose, (err: unknown) => setError(failed(err)))
   return (
     <BottomSheet title={actions.raiseAll} onClose={onClose} footer={plan.steps.length > 0
       ? <button type="button" onClick={go} className="min-h-12 w-full rounded-sm bg-accent px-3 font-display font-bold text-accent-ink">{actions.raise(plan.steps.length)}</button>

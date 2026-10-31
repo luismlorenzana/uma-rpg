@@ -12,7 +12,6 @@ import { FeaturedSheet } from '../hub/Featured'
 import StablePage from '../places/stable/StablePage'
 import PartyHallPage from '../places/party-hall/PartyHallPage'
 import FacilityPage from '../places/work/FacilityPage'
-import ObservatoryPage from '../places/observatory/ObservatoryPage'
 import HallPage from '../places/halls/HallPage'
 import ExchangePage from '../places/exchange/ExchangePage'
 import { ActivePartyBar } from '../places/scenario-gate/ActiveParty'
@@ -162,14 +161,6 @@ describe('SB4 uses the shared album in every RPG choice', () => {
     fixture.world.targets = ['81001']
     const ui = show(<FacilityPage {...page('monster-den')} />)
     expect(ui.container.querySelector('[data-kit="targets-strip"] [data-grade]')).not.toBeNull()
-  })
-
-  it('Observatory honors its explicit Uma route and changes her through the shared picker', async () => {
-    show(<ObservatoryPage {...page('observatory', '81001')} />)
-    expect(within(screen.getByRole('button', { name: 'Choose an Uma' })).getByText('Aster')).toBeDefined()
-    fireEvent.click(screen.getByRole('button', { name: 'Choose an Uma' }))
-    fireEvent.click(within(dialog()).getByRole('button', { name: 'Cinder' }))
-    await waitFor(() => expect(within(screen.getByRole('button', { name: 'Choose an Uma' })).getByText('Cinder')).toBeDefined())
   })
 
   it('Hall Heroes and Learners use shared choices and display the existing domain refusals instead of hiding them', async () => {

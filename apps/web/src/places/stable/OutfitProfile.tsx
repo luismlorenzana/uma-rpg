@@ -107,7 +107,7 @@ export function OutfitProfile({ view, outfitId, place, route }: OutfitProfilePro
           <>
             {tab === 'class' && <ClassTab outfit={outfit} uma={owned} world={world} />}
             {tab === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} tier={tier as 1 | 2 | 3} upgrades={upgrades} />}
-            {tab === 'stars' && <StarsPanel outfitId={outfitId} />}
+            {tab === 'stars' && <StarsPanel outfit={outfit} uma={owned} world={world} tier={tier as 1 | 2 | 3} />}
             {tab === 'template' && <TemplateTab view={view} outfit={outfit} uma={owned} classId={classId} tier={tier as 1 | 2 | 3} stock={world.items} />}
           </>
         ) : <TemplateTab view={view} outfit={outfit} uma={null} classId={null} tier={tier as 1 | 2 | 3} stock={world?.items ?? {}} />}

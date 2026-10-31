@@ -278,8 +278,22 @@ tiles, Gear's budget one screen at 390×844. Weapons are chosen on the Class tab
   "Uses 4 items". Slots draw on the stock in the tab's order, and one the stock no longer covers stops lower or drops out.
   **Raise 3** spends it all in one save write.
 
-**Stars tab** (`StarsPanel.tsx`): the Observatory's live body without its Uma picker: the planet-and-moons map, Prowess,
-the six totals, Set list and node sheet. The Observatory and profile share this one body.
+**Stars tab** (`StarsPanel.tsx`, `stars-view.ts`; H122, D269; the rules are [loops](loops.md#extra-stats) and
+[jewels](materials.md#jewels)):
+- **First row:** "Extra Stats · Open 13/22 · 2 ready" ("Extra Stats · Open 4/22" with none ready), **Set all** while a jewel fits,
+  and the (i): each node opens with its jewel in order, a Planet node takes three, her moon takes none, Set all's rule.
+- **Her map:** the Planet in the middle, Prowess, Vigor and Guard around it, five nodes each, and her own moon's two, "★ Bruiser".
+  An open node is filled, a closed one faded, and a green dot marks one a jewel in the Warehouse opens now.
+- **The six totals** ("HP +125", "MP +25", "ATK +25", "M.ATK +13", "DEF +19", "M.DEF +19") of the shared map, then her moon's line in
+  the accent ("★ Evasion +2.4% · DEF +8").
+- **A node's sheet** ("Guard III", "★ Bruiser's moon II"): what it gives for her class ("DEF/M.DEF +6"; Prowess "ATK +6" as a Brawler;
+  "+4 · all six"), before → after, the first at display size ("DEF 151 → 157", then "M.DEF 129 → 135"), from her battle sheet, a
+  moon node it brings included, and its jewel ("Moon Jewel III ×1 · 4 held", "Planet Jewel III ×3 · 4 held"). The footer is **Set**,
+  or disabled with what stops it: "Guard II first", "Lv 41", or the jewels held ("Planet Jewel I ×1"). An open node reads Open with no
+  button, and the sheet stays open on it after Set. Her moon's nodes have no jewel and read "With its moons".
+- **Set all:** every jewel that fits, one line each ("Moon Jewel IV → Guard IV · DEF/M.DEF +8", "Planet Jewel III ×3 → Planet III · +4 ·
+  all six"). Planet Jewels go first; a Moon Jewel goes to the shared moon with the fewest open nodes, Prowess, Vigor, Guard on a tie.
+  **Set 4** sets them all in one save write.
 
 **Template tab** (`TemplateTab.tsx`, `template-view.ts`): her template name, Calling, Stride and Knack readings; trade;
 ★ Flourish, ★ Signature and ★ Moon I and II; Surface, Distance and Style aptitudes; and her racing unique skill. It
@@ -419,22 +433,12 @@ The five halls share `places/halls/HallPage.tsx` (D106; Halls v2's page, H133, D
 
 ### Observatory
 
-`places/observatory/ObservatoryPage.tsx`, route `/learning/observatory/:outfitId` (the rules are
-[loops](loops.md#extra-stats), [jewels](materials.md#jewels) and [Extra
-Stats](../design/tier-rework/extra-stats-progression.md)). It opens on the Uma its route names, else the highest Uma
-Level.
-- Her face and name with "Open 8 of 20 · ★ 1 of 2"; a tap opens the shared picker, "Observatory Uma" (locked Umas
-  disabled, working ones selectable).
-- **Extra Stats**, with its (i): "Each node opens with its jewel, in order. Every open node counts."
-- **Her map:** the Planet in the middle; Prowess, Vigor and Guard around it, five nodes each; and her own moon's two, "★
-  Longblade". An open node is filled. A tap opens its sheet: "Prowess II"; what it gives ("+4 to every stat", "as
-  Brawler ATK +6, M.ATK +0", "HP +30, MP +6", "DEF and M.DEF +6"; her moon's "Tireless · HP +20" and "DEF +8"); and its
-  jewels ("Planet Jewel III ×3 · Lv 21", "Moon Jewel II · Open"; her moon's "With its moons · Lv 16").
-- Prowess's split ("Prowess · Brawler 100/0: ATK +6, M.ATK +0"), then the six stats' totals, her moon's part starred.
-- **Set:** each jewel in the Warehouse that opens one of her nodes now, with three in stock for a Planet node ("Moon Jewel I
-  ×4", "Opens Prowess I · …", **Set**), or "No jewels ready." A jewel that fits several nodes asks which one.
-
-Its quick look and (i) show the place's line, which still reads "a Sun, eight planets and their moons".
+`places/observatory/ObservatoryPage.tsx` (the rules are [loops](loops.md#extra-stats), [jewels](materials.md#jewels) and [Extra
+Stats](../design/tier-rework/extra-stats-progression.md)): a door to her Stars tab (H122, D269). The page lists the world's owned
+Umas, those with a jewel ready first, then by Uma Level: a face, a name and "Open 13/22 · 2 ready" ("Open 13/22" with none), with the
+green dot on a ready one, or "Unlock an Uma first." A tap opens her profile on **Stars**, and Back returns to the list. The route
+`/learning/observatory/:id` redirects to `/town/stable/outfit/:id/stars`. Its quick look and (i) show the place's line, "Each Uma's
+Extra Stats: a Planet, three moons and her own moon."
 
 ## Battle
 

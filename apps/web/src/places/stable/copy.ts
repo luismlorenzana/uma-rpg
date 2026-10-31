@@ -62,6 +62,12 @@ export type MoonState = 'Open' | 'Ready' | `Lv ${number}`
 export const moonNode = (roman: 'I' | 'II', stat: string, state: MoonState): string => `★ Moon ${roman} · ${stat} · ${state}`
 /** C1: opened Extra Stats nodes. */
 export const extraStatsCount = (open: number, total = 22): string => `Open ${n(open)}/${n(total)}`
+/** C1: a count with what's ready: the Observatory's rows. */
+export const extraStatsRow = (open: number, ready: number): string => `${extraStatsCount(open)}${ready ? ` · ${n(ready)} ready` : ''}`
+/** C1: the Stars tab's first row. */
+export const extraStats = (open: number, ready: number): string => `Extra Stats · ${extraStatsRow(open, ready)}`
+/** C1: Set all's line. */
+export const setLine = (jewel: string, node: string, value: string): string => `${jewel} → ${node} · ${value}`
 
 export type NodeValue =
   | { kind: 'planet'; value: number }

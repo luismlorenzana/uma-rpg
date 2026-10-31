@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-10-31, after D268.** Tier 1 is built and live: engine v20, save v34. That covers the Tier rework's R1
+> **Status: 2026-10-31, after D269.** Tier 1 is built and live: engine v20, save v34. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, and **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H139; decision numbers from D269). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H139; decision numbers from D270). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it. Open now:
@@ -39,8 +39,7 @@ retirement and the hall-based names are already on `main`.
 
 | Id | Task | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H122](tasks/H122-stars-tab-observatory-door.md) | Uma profile v2: the Stars tab, Set all, and the Observatory as a door (its old route redirects) | Claude | M | H119 | Ready |
-| [H123](tasks/H123-template-tab.md) | Uma profile v2: the Template tab (the calling by style, the family Flourish, moon II by root and 5 × 3 templates are live since H134) | Claude | S–M | H120, H121, H122 | Waiting |
+| [H123](tasks/H123-template-tab.md) | Uma profile v2: the Template tab (the calling by style, the family Flourish, moon II by root and 5 × 3 templates are live since H134) | Claude | S–M | H120, H121, H122 | Ready |
 | [H124](tasks/H124-profile-doors-back-stepper.md) | Uma profile v2: every door opens a tab, Back returns to it, ‹ n/N › next and previous Uma | Claude | S–M | H119 | Ready |
 | [H125](tasks/H125-profile-measure-close.md) | Uma profile v2: the built screens measured against B1–B4, the phone check, profile-ux.md superseded, the manual read through | Claude | S | H117, H118, H119, H121, H122, H124 | Waiting |
 
@@ -61,6 +60,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H122 | Uma profile v2: the Stars tab, Set all and the Observatory as a door (D269); B2 1.16 at 390×844 | See the commit of D269 |
 | H121 | Uma profile v2: the Gear tab, eleven tiles, raise sheets, Raise all (D268); B2 1.00 at 390×844 | See the commit of D268 |
 | H120 | Uma profile v2: the Class tab, the class tree, promotion and the Limit line (D267); B2 1.38 at 390×844 | See the commit of D267 |
 | H119 | Uma profile v2: the frame, four tabs, the compact header, the facts row and Details (D265) | `1b807d4` ([#86](https://github.com/luismlorenzana/uma-rpg/pull/86)) |

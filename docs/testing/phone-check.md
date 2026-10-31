@@ -1,7 +1,7 @@
 # Current phone check
 
 Use this script for a release, in order, on the [live game](https://uma-rpg.web.app). It tests the game as it runs today
-(engine v20, save v33); the screens are in [Game sections](../game/sections.md) and the rules in the [game
+(engine v20, save v34); the screens are in [Game sections](../game/sections.md) and the rules in the [game
 manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
 
 Use your existing save; do not reset it. Before you start, have: one full party of five with one healer; an Uma at Lv 10
@@ -11,7 +11,7 @@ grades, setting jewels, reading Manuals, promoting and spending tickets are real
 you are away, or with Speed Tickets (step 22).
 
 **Phone only** means an installed iPhone app or the production service is required; local auth-off previews cannot check
-it. Check the other steps at 390×844, then repeat the busy screens at 375×667: the Wilds page, the Skills and Gear tabs,
+it. Check the other steps at 390×844, then repeat the busy screens at 375×667: the Wilds page, the Class, Gear and Stars tabs,
 the Classes and promotion sheets, a Wilds job sheet, the Learning page, the fight and the Exchange's Manual sheet. Every
 button and footer should stay reachable without horizontal page scrolling, in light and dark.
 
@@ -79,9 +79,12 @@ button and footer should stay reachable without horizontal page scrolling, in li
     line B**: the footer reads Held, the tile reads B and the tree's equipped skills follow; take A back. A closed node reads
     `Opens · Rn`, disabled. Tap **Limit**: its sheet lists each Limit Break she casts, then her other Bonds; **Open {hall}** opens
     the hall, and Back returns to the sheet. (D201, D206, D229, D267)
-12. **Stars and Template tabs.** Stars is the Observatory body without its picker: map, Prowess, six totals, Set list
-    and node sheets. Template has Calling, Stride and Knack, her trade, full ★ Flourish, ★ Signature, separate ★ Moon
-    I/II rows, aptitudes and unique racing skill. An All-Rounder Moon II reads `DEF +4 · M.DEF +4`. (D204, D217, D258)
+12. **Stars and Template tabs.** Stars reads "Extra Stats · Open n/22 · n ready", her map with a green dot on a node a jewel opens now,
+    six totals and her moon's ★ line. Tap a closed node: what it gives, before → after, its jewel with what's held, and **Set**, or
+    disabled with `Lv n` or `{Node} first`. **Set**: the sheet stays open on Open and the count falls. **Set all** lists each jewel;
+    **Set n** sets them. Her moon's nodes read "With its moons". Template has Calling, Stride and Knack, her trade, full ★ Flourish,
+    ★ Signature, separate ★ Moon I/II rows, aptitudes and unique racing skill. An All-Rounder Moon II reads `DEF +4 · M.DEF +4`.
+    (D204, D217, D258, D269)
 13. **Standard preset.** On a promoted Uma, in **Classes** on her own class, tap **Standard preset**: expect **Standard preset ·
     On** and her preset's weapons. On a Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it to read **· On**;
     a Warrior or a Mage shows three rows, each listing its accessories. Check the weapon chips' colours in both themes: the
@@ -109,10 +112,8 @@ button and footer should stay reachable without horizontal page scrolling, in li
     **+** for a Learner: the picker shows `Bond n/10 · n/2 Heroes` and "Adds …", and Umas that can't sit there show why.
     Open the Learner's sheet: expect `Bond n/10 · Strength n%` and **Leave**. A Hero's sheet says
     `Hero · Strength 100%`; emptying its seat uses the compact **Empty seat** confirmation. (D106, D241, D255, D258)
-19. **Observatory.** Pick an Uma: expect `Open n/22` and her map with "★ {her type}". Tap a closed node: its sheet uses
-    compact values such as `+21 · all six`, `HP +100 · MP +20` and `DEF/M.DEF +4`, then names its jewel. Tap **Set** on a
-    ready jewel: the node fills, the counts and totals go up and
-    the jewel is spent. A Moon Jewel that fits several nodes asks which. (D217)
+19. **Observatory.** Expect a list of her Umas, those with a jewel ready first, each `Open n/22 · n ready`. Tap one: her profile
+    on Stars. Back returns to the list. (D269)
 20. **Wilds: gather.** At **Wilds → Mine** (or her trade's gathering place) tap a free slot. Expect Who → How many →
     What: her trade's Umas first with "C{Craft Level}", others greyed "Another trade" (unless the header says "Open
     shop: …"); sizes ×1, ×2, ×3, ×5, ×10, ×15 and ×20, each with its time, about half an hour to 8 hours; ten raw tiles,
