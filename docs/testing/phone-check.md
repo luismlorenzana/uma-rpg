@@ -60,29 +60,31 @@ button and footer should stay reachable without horizontal page scrolling, in li
    Open **Details**: every battle row, 0 included, appears in two columns with Core, Work and Since; **How stats add up**
    expands in place and the sheet fits without its own scroll at 390×844. A locked profile has **Unlock · 1 Ticket**,
    Template content, no level, no tabs and no ticket-balance sentence. (D206, D229, D240, D258)
-9. **Class tab: Classes.** On a Tier 0, the class button reads "R7/10" and her trees are one node each ("Drill Strike
-   · Greatsword", "R7/10") with "Promotion at R10 · 3 to go" under them; **Change** lists all ten weapons. Tap the class
-   button: **Classes** shows the tree, Warrior · All-Rounder · Mage over the Tier 0 row and the Tier 1 rows. Tap a
-   closed Tier 1 tile: its line and the gate ("Opens with Warrior R10 or Summoner R10"), disabled. Tap another Tier 0:
-   **Start Summoner · R1**; start it, expect it On, then switch back with **Fight as …**. (D253)
+9. **Class tab: Classes.** On a Tier 0, the class tile reads "R7/10" with its bar, her weapon tiles carry no letters and her
+   trees are one node each ("Drill Strike · Greatsword", "R7/10") with "Promotion at R10 · 3 to go" under them; **Change ›**
+   lists all ten weapons, and a tap holds one with the sheet still open. Tap the class tile: **Classes** shows the tree,
+   Warrior · All-Rounder · Mage over the Tier 0 row and the Tier 1 rows, with her **Standard preset** in the footer on her
+   own class. Tap a closed Tier 1 tile: its line and the gate ("Opens with Warrior R10 or Summoner R10"), disabled. Tap another
+   Tier 0: **Start Summoner · R1**; start it, expect it On, then switch back with **Fight as …**. (D253, D267)
 10. **Promotion and a reclass.** On a Tier 0 at Rank 10 (read her share at the Exchange first, step 24, if none is),
-    expect **Promote** with the green dot on the class button and her roster face. Tap it: the promotion
-    sheet ("Promote · Warrior R10", Suggested on one child) with "Warrior R10 → Brawler R…" and "Depths 1–2 · 6 skills ·
-    +n EXP". **Promote to …**: she fights as the child at Rank 10 or more, on its first tree with its lines. Reopen
-    **Classes**: her siblings read **Ready**; promote one, then **Fight as** the first again. **Class Manuals ›** opens
-    the Exchange's sheet on her, and Back returns to Classes. (D253)
-11. **Class tab: trees.** On a Tier 1 class, tap each of the three tree buttons. Tap a held node: its sheet shows rank
-    pips, `Rank n · next Rn` and `Depth n · Line A/B`; **Equip** it, then tap it in **Equipped** to take it off. Tap the
-    B square and **Take line B**: expect the tree's letter to read B and its equipped skills to follow; take A back.
-    Tap **Back to auto** if shown. Tap **Change**: the slot sheet lists the channel's weapons with their grades; pick
-    another, expect the tree to change, and put it back. Below, **Class Ranks** lists the five Tier 0s (bars to Rank 10)
-    and the Tier 1 classes she holds. (D201, D206, D229)
+    expect "R10 · Promote" with the green dot on the class tile, a dot on the Class tab and the mark on her roster face.
+    Tap the tile: the promotion sheet ("Promote · Warrior R10", Suggested on one child) with "Warrior R10 → Brawler R…" and
+    "Depths 1–2 · 6 skills · +n EXP". **Promote to …**: she fights as the child at Rank 10 or more, on its first tree with its
+    lines. Reopen **Classes**: her siblings read **Ready**; promote one, then **Fight as** the first again. **Class Manuals ›**
+    opens the Exchange's sheet on her, and Back returns to Classes. (D253, D267)
+11. **Class tab: trees.** On a Tier 1 class, tap each of the three weapon tiles: a ring and that tree. Tap a held node: its
+    sheet shows rank pips, `Rank n · next Rn` and `Depth n · Line A/B`; **Equip** it and the sheet stays open on **Unequip**.
+    Tap a square in **Equipped**: its sheet opens and nothing comes off. At 7/7, a held node offers **Replace**: tap it, tap a
+    skill, and it swaps. Tap **Auto** when it's off. Tap a node on the other line: **Take line …**. Tap the B square and **Take
+    line B**: the footer reads Held, the tile reads B and the tree's equipped skills follow; take A back. A closed node reads
+    `Opens · Rn`, disabled. Tap **Limit**: its sheet lists each Limit Break she casts, then her other Bonds; **Open {hall}** opens
+    the hall, and Back returns to the sheet. (D201, D206, D229, D267)
 12. **Stars and Template tabs.** Stars is the Observatory body without its picker: map, Prowess, six totals, Set list
     and node sheets. Template has Calling, Stride and Knack, her trade, full ★ Flourish, ★ Signature, separate ★ Moon
     I/II rows, aptitudes and unique racing skill. An All-Rounder Moon II reads `DEF +4 · M.DEF +4`. (D204, D217, D258)
-13. **Gear → Equip.** On a promoted Uma, tap **Standard preset**: expect **Standard preset · On** and her preset's weapons. On a
-    Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it to read **· On** and Loadout to show its three
-    weapons; a Warrior or a Mage shows three rows, each listing its accessories. Under the armor, expect three small Accessory
+13. **Standard preset and Gear → Equip.** On a promoted Uma, in **Classes** on her own class, tap **Standard preset**: expect
+    **Standard preset · On** and her preset's weapons. On a Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it
+    to read **· On**; a Warrior or a Mage shows three rows, each listing its accessories. On Gear, under the armor, expect three small Accessory
     tiles. Tap one: a list, her ★ family first, an Orb for each weapon she holds. Tap a row: the sheet closes and the tile
     shows it at once; a slot at G0 reads "Off". Set the same accessory in two slots, leave and come back: both stick. Check the weapon chips' colours in both themes: the
     Katana jade, the Bow rose. (D223, D266)

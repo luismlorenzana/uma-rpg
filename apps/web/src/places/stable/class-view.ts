@@ -1,20 +1,18 @@
-// Classes v3's class tree and promotion as the profile draws them (D240 CV32, classes-v3.md §14.1–§14.2; H137, D253): the
-// Classes sheet's tiles in the tree's grid, each in the state language (UP23) with its word, the selection's line and its
-// footer; the promotion sheet's children, Suggested and Held, before → after from `promotionPlan`; the Tier 0 tree's node and
-// its promotion line; the class button's word and whether a promotion waits. Pure, on H126's data only (`umaClassTree`,
-// `promotionPlan`, the class tree's tables): it never re-derives a rule, and the sheets only draw what it returns. Built on
-// today's Skills tab (D252), live since the switch (H134); H120 reuses it in profile v2's Class tab.
-//
-// Every new wording lives here, in one place H117's copy test can absorb (C3); the three facts the Exchange shares come from
-// `ui/rank-words.ts`.
+// The Class tab's rules (H120; D239 UP10–UP12, D240 CV32, classes-v3.md §14.1–§14.2; H137, D253): the Classes sheet's tiles
+// in the tree's grid, each in the state language (UP23) with its word, the selection's line and its footer; the promotion
+// sheet's children, Suggested and Held, before → after from `promotionPlan`; the Tier 0 tree's node and its promotion line;
+// the class tile and whether a promotion waits; the Limit line and its sheet. Pure, on H126's data only (`umaClassTree`,
+// `promotionPlan`, the class tree's tables): it never re-derives a rule, and the sheets only draw what it returns.
 import {
-  activeClass, BATTLE_ENGINE_VERSION, classTrack, healerBlock, partyOf, promotionPlan, RPG_CLASS_CHILDREN, RPG_CLASS_PARENTS, RPG_CLASS_ROOTS,
-  RPG_ROOT_NAME, RPG_TIER0_CLASSES, RPG_TIER0_MAX_RANK, RPG_TIER0_ROOT, RPG_TIER0_SKILL, RPG_TIER1_CLASSES, rpgClassExpToNext, rpgClassName,
-  rpgClassSlots, rpgHand, rpgHoldsTier1, rpgIsHealer, rpgIsTier0, rpgPresetWeapons, rpgReadyParent, rpgRework,
-  rpgSuggestedPromotion, umaClassTree, umaPromotionWaits, type BattleOutfit, type OwnedUma, type RpgClass, type RpgClassTile, type RpgClassTileState,
-  type RpgSlotKind, type RpgTier0Class, type RpgTier1Class, type RpgWeapon, type TierWorld,
+  activeClass, BATTLE_ENGINE_VERSION, bondCapacity, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondOf, classTrack, healerBlock, HERO_HALL_PLACES, HERO_LIMIT_IDS, heroHalls,
+  heroLimit, heroLimitHall, heroLimitScale, heroSeatHome, heroSeatOf, parentsOf, partyOf, placeById, promotionPlan, RPG_CLASS_CHILDREN, RPG_CLASS_PARENTS,
+  RPG_CLASS_ROOTS, RPG_ROOT_NAME, RPG_TIER0_CLASSES, RPG_TIER0_MAX_RANK, RPG_TIER0_MODEL, RPG_TIER0_ROOT, RPG_TIER0_SKILL, RPG_TIER1_CLASSES, rpgClassExpToNext,
+  rpgClassMaxRank, rpgClassName, rpgClassSlots, rpgHand, rpgHoldsTier1, rpgIsHealer, rpgIsTier0, rpgPresetWeapons, rpgReadyParent, rpgRework,
+  rpgSuggestedPromotion, umaClassTree, umaPromotionWaits, type BattleOutfit, type HeroHall, type HeroLimitId, type OwnedUma, type RpgClass, type RpgClassTile,
+  type RpgClassTileState, type RpgSlotKind, type RpgTier0Class, type RpgTier1Class, type RpgWeapon, type TierWorld,
 } from '@rpg/domain'
 import { classRankWord, tier0RankWord, waitingWord } from '../../ui/rank-words'
+import { actions, bond as bondWord, bondLevel, bondNext, heroBond, heroName, limitLine, limitPower, limitSeat, promoteRank } from './copy'
 
 const num = (n: number) => n.toLocaleString('en-US')
 type Uma = Pick<OwnedUma, 'classId' | 'ranks' | 'classes'>
@@ -126,14 +124,14 @@ export function classLine(tile: ClassTileView, engine: number = BATTLE_ENGINE_VE
   const role = rpgRework('classes', engine) ? ROLE[tile.classId as RpgTier1Class] : null
   return { title, facts: [role ? `${slots} · ${role}` : slots], weapons: rpgPresetWeapons(tile.classId as RpgTier1Class, engine), hand: handWord(tile.classId, engine) }
 }
-/** The footer for a tile, by its state: On "Fights as …" (disabled; H120 puts the standard preset here), a held class
- * "Fight as …", a Ready one "Promote to …", an open one "Start … · R1", a closed one its gate, disabled. */
+/** The footer for a tile, by its state: On has none (the sheet draws her standard preset there), a held class "Fight as
+ * …", a Ready one "Promote to …", an open one "Start … · R1", a closed one its gate, disabled. */
 export function classFooter(tile: ClassTileView): ClassFooter {
   switch (tile.state) {
-    case 'on': return { label: `Fights as ${tile.name}`, act: null }
-    case 'available': return { label: `Fight as ${tile.name}`, act: 'switch' }
-    case 'ready': return { label: `Promote to ${tile.name}`, act: 'promote' }
-    case 'open': return { label: `Start ${tile.name} · R1`, act: 'start' }
+    case 'on': return { label: actions.standardPreset, act: null }
+    case 'available': return { label: actions.fightAs(tile.name), act: 'switch' }
+    case 'ready': return { label: actions.promoteTo(tile.name), act: 'promote' }
+    case 'open': return { label: actions.startClass(tile.name), act: 'start' }
     case 'closed': return { label: tile.gate ?? 'Closed', act: null }
   }
 }
@@ -213,26 +211,30 @@ export function promotionSheet(outfit: BattleOutfit, uma: Uma, tier: number | st
   if (pick.held) {
     const on = activeClass(outfit, uma, tier, engine) === pick.classId
     return { ...base, before: `${pick.name} ${classRankWord(classTrack(uma.ranks, pick.classId).rank)}`, after: null,
-      footer: on ? { label: `Fights as ${pick.name}`, act: null, block: null } : { label: `Fight as ${pick.name}`, act: 'switch', block: null } }
+      footer: on ? { label: `Fights as ${pick.name}`, act: null, block: null } : { label: actions.fightAs(pick.name), act: 'switch', block: null } }
   }
   const plan = promotionPlan(uma, from, pick.classId, tier, engine)
   const after = [`Depths 1–${plan.depths}`, `${plan.skills} skills`, plan.waiting ? `+${num(plan.waiting)} EXP` : null,
     plan.marks ? `+${num(plan.marks)} Class Marks` : null].filter((p): p is string => !!p).join(' · ')
   return { ...base, before: `${fromName} R${RPG_TIER0_MAX_RANK} → ${pick.name} ${classRankWord(plan.after.rank)}`, after,
-    footer: { label: `Promote to ${pick.name}`, act: 'promote', block: plan.block } }
+    footer: { label: actions.promoteTo(pick.name), act: 'promote', block: plan.block } }
 }
 
-// --- The Skills tab's pieces (§14.1) -------------------------------------------------------------------------------------
+// --- The Class tab's pieces (§14.1) --------------------------------------------------------------------------------------
 
-/** The class button: her class's name and its word ("R34"; a Tier 0's "R7/10"; "Promote" while a promotion waits, with
- * the Ready dot), and the Tier 0 it promotes from then (the button opens the promotion sheet, else the Classes sheet). */
-export interface ClassButtonView { classId: RpgClass; name: string; word: string; promote: RpgTier0Class | null }
+/** The class tile: her class's name, its word ("R34"; a Tier 0's "R7/10"; "R10 · Promote" while a promotion waits, with the
+ * Ready dot), the Class Rank bar (a Tier 0's to Rank 10), and the Tier 0 it promotes from then (the tile opens the promotion
+ * sheet, else the Classes sheet). */
+export interface ClassButtonView { classId: RpgClass; name: string; word: string; bar: { value: number; max: number }; promote: RpgTier0Class | null }
 export function classButton(outfit: BattleOutfit, uma: Uma, tier: number | string = 1, engine: number = BATTLE_ENGINE_VERSION): ClassButtonView {
   const classId = activeClass(outfit, uma, tier, engine)
-  const rank = classTrack(uma.ranks, classId).rank
+  const track = classTrack(uma.ranks, classId)
+  const rank = track.rank
   const tier0 = rpgRework('classes', engine) && rpgIsTier0(classId)
   const promote = promotionFrom(outfit, uma, tier, null, engine)
-  return { classId, name: rpgClassName(classId, engine), word: promote ? 'Promote' : tier0 ? tier0RankWord(rank) : classRankWord(rank), promote }
+  const bar = tier0 ? tier0Progress(classId as RpgTier0Class, track, engine)
+    : rank >= rpgClassMaxRank(classId, engine) ? { value: 1, max: 1 } : { value: track.exp, max: rpgClassExpToNext(classId, rank, engine) }
+  return { classId, name: rpgClassName(classId, engine), word: promote ? promoteRank(rank) : tier0 ? tier0RankWord(rank) : classRankWord(rank), bar, promote }
 }
 
 /** A Tier 0's EXP from Class Rank 1, and what Rank 10 takes (3,600): the promotion line's bar. */
@@ -260,3 +262,51 @@ export function promotionLine(uma: Uma, classId: RpgTier0Class, tier: number | s
 /** A Tier 0 node's title: her skill and the weapon that casts it, "Drill Strike · Lance" (the catalog names it by the
  * skill alone, CV6). */
 export const tier0NodeTitle = (skill: string, weapon: string): string => `${skill} · ${weapon}`
+
+// --- The Limit line and its sheet (UP12) ----------------------------------------------------------------------------------
+
+/** A hall as a door: its place's id and name. */
+export interface HallDoor { place: string; name: string }
+const hallDoor = (hall: HeroHall): HallDoor => {
+  const place = HERO_HALL_PLACES[hall]
+  return { place, name: placeById(place)?.name ?? place }
+}
+/** Her class's hall (H120 decision 9): the hall with a seat at home to her class, a Tier 0's by the child she models. */
+export function classHall(classId: RpgClass): HeroHall {
+  const home = rpgIsTier0(classId) ? RPG_TIER0_MODEL[classId] : classId
+  return heroHalls().find((hall) => HERO_LIMIT_IDS.some((id) => heroLimitHall(id) === hall && heroSeatHome(id) === home)) ?? heroHalls()[0]!
+}
+/** One Limit Break she casts: its seat, her Bond, the next level's EXP, her Hero, its power and hall. */
+export interface LimitBlock { id: HeroLimitId; name: string; seat: string; bond: string; next: string | null; hero: string | null; power: string; hall: HallDoor }
+/** The Limit line and sheet: the Limit Break Auto fires first, then any other she casts; every other Bond she has; the hall a
+ * sheet with none opens. */
+export interface LimitView { line: string; blocks: LimitBlock[]; others: { id: HeroLimitId; text: string }[]; hall: HallDoor }
+
+const seatNumber = (id: HeroLimitId): number => Number(id.slice(id.lastIndexOf('-') + 1))
+/**
+ * Her Limit Breaks (H120 decision 9): a Hero's own, or a Learner's under each Hero, strongest Bond first, ties in seat order,
+ * which is the one Auto fires. `nameOf` reads an outfit's name from the master data.
+ */
+export function limitView(world: Pick<TierWorld, 'heroes' | 'umas'>, outfitId: string, classId: RpgClass, nameOf: (outfitId: string) => string): LimitView {
+  const uma = world.umas[outfitId]!
+  const seat = heroSeatOf(world, outfitId)
+  const parents = parentsOf(world, outfitId)
+  const scale = heroLimitScale(classId)
+  const power = (id: HeroLimitId) => limitPower(heroLimit(id).power ?? 0, scale === 1 ? null : { value: scale, name: rpgClassName(classId) })
+  const block = (id: HeroLimitId, role: 'Hero' | 'Learner'): LimitBlock => {
+    const track = bondOf(uma, id)
+    const hall = hallDoor(heroLimitHall(id))
+    return { id, name: heroLimit(id).name, seat: limitSeat(role, hall.name, seatNumber(id)), hall, power: power(id),
+      bond: role === 'Hero' ? `${heroBond()} · ${bondLevel(track.level)}` : bondWord(track.level, Math.round(bondCapacity(track.level) * 100)),
+      next: track.level < BOND_MAX_LEVEL ? bondNext(track.exp, BOND_EXP_TO_NEXT) : null,
+      hero: role === 'Learner' ? heroName(nameOf(world.heroes[id]!.hero!)) : null }
+  }
+  const strongest = [...parents].sort((a, b) => bondOf(uma, b).level - bondOf(uma, a).level)
+  const blocks = seat ? [block(seat, 'Hero')] : strongest.map((id) => block(id, 'Learner'))
+  const lead = blocks[0]
+  const line = seat ? limitLine({ kind: 'hero', name: lead!.name })
+    : lead ? limitLine({ kind: 'learner', name: lead.name, bond: bondOf(uma, strongest[0]!).level, more: blocks.length > 1 }) : limitLine({ kind: 'none' })
+  const others = HERO_LIMIT_IDS.filter((id) => uma.bonds[id] && !blocks.some((b) => b.id === id))
+    .map((id) => ({ id, text: `${heroLimit(id).name} · ${bondLevel(bondOf(uma, id).level)}` }))
+  return { line, blocks, others, hall: lead?.hall ?? hallDoor(classHall(classId)) }
+}

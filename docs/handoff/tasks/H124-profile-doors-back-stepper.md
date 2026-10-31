@@ -59,7 +59,8 @@ No rule or save change; nothing in uma-kit beyond H118's opt-in `onFace`.
 - **A door that names a tab wins; otherwise the remembered tab.** **Every door and every link out pushes with `back:
   true`**, so the place header's Back returns to it (the kit's `useLeave` already pops). Links out: the Party and Work
   cells (H119), the Limit sheet's hall (H120, after Classes v3; today's Inheritance rows until then).
-- **The Skills-alone route retires:** `outfit/:id/skills` redirects to `outfit/:id/class`.
+- **The Skills-alone route retires:** `outfit/:id/skills` redirects to `outfit/:id/class`. *(H120 did this in `OutfitProfile`
+  when it deleted `SkillsPage`, keeping the entry's state; the party bar and the Rift's guided weapons still link to it.)*
 - **‹ n/N ›** in the place header's trailing slot: 44 pt arrows, the label says where she is in the list; **the list is
   the door's**, passed in the navigation state (a shared link uses the roster); a step **keeps the tab and closes any
   sheet**, and **replaces the history entry** (‹ › never stack Backs); arrows only, no swipe; **hidden when the list has

@@ -18,7 +18,6 @@ import { HelpButton } from '../../ui/HelpButton'
 import { UpgradeMark } from '../../ui/UpgradeMark'
 import { accessoryChoices, accessoryTile, upgradeRows, type AccessoryChoice, type UpgradeRow } from './gear-equip'
 import { gradeUpgradeView } from './gear-v3'
-import { PresetButton } from './PresetButton'
 import { accessoryEffect, actions, armorHalf as armorHalfCopy, armorSlot, armorStat, extraStatsCount, grade, gradeStep, itemCount, maxGrade, might, signature } from './copy'
 
 const armorStatLine = (slot: ArmorSlot, gradeValue: number, tier: GearTier, classId: RpgClass) => {
@@ -137,7 +136,7 @@ function AccessorySheet({ index, slot, choices, signatureLine, onPick, onClose }
 }
 
 /** Equip: what she wears, nothing to spend. */
-export function EquipView({ outfit, uma, world, tier, onSkills }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; tier: GearTier; onSkills: () => void }) {
+export function EquipView({ outfit, uma, tier, onSkills }: { outfit: RosterOutfit; uma: OwnedUma; tier: GearTier; onSkills: () => void }) {
   const [picking, setPicking] = useState<number | null>(null)
   if (!isGrades(uma.gear)) return null
   const grades = uma.gear
@@ -148,7 +147,6 @@ export function EquipView({ outfit, uma, world, tier, onSkills }: { outfit: Rost
   const value = (of: AccessoryFamily) => accessorySlotValue(of, 10, tier)
   return (
     <div className="space-y-2">
-      <PresetButton outfit={outfit} uma={uma} world={world} />
       <section className="space-y-1.5 rounded-sm bg-raised p-2">
         <div className="flex items-center justify-between">
           <h4 className="text-micro">Loadout</h4>

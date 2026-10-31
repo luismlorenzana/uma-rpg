@@ -79,8 +79,8 @@ below them, the Healer Sanctum in the middle on its own temple, the Observatory 
 - **A Bond stays with her** when she leaves a seat. A Hero's own Bond doesn't change her Limit Break (she has it at 100%),
   but taken out of her seat and put back as its Learner she starts at the Bond she earned; the Hero's sheet in the hall
   shows it.
-- **Her profile's Class tab** has an Inheritance card: her seat and its Bond, or her Heroes and every Bond she has made,
-  each with its strength.
+- **Her profile's Class tab** has a Limit line: the Limit Break Auto fires, and its sheet lists each one she casts with its
+  seat, Bond, strength and power, then every other Bond she has.
 
 ## The sixteen Limit Breaks
 

@@ -2,51 +2,21 @@
 // columns, Warrior · All-Rounder · Mage, the Tier 0 row over the Tier 1 rows, every tile in the state language (On, Held,
 // Ready, Open, Closed) with its rank; a tap selects (2 px ring) and the footer acts on the selection: Fight as, Start …
 // · R1, Promote to … (the caller swaps this sheet for the promotion sheet: never a sheet on a sheet), or the closed gate.
-// "Class Manuals ›" is a door to the Exchange's Manual sheet with her picked; its Back reopens this sheet. Standalone (props
-// in, no knowledge of the tab around it): today's Skills tab opens it from v19; H120 places it in profile v2's Class tab.
-// The model is `class-view.ts`.
-import { SaveRuleError, type BattleOutfit, type OwnedUma, type RpgClass, type RpgClassTileState, type RpgTier1Class, type TierWorld } from '@rpg/domain'
-import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+// "Class Manuals ›" is a door to the Exchange's Manual sheet with her picked; its Back reopens this sheet. On her own class
+// the footer is her standard preset (H120 decision 7). Standalone (props in, no knowledge of the tab around it). The model
+// is `class-view.ts`.
+import { SaveRuleError, type OwnedUma, type RosterOutfit, type RpgClass, type RpgClassTileState, type RpgTier1Class, type TierWorld } from '@rpg/domain'
+import { useState } from 'react'
 import { WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
 import { pickClass } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { classesSheet, type ClassGrid, type ClassLine, type ClassTileView } from './class-view'
+import { PresetButton } from './PresetButton'
+import { useSheetDoor } from './sheet-door'
 
-/** The navigation state the profile's entry carries while the Manuals door is open (H120 decision 6). */
-interface ReturnState { sheet?: 'classes' }
 /** The Exchange's Manual sheet on her (H132's route). */
 export const manualsPath = (outfitId: string): string => `/town/exchange/manual/${encodeURIComponent(outfitId)}`
-
-/** The Manuals door (UP30; H120 decisions 5–6): replaces this entry with its state plus `sheet: 'classes'`, then pushes the
- * Exchange's Manual sheet on her with `{ back: true }`, so the Exchange's Back pops to here with the Classes sheet open. */
-export function useManualsDoor(outfitId: string): () => void {
-  const navigate = useNavigate()
-  const location = useLocation()
-  return () => {
-    const here = `${location.pathname}${location.search}${location.hash}`
-    const state = { ...(location.state as object | null ?? {}), sheet: 'classes' } satisfies ReturnState
-    // A data router's navigate resolves once the entry is replaced; a memory router's returns at once.
-    void Promise.resolve(navigate(here, { replace: true, state })).then(() => navigate(manualsPath(outfitId), { state: { back: true } }))
-  }
-}
-/** Whether this entry asks for the Classes sheet (Back from the Manuals door). Read once on mount; the entry's `sheet` is then
- * replaced away, so a later visit opens the tab as usual. */
-export function useClassesReturn(): boolean {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [asked] = useState(() => (location.state as ReturnState | null)?.sheet === 'classes')
-  useEffect(() => {
-    if (!asked) return
-    const rest: Record<string, unknown> = { ...(location.state as Record<string, unknown>) }
-    delete rest.sheet
-    navigate(`${location.pathname}${location.search}${location.hash}`, { replace: true, state: rest })
-    // Once, on mount: the entry is read as it arrived.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  return asked
-}
 
 /** One look a state (profile v2's §7.4): On the accent fill, Held raised, Ready raised with the green dot, Open a dashed
  * outline, Closed at 40%. */
@@ -62,12 +32,12 @@ const WORD_TONE: Readonly<Record<RpgClassTileState, string>> = {
 }
 
 export function ClassesSheet({ outfit, uma, world, tier, outfits, onClose, onPromote, onSwitch }: {
-  outfit: BattleOutfit
+  outfit: RosterOutfit
   uma: OwnedUma
   world: TierWorld
   tier: number
   /** Her world's outfits, for the healer note (none: no note). */
-  outfits?: ReadonlyMap<string, BattleOutfit>
+  outfits?: ReadonlyMap<string, RosterOutfit>
   onClose: () => void
   /** Promote to … on a Ready tile: the caller closes this sheet and opens the promotion sheet on that child. */
   onPromote: (child: RpgTier1Class) => void
@@ -77,7 +47,7 @@ export function ClassesSheet({ outfit, uma, world, tier, outfits, onClose, onPro
   const [selected, setSelected] = useState<RpgClass | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const door = useManualsDoor(outfit.outfitId)
+  const door = useSheetDoor('classes')
   const view = classesSheet(outfit, uma, world, tier, selected, outfits)
   const { footer } = view
   const pick = view.selected
@@ -91,16 +61,16 @@ export function ClassesSheet({ outfit, uma, world, tier, outfits, onClose, onPro
     }, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.')).finally(() => setBusy(false))
   }
   return (
-    <BottomSheet title="Classes" onClose={onClose} footer={
+    <BottomSheet title="Classes" onClose={onClose} footer={pick.state === 'on' ? <div className="space-y-1"><PresetButton outfit={outfit} uma={uma} world={world} /></div> : (
       <button type="button" disabled={!footer.act || busy} onClick={act} data-classes-footer
         className={`min-h-12 w-full rounded-sm px-3 font-display font-bold ${footer.act ? 'bg-accent text-accent-ink' : 'bg-raised text-[14px] text-ink-soft'}`}>
         {footer.label}
       </button>
-    }>
+    )}>
       <div className="space-y-1.5" data-classes-sheet>
         <Tree grid={view.grid} selected={pick.classId} onSelect={setSelected} />
         <Selection line={view.line} />
-        <button type="button" onClick={door} data-manuals-door
+        <button type="button" onClick={() => door(manualsPath(outfit.outfitId))} data-manuals-door
           className="flex min-h-11 w-full items-center justify-between gap-2 rounded-sm bg-raised px-3 text-left">
           <span className="text-[14px] font-semibold">Class Manuals</span>
           <span className="text-[12.5px] text-ink-faint">Exchange ›</span>

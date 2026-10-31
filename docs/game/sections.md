@@ -146,9 +146,9 @@ A shut place's page sends you to its quick look.
 
 ### Stable
 
-Routes: `/town/stable`, then `outfit/:id/:tab` (her profile's Class, Gear, Stars or Template tab) and
-`outfit/:id/skills` (her Class content alone, reached from the world map's party bar). A bare `outfit/:id` opens the
-last profile tab used on this device; a tab named in the route wins.
+Routes: `/town/stable`, then `outfit/:id/:tab` (her profile's Class, Gear, Stars or Template tab). A bare `outfit/:id` opens
+the last profile tab used on this device; a tab named in the route wins. `outfit/:id/skills`, which the world map's party bar
+and the Rift's guided weapons still use, lands on the Class tab.
 
 **The roster** (`StablePage.tsx` on the kit's `AlbumChrome` and `AlbumGrid`; rows and facets in `album/rows.ts`):
 - "Stable" and "26/270 owned", then All, Owned and Locked tabs with counts. Tier 1 also lists the outfits nobody owns,
@@ -191,19 +191,17 @@ UX](../design/profile-ux.md), D229):
   **How stats add up** expands the formula one source a line.
 - **A locked outfit** has a dimmed portrait, no level and no tabs. Its facts row becomes **Unlock · 1 Ticket**, "In
   Tier 2" or "Unlock in Tier 1"; its Template content remains below. The unlock uses the kit's `UnlockConfirm`.
-- **Tabs:** Class, Gear, Stars and Template, always in that order; the last one used is remembered on the device. Gear
-  carries a Ready dot while a grade can rise, Stars while a jewel can be set. Class never carries a dot.
+- **Tabs:** Class, Gear, Stars and Template, always in that order; the last one used is remembered on the device. Class
+  carries a Ready dot while a promotion waits, Gear while a grade can rise, Stars while a jewel can be set.
 
-**Class tab** (`SkillsPage.tsx`, `SkillTree.tsx`, `ClassesSheet.tsx`, `PromotionSheet.tsx`, `class-view.ts`,
-`WeaponSheet.tsx`; D253; the rules are [classes](classes.md#the-class-tree) and [skill trees](skill-trees.md)):
-- **Class and trees**, one row of four: the **class button** (emblem, name and her rank, "R34", a Tier 0's "R7/10") and
-  her three weapon trees (the weapon's glyph, her line's letter A or B, the slot's grade "G3", and the green mark when it
-  can be raised). A tree button shows that tree below. While she fights as a Tier 0 at Rank 10 with a child she doesn't
-  hold, the class button reads **Promote** with the green Ready dot, and her roster
-  face the can-upgrade mark (the "Can upgrade" filter finds her).
-- Her ★ Flourish ("★ Even pace · 1% of her max HP a round, up to 4%"), dimmed with "· No effect as Sorcerer" outside her
-  calling's family; on a Tier 1 class her Class Rank bar and "Depths 1–3 open".
-- **The class button** opens **Classes**, the class tree, or, while a promotion waits, the promotion sheet:
+**Class tab** (`ClassTab.tsx`, `class-sheets.tsx`, `ClassesSheet.tsx`, `PromotionSheet.tsx`, `WeaponSheet.tsx`, `class-view.ts`;
+H120, D267; the rules are [classes](classes.md#the-class-tree) and [skill trees](skill-trees.md)). Every change here is free,
+and a tap opens one sheet.
+- **First row:** the **class tile** (emblem, name, "R34", a thin Class Rank bar; a Tier 0's "R7/10" with its bar to 10), her
+  three **weapon tiles** (the glyph and her line's letter A or B, none on a Tier 0; a tap shows that tree, with a ring), and
+  the (i). While she fights as a Tier 0 at Rank 10 with a child she doesn't hold, the tile reads "R10 · Promote" with the
+  green Ready dot, the Class tab carries a dot and her roster face the can-upgrade mark.
+- **The class tile** opens **Classes**, the class tree, or, while a promotion waits, the promotion sheet:
   - **Classes:** Warrior · All-Rounder · Mage over five columns, the Tier 0 row (Warrior, Spellblade, Healer, Summoner,
     Mage) over the Tier 1 rows (Brawler, Arms Spellblade, Paladin, Arms Summoner, Sorcerer; Tome Spellblade, Cleric,
     Tome Summoner), each Tier 1 class under its All-Rounder parent or its only one. Each tile: emblem, name and its word,
@@ -215,8 +213,12 @@ UX](../design/profile-ux.md), D229):
     "Promotes to Brawler, Arms Spellblade, Arms Summoner"), and "Party 1: 2 healers" in the warning colour when the
     selected healer would make two in her party.
   - The footer acts on the selection: **Fight as Arms Spellblade** or **Start Summoner · R1** (free; the sheet stays open,
-    the class On), **Promote to Arms Summoner** (the promotion sheet replaces this one on that child), "Fights as
-    Brawler" on her own class, and on a closed one its gate, "Opens with Spellblade R10 or Mage R10", disabled.
+    the class On), **Promote to Arms Summoner** (the promotion sheet replaces this one on that child), and on a closed one
+    its gate, "Opens with Spellblade R10 or Mage R10", disabled. On her own class it is her **standard preset** (`presetRows`;
+    D263): one row, "Standard preset" or "Standard preset · On", with her class's emblem, "Lance · Greatsword · Light Tome" and
+    "Pendant · Pendant · Orb" under it. A Tier 0 shows a "Standard preset" heading and one row for each class it promotes
+    into, each with that class's emblem and name ("Paladin", "Cleric · On"). A tap sets those weapons and all three
+    accessory slots, her ★ family first; no grade moves ([classes](classes.md#standard-presets)).
   - **Class Manuals ›** ("Exchange") opens the Exchange's Manual sheet on her at `/town/exchange/manual/:outfitId`; its
     Back returns to the Class tab with Classes open.
   - **The promotion sheet** ("Promote · Warrior R10", "Free · the others stay open"): one tile a child, **Suggested** on
@@ -224,40 +226,39 @@ UX](../design/profile-ux.md), D229):
     preset she lands on and role, a row the same on every tile left out. Under them "Warrior R10 → Brawler R11" and "Depths 1–2 · 6
     skills · +400 EXP" (the EXP waiting on her Tier 0 lands at once). **Promote to Brawler** (free, no confirm) closes it
     and the tab shows the Brawler's first tree; on a held child **Fight as …**. **Classes ›** swaps back to the tree.
-- **Equipped · 4/7**: one square per skill slot her Uma Level gives. Each equipped skill shows its kind marks and its
-  rank; a tap unequips it. Empty squares are dashed. **Auto** while the game picks for her, else **Back to auto**.
-- **A Tier 1 class's tree** ("Lance tree", with **Change**): two trunk nodes, a fork, then branches A and B down to depth
-  5, each under a square A or B button.
+- **Equipped 4/7**: one square per skill slot her Uma Level gives, each equipped skill with its kind marks and rank; empty
+  squares are dashed. A tap opens its node sheet: nothing unequips on a tap. **Auto** is On while the game picks for her;
+  while she has her own pick, a tap returns to auto.
+- **A Tier 1 class's tree** ("Lance tree", with **Change ›**): two trunk nodes, a fork, then lines A and B down to depth 5,
+  each under a square A or B button, the held line's filled.
   - A node is a circle with the skill's kind marks and a badge: its rank, or the Class Rank that opens a closed depth.
-  - Held nodes have an accent ring; equipped ones are filled, with a green dot. The other branch is dimmed and a closed
-    depth faded. The lines fill along her path.
-- **A node's sheet:** its name, five rank pips, "Rank 3 · next at Class Rank 14" ("Rank 5" at the top, "Class Rank 30"
-  while closed), "Depth 4 · Branch B", its line at her Skill Rank ("one foe · 2 hits · 1.4× · 12 MP · cuts through the
-  shield"), and **Equip** or **Unequip** on a held node at an open depth.
-- **A branch's sheet** ("Lance · B · Impale"): its three skills, each with "Depth 3 · Class Rank 20" and its line;
-  **Take branch B** (free; her equipped skills follow), or "Her branch".
-- **A Tier 0's trees** are one node each, no letters on the weapon buttons and no fork: "Drill Strike · Greatsword", its
-  line at her Class Rank ("one foe · 1 hit · 2.1× · 10 MP") and "R7/10"; its sheet has no pips ("Rank 7 · next at Class
-  Rank 8", "Depth 1 · Trunk"). Under it "Promotion at R10 · 3 to go" with a bar to Rank 10, or at Rank 10 "Promotion ·
-  +400 EXP waiting" ("Promotion · Ready" with none), which opens the promotion sheet. Her rank row and depths line are
-  left out.
-- **Change** opens the slot's sheet ("Slot 1 · Arm"): each weapon of the slot's channel (all ten for a Tier 0) with its
-  grade line ("Lance · G2 · Might 4 · weak ×1.3"), Held or Hers, and "swaps with slot 2" when she holds it in another
-  slot. Grades are raised on the Gear tab.
-- Its (i) covers the class, switching, one healer a party, depths, the fork, Skill Ranks, equip slots and weapon grades.
-- Below: **Inheritance**, with her Hall seat as a Hero ("Paladin Hero · {Limit Break} · Bond 3/10", the seat's home
-  class), or her Heroes' Limit Breaks with "Bond 2/10 · 60%" (" · former Hero" for one she left), or "No inheritance
-  yet"; each opens its hall. Then **Class Ranks**, a cell a class with its rank and bar: in Tier 1's world the five Tier
-  0s (their bars to Rank 10) and the Tier 1 classes she holds; in a later tier the eight Tier 1 classes.
+  - Held nodes have an accent ring; equipped ones are filled. The other line is dimmed and a closed depth faded. The lines
+    fill along her path.
+- **A node's sheet:** its name, five rank pips, "Rank 3 · next R36" ("Rank 5" at the top, "R30" while closed), "Depth 4 · Line
+  B", and its line at her Skill Rank ("one foe · 2 hits · 1.4× · 12 MP · cuts through the shield"). Its footer: **Equip**,
+  **Unequip**, at a full loadout **Replace**, which lists what she equips so a tap swaps one; **Take line A** on the other
+  line; closed, "Opens · R40", disabled. The sheet stays open on its new state.
+- **A line's sheet** ("Lance · Line B · Impale"): its three skills, each with "Depth 3 · Line B · R20" and its line; **Take
+  line B** (free; her equipped skills follow), or "Held", disabled.
+- **A Tier 0's trees** are one node each and no fork: "Drill Strike · Greatsword", its line at her Class Rank ("one foe · 1 hit
+  · 2.1× · 10 MP") and "R7/10"; its sheet has no pips ("Rank 7 · next R8", "Depth 1 · Trunk"). Under it "Promotion at R10 · 3
+  to go" with a bar to Rank 10, or at Rank 10 "Promotion · +400 EXP waiting" ("Promotion · Ready" with none), which opens the
+  promotion sheet.
+- **Change ›** opens the slot's sheet ("Slot 1 · Arms", a Tier 0's "Slot 1 · Any"): each weapon of the slot's channel (all
+  ten for a Tier 0, Arms first) with its grade line ("Lance · G2 · Might 4"), "Held", or "Slot 2" when she holds it in
+  another slot, which swaps them. A tap holds it and the sheet stays open. Grades are raised on the Gear tab.
+- **Limit**, one row at the bottom: the Limit Break Auto fires, "{Limit Break} · Learner · Bond 2/10" (" · +1" for a second
+  Hero), "{Limit Break} · Hero", or "None". Its sheet has a block for each Limit Break she casts ("Learner · Warrior Dojo ·
+  Seat 2", "Bond 2/10 · Strength 60%", "Next · 3/12" of the Bond EXP to the next level, "Hero · {name}", "Power · ×2.5 · ×0.95 as
+  Brawler"; a Hero's reads "Hero · Strength 100% · Bond 3/10"), then every other Bond she has. With two blocks a tap selects
+  one. **Open {hall}** opens that hall, or her class's hall with none; its Back returns here with the sheet open.
+- The (i) on the first row covers switching, one healer a party, depths, Skill Ranks, equip slots, Tier 0, promotion and
+  Heroes and Learners, one rule a line.
 
 **Gear tab** (`GearCardV3.tsx`, `gear-equip.ts`, `gear-v3.ts`, `PresetButton.tsx`; H107, D223; the rules are
 [classes](classes.md#armor-and-the-accessory), [loops](loops.md#gear) and [materials](materials.md#gear)): **Equip** and
 then **Upgrade** ("Upgrade · 12" counts the raises ready and the jewels to set), stacked in one scroll.
 - **Equip**, what she wears:
-  - the standard preset (`presetRows`; D263): one row, "Standard preset" or "Standard preset · On", with her class's
-    emblem, "Lance · Greatsword · Light Tome" and "Pendant · Pendant · Orb" under it. A Tier 0 shows a "Standard preset" heading and one row
-    for each class it promotes into, each with that class's emblem and name ("Paladin", "Cleric · On"). A tap sets those
-    weapons and all three accessory slots, her ★ family first; no grade moves ([classes](classes.md#standard-presets)).
   - **Loadout** ("Set on Skills ›"): her three weapons' icons with their grades, then "Physical armor" or "Magical
     armor" with the five slots' icons and grades. A slot at G0 is an empty frame. Then **Accessories** (i), three tiles the
     size of her weapons' (D266): the icon, the grade, and what the slot does ("ATK +4", "Lance +8", "Bosses +4%"), "Charm ·

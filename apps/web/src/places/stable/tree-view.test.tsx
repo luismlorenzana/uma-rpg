@@ -1,5 +1,5 @@
-// The compact Skills tab (D224): class plus three icon tree tabs in one row; connected icon nodes whose tap sheet owns
-// their words and Equip action; her branch filled and the other dimmed; gates/ranks on the nodes; branch swaps unchanged.
+// The Class tab's trees (D224, H120): class plus three icon tree tabs in one row; connected icon nodes whose tap sheet owns
+// their words and Equip action; her line filled and the other dimmed; gates/ranks on the nodes; line swaps unchanged.
 // Invented outfits; the store is the real one, holding a test save.
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
 import { configureKit, MotionRoot, setReducedMotion } from '@luismlorenzana/uma-kit/ui'
@@ -11,7 +11,7 @@ import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { albumFixture } from '../../album/testing'
 import { resetGame, useGame } from '../../save/game'
-import { SkillsPage } from './SkillsPage'
+import { ClassTab } from './ClassTab'
 
 vi.mock('@rpg/domain/battle', async (orig) => {
   const actual = await orig<typeof import('@rpg/domain/battle')>()
@@ -35,10 +35,14 @@ async function brawler(): Promise<Save> {
   }
   return save
 }
+function Live() {
+  const world = worldOf(useGame((s) => s.save)!)
+  return <ClassTab outfit={outfit} uma={world.umas[outfit.outfitId]!} world={world} />
+}
 function show(save: Save) {
   useGame.setState({ status: 'ready', save, activeTier: 1 })
   render(<MemoryRouter><MotionRoot features={domMax}><AlbumArtProvider art={{ useUrl: () => null }}>
-    <SkillsPage outfit={outfit} name="Aster" />
+    <Live />
   </AlbumArtProvider></MotionRoot></MemoryRouter>)
 }
 const node = (id: string) => document.querySelector<HTMLElement>(`[data-node="${id}"]`)!
@@ -57,7 +61,7 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('the Skills tab as a tree (H70)', () => {
+describe('the Class tab as a tree (H70, H120)', () => {
   it('runs on engine 19: weaknesses v2 (H116) and Classes v3 (H134) live', () => expect(BATTLE_ENGINE_VERSION).toBe(20))
 
   it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Sunder\'s detail on tap', async () => {
@@ -94,7 +98,7 @@ describe('the Skills tab as a tree (H70)', () => {
     expect(screen.queryByRole('button', { name: /^Learn/ })).toBeNull()
   })
 
-  it('takes branch A from its sheet, calling the save\'s pickBranch with A, and her tree follows', async () => {
+  it('takes line A from its sheet, calling the save\'s pickBranch with A; her tree follows and the sheet stays open on Held', async () => {
     show(await brawler())
     fireEvent.click(within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')[2]!)
     fireEvent.click(within(branch(/^Line A$/)).getByRole('button', { name: 'Line A' }))
@@ -103,9 +107,8 @@ describe('the Skills tab as a tree (H70)', () => {
     await waitFor(() => expect(vi.mocked(battle.pickBranch)).toHaveBeenCalledWith(expect.anything(), outfit, 'brawler', 'lance', 'A', expect.any(String), '1'))
     await waitFor(() => expect(node('brawler-lance.3').dataset.held).toBe('true'))
     expect(worldOf(useGame.getState().save!).umas[outfit.outfitId]!.classes.brawler!.lines).toEqual({})
-    // The held branch's sheet has no button.
-    fireEvent.click(within(branch(/^Line A, held$/)).getByRole('button', { name: 'Line A, held' }))
-    expect(await screen.findByText('Held')).toBeDefined()
+    // The held line's sheet reads Held, disabled.
+    expect(await screen.findByRole('button', { name: 'Held' })).toHaveProperty('disabled', true)
     expect(screen.queryByRole('button', { name: /^Take line/ })).toBeNull()
   })
 })

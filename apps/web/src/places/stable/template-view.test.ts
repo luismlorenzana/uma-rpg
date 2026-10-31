@@ -5,7 +5,7 @@
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
 import { newOwnedUma, nodePoints, type TemplateOutfit } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { flourishLine, racingTemplate, rootFlourish, templateCard, templateChip } from './template-view'
+import { flourishLine, racingTemplate, templateCard, templateChip } from './template-view'
 
 type Grades<K extends string> = Partial<Record<K, AptitudeGrade>>
 const outfit = (style: Grades<keyof Aptitudes['strategy']>, distance: Grades<keyof Aptitudes['distance']>, power: number, wit: number,
@@ -71,10 +71,7 @@ describe('her template on the sheet (H70; Classes v3 from H134)', () => {
     expect(racingTemplate(C, null, null)![3]!.note).toBe('As a Spellblade')
   })
 
-  it('draws the root plate\'s ★ line, dimmed outside her Tier 0\'s family', () => {
-    expect(rootFlourish(C, open, 'duelist')).toEqual({ line: '★ Even pace · On', off: null })
-    expect(rootFlourish(C, open, 'tomeblade').off).toBeNull()
-    expect(rootFlourish(C, open, 'cleric')).toEqual({ line: '★ Even pace · Off', off: null })
+  it('words her Flourish in one line', () => {
     expect(flourishLine('late-reserve')).toBe('★ Flourish · Late reserve · round 3+ · 2%/round · max 4% · On')
     expect(flourishLine('clean-break')).toBe('★ Flourish · Clean break · Barrier 4% · start · On')
   })

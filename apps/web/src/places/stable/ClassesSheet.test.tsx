@@ -1,5 +1,5 @@
-// Classes v3's sheets on the Skills tab (H137, D253; classes-v3.md §14.1–§14.2; live since H134): the class button opens
-// the Classes sheet; Fight as and Start call `chooseClass` and the sheet stays open on its new state; Promote on a Ready
+// Classes v3's sheets on the Class tab (H137, D253, H120; classes-v3.md §14.1–§14.2): the class tile opens the Classes
+// sheet; Fight as and Start call `chooseClass` and the sheet stays open on its new state; Promote on a Ready
 // tile swaps to the promotion sheet on that child and "Classes ›" swaps back; the Manuals door pushes the Exchange's sheet with `{ back: true }` and its Back reopens the Classes sheet; a Tier 0's
 // tree is one node with the promotion line; at Rank 10 the class button reads Promote and promoting calls `promoteUma`, then
 // the tab shows the child's tree. Invented outfits; the store is the real one, holding a test save.
@@ -13,7 +13,7 @@ import { MemoryRouter, Route, Routes, useLocation, useNavigate, type Location } 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { albumFixture } from '../../album/testing'
 import { resetGame, useGame } from '../../save/game'
-import { SkillsPage } from './SkillsPage'
+import { ClassTab } from './ClassTab'
 
 vi.mock('@rpg/domain/battle', async (orig) => {
   const actual = await orig<typeof import('@rpg/domain/battle')>()
@@ -45,6 +45,10 @@ function ExchangeStub() {
   const navigate = useNavigate()
   return <button type="button" onClick={() => navigate(-1)}>Back to the profile</button>
 }
+function Live() {
+  const world = worldOf(useGame((s) => s.save)!)
+  return <ClassTab outfit={outfit} uma={world.umas[outfit.outfitId]!} world={world} />
+}
 function show(save: Save) {
   useGame.setState({ status: 'ready', save, activeTier: 1 })
   const path = `/town/stable/outfit/${outfit.outfitId}`
@@ -52,7 +56,7 @@ function show(save: Save) {
     <MotionRoot features={domMax}><AlbumArtProvider art={{ useUrl: () => null }}>
       <Probe />
       <Routes>
-        <Route path="/town/stable/*" element={<SkillsPage outfit={outfit} name="Aster" />} />
+        <Route path="/town/stable/*" element={<Live />} />
         <Route path="/town/exchange/*" element={<ExchangeStub />} />
       </Routes>
     </AlbumArtProvider></MotionRoot>
@@ -80,15 +84,16 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('the Classes sheet on the Skills tab (v19)', () => {
+describe('the Classes sheet on the Class tab', () => {
   it('opens from the class button on the tree; Fight as switches her and the sheet stays open on its new state', async () => {
     show(await umaC())
     fireEvent.click(screen.getByRole('button', { name: 'Class: Brawler, R34' }))
     const classes = sheet('Classes')
     expect(within(classes).getAllByRole('radio')).toHaveLength(13)
     expect(tile('brawler').getAttribute('aria-checked')).toBe('true')
-    expect(footer().textContent).toBe('Fights as Brawler')
-    expect(footer().disabled).toBe(true)
+    // On her own class the footer is her standard preset.
+    expect(footer()).toBeNull()
+    expect(within(classes).getByRole('button', { name: /^Standard preset/ })).toBeDefined()
 
     fireEvent.click(tile('spellblade'))
     expect(within(classes).getByText('Arms Spellblade · Held')).toBeDefined()
@@ -96,7 +101,7 @@ describe('the Classes sheet on the Skills tab (v19)', () => {
     await act(async () => { fireEvent.click(footer()) })
     await waitFor(() => expect(vi.mocked(battle.chooseClass)).toHaveBeenCalledWith(expect.anything(), outfit.outfitId, 'spellblade', expect.any(String), '1'))
     await waitFor(() => expect(tile('spellblade').dataset.state).toBe('on'))
-    expect(footer().textContent).toBe('Fights as Arms Spellblade')
+    expect(footer()).toBeNull()
     expect(her().classId).toBe('spellblade')
   })
 
@@ -144,7 +149,7 @@ describe('the Classes sheet on the Skills tab (v19)', () => {
   })
 })
 
-describe('a Tier 0 on the Skills tab (v19)', () => {
+describe('a Tier 0 on the Class tab', () => {
   it('draws one node a tree with her skill and weapon, R7/10, no fork or letters, and the promotion line', async () => {
     show(await saveWith('recruit', { recruit: { rank: 7, exp: 100 } }, 7))
     const tabs = within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')
@@ -159,7 +164,7 @@ describe('a Tier 0 on the Skills tab (v19)', () => {
     expect(within(node).getByText('Depth 1 · Trunk')).toBeDefined()
     expect(within(node).queryByRole('img', { name: /of 5/ })).toBeNull()
     fireEvent.click(within(node).getByRole('button', { name: 'Close' }))
-    // Below Rank 10 the class button opens the tree.
+    // Below Rank 10 the class tile opens the tree.
     fireEvent.click(screen.getByRole('button', { name: 'Class: Warrior, R7/10' }))
     expect(await screen.findByRole('dialog', { name: 'Classes' })).toBeDefined()
   })
@@ -177,7 +182,7 @@ describe('a Tier 0 on the Skills tab (v19)', () => {
     await waitFor(() => expect(vi.mocked(battle.promoteUma)).toHaveBeenCalledWith(expect.anything(), outfit.outfitId, 'recruit', 'brawler', expect.any(String), '1'))
     await waitFor(() => expect(screen.queryByRole('dialog', { name: /^Promote/ })).toBeNull())
     expect(her()).toMatchObject({ classId: 'brawler', ranks: { classes: { brawler: { rank: 11, exp: 120 }, recruit: { rank: 10, exp: 0 } } } })
-    // Her Brawler tree: the trunk, the fork and both lines; the class button reads her new rank.
+    // Her Brawler tree: the trunk, the fork and both lines; the class tile reads her new rank.
     expect(screen.getByRole('button', { name: 'Class: Brawler, R11' })).toBeDefined()
     expect(screen.getAllByRole('group', { name: /^Line/ })).toHaveLength(2)
     // The Classes sheet now shows the siblings Ready.

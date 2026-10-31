@@ -1,7 +1,7 @@
 // SB4: shared album chrome, virtual views and device preferences. RPG profile routes and rules stay here.
 import { AlbumChrome, AlbumGrid, useAlbumPrefs } from '@luismlorenzana/uma-kit/album'
 import { emptyStateHint } from '@luismlorenzana/uma-kit/roster'
-import { bestAptitudeLine, type RosterOutfit } from '@rpg/domain'
+import { bestAptitudeLine } from '@rpg/domain'
 import { useMemo, useState } from 'react'
 import { albumRows, stableResult, STABLE_FACETS, STABLE_PRESETS, STABLE_SCHEMA, STABLE_SORTS } from '../../album/rows'
 import { withUpgrades } from '../../album/upgrades'
@@ -10,32 +10,19 @@ import { ClassEmblem } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
 import type { MasterView } from '../../master/master'
 import { useActiveTier, useAlbumScope, useWorld } from '../../save/game'
-import { BackIcon, TargetIcon } from '../../ui/icons'
+import { TargetIcon } from '../../ui/icons'
 import { UpgradeMark } from '../../ui/UpgradeMark'
 import { useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
 import { OutfitProfile } from './OutfitProfile'
-import { SkillsPage } from './SkillsPage'
 
 export default function StablePage({ place, rest }: PageProps) {
   const [, outfitId, sub] = rest.split('/')
   return <MasterGate>{view => {
     if (!outfitId) return <Roster view={view} place={place} />
-    const outfit = view.roster.find(o => o.outfitId === outfitId)
-    if (sub === 'skills' && outfit) return <SkillsRoute outfit={outfit} place={place} />
     return <OutfitProfile view={view} outfitId={outfitId} place={place} route={sub} />
   }}</MasterGate>
-}
-
-function SkillsRoute({ outfit, place }: { outfit: RosterOutfit; place: PageProps['place'] }) {
-  const nav = useHubNavigation()
-  return <div className="space-y-2 p-4">
-    <button type="button" onClick={() => nav.subBack(place)} className="-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-semibold text-ink-soft">
-      <BackIcon size={18} /> {outfit.name}
-    </button>
-    <SkillsPage outfit={outfit} name={outfit.name} />
-  </div>
 }
 
 export function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }) {

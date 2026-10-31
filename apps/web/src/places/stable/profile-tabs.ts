@@ -47,10 +47,10 @@ export function rememberTab(tab: ProfileTab): void {
   }
 }
 
-/** Ready marks owned by each skeleton tab until H120–H123 rebuild their bodies. */
+/** Ready marks by the tab that owns the action (§5.5): Class while a promotion waits (H120). */
 export function tabDots(upgrades: UmaUpgrades | null, callingOpen: boolean): ProfileDots {
   return {
-    class: false,
+    class: upgrades?.promote ?? false,
     gear: (upgrades?.gear ?? 0) > 0,
     stars: (upgrades?.stars ?? 0) > 0,
     template: callingOpen,
@@ -59,7 +59,7 @@ export function tabDots(upgrades: UmaUpgrades | null, callingOpen: boolean): Pro
 
 /** The first actionable door, in the profile contract's priority order. */
 export function firstDotTab(dots: ProfileDots): ProfileTab | null {
-  return (['gear', 'stars', 'template'] as const).find((tab) => dots[tab]) ?? null
+  return PROFILE_TABS.find(({ key }) => dots[key])?.key ?? null
 }
 
 export interface ProfileDoorOptions {

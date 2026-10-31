@@ -1,4 +1,4 @@
-// One of a class's weapon slots (D98; five to v15, three by channel from v16): the weapon she holds there opens its skill
+// One of a class's weapon slots (D98; five to v15, three by channel from v16; H120 keeps it open on the new weapon, G5): the weapon she holds there opens its skill
 // tree. Every Uma holds a Training weapon of each kind (grade 0, no stats), shown only until she binds its grade 1. A class
 // that picks (`rpgPicksWeapons`: to v15 the Summoner, Spell Blade and Cleric, from v16 every class, CP12) chooses each
 // slot's weapon among her class's kinds of the slot's channel; the others keep theirs. From R2 (H82) the sheet lists her
@@ -12,12 +12,13 @@ import {
   type GearTier, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
-import { kindLabel, SLOT_LABEL, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { kindLabel, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { hold, useActiveTier } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { pointText } from '../../items/planets'
+import { weaponSlot } from './copy'
 import { weaponGradeLine } from './gear-v3'
 
 /** Accessories' defensive effects, one phrase each (D124). Regen and the two shields are shares of her max HP (D141). */
@@ -70,18 +71,17 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
   const weapons = classOf(uma, classId).weapons
   const kind = RPG_CLASS_SLOTS[classId][slot]!
   const here = weapons[slot]!
-  const kinds = rpgPicksWeapons(classId)
-    ? [here, ...rpgClassWeapons(classId).filter((w) => w !== here && (kind === 'any' || (kind === 'tome') === isRpgTome(w)))]
-    : [here]
+  // In the class's order, so a row stays put when a tap makes it Held and the sheet stays open (G5).
+  const kinds = rpgPicksWeapons(classId) ? rpgClassWeapons(classId).filter((w) => w === here || kind === 'any' || (kind === 'tome') === isRpgTome(w)) : [here]
   const pieces = (w: RpgWeapon) => gearChoices(uma, gearStock(world), (p) => p.type === w)
   const held = (w: RpgWeapon, id: string | null) => here === w && (gear.equipped[w] ?? null) === id
   // A graded Uma (save v28, R2): a weapon is a grade she raises on the Gear tab, so the sheet only picks the slot's weapon.
   const graded = isGrades(uma.gear) ? uma.gear : null
   const tier = Math.min(3, useActiveTier()) as GearTier
   const choose = (w: RpgWeapon, id: string | null) =>
-    hold(outfitId, classId, slot, w, id).then(onClose, (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
+    hold(outfitId, classId, slot, w, id).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
   return (
-    <BottomSheet title={`Slot ${slot + 1} · ${SLOT_LABEL[kind]}`} onClose={onClose}>
+    <BottomSheet title={weaponSlot(slot + 1, kind)} onClose={onClose}>
       <div className="space-y-3">
         {graded ? <ul className="space-y-1">
           {kinds.map((w) => {

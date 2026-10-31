@@ -2,7 +2,7 @@
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
 import {
   ACCESSORY_FAMILY_LABEL, ARMOR_LABEL, ARMOR_SLOT_LABEL, BATTLE_ENGINE_VERSION, EFFECT_LABEL, FLOURISH_NAMES, KEY_LABELS,
-  KNACK_LABEL, madeName, newGrades, newOwnedUma, RPG_CLASSES, STRIDE_LABEL, umaBattleSheet, WEAPON_LABEL,
+  KNACK_LABEL, madeName, newGrades, newOwnedUma, newTierWorld, RPG_ALL_CLASSES, RPG_CLASSES, rpgClassName, RPG_ROOT_NAME, RPG_TIER0_SKILL, STRIDE_LABEL, umaBattleSheet, WEAPON_LABEL,
   type AccessoryFamily, type BattleOutfit, type RpgFlourish, type TemplateOutfit,
 } from '@rpg/domain'
 import fs from 'node:fs'
@@ -13,13 +13,15 @@ import { mapNodeValue } from '../observatory/StarsPanel'
 import * as copy from './copy'
 import { accessoryChoices, accessoryTile, upgradeRows } from './gear-equip'
 import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine } from './gear-v3'
-import { handLine, rankText } from './SkillTree'
-import { flourishLine, rootFlourish, templateCard } from './template-view'
+import { rankText } from './class-sheets'
+import { classesSheet, classTiles, handWord, limitView, promotionLine, promotionSheet } from './class-view'
+import { flourishLine, templateCard } from './template-view'
 
 const NAMES = [
   ...Object.values(WEAPON_LABEL), ...Object.values(ACCESSORY_FAMILY_LABEL), ...Object.values(ARMOR_SLOT_LABEL),
   ...Object.values(ARMOR_LABEL), ...Object.values(EFFECT_LABEL), ...Object.values(FLOURISH_NAMES), ...Object.values(STRIDE_LABEL),
-  ...Object.values(KNACK_LABEL), ...Object.values(KEY_LABELS), ...RPG_CLASSES,
+  ...Object.values(KNACK_LABEL), ...Object.values(KEY_LABELS), ...RPG_CLASSES, ...RPG_ALL_CLASSES.map((c) => rpgClassName(c)),
+  ...Object.values(RPG_ROOT_NAME), ...Object.values(RPG_TIER0_SKILL), 'Warrior Dojo', 'Mage Tower', 'Spellblade Salle', 'Summoner Circle', 'Healer Sanctum',
   'Spell Blade', 'Greatsword', 'Thunder Tome', 'Even pace', 'Late reserve', 'Clean break', 'Weapon Forge', 'Tome Forge',
   'Charm Forge', 'Armor Fittings G5', 'Arms Gem G10', 'Planet Jewel I', 'Clever Spellwright', 'Clever Spellfencer',
   'Aster', 'Beryl', 'Fire', 'Blizzard', 'Thunder', 'Dark', 'Light', 'Physical', 'Magical',
@@ -101,7 +103,19 @@ describe('the profile wording list (H117)', () => {
     expect(copy.mp(296, 15)).toBe('MP 296 · +15/round')
     expect(copy.hand(.72, .44)).toBe('Hand · Arms ×0.72 · Tome ×0.44')
     expect(copy.standardPreset(true)).toBe('Standard preset · On')
-    expect(copy.flourishChip('even-pace', false)).toBe('★ Even pace · Off')
+    expect(copy.promoteRank(10)).toBe('R10 · Promote')
+    expect(copy.opens('R40')).toBe('Opens · R40')
+    expect(copy.weaponSlot(3, 'arms')).toBe('Slot 3 · Arms')
+    expect(copy.weaponSlot(3, 'any')).toBe('Slot 3 · Any')
+    expect(copy.bondNext(3, 12)).toBe('Next · 3/12')
+    expect(copy.heroName('Uma F')).toBe('Hero · Uma F')
+    expect(copy.limitLine({ kind: 'none' })).toBe('None')
+    expect(copy.limitLine({ kind: 'hero', name: 'Rend' })).toBe('Rend · Hero')
+    expect(copy.limitLine({ kind: 'learner', name: 'Rend', bond: 2, more: true })).toBe('Rend · Learner · Bond 2/10 · +1')
+    expect(copy.limitSeat('Learner', 'Warrior Dojo', 2)).toBe('Learner · Warrior Dojo · Seat 2')
+    expect(copy.limitPower(2.9, { value: 0.8, name: 'Paladin' })).toBe('×2.9 · ×0.8 as Paladin')
+    expect(copy.actions.promoteTo('Brawler')).toBe('Promote to Brawler')
+    expect(copy.actions.startClass('Summoner')).toBe('Start Summoner · R1')
     expect(copy.armorSlot('head')).toBe('Head')
     expect(copy.unlock({ kind: 'ticket' })).toBe('Unlock · 1 Ticket')
     expect(copy.unlock({ kind: 'tier', tier: 2 })).toBe('In Tier 2')
@@ -138,8 +152,7 @@ describe('the profile wording list (H117)', () => {
       { source: 'level and exp ends', value: [copy.level(1), copy.level(50), copy.exp(0, 168), copy.exp(301, null)] },
       { source: 'templateCard locked', value: templateCard(outfit, null, null) },
       { source: 'templateCard owned', value: templateCard(outfit, owned, 'mage', 1, { 'jewel-template-1': 1 }) },
-      { source: 'rootFlourish', value: rootFlourish(outfit, owned, 'mage') },
-      { source: 'handLine', value: handLine('spellblade', { power: 1, arms: .72, tome: .44, mp: 1, linger: 0, pair: false, lead: 'arms', extra: true }) },
+      { source: 'handWord', value: handWord('spellblade') },
       { source: 'rankText', value: [rankText({ open: true, rank: 3, nextRankAt: 14, gate: 1 }), rankText({ open: false, rank: 0, nextRankAt: null, gate: 30 })] },
       { source: 'mapNodeValue', value: ['planet:1', 'prowess:1', 'vigor:1', 'guard:1', 'template:1'].map((id) => mapNodeValue(id, 'spellblade', 'fleet', 'physical', 1)) },
     ]
@@ -158,6 +171,12 @@ describe('the profile wording list (H117)', () => {
     values.push({ source: 'grade rows', value: [weaponGradeLine(grades, 'greatsword', 1), armorGradeLine(grades, 'head', 'brawler', 1),
       upgradeRows(grades, ['greatsword', 'axe', 'lance'], 'brawler', 50, { 'weapon-gem-g1': 1 }, 1, 'bell'),
       gradeUpgradeView(grades, { kind: 'weapon', weapon: 'greatsword' }, 50, { 'weapon-gem-g1': 1 })] })
+    const world = { ...newTierWorld('2026-10-29T00:00:00.000Z', 3), umas: { '81001': { ...owned, classId: 'recruit' as const,
+      ranks: { classes: { recruit: { rank: 10, exp: 400 }, duelist: { rank: 7, exp: 0 } } }, bonds: { 'brawler-1': { level: 3, exp: 2 } } } } }
+    const tiered = world.umas['81001']
+    values.push({ source: 'class tree', value: [classTiles(outfit, tiered).map((t) => t.word), RPG_CLASSES.map((c) => classesSheet(outfit, tiered, world, 1, c).line),
+      RPG_CLASSES.map((c) => classesSheet(outfit, tiered, world, 1, c).footer.label), promotionSheet(outfit, tiered, 1, 'recruit'), promotionLine(tiered, 'duelist')] })
+    values.push({ source: 'limit', value: limitView(world, '81001', 'recruit', () => 'Aster') })
     for (const classId of RPG_CLASSES) values.push({ source: `battle sheet ${classId}`, value: umaBattleSheet(outfit, { ...owned, classId }, classId, 1, BATTLE_ENGINE_VERSION) })
     for (const entry of values) for (const value of strings(entry.value)) check(value, entry.source)
   })
@@ -165,7 +184,7 @@ describe('the profile wording list (H117)', () => {
   it('keeps literal JSX terse outside help sheets', () => {
     const files = [
       'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'TemplateTab.tsx',
-      'SkillTree.tsx', 'SkillsPage.tsx', 'WeaponSheet.tsx', 'GearCardV3.tsx', 'PresetButton.tsx', 'ClassPicker.tsx',
+      'ClassTab.tsx', 'class-sheets.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'GearCardV3.tsx', 'PresetButton.tsx',
       '../observatory/StarsPanel.tsx',
     ]
     const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.'])

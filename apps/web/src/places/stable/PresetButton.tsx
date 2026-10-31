@@ -30,9 +30,9 @@ export function PresetButton({ outfit, uma, world }: { outfit: RosterOutfit; uma
           className="flex min-h-11 w-full items-center gap-2 rounded-sm bg-raised px-2 py-1 text-left disabled:opacity-60">
           <ClassEmblem classId={row.pick} />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-[12px] font-semibold">{row.title}</span>
-            <span className="block truncate text-[10.5px] text-ink-soft">{row.detail}</span>
-            {row.accessories && <span className="block truncate text-[10.5px] text-ink-soft">{row.accessories}</span>}
+            <span className="block truncate text-[12.5px] font-semibold">{row.title}</span>
+            <span className="block truncate text-[11px] text-ink-soft">{row.detail}</span>
+            {row.accessories && <span className="block truncate text-[11px] text-ink-soft">{row.accessories}</span>}
           </span>
           {!row.on && <span className="shrink-0 text-ink-faint">›</span>}
         </button>

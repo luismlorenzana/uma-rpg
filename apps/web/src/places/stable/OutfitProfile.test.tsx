@@ -4,13 +4,10 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { domAnimation } from 'motion/react'
 import { MemoryRouter, Route, Routes, useLocation, useNavigate, useParams, type InitialEntry } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  activeClass, placeById, tradePlaces, umaBattleSheet, umaPick, umaTrade,
-  type OwnedUma,
-} from '@rpg/domain'
+import { activeClass, placeById, tradePlaces, umaBattleSheet, umaPick, umaTrade } from '@rpg/domain'
 import { albumFixture } from '../../album/testing'
 import * as copy from './copy'
-import { OutfitProfile, rankGridClasses } from './OutfitProfile'
+import { OutfitProfile } from './OutfitProfile'
 
 let fixture: Awaited<ReturnType<typeof albumFixture>>
 let ownerTier: number | null
@@ -205,19 +202,23 @@ describe('the Uma profile v2 frame (H119)', () => {
     expect(screen.queryByRole('button', { name: 'Unlock · 1 Ticket' })).toBeNull()
   })
 
-  it('labels Gear and Stars dots independently and never dots Class', () => {
+  it('labels each dot on its own: Class only while a promotion waits', () => {
     fixture.world = { ...fixture.world, items: { ...fixture.world.items, 'weapon-gem-g1': 1, 'jewel-planet-1': 3 } }
-    render(profile())
+    const ui = render(profile())
     expect(screen.getByRole('tab', { name: 'Class' })).toBeDefined()
     expect(screen.getByRole('tab', { name: 'Gear, ready' })).toBeDefined()
     expect(screen.getByRole('tab', { name: 'Stars, ready' })).toBeDefined()
+    ui.unmount()
+    const uma = fixture.world.umas['81001']!
+    fixture.world = { ...fixture.world, umas: { ...fixture.world.umas, '81001': { ...uma, classId: 'recruit', ranks: { classes: { recruit: { rank: 10, exp: 0 } } } } } }
+    render(profile())
+    expect(screen.getByRole('tab', { name: 'Class, ready' })).toBeDefined()
   })
-})
 
-describe('the Class Ranks grid (v19)', () => {
-  it('lists Tier 0s plus held Tier 1 classes in Tier 1, and every Tier 1 class later', () => {
-    const ranks = { classes: { recruit: { rank: 10, exp: 0 }, brawler: { rank: 10, exp: 0 } } }
-    expect(rankGridClasses({ ranks } as Pick<OwnedUma, 'ranks'>, 1)).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice', 'brawler'])
-    expect(rankGridClasses({ ranks } as Pick<OwnedUma, 'ranks'>, 2)).toEqual(['brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage'])
+  it('sends the retired Skills-alone route to the Class tab, keeping its state', async () => {
+    storage.set('rpg.profile.tab.v3', 'gear')
+    render(profile('', [{ pathname: '/town/stable/outfit/81001/skills', state: { fromPlace: true } }]))
+    await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/town/stable/outfit/81001/class|{"fromPlace":true}'))
+    expect(screen.getByRole('tab', { name: 'Class' }).getAttribute('aria-selected')).toBe('true')
   })
 })

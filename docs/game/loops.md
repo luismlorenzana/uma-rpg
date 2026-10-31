@@ -404,7 +404,7 @@ Every made item and value is in [materials](materials.md#gear); `economy/grades.
   accessory's family in its base form; her signature while she wears her knack's family ([combat](combat.md#damage)).
 - **The accessory slots:** each has its own family (Pendant, Charm, Orb, Insignia), an Orb's kind (one of her three
   weapons'), which change with one tap on the Gear tab's Equip view, and its own grade, raised on its Upgrade view.
-- **Standard preset (D164, D263):** at the top of the Gear tab, a tap puts on her active class's preset
+- **Standard preset (D164, D263):** in the footer of the Classes sheet, on her own class, a tap puts on her active class's preset
   ([classes](classes.md#standard-presets)), or a Tier 0's pick among the classes it promotes into: three weapons and all three
   accessory slots (her armor half's stat twice and an Orb, her signature's ★ family first). Grades don't move.
 

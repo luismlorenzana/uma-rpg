@@ -14,6 +14,8 @@ export const exp = (value: number, next: number | null): string => next === null
 /** C8/C9: Class Rank. The expanded wording belongs only in aria labels. */
 export const classRank = (value: number): string => `R${n(value)}`
 export const tier0Rank = (value: number): string => `${classRank(value)}/10`
+/** C7: the class tile while a promotion waits. */
+export const promoteRank = (value: number): string => `${classRank(value)} · Promote`
 export const waitingExp = (value: number): string => `+${n(value)} EXP waiting`
 /** C8/C9: Craft Level. */
 export const craftLevel = (value: number): string => `Craft ${n(value)}`
@@ -21,6 +23,8 @@ export const craftLevel = (value: number): string => `Craft ${n(value)}`
 export type GateKind = 'level' | 'rank' | 'craft'
 /** C9: a level, rank or craft gate. */
 export const gate = (kind: GateKind, value: number): string => kind === 'level' ? level(value) : kind === 'rank' ? classRank(value) : craftLevel(value)
+/** C9: a gate in a sheet. */
+export const opens = (value: string): string => `Opens · ${value}`
 /** C9: an ordered map-node gate. */
 export const nodeGate = (node: string): string => `${node} first`
 
@@ -102,6 +106,25 @@ export const depth = (value: number, path: RpgBranch | 'trunk'): string => `Dept
 export const bond = (value: number, percent: number): string => `Bond ${n(value)}/10 · Strength ${n(percent)}%`
 export const bondLevel = (value: number): string => `Bond ${n(value)}/10`
 export const heroBond = (): string => 'Hero · Strength 100%'
+/** C7: a Bond's EXP toward its next level. */
+export const bondNext = (value: number, of: number): string => `Next · ${n(value)}/${n(of)}`
+/** C7: the Hero a Learner borrows from. */
+export const heroName = (name: string): string => `Hero · ${name}`
+export type LimitLine = { kind: 'none' } | { kind: 'hero'; name: string; more?: boolean } | { kind: 'learner'; name: string; bond: number; more: boolean }
+/** C7: the Class tab's Limit line, the Limit Break Auto fires; ` · +1` for a second one. */
+export function limitLine(value: LimitLine): string {
+  if (value.kind === 'none') return 'None'
+  const line = value.kind === 'hero' ? `${value.name} · Hero` : `${value.name} · Learner · ${bondLevel(value.bond)}`
+  return value.more ? `${line} · +1` : line
+}
+/** C7: a seat, by its hall and number. */
+export const limitSeat = (role: 'Hero' | 'Learner', hall: string, seat: number): string => `${role} · ${hall} · Seat ${n(seat)}`
+/** C1: a Limit Break's power, and her class's scale when it isn't 1. */
+export const limitPower = (power: number, scale?: { value: number; name: string } | null): string =>
+  `×${+power.toFixed(2)}${scale ? ` · ×${+scale.value.toFixed(2)} as ${scale.name}` : ''}`
+/** C1: a weapon slot's sheet: "Slot 3 · Arms", a Tier 0's "Slot 3 · Any". */
+export const weaponSlot = (slot: number, kind: 'arms' | 'tome' | 'any'): string =>
+  `Slot ${n(slot)} · ${kind === 'arms' ? 'Arms' : kind === 'tome' ? 'Tome' : 'Any'}`
 /** C3/C8: a class's two-part hand. */
 export const hand = (arms: number, tome: number): string => `Hand${arms ? ` · Arms ×${+arms.toFixed(2)}` : ''}${tome ? ` · Tome ×${+tome.toFixed(2)}` : ''}`
 /** C7: the standard class preset. */
@@ -128,15 +151,11 @@ export const actions = {
   takeLine: (value: RpgBranch) => `Take line ${value}`,
   auto: 'Auto', standardPreset: 'Standard preset', confirm: 'Confirm', confirmOnce: 'Confirm once',
   fightAs: (name: string) => `Fight as ${name}`,
+  promoteTo: (name: string) => `Promote to ${name}`,
+  startClass: (name: string) => `Start ${name} · R1`,
   unlock: 'Unlock · 1 Ticket',
   open: (place: string) => `Open ${place}`,
 } as const
-
-/** Interim H117 chip; H120 removes it. The full Flourish fact stays in `flourish`. */
-export const flourishChip = (value: RpgFlourish, on: boolean): string => {
-  const name = value === 'clean-break' ? 'Clean break' : value === 'even-pace' ? 'Even pace' : 'Late reserve'
-  return `★ ${name} · ${on ? 'On' : 'Off'}`
-}
 
 /** Grade-sheet slot labels that are data rather than prose. */
 export const armorSlot = (slot: ArmorSlot): string => ({ head: 'Head', body: 'Body', legs: 'Legs', arms: 'Arms', feet: 'Feet' })[slot]

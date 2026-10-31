@@ -5,11 +5,11 @@
 // selection's line, a later tier's tree, every Tier 0's promotion sheet (Suggested by Power and Wit, Held, the rows that
 // differ, before → after with and without waiting EXP), the class button, the promotion line and which Tier 0 a promotion
 // comes from. Made-up outfits only.
-import { BATTLE_ENGINE_VERSION, newOwnedUma, newTierWorld, RPG_CLASSES, rpgClasses, type BattleOutfit, type OwnedUma, type RpgClass, type TierWorld } from '@rpg/domain'
+import { BATTLE_ENGINE_VERSION, heroLimit, newOwnedUma, newTierWorld, RPG_CLASSES, rpgClasses, type BattleOutfit, type HeroLimitId, type OwnedUma, type RpgClass, type TierWorld } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import {
-  classButton, classesSheet, classFooter, classGrid, classLine, classTiles, handWord, healerWarning, promotionFrom, promotionLine, promotionSheet, slotsWord,
-  tier0Progress,
+  classButton, classesSheet, classFooter, classGrid, classHall, classLine, classTiles, handWord, healerWarning, limitView, promotionFrom, promotionLine,
+  promotionSheet, slotsWord, tier0Progress,
 } from './class-view'
 
 const NOW = '2026-10-29T12:00:00.000Z'
@@ -45,16 +45,16 @@ describe('class-view on v18', () => {
     ])
   })
 
-  it('acts by the selection: her class is "Fights as", another "Fight as"', () => {
+  it('acts by the selection: her class has the standard preset, another "Fight as"', () => {
     const sheet = classesSheet(A, her(), world(), 1, null, undefined, 18)
     expect(sheet.selected.classId).toBe('brawler')
-    expect(sheet.footer).toEqual({ label: 'Fights as Brawler', act: null })
+    expect(sheet.footer).toEqual({ label: 'Standard preset', act: null })
     expect(classFooter(classTiles(A, her(), 1, 18)[1]!)).toEqual({ label: 'Fight as Mage', act: 'switch' })
     expect(classesSheet(A, her(), world(), 1, 'mage', undefined, 18).line).toMatchObject({ title: 'Mage · Held', facts: ['3 Tomes'], weapons: ['tome-fire', 'tome-ice', 'tome-lightning'] })
   })
 
   it('reads "R22" on the class button and finds no promotion', () => {
-    expect(classButton(A, her(), 1, 18)).toEqual({ classId: 'brawler', name: 'Brawler', word: 'R22', promote: null })
+    expect(classButton(A, her(), 1, 18)).toMatchObject({ classId: 'brawler', name: 'Brawler', word: 'R22', promote: null })
     expect(promotionFrom(A, her(), 1, null, 18)).toBeNull()
     expect(promotionFrom(A, her(), 1, 'brawler', 18)).toBeNull()
   })
@@ -112,9 +112,9 @@ describe('the Classes sheet from v19 (Uma C)', () => {
     ])
   })
 
-  it('gives each state its footer: Fights as, Fight as, Promote to, Start · R1, and the closed gate', () => {
+  it('gives each state its footer: the preset, Fight as, Promote to, Start · R1, and the closed gate', () => {
     const footer = (id: RpgClass) => classFooter(classTiles(C, UMA_C).find((t) => t.classId === id)!)
-    expect(footer('brawler')).toEqual({ label: 'Fights as Brawler', act: null })
+    expect(footer('brawler')).toEqual({ label: 'Standard preset', act: null })
     expect(footer('spellblade')).toEqual({ label: 'Fight as Arms Spellblade', act: 'switch' })
     expect(footer('acolyte')).toEqual({ label: 'Fight as Healer', act: 'switch' })
     expect(footer('armsummoner')).toEqual({ label: 'Promote to Arms Summoner', act: 'promote' })
@@ -210,9 +210,11 @@ describe('the promotion sheet from v19', () => {
 
 describe('the Skills tab\'s pieces from v19', () => {
   it('reads the class button: R34, a Tier 0\'s R7/10, and Promote while a promotion waits', () => {
-    expect(classButton(C, UMA_C)).toEqual({ classId: 'brawler', name: 'Brawler', word: 'R34', promote: null })
-    expect(classButton(C, uma('recruit', { recruit: { rank: 7, exp: 0 } }))).toEqual({ classId: 'recruit', name: 'Warrior', word: 'R7/10', promote: null })
-    expect(classButton(C, uma('recruit', { recruit: { rank: 10, exp: 400 } }))).toMatchObject({ word: 'Promote', promote: 'recruit' })
+    expect(classButton(C, UMA_C)).toMatchObject({ classId: 'brawler', name: 'Brawler', word: 'R34', promote: null })
+    expect(classButton(C, uma('recruit', { recruit: { rank: 7, exp: 0 } }))).toMatchObject({ classId: 'recruit', name: 'Warrior', word: 'R7/10', promote: null })
+    expect(classButton(C, uma('recruit', { recruit: { rank: 10, exp: 400 } }))).toMatchObject({ word: 'R10 · Promote', promote: 'recruit' })
+    expect(classButton(C, uma('recruit', { recruit: { rank: 10, exp: 0 } })).bar).toEqual({ value: 3600, max: 3600 })
+    expect(classButton(C, uma('brawler', { brawler: { rank: 50, exp: 0 } })).bar).toEqual({ value: 1, max: 1 })
   })
 
   it('draws the promotion line: to go with its bar, then the waiting EXP, then nothing once every child is held', () => {
@@ -223,5 +225,50 @@ describe('the Skills tab\'s pieces from v19', () => {
     const all: Tracks = { acolyte: { rank: 10, exp: 50 }, paladin: { rank: 10, exp: 0 }, cleric: { rank: 10, exp: 0 } }
     expect(promotionLine(uma('acolyte', all), 'acolyte')).toBeNull()
     expect(tier0Progress('recruit', { rank: 10, exp: 400 })).toEqual({ value: 3_600, max: 3_600 })
+  })
+})
+
+describe('the Limit line and sheet (H120)', () => {
+  const heroes = (...seats: [HeroLimitId, string, string[]][]): TierWorld['heroes'] => Object.fromEntries(seats.map(([id, hero, learners]) => [id, { hero, learners }]))
+  const names = (id: string) => `Uma ${id}`
+  const learner = (bonds: OwnedUma['bonds']) => ({ ...newOwnedUma(NOW), classId: 'brawler' as const, bonds })
+
+  it('reads None with her class\'s hall, a Tier 0\'s by the child she models', () => {
+    const w = { heroes: {}, umas: { '1': learner({}) } }
+    expect(limitView(w, '1', 'brawler', names)).toEqual({ line: 'None', blocks: [], others: [], hall: { place: 'brawler-dojo', name: 'Warrior Dojo' } })
+    expect(limitView(w, '1', 'paladin', names).hall.name).toBe('Healer Sanctum')
+    expect(classHall('recruit')).toBe('brawler')
+    expect(classHall('duelist')).toBe('spellblade')
+    expect(classHall('acolyte')).toBe('healer')
+    expect(classHall('caller')).toBe('summoner')
+    expect(classHall('apprentice')).toBe('mage')
+  })
+
+  it('reads a Hero\'s own Limit Break at full strength', () => {
+    const w = { heroes: heroes(['brawler-2', '1', []]), umas: { '1': learner({ 'brawler-2': { level: 3, exp: 4 } }) } }
+    const view = limitView(w, '1', 'brawler', names)
+    const name = heroLimit('brawler-2').name
+    expect(view.line).toBe(`${name} · Hero`)
+    expect(view.blocks).toHaveLength(1)
+    expect(view.blocks[0]).toMatchObject({ seat: 'Hero · Warrior Dojo · Seat 2', bond: 'Hero · Strength 100% · Bond 3/10', hero: null,
+      power: `×${heroLimit('brawler-2').power} · ×0.95 as Brawler` })
+  })
+
+  it('leads a Learner with her strongest Bond, ties in seat order, a second Hero as +1, and keeps a former Hero\'s Bond', () => {
+    const bonds = { 'brawler-1': { level: 2, exp: 5 }, 'mage-1': { level: 4, exp: 0 }, 'summoner-1': { level: 6, exp: 0 } }
+    const w = { heroes: heroes(['brawler-1', '8', ['1']], ['mage-1', '9', ['1']]), umas: { '1': learner(bonds) } }
+    const view = limitView(w, '1', 'recruit', names)
+    expect(view.line).toBe(`${heroLimit('mage-1').name} · Learner · Bond 4/10 · +1`)
+    expect(view.blocks.map((b) => b.id)).toEqual(['mage-1', 'brawler-1'])
+    expect(view.blocks[1]).toMatchObject({ seat: 'Learner · Warrior Dojo · Seat 1', bond: 'Bond 2/10 · Strength 60%', next: 'Next · 5/12', hero: 'Hero · Uma 8', power: `×${heroLimit('brawler-1').power}` })
+    expect(view.others).toEqual([{ id: 'summoner-1', text: `${heroLimit('summoner-1').name} · Bond 6/10` }])
+    const tie = { heroes: w.heroes, umas: { '1': learner({ 'brawler-1': { level: 4, exp: 0 }, 'mage-1': { level: 4, exp: 0 } }) } }
+    expect(limitView(tie, '1', 'recruit', names).blocks[0]!.id).toBe('brawler-1')
+  })
+
+  it('names a healer seat and its scale', () => {
+    const w = { heroes: heroes(['healer-3', '8', ['1']]), umas: { '1': { ...learner({ 'healer-3': { level: 10, exp: 0 } }), classId: 'paladin' as const } } }
+    expect(limitView(w, '1', 'paladin', names).blocks[0]).toMatchObject({ seat: 'Learner · Healer Sanctum · Seat 3', next: null, bond: 'Bond 10/10 · Strength 100%',
+      power: `×${heroLimit('healer-3').power} · ×0.8 as Paladin` })
   })
 })

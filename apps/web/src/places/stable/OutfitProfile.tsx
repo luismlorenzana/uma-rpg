@@ -4,29 +4,24 @@ import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/conte
 import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
 import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import {
-  BOND_MAX_LEVEL, HERO_HALL_PLACES, HERO_LIMIT_IDS, RPG_CLASSES, RPG_TIER_MAX_LEVEL, SaveRuleError, activeClass, bondCapacity, classTrack,
-  heroLimit, heroLimitHall, heroSeatHome, heroSeatOf, parentsOf, rpgClassExpToNext, rpgClassMaxRank, rpgExpToNext,
-  rpgIsTier0, rpgRework, umaCallingPick,
-  type OwnedUma, type Place, type RosterOutfit, type RpgClass, type TierWorld,
+  RPG_TIER_MAX_LEVEL, SaveRuleError, activeClass, rpgExpToNext, umaCallingPick,
+  type OwnedUma, type Place, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { seeStableOutfit } from '../../album/preferences'
 import { umaUpgrades } from '../../album/upgrades'
-import { Bar, CLASS_LABEL } from '../../battle/labels'
-import { ClassEmblem } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
 import type { MasterView } from '../../master/master'
 import { markTarget, unlock, useActiveTier, useOwnerTier, useWorld } from '../../save/game'
-import { HelpButton } from '../../ui/HelpButton'
 import { TargetIcon, TicketIcon } from '../../ui/icons'
 import { StarsPanel } from '../observatory/StarsPanel'
+import { ClassTab } from './ClassTab'
 import { DetailsSheet } from './DetailsSheet'
 import { FactsRow } from './FactsRow'
 import { EquipView, upgradeCount, UpgradeView } from './GearCardV3'
-import { SkillsPage } from './SkillsPage'
 import { TemplateTab } from './TemplateTab'
-import { bond as bondCopy, exp, level, unlock as unlockCopy } from './copy'
+import { exp, level, unlock as unlockCopy } from './copy'
 import { PROFILE_TABS, rememberTab, storedTab, tabDots, tabFromRoute, type ProfileTab } from './profile-tabs'
 
 export interface OutfitProfileProps {
@@ -46,8 +41,9 @@ export function OutfitProfile({ view, outfitId, place, route }: OutfitProfilePro
   const outfit = view.roster.find((row) => row.outfitId === outfitId)
   const owned = world?.umas[outfitId] ?? null
   const routed = tabFromRoute(route)
+  // The Skills-alone route retired with its page (H120): it lands on the Class tab.
   const [remembered, setRemembered] = useState<ProfileTab>(() =>
-    (location.state as { sheet?: string } | null)?.sheet === 'classes' ? 'class' : storedTab())
+    route === 'skills' || (location.state as { sheet?: string } | null)?.sheet ? 'class' : storedTab())
   const [details, setDetails] = useState(false)
   const bust = useArtUrl(outfit ? imagePath(view.art, 'outfit-busts', outfit.outfitId) ?? imagePath(view.art, 'outfit-portraits', outfit.outfitId) : null)
 
@@ -157,89 +153,6 @@ function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number 
   )
 }
 
-// --- Class skeleton: today's complete Skills body, Inheritance and Class Ranks ---------------------------------------
-
-/** Classes in the Class Ranks grid for this world and generation. */
-export function rankGridClasses(uma: Pick<OwnedUma, 'ranks'>, tier: number | string): RpgClass[] {
-  if (!rpgRework('classes')) return [...RPG_CLASSES]
-  return RPG_CLASSES.filter((classId) => (rpgIsTier0(classId) ? Number(tier) === 1 : Number(tier) !== 1 || !!uma.ranks.classes[classId]))
-}
-
-function classFill(classId: RpgClass, track: { rank: number; exp: number }): { value: number; max: number } {
-  return track.rank >= rpgClassMaxRank(classId) ? { value: 1, max: 1 } : { value: track.exp, max: rpgClassExpToNext(classId, track.rank) }
-}
-
-function ClassTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: OwnedUma; world: TierWorld }) {
-  const tier = useActiveTier()
-  return (
-    <div className="space-y-2">
-      <SkillsPage outfit={outfit} name={outfit.name} />
-      <InheritanceCard outfitId={outfit.outfitId} uma={uma} world={world} />
-      <section className="rounded-md bg-panel p-2">
-        <h3 className="text-micro">Class Ranks</h3>
-        <div className="mt-1 grid grid-cols-3 gap-1" aria-label="Class Ranks">
-          {rankGridClasses(uma, tier).map((classId) => {
-            const track = classTrack(uma.ranks, classId)
-            const progress = classFill(classId, track)
-            return (
-              <div key={classId} className="rounded-xs bg-raised px-1.5 py-1" aria-label={`${CLASS_LABEL[classId]} Rank ${track.rank}`}>
-                <span className="flex items-center gap-1">
-                  <ClassEmblem classId={classId} />
-                  <span className="min-w-0 flex-1 truncate text-[10px] font-semibold">{CLASS_LABEL[classId]}</span>
-                  <span className="font-display text-[11px] font-bold">{track.rank}</span>
-                </span>
-                <Bar className="mt-0.5 h-1" value={progress.value} max={progress.max} tone="exp" />
-              </div>
-            )
-          })}
-        </div>
-      </section>
-    </div>
-  )
-}
-
-function InheritanceCard({ outfitId, uma, world }: { outfitId: string; uma: OwnedUma; world: TierWorld }) {
-  const navigate = useNavigate()
-  const seat = heroSeatOf(world, outfitId)
-  const parents = parentsOf(world, outfitId)
-  const bonds = HERO_LIMIT_IDS.filter((id) => uma.bonds[id] || parents.includes(id))
-  const hall = (id: (typeof HERO_LIMIT_IDS)[number]) => () => navigate(`/learning/${HERO_HALL_PLACES[heroLimitHall(id)]}`, { state: { back: true } })
-  return (
-    <section className="space-y-1 rounded-md bg-panel p-2">
-      <div className="flex min-h-9 items-center justify-between">
-        <h3 className="text-micro">Inheritance</h3>
-        <HelpButton title="Inheritance">
-          <p>Seat her in a Hall of Heroes. A Hero owns that seat's Limit Break; a Learner borrows it and builds a Bond.</p>
-        </HelpButton>
-      </div>
-      {seat ? (
-        <button type="button" onClick={hall(seat)} className="flex min-h-11 w-full items-center gap-2 rounded-xs bg-raised px-2 text-left">
-          <ClassEmblem classId={heroSeatHome(seat)} />
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-[12px] font-semibold">{CLASS_LABEL[heroSeatHome(seat)]} Hero · {heroLimit(seat).name}</span>
-            <span className="block text-[10px] text-ink-soft">Bond {(uma.bonds[seat] ?? { level: 0 }).level}/{BOND_MAX_LEVEL}</span>
-          </span>
-          <span className="text-ink-faint">›</span>
-        </button>
-      ) : (
-        <>
-          {parents.length === 0 && <p className="text-[12px] text-ink-soft">No inheritance yet</p>}
-          {bonds.map((id) => {
-            const bond = uma.bonds[id] ?? { level: 0, exp: 0 }
-            const now = parents.includes(id)
-            return (
-              <button key={id} type="button" onClick={hall(id)} className="flex min-h-11 w-full items-center justify-between gap-2 text-left text-[13px]">
-                <span className="truncate">{heroLimit(id).name}{now ? '' : <span className="text-ink-faint"> · former Hero</span>}</span>
-                <span className="shrink-0 text-ink-soft">{bondCopy(bond.level, Math.round(bondCapacity(bond.level) * 100))}</span>
-              </button>
-            )
-          })}
-        </>
-      )}
-    </section>
-  )
-}
-
 // --- Gear skeleton: both current bodies stacked, without a hidden sub-view -------------------------------------------
 
 function GearTab({ outfit, uma, world, upgrades, onClass }: {
@@ -251,7 +164,7 @@ function GearTab({ outfit, uma, world, upgrades, onClass }: {
     <div className="space-y-4">
       <section className="space-y-2">
         <h2 className="font-display text-[16px] font-bold">Equip</h2>
-        <EquipView outfit={outfit} uma={uma} world={world} tier={tier} onSkills={onClass} />
+        <EquipView outfit={outfit} uma={uma} tier={tier} onSkills={onClass} />
       </section>
       <section className="space-y-2">
         <h2 className="font-display text-[16px] font-bold">Upgrade{count ? ` · ${count}` : ''}</h2>

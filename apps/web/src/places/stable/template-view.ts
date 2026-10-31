@@ -12,7 +12,7 @@ import {
 import type { AptitudeGrade } from '@luismlorenzana/uma-data'
 import { CLASS_LABEL } from '../../battle/labels'
 import { tradeLabel } from '../../save/trade'
-import { flourish, flourishChip, moonNode, signature, trade as tradeCopy } from './copy'
+import { flourish, moonNode, signature, trade as tradeCopy } from './copy'
 
 const STAT_LABEL = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' } as const
 const GRADES: readonly AptitudeGrade[] = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
@@ -72,13 +72,6 @@ export function knackSource(outfit: TemplateOutfit): string {
  * engine's own numbers, so a tuning moves it. */
 export function flourishLine(value: RpgFlourish): string {
   return flourish(value, true)
-}
-
-/** The root plate's ★ line on the Skills tab: her Flourish, on while she is her calling's class (from v19 any class of her
- * Tier 0's family, `umaFlourishActive`); `off` names the class she is, "No effect as Mage". */
-export function rootFlourish(outfit: TemplateOutfit, uma: Holder, classId: RpgClass): { line: string; off: string | null } {
-  const t = umaTemplate(outfit, pickOf(outfit, uma))
-  return { line: flourishChip(t.flourish, umaFlourishActive(t, classId)), off: null }
 }
 
 /** The chip after her rarity stars (UT14): "★ Clever Spellwright", with a dot while an owned Uma's calling can still be
