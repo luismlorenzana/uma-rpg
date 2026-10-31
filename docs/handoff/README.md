@@ -47,7 +47,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
-| H125 | Uma profile v2 measured: everything about her 5.73 screens from 9.5; the phone check; D229 superseded (D272) | See this commit's D272 |
+| H125 | Uma profile v2 measured: everything about her 5.73 screens from 9.5; the phone check; D229 superseded (D272) | `021ef11` |
 | H124 | Uma profile v2: every door opens a tab, Back returns to it, ‹ n/N › (D271) | `518557f` |
 | H123 | Uma profile v2: the Template tab, no calling pick (D270); B2 1.28 at 390×844 | `36ee376` |
 | H122 | Uma profile v2: the Stars tab, Set all and the Observatory as a door (D269); B2 1.16 at 390×844 | `81e536f` |
