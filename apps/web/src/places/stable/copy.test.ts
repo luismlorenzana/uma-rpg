@@ -3,7 +3,7 @@ import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
 import {
   ACCESSORY_FAMILY_LABEL, ARMOR_LABEL, ARMOR_SLOT_LABEL, BATTLE_ENGINE_VERSION, EFFECT_LABEL, FLOURISH_NAMES, KEY_LABELS,
   KNACK_LABEL, madeName, newGrades, newOwnedUma, newTierWorld, RPG_ALL_CLASSES, RPG_CLASSES, rpgClassName, RPG_ROOT_NAME, RPG_TIER0_SKILL, STRIDE_LABEL, umaBattleSheet, WEAPON_LABEL,
-  type AccessoryFamily, type BattleOutfit, type RpgFlourish, type TemplateOutfit,
+  type AccessoryFamily, type RosterOutfit, type RpgFlourish,
 } from '@rpg/domain'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -16,7 +16,7 @@ import { accessoryGradeLine, weaponGradeLine } from './gear-v3'
 import { gearTiles, raiseAllPlan, raiseSheet } from './gear-view'
 import { rankText } from './class-sheets'
 import { classesSheet, classTiles, handWord, limitView, promotionLine, promotionSheet } from './class-view'
-import { flourishLine, templateCard } from './template-view'
+import { flourishLine, flourishSheet, templateTab } from './template-view'
 
 const NAMES = [
   ...Object.values(WEAPON_LABEL), ...Object.values(ACCESSORY_FAMILY_LABEL), ...Object.values(ARMOR_SLOT_LABEL),
@@ -73,6 +73,16 @@ describe('the profile wording list (H117)', () => {
     expect(copy.signature(10, false)).toBe('★ Signature · ATK/M.ATK +10 · Not worn')
     expect(copy.flourish('even-pace', true)).toBe('★ Flourish · Even pace · 1%/round · max 4% · On')
     expect(copy.moonNode('I', 'Evasion +2.4%', 'Open')).toBe('★ Moon I · Evasion +2.4% · Open')
+    expect(copy.calling('Warrior')).toBe('Calling · Warrior · fixed')
+    expect(copy.callingOnUnlock('Spellblade')).toBe('Calling on unlock · Spellblade')
+    expect(copy.worksAs(['Warrior', 'Brawler'])).toBe('Works as · Warrior, Brawler')
+    expect(copy.flourishNow(true, 'Mage')).toBe('Now · On')
+    expect(copy.flourishNow(false, 'Sorcerer')).toBe('Now · Off · as Sorcerer')
+    expect(copy.offAs('Mage')).toBe('Off · as Mage')
+    expect(copy.signatureFirst).toBe('G1 first')
+    expect(copy.atLevel('ATK/M.ATK +5', 50)).toBe('ATK/M.ATK +5 · Lv 50')
+    expect(copy.growth([{ stat: 'Speed', percent: 20 }, { stat: 'Power', percent: 10 }])).toBe('Speed +20% · Power +10%')
+    expect(copy.racingSkill).toBe('Racing skill')
     expect(copy.extraStatsCount(17)).toBe('Open 17/22')
     expect(copy.extraStatsRow(13, 2)).toBe('Open 13/22 · 2 ready')
     expect(copy.extraStatsRow(4, 0)).toBe('Open 4/22')
@@ -156,15 +166,16 @@ describe('the profile wording list (H117)', () => {
   it('keeps every builder and profile view-model compact', () => {
     const styles: Aptitudes['strategy'] = { front: 'C', pace: 'A', late: 'C', end: 'C' }
     const distances: Aptitudes['distance'] = { sprint: 'C', mile: 'C', medium: 'A', long: 'C' }
-    const outfit: TemplateOutfit & BattleOutfit = {
+    const outfit = {
       outfitId: '81001', baseStats: { speed: 100, stamina: 100, power: 90, guts: 100, wit: 102 },
-      growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 20 }, aptitudes: { strategy: styles, distance: distances },
-    }
+      growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 20 }, aptitudes: { surface: { turf: 'A', dirt: 'G' }, strategy: styles, distance: distances },
+    } as unknown as RosterOutfit
     const owned = { ...newOwnedUma('2026-10-29T00:00:00.000Z', 'mage'), level: 50, calling: { pick: null, confirmed: false } }
     const values: { source: string; value: unknown }[] = [
       { source: 'level and exp ends', value: [copy.level(1), copy.level(50), copy.exp(0, 168), copy.exp(301, null)] },
-      { source: 'templateCard locked', value: templateCard(outfit, null, null) },
-      { source: 'templateCard owned', value: templateCard(outfit, owned, 'mage', 1, { 'jewel-template-1': 1 }) },
+      { source: 'templateTab locked', value: templateTab(outfit, null, null, 1) },
+      { source: 'templateTab owned', value: templateTab(outfit, owned, 'mage', 1) },
+      { source: 'flourishSheet', value: [flourishSheet(outfit, owned, 'duelist', 1, null), flourishSheet(outfit, owned, 'brawler', 1, null)] },
       { source: 'handWord', value: handWord('spellblade') },
       { source: 'rankText', value: [rankText({ open: true, rank: 3, nextRankAt: 14, gate: 1 }), rankText({ open: false, rank: 0, nextRankAt: null, gate: 30 })] },
       { source: 'mapNodeValue', value: ['planet:1', 'prowess:1', 'vigor:1', 'guard:1', 'template:1'].map((id) => mapNodeValue(id, 'spellblade', 'fleet', 'physical', 1)) },
@@ -204,8 +215,8 @@ describe('the profile wording list (H117)', () => {
 
   it('keeps literal JSX terse outside help sheets', () => {
     const files = [
-      'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'TemplateTab.tsx',
-      'ClassTab.tsx', 'class-sheets.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'GearTab.tsx', 'PresetButton.tsx',
+      'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'TemplateTab.tsx', 'GearTab.tsx',
+      'ClassTab.tsx', 'class-sheets.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'PresetButton.tsx',
       '../observatory/StarsPanel.tsx', '../observatory/ObservatoryPage.tsx',
     ]
     const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.', 'Unlock an Uma first.'])

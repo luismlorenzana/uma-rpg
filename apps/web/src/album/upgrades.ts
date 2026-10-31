@@ -2,6 +2,8 @@
 // makes a new world object, so the world is the revision: the Stable's 30-second rerun and the profile's renders hit the
 // cache, and a save change recomputes. Only the Stable and the profile ask; pickers and quick looks pay nothing.
 import { activeClass, upgradesFor, type BattleOutfit, type TierWorld, type UmaUpgrades } from '@rpg/domain'
+import { tabDots } from '../places/stable/profile-tabs'
+import { signatureDot } from '../places/stable/template-view'
 import type { RpgUmaRow } from './rows'
 
 const CACHE = new WeakMap<TierWorld, Map<string, UmaUpgrades | null>>()
@@ -20,11 +22,14 @@ export function umaUpgrades(world: TierWorld | null, outfit: BattleOutfit, tier 
   return found
 }
 
-/** The Stable's rows with each owned Uma's upgrades and the `upgrade` facet. */
+/** The Stable's rows with each owned Uma's upgrades and the `upgrade` facet: the mark and the filter follow any tab's dot. */
 export function withUpgrades(rows: readonly RpgUmaRow[], world: TierWorld | null, tier = 1): RpgUmaRow[] {
   return rows.map(row => {
     if (!row.uma) return row
-    const upgrades = umaUpgrades(world, row.outfit, tier)
-    return { ...row, upgrades, facets: { ...row.facets, upgrade: upgrades?.any ?? false } }
+    const found = umaUpgrades(world, row.outfit, tier)
+    const signature = signatureDot(row.outfit, row.uma, activeClass(row.outfit, row.uma, tier))
+    const any = Object.values(tabDots(found, signature)).some(Boolean)
+    const upgrades = found && { ...found, any }
+    return { ...row, upgrades, facets: { ...row.facets, upgrade: any } }
   })
 }

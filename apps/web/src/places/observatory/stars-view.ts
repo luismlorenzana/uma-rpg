@@ -29,7 +29,11 @@ export function mapNodeValue(id: string, classId: RpgClass, knack: keyof typeof 
   }
   if (body === 'vigor') return nodeValueCopy({ kind: 'vigor', hp: value * 5, mp: value })
   if (body === 'guard') return nodeValueCopy({ kind: 'guard', value })
-  if (nodeNumeral(id) === 2 && channel === 'both') return `${nodeValueCopy({ kind: 'stat', stat: 'DEF', value: Math.floor(value / 2) })} · ${nodeValueCopy({ kind: 'stat', stat: 'M.DEF', value: value - Math.floor(value / 2) })}`
+  if (nodeNumeral(id) === 2 && channel === 'both') {
+    const half = Math.floor(value / 2)
+    return half * 2 === value ? nodeValueCopy({ kind: 'guard', value: half })
+      : `${nodeValueCopy({ kind: 'stat', stat: 'DEF', value: half })} · ${nodeValueCopy({ kind: 'stat', stat: 'M.DEF', value: value - half })}`
+  }
   if (nodeNumeral(id) === 2) return nodeValueCopy({ kind: 'stat', stat: channel === 'physical' ? 'DEF' : 'M.DEF', value })
   return knack === 'tireless' ? nodeValueCopy({ kind: 'stat', stat: 'HP', value: value * 5 })
     : knack === 'clever' ? nodeValueCopy({ kind: 'stat', stat: 'MP', value })

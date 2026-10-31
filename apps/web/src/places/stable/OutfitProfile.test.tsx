@@ -171,8 +171,8 @@ describe('the Uma profile v2 frame (H119)', () => {
 
     render(profile('/town/stable/outfit/81001/template'))
     expect(document.querySelector('[data-profile-template]')).not.toBeNull()
-    expect(screen.getByText('Aptitudes')).toBeDefined()
-    expect(screen.getByText('Unique skill')).toBeDefined()
+    expect(screen.getByRole('region', { name: 'Racing' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Racing skill ›' })).toBeDefined()
   })
 
   it('keeps a locked or elsewhere outfit compact and gives it Template content without tabs', () => {

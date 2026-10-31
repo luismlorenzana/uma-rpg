@@ -105,8 +105,7 @@ export function upgradesFor(world: TierWorld, outfitId: string, classId: RpgClas
       }
       for (let slot = 0; slot < uma.gear.accessories.length; slot++) {
         const target: GradeTarget = { kind: 'accessory', slot }
-        if (raiseBlock(uma.gear, target, uma.level, world.items) === null ||
-          (gradeOf(uma.gear, target) >= 1 && uma.gear.accessories[slot]?.family === null)) grades.push(target)
+        if (raiseBlock(uma.gear, target, uma.level, world.items) === null) grades.push(target)
       }
     }
     const map = isStarMap(uma.stars) ? uma.stars : null

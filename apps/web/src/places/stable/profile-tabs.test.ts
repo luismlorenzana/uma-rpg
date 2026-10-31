@@ -48,6 +48,7 @@ describe('the profile v2 tab contract', () => {
     expect(firstDotTab(tabDots(upgrades, true))).toBe('gear')
     expect(firstDotTab(tabDots({ gear: 0, stars: 1 } as UmaUpgrades, true))).toBe('stars')
     expect(firstDotTab(tabDots({ gear: 0, stars: 0 } as UmaUpgrades, true))).toBe('template')
+    expect(tabDots({ gear: 0, stars: 0 } as UmaUpgrades, false).template).toBe(false)
     expect(firstDotTab(tabDots(null, false))).toBeNull()
   })
 

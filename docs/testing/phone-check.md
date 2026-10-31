@@ -82,9 +82,11 @@ button and footer should stay reachable without horizontal page scrolling, in li
 12. **Stars and Template tabs.** Stars reads "Extra Stats · Open n/22 · n ready", her map with a green dot on a node a jewel opens now,
     six totals and her moon's ★ line. Tap a closed node: what it gives, before → after, its jewel with what's held, and **Set**, or
     disabled with `Lv n` or `{Node} first`. **Set**: the sheet stays open on Open and the count falls. **Set all** lists each jewel;
-    **Set n** sets them. Her moon's nodes read "With its moons". Template has Calling, Stride and Knack, her trade, full ★ Flourish,
-    ★ Signature, separate ★ Moon I/II rows, aptitudes and unique racing skill. An All-Rounder Moon II reads `DEF +4 · M.DEF +4`.
-    (D204, D217, D258, D269)
+    **Set n** sets them. Her moon's nodes read "With its moons". On Template, expect her name, three reading tiles, "Calling · … ·
+    fixed" and her trade, four ★ rows, her racing chips with the sources ringed, and **Racing skill ›**. Tap ★ Signature: Gear's
+    accessory sheet; tap her ★ row and the row reads Worn. A Brawler with a Charm ★ reads Not worn with no dot. Tap ★ Flourish on an
+    Uma outside her family: **Fight as …** and the row reads On. Tap a ★ Moon row: Stars' node sheet. An All-Rounder Moon II reads
+    `DEF/M.DEF +4`. (D204, D217, D258, D269, D270)
 13. **Standard preset.** On a promoted Uma, in **Classes** on her own class, tap **Standard preset**: expect **Standard preset ·
     On** and her preset's weapons. On a Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it to read **· On**;
     a Warrior or a Mage shows three rows, each listing its accessories. Check the weapon chips' colours in both themes: the

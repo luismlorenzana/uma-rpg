@@ -1,66 +1,44 @@
-// Her template on the Uma sheet (the Tier rework's R1, engine v16, H70, live since H72; uma-templates.md §5, UT14): the chip
-// and its card, the Racing tab's "Her template" and the Skills tab's ★ Flourish line. From Classes v3 (engine v19, live since
-// H134; CV19, CV21) her calling is her Tier 0 by running style (no pick: the calling pick card retired with H134), her
-// Flourish works as any class of her Tier 0's family and her moon's node II follows its root. Pure. Lazy, with the Stable's
-// pages.
+// The Template tab's rules (H123; D239 UP16–UP19, D240 CV19, CV21; proposal §5): her template's name, the three readings and
+// what each read, her calling and trade, every ★ piece as a label, a number and a state, the racing chips with the three
+// sources ringed, and the Flourish sheet. Her calling is read from her running styles, so nothing here is picked (the pick
+// retired with H134). Pure, on the domain's rules. Lazy, with the Stable's pages.
 import {
-  FLOURISH_NAMES, KEY_LABELS, KNACK_LABEL, KNACK_STAT, STRIDE_LABEL, tradeOfCalling,
-  isGrades, isStarMap, jewelBlock, mapNodeGate, nodeJewel, nodePoints, signatureBonus, signatureWorn,
-  moonChannel, rpgRework, umaCallingPick, umaCallingRow, umaFlourishActive, umaTemplate,
-  type GearTier, type OwnedUma, type RpgClass, type RpgFlourish, type TemplateOutfit, umaPick,
+  ACCESSORY_FAMILY_LABEL, accessoryFamilyUsable, classOf, FLOURISH_NAMES, flourish, isGrades, isStarMap, KEY_LABELS, KNACK_LABEL, KNACK_STAT, mapNodeGate, moonTemplate,
+  rpgClassFamily, rpgClassName, signatureBonus, signatureWorn, STRIDE_LABEL, tradeOfCalling, umaFlourishActive, umaPick, umaTemplate,
+  type AccessoryFamily, type GearTier, type OwnedUma, type RosterOutfit, type RpgClass, type RpgFlourish, type RpgTier0Class, type TemplateOutfit,
 } from '@rpg/domain'
 import type { AptitudeGrade } from '@luismlorenzana/uma-data'
-import { CLASS_LABEL } from '../../battle/labels'
 import { tradeLabel } from '../../save/trade'
-import { flourish, moonNode, signature, trade as tradeCopy } from './copy'
+import { mapNodeValue } from '../observatory/stars-view'
+import { classFooter, classTiles } from './class-view'
+import { atLevel, calling, callingOnUnlock, flourishNow, growth as growthWords, offAs, signatureFirst, worksAs } from './copy'
 
 const STAT_LABEL = { speed: 'Speed', stamina: 'Stamina', power: 'Power', guts: 'Guts', wit: 'Wit' } as const
 const GRADES: readonly AptitudeGrade[] = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
 const DISTANCES = ['sprint', 'mile', 'medium', 'long'] as const
 const STYLES = ['front', 'pace', 'late', 'end'] as const
+const STATS = ['speed', 'stamina', 'power', 'guts', 'wit'] as const
 const rank = (g: AptitudeGrade) => GRADES.indexOf(g)
-/** "a Brawler", "a Mage". */
-const aClass = (classId: RpgClass) => `${/^[AEIOU]/.test(CLASS_LABEL[classId]) ? 'an' : 'a'} ${CLASS_LABEL[classId]}`
-
-/** Her calling pick as the save holds it, when the world owns her. */
-type Holder = Pick<OwnedUma, 'calling'> | null
-
-/** Her stored pick, when it is one of her row's two (a master-data fix can move her out of them; UT4). */
-function pickOf(outfit: TemplateOutfit, uma: Holder): RpgClass | null {
-  const pick = uma ? umaPick(uma) : null
-  return pick && umaCallingPick(outfit)?.options.includes(pick) ? pick : null
-}
-
-/** "Wit 102 ≥ Power 90" or "Power 104 > Wit 90": the stats her calling rule read. */
-function powerWit(outfit: TemplateOutfit): string {
-  const { power, wit } = outfit.baseStats
-  return power > wit ? `Power ${power} > Wit ${wit}` : `Wit ${wit} ≥ Power ${power}`
-}
 const grade = (key: string, g: AptitudeGrade) => `${KEY_LABELS[key] ?? key} ${g}`
 
-/** What her calling reading read, row by row (uma-templates §2.2): "Pace A", "Wit 102 ≥ Power 90"; from v19 her best
- * running styles alone (CV19): "Pace A", "Late A". */
-export function callingSources(outfit: TemplateOutfit): string[] {
-  const { strategy, distance } = outfit.aptitudes
-  if (rpgRework('classes')) {
-    const top = Math.min(...STYLES.map((s) => rank(strategy[s])))
-    return STYLES.filter((s) => rank(strategy[s]) === top).map((s) => grade(s, strategy[s]))
-  }
-  const style = STYLES.reduce((top, s) => (rank(strategy[s]) < rank(strategy[top]) ? s : top))
-  switch (umaCallingRow(outfit)) {
-    case 1: return [grade('front', strategy.front)]
-    case 2: return [grade('late', strategy.late), grade('end', strategy.end)]
-    case 3: return [grade('end', strategy.end)]
-    case 4: return [grade('pace', strategy.pace), grade('sprint', distance.sprint), powerWit(outfit)]
-    default: return [grade(style, strategy[style]), powerWit(outfit)]
-  }
+/** The running styles her calling read (CV19): every style at her top grade. */
+function callingStyles(outfit: TemplateOutfit): typeof STYLES[number][] {
+  const { strategy } = outfit.aptitudes
+  const top = Math.min(...STYLES.map((s) => rank(strategy[s])))
+  return STYLES.filter((s) => rank(strategy[s]) === top)
 }
-/** What her stride read: the longest distance at her best distance grade, "Medium A". */
-export function strideSource(outfit: Pick<TemplateOutfit, 'aptitudes'>): string {
+/** The distance her stride read: the longest at her best distance grade. */
+function strideDistance(outfit: Pick<TemplateOutfit, 'aptitudes'>): typeof DISTANCES[number] {
   const { distance } = outfit.aptitudes
   const top = Math.min(...DISTANCES.map((d) => rank(distance[d])))
-  const longest = [...DISTANCES].reverse().find((d) => rank(distance[d]) === top)!
-  return grade(longest, distance[longest])
+  return [...DISTANCES].reverse().find((d) => rank(distance[d]) === top)!
+}
+/** What her calling reading read: "Pace A", "Late A". */
+export const callingSources = (outfit: TemplateOutfit): string[] => callingStyles(outfit).map((s) => grade(s, outfit.aptitudes.strategy[s]))
+/** What her stride read: "Medium A". */
+export function strideSource(outfit: Pick<TemplateOutfit, 'aptitudes'>): string {
+  const longest = strideDistance(outfit)
+  return grade(longest, outfit.aptitudes.distance[longest])
 }
 /** What her knack read: her top growth rate, "Wit +20%". */
 export function knackSource(outfit: TemplateOutfit): string {
@@ -68,73 +46,127 @@ export function knackSource(outfit: TemplateOutfit): string {
   return `${STAT_LABEL[stat]} +${outfit.growthRatePercents[stat]}%`
 }
 
-/** A Flourish's full line, the Skills tab's root plate (UT6): "★ Even pace · 1% of her max HP a round, up to 4%". From the
- * engine's own numbers, so a tuning moves it. */
-export function flourishLine(value: RpgFlourish): string {
-  return flourish(value, true)
+/** A Flourish's shape and number: "Even pace · 1%/round · max 4%". From the engine's own numbers, so a tuning moves it. */
+export const flourishValue = (value: RpgFlourish): string => flourish(value, true).replace('★ Flourish · ', '').replace(/ · On$/, '')
+/** A Flourish's full line. */
+export const flourishLine = (value: RpgFlourish): string => flourish(value, true)
+
+/** The tab's first dot reason (§5.5, UP18): an accessory slot at G1 or more with no family, or her ★ family not worn while a
+ * slot could wear it. Her ★ only when her weapons can use it (D266): a Charm on three Arms stays off, by choice, as the
+ * standard preset leaves it, and a choice is never flagged. */
+export function signatureDot(outfit: TemplateOutfit, uma: OwnedUma, classId: RpgClass): boolean {
+  if (!isGrades(uma.gear) || !uma.gear.accessories.some((slot) => slot.grade >= 1)) return false
+  if (uma.gear.accessories.some((slot) => slot.grade >= 1 && slot.family === null)) return true
+  const family = umaTemplate(outfit, umaPick(uma)).family
+  return !signatureWorn(uma.gear, family) && accessoryFamilyUsable(family, classOf(uma, classId).weapons)
+}
+/** The slot the Signature row opens: the one wearing her ★, else an empty one at G1 or more, else her highest. */
+export function signatureSlot(uma: OwnedUma, family: AccessoryFamily): number {
+  if (!isGrades(uma.gear)) return 0
+  const slots = uma.gear.accessories
+  const worn = slots.findIndex((slot) => slot.family === family && slot.grade >= 1)
+  if (worn >= 0) return worn
+  const empty = slots.findIndex((slot) => slot.family === null && slot.grade >= 1)
+  if (empty >= 0) return empty
+  return slots.reduce((best, slot, i) => (slot.grade > slots[best]!.grade ? i : best), 0)
 }
 
-/** The chip after her rarity stars (UT14): "★ Clever Spellwright", with a dot while an owned Uma's calling can still be
- * picked. Locked outfits show it too (no dot). */
-export function templateChip(outfit: TemplateOutfit, uma: Holder): { name: string; dot: boolean } {
-  return { name: `★ ${umaTemplate(outfit, pickOf(outfit, uma)).name}`, dot: !!uma && !!umaCallingPick(outfit) && !uma.calling?.confirmed }
+export type TemplateRowKey = 'flourish' | 'signature' | 'moon-1' | 'moon-2'
+/** One ★ piece: a label, a number, its state and the Ready dot. A locked Uma's has no state. */
+export interface TemplateRow { key: TemplateRowKey; label: string; number: string; state: string | null; tone: 'on' | 'off' | 'closed' | null; dot: boolean }
+export interface RacingChip { key: string; label: string; grade: string; ring: boolean }
+export interface TemplateTabView {
+  name: string
+  family: AccessoryFamily
+  readings: { label: 'Calling' | 'Stride' | 'Knack'; value: string; source: string }[]
+  calling: string
+  trade: string
+  rows: TemplateRow[]
+  racing: { groups: { name: string; chips: RacingChip[] }[]; growth: string; growthRing: string | null }
 }
 
-export interface TemplateReading { label: 'Calling' | 'Stride' | 'Knack'; value: string; source: string }
-/** The template card (UT14, R1's part): her name, the three readings with their sources ("Calling ← Pace A, Wit 102 ≥
- * Power 90", or "← picked"), and her Flourish with its state ("★ Even pace · as a Mage · on", "· no effect as Brawler";
- * a locked outfit's has none). */
-export function templateCard(outfit: TemplateOutfit, uma: Holder, classId: RpgClass | null, tier: GearTier = 1,
-  stock: Readonly<Record<string, number>> = {}): {
-  name: string; readings: TemplateReading[]; flourish: string; signature?: string; moon?: string[]
-} {
-  const pick = pickOf(outfit, uma)
-  const t = umaTemplate(outfit, pick)
+const chips = <K extends string>(grades: Readonly<Record<K, string>>, rings: readonly string[]): RacingChip[] =>
+  (Object.keys(grades) as K[]).map((key) => ({ key, label: KEY_LABELS[key] ?? key, grade: grades[key], ring: rings.includes(key) }))
+
+/** Her moon's state: Open, her level's gate, or waiting on the moons it opens with (D264). */
+function moonState(uma: OwnedUma, node: string): string {
+  if (isStarMap(uma.stars) && uma.stars.open.includes(node)) return 'Open'
+  return uma.level < mapNodeGate(node) ? `Lv ${mapNodeGate(node)}` : 'With its moons'
+}
+
+/** The tab: `uma` null for a locked or elsewhere outfit, its rows with numbers and no states. */
+export function templateTab(outfit: RosterOutfit, uma: OwnedUma | null, classId: RpgClass | null, tier: GearTier): TemplateTabView {
+  const t = umaTemplate(outfit, uma ? umaPick(uma) : null)
+  const moon = moonTemplate(outfit, uma ? umaPick(uma) : null)
+  const name = rpgClassName(t.calling)
   const on = classId !== null && umaFlourishActive(t, classId)
-  const owned = uma && 'gear' in uma ? uma as OwnedUma : null
-  const gradeGear = owned && isGrades(owned.gear) ? owned.gear : null
-  const graded = gradeGear && owned && isStarMap(owned.stars)
-  const family = t.family
-  const signatureLine = graded ? signature(signatureBonus(owned.level, tier), signatureWorn(gradeGear, family)) : undefined
-  const status = (id: string): 'Open' | 'Ready' | `Lv ${number}` => {
-    if (owned && isStarMap(owned.stars) && owned.stars.open.includes(id)) return 'Open'
-    if (owned && isStarMap(owned.stars) && jewelBlock(owned.stars, nodeJewel(id), id, owned.level, stock) === null) return 'Ready'
-    return `Lv ${mapNodeGate(id)}`
+  const value = (node: string) => mapNodeValue(node, t.calling, moon.knack, moon.channel, tier)
+  const worn = uma && isGrades(uma.gear) ? signatureWorn(uma.gear, t.family) : false
+  const graded = uma && isGrades(uma.gear) ? uma.gear.accessories.some((slot) => slot.grade >= 1) : false
+  const bonus = `ATK/M.ATK +${signatureBonus(uma?.level ?? 50, tier)}`
+  const flourishRow: TemplateRow = { key: 'flourish', label: '★ Flourish', number: flourishValue(t.flourish), dot: false,
+    state: uma ? (on ? 'On' : offAs(rpgClassName(classId!))) : null, tone: uma ? (on ? 'on' : 'off') : null }
+  const signatureRow: TemplateRow = uma
+    ? { key: 'signature', label: '★ Signature', number: bonus, state: worn ? 'Worn' : graded ? 'Not worn' : signatureFirst, tone: worn ? 'on' : graded ? null : 'closed',
+        dot: signatureDot(outfit, uma, classId!) }
+    : { key: 'signature', label: '★ Signature', number: atLevel(bonus, 50), state: null, tone: null, dot: false }
+  const moonRow = (key: 'moon-1' | 'moon-2', label: string, node: string): TemplateRow => {
+    const state = uma ? moonState(uma, node) : null
+    return { key, label, number: value(node), state, tone: state === null ? null : state === 'Open' ? 'on' : 'closed', dot: false }
   }
-  const one = nodePoints('template:1', tier), two = nodePoints('template:2', tier)
-  const knack = t.knack === 'tireless' ? `HP +${one * 5}` : t.knack === 'clever' ? `MP +${one}`
-    : t.knack === 'mighty' ? `DEF/M.DEF +${one}` : t.knack === 'fleet' ? 'Evasion +2.4%' : 'Limit start +1'
-  const channel = moonChannel(t.calling)
-  const defense = channel === 'both' ? `DEF +${Math.floor(two / 2)} · M.DEF +${two - Math.floor(two / 2)}`
-    : channel === 'magical' ? `M.DEF +${two}` : `DEF +${two}`
+  const styles = callingStyles(outfit) as readonly string[]
+  const knackStat = KNACK_STAT[t.knack]
+  const rates = STATS.filter((stat) => outfit.growthRatePercents[stat] > 0).map((stat) => ({ stat: STAT_LABEL[stat], percent: outfit.growthRatePercents[stat] }))
   return {
     name: t.name,
+    family: t.family,
     readings: [
-      { label: 'Calling', value: CLASS_LABEL[t.calling], source: pick ? 'picked' : callingSources(outfit).join(', ') },
+      { label: 'Calling', value: name, source: callingSources(outfit).join(' · ') },
       { label: 'Stride', value: STRIDE_LABEL[t.stride], source: strideSource(outfit) },
-      { label: 'Knack', value: KNACK_LABEL[t.knack], source: knackSource(outfit) },
+      { label: 'Knack', value: KNACK_LABEL[t.knack], source: `${knackSource(outfit)} · ${ACCESSORY_FAMILY_LABEL[t.family]}` },
     ],
-    flourish: flourish(t.flourish, on),
-    ...(signatureLine ? { signature: signatureLine, moon: [moonNode('I', knack, status('template:1')), moonNode('II', defense, status('template:2'))] } : {}),
+    calling: uma ? calling(name) : callingOnUnlock(name),
+    trade: tradeLabel(tradeOfCalling(t.calling)),
+    rows: [flourishRow, signatureRow, moonRow('moon-1', '★ Moon I', 'template:1'), moonRow('moon-2', '★ Moon II', 'template:2')],
+    racing: {
+      groups: [
+        { name: 'Surface', chips: chips(outfit.aptitudes.surface, []) },
+        { name: 'Distance', chips: chips(outfit.aptitudes.distance, [strideDistance(outfit)]) },
+        { name: 'Style', chips: chips(outfit.aptitudes.strategy, styles) },
+      ],
+      growth: growthWords(rates),
+      growthRing: STAT_LABEL[knackStat],
+    },
   }
 }
 
-/** The Racing tab's "Her template" (UT14): Calling, Stride, Knack and Flourish, each with its note. `classId` is the class
- * she fights as (null for a locked outfit: "As a Mage"). */
-export function racingTemplate(outfit: TemplateOutfit, uma: Holder, classId: RpgClass | null): { label: string; value: string; note: string }[] {
-  const pick = pickOf(outfit, uma)
-  const t = umaTemplate(outfit, pick)
-  return [
-    { label: 'Calling', value: CLASS_LABEL[t.calling], note: pick ? 'Picked' : callingSources(outfit).join(' · ') },
-    { label: 'Stride', value: STRIDE_LABEL[t.stride], note: strideSource(outfit) },
-    { label: 'Knack', value: KNACK_LABEL[t.knack], note: knackSource(outfit) },
-    { label: 'Flourish', value: FLOURISH_NAMES[t.flourish],
-      note: classId === null ? `As ${aClass(t.calling)}` : umaFlourishActive(t, classId) ? 'Active' : `No effect as ${CLASS_LABEL[classId]}` },
-  ]
+/** One class of her family in the Flourish sheet. */
+export interface FlourishChip { classId: RpgClass; name: string; tappable: boolean; selected: boolean }
+export interface FlourishSheetView {
+  shape: string
+  flourishName: string
+  works: string
+  now: string
+  chips: FlourishChip[]
+  footer: { label: string; classId: RpgClass } | null
 }
-
-/** Her trade on the template card (R2, UT14; H80): "Trade · Monster Den · Lapidary", from her calling. */
-export function templateTrade(outfit: TemplateOutfit, uma: Holder): string {
-  const [place, maker] = tradeLabel(tradeOfCalling(umaTemplate(outfit, pickOf(outfit, uma)).calling)).split(' · ') as [string, string]
-  return `Trade · ${tradeCopy(place, maker)}`
+/**
+ * The Flourish sheet (§5.3): its shape and number, what it works as, how it stands, and while it's off her family's classes
+ * she can fight as: a tap selects, the default the highest Class Rank she holds (a Tier 1 class before its Tier 0 at a tie),
+ * and the footer is Fight as …, or Start … · R1 on a Tier 0 she hasn't started. In a later tier's world the family has no Tier 0.
+ */
+export function flourishSheet(outfit: RosterOutfit, uma: OwnedUma, classId: RpgClass, tier: number | string, selected: RpgClass | null): FlourishSheetView {
+  const t = umaTemplate(outfit, umaPick(uma))
+  const on = umaFlourishActive(t, classId)
+  const family = rpgClassFamily(t.calling as RpgTier0Class)
+  const tiles = classTiles(outfit, uma, tier).filter((tile) => family.includes(tile.classId))
+    .sort((a, b) => family.indexOf(a.classId) - family.indexOf(b.classId))
+  const base = { shape: flourishValue(t.flourish), flourishName: FLOURISH_NAMES[t.flourish], works: worksAs(family.map((c) => rpgClassName(c))), now: flourishNow(on, rpgClassName(classId)) }
+  if (on) return { ...base, chips: [], footer: null }
+  const can = tiles.filter((tile) => tile.state === 'available' || tile.state === 'open')
+  const held = can.filter((tile) => tile.state === 'available').sort((a, b) => b.rank - a.rank || b.tier - a.tier)
+  const pick = can.find((tile) => tile.classId === selected) ?? held[0] ?? can[0]
+  const footer = pick ? classFooter(pick) : null
+  return { ...base, chips: tiles.map((tile) => ({ classId: tile.classId, name: tile.name, tappable: can.includes(tile), selected: tile === pick })),
+    footer: pick && footer ? { label: footer.label, classId: pick.classId } : null }
 }

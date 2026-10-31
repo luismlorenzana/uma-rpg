@@ -57,7 +57,7 @@ export const armorHalf = (half: 'physical' | 'magical'): string => half === 'phy
 /** C10: a selected kind the Uma no longer holds. */
 export const staleKind = (weapon: string): string => `${weapon} not held`
 
-export type MoonState = 'Open' | 'Ready' | `Lv ${number}`
+export type MoonState = 'Open' | 'With its moons' | `Lv ${number}`
 /** C1/C7: one of her two moon rows. */
 export const moonNode = (roman: 'I' | 'II', stat: string, state: MoonState): string => `★ Moon ${roman} · ${stat} · ${state}`
 /** C1: opened Extra Stats nodes. */
@@ -89,6 +89,22 @@ export const itemCount = (item: string, count: number, held?: number): string =>
   `${item} ×${n(count)}${held === undefined ? '' : ` · ${n(held)} held`}`
 /** C3: a template reading and its source. */
 export const reading = (value: string, source: string): string => `${value} · ${source === 'Picked' ? 'Picked' : `from ${source}`}`
+/** C7: her calling, as the Template tab reads it. */
+export const calling = (name: string): string => `Calling · ${name} · fixed`
+export const callingOnUnlock = (name: string): string => `Calling on unlock · ${name}`
+/** C7: what a Flourish works as, and how it stands now. */
+export const worksAs = (names: readonly string[]): string => `Works as · ${names.join(', ')}`
+export const flourishNow = (on: boolean, name: string): string => (on ? 'Now · On' : `Now · ${offAs(name)}`)
+/** C7: a ★ piece's state outside her family. */
+export const offAs = (name: string): string => `Off · as ${name}`
+/** C9: her signature's first gate. */
+export const signatureFirst = 'G1 first'
+/** C1: a locked Uma's number, at the level it's read. */
+export const atLevel = (value: string, at: number): string => `${value} · ${level(at)}`
+/** C1: her growth rates that aren't 0. */
+export const growth = (rates: readonly { stat: string; percent: number }[]): string => rates.map(({ stat, percent }) => `${stat} +${n(percent)}%`).join(' · ')
+/** C7: the racing skill's row. */
+export const racingSkill = 'Racing skill'
 /** C3: a trade. */
 export const trade = (place: string, maker: string): string => `${place} · ${maker}`
 /** C7: the three compact profile facts. */

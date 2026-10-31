@@ -22,12 +22,12 @@ describe('Can upgrade on the Stable (H34)', () => {
   it('withUpgrades sets the facet, and the Can upgrade preset keeps only those Umas', async () => {
     const { view, world } = await albumFixture()
     const aster = world.umas['81001']!
-    // Her accessory slot raised to G1 with no family yet: she can choose one (R2, live since H82).
+    // Her accessory slot raised to G1 with no family yet: Template's dot (H123), so the roster's mark and filter follow it.
     world.umas['81001'] = { ...aster, gear: { weapons: {}, armor: {}, accessories: [{ grade: 1, family: null, form: 'base' }] } }
     const plain = albumRows(view, world, [], NOW)
     expect(plain.every(row => row.upgrades === null && row.facets.upgrade === false)).toBe(true)
     const rows = withUpgrades(plain, world)
-    expect(rows.find(row => row.id === '81001')).toMatchObject({ upgrades: { grades: [{ kind: 'accessory', slot: 0 }], any: true }, facets: { upgrade: true } })
+    expect(rows.find(row => row.id === '81001')).toMatchObject({ upgrades: { grades: [], any: true }, facets: { upgrade: true } })
     expect(rows.find(row => row.id === '81006')).toMatchObject({ upgrades: null, facets: { upgrade: false } })
     const picked = STABLE_PRESETS.find(p => p.key === 'upgrade')!.apply(STABLE_SCHEMA.fallback)
     expect(picked.filters).toEqual({ upgrade: true })

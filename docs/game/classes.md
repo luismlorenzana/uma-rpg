@@ -248,8 +248,8 @@ stride give her type, her knack its word: "Clever Spellwright". Five callings ×
 
 Its four pieces all work in Tier 1:
 
-- **★ Her Flourish** works while she fights as any class of her calling's family: her Tier 0 and its children ("No
-  effect as Sorcerer" otherwise). A Spellblade or a Summoner belongs to two families, so a Warrior-calling Uma and a
+- **★ Her Flourish** works while she fights as any class of her calling's family: her Tier 0 and its children ("Off ·
+  as Sorcerer" otherwise). A Spellblade or a Summoner belongs to two families, so a Warrior-calling Uma and a
   Spellblade-calling Uma both keep it as an Arms Spellblade. It gives 4% of her max HP a fight, in her stride's shape. Clean
   break's Barrier lapses at round 1's end. Not a heal skill: no healing scale, it never overheals, and a fallen Uma gets
   none. Once a fight, not each wave ([combat](combat.md#sustain-mp-and-the-flourish)).
@@ -257,7 +257,8 @@ Its four pieces all work in Tier 1:
   Pendant, Gritty and Clever the Insignia. While one of her accessory slots wears that family at G1 or more, her ATK and M.ATK
   rise 0.1 a level × the tier (Tier 1: +1, +3, +5 at Lv 10, 30, 50; D266), whatever class she fights as. Her standard preset
   wears it unless her weapons can't use it, and a slot's list shows her family first with a ★ ([materials](materials.md#gear)).
-- **★ Her moon** (UT10, D213): two nodes beside her Extra Stats map, opened by a Moon Jewel II (Lv 16) and IV (Lv 36).
+- **★ Her moon** (UT10, D213): two nodes beside her Extra Stats map. They take no jewel: node I opens with the third moon's
+  node II (Lv 16 at the earliest) and node II with the third moon's node IV (Lv 36; D264).
   Node I gives +4 × the tier to her knack's stat: Tireless HP, Clever MP, Mighty DEF and M.DEF, Fleet 4 Speed points
   (2.4% evasion) and Gritty 4 Limit points (a starting charge of 1), those two in every tier. Node II gives +8 × the tier
   to her calling's root's defense: DEF +8 for a Warrior, M.DEF +8 for a Mage, DEF +4 and M.DEF +4
@@ -268,8 +269,8 @@ Its four pieces all work in Tier 1:
   switch or a promotion never moves it.
 - **Nothing else moves:** a template adds no damage kind, lean, hand or rule, and never takes anything away.
 
-The template's chip and card are on the Uma sheet ([sections](sections.md#stable)); the Stable filters by calling,
-stride, knack, signature and trade.
+Her profile's Template tab shows all of it ([sections](sections.md#stable)); the Stable filters by calling, stride, knack,
+signature and trade.
 
 ## Weapons
 

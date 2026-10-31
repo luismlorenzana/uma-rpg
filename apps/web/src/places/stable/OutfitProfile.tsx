@@ -4,7 +4,7 @@ import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/conte
 import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
 import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import {
-  RPG_TIER_MAX_LEVEL, SaveRuleError, activeClass, rpgExpToNext, umaCallingPick,
+  RPG_TIER_MAX_LEVEL, SaveRuleError, activeClass, rpgExpToNext,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
@@ -20,6 +20,7 @@ import { ClassTab } from './ClassTab'
 import { DetailsSheet } from './DetailsSheet'
 import { FactsRow } from './FactsRow'
 import { GearTab } from './GearTab'
+import { signatureDot } from './template-view'
 import { TemplateTab } from './TemplateTab'
 import { exp, level, unlock as unlockCopy } from './copy'
 import { PROFILE_TABS, rememberTab, storedTab, tabDots, tabFromRoute, type ProfileTab } from './profile-tabs'
@@ -76,8 +77,7 @@ export function OutfitProfile({ view, outfitId, place, route }: OutfitProfilePro
   const tab = routed ?? remembered
   const classId = owned ? activeClass(outfit, owned, tier) : null
   const upgrades = owned && world ? umaUpgrades(world, outfit, tier) : null
-  const callingOpen = !!owned && !!umaCallingPick(outfit) && !owned.calling?.confirmed
-  const dots = tabDots(upgrades, callingOpen)
+  const dots = tabDots(upgrades, !!owned && !!classId && signatureDot(outfit, owned, classId))
   const next = owned && owned.level < RPG_TIER_MAX_LEVEL ? rpgExpToNext(owned.level) : null
 
   return (
@@ -108,9 +108,9 @@ export function OutfitProfile({ view, outfitId, place, route }: OutfitProfilePro
             {tab === 'class' && <ClassTab outfit={outfit} uma={owned} world={world} />}
             {tab === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} tier={tier as 1 | 2 | 3} upgrades={upgrades} />}
             {tab === 'stars' && <StarsPanel outfit={outfit} uma={owned} world={world} tier={tier as 1 | 2 | 3} />}
-            {tab === 'template' && <TemplateTab view={view} outfit={outfit} uma={owned} classId={classId} tier={tier as 1 | 2 | 3} stock={world.items} />}
+            {tab === 'template' && <TemplateTab view={view} outfit={outfit} uma={owned} world={world} tier={tier as 1 | 2 | 3} />}
           </>
-        ) : <TemplateTab view={view} outfit={outfit} uma={null} classId={null} tier={tier as 1 | 2 | 3} stock={world?.items ?? {}} />}
+        ) : <TemplateTab view={view} outfit={outfit} uma={null} world={null} tier={tier as 1 | 2 | 3} />}
       </ProfileFrame>
       {owned && <DetailsSheet open={details} onClose={() => setDetails(false)} outfit={outfit} uma={owned} tier={tier} />}
     </>

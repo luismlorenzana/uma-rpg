@@ -1,86 +1,160 @@
-// Her template on the Uma sheet (H70, live since H72; uma-templates.md §5, UT14): the chip, the card's readings with their
-// sources, the Racing tab's rows, the root plate's ★ line and the moon's line. From Classes v3 (live since H134; CV19, CV21)
-// her calling is her Tier 0 by running style, with no pick (the calling pick card retired with H134), and her Flourish
-// works as any class of that Tier 0's family. Invented outfits.
+// The Template tab's rules (H123; uma-templates.md §5, UT14; CV19, CV21): the readings with what they read, her calling and trade,
+// every ★ row's number and state, the racing rings, the Flourish sheet, and the signature dot, which skips a ★ her weapons
+// can't use (D266). Her calling comes from her running styles, with nothing to pick. Invented outfits.
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
-import { newOwnedUma, nodePoints, type TemplateOutfit } from '@rpg/domain'
+import { newGrades, newOwnedUma, type AccessorySlotState, type OwnedUma, type RosterOutfit, type RpgClass, type RpgWeapon } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { flourishLine, racingTemplate, templateCard, templateChip } from './template-view'
+import { flourishLine, flourishSheet, signatureDot, signatureSlot, templateTab } from './template-view'
 
+const NOW = '2026-10-31T12:00:00.000Z'
 type Grades<K extends string> = Partial<Record<K, AptitudeGrade>>
 const outfit = (style: Grades<keyof Aptitudes['strategy']>, distance: Grades<keyof Aptitudes['distance']>, power: number, wit: number,
-  growth: Partial<TemplateOutfit['growthRatePercents']>): TemplateOutfit => ({
-  baseStats: { speed: 100, stamina: 100, power, guts: 100, wit },
+  growth: Partial<RosterOutfit['growthRatePercents']>): RosterOutfit => ({
+  outfitId: '81001', baseStats: { speed: 100, stamina: 100, power, guts: 100, wit },
   growthRatePercents: { speed: 0, stamina: 0, power: 0, guts: 0, wit: 0, ...growth },
-  aptitudes: { strategy: { front: 'C', pace: 'C', late: 'C', end: 'C', ...style }, distance: { sprint: 'C', mile: 'C', medium: 'C', long: 'C', ...distance } },
-})
-/** uma-templates §6.2's made-up Umas, by Classes v3's calling: C a Pace Uma (a Spellblade; Wit over Power, which no longer
- * counts), D a Late and End one (a Summoner), A a front runner (a Warrior), I a Pace and Late one (a Mage). */
+  aptitudes: { surface: { turf: 'A', dirt: 'G' }, strategy: { front: 'C', pace: 'C', late: 'C', end: 'C', ...style }, distance: { sprint: 'C', mile: 'C', medium: 'C', long: 'C', ...distance } },
+} as unknown as RosterOutfit)
+/** C a Pace Uma (a Spellblade, Clever, so a Charm), D a Late and End one (a Summoner), A a front runner (a Warrior, Tireless),
+ * I a Pace and Late one (a Mage), F a Fleet Warrior. */
 const C = outfit({ pace: 'A' }, { medium: 'A' }, 90, 102, { wit: 20 })
 const D = outfit({ late: 'A', end: 'A' }, { long: 'A' }, 104, 88, { power: 20 })
 const A = outfit({ front: 'A' }, { medium: 'A', long: 'A' }, 88, 86, { stamina: 20 })
-const I = outfit({ pace: 'A', late: 'A' }, { medium: 'A' }, 90, 102, { wit: 20 })
-const open = { calling: { pick: null, confirmed: false } }
+const I = outfit({ pace: 'A', late: 'A' }, { medium: 'A' }, 90, 102, { wit: 20, power: 10 })
 
-describe('her template on the sheet (H70; Classes v3 from H134)', () => {
-  it('names her on the chip by her Tier 0, owned or locked, with no dot: there is no calling to pick', () => {
-    expect(templateChip(C, open)).toEqual({ name: '★ Clever Spellfencer', dot: false })
-    // A stored pick from before the switch changes nothing.
-    expect(templateChip(C, { calling: { pick: 'mage', confirmed: false } })).toEqual({ name: '★ Clever Spellfencer', dot: false })
-    expect(templateChip(C, null)).toEqual({ name: '★ Clever Spellfencer', dot: false })
-    expect(templateChip(A, open)).toEqual({ name: '★ Tireless Ironhide', dot: false })
-  })
+function uma(classId: RpgClass, slots: AccessorySlotState[] = [], extra: Partial<OwnedUma> = {}): OwnedUma {
+  const gear = newGrades(1)
+  slots.forEach((slot, i) => { gear.accessories[i] = slot })
+  return { ...newOwnedUma(NOW), classId, level: 40, gear, ranks: { classes: { [classId]: { rank: 34, exp: 0 } } }, ...extra }
+}
+const slot = (grade: number, family: AccessorySlotState['family'] = null): AccessorySlotState => ({ grade, family, form: 'base' })
+const row = (view: ReturnType<typeof templateTab>, key: string) => view.rows.find((r) => r.key === key)!
 
-  it('reads the card: the three readings and their sources, then her Flourish and its state', () => {
-    expect(templateCard(C, open, 'duelist')).toEqual({
-      name: 'Clever Spellfencer',
-      readings: [
-        { label: 'Calling', value: 'Spellblade', source: 'Pace A' },
-        { label: 'Stride', value: 'Middle', source: 'Medium A' },
-        { label: 'Knack', value: 'Clever', source: 'Wit +20%' },
-      ],
-      flourish: '★ Flourish · Even pace · 1%/round · max 4% · On',
-    })
-    // On as any class of her Tier 0's family; off outside it.
-    expect(templateCard(C, open, 'tomeblade')!.flourish).toBe('★ Flourish · Even pace · 1%/round · max 4% · On')
-    expect(templateCard(C, open, 'brawler')!.flourish).toBe('★ Flourish · Even pace · 1%/round · max 4% · Off')
-    expect(templateCard(C, null, null)!.flourish).toBe('★ Flourish · Even pace · 1%/round · max 4% · Off')
-    // A stored pick isn't read: her calling still comes from her style.
-    const picked = templateCard(C, { calling: { pick: 'spellblade', confirmed: false } }, 'spellblade')!
-    expect(picked.readings[0]).toEqual({ label: 'Calling', value: 'Spellblade', source: 'Pace A' })
-    // A front runner's calling reads her style; the longest distance at her best grade is her stride.
-    expect(templateCard(A, open, 'recruit')!.readings).toEqual([
-      { label: 'Calling', value: 'Warrior', source: 'Front A' },
-      { label: 'Stride', value: 'Stayer', source: 'Long A' },
-      { label: 'Knack', value: 'Tireless', source: 'Stamina +20%' },
+describe('the Template tab (H123)', () => {
+  it('reads her name, the three readings and what each read, her calling and trade', () => {
+    const view = templateTab(C, uma('duelist'), 'duelist', 1)
+    expect(view.name).toBe('Clever Spellfencer')
+    expect(view.readings).toEqual([
+      { label: 'Calling', value: 'Spellblade', source: 'Pace A' },
+      { label: 'Stride', value: 'Middle', source: 'Medium A' },
+      { label: 'Knack', value: 'Clever', source: `Wit +20% · ${view.readings[2]!.source.split(' · ')[1]}` },
     ])
-    expect(templateCard(D, open, 'caller')!.readings[0]).toEqual({ label: 'Calling', value: 'Summoner', source: 'Late A, End A' })
-    expect(templateCard(I, open, 'apprentice')!.readings[0]).toEqual({ label: 'Calling', value: 'Mage', source: 'Pace A, Late A' })
+    expect(view.calling).toBe('Calling · Spellblade · fixed')
+    expect(view.trade).toMatch(/^.+ · .+$/)
+    // Every style at her top grade, with no Power or Wit.
+    expect(templateTab(I, uma('apprentice'), 'apprentice', 1).readings[0]).toMatchObject({ value: 'Mage', source: 'Pace A · Late A' })
   })
 
-  it('fills the Racing tab\'s "Her template", Active or no effect', () => {
-    expect(racingTemplate(C, open, 'duelist')).toEqual([
-      { label: 'Calling', value: 'Spellblade', note: 'Pace A' },
-      { label: 'Stride', value: 'Middle', note: 'Medium A' },
-      { label: 'Knack', value: 'Clever', note: 'Wit +20%' },
-      { label: 'Flourish', value: 'Even pace', note: 'Active' },
-    ])
-    expect(racingTemplate(C, open, 'spellblade')![3]!.note).toBe('Active')
-    expect(racingTemplate(C, open, 'brawler')![3]!.note).toBe('No effect as Brawler')
-    expect(racingTemplate(C, { calling: { pick: 'spellblade', confirmed: true } }, 'spellblade')![0]).toEqual({ label: 'Calling', value: 'Spellblade', note: 'Pace A' })
-    expect(racingTemplate(C, null, null)![3]!.note).toBe('As a Spellblade')
+  it('rings the three sources: her styles, her stride\'s distance, her knack\'s growth', () => {
+    const { racing } = templateTab(I, uma('apprentice'), 'apprentice', 1)
+    const ringed = (name: string) => racing.groups.find((g) => g.name === name)!.chips.filter((c) => c.ring).map((c) => c.key)
+    expect(ringed('Style')).toEqual(['pace', 'late'])
+    expect(ringed('Distance')).toEqual(['medium'])
+    expect(ringed('Surface')).toEqual([])
+    expect(racing.growth).toBe('Power +10% · Wit +20%')
+    expect(racing.growthRing).toBe('Wit')
+    expect(templateTab(A, uma('recruit'), 'recruit', 1).racing.groups[1]!.chips.filter((c) => c.ring).map((c) => c.key)).toEqual(['long'])
   })
 
-  it('words her Flourish in one line', () => {
+  it('reads the Flourish On as any class of her family, and Off · as her class, never a dot', () => {
+    expect(row(templateTab(C, uma('tomeblade'), 'tomeblade', 1), 'flourish')).toMatchObject({ number: 'Even pace · 1%/round · max 4%', state: 'On', tone: 'on', dot: false })
+    expect(row(templateTab(C, uma('brawler'), 'brawler', 1), 'flourish')).toMatchObject({ state: 'Off · as Brawler', tone: 'off', dot: false })
+  })
+
+  it('reads the signature Worn, Not worn and G1 first', () => {
+    const family = templateTab(C, uma('duelist'), 'duelist', 1).family
+    const other = family === 'pendant' ? 'orb' : 'pendant'
+    expect(row(templateTab(C, uma('duelist', [slot(3, family)]), 'duelist', 1), 'signature')).toMatchObject({ number: 'ATK/M.ATK +4', state: 'Worn', tone: 'on', dot: false })
+    expect(row(templateTab(C, uma('duelist', [slot(3, other)]), 'duelist', 1), 'signature')).toMatchObject({ state: 'Not worn', dot: true })
+    expect(row(templateTab(C, uma('duelist', [slot(0, family)]), 'duelist', 1), 'signature')).toMatchObject({ state: 'G1 first', dot: false })
+  })
+
+  it('reads her moon: Open, its level, or waiting on the moons it opens with', () => {
+    const open = { stars: { open: ['template:1'], moons: [] as [] } }
+    expect(row(templateTab(A, uma('recruit', [], open), 'recruit', 1), 'moon-1')).toMatchObject({ number: 'HP +20', state: 'Open' })
+    expect(row(templateTab(A, uma('recruit', [], { level: 10 }), 'recruit', 1), 'moon-1').state).toBe('Lv 16')
+    expect(row(templateTab(A, uma('recruit'), 'recruit', 1), 'moon-1').state).toBe('With its moons')
+  })
+
+  it('reads moon II by her calling\'s root', () => {
+    expect(row(templateTab(A, uma('recruit'), 'recruit', 1), 'moon-2').number).toBe('DEF +8')
+    expect(row(templateTab(I, uma('apprentice'), 'apprentice', 1), 'moon-2').number).toBe('M.DEF +8')
+    expect(row(templateTab(C, uma('duelist'), 'duelist', 1), 'moon-2').number).toBe('DEF/M.DEF +4')
+    expect(row(templateTab(D, uma('caller'), 'caller', 1), 'moon-2').number).toBe('DEF/M.DEF +4')
+  })
+
+  it('shows a locked outfit the same rows with numbers and no states', () => {
+    const view = templateTab(C, null, null, 1)
+    expect(view.calling).toBe('Calling on unlock · Spellblade')
+    expect(view.rows.map((r) => r.state)).toEqual([null, null, null, null])
+    expect(row(view, 'signature').number).toBe('ATK/M.ATK +5 · Lv 50')
+    expect(view.rows.every((r) => !r.dot)).toBe(true)
+  })
+
+  it('words a Flourish in one line', () => {
     expect(flourishLine('late-reserve')).toBe('★ Flourish · Late reserve · round 3+ · 2%/round · max 4% · On')
     expect(flourishLine('clean-break')).toBe('★ Flourish · Clean break · Barrier 4% · start · On')
   })
+})
 
-  it('reads the moon\'s node II by her Tier 0\'s root: a Warrior DEF, a Mage M.DEF, the All-Rounders both', () => {
-    const owned = newOwnedUma('2026-10-29T12:00:00.000Z')
-    const two = nodePoints('template:2', 1), half = Math.floor(two / 2)
-    expect(templateCard(A, owned, 'recruit')!.moon?.[1]).toContain(`★ Moon II · DEF +${two} · `)
-    expect(templateCard(I, owned, 'apprentice')!.moon?.[1]).toContain(`★ Moon II · M.DEF +${two} · `)
-    expect(templateCard(C, owned, 'duelist')!.moon?.[1]).toContain(`★ Moon II · DEF +${half} · M.DEF +${two - half} · `)
+describe('the signature dot (H123, D266)', () => {
+  const ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance']
+  const armed = (slots: AccessorySlotState[]) => uma('brawler', slots, { classes: { brawler: { weapons: ARMS, lines: {}, loadout: null } } })
+  const family = (o: RosterOutfit) => templateTab(o, null, null, 1).family
+
+  it('flags an empty slot at G1 for anyone, and nothing at G0 or when worn', () => {
+    expect(signatureDot(C, uma('duelist', [slot(1)]), 'duelist')).toBe(true)
+    expect(signatureDot(C, uma('duelist', [slot(0)]), 'duelist')).toBe(false)
+    expect(signatureDot(C, uma('duelist', [slot(2, family(C))]), 'duelist')).toBe(false)
+  })
+
+  it('flags her ★ not worn only when her weapons can use it, as the standard preset does', () => {
+    const fleet = outfit({ front: 'A' }, { medium: 'A' }, 100, 90, { speed: 20 })
+    expect(family(fleet)).toBe('bell')
+    // A Charm on three Arms stays off by choice: Not worn, with no dot.
+    const charmless = armed([slot(4, 'pendant'), slot(4, 'pendant'), slot(4, 'orb')])
+    expect(signatureDot(fleet, charmless, 'brawler')).toBe(false)
+    expect(row(templateTab(fleet, charmless, 'brawler', 1), 'signature')).toMatchObject({ state: 'Not worn', dot: false })
+    const hybrid = uma('spellblade', [slot(4, 'pendant')], { classes: { spellblade: { weapons: ['katana', 'lance', 'tome-lightning'], lines: {}, loadout: null } } })
+    expect(signatureDot(fleet, hybrid, 'spellblade')).toBe(true)
+  })
+
+  it('opens the slot wearing her ★, else an empty one at G1, else her highest', () => {
+    const f = family(C)
+    const other = f === 'pendant' ? 'orb' : 'pendant'
+    expect(signatureSlot(uma('duelist', [slot(2, other), slot(1, f)]), f)).toBe(1)
+    expect(signatureSlot(uma('duelist', [slot(5, other), slot(0, f), slot(1)]), f)).toBe(2)
+    expect(signatureSlot(uma('duelist', [slot(2, other), slot(6, other)]), f)).toBe(1)
+    expect(signatureSlot(uma('duelist'), f)).toBe(0)
+  })
+})
+
+describe('the Flourish sheet (H123)', () => {
+  it('reads On with what it works as, and no action', () => {
+    const view = flourishSheet(A, uma('brawler'), 'brawler', 1, null)
+    expect(view).toMatchObject({ shape: flourishSheet(A, uma('brawler'), 'brawler', 1, null).shape, now: 'Now · On', chips: [], footer: null })
+    expect(view.works).toBe('Works as · Warrior, Brawler, Arms Spellblade, Arms Summoner')
+  })
+
+  it('offers her family while it\'s off: the highest she holds first, a Tier 1 class before its Tier 0 at a tie', () => {
+    const her = uma('apprentice', [], { ranks: { classes: { apprentice: { rank: 10, exp: 0 }, recruit: { rank: 10, exp: 0 }, brawler: { rank: 10, exp: 0 } } } })
+    const view = flourishSheet(A, her, 'apprentice', 1, null)
+    expect(view.now).toBe('Now · Off · as Mage')
+    expect(view.chips.map((c) => [c.name, c.tappable, c.selected])).toEqual([
+      ['Warrior', true, false], ['Brawler', true, true], ['Arms Spellblade', false, false], ['Arms Summoner', false, false],
+    ])
+    expect(view.footer).toEqual({ label: 'Fight as Brawler', classId: 'brawler' })
+    expect(flourishSheet(A, her, 'apprentice', 1, 'recruit').footer).toEqual({ label: 'Fight as Warrior', classId: 'recruit' })
+  })
+
+  it('reads Start … · R1 on a Tier 0 she hasn\'t started', () => {
+    const her = uma('apprentice', [], { ranks: { classes: { apprentice: { rank: 3, exp: 0 } } } })
+    expect(flourishSheet(A, her, 'apprentice', 1, null).footer).toEqual({ label: 'Start Warrior · R1', classId: 'recruit' })
+  })
+
+  it('has no Tier 0 in a later tier\'s world', () => {
+    const her = uma('mage', [], { ranks: { classes: { mage: { rank: 3, exp: 0 }, brawler: { rank: 5, exp: 0 } } } })
+    const view = flourishSheet(A, her, 'mage', 2, null)
+    expect(view.chips.map((c) => c.name)).toEqual(['Brawler', 'Arms Spellblade', 'Arms Summoner'])
+    expect(view.footer).toEqual({ label: 'Fight as Brawler', classId: 'brawler' })
   })
 })

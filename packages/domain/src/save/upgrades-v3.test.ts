@@ -12,14 +12,13 @@ const worldAt = (level: number) => {
 }
 
 describe('R2 Can upgrade', () => {
-  it('uses the level gate, settable jewels and an unformed G1 accessory', () => {
+  it('uses the level gate and settable jewels; an unformed G1 accessory is the Template tab\'s to flag (H123)', () => {
     const ready = upgradesFor(worldAt(6), '101', 'brawler', 1, 17)!
     expect(ready.grades).toContainEqual({ kind: 'weapon', weapon: 'greatsword' })
-    expect(ready.grades).toContainEqual({ kind: 'accessory', slot: 0 })
+    expect(ready.grades).not.toContainEqual({ kind: 'accessory', slot: 0 })
     expect(ready.any).toBe(true)
     const early = upgradesFor(worldAt(5), '101', 'brawler', 1, 17)!
-    expect(early.grades).not.toContainEqual({ kind: 'weapon', weapon: 'greatsword' })
-    expect(early.grades).toContainEqual({ kind: 'accessory', slot: 0 })
+    expect(early.grades).toEqual([])
     expect(upgradesFor(worldAt(6), '101', 'brawler', 1, 17)!.jewels).toEqual(['jewel-moon-1'])
     expect(early.jewels).toEqual([])
   })

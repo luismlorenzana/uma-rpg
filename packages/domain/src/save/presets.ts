@@ -134,7 +134,7 @@ export function presetAccessory(classId: RpgClass, weapons: readonly RpgWeapon[]
 }
 
 /** Whether her weapons can use a family: a Pendant needs an Arm, a Charm (id `bell`) a Tome. */
-const familyUsable = (family: AccessoryFamily, weapons: readonly RpgWeapon[]): boolean =>
+export const accessoryFamilyUsable = (family: AccessoryFamily, weapons: readonly RpgWeapon[]): boolean =>
   (family === 'pendant' ? weapons.some((w) => !isRpgTome(w)) : family === 'bell' ? weapons.some(isRpgTome) : true)
 /** A weapon preset: a class's weapons and armor half, and one accessory form a slot. */
 export interface WeaponPreset { classId: RpgClass; weapons: RpgWeapon[]; armor: 'physical' | 'magical'; accessories: PresetAccessory[] }
@@ -146,7 +146,7 @@ export function weaponPreset(classId: RpgTier1Class, family?: AccessoryFamily | 
   const weapons = rpgPresetWeapons(classId, engine)
   const stat: AccessoryFamily = RPG_CLASS_ARMOR[classId] === 'physical' ? 'pendant' : 'bell'
   const slots: AccessoryFamily[] = [stat, stat, 'orb']
-  if (family && familyUsable(family, weapons)) { slots.splice(Math.max(0, slots.indexOf(family)), 1); slots.unshift(family) }
+  if (family && accessoryFamilyUsable(family, weapons)) { slots.splice(Math.max(0, slots.indexOf(family)), 1); slots.unshift(family) }
   const accessories = slots.map((f): PresetAccessory => (f === 'orb' ? { family: f, kind: presetKind(classId, weapons, engine) } : { family: f }))
   return { classId, weapons, armor: RPG_CLASS_ARMOR[classId], accessories }
 }
