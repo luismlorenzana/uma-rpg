@@ -8,8 +8,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import type { Campaign } from '../../battle/campaign'
 import { CLASS_LABEL, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
-import { pagePath } from '../../hub/navigation'
 import { useActiveTier, wieldWeapons } from '../../save/game'
+import { profileDoor } from '../stable/profile-tabs'
 import { fullParty, guidanceNeeds, guidedPlan, guidedWeapons, needLine, partyHeldOf } from './rift-view'
 
 type Guide = { classId: RpgClass; weapons: readonly RpgWeapon[]; switch: boolean } | null
@@ -86,7 +86,7 @@ export function GuidanceNeeds({ campaign, world, front, party, roster }: {
               {need.umas.map(({ outfitId, ready }) => (
                 <li key={outfitId}>
                   <button type="button" className="flex min-h-11 w-full items-center gap-2 rounded-sm bg-raised px-2 text-left"
-                    onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${outfitId}/skills`), { state: { fromPlace: true } })}>
+                    onClick={() => { const door = profileDoor(outfitId, { tab: 'class', list: need.umas.map((uma) => uma.outfitId) }); void navigate(door.to, { state: door.state }) }}>
                     <FaceTile outfitId={outfitId} size={28} label={label(outfitId)} round />
                     <span className="min-w-0 flex-1 truncate text-[13px]">{label(outfitId)}</span>
                     <span className={`shrink-0 text-[12px] ${ready ? 'font-semibold text-accent' : 'text-ink-soft'}`}>{ready ? 'Ready to promote' : 'Holds it'}</span>

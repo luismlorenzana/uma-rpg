@@ -1,13 +1,13 @@
 // SB4: shared album chrome, virtual views and device preferences. RPG profile routes and rules stay here.
 import { AlbumChrome, AlbumGrid, useAlbumPrefs } from '@luismlorenzana/uma-kit/album'
 import { emptyStateHint } from '@luismlorenzana/uma-kit/roster'
-import { bestAptitudeLine } from '@rpg/domain'
-import { useMemo, useState } from 'react'
+import { activeClass, bestAptitudeLine } from '@rpg/domain'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { albumRows, stableResult, STABLE_FACETS, STABLE_PRESETS, STABLE_SCHEMA, STABLE_SORTS } from '../../album/rows'
 import { withUpgrades } from '../../album/upgrades'
 import { prepareStablePrefs } from '../../album/preferences'
 import { ClassEmblem } from '../../battle/pixel-icons'
-import { useHubNavigation } from '../../hub/navigation'
 import type { MasterView } from '../../master/master'
 import { useActiveTier, useAlbumScope, useWorld } from '../../save/game'
 import { TargetIcon } from '../../ui/icons'
@@ -16,21 +16,25 @@ import { useNow } from '../../ui/useNow'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
 import { OutfitProfile } from './OutfitProfile'
+import { restoreRosterScroll, rosterList, saveRosterScroll } from './profile-nav'
+import { firstDotTab, profileDoor, tabDots } from './profile-tabs'
+import { signatureDot } from './template-view'
 
 export default function StablePage({ place, rest }: PageProps) {
   const [, outfitId, sub] = rest.split('/')
   return <MasterGate>{view => {
     if (!outfitId) return <Roster view={view} place={place} />
-    return <OutfitProfile view={view} outfitId={outfitId} place={place} route={sub} />
+    // Keyed by her, so a step closes any open sheet (H124).
+    return <OutfitProfile key={outfitId} view={view} outfitId={outfitId} place={place} route={sub} />
   }}</MasterGate>
 }
 
-export function Roster({ view, place }: { view: MasterView; place: PageProps['place'] }) {
+export function Roster({ view }: { view: MasterView; place: PageProps['place'] }) {
   const world = useWorld()
   const scope = useAlbumScope()
   const tier = useActiveTier()
   const now = useNow(30_000)
-  const nav = useHubNavigation()
+  const navigate = useNavigate()
   const [schema] = useState(() => {
     prepareStablePrefs(view.roster.map(o => o.outfitId))
     return STABLE_SCHEMA
@@ -42,6 +46,15 @@ export function Roster({ view, place }: { view: MasterView; place: PageProps['pl
   const ownership = prefs.query.filters.ownership
   const tab = Array.isArray(ownership) && ownership.length === 1 && (ownership[0] === 'owned' || ownership[0] === 'locked') ? ownership[0] : 'all'
   const counts = result.counts.ownership ?? {}
+  useEffect(restoreRosterScroll, [])
+  /** A face (H124): the remembered tab, or with Can upgrade on the first tab with a dot; the list is what the view shows, owned. */
+  const open = (row: (typeof result.rows)[number]) => {
+    prefs.see([row.id])
+    saveRosterScroll()
+    const dots = prefs.query.filters.upgrade && row.uma ? tabDots(row.upgrades, signatureDot(row.outfit, row.uma, activeClass(row.outfit, row.uma, tier))) : null
+    const door = profileDoor(row.id, { tab: (dots && firstDotTab(dots)) ?? undefined, list: rosterList(result.rows) })
+    void navigate(door.to, { state: door.state })
+  }
   return <div className="p-4">
     <AlbumChrome title="Stable" completion={`${Object.keys(world?.umas ?? {}).length}/${rows.length} owned`}
       facets={STABLE_FACETS} sorts={STABLE_SORTS} presets={STABLE_PRESETS} query={prefs.query} counts={result.counts} total={result.total}
@@ -58,7 +71,7 @@ export function Roster({ view, place }: { view: MasterView; place: PageProps['pl
       words={{ level: 'Uma Level', savedViewHint: 'Filters, sort and view' }}>
       <AlbumGrid rows={result.rows} view={prefs.query.view} columns={5}
         locked={row => row.uma === null}
-        onOpen={row => { prefs.see([row.id]); nav.sub(place, `outfit/${row.id}`) }}
+        onOpen={open}
         renderBadges={row => ({
           topLeft: row.classId ? <ClassEmblem classId={row.classId} /> : undefined,
           bottomLeft: world?.targets.includes(row.id) ? (

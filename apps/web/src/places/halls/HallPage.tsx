@@ -9,6 +9,7 @@ import {
   heroLimitsOfHall, learnerBlock, LEARNER_MAX_PARENTS, parentsOf, SaveRuleError, heroLimit, type HeroLimit, type HeroLimitId, type Place,
 } from '@rpg/domain'
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { Bar, CLASS_LABEL, KindMark } from '../../battle/labels'
 import { FaceTile, UmaBust } from '@luismlorenzana/uma-kit/album'
 import { formatLevel } from '@luismlorenzana/uma-kit/roster'
@@ -22,6 +23,7 @@ import { MasterGate } from '../MasterGate'
 import type { PageProps, PeekProps } from '../registry'
 import { hallHelp, learnerAdds, seatCard, seatTwinSets, TWIN_SET_LABEL } from './hall-view'
 import { bond as bondCopy, bondLevel, heroBond } from '../stable/copy'
+import { profileDoor } from '../stable/profile-tabs'
 
 export default function HallPage({ place }: PageProps) {
   return <MasterGate>{(view) => <Hall view={view} place={place} />}</MasterGate>
@@ -37,6 +39,7 @@ type Pick = { seat: HeroLimitId; role: 'hero' | 'learner' }
 function Hall({ view, place }: { view: MasterView; place: Place }) {
   const world = useWorld()
   const scope = useAlbumScope()
+  const navigate = useNavigate()
   const [pick, setPick] = useState<Pick | null>(null)
   const [heroOpen, setHeroOpen] = useState<HeroLimitId | null>(null)
   const [learner, setLearner] = useState<{ seat: HeroLimitId; outfitId: string } | null>(null)
@@ -45,6 +48,12 @@ function Hall({ view, place }: { view: MasterView; place: Place }) {
   const hall = hallOfPlace(place.id)
   if (!world || !hall) return null
   const outfit = (id: string) => view.roster.find((o) => o.outfitId === id)
+  /** The Hall's door (H124 decision 7): her Class tab, stepping through that seat's Hero and Learners. */
+  const openProfile = (outfitId: string, seat: HeroLimitId) => {
+    const taken = world.heroes[seat]
+    const door = profileDoor(outfitId, { tab: 'class', list: taken ? [taken.hero, ...taken.learners] : [outfitId] })
+    void navigate(door.to, { state: door.state })
+  }
   const run = (op: () => Promise<unknown>, after?: () => void) => {
     setMessage(null)
     op().then(() => after?.()).catch((err: unknown) => setMessage(err instanceof SaveRuleError ? err.message : 'That didn’t work.'))
@@ -153,6 +162,7 @@ function Hall({ view, place }: { view: MasterView; place: Place }) {
                 )
               })()}
               {!emptyConfirm ? <>
+                <button type="button" onClick={() => openProfile(seat.hero, heroOpen)} className="min-h-11 w-full rounded-sm bg-raised font-semibold">Profile</button>
                 <button type="button" onClick={() => { setHeroOpen(null); setPick({ seat: heroOpen, role: 'hero' }) }} className="min-h-12 w-full rounded-sm bg-accent font-display font-bold text-accent-ink">Change Hero</button>
                 <button type="button" onClick={() => seat.learners.length ? setEmptyConfirm(true) : run(() => appointHero(heroOpen, null), () => setHeroOpen(null))}
                   className="min-h-12 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft">Empty seat</button>
@@ -183,6 +193,7 @@ function Hall({ view, place }: { view: MasterView; place: Place }) {
                 </div>
               </div>
               <p className="text-[13px] text-ink-soft">Limit Breaks · {heroLimit(learner.seat).name}{others.length ? ` · ${heroLimit(others[0]!).name}` : ''}</p>
+              <button type="button" onClick={() => openProfile(learner.outfitId, learner.seat)} className="min-h-11 w-full rounded-sm bg-raised font-semibold">Profile</button>
               <button type="button" onClick={() => run(() => removeLearner(learner.seat, learner.outfitId), () => setLearner(null))}
                 className="min-h-12 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft">Leave</button>
             </div>

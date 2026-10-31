@@ -16,6 +16,7 @@ import { BottomSheet } from '../../ui/BottomSheet'
 import { BackIcon, FlagIcon } from '../../ui/icons'
 import { MasterGate } from '../MasterGate'
 import type { PageProps } from '../registry'
+import { profileDoor } from '../stable/profile-tabs'
 import { healerNote } from './healer-note'
 
 /** A party's one-healer note, in the warning colour. */
@@ -191,7 +192,10 @@ function PartyEditor({ view, world, index, place }: { view: MasterView; world: T
             <button type="button" onClick={() => { setPicking(acting); setActing(null) }} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
               Swap with another Uma
             </button>
-            <button type="button" onClick={() => navigate(`/town/stable/outfit/${party.slots[acting]}`, { state: { fromHub: true } })} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
+            <button type="button" onClick={() => {
+              const door = profileDoor(party.slots[acting]!, { tab: 'class', list: party.slots.filter((s): s is string => s !== null) })
+              void navigate(door.to, { state: door.state })
+            }} className="min-h-12 w-full rounded-sm bg-raised font-semibold">
               View profile
             </button>
             {(() => {

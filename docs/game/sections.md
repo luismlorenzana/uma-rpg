@@ -147,8 +147,27 @@ A shut place's page sends you to its quick look.
 ### Stable
 
 Routes: `/town/stable`, then `outfit/:id/:tab` (her profile's Class, Gear, Stars or Template tab). A bare `outfit/:id` opens
-the last profile tab used on this device; a tab named in the route wins. `outfit/:id/skills`, which the world map's party bar
-and the Rift's guided weapons still use, lands on the Class tab.
+the last profile tab used on this device; a tab named in the route wins. The old `outfit/:id/skills` lands on the Class tab.
+
+**One profile, many doors** (H124, D271; `profile-tabs.ts`, `profile-nav.ts`): every door pushes, so the place header's Back returns
+to it, and passes the list ‹ › step through. A link out (the facts row's Party and Work, the Limit sheet's hall, Class Manuals)
+pushes too, and Back returns to her on the same tab.
+
+| Door | Opens on | ‹ › step through |
+|---|---|---|
+| Stable roster, a face | The remembered tab; with the Can upgrade filter on, the first tab with a dot (Class, Gear, Stars, Template). Back restores the roster's scroll | The roster's owned Umas, in the view's sort and filter |
+| Party Hall, **View profile** | Class | The party, in slot order |
+| World map's party bar, a face | Class | The active party |
+| Rift, a guided Uma | Class | That guidance's Umas |
+| Plaza, **Profile** | The remembered tab | No list: the roster's |
+| Observatory, a row | Stars | That list, jewels ready first |
+| Hall of Heroes, **Profile** in a Hero's or a Learner's sheet | Class | That seat's Hero and Learners |
+| A Wilds place, a worker's face | The remembered tab | That place's workers, in slot order |
+| A shared link | Its tab | The roster's |
+
+**‹ 3/26 ›** sits in the place header on a profile (the roster's Uma Tickets go: they stay in the top bar). A step keeps the tab,
+closes any open sheet, returns to the top and replaces the history entry, so Back still returns to the door; the ends wrap. It
+hides with one Uma in the list and on a locked profile. Arrows only, no swipe.
 
 **The roster** (`StablePage.tsx` on the kit's `AlbumChrome` and `AlbumGrid`; rows and facets in `album/rows.ts`):
 - "Stable" and "26/270 owned", then All, Owned and Locked tabs with counts. Tier 1 also lists the outfits nobody owns,
@@ -446,8 +465,8 @@ The five halls share `places/halls/HallPage.tsx` (D106; Halls v2's page, H133, D
   Umas that can't take the seat stay listed with why ("Locked", "Already seated here", "Already a Hero", "A Learner:
   leave her Heroes first", "A Hero", "Already learning here", "Already has 2 Heroes", "10 Learners at most"). A Learner
   candidate shows "Bond 2 · 1/2 Heroes" and the sets the seat adds to her weapons' ("Adds Light, Twilight").
-- **A Hero's sheet:** she uses the seat's Limit Break at full strength; her own Bond with the seat; **Change Hero**;
-  "Empty this seat (its 3 Learners leave; their Bonds stay)".
+- **A Hero's sheet:** "Hero · Strength 100%"; her own Bond with the seat; **Profile**; **Change Hero**; **Empty seat**, which lists
+  the Learners who'd leave before it confirms.
 - **A Learner's sheet:** "Bond 4/10 · 70% strength", its bar and the EXP to the next, "Inherits {Limit Break}, and
   {another} from her other Hero.", and "Leave this Hero (her Bond stays)".
 - The map's pips, the quick look, the Hero and Learner sheets and the pickers are Halls v1's; the profile's Inheritance
@@ -475,8 +494,8 @@ Routes: `/battle/scenario-gate`, then `c/:continent`, `r/:region`, `capital/:con
   - "Party 1 · swap", which opens "Who fights?": every party with members, by its lead's face and its highest level
     ("5/5 · Lv 50"). Off while a fight is open.
   - **Edit parties** (the Party Hall), then "A fight needs five" or "One healer a party" when it applies.
-  - The five: face with "Lv 50", the MP she carries between stages (Springs refill it), her class. A tap opens her
-    Skills.
+  - The five: face with "Lv 50", the MP she carries between stages (Springs refill it), her class. A tap opens her Class
+    tab; ‹ › step through the party.
 - **World:** five islands on the map; in the list, "Tier 1 · five continents" ("four" for a partial tier), each
   continent with its crest, "Lv 1–10" ("T2 Lv 1–10" in Tier 2) and "21/480 stages cleared". The tiers above with no
   world yet show "Tier 2 locked".

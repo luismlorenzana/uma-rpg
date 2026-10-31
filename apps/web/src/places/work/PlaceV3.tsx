@@ -19,6 +19,7 @@ import { collectEverything, finishAll, useAlbumScope } from '../../save/game'
 import { TRADE_CLASS_WORDS, tradeOfWorld } from '../../save/trade'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { HelpButton } from '../../ui/HelpButton'
+import { profileDoor } from '../stable/profile-tabs'
 import { whoAt } from './place-view'
 import { helpLinesV4, initialJobV4, jobKindAtV4, jobSizesV4 } from './place-view-v4'
 import { PeekLineV4, WhatV4 } from './PlaceV4'
@@ -64,6 +65,11 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
     else navigate({ pathname: location.pathname, search: withoutJobQuery(location.search) }, { replace: true })
   }
   const openJob = (search: string) => navigate({ pathname: location.pathname, search })
+  /** A worker's face (H124): her profile, stepping through this place's workers in slot order. */
+  const openProfile = (outfitId: string) => {
+    const door = profileDoor(outfitId, { list: cards.flatMap((card) => (card.kind === 'held' ? [card.outfitId] : [])) })
+    void navigate(door.to, { state: door.state })
+  }
   return (
     <div className="space-y-3 p-4" data-place-v3={placeId}>
       <section className="rounded-md bg-raised px-3">
@@ -97,6 +103,7 @@ export function PlaceBodyV3({ view, world, now, tier, placeId }: { view: MasterV
               slot={card.slot}
               onStart={() => openJob(jobQuery({ slot: card.slot.slot }))}
               onQueue={card.kind === 'held' ? (outfitId) => openJob(jobQuery({ uma: outfitId, queue: true })) : undefined}
+              onFace={openProfile}
               repeat
             />
           </li>

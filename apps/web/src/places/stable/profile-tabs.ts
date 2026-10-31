@@ -62,6 +62,9 @@ export function firstDotTab(dots: ProfileDots): ProfileTab | null {
   return PROFILE_TABS.find(({ key }) => dots[key])?.key ?? null
 }
 
+/** Where a door's navigation state lands: Back's `back`, the list ‹ › step through, the sheet a door out reopens. */
+export interface ProfileNavState { back?: boolean; list?: readonly string[]; sheet?: string }
+
 export interface ProfileDoorOptions {
   tab?: ProfileTab
   list?: readonly string[]

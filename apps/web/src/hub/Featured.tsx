@@ -108,7 +108,7 @@ export function FeaturedSheet({ open, onClose }: { open: boolean; onClose: () =>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Link to="/battle/scenario-gate" replace className="font-display flex min-h-12 items-center justify-center rounded-sm bg-accent font-semibold text-accent-ink shadow-1">Fight</Link>
-            <Link to={`/town/stable/outfit/${shown.outfitId}`} replace className="font-display flex min-h-12 items-center justify-center rounded-sm border border-hairline-strong bg-panel font-semibold shadow-1">Profile</Link>
+            <Link to={`/town/stable/outfit/${shown.outfitId}`} state={{ back: true }} className="font-display flex min-h-12 items-center justify-center rounded-sm border border-hairline-strong bg-panel font-semibold shadow-1">Profile</Link>
           </div>
           <section>
             <h3 className="text-micro mb-1.5">Feature another</h3>

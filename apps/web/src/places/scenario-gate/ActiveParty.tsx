@@ -14,6 +14,7 @@ import { formatLevel } from '@luismlorenzana/uma-kit/roster'
 import { PickerStep } from '../../album/PickerStep'
 import { activePartyRows } from '../../album/party-rows'
 import { chooseActiveParty, useActiveTier, useWorld } from '../../save/game'
+import { profileDoor } from '../stable/profile-tabs'
 
 export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
   const world = useWorld()
@@ -51,7 +52,7 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
           const mp = rpgCarriedMp(run, profile, points)
           return (
             <button key={id} type="button" className="relative min-w-0 flex-1" title={CLASS_LABEL[classId]} aria-label={`${outfit.name}: ${CLASS_LABEL[classId]}, Lv ${uma.level}, MP ${mp} of ${max}`}
-              onClick={() => navigate(pagePath({ page: 'town', id: 'stable' }, `outfit/${id}/skills`), { state: { fromPlace: true } })}>
+              onClick={() => { const door = profileDoor(id, { tab: 'class', list: members }); void navigate(door.to, { state: door.state }) }}>
               <span className="relative mx-auto block w-12">
                 <FaceTile outfitId={id} size={48} label={outfit.name} round />
                 <span className="absolute left-0 top-0 rounded-full bg-black/70 px-1 font-display text-[9px] font-bold leading-3.5">Lv {uma.level}</span>

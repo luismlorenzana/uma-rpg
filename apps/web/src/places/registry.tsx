@@ -23,7 +23,7 @@ export const PLACE_UI: Record<string, PlaceUi> = {
   stable: {
     Peek: lazy(() => import('./stable/StablePeek')),
     Page: lazy(() => import('./stable/StablePage')),
-    Counter: lazy(() => import('./stable/TicketCounter')),
+    Counter: lazy(() => import('./stable/StableCounter')),
   },
   'party-hall': {
     Peek: lazy(() => import('./party-hall/PartyHallPeek')),
