@@ -360,7 +360,7 @@ nothing. The four families:
 
 Values are in [materials](materials.md#gear) and how they reach a hit in [combat](combat.md#damage). The slots are hers, not
 her class's: after a class or weapon switch, an Orb left on a kind she no longer slots stays set, and its tile says so. She
-sets them on the Gear tab's Equip view: a tile a slot, and a tap on a row of its list wears it (D266).
+sets them on the Gear tab: a tile a slot, and a tap on a row of its list wears it (D266).
 
 ### Standard presets
 

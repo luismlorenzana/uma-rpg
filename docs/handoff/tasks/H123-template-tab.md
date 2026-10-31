@@ -43,7 +43,8 @@ No rule or save change beyond decision 6's dot reason. Screens and words.
   - `places/stable/TemplateCard.tsx` (the chip's sheet `:28–46`, `CallingCard :52–88`); H119's Template skeleton;
   - `places/stable/OutfitProfile.tsx`: `RacingTab :467–528` (the aptitude groups `:476–480`, the racing skill loaded with
     `loadSkills` and `skillText` `:469–474`), `GradeChip :65`;
-  - H121's exported `AccessorySheet` (decision 10) and H122's exported `NodeSheet` (decision 5): the ★ rows open them
+  - H121's exported `AccessorySheet` (`GearTab.tsx`, props `outfit, uma, world, tier, slot, onClose`; pick her ★ family's slot or
+    slot 0) and H122's exported `NodeSheet` (decision 5): the ★ rows open them
     (§5.3, "one component, two doors");
   - H119's `places/stable/profile-tabs.ts` (`tabDots`, `firstDotTab`) as H120 extended it (the Class dot);
     `album/upgrades.ts` (`umaUpgrades`, `withUpgrades`); the domain's `save/upgrades.ts :78–106` (`upgradesFor`; the

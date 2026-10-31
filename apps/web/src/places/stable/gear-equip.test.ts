@@ -1,6 +1,6 @@
 import { newGrades, newOwnedUma, newSave, worldOf, type AccessorySlotState, type OwnedUma, type RpgClass, type RpgWeapon, type TierWorld } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { accessoryChoices, accessoryTile, presetRows, readyCount, upgradeRows } from './gear-equip'
+import { accessoryChoices, accessoryTile, presetRows } from './gear-equip'
 
 const slot = (grade: number, family: AccessorySlotState['family'] = null, kind?: AccessorySlotState['kind']): AccessorySlotState =>
   ({ grade, family, form: 'base', ...(kind ? { kind } : {}) })
@@ -35,18 +35,6 @@ describe('the Equip view (H107, D266)', () => {
   it('flags an Orb left on a kind she no longer holds', () => {
     expect(accessoryTile(slot(4, 'orb', 'dark'), SPELL_BLADE, 1).stale).toBe('Dark Tome not held')
     expect(accessoryChoices(slot(4, 'orb', 'dark'), SPELL_BLADE, 'bell', 1).some((r) => r.worn)).toBe(false)
-  })
-})
-
-describe('the Upgrade view (H107)', () => {
-  it('lists her three weapons, five armor slots and three accessory slots, and counts what can raise now', () => {
-    const grades = newGrades(1)
-    // Her Arms take Arms Gems and her Tome Tome Ink (FL4).
-    const rows = upgradeRows(grades, ['katana', 'lance', 'tome-lightning'], 'spellblade', 30, { 'weapon-gem-g1': 1, 'tome-ink-g1': 1, 'armor-fittings-g1': 1 }, 1, 'bell')
-    expect(rows.map((r) => r.key)).toEqual(['katana', 'lance', 'tome-lightning', 'head', 'body', 'legs', 'arms', 'feet', 'accessory-0', 'accessory-1', 'accessory-2'])
-    expect(rows[0]!.upgrade).toMatchObject({ ready: true, label: 'G0 → G1 · Arms Gem G1 ×1' })
-    expect(rows.at(-1)!.upgrade).toMatchObject({ ready: false })
-    expect(readyCount(rows)).toBe(8)
   })
 })
 

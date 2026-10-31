@@ -1,12 +1,9 @@
-// The Gear tab's two views as data (H107, D219): Equip, what she wears, with a tile for each accessory slot and the list a
-// tile opens (D266); and Upgrade, every slot's grade row and the made item that raises it. Pure, so both views test without
-// React.
+// Her presets and accessories as data (H107, D219, D263, D266): the standard presets, a tile for each accessory slot and the
+// list a tile opens. Pure.
 import {
-  ACCESSORY_FAMILY_LABEL, ARMOR_SLOTS, classPresetPlan, isRpgElement, rpgClassName, rpgPresetClasses, rpgTomeOf, WEAPON_LABEL,
-  type AccessoryFamily, type AccessorySlotState, type GearTier, type GradeTarget, type RpgClass, type RpgDamageKind, type RpgTier1Class,
-  type RpgWeapon, type TierWorld, type UmaGrades,
+  ACCESSORY_FAMILY_LABEL, classPresetPlan, isRpgElement, rpgClassName, rpgPresetClasses, rpgTomeOf, WEAPON_LABEL,
+  type AccessoryFamily, type AccessorySlotState, type GearTier, type RpgClass, type RpgDamageKind, type RpgTier1Class, type TierWorld,
 } from '@rpg/domain'
-import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine, type GradeUpgradeView } from './gear-v3'
 import { accessoryEffect, classPresetName, standardPreset, staleKind } from './copy'
 
 /** One standard preset (D263): the class it's for, its name, its weapons and accessories, and whether she wears it. */
@@ -67,19 +64,3 @@ export function accessoryChoices(slot: AccessorySlotState | undefined, kinds: re
     worn: slot?.family === family && (kind === null || slot.kind === kind),
   })))
 }
-
-export interface UpgradeRow { key: string; target: GradeTarget; text: string; upgrade: GradeUpgradeView }
-
-/** Every slot's grade row, in the tab's order: her three weapons, the five armor slots, then each accessory slot. */
-export function upgradeRows(grades: UmaGrades, weapons: readonly RpgWeapon[], classId: RpgClass, level: number,
-  stock: Readonly<Record<string, number>>, tier: GearTier, signature: AccessoryFamily): UpgradeRow[] {
-  const row = (key: string, target: GradeTarget, text: string): UpgradeRow => ({ key, target, text, upgrade: gradeUpgradeView(grades, target, level, stock) })
-  return [
-    ...weapons.map((weapon) => row(weapon, { kind: 'weapon', weapon }, weaponGradeLine(grades, weapon, tier))),
-    ...ARMOR_SLOTS.map((slot) => row(slot, { kind: 'armor', slot }, armorGradeLine(grades, slot, classId, tier))),
-    ...grades.accessories.map((slot, i) => row(`accessory-${i}`, { kind: 'accessory', slot: i }, accessoryGradeLine(slot, weapons, tier, signature, level))),
-  ]
-}
-
-/** How many rows can raise now: the Upgrade view's count. */
-export const readyCount = (rows: readonly UpgradeRow[]): number => rows.filter((row) => row.upgrade.ready).length

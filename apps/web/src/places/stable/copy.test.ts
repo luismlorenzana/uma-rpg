@@ -11,8 +11,9 @@ import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { mapNodeValue } from '../observatory/StarsPanel'
 import * as copy from './copy'
-import { accessoryChoices, accessoryTile, upgradeRows } from './gear-equip'
-import { accessoryGradeLine, armorGradeLine, gradeUpgradeView, weaponGradeLine } from './gear-v3'
+import { accessoryChoices, accessoryTile } from './gear-equip'
+import { accessoryGradeLine, weaponGradeLine } from './gear-v3'
+import { gearTiles, raiseAllPlan, raiseSheet } from './gear-view'
 import { rankText } from './class-sheets'
 import { classesSheet, classTiles, handWord, limitView, promotionLine, promotionSheet } from './class-view'
 import { flourishLine, templateCard } from './template-view'
@@ -23,7 +24,7 @@ const NAMES = [
   ...Object.values(KNACK_LABEL), ...Object.values(KEY_LABELS), ...RPG_CLASSES, ...RPG_ALL_CLASSES.map((c) => rpgClassName(c)),
   ...Object.values(RPG_ROOT_NAME), ...Object.values(RPG_TIER0_SKILL), 'Warrior Dojo', 'Mage Tower', 'Spellblade Salle', 'Summoner Circle', 'Healer Sanctum',
   'Spell Blade', 'Greatsword', 'Thunder Tome', 'Even pace', 'Late reserve', 'Clean break', 'Weapon Forge', 'Tome Forge',
-  'Charm Forge', 'Armor Fittings G5', 'Arms Gem G10', 'Planet Jewel I', 'Clever Spellwright', 'Clever Spellfencer',
+  'Charm Forge', 'Armor Fittings G5', 'Arms Gem G10', 'Accessory Setting', 'Armor Fittings', 'Arms Gem', 'Tome Ink', 'Planet Jewel I', 'Clever Spellwright', 'Clever Spellfencer',
   'Aster', 'Beryl', 'Fire', 'Blizzard', 'Thunder', 'Dark', 'Light', 'Physical', 'Magical',
 ].sort((a, b) => b.length - a.length)
 const numberPattern = /[+−-]?\d[\d,.]*(?:%|×\d+(?:\.\d+)?)?/g
@@ -123,6 +124,14 @@ describe('the profile wording list (H117)', () => {
     expect(copy.unlock({ kind: 'pick', a: 'Mage', b: 'Spell Blade' })).toBe('Pick on unlock · Mage or Spell Blade')
     expect(copy.actions.raiseTo(9)).toBe('Raise to G9')
     expect(copy.actions.raiseAll).toBe('Raise all')
+    expect(copy.valueStep('Might', 26, 45)).toBe('Might 26 → 45')
+    expect(copy.effectStep('ATK +7', 'ATK +9')).toBe('ATK +7 → +9')
+    expect(copy.effectStep('Off', 'Lance +2')).toBe('Off → Lance +2')
+    expect(copy.raiseLine('Axe', 6, 8, ['Arms Gem G7', 'Arms Gem G8'])).toBe('Axe G6 → G8 · Arms Gem G7 ×1 · G8 ×1')
+    expect(copy.usesItems(4)).toBe('Uses 4 items')
+    expect(copy.usesItems(1)).toBe('Uses 1 item')
+    expect(copy.gearSummary('physical', 3)).toBe('Physical · 3 ready')
+    expect(copy.gearSummary('magical', 0)).toBe('Magical')
     expect(copy.actions.raise(3)).toBe('Raise 3')
     expect(copy.actions.set).toBe('Set')
     expect(copy.actions.setAll).toBe('Set all')
@@ -168,9 +177,11 @@ describe('the profile wording list (H117)', () => {
     }
     for (const value of ['even-pace', 'late-reserve', 'clean-break'] as RpgFlourish[]) values.push({ source: `flourish ${value}`, value: flourishLine(value) })
     for (const knack of ['tireless', 'clever', 'mighty', 'fleet', 'gritty'] as const) values.push({ source: `moon ${knack}`, value: mapNodeValue('template:1', 'spellblade', knack, 'physical', 1) })
-    values.push({ source: 'grade rows', value: [weaponGradeLine(grades, 'greatsword', 1), armorGradeLine(grades, 'head', 'brawler', 1),
-      upgradeRows(grades, ['greatsword', 'axe', 'lance'], 'brawler', 50, { 'weapon-gem-g1': 1 }, 1, 'bell'),
-      gradeUpgradeView(grades, { kind: 'weapon', weapon: 'greatsword' }, 50, { 'weapon-gem-g1': 1 })] })
+    const gearWorld = { ...newTierWorld('2026-10-29T00:00:00.000Z', 3), items: { 'weapon-gem-g1': 1, 'armor-fittings-g1': 1, 'accessory-setting-g1': 1 },
+      umas: { '81001': { ...owned, classId: 'brawler' as const, gear: { ...grades, accessories: [{ grade: 0, family: 'orb' as const, form: 'base' as const, kind: 'fire' as const }, ...grades.accessories.slice(1)] } } } }
+    values.push({ source: 'gear tab', value: [weaponGradeLine(grades, 'greatsword', 1), gearTiles(gearWorld.umas['81001'].gear, ['greatsword', 'axe', 'lance'], ['greatsword', 'axe', 'lance'], 1, null),
+      raiseAllPlan(gearWorld, '81001', ['greatsword', 'axe', 'lance']).lines,
+      (['weapon', 'armor', 'accessory'] as const).map((kind) => raiseSheet(gearWorld, '81001', kind === 'weapon' ? { kind, weapon: 'greatsword' } : kind === 'armor' ? { kind, slot: 'feet' } : { kind, slot: 0 }, 'brawler', 1))] })
     const world = { ...newTierWorld('2026-10-29T00:00:00.000Z', 3), umas: { '81001': { ...owned, classId: 'recruit' as const,
       ranks: { classes: { recruit: { rank: 10, exp: 400 }, duelist: { rank: 7, exp: 0 } } }, bonds: { 'brawler-1': { level: 3, exp: 2 } } } } }
     const tiered = world.umas['81001']
@@ -184,7 +195,7 @@ describe('the profile wording list (H117)', () => {
   it('keeps literal JSX terse outside help sheets', () => {
     const files = [
       'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'TemplateTab.tsx',
-      'ClassTab.tsx', 'class-sheets.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'GearCardV3.tsx', 'PresetButton.tsx',
+      'ClassTab.tsx', 'class-sheets.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'GearTab.tsx', 'PresetButton.tsx',
       '../observatory/StarsPanel.tsx',
     ]
     const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.'])

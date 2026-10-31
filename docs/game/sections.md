@@ -255,27 +255,28 @@ and a tap opens one sheet.
 - The (i) on the first row covers switching, one healer a party, depths, Skill Ranks, equip slots, Tier 0, promotion and
   Heroes and Learners, one rule a line.
 
-**Gear tab** (`GearCardV3.tsx`, `gear-equip.ts`, `gear-v3.ts`, `PresetButton.tsx`; H107, D223; the rules are
-[classes](classes.md#armor-and-the-accessory), [loops](loops.md#gear) and [materials](materials.md#gear)): **Equip** and
-then **Upgrade** ("Upgrade · 12" counts the raises ready and the jewels to set), stacked in one scroll.
-- **Equip**, what she wears:
-  - **Loadout** ("Set on Skills ›"): her three weapons' icons with their grades, then "Physical armor" or "Magical
-    armor" with the five slots' icons and grades. A slot at G0 is an empty frame. Then **Accessories** (i), three tiles the
-    size of her weapons' (D266): the icon, the grade, and what the slot does ("ATK +4", "Lance +8", "Bosses +4%"), "Charm ·
-    Off" at G0, "Empty" with no family, or "Greatsword not held" on an Orb left on a kind she no longer holds.
-  - A tile opens **Accessory 1 · G4**: "★ Signature · ATK/M.ATK +5 · Worn", "Off until G1" at G0, and one row a choice, her ★
-    family first, then Pendant, Charm, an Orb for each weapon she holds, and Insignia, with what each does at the slot's
-    grade ("ATK +4"; "G1: ATK +1" at G0). The row she wears is ringed with a ✓. **A tap wears the row and closes the sheet:**
-    there is no Set button, so what a tile shows is what the save holds.
-- **Upgrade**, what she spends:
-  - **Grades**, in three groups: Weapons ("Greatsword · G3 · Might 8 · weak ×1.3"), Armor ("Head · Helm · G2 · DEF +8")
-    and Accessory, one row a slot ("Pendant · G4 · ATK +4 · ★ +5", "Charm · G0 · Off", "None · G0"). Each row's pill raises it at once ("G3 → G4 · 1 Arms Gem G4"; Tome Ink on a Tome), with the
-    green mark, or says why not ("Needs Lv 16", "Needs 1 Arms Gem G4", "Already G10").
-  - A row's sheet: "Now · G3 · Might 8 · weak ×1.3", "Next · …", an armor slot's half ("Her class's half · Helm"), the
-    raise button, and **Up to G6** when the Warehouse holds several grades, which lists the items and asks Cancel or
-    Raise.
-  - **Extra Stats:** "3 to set" while jewels can be set, "8/22 open · map ›" (her Observatory map), and "Total with
-    armor: HP +55 · …".
+**Gear tab** (`GearTab.tsx`, `gear-view.ts`, `gear-equip.ts`, `gear-v3.ts`; H121, D268; the rules are
+[classes](classes.md#armor-and-the-accessory), [loops](loops.md#gear) and [materials](materials.md#gear)): one view of eleven
+tiles, Gear's budget one screen at 390×844. Weapons are chosen on the Class tab and raised here.
+- **First row:** "Physical · 3 ready" (her class's armor half, then the ready slots; "Physical" alone with none), **Raise all**
+  while a slot can rise, and the (i) with the grades', the forges' and the accessories' rules, one a line.
+- **Weapons**, **Armor** and **Accessories:** three, five and three tiles. A tile shows its icon, its grade badge and one stat
+  ("Might 45", "DEF 32", "HP 105", "MP 18", "M.DEF 28", "Evasion 4.8%"); an accessory what the slot does ("ATK +4", "Lance +8",
+  "Bosses +4%"), "Charm · Off" at G0, "Empty" with no family, or "Greatsword not held" in the warning colour on an Orb left on
+  a kind she no longer holds. A slot at G0 is an empty frame. The green Ready dot marks a slot that can rise now, or an
+  accessory slot at G1 or more with no family: the very list the tab's dot and the roster's mark count.
+- **A weapon's or armor's sheet** ("Axe · Slot 2", "Head · Physical"): before → after at display size ("G6 → G8", "Might 26 →
+  45"; "DEF 32 → 36 · ATK 4 → 5", an unchanged stat left out), each grade's cost ("Arms Gem G7 ×1 · 2 held"), and **target grade
+  chips** up to G10, a grade above her level faded with its "Lv 41". It opens on the highest grade the Warehouse covers; a tap on
+  a chip picks another, and a grade the stock doesn't cover stays tappable. The footer is **Raise to G8**, or disabled with what's
+  missing ("Arms Gem G7 ×0", "Lv 41"). At G10 it reads "G10 · Max" with no button. The sheet stays open on the new grade.
+- **An accessory's sheet** ("Accessory 1 · G4"), the same raise with "Pendant · G4 · ATK +4 · ★ +5" and "★ Signature · ATK/M.ATK +5
+  · Worn" on top, and its list: one row a choice, her ★ family first, then Pendant, Charm, an Orb for each weapon she holds, and
+  Insignia, with what each does at the slot's grade ("ATK +4"; "G1: ATK +1" at G0). The row she wears is ringed with a ✓. **A tap
+  wears the row and closes the sheet** (D266): there is no Set button, so what a tile shows is what the save holds.
+- **Raise all:** every ready slot as far as items and level allow, one line each ("Axe G6 → G8 · Arms Gem G7 ×1 · G8 ×1"), then
+  "Uses 4 items". Slots draw on the stock in the tab's order, and one the stock no longer covers stops lower or drops out.
+  **Raise 3** spends it all in one save write.
 
 **Stars tab** (`StarsPanel.tsx`): the Observatory's live body without its Uma picker: the planet-and-moons map, Prowess,
 the six totals, Set list and node sheet. The Observatory and profile share this one body.

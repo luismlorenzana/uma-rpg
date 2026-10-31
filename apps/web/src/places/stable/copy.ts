@@ -32,6 +32,23 @@ export const nodeGate = (node: string): string => `${node} first`
 export const grade = (value: number): string => `G${value}`
 export const gradeStep = (from: number, to: number): string => `${grade(from)} → ${grade(to)}`
 export const maxGrade = (): string => 'G10 · Max'
+/** C8: a number before and after a change. */
+export const valueStep = (label: string, from: number | string, to: number | string): string =>
+  `${label} ${typeof from === 'number' ? n(from) : from} → ${typeof to === 'number' ? n(to) : to}`
+/** C8: an accessory's effect before and after a raise; the label once when they share it ("ATK +7 → +9"). */
+export function effectStep(from: string, to: string): string {
+  const label = from.slice(0, from.lastIndexOf(' '))
+  return from !== 'Off' && to.startsWith(`${label} `) ? `${from} → ${to.slice(label.length + 1)}` : `${from} → ${to}`
+}
+/** C1: Raise all's line for a slot: the first item in full, later grades by their grade alone. */
+export function raiseLine(slot: string, from: number, to: number, items: readonly string[]): string {
+  const cost = items.map((item, i) => (i === 0 ? itemCount(item, 1) : itemCount(item.slice(item.lastIndexOf(' ') + 1), 1)))
+  return [`${slot} ${gradeStep(from, to)}`, ...cost].join(' · ')
+}
+/** C1: how many made items a Raise all spends. */
+export const usesItems = (count: number): string => `Uses ${n(count)} item${count === 1 ? '' : 's'}`
+/** C7: Gear's first row: her armor's half and what's ready. */
+export const gearSummary = (half: 'physical' | 'magical', ready: number): string => `${armorHalf(half)}${ready ? ` · ${n(ready)} ready` : ''}`
 /** C1: a weapon's Might. */
 export const might = (value: number): string => `Might ${n(value)}`
 /** C1: an armor stat and its value. */

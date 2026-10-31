@@ -342,6 +342,9 @@ export async function wearPreset(outfitId: string, classId: RpgClass, family?: A
 /** Raises one R2 gear slot, or several grades after the sheet's confirmation. */
 export const raiseGear = (outfitId: string, target: GradeTarget, to?: number) => edit(import('@rpg/domain/forge'), (d, s, now, t) =>
   to === undefined ? d.raiseGrade(s, outfitId, target, now, t) : d.raiseGradeTo(s, outfitId, target, to, now, t))
+/** Raise all (H121): every step in one save write; a step the rules refuse aborts it with its message, nothing half-spent. */
+export const raiseAll = (outfitId: string, steps: readonly { target: GradeTarget; to: number }[]) => edit(import('@rpg/domain/forge'), (d, s, now, t) =>
+  steps.reduce((next, step) => d.raiseGradeTo(next, outfitId, step.target, step.to, now, t), s))
 /** Changes an R2 accessory's form without changing its grade. */
 export const chooseAccessoryForm = (outfitId: string, classId: RpgClass, slot: number, family: AccessoryFamily | null, kind?: RpgDamageKind) =>
   edit(import('@rpg/domain/forge'), (d, s, now, t) => d.setAccessoryForm(s, outfitId, classId, slot, family, kind, now, t))

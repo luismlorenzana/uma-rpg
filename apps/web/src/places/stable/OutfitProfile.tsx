@@ -19,7 +19,7 @@ import { StarsPanel } from '../observatory/StarsPanel'
 import { ClassTab } from './ClassTab'
 import { DetailsSheet } from './DetailsSheet'
 import { FactsRow } from './FactsRow'
-import { EquipView, upgradeCount, UpgradeView } from './GearCardV3'
+import { GearTab } from './GearTab'
 import { TemplateTab } from './TemplateTab'
 import { exp, level, unlock as unlockCopy } from './copy'
 import { PROFILE_TABS, rememberTab, storedTab, tabDots, tabFromRoute, type ProfileTab } from './profile-tabs'
@@ -106,7 +106,7 @@ export function OutfitProfile({ view, outfitId, place, route }: OutfitProfilePro
         {owned && world ? (
           <>
             {tab === 'class' && <ClassTab outfit={outfit} uma={owned} world={world} />}
-            {tab === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} upgrades={upgrades} onClass={() => openTab('class')} />}
+            {tab === 'gear' && <GearTab outfit={outfit} uma={owned} world={world} tier={tier as 1 | 2 | 3} upgrades={upgrades} />}
             {tab === 'stars' && <StarsPanel outfitId={outfitId} />}
             {tab === 'template' && <TemplateTab view={view} outfit={outfit} uma={owned} classId={classId} tier={tier as 1 | 2 | 3} stock={world.items} />}
           </>
@@ -150,26 +150,5 @@ function UnlockBox({ outfit, tickets }: { outfit: RosterOutfit; tickets: number 
           throw new Error(err instanceof SaveRuleError ? err.message : 'Could not unlock.')
         })} />
     </section>
-  )
-}
-
-// --- Gear skeleton: both current bodies stacked, without a hidden sub-view -------------------------------------------
-
-function GearTab({ outfit, uma, world, upgrades, onClass }: {
-  outfit: RosterOutfit; uma: OwnedUma; world: TierWorld; upgrades: ReturnType<typeof umaUpgrades> | null; onClass: () => void
-}) {
-  const tier = useActiveTier() as 1 | 2 | 3
-  const count = upgradeCount(upgrades)
-  return (
-    <div className="space-y-4">
-      <section className="space-y-2">
-        <h2 className="font-display text-[16px] font-bold">Equip</h2>
-        <EquipView outfit={outfit} uma={uma} tier={tier} onSkills={onClass} />
-      </section>
-      <section className="space-y-2">
-        <h2 className="font-display text-[16px] font-bold">Upgrade{count ? ` · ${count}` : ''}</h2>
-        <UpgradeView outfit={outfit} uma={uma} world={world} tier={tier} upgrades={upgrades} />
-      </section>
-    </div>
   )
 }

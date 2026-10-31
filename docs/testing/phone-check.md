@@ -82,16 +82,17 @@ button and footer should stay reachable without horizontal page scrolling, in li
 12. **Stars and Template tabs.** Stars is the Observatory body without its picker: map, Prowess, six totals, Set list
     and node sheets. Template has Calling, Stride and Knack, her trade, full ★ Flourish, ★ Signature, separate ★ Moon
     I/II rows, aptitudes and unique racing skill. An All-Rounder Moon II reads `DEF +4 · M.DEF +4`. (D204, D217, D258)
-13. **Standard preset and Gear → Equip.** On a promoted Uma, in **Classes** on her own class, tap **Standard preset**: expect
-    **Standard preset · On** and her preset's weapons. On a Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it
-    to read **· On**; a Warrior or a Mage shows three rows, each listing its accessories. On Gear, under the armor, expect three small Accessory
-    tiles. Tap one: a list, her ★ family first, an Orb for each weapon she holds. Tap a row: the sheet closes and the tile
-    shows it at once; a slot at G0 reads "Off". Set the same accessory in two slots, leave and come back: both stick. Check the weapon chips' colours in both themes: the
-    Katana jade, the Bow rose. (D223, D266)
-14. **Gear → Upgrade.** Expect three Accessory rows, each raising on its own. Expect "Upgrade · n" to match the green marks. Tap a ready pill: the grade goes up by one, one
-    made item is spent and the count drops. A blocked row says why ("Needs Lv …", "Needs 1 Arms Gem G…", "Already G10").
-    On a row with several grades in stock, open it, tap **Raise to G…**, read the list and **Confirm**. Tap **Extra Stats**:
-    her Observatory map opens. (D217, D223)
+13. **Standard preset.** On a promoted Uma, in **Classes** on her own class, tap **Standard preset**: expect **Standard preset ·
+    On** and her preset's weapons. On a Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it to read **· On**;
+    a Warrior or a Mage shows three rows, each listing its accessories. Check the weapon chips' colours in both themes: the
+    Katana jade, the Bow rose. (D223, D263, D266)
+14. **Gear.** Expect eleven tiles on one screen at 390×844: three weapons, five armor slots, three accessories, each with its grade
+    and one stat, and "Physical · n ready" matching the green dots. Tap a ready weapon: "G6 → G8", "Might a → b", each cost with
+    what's held and the target chips; tap a lower chip, then **Raise to G…**: the sheet stays open on the new grade and the items
+    fall. A blocked slot's footer names the missing item or the "Lv n", disabled; a G10 slot reads "G10 · Max". **Raise all** lists
+    each slot and "Uses n items"; **Raise n** raises them. Tap an accessory tile: a list, her ★ family first, an Orb for each weapon
+    she holds. Tap a row: the sheet closes and the tile shows it at once; a slot at G0 reads "Off". Set the same accessory in
+    two slots, leave and come back: both stick. (D217, D223, D266, D268)
 15. **Facts and Details.** A working Uma's Work fact shows her place and time or Done; an idle one reads Idle and opens
     her trade's first place. Details shows Craft Level and EXP, grade gates and trade. Template holds her aptitudes and
     unique skill.
