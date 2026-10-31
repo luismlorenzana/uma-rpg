@@ -2,8 +2,8 @@
 
 > **Approved (D239) and built: H117–H125 (D258, D265, D267–D272), measured in H125 ([§10](#10-before-and-after)).** Later
 > decisions changed three things this doc says: Classes v3 (D240) removed the calling pick; D264 gave her three accessory
-> slots, took the jewels off her moon and made a Planet node take three; D266 made an accessory a one-tap list and left a ★ her
-> weapons can't use off the preset, so its dot follows (D270). Where they differ, the code and [the manual](../../game/sections.md#stable)
+> slots, took the jewels off her moon and made a Planet node take three; D266 made an accessory a one-tap list; D274 removed
+> §5.5's Template dot, since her uniqueness is optional, and an empty accessory slot stays Gear's. Where they differ, the code and [the manual](../../game/sections.md#stable)
 > win. The rework of the Uma profile the owner asked for
 > (2026-10-28): a full review of the compaction passes and ChatGPT's guideline (D229), the AI slop cleaned out of every
 > profile string, one consistent structure for display, visuals and changes, and her uniqueness in one place with every

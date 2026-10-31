@@ -95,12 +95,11 @@ function Row({ row, onOpen }: { row: TemplateRow; onOpen?: () => void }) {
         <span className="block text-[12.5px] text-ink-soft">{row.number}</span>
       </span>
       {row.state && <span className={`shrink-0 text-[12.5px] font-semibold ${row.tone ? TONE[row.tone] : ''}`}>{row.state}</span>}
-      {row.dot && <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-success" />}
       {onOpen && <span className="shrink-0 text-ink-faint">›</span>}
     </>
   )
   return onOpen
-    ? <button type="button" onClick={onOpen} data-template-row={row.key} aria-label={`${row.label}, ${row.number}, ${row.state ?? ''}${row.dot ? ', ready' : ''}`}
+    ? <button type="button" onClick={onOpen} data-template-row={row.key} aria-label={`${row.label}, ${row.number}, ${row.state ?? ''}`}
         className="flex min-h-11 w-full items-center gap-2 rounded-sm bg-raised px-2.5 py-1 text-left">{body}</button>
     : <div data-template-row={row.key} className="flex min-h-11 items-center gap-2 rounded-sm bg-raised px-2.5 py-1">{body}</div>
 }

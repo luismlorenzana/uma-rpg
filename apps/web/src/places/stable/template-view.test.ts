@@ -1,10 +1,10 @@
 // The Template tab's rules (H123; uma-templates.md §5, UT14; CV19, CV21): the readings with what they read, her calling and trade,
-// every ★ row's number and state, the racing rings, the Flourish sheet, and the signature dot, which skips a ★ her weapons
-// can't use (D266). Her calling comes from her running styles, with nothing to pick. Invented outfits.
+// every ★ row's number and state, the racing rings, the Flourish sheet and the slot the Signature row opens. Nothing here carries
+// a dot (D274). Her calling comes from her running styles, with nothing to pick. Invented outfits.
 import type { AptitudeGrade, Aptitudes } from '@luismlorenzana/uma-data'
-import { newGrades, newOwnedUma, type AccessorySlotState, type OwnedUma, type RosterOutfit, type RpgClass, type RpgWeapon } from '@rpg/domain'
+import { newGrades, newOwnedUma, type AccessorySlotState, type OwnedUma, type RosterOutfit, type RpgClass } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { flourishLine, flourishSheet, signatureDot, signatureSlot, templateTab } from './template-view'
+import { flourishLine, flourishSheet, signatureSlot, templateTab } from './template-view'
 
 const NOW = '2026-10-31T12:00:00.000Z'
 type Grades<K extends string> = Partial<Record<K, AptitudeGrade>>
@@ -56,16 +56,16 @@ describe('the Template tab (H123)', () => {
   })
 
   it('reads the Flourish On as any class of her family, and Off · as her class, never a dot', () => {
-    expect(row(templateTab(C, uma('tomeblade'), 'tomeblade', 1), 'flourish')).toMatchObject({ number: 'Even pace · 1%/round · max 4%', state: 'On', tone: 'on', dot: false })
-    expect(row(templateTab(C, uma('brawler'), 'brawler', 1), 'flourish')).toMatchObject({ state: 'Off · as Brawler', tone: 'off', dot: false })
+    expect(row(templateTab(C, uma('tomeblade'), 'tomeblade', 1), 'flourish')).toMatchObject({ number: 'Even pace · 1%/round · max 4%', state: 'On', tone: 'on' })
+    expect(row(templateTab(C, uma('brawler'), 'brawler', 1), 'flourish')).toMatchObject({ state: 'Off · as Brawler', tone: 'off' })
   })
 
   it('reads the signature Worn, Not worn and G1 first', () => {
     const family = templateTab(C, uma('duelist'), 'duelist', 1).family
     const other = family === 'pendant' ? 'orb' : 'pendant'
-    expect(row(templateTab(C, uma('duelist', [slot(3, family)]), 'duelist', 1), 'signature')).toMatchObject({ number: 'ATK/M.ATK +4', state: 'Worn', tone: 'on', dot: false })
-    expect(row(templateTab(C, uma('duelist', [slot(3, other)]), 'duelist', 1), 'signature')).toMatchObject({ state: 'Not worn', dot: true })
-    expect(row(templateTab(C, uma('duelist', [slot(0, family)]), 'duelist', 1), 'signature')).toMatchObject({ state: 'G1 first', dot: false })
+    expect(row(templateTab(C, uma('duelist', [slot(3, family)]), 'duelist', 1), 'signature')).toMatchObject({ number: 'ATK/M.ATK +4', state: 'Worn', tone: 'on' })
+    expect(row(templateTab(C, uma('duelist', [slot(3, other)]), 'duelist', 1), 'signature')).toMatchObject({ state: 'Not worn', tone: null })
+    expect(row(templateTab(C, uma('duelist', [slot(0, family)]), 'duelist', 1), 'signature')).toMatchObject({ state: 'G1 first' })
   })
 
   it('reads her moon: Open, its level, or waiting on the moons it opens with', () => {
@@ -87,7 +87,6 @@ describe('the Template tab (H123)', () => {
     expect(view.calling).toBe('Calling on unlock · Spellblade')
     expect(view.rows.map((r) => r.state)).toEqual([null, null, null, null])
     expect(row(view, 'signature').number).toBe('ATK/M.ATK +5 · Lv 50')
-    expect(view.rows.every((r) => !r.dot)).toBe(true)
   })
 
   it('words a Flourish in one line', () => {
@@ -96,29 +95,10 @@ describe('the Template tab (H123)', () => {
   })
 })
 
-describe('the signature dot (H123, D266)', () => {
-  const ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance']
-  const armed = (slots: AccessorySlotState[]) => uma('brawler', slots, { classes: { brawler: { weapons: ARMS, lines: {}, loadout: null } } })
+describe('the slot the Signature row opens (H123)', () => {
   const family = (o: RosterOutfit) => templateTab(o, null, null, 1).family
 
-  it('flags an empty slot at G1 for anyone, and nothing at G0 or when worn', () => {
-    expect(signatureDot(C, uma('duelist', [slot(1)]), 'duelist')).toBe(true)
-    expect(signatureDot(C, uma('duelist', [slot(0)]), 'duelist')).toBe(false)
-    expect(signatureDot(C, uma('duelist', [slot(2, family(C))]), 'duelist')).toBe(false)
-  })
-
-  it('flags her ★ not worn only when her weapons can use it, as the standard preset does', () => {
-    const fleet = outfit({ front: 'A' }, { medium: 'A' }, 100, 90, { speed: 20 })
-    expect(family(fleet)).toBe('bell')
-    // A Charm on three Arms stays off by choice: Not worn, with no dot.
-    const charmless = armed([slot(4, 'pendant'), slot(4, 'pendant'), slot(4, 'orb')])
-    expect(signatureDot(fleet, charmless, 'brawler')).toBe(false)
-    expect(row(templateTab(fleet, charmless, 'brawler', 1), 'signature')).toMatchObject({ state: 'Not worn', dot: false })
-    const hybrid = uma('spellblade', [slot(4, 'pendant')], { classes: { spellblade: { weapons: ['katana', 'lance', 'tome-lightning'], lines: {}, loadout: null } } })
-    expect(signatureDot(fleet, hybrid, 'spellblade')).toBe(true)
-  })
-
-  it('opens the slot wearing her ★, else an empty one at G1, else her highest', () => {
+  it('is the one wearing her ★, else an empty one at G1, else her highest', () => {
     const f = family(C)
     const other = f === 'pendant' ? 'orb' : 'pendant'
     expect(signatureSlot(uma('duelist', [slot(2, other), slot(1, f)]), f)).toBe(1)

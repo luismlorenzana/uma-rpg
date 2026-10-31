@@ -47,13 +47,14 @@ export function rememberTab(tab: ProfileTab): void {
   }
 }
 
-/** Ready marks by the tab that owns the action (§5.5): Class while a promotion waits, Template while `signature` flags. */
-export function tabDots(upgrades: UmaUpgrades | null, signature: boolean): ProfileDots {
+/** Ready marks by the tab that owns the action (§5.5): Class while a promotion waits. Template never: her uniqueness is
+ * optional, so nothing there asks for a tap (D274). */
+export function tabDots(upgrades: UmaUpgrades | null): ProfileDots {
   return {
     class: upgrades?.promote ?? false,
     gear: (upgrades?.gear ?? 0) > 0,
     stars: (upgrades?.stars ?? 0) > 0,
-    template: signature,
+    template: false,
   }
 }
 

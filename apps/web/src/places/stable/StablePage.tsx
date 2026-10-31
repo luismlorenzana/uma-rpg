@@ -1,7 +1,7 @@
 // SB4: shared album chrome, virtual views and device preferences. RPG profile routes and rules stay here.
 import { AlbumChrome, AlbumGrid, useAlbumPrefs } from '@luismlorenzana/uma-kit/album'
 import { emptyStateHint } from '@luismlorenzana/uma-kit/roster'
-import { activeClass, bestAptitudeLine } from '@rpg/domain'
+import { bestAptitudeLine } from '@rpg/domain'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { albumRows, stableResult, STABLE_FACETS, STABLE_PRESETS, STABLE_SCHEMA, STABLE_SORTS } from '../../album/rows'
@@ -18,7 +18,6 @@ import type { PageProps } from '../registry'
 import { OutfitProfile } from './OutfitProfile'
 import { restoreRosterScroll, rosterList, saveRosterScroll } from './profile-nav'
 import { firstDotTab, profileDoor, tabDots } from './profile-tabs'
-import { signatureDot } from './template-view'
 
 export default function StablePage({ place, rest }: PageProps) {
   const [, outfitId, sub] = rest.split('/')
@@ -51,7 +50,7 @@ export function Roster({ view }: { view: MasterView; place: PageProps['place'] }
   const open = (row: (typeof result.rows)[number]) => {
     prefs.see([row.id])
     saveRosterScroll()
-    const dots = prefs.query.filters.upgrade && row.uma ? tabDots(row.upgrades, signatureDot(row.outfit, row.uma, activeClass(row.outfit, row.uma, tier))) : null
+    const dots = prefs.query.filters.upgrade && row.uma ? tabDots(row.upgrades) : null
     const door = profileDoor(row.id, { tab: (dots && firstDotTab(dots)) ?? undefined, list: rosterList(result.rows) })
     void navigate(door.to, { state: door.state })
   }

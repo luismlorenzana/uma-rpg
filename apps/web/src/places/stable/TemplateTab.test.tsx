@@ -54,9 +54,10 @@ afterEach(() => {
 })
 
 describe('the Template tab (H123)', () => {
-  it('opens Gear\'s accessory sheet from the Signature row, and a tap on her ★ wears it: the dot goes', async () => {
+  it('opens Gear\'s accessory sheet from the Signature row with no dot, and a tap on her ★ wears it', async () => {
     show(await saveWith('recruit', 2))
-    expect(row('signature').getAttribute('aria-label')).toMatch(/, ready$/)
+    expect(row('signature').getAttribute('aria-label')).toMatch(/Not worn$/)
+    expect(row('signature').querySelector('.bg-success')).toBeNull()
     fireEvent.click(row('signature'))
     const sheet = await screen.findByRole('dialog', { name: 'Accessory 1 · G2' })
     await act(async () => { fireEvent.click(within(sheet).getAllByRole('button', { name: /^★ / })[0]!) })

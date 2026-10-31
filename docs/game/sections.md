@@ -191,10 +191,10 @@ hides with one Uma in the list and on a locked profile. Arrows only, no swipe.
 - **Device preferences** (`album/preferences.ts`): the query and view, and up to 20 saved views. Nothing goes in the
   save. **NEW** marks an outfit added since this device's first visit and not opened yet; the first visit marks the
   catalogue of the day as seen.
-- **Can upgrade** (`album/upgrades.ts`): any tab's Ready dot, as her active class: a promotion waiting (she fights as a Tier 0
-  at Rank 10 with a child she doesn't hold, `umaPromotionWaits`), a weapon, armor or accessory slot she can raise now (its made
-  item in the Warehouse, her level allowing), a jewel in the Warehouse that opens one of her nodes now, or the Template tab's
-  signature dot.
+- **Can upgrade** (`upgradesFor`, as her active class; `album/upgrades.ts`): a promotion waiting (she fights as a Tier 0 at Rank 10
+  with a child she doesn't hold, `umaPromotionWaits`), a weapon, armor or accessory slot she can raise now (its made item in the
+  Warehouse, her level allowing), an accessory slot at G1 or more with no family yet, or a jewel in the Warehouse that opens one of
+  her nodes now. Her template never counts: it is optional (D274).
 
 **Her profile** (`OutfitProfile.tsx` in the kit's compact `ProfileFrame`; its contract is [Uma profile
 v2](../design/uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229), D239):
@@ -211,8 +211,8 @@ v2](../design/uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229), D23
 - **A locked outfit** has a dimmed portrait, no level and no tabs. Its facts row becomes **Unlock · 1 Ticket**, "In
   Tier 2" or "Unlock in Tier 1"; its Template content remains below. The unlock uses the kit's `UnlockConfirm`.
 - **Tabs:** Class, Gear, Stars and Template, always in that order; the last one used is remembered on the device. Class
-  carries a Ready dot while a promotion waits, Gear while a grade can rise, Stars while a jewel can be set, Template while
-  a slot at G1 or more has no family or her usable ★ isn't worn.
+  carries a Ready dot while a promotion waits, Gear while a grade can rise, Stars while a jewel can be set. Template never does:
+  her uniqueness is optional (D274).
 
 **Class tab** (`ClassTab.tsx`, `class-sheets.tsx`, `ClassesSheet.tsx`, `PromotionSheet.tsx`, `WeaponSheet.tsx`, `class-view.ts`;
 H120, D267; the rules are [classes](classes.md#the-class-tree) and [skill trees](skill-trees.md)). Every change here is free,
@@ -283,8 +283,8 @@ tiles, Gear's budget one screen at 390×844. Weapons are chosen on the Class tab
 - **Weapons**, **Armor** and **Accessories:** three, five and three tiles. A tile shows its icon, its grade badge and one stat
   ("Might 45", "DEF 32", "HP 105", "MP 18", "M.DEF 28", "Evasion 4.8%"); an accessory what the slot does ("ATK +4", "Lance +8",
   "Bosses +4%"), "Charm · Off" at G0, "Empty" with no family, or "Greatsword not held" in the warning colour on an Orb left on
-  a kind she no longer holds. A slot at G0 is an empty frame. The green Ready dot marks a slot that can rise now: the very
-  list the tab's dot counts.
+  a kind she no longer holds. A slot at G0 is an empty frame. The green Ready dot marks a slot that can rise now, or an
+  accessory slot at G1 or more with no family: the very list the tab's dot and the roster's mark count.
 - **A weapon's or armor's sheet** ("Axe · Slot 2", "Head · Physical"): before → after at display size ("G6 → G8", "Might 26 →
   45"; "DEF 32 → 36 · ATK 4 → 5", an unchanged stat left out), each grade's cost ("Arms Gem G7 ×1 · 2 held"), and **target grade
   chips** up to G10, a grade above her level faded with its "Lv 41". It opens on the highest grade the Warehouse covers; a tap on
@@ -329,9 +329,8 @@ her uniqueness in one place, and the only body shown for a locked or elsewhere o
     the footer **Fight as Brawler**, or **Start Warrior · R1** on a Tier 0 she hasn't started; a class she can't enter yet is faded.
     A later tier's world has no Tier 0 chip.
   - **★ Signature** "ATK/M.ATK +8": **Worn**, **Not worn**, or "G1 first" with every slot at G0. It opens Gear's accessory sheet, on
-    the slot wearing her ★, else an empty slot at G1 or more, else her highest. The green Ready dot shows while a slot at G1 or
-    more has no family, or her ★ isn't worn and her weapons can use it: a Charm on three Arms stays off by choice, as the
-    standard preset leaves it (D266), and reads Not worn with no dot.
+    the slot wearing her ★, else an empty slot at G1 or more, else her highest. It never carries a dot: wearing her ★ is her
+    choice (D274).
   - **★ Moon I** ("HP +20", her knack's stat) and **★ Moon II** (by her calling's root: "DEF +8", "M.DEF +8", "DEF/M.DEF +4"):
     **Open**, "Lv 16", or "With its moons" once her level is there. They open Stars' node sheet.
 - **Racing:** Surface, Distance and Style chips, with what her template read ringed in the accent (her calling's styles, her

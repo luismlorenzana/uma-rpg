@@ -116,6 +116,6 @@ describe('the Gear tab (H121)', () => {
     expect(screen.getByText('Physical')).toBeDefined()
     expect(screen.queryByRole('button', { name: 'Raise all' })).toBeNull()
     expect(screen.queryByRole('button', { name: /, ready$/ })).toBeNull()
-    expect(tabDots(umaUpgrades(world(), outfit, 1), false).gear).toBe(false)
+    expect(tabDots(umaUpgrades(world(), outfit, 1)).gear).toBe(false)
   })
 })

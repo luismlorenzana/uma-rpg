@@ -40,16 +40,15 @@ describe('the profile v2 tab contract', () => {
     expect(storedTab()).toBe('class')
   })
 
-  it('marks each tab independently and chooses the first ready tab: Class, Gear, Stars, Template', () => {
+  it('marks each tab independently, never Template, and chooses the first ready tab', () => {
     const upgrades = { gear: 2, stars: 1, promote: false } as UmaUpgrades
-    expect(tabDots(upgrades, true)).toEqual({ class: false, gear: true, stars: true, template: true })
-    expect(tabDots({ ...upgrades, promote: true }, false).class).toBe(true)
-    expect(firstDotTab(tabDots({ ...upgrades, promote: true }, true))).toBe('class')
-    expect(firstDotTab(tabDots(upgrades, true))).toBe('gear')
-    expect(firstDotTab(tabDots({ gear: 0, stars: 1 } as UmaUpgrades, true))).toBe('stars')
-    expect(firstDotTab(tabDots({ gear: 0, stars: 0 } as UmaUpgrades, true))).toBe('template')
-    expect(tabDots({ gear: 0, stars: 0 } as UmaUpgrades, false).template).toBe(false)
-    expect(firstDotTab(tabDots(null, false))).toBeNull()
+    expect(tabDots(upgrades)).toEqual({ class: false, gear: true, stars: true, template: false })
+    expect(tabDots({ ...upgrades, promote: true }).class).toBe(true)
+    expect(firstDotTab(tabDots({ ...upgrades, promote: true }))).toBe('class')
+    expect(firstDotTab(tabDots(upgrades))).toBe('gear')
+    expect(firstDotTab(tabDots({ gear: 0, stars: 1 } as UmaUpgrades))).toBe('stars')
+    expect(firstDotTab(tabDots({ gear: 0, stars: 0 } as UmaUpgrades))).toBeNull()
+    expect(firstDotTab(tabDots(null))).toBeNull()
   })
 
   it('builds one Back-aware profile door shape', () => {

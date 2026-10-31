@@ -3,7 +3,7 @@
 // sources ringed, and the Flourish sheet. Her calling is read from her running styles, so nothing here is picked (the pick
 // retired with H134). Pure, on the domain's rules. Lazy, with the Stable's pages.
 import {
-  ACCESSORY_FAMILY_LABEL, accessoryFamilyUsable, classOf, FLOURISH_NAMES, flourish, isGrades, isStarMap, KEY_LABELS, KNACK_LABEL, KNACK_STAT, mapNodeGate, moonTemplate,
+  ACCESSORY_FAMILY_LABEL, FLOURISH_NAMES, flourish, isGrades, isStarMap, KEY_LABELS, KNACK_LABEL, KNACK_STAT, mapNodeGate, moonTemplate,
   rpgClassFamily, rpgClassName, signatureBonus, signatureWorn, STRIDE_LABEL, tradeOfCalling, umaFlourishActive, umaPick, umaTemplate,
   type AccessoryFamily, type GearTier, type OwnedUma, type RosterOutfit, type RpgClass, type RpgFlourish, type RpgTier0Class, type TemplateOutfit,
 } from '@rpg/domain'
@@ -51,15 +51,6 @@ export const flourishValue = (value: RpgFlourish): string => flourish(value, tru
 /** A Flourish's full line. */
 export const flourishLine = (value: RpgFlourish): string => flourish(value, true)
 
-/** The tab's first dot reason (§5.5, UP18): an accessory slot at G1 or more with no family, or her ★ family not worn while a
- * slot could wear it. Her ★ only when her weapons can use it (D266): a Charm on three Arms stays off, by choice, as the
- * standard preset leaves it, and a choice is never flagged. */
-export function signatureDot(outfit: TemplateOutfit, uma: OwnedUma, classId: RpgClass): boolean {
-  if (!isGrades(uma.gear) || !uma.gear.accessories.some((slot) => slot.grade >= 1)) return false
-  if (uma.gear.accessories.some((slot) => slot.grade >= 1 && slot.family === null)) return true
-  const family = umaTemplate(outfit, umaPick(uma)).family
-  return !signatureWorn(uma.gear, family) && accessoryFamilyUsable(family, classOf(uma, classId).weapons)
-}
 /** The slot the Signature row opens: the one wearing her ★, else an empty one at G1 or more, else her highest. */
 export function signatureSlot(uma: OwnedUma, family: AccessoryFamily): number {
   if (!isGrades(uma.gear)) return 0
@@ -72,8 +63,8 @@ export function signatureSlot(uma: OwnedUma, family: AccessoryFamily): number {
 }
 
 export type TemplateRowKey = 'flourish' | 'signature' | 'moon-1' | 'moon-2'
-/** One ★ piece: a label, a number, its state and the Ready dot. A locked Uma's has no state. */
-export interface TemplateRow { key: TemplateRowKey; label: string; number: string; state: string | null; tone: 'on' | 'off' | 'closed' | null; dot: boolean }
+/** One ★ piece: a label, a number and its state, never a dot: her uniqueness is optional (D274). A locked Uma's has no state. */
+export interface TemplateRow { key: TemplateRowKey; label: string; number: string; state: string | null; tone: 'on' | 'off' | 'closed' | null }
 export interface RacingChip { key: string; label: string; grade: string; ring: boolean }
 export interface TemplateTabView {
   name: string
@@ -104,15 +95,14 @@ export function templateTab(outfit: RosterOutfit, uma: OwnedUma | null, classId:
   const worn = uma && isGrades(uma.gear) ? signatureWorn(uma.gear, t.family) : false
   const graded = uma && isGrades(uma.gear) ? uma.gear.accessories.some((slot) => slot.grade >= 1) : false
   const bonus = `ATK/M.ATK +${signatureBonus(uma?.level ?? 50, tier)}`
-  const flourishRow: TemplateRow = { key: 'flourish', label: '★ Flourish', number: flourishValue(t.flourish), dot: false,
+  const flourishRow: TemplateRow = { key: 'flourish', label: '★ Flourish', number: flourishValue(t.flourish),
     state: uma ? (on ? 'On' : offAs(rpgClassName(classId!))) : null, tone: uma ? (on ? 'on' : 'off') : null }
   const signatureRow: TemplateRow = uma
-    ? { key: 'signature', label: '★ Signature', number: bonus, state: worn ? 'Worn' : graded ? 'Not worn' : signatureFirst, tone: worn ? 'on' : graded ? null : 'closed',
-        dot: signatureDot(outfit, uma, classId!) }
-    : { key: 'signature', label: '★ Signature', number: atLevel(bonus, 50), state: null, tone: null, dot: false }
+    ? { key: 'signature', label: '★ Signature', number: bonus, state: worn ? 'Worn' : graded ? 'Not worn' : signatureFirst, tone: worn ? 'on' : graded ? null : 'closed' }
+    : { key: 'signature', label: '★ Signature', number: atLevel(bonus, 50), state: null, tone: null }
   const moonRow = (key: 'moon-1' | 'moon-2', label: string, node: string): TemplateRow => {
     const state = uma ? moonState(uma, node) : null
-    return { key, label, number: value(node), state, tone: state === null ? null : state === 'Open' ? 'on' : 'closed', dot: false }
+    return { key, label, number: value(node), state, tone: state === null ? null : state === 'Open' ? 'on' : 'closed' }
   }
   const styles = callingStyles(outfit) as readonly string[]
   const knackStat = KNACK_STAT[t.knack]

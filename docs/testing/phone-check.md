@@ -84,7 +84,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
     disabled with `Lv n` or `{Node} first`. **Set**: the sheet stays open on Open and the count falls. **Set all** lists each jewel;
     **Set n** sets them. Her moon's nodes read "With its moons". On Template, expect her name, three reading tiles, "Calling · … ·
     fixed" and her trade, four ★ rows, her racing chips with the sources ringed, and **Racing skill ›**. Tap ★ Signature: Gear's
-    accessory sheet; tap her ★ row and the row reads Worn. A Brawler with a Charm ★ reads Not worn with no dot. Tap ★ Flourish on an
+    accessory sheet; tap her ★ row and the row reads Worn. An Uma without her ★ reads Not worn, with no dot on the tab or the roster. Tap ★ Flourish on an
     Uma outside her family: **Fight as …** and the row reads On. Tap a ★ Moon row: Stars' node sheet. An All-Rounder Moon II reads
     `DEF/M.DEF +4`. (D204, D217, D258, D269, D270)
 13. **Standard preset.** On a promoted Uma, in **Classes** on her own class, tap **Standard preset**: expect **Standard preset ·
