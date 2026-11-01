@@ -1,10 +1,9 @@
 # Profile polish: Details and the star chart
 
-> **Proposed 2026-10-31, from the owner's two screenshots. Nothing here is built.** Five packets carry it:
-> [H139](../../handoff/tasks/H139-damage-sheet-domain.md), [H140](../../handoff/tasks/H140-details-damage-first.md),
-> [H141](../../handoff/tasks/H141-star-crests-art.md), [H142](../../handoff/tasks/H142-star-chart.md) and
-> [H143](../../handoff/tasks/H143-star-sheets-and-marks.md). No rule, save or balance change: the fight, the jewels and every
-> number stay as they are.
+> **From the owner's two screenshots, 2026-10-31; approved and built by H139, H140 and H142 (D275–D277); H143 follows.** Art is ChatGPT's,
+> so the chart shipped with vector crests, and [H141](../../handoff/tasks/H141-star-crests-art.md) draws the pixel art that
+> [H144](../../handoff/tasks/H144-pin-star-art.md) pins (PP25, PP30). No rule, save or balance change: the fight, the jewels and every number stay as
+> they are.
 
 **Pages:** [Details](previews/details.html) · [Star chart](previews/star-chart.html). Both are live mocks with the light and dark
 themes and both phone sizes; the chart's stars and bodies can be tapped.
@@ -86,7 +85,7 @@ rest. It is the number you can raise, which is what the owner asked to see. "How
 
 **The figures.** A true circle of radius 132 around the Planet carries the three moons, 120° apart. Each moon draws five stars into a
 figure, clockwise from I at the top: **Prowess a spearhead, Vigor a pentagon, Guard a shield.** The Planet's five sit on a true ring of
-radius 44, and her moon is a pair beside a crescent. Every coordinate is in [H142](../../handoff/tasks/H142-star-chart.md).
+radius 44, and her moon is a pair beside a crescent. Every coordinate is in `places/observatory/star-chart.ts`, and its test holds them.
 
 **The states.** Colour says which body, fill says how far along:
 
@@ -140,22 +139,23 @@ The owner prefers no open questions, so each is decided, with the reason.
 | PP22 | Lines light from star to star; the closing line only when a body is full | The order shows, and finishing a body shows too |
 | PP23 | A color for each body: gold, ember, rose, sky and orchid | A chart should be readable at a glance; no green |
 | PP24 | Each body's label holds its name and count; ★ her moon's label runs from the right edge | Any template name fits |
-| PP25 | Crests are pixel art over the SVG at whole pixels, in HTML buttons | The viewBox scale would blur pixel art, and a button is a real 44 pt target |
+| PP25 | Crests sit over the SVG in HTML buttons: vector until H144 pins the pixel art, at whole pixels | The viewBox scale would blur pixel art, and a button is a real 44 pt target |
 | PP26 | A tap on a body opens the sheet on its next node, or its last when full | One sheet, no new kind |
 | PP27 | The node sheet gains a strip of its body's nodes, each with the first number of its value | Every value of a body in one place |
 | PP28 | The six totals and the ★ line stay, with stat marks | The owner didn't ask to lose them |
 | PP29 | Details' tiles wear the same marks | One icon set |
-| PP30 | Five 24 px crests and eight 16 px marks, in uma-art's `ui` atlas; ChatGPT draws and publishes; H142 pins | Art is ChatGPT's end to end |
+| PP30 | Five 24 px crests and eight 16 px marks, in uma-art's `ui` atlas; ChatGPT draws and publishes; H144 pins, and vector stand-ins carry the game until then | Art is ChatGPT's end to end, and the chart shouldn't wait on it |
 | PP31 | The top-left corner stays empty | Tier 2 and Tier 3's weapon moons fit there, whenever they're built; nothing is built for them now |
 
 ## 5. The packets
 
 | Id | What | Who | Size | Needs |
 |---|---|---|---|---|
-| [H139](../../handoff/tasks/H139-damage-sheet-domain.md) | The damage numbers, proved equal to a fight's | Claude or ChatGPT | S | — |
-| [H140](../../handoff/tasks/H140-details-damage-first.md) | Details: damage first, All stats a tap down | Claude or ChatGPT | M | H139 |
+| H139 | The damage numbers, proved equal to a fight's | Claude | S | — |
+| H140 | Details: damage first, All stats a tap down | Claude | M | H139 |
 | [H141](../../handoff/tasks/H141-star-crests-art.md) | Art: five crests and eight stat marks | ChatGPT draws and publishes | S | — |
-| [H142](../../handoff/tasks/H142-star-chart.md) | The star chart | Claude or ChatGPT | M | H141 |
-| [H143](../../handoff/tasks/H143-star-sheets-and-marks.md) | A body's sheet, its strip and the stat marks | Claude or ChatGPT | S | H140, H142 |
+| H142 | The star chart, with vector crests | Claude | M | — |
+| [H143](../../handoff/tasks/H143-star-sheets-and-marks.md) | A body's sheet, its strip and the stat marks | Claude | S | H140, H142 |
+| [H144](../../handoff/tasks/H144-pin-star-art.md) | Pin uma-art 2.19.0: pixel crests and marks | Claude or ChatGPT | S | H141, H143 |
 
-Details (H139, H140) and the chart (H141, H142) are separate tracks: either can ship first. H143 closes both.
+H143 joins Details and the chart. H144 follows the art.

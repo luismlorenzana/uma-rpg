@@ -84,6 +84,12 @@ export function nodeValue(value: NodeValue): string {
   return `${value.stat} +${typeof value.value === 'number' ? n(value.value) : value.value}`
 }
 
+const capital = (word: string): string => word[0]!.toUpperCase() + word.slice(1)
+/** C1: a body's name on the chart: "Guard", "★ Spellfencer". */
+export const bodyName = (body: string, type: string): string => (body === 'template' ? `★ ${capital(type)}` : capital(body))
+/** C1: a body's button: "Guard, 3 of 5 open". */
+export const bodyLabel = (body: string, type: string, open: number, total: number): string => `${bodyName(body, type)}, ${n(open)} of ${n(total)} open`
+
 /** C1/C8: an item, its cost and optional stock. */
 export const itemCount = (item: string, count: number, held?: number): string =>
   `${item} ×${n(count)}${held === undefined ? '' : ` · ${n(held)} held`}`

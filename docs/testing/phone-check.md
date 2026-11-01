@@ -81,8 +81,10 @@ button and footer should stay reachable without horizontal page scrolling, in li
     line B**: the footer reads Held, the tile reads B and the tree's equipped skills follow; take A back. A closed node reads
     `Opens · Rn`, disabled. Tap **Limit**: its sheet lists each Limit Break she casts, then her other Bonds; **Open {hall}** opens
     the hall, and Back returns to the sheet. (D201, D206, D229, D267)
-12. **Stars and Template tabs.** Stars reads "Extra Stats · Open n/22 · n ready", her map with a green dot on a node a jewel opens now,
-    six totals and her moon's ★ line. Tap a closed node: what it gives, before → after, its jewel with what's held, and **Set**, or
+12. **Stars and Template tabs.** Stars reads "Extra Stats · Open n/22 · n ready", then the star chart on a night sky in both themes: Prowess a
+    spearhead, Vigor a pentagon, Guard a shield, the Planet a ring, each star numbered, a label and count on each body. Filled and lit lines are
+    Open, a green dot and a slow pulse are Ready, a bright ring is Next, a dim one Later; a full body closes its figure. Nothing overlaps at
+    375×667, and no line bulges off its stars. Tap a body's middle: its next node's sheet. Below it the six totals and her moon's ★ line. Tap a closed node: what it gives, before → after, its jewel with what's held, and **Set**, or
     disabled with `Lv n` or `{Node} first`. **Set**: the sheet stays open on Open and the count falls. **Set all** lists each jewel;
     **Set n** sets them. Her moon's nodes read "With its moons". On Template, expect her name, three reading tiles, "Calling · … ·
     fixed" and her trade, four ★ rows, her racing chips with the sources ringed, and **Racing skill ›**. Tap ★ Signature: Gear's

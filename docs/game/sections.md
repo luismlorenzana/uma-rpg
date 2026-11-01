@@ -305,12 +305,16 @@ tiles, Gear's budget one screen at 390×844. Weapons are chosen on the Class tab
   "Uses 4 items". Slots draw on the stock in the tab's order, and one the stock no longer covers stops lower or drops out.
   **Raise 3** spends it all in one save write.
 
-**Stars tab** (`StarsPanel.tsx`, `stars-view.ts`; H122, D269; the rules are [loops](loops.md#extra-stats) and
-[jewels](materials.md#jewels)):
+**Stars tab** (`StarsPanel.tsx`, `stars-view.ts`, `StarChart.tsx`, `star-chart.ts`; H122, D269, H142, D277; the rules are
+[loops](loops.md#extra-stats) and [jewels](materials.md#jewels)):
 - **First row:** "Extra Stats · Open 13/22 · 2 ready" ("Extra Stats · Open 4/22" with none ready), **Set all** while a jewel fits,
   and the (i): each node opens with its jewel in order, a Planet node takes three, her moon takes none, Set all's rule.
-- **Her map:** the Planet in the middle, Prowess, Vigor and Guard around it, five nodes each, and her own moon's two, "★ Bruiser".
-  An open node is filled, a closed one faded, and a green dot marks one a jewel in the Warehouse opens now.
+- **Her star chart,** on the night sky in both themes: the Planet in the middle on its ring, Prowess, Vigor and Guard on one orbit around it,
+  and her own moon's two beside a crescent. Each moon draws a figure, clockwise from I: Prowess a spearhead, Vigor a pentagon, Guard a shield.
+  Each star carries its numeral, its jewel's numeral, and each body a label with its count ("Guard 3/5", "★ Bruiser 1/2"). **Open** is filled, with
+  the line to it lit; **Ready** (a jewel in the Warehouse opens it now) has a green dot and a slow pulse; **Next** is a bright ring; **Later** a dim one.
+  A full body closes its figure. A star opens its sheet; a body opens the sheet on its next node, its last when full. The crests are vector
+  stand-ins until uma-art's own (H141, H144).
 - **The six totals** ("HP +125", "MP +25", "ATK +25", "M.ATK +13", "DEF +19", "M.DEF +19") of the shared map, then her moon's line in
   the accent ("★ Evasion +2.4% · DEF +8").
 - **A node's sheet** ("Guard III", "★ Bruiser's moon II"): what it gives for her class ("DEF/M.DEF +6"; Prowess "ATK +6" as a Brawler;

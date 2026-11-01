@@ -393,6 +393,9 @@ sheet with before → after; **Raise to G6 at once is one sheet, not a list behi
 
 ### 4.3 Stars
 
+> **The map is now a star chart (H142, D277; [profile polish](../profile-polish/proposal.md)):** the drawing below is superseded; the sheets,
+> Set all and the doors stand.
+
 **Draws:** her Extra Stats map, as the Observatory draws it today (`StarMapV3`): the Planet in the middle, Prowess,
 Vigor and Guard around it, five nodes each, and ★ her moon's two nodes; then the six totals.
 **Changes:** nodes, by jewel (spending).

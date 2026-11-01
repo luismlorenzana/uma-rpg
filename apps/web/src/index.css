@@ -68,6 +68,19 @@
 }
 @source '../node_modules/@luismlorenzana/uma-kit/dist';
 
+/* The star chart's Ready pulse (H142): transform and opacity, which every phone engine animates on SVG; only Ready moves. */
+@keyframes star-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.15; }
+  50% { transform: scale(1.2); opacity: 0.75; }
+}
+.star-pulse { animation: star-pulse 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.star-tap { outline: none; }
+.star-focus { opacity: 0; }
+.star-tap:focus-visible .star-focus { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .star-pulse { animation: none; opacity: 0.45; }
+}
+
 /* Latin-only variable faces, loaded from the workspace; the kit's theme names them. */
 @font-face {
   font-family: 'Outfit Variable';

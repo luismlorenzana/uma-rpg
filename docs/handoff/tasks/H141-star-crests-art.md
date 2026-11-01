@@ -1,15 +1,15 @@
 # H141 — Art: five star crests and eight stat marks (uma-art 2.19.0)
 
-**uma-platform · ChatGPT draws and publishes · S · Needs: nothing · Unblocks: H142 (pins it and draws the crests), H143 (the marks)**
+**uma-platform · ChatGPT draws and publishes · S · Needs: nothing · Unblocks: H144 (pins it)**
 
 > **Where this lives:** the work and its pull request are in **uma-platform**; the packet sits in uma-rpg's `docs/handoff/tasks/` because uma-rpg asks
 > for the art, as H127 and H138 did.
 
 ## Why
 
-The Stars tab's Extra Stats map is being redrawn as a star chart ([the design](../../design/profile-polish/proposal.md)). The owner asked for "proper iconography":
-each of the five bodies needs a crest at its centre, and the six totals, the Details tiles and her moon's line need a mark per stat. uma-art has neither. Lean assets:
-thirteen small icons on the existing kit, nothing else.
+The Stars tab's Extra Stats map is now a star chart ([the design](../../design/profile-polish/proposal.md)). The owner asked for "proper iconography": each of the five
+bodies has a crest at its centre, and the six totals, the Details tiles and her moon's line have a mark per stat. They're vector stand-ins in the game today
+(`apps/web/src/places/observatory/star-marks.tsx`); this packet draws the real ones. Lean assets: thirteen small icons on the existing kit, nothing else.
 
 ## Context (read first)
 
@@ -86,4 +86,4 @@ Each must read on **white and on `#17202b`**, at 16 px, with the house's 1 px ou
 ## Deliver
 
 - **ChatGPT:** a branch and a pull request in uma-platform, "feat(art): star crests and stat marks (H141)". Merge it yourself, publish uma-art, and confirm the release.
-- **Flag it done:** in uma-rpg, delete this file, add a Done row in [README.md](../README.md) with the art commit and the release, and set H142 to Ready. **H142 pins 2.19.0;** don't pin it here.
+- **Flag it done:** in uma-rpg, delete this file, add a Done row in [README.md](../README.md) with the art commit and the release, and set H144 to Ready. **H144 pins 2.19.0;** don't pin it here.

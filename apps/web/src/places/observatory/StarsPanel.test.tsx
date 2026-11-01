@@ -71,6 +71,17 @@ describe('the Stars tab (H122)', () => {
     expect(within(sheet).queryByRole('button', { name: 'Set' })).toBeNull()
   })
 
+  it('draws each star’s state, and a body’s tap opens its next node', async () => {
+    useGame.setState({ status: 'ready', save: await saveWith(['guard:1', 'guard:2'], { 'jewel-moon-3': 1 }), activeTier: 1 })
+    render(shell('/stars', <Live />))
+    const state = (id: string) => document.querySelector(`[data-map-node="${id}"]`)!.getAttribute('data-star-state')
+    expect(document.querySelectorAll('[data-map-node]')).toHaveLength(22)
+    expect([state('guard:2'), state('guard:3'), state('guard:4'), state('template:1')]).toEqual(['open', 'ready', 'later', 'next'])
+    expect(document.querySelector('[data-map-node="guard:3"]')!.textContent).toBe('III')
+    fireEvent.click(screen.getByRole('button', { name: 'Guard, 2 of 5 open' }))
+    expect(await screen.findByRole('dialog', { name: 'Guard III' })).toBeDefined()
+  })
+
   it('Set all lists its lines and sets them in one save write', async () => {
     useGame.setState({ status: 'ready', save: await saveWith(['prowess:1', 'vigor:1', 'guard:1'], { 'jewel-moon-2': 2, 'jewel-planet-1': 3 }), activeTier: 1 })
     render(shell('/stars', <Live />))
