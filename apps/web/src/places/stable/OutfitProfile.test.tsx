@@ -141,8 +141,7 @@ describe('the Uma profile v2 frame (H119)', () => {
     const uma = fixture.world.umas['81001']!
     const damage = umaDamageSheet(outfit, uma, activeClass(outfit, uma, 1), 1)!
     expect(details.querySelectorAll('[data-damage-row]')).toHaveLength(3)
-    for (const row of damage.weapons) expect(details.querySelector(`[data-damage-row="${row.kind}"]`)!.textContent).toContain(String(row.total))
-    for (const stat of damage.stats) expect(details.querySelector(`[data-damage-stat="${stat.label}"]`)!.textContent).toContain(`${stat.label} ${stat.total}`)
+    for (const row of damage.weapons) expect(details.querySelector(`[data-damage-row="${row.kind}"]`)!.textContent).toContain(`${row.total}(${row.base}`)
     expect(within(details).queryByText(/^Bosses/)).toBeNull()
     expect([...details.querySelectorAll('[data-stat-tiles] li')].map((tile) => tile.lastChild!.textContent)).toEqual(['HP', 'MP', 'DEF', 'M.DEF', 'Evasion'])
     expect([...details.querySelectorAll('[data-stat-mark]')].map((mark) => mark.getAttribute('data-stat-mark'))).toEqual(['hp', 'mp', 'def', 'mdef', 'evasion'])
@@ -166,8 +165,8 @@ describe('the Uma profile v2 frame (H119)', () => {
     render(profile())
     fireEvent.click(screen.getByRole('button', { name: 'Details' }))
     const details = document.querySelector('[data-profile-details]') as HTMLElement
-    expect([...details.querySelectorAll('[data-damage-stat]')].map((line) => line.getAttribute('data-damage-stat'))).toEqual(['ATK', 'M.ATK'])
-    expect(details.querySelector('[data-damage-stat="ATK"]')!.textContent).toContain('accessory 2')
+    expect(details.textContent).toContain('ATK base')
+    expect(details.textContent).toContain('M.ATK base')
     expect(within(details).getByText('Bosses +3%')).toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'All stats' }))
     expect(document.querySelector('[data-all-stats]')!.textContent).not.toMatch(/\bgear\b/)

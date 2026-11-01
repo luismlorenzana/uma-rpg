@@ -61,10 +61,11 @@ describe('umaDamageSheet (H139): the sum a fight uses', () => {
     expect(sheet.weapons.map((row) => row.weapon)).toEqual([...ally.weapons])
     for (const row of sheet.weapons) {
       const stat = row.stat === 'ATK' ? ally.stats.atk : ally.stats.matk
-      expect(row.base, row.weapon).toBe(stat)
+      expect(row.base + row.armor + row.accessory - row.orb + row.stars + row.moon, row.weapon).toBe(stat)
       expect(row.might, row.weapon).toBe(ally.might?.[row.kind] ?? 0)
       expect(row.orb, row.weapon).toBe(ally.flat?.[row.kind] ?? 0)
       expect(row.signature, row.weapon).toBe(ally.signature ?? 0)
+      expect(row.total, row.weapon).toBe(row.base + row.might + row.accessory + row.armor + row.stars + row.moon + row.signature)
       expect(row.total, row.weapon).toBe(stat + row.might + row.orb + row.signature)
       expect(hitWith(allies, row.kind), row.weapon).toBe(row.total)
     }
@@ -88,32 +89,30 @@ describe('umaDamageSheet (H139): the sum a fight uses', () => {
   })
 })
 
-describe('umaDamageSheet (H139): her stats, apart', () => {
-  it('reads the owner’s Sorcerer: armor and her Charm apart, an Orb on one row', () => {
+describe('umaDamageSheet (D279): every source on every row', () => {
+  it('reads the owner’s Sorcerer: Might, her Charm and Orb, armor and her signature', () => {
     const gear = newGrades(1)
     for (const weapon of rpgDefaultWeapons('mage')) gear.weapons[weapon] = { grade: 3 }
     for (const slot of ARMOR) gear.armor[slot] = { grade: 3 }
     gear.accessories = [accessorySlot('bell', 3), accessorySlot('orb', 3, 'fire'), accessorySlot('insignia', 3)]
     const uma = gradedUma({ level: 20, classId: 'mage', gear, ranks: { classes: { mage: { rank: 20, exp: 0 } } } })
     const sheet = umaDamageSheet(templateOutfit('101', 'clever', 'magical'), uma, 'mage', 1)!
-    const [stat] = sheet.stats
-    expect(sheet.stats.map((s) => s.label)).toEqual(['M.ATK'])
-    expect(stat).toMatchObject({ armor: 10, accessory: 3, stars: 0, moon: 0 })
-    expect(sheet.weapons.map((row) => [row.might, row.orb, row.signature])).toEqual([[8, 6, 2], [8, 0, 2], [8, 0, 2]])
-    expect(sheet.weapons.map((row) => row.total)).toEqual([stat!.total + 16, stat!.total + 10, stat!.total + 10])
+    const [fire, ice] = sheet.weapons
+    expect(fire).toMatchObject({ stat: 'M.ATK', might: 8, accessory: 9, orb: 6, armor: 10, stars: 0, moon: 0, signature: 2 })
+    expect(ice).toMatchObject({ stat: 'M.ATK', might: 8, accessory: 3, orb: 0, armor: 10, stars: 0, moon: 0, signature: 2 })
+    expect(fire!.total - ice!.total).toBe(6)
     expect(sheet.bosses).toBe(3)
   })
 
-  it('adds every stat up to its row, and lists a hybrid’s two, ATK first', () => {
+  it('gives a hybrid’s rows each its own channel’s sources, each adding up to the sheet’s stat', () => {
     const spec = { classId: 'spellblade', tier: 2, slots: [accessorySlot('pendant', 4), accessorySlot('bell', 2)] } as const
     const { outfit, uma } = party({ ...spec, slots: [...spec.slots] })
     const sheet = umaDamageSheet(outfit, uma, 'spellblade', 2)!
     const rows = umaBattleSheet(outfit, uma, 'spellblade', 2).flatMap((group) => group.rows)
-    expect(sheet.stats.map((s) => s.label)).toEqual(['ATK', 'M.ATK'])
-    for (const stat of sheet.stats) {
-      expect(stat.base + stat.armor + stat.accessory + stat.stars + stat.moon).toBe(stat.total)
-      expect(String(stat.total)).toBe(rows.find((row) => row.label === stat.label)!.value)
-      expect(stat.accessory).toBeGreaterThan(0)
+    expect(new Set(sheet.weapons.map((row) => row.stat))).toEqual(new Set(['ATK', 'M.ATK']))
+    for (const row of sheet.weapons) {
+      expect(String(row.base + row.armor + row.accessory - row.orb + row.stars + row.moon)).toBe(rows.find((r) => r.label === row.stat)!.value)
+      expect(row.accessory).toBeGreaterThan(0)
     }
   })
 

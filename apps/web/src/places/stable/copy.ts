@@ -133,10 +133,10 @@ export function statPartList(base: number, armor = 0, accessory = 0, stars = 0, 
 /** C7: her Insignias on Details' Damage. */
 export const bosses = (percent: number): string => `Bosses +${n(percent)}%`
 /** C7: the sources in Details' key. */
-export const damageKey = { might: 'Might', accessory: 'Accessory', star: '★ Signature' } as const
-/** C7: a damage row for a screen reader: "Fire 86: M.ATK 70, Might 8, Accessory 6, Signature 2". */
-export const damageLabel = (kind: string, total: number, stat: string, base: number, might: number, orb: number, signature: number): string =>
-  `${kind} ${n(total)}: ${[`${stat} ${n(base)}`, might ? `Might ${n(might)}` : '', orb ? `Accessory ${n(orb)}` : '', signature ? `Signature ${n(signature)}` : ''].filter(Boolean).join(', ')}`
+export const damageKey = { base: (stat: string): string => `${stat} base`, might: 'Might', accessory: 'Accessory', armor: 'Armor', stars: 'Stars', star: '★ Signature' } as const
+/** C7: a damage row for a screen reader: "Fire 86: M.ATK base 52, Might 8, Accessory 9, Armor 10, Stars 5, ★ Signature 2". */
+export const damageLabel = (kind: string, total: number, parts: readonly { name: string; value: number }[]): string =>
+  `${kind} ${n(total)}: ${parts.map(({ name, value }) => `${name} ${n(value)}`).join(', ')}`
 /** C7: a core stat's base and growth. */
 export const coreSource = (base: number, growth: number): string => `${n(base)}${growth ? ` · +${n(growth)}%` : ''}`
 /** C7: the open grade and its next Craft gate. */

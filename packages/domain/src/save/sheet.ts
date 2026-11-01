@@ -41,14 +41,14 @@ export function accessorySheetLine(slot: AccessorySlotState | undefined, tier: G
   if (!slot || slot.grade < 1 || slot.family === null) return 'None'
   return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier, slot.kind))
 }
-/** What makes up her ATK or M.ATK, every part as her sheet has it (H139). A Pendant or a Charm is a real stat, so it's inside
- * `total`, as `accessory`. */
-export interface OffenseStat { label: 'ATK' | 'M.ATK'; total: number; base: number; armor: number; accessory: number; stars: number; moon: number }
-/** One of her three weapons as it hits, the damage stack's step 1 (`battleDamage`): `base` is her ATK or M.ATK, `orb` her Orbs'
- * flat offense on its kind. */
-export interface WeaponDamage { weapon: RpgWeapon; kind: RpgDamageKind; stat: 'ATK' | 'M.ATK'; total: number; base: number; might: number; orb: number; signature: number }
-/** `stats`: the ones her weapons use, ATK first. `bosses`: her Insignias' percent on sub-bosses and bosses, 0 with none. */
-export interface DamageSheet { weapons: WeaponDamage[]; stats: OffenseStat[]; bosses: number }
+/** One of her three weapons as it hits, the damage stack's step 1 (`battleDamage`), every source apart (D279): `base` is her ATK or
+ * M.ATK before gear and Extra Stats, `accessory` her Pendants or Charms and, of it, `orb` her Orbs on this kind. */
+export interface WeaponDamage {
+  weapon: RpgWeapon; kind: RpgDamageKind; stat: 'ATK' | 'M.ATK'; total: number
+  base: number; might: number; accessory: number; orb: number; armor: number; stars: number; moon: number; signature: number
+}
+/** `bosses`: her Insignias' percent on sub-bosses and bosses, 0 with none. */
+export interface DamageSheet { weapons: WeaponDamage[]; bosses: number }
 
 /** What each of her three weapons hits with before the skill and the foe (D275), for Details. Read off her battle sheet, so no
  * stat has a second formula; `damage-sheet.test.ts` proves the sum equal to a fight's. Null for a non-graded Uma, the older
@@ -60,22 +60,19 @@ export function umaDamageSheet(outfit: BattleOutfit, uma: OwnedUma, classId?: Rp
   const gearTier = tier as GearTier
   const active = classId ?? activeClass(outfit, uma, tier, engine)
   const rows = battleSheet(outfit, uma, active, tier, engine).find((group) => group.title === 'Offense')!.rows
-  const statOf = (label: OffenseStat['label']): OffenseStat => {
-    const row = rows.find((r) => r.label === label)!
-    const total = Number(row.value), gear = row.gear ?? 0, extra = row.extra ?? 0, moon = row.star ?? 0, accessory = row.accessory ?? 0
-    return { label, total, base: total - gear - extra, armor: gear - accessory, accessory, stars: extra - moon, moon }
-  }
   const weapons = classOf(uma, active).weapons
   const might = gradeMight(grades, weapons, gearTier)
   const parts = accessorySlotsParts(grades.accessories, gearTier)
   const signature = signatureWorn(grades, umaTemplate(outfit, umaPick(uma), engine).family) ? signatureBonus(uma.level, gearTier, engine) : 0
   const damage = weapons.map((weapon): WeaponDamage => {
     const kind = rpgWeaponKind(weapon), stat = isRpgTome(weapon) ? 'M.ATK' : 'ATK'
-    const base = statOf(stat).total, weaponMight = might[kind] ?? 0, orb = parts.flat[kind] ?? 0
-    return { weapon, kind, stat, total: base + weaponMight + orb + signature, base, might: weaponMight, orb, signature }
+    const row = rows.find((r) => r.label === stat)!
+    const value = Number(row.value), gear = row.gear ?? 0, extra = row.extra ?? 0, moon = row.star ?? 0, worn = row.accessory ?? 0
+    const weaponMight = might[kind] ?? 0, orb = parts.flat[kind] ?? 0
+    return { weapon, kind, stat, total: value + weaponMight + orb + signature, base: value - gear - extra, might: weaponMight,
+      accessory: worn + orb, orb, armor: gear - worn, stars: extra - moon, moon, signature }
   })
-  const used = (['ATK', 'M.ATK'] as const).filter((label) => damage.some((row) => row.stat === label))
-  return { weapons: damage, stats: used.map(statOf), bosses: (parts.insignia?.value ?? 0) / 10 }
+  return { weapons: damage, bosses: (parts.insignia?.value ?? 0) / 10 }
 }
 
 /** Every battle stat she has with her active class in her tier, each always listed, 0 included (combat-balance.md §6.0).

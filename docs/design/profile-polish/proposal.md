@@ -13,11 +13,11 @@ themes and both phone sizes; the chart's stars and bodies can be tapped.
 | The owner said | What this does | Packet |
 |---|---|---|
 | "split this one up a bit and have the raw stats somewhere hidden" | Details opens on damage; every raw number moves to **All stats**, one tap down in the same sheet | H140 |
-| "final damage with parenthesis for the different damage sources" | One row a weapon: **86 (70 +8 +6 +2)** | H139, H140 |
+| "final damage with parenthesis for the different damage sources" | One row a weapon, every source on it: **86 (52 +8 +9 +10 +5 +2)** (D279) | H139, H140 |
 | "the summarized 3 weapon type damages" | Her class's three weapons, always | H139 |
 | "the ATK or MATK stat in different colors" | ATK orange, M.ATK blue, and a color for each source | H140 |
-| "then the weapon might damage and then the accessory damage and then any additional value" | The parts in that order: stat, Might, accessory, ★ | H139 |
-| "not sure if we removed Atk values from armors" | Not removed; now shown on its own: **armor 10** | H139, H140 |
+| "then the weapon might damage and then the accessory damage and then any additional value" | The parts in that order, from her base: Might, accessory, armor, Stars, ★ | H139 |
+| "not sure if we removed Atk values from armors" | Not removed; now its own number on every row | H139, H140 |
 | "use the weapon icons any visual info to keep this screen clean of text" | Kind glyphs instead of names, and a thin strip under each row | H140 |
 | "pretty inexcusable elipsis not even well positioned" | The lopsided loop goes; every line is a true circle or a straight one, from a checked table | H142 |
 | "proper iconography" | Five crests and eight stat marks in uma-art | H141 |
@@ -32,8 +32,8 @@ themes and both phone sizes; the chart's stars and bodies can be tapped.
 | **Details opens on** | 26 rows in two columns | Three damage rows, five stat tiles, All stats |
 | **Details height in the mock, 390 wide** | 620 px | 436 px (a hybrid 460), no scroll at 375×667 |
 | **Her damage per weapon** | Add it up yourself, from four rows | The first thing on the sheet |
-| **Armor's offense** | Inside "gear 13" | "armor 10" beside "accessory 3" |
-| **Source colors** | None, only ★ | Six, each at least 4.5:1 in both themes |
+| **Armor's offense** | Inside "gear 13" | Its own number on every row |
+| **Source colors** | None, only ★ | Seven, each at least 4.5:1 in both themes |
 | **The map's lines** | An uneven loop, rings missing their nodes | Measured: stars on their ring within 0.05 units |
 | **A label past its edge** | ★ Longblade past its ring | None, for the longest template name |
 | **What a star says** | Nothing | Its numeral, the jewel's numeral |
@@ -61,20 +61,15 @@ themes and both phone sizes; the chart's stars and bodies can be tapped.
 offense = her ATK or M.ATK + the weapon's Might + her Orbs on that kind + her signature
 ```
 
-So each row reads **total (stat +Might +accessory +★)**. The screenshot's Sorcerer:
+Her ATK or M.ATK is itself base + armor + Pendants or Charms + Stars, so every row opens all of it (D279, the owner: "all sources"): **total (base
++Might +accessory +armor +Stars +★)**. The screenshot's Sorcerer:
 
-| Row | M.ATK | Might | Orb | ★ | Total |
-|---|---|---|---|---|---|
-| Fire | 70 | 8 | 6 | 2 | **86** |
-| Blizzard | 70 | 8 | | 2 | **80** |
-| Thunder | 70 | 8 | | 2 | **80** |
+| Row | M.ATK base | Might | Accessory | Armor | Stars | ★ | Total |
+|---|---|---|---|---|---|---|---|
+| Fire | 52 | 8 | 9 (Charm 3, Orb 6) | 10 | 5 | 2 | **86** |
+| Blizzard | 52 | 8 | 3 | 10 | 5 | 2 | **80** |
+| Thunder | 52 | 8 | 3 | 10 | 5 | 2 | **80** |
 
-A Pendant or a Charm is a real stat: heals read it, so the engine holds it inside ATK or M.ATK. It can't be a part of the row without
-counting twice. The line under the rows opens the stat instead:
-
-```
-M.ATK 70 · base 52 · armor 10 · accessory 3 · Stars 5
-```
 
 **It is not the hit you see in a fight.** A hit is that number² ÷ (that number + the foe's DEF) × the skill's power × weakness and the
 rest. It is the number you can raise, which is what the owner asked to see. "How stats add up" says so.
@@ -114,13 +109,13 @@ The owner prefers no open questions, so each is decided, with the reason.
 | PP2 | Details always opens on its first page | The page you came for, every time |
 | PP3 | One row a weapon, her class's three in slot order | Every hit is one of them |
 | PP4 | A kind's glyph (`KindMark`), no name; the name is its label for screen readers | The owner's request; a flame, a snowflake and a bolt differ by shape, which three colored books wouldn't |
-| PP5 | The row reads **total (stat +Might +accessory +★)**, zero parts dropped, the stat always shown | The owner's order, and the engine's sum |
+| PP5 | The row reads **total (base +Might +accessory +armor +Stars +★)**, zero parts dropped, her base always shown | The owner: every source on the row (D279) |
 | PP6 | Named **Damage**, not Offense | The owner's word; "How stats add up" says it comes before the skill and the foe |
-| PP7 | A row's accessory part is her Orbs; a Pendant or a Charm counts inside the stat, and the line below shows it as "accessory" | The engine holds them there, and a row must add up |
-| PP8 | One line per stat she uses: `M.ATK 70 · base 52 · armor 10 · accessory 3 · Stars 5`, then `★ n` for her moon | Where armor shows; a Sorcerer's unused ATK stays in All stats |
+| PP7 | A row's accessory part is everything her accessories give that hit: Pendants or Charms, and Orbs on its kind | One number for one source (D279) |
+| PP8 | No line under the rows: all sources are on them. A stat's own parts stay in All stats | The owner: "not additional rows" (D279) |
 | PP9 | The Insignia is a chip beside the title, **Bosses +3%**, only when she has one | It multiplies, so it can't be a part |
 | PP10 | A 4 px stacked strip under each row, one scale across her three, 2 px gaps | The sources at a glance, with no more text |
-| PP11 | Six fixed colors as `--src-*` tokens: ATK, M.ATK, Might, accessory, ★, Stars. Might is a neutral steel | Worst adjacent pair ΔE 12 under simulated colour blindness; every one at least 4.5:1 as 11 px text in both themes |
+| PP11 | Seven fixed colors as `--src-*` tokens: ATK, M.ATK, Might, accessory, armor, Stars, ★. Might is a neutral steel, armor a bronze | Worst adjacent pair ΔE 12 under simulated colour blindness; every one at least 4.5:1 as 11 px text in both themes |
 | PP12 | A **Stats** block of five tiles: HP, MP, DEF, M.DEF, Evasion; a healer adds **Mends** | The next question after damage, as final numbers only |
 | PP13 | All stats is one column and holds everything: every `umaBattleSheet` row, 0 included, Core, Work, Since, How stats add up | Nothing is lost; one column ends the wrapped rows |
 | PP14 | "gear" splits into **armor** and **accessory** everywhere it shows | The owner couldn't see armor |

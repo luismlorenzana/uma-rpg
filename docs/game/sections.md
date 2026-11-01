@@ -205,11 +205,11 @@ v2](../design/uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229), D23
   trade's first place). **Details** opens what she hits with and her stats, read-only. Back from Party or Work returns to
   this profile and tab.
 - **Details (H140):** two pages in one sheet, and it always opens on the first.
-  - **Damage:** one row for each of her class's three weapons: its kind's glyph, the total, and its parts in parentheses,
-    `86 (70 +8 +6 +2)`: her ATK or M.ATK, the weapon's Might, her Orbs on that kind and her signature, each in its source's color,
-    zero parts dropped. A strip under each row shows the same parts, scaled to her largest row. That sum is what a fight uses before
-    the skill and the foe ([combat](combat.md#damage)). Below them a key, then a line for each stat her weapons use:
-    `M.ATK 70 · base 52 · armor 10 · accessory 3 · Stars 5`, ★ for her Moon. An Insignia reads `Bosses +3%` beside the title.
+  - **Damage:** one row for each of her class's three weapons: its kind's glyph, the total, and every source in parentheses,
+    `86 (52 +8 +9 +10 +5 +2)`: her base ATK or M.ATK, the weapon's Might, her accessories (Pendants or Charms, and Orbs on that kind),
+    her armor, her Extra Stats and her signature, each in its source's color, zero parts dropped. A strip under each row shows the same
+    parts, scaled to her largest row. That sum is what a fight uses before the skill and the foe ([combat](combat.md#damage)). A key
+    follows the rows. An Insignia reads `Bosses +3%` beside the title.
   - **Stats:** HP, MP, DEF, M.DEF and Evasion as tiles with their marks, and a healer's Mends.
   - **All stats** swaps the page, and ‹ Details returns: one column. Offense, Defense, Sustain and Other preserve every row of
     `umaBattleSheet`, including 0; stat rows show their base, armor, accessory and Stars parts, with her Moon marked ★. Core lists

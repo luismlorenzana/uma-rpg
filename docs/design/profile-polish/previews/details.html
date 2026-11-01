@@ -15,7 +15,7 @@
     --success: #2f7a4f; --danger: #c23b33;
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
     --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
-    --src-atk: #c2410c; --src-matk: #1d6fd1; --src-might: #3f4b5c; --src-accessory: #a23ac8; --src-star: #8f6410; --src-stars: #0e7490;
+    --src-atk: #c2410c; --src-matk: #1d6fd1; --src-might: #3f4b5c; --src-accessory: #a23ac8; --src-armor: #7a5230; --src-star: #8f6410; --src-stars: #0e7490;
     --kind-fire: #e0562a; --kind-ice: #2f8fd8; --kind-lightning: #b98900; --kind-greatsword: #d9761a; --kind-lance: #2f9a43; --kind-axe: #5b4fd6;
     color-scheme: light;
   }
@@ -27,7 +27,7 @@
       --success: #4fb37a; --danger: #e0645c;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
       --scrim: rgb(0 0 0 / 0.55);
-      --src-atk: #ff8f5e; --src-matk: #5fb2ff; --src-might: #c3ccd8; --src-accessory: #d48cf0; --src-star: #e8b65a; --src-stars: #7fd4e8;
+      --src-atk: #ff8f5e; --src-matk: #5fb2ff; --src-might: #c3ccd8; --src-accessory: #d48cf0; --src-armor: #c9a27a; --src-star: #e8b65a; --src-stars: #7fd4e8;
       --kind-fire: #ff8a5c; --kind-ice: #8fd3ff; --kind-lightning: #ffd84d; --kind-greatsword: #f5a54a; --kind-lance: #62cf70; --kind-axe: #9a86f2;
       color-scheme: dark;
     }
@@ -39,7 +39,7 @@
     --success: #4fb37a; --danger: #e0645c;
     --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
     --scrim: rgb(0 0 0 / 0.55);
-    --src-atk: #ff8f5e; --src-matk: #5fb2ff; --src-might: #c3ccd8; --src-accessory: #d48cf0; --src-star: #e8b65a; --src-stars: #7fd4e8;
+    --src-atk: #ff8f5e; --src-matk: #5fb2ff; --src-might: #c3ccd8; --src-accessory: #d48cf0; --src-armor: #c9a27a; --src-star: #e8b65a; --src-stars: #7fd4e8;
     --kind-fire: #ff8a5c; --kind-ice: #8fd3ff; --kind-lightning: #ffd84d; --kind-greatsword: #f5a54a; --kind-lance: #62cf70; --kind-axe: #9a86f2;
     color-scheme: dark;
   }
@@ -113,7 +113,7 @@
   .rw div span { color: var(--ink-soft); white-space: nowrap; }
   .rw div b { font-weight: 600; text-align: right; }
   .rw small { display: block; font-size: 11px; line-height: 1.25; color: var(--ink-faint); }
-  .armor { color: var(--src-might); } .acc { color: var(--src-accessory); } .stars { color: var(--src-stars); } .moon { color: var(--src-star); }
+  .armor { color: var(--src-armor); } .acc { color: var(--src-accessory); } .stars { color: var(--src-stars); } .moon { color: var(--src-star); }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; font-size: 13px; line-height: 14px; }
   .two .rw { padding: 2px 0; }
   .two .rw div span { white-space: nowrap; }
@@ -124,7 +124,7 @@
 <main>
   <h1>Details: damage first</h1>
   <p class="lede">The Details sheet opens on what her hits are made of. Every raw number stays, one tap behind <b>All stats</b>. Each weapon's number is the exact sum a fight uses
-    before the foe's defense, in the order you asked for: her ATK or M.ATK, the weapon's Might, her accessory, then anything extra.</p>
+    before the foe's defense, with every source on its row: her base ATK or M.ATK, the weapon's Might, her accessories, her armor, her Extra Stats and her signature.</p>
   <div class="bar">
     <span class="seg" id="theme"><button data-v="">System</button><button data-v="light">Light</button><button data-v="dark">Dark</button></span>
     <span class="seg" id="width"><button data-v="390">390 × 844</button><button data-v="375">375 × 667</button></span>
@@ -132,7 +132,7 @@
   <div class="row" id="phones"></div>
 
   <h2>What each number is</h2>
-  <p class="lede">The top sum is what the engine adds, so it can't drift from a fight. The line under it opens up the one stat that hides armor.</p>
+  <p class="lede">Each row adds up every source, and its total is what a fight uses, so it can't drift. A test builds a real fight to prove it.</p>
   <div class="cards">
     <div class="card"><h3>Every row adds up</h3><table id="sums"></table></div>
     <div class="card"><h3>Your questions</h3>
@@ -191,18 +191,17 @@ const color = (stat) => (stat === 'ATK' ? 'var(--src-atk)' : 'var(--src-matk)')
 function damage(u) {
   const top = Math.max(...u.weapons.map((w) => total(u, w)))
   const rows = u.weapons.map((w) => {
-    const t = total(u, w), s = u.stats[w.stat].total
-    const parts = [[s, color(w.stat), false], [w.might, 'var(--src-might)', true], [w.orb, 'var(--src-accessory)', true], [u.signature, 'var(--src-star)', true]].filter(([n]) => n)
+    const t = total(u, w), v = u.stats[w.stat]
+    const parts = [[v.base, color(w.stat), false], [w.might, 'var(--src-might)', true], [v.acc + w.orb, 'var(--src-accessory)', true], [v.armor, 'var(--src-armor)', true], [v.stars, 'var(--src-stars)', true], [u.signature, 'var(--src-star)', true]].filter(([n]) => n)
     const strip = parts.map(([n, c]) => `<i style="flex:${n} 0 0;background:${c}"></i>`).join('')
     return `<div class="wrow">${icon(w.kind)}<span class="tot display">${t}</span>
       <span class="parts">(${parts.map(([n, c, plus]) => `<i style="color:${c}">${plus ? '+' : ''}${n}</i>`).join(' ')})</span>
       <span class="strip" style="width:${(t / top) * 100}%">${strip}</span></div>`
   }).join('')
   const stats = [...new Set(u.weapons.map((w) => w.stat))]
-  const key = [...stats.map((s) => [s, color(s)]), ['Might', 'var(--src-might)'], ['Accessory', 'var(--src-accessory)'], ['★ Signature', 'var(--src-star)']]
-  const src = stats.map((s) => { const v = u.stats[s]; return `<p class="src"><b style="color:${color(s)}">${s} ${v.total}</b> · base ${v.base}${v.armor ? ` · <span class="armor">armor ${v.armor}</span>` : ''}${v.acc ? ` · <span class="acc">accessory ${v.acc}</span>` : ''}${v.stars ? ` · <span class="stars">Stars ${v.stars}</span>` : ''}</p>` }).join('')
+  const key = [...stats.map((s) => [`${s} base`, color(s)]), ['Might', 'var(--src-might)'], ['Accessory', 'var(--src-accessory)'], ['Armor', 'var(--src-armor)'], ['Stars', 'var(--src-stars)'], ['★ Signature', 'var(--src-star)']]
   return `<div class="sec"><h3>Damage</h3>${u.bosses ? `<span class="chip">Bosses +${u.bosses}%</span>` : ''}</div>${rows}
-    <p class="key">${key.map(([t, c]) => `<span><i style="background:${c}"></i>${t}</span>`).join('')}</p>${src}`
+    <p class="key">${key.map(([t, c]) => `<span><i style="background:${c}"></i>${t}</span>`).join('')}</p>`
 }
 const survive = (u) => `<div class="sec" style="margin-top:14px"><h3>Stats</h3></div><div class="tiles ${u.tiles.length > 5 ? 'six' : ''}">${u.tiles.map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join('')}</div>`
 const sheet = (title, body, back = '') => `<div class="scrim"><div class="sheet"><div class="grip"></div><header><b class="display">${title}</b><span class="x">×</span></header><div class="sb">${back}${body}</div></div></div>`
@@ -236,11 +235,11 @@ document.querySelectorAll('[data-more]').forEach((b) => b.onclick = () => { cons
 
 // The sums, and the colors' contrast.
 const rows = [...SORCERER.weapons.map((w) => ['Sorcerer', w, SORCERER]), ...HYBRID.weapons.map((w) => ['Spellblade', w, HYBRID])]
-document.getElementById('sums').innerHTML = `<tr><th>Uma</th><th>Kind</th><th>Stat</th><th>Might</th><th>Orb</th><th>★</th><th>Total</th></tr>` +
-  rows.map(([n, w, u]) => `<tr><td>${n}</td><td>${w.kind}</td><td>${u.stats[w.stat].total}</td><td>${w.might}</td><td>${w.orb}</td><td>${u.signature}</td><td><b>${total(u, w)}</b></td></tr>`).join('')
+document.getElementById('sums').innerHTML = `<tr><th>Uma</th><th>Kind</th><th>Base</th><th>Might</th><th>Accessory</th><th>Armor</th><th>Stars</th><th>★</th><th>Total</th></tr>` +
+  rows.map(([n, w, u]) => { const v = u.stats[w.stat]; return `<tr><td>${n}</td><td>${w.kind}</td><td>${v.base}</td><td>${w.might}</td><td>${v.acc + w.orb}</td><td>${v.armor}</td><td>${v.stars}</td><td>${u.signature}</td><td><b>${total(u, w)}</b></td></tr>` }).join('')
 const lum = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2] }
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + .05) / (y + .05) }
-const COLORS = [['ATK', '#c2410c', '#ff8f5e'], ['M.ATK', '#1d6fd1', '#5fb2ff'], ['Might', '#3f4b5c', '#c3ccd8'], ['Accessory', '#a23ac8', '#d48cf0'], ['★', '#8f6410', '#e8b65a'], ['Stars', '#0e7490', '#7fd4e8']]
+const COLORS = [['ATK', '#c2410c', '#ff8f5e'], ['M.ATK', '#1d6fd1', '#5fb2ff'], ['Might', '#3f4b5c', '#c3ccd8'], ['Accessory', '#a23ac8', '#d48cf0'], ['Armor', '#7a5230', '#c9a27a'], ['★', '#8f6410', '#e8b65a'], ['Stars', '#0e7490', '#7fd4e8']]
 document.getElementById('colors').innerHTML = `<tr><th>Source</th><th>Light</th><th>on panel · raised</th><th>Dark</th><th>on panel · raised</th><th></th></tr>` + COLORS.map(([n, l, d]) => {
   const v = [ratio(l, '#ffffff'), ratio(l, '#f3f6fa'), ratio(d, '#17202b'), ratio(d, '#1f2a37')], ok = v.every((x) => x >= 4.5)
   return `<tr><td>${n}</td><td><code>${l}</code></td><td>${v[0].toFixed(1)} · ${v[1].toFixed(1)}</td><td><code>${d}</code></td><td>${v[2].toFixed(1)} · ${v[3].toFixed(1)}</td><td class="${ok ? 'ok' : 'no'}">${ok ? '≥ 4.5' : 'Low'}</td></tr>`

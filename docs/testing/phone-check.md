@@ -57,8 +57,8 @@ button and footer should stay reachable without horizontal page scrolling, in li
 8. **Profile frame.** Expect the compact bust, name, title and stars, `Lv n` with `current/next` EXP, then the Party,
    Work and Details doors and the four tabs **Class · Gear · Stars · Template**. The tab bar starts within 150 px of
    the profile main. Tap Party and Work, then Back: expect the same profile tab. Mark her as a target and unmark her.
-   Open **Details**: three damage rows, each a glyph and `total (stat +Might +accessory +★)`, a key, a stat line, five stat tiles
-   and **All stats**, with no scroll at 390×844 or 375×667. Add one row up by hand, then check its Might and accessory on Gear. **All
+   Open **Details**: three damage rows, each a glyph and `total (base +Might +accessory +armor +Stars +★)`, a key, five stat tiles
+   and **All stats**, with no scroll at 390×844 or 375×667. Add one row up by hand: it equals its total. Check its Might and accessory on Gear. **All
    stats**: every battle row, 0 included, with Core, Work and Since; **How stats add up** expands in place; ‹ Details returns; closing
    and reopening lands on the first page. A locked profile has **Unlock · 1 Ticket**,
    Template content, no level, no tabs and no ticket-balance sentence. (D206, D229, D240, D258, D276)

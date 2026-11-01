@@ -1,10 +1,10 @@
-// Details' Damage section (H140; profile-polish §2): one row a weapon, each number in its source's color. The rows are
-// `damage-view.ts`'.
+// Details' Damage section (H140, D279; profile-polish §2): one row a weapon, every source on it, each number in its source's color.
+// The rows are `damage-view.ts`'.
 import type { DamageSheet } from '@rpg/domain'
 import { Fragment } from 'react'
 import { KindMark } from '../../battle/labels'
 import * as copy from './copy'
-import { damageKeyRows, damageRows, offenseParts, PART_COLOR, SOURCE_COLOR, type DamageRow } from './damage-view'
+import { damageKeyRows, damageRows, PART_COLOR, SOURCE_COLOR, type DamageRow } from './damage-view'
 
 export function DamageCard({ sheet }: { sheet: DamageSheet }) {
   return (
@@ -21,12 +21,6 @@ export function DamageCard({ sheet }: { sheet: DamageSheet }) {
           <span key={source} className="inline-flex items-center gap-1"><i className="block size-2 rounded-[2px]" style={{ background: SOURCE_COLOR[source] }} />{label}</span>
         ))}
       </p>
-      {sheet.stats.map((stat) => (
-        <p key={stat.label} className="mt-1.5 text-[11.5px] leading-normal text-ink-soft" data-damage-stat={stat.label}>
-          <b className="font-bold" style={{ color: SOURCE_COLOR[stat.label] }}>{stat.label} {stat.total}</b>
-          {' · '}<StatParts parts={offenseParts(stat)} />
-        </p>
-      ))}
     </section>
   )
 }
