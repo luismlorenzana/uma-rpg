@@ -31,7 +31,8 @@ Code: `packages/domain/src/rpg/battle/` (`engine.ts` the reducer, `skills.ts` it
 - **Rounds.** Each round:
   1. The foes' intents are shown: each foe's move and target, and for a damaging move about what it will deal to
      its target (the most it deals to anyone, for a move on everyone), before Barriers and guards (D140).
-  2. Each living Uma acts **once**, in any order the player picks.
+  2. Each living Uma acts **once**, in any order the player picks. A round opens on the first standing Uma in party
+     order, and after each act the next one who hasn't acted is picked.
   3. When all have acted, the foes act in initiative order. A foe that **acts twice** takes her second move after every
      foe's first; a Rift Duel champion who **acts three times** takes her third after every second.
   4. The round ends, in this order: guards lapse; a Broken foe whose two rounds are up stands back up; Burn ticks;

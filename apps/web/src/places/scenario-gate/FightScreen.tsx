@@ -14,7 +14,7 @@ import { AtlasSprite, imagePath } from '@luismlorenzana/uma-kit/content'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Campaign } from '../../battle/campaign'
 import {
-  actionFor, describeCue, followCue, halfIsTome, limitMode, limitNow, limitOptions, limitReady, pairing, pairMode, pairOf, previewTarget, skillChoices,
+  actionFor, actorAfter, describeCue, followCue, halfIsTome, limitMode, limitNow, limitOptions, limitReady, pairing, pairMode, pairOf, previewTarget, skillChoices,
   type BattleMode, type SkillChoice,
 } from '../../battle/battle-view'
 import { BattleStage } from '../../battle/BattleStage'
@@ -199,7 +199,7 @@ export function FightScreen<R>({ campaign, source, onEnd, onMap }: {
       const { step, result } = await source.act(action)
       setLive(step.state)
       setMode({ kind: 'attack' })
-      setActorId(battleActionsLeft(step.state, action.actorId) > 0 ? action.actorId : null)
+      setActorId(actorAfter(state, step.state, action.actorId))
       let display = shown
       const g = game.current
       if (g) {

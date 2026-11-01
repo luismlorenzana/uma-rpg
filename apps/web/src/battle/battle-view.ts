@@ -62,6 +62,12 @@ export function actionFor(mode: BattleMode, actorId: string, targetId: string): 
   return { kind: 'guard', actorId, targetId }
 }
 
+/** Who stays picked after an act: her, while she has more to do this round. A new round, a new wave's too, has no pick,
+ * so it opens on the party's first Uma standing rather than on whoever acted last (D281). */
+export function actorAfter(before: Pick<BattleState, 'round'>, after: BattleState, actorId: string): string | null {
+  return after.round === before.round && battleActionsLeft(after, actorId) > 0 ? actorId : null
+}
+
 export interface TargetPreview { amount: number; weak: boolean; chips: number; breaks: boolean; error?: string }
 /** Runs the action on a copy and totals this action's hits on the target. */
 export function previewTarget(state: BattleState, actorId: string, mode: BattleMode, targetId: string): TargetPreview | null {

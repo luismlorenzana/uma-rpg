@@ -4,7 +4,7 @@ import {
 } from '@rpg/domain'
 import { applyBattleAction, createBattle } from '@rpg/domain/engine'
 import { describe, expect, it } from 'vitest'
-import { actionFor, describeCue, limitMode, limitOptions, limitReady, pairing, pairMode, pairOf } from './battle-view'
+import { actionFor, actorAfter, describeCue, limitMode, limitOptions, limitReady, pairing, pairMode, pairOf } from './battle-view'
 
 // Invented outfits only. Depth-1 cores at Class Rank 4.
 const ARMS: RpgWeapon[] = ['greatsword', 'axe', 'lance', 'bow', 'katana']
@@ -44,6 +44,26 @@ describe('the Limit Break menu (D106, D112)', () => {
     expect(limitReady(fight(10, { hero: 'cleric-1' }), 'a1')).toBe(true)
     expect(limitReady(fight(9, {}), 'a1')).toBe(true)
     expect(limitOptions(fight(9, {}), 'a1').options[0]).toMatchObject({ name: 'Heavy Slash' })
+  })
+})
+
+describe('who is picked after an act (D281)', () => {
+  const act = (state: BattleState, actorId: string) =>
+    applyBattleAction(state, { kind: 'attack', actorId, targetId: 'f1' }).state
+
+  it('moves on from her when she is done, and keeps the round going', () => {
+    const state = fight(10, {})
+    const next = act(state, 'a2')
+    expect(next.round).toBe(state.round)
+    expect(actorAfter(state, next, 'a2')).toBeNull()
+  })
+
+  it('has no pick once a new round starts, so the last Uma to act stays unpicked', () => {
+    let state = fight(10, {})
+    for (const id of ['a1', 'a2', 'a3', 'a4']) state = act(state, id)
+    const next = act(state, 'a5')
+    expect(next.round).toBe(state.round + 1)
+    expect(actorAfter(state, next, 'a5')).toBeNull()
   })
 })
 
