@@ -6,12 +6,12 @@ import {
   BATTLE_LIMIT_MAX, rpgV2,
 } from '../rpg/battle/caps'
 import type { RpgFlourish } from '../rpg/battle/types'
-import { rpgIsHealer, rpgWeaponKind } from '../rpg/kinds'
+import { isRpgTome, rpgIsHealer, rpgWeaponKind, type RpgDamageKind, type RpgWeapon } from '../rpg/kinds'
 import { projectRpgStats, rpgBaseMpRegen, rpgClassName, type RpgClass } from '../rpg/rules'
 import { addPoints, applyPoints } from '../economy/bonus'
 import { equippedAccessories, equippedMight, noAccessoryEffects } from '../economy/gear'
-import { accessorySlotValue, signatureBonus, signatureWorn } from '../economy/accessories'
-import { gradeOf, mightAt, type AccessorySlotState, type GearTier } from '../economy/grades'
+import { accessoryOffense, accessorySlotsParts, accessorySlotValue, signatureBonus, signatureWorn } from '../economy/accessories'
+import { gradeMight, gradeOf, mightAt, type AccessorySlotState, type GearTier } from '../economy/grades'
 import { classRankOf, WEAPON_LABEL } from '../economy/ranks'
 import { mapPoints, moonTemplate } from '../economy/planet'
 import { umaTemplate } from '../roster/template'
@@ -30,8 +30,8 @@ export const flourishSheetLine = (flourish: RpgFlourish | null, classId: RpgClas
 const flourishLineValue = (value: RpgFlourish, on: boolean): string => flourish(value, on).replace('★ Flourish · ', '')
 
 /** One line of her battle sheet: the total, for the six core stats what gear and Extra Stats add, and a short note after
- * them (v16's MP: "+13 a round"). */
-export interface SheetRow { label: string; value: string; gear?: number; extra?: number; star?: number; note?: string }
+ * them (v16's MP: "+13 a round"). `accessory` is the Pendants' or Charms' share of `gear`; the rest of it is armor (H139). */
+export interface SheetRow { label: string; value: string; gear?: number; accessory?: number; extra?: number; star?: number; note?: string }
 export interface SheetGroup { title: 'Offense' | 'Defense' | 'Sustain' | 'Other'; rows: SheetRow[] }
 const KIND_NAME = (k: string) => k[0]!.toUpperCase() + k.slice(1)
 const permille = (n: number) => `${Math.round(n) / 10}%`
@@ -41,6 +41,43 @@ export function accessorySheetLine(slot: AccessorySlotState | undefined, tier: G
   if (!slot || slot.grade < 1 || slot.family === null) return 'None'
   return accessoryLine(slot.family, accessoryEffect(slot.family, slot.grade, tier, slot.kind))
 }
+/** What makes up her ATK or M.ATK, every part as her sheet has it (H139). A Pendant or a Charm is a real stat, so it's inside
+ * `total`, as `accessory`. */
+export interface OffenseStat { label: 'ATK' | 'M.ATK'; total: number; base: number; armor: number; accessory: number; stars: number; moon: number }
+/** One of her three weapons as it hits, the damage stack's step 1 (`battleDamage`): `base` is her ATK or M.ATK, `orb` her Orbs'
+ * flat offense on its kind. */
+export interface WeaponDamage { weapon: RpgWeapon; kind: RpgDamageKind; stat: 'ATK' | 'M.ATK'; total: number; base: number; might: number; orb: number; signature: number }
+/** `stats`: the ones her weapons use, ATK first. `bosses`: her Insignias' percent on sub-bosses and bosses, 0 with none. */
+export interface DamageSheet { weapons: WeaponDamage[]; stats: OffenseStat[]; bosses: number }
+
+/** What each of her three weapons hits with before the skill and the foe (D275), for Details. Read off her battle sheet, so no
+ * stat has a second formula; `damage-sheet.test.ts` proves the sum equal to a fight's. Null for a non-graded Uma, the older
+ * engines' test shapes. */
+export function umaDamageSheet(outfit: BattleOutfit, uma: OwnedUma, classId?: RpgClass, tier = 1,
+  engine: number = BATTLE_ENGINE_VERSION): DamageSheet | null {
+  if (!isGrades(uma.gear)) return null
+  const grades = uma.gear
+  const gearTier = tier as GearTier
+  const active = classId ?? activeClass(outfit, uma, tier, engine)
+  const rows = battleSheet(outfit, uma, active, tier, engine).find((group) => group.title === 'Offense')!.rows
+  const statOf = (label: OffenseStat['label']): OffenseStat => {
+    const row = rows.find((r) => r.label === label)!
+    const total = Number(row.value), gear = row.gear ?? 0, extra = row.extra ?? 0, moon = row.star ?? 0, accessory = row.accessory ?? 0
+    return { label, total, base: total - gear - extra, armor: gear - accessory, accessory, stars: extra - moon, moon }
+  }
+  const weapons = classOf(uma, active).weapons
+  const might = gradeMight(grades, weapons, gearTier)
+  const parts = accessorySlotsParts(grades.accessories, gearTier)
+  const signature = signatureWorn(grades, umaTemplate(outfit, umaPick(uma), engine).family) ? signatureBonus(uma.level, gearTier, engine) : 0
+  const damage = weapons.map((weapon): WeaponDamage => {
+    const kind = rpgWeaponKind(weapon), stat = isRpgTome(weapon) ? 'M.ATK' : 'ATK'
+    const base = statOf(stat).total, weaponMight = might[kind] ?? 0, orb = parts.flat[kind] ?? 0
+    return { weapon, kind, stat, total: base + weaponMight + orb + signature, base, might: weaponMight, orb, signature }
+  })
+  const used = (['ATK', 'M.ATK'] as const).filter((label) => damage.some((row) => row.stat === label))
+  return { weapons: damage, stats: used.map(statOf), bosses: (parts.insignia?.value ?? 0) / 10 }
+}
+
 /** Every battle stat she has with her active class in her tier, each always listed, 0 included (combat-balance.md §6.0).
  * Classes v2 (H57): her Orb's offense ("Fire Orb +34"), and a healer's mends from her ATK or M.ATK instead of Heal. */
 export function umaBattleSheet(outfit: BattleOutfit, uma: OwnedUma, classId?: RpgClass, tier = 1,
@@ -78,9 +115,11 @@ function battleSheet(outfit: BattleOutfit, uma: OwnedUma, classId: RpgClass, tie
     const map = starMapOf(uma)
     const sharedPoints = mapPoints(map.open.filter((id) => !id.startsWith('template:')), classId, gearTier, undefined, weapons)
     const sharedStats = applyPoints(base, addPoints(parts.gear, sharedPoints))
+    const offense = accessoryOffense(grades.accessories, gearTier)
     const coreV3 = (label: string, k: 'hp' | 'mp' | 'atk' | 'matk' | 'pdef' | 'mdef'): SheetRow => ({
       label, value: String(boosted.stats[k]), gear: geared[k] - base[k],
       extra: boosted.stats[k] - geared[k], star: boosted.stats[k] - sharedStats.stats[k],
+      ...(k === 'atk' && offense.atk ? { accessory: offense.atk } : k === 'matk' && offense.matk ? { accessory: offense.matk } : {}),
     })
     const family = umaTemplate(outfit, umaPick(uma), engine).family
     const worn = signatureWorn(grades, family)

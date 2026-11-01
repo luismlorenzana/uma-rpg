@@ -132,6 +132,8 @@ the damage stack, `battleDamage`). For each part of each hit:
      ×2.6 in Tiers 2 and 3 ([materials](materials.md#gear));
    - her **accessory's flat offense** on the hit's kind, and her **signature** while she wears her knack's family
      ([below](#her-accessory-and-signature)).
+
+   Details shows this sum for each of her three weapons (`umaDamageSheet`, H139).
 2. **The hit:** `offense² ÷ (offense + defense) × power` (D141). Defense is the target's DEF against an Arms kind and
    M.DEF against an element. The same ratio gives the same share at every level, and it is never zero. Power is the
    hit's share of its skill (an Attack 1.0) × her hand for its half (a pair's lead half the larger,
