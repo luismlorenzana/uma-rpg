@@ -7,6 +7,7 @@ import {
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { tradeLabel } from '../../save/trade'
 import { BottomSheet } from '../../ui/BottomSheet'
+import { StatMark } from '../observatory/star-marks'
 import * as copy from './copy'
 import { DamageCard, StatParts } from './DamageCard'
 import { statTiles } from './damage-view'
@@ -52,9 +53,10 @@ function FirstPage({ damage, groups, onAll }: { damage: ReturnType<typeof umaDam
       <section className={damage ? 'mt-3.5' : ''}>
         <h3 className="mb-1 text-[11px] font-bold uppercase tracking-wide text-ink-soft">{copy.details.stats}</h3>
         <ul className={`grid gap-1 ${tiles.length > 5 ? 'grid-cols-3' : 'grid-cols-5'}`} data-stat-tiles>
-          {tiles.map(({ label, value }) => (
+          {tiles.map(({ label, value, mark }) => (
             <li key={label} className="rounded-xs bg-raised px-0.5 py-1.5 text-center text-[11px] text-ink-soft">
-              <b className="block font-display text-[16px] font-bold leading-tight tabular-nums text-ink">{value}</b>{label}
+              <b className="block font-display text-[16px] font-bold leading-tight tabular-nums text-ink">{value}</b>
+              <span className="inline-flex items-center gap-0.5">{mark && <StatMark stat={mark} />}{label}</span>
             </li>
           ))}
         </ul>

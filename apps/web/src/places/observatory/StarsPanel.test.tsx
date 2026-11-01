@@ -82,6 +82,39 @@ describe('the Stars tab (H122)', () => {
     expect(await screen.findByRole('dialog', { name: 'Guard III' })).toBeDefined()
   })
 
+  it('moves along a body from its strip, and Sets the node it moved to', async () => {
+    useGame.setState({ status: 'ready', save: await saveWith(['guard:1', 'guard:2'], { 'jewel-moon-3': 1 }), activeTier: 1 })
+    render(shell('/stars', <Live />))
+    fireEvent.click(document.querySelector('[data-map-node="guard:1"]')!)
+    const sheet = await screen.findByRole('dialog', { name: 'Guard I' })
+    expect(within(sheet).getByText('Open')).toBeDefined()
+    expect(sheet.querySelectorAll('[data-body-strip] button')).toHaveLength(5)
+    fireEvent.click(sheet.querySelector('[data-step="guard:5"]')!)
+    expect(await screen.findByRole('dialog', { name: 'Guard V' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Guard III first' })).toHaveProperty('disabled', true)
+    fireEvent.click(sheet.querySelector('[data-step="guard:3"]')!)
+    expect(await screen.findByRole('dialog', { name: 'Guard III' })).toBeDefined()
+    await act(async () => { fireEvent.click(within(sheet).getByRole('button', { name: 'Set' })) })
+    await waitFor(() => expect(stars().open).toContain('guard:3'))
+    expect(sheet.querySelector('[data-step="guard:3"]')!.getAttribute('data-star-state')).toBe('open')
+    expect(sheet.querySelector('[data-step="guard:3"]')!.getAttribute('aria-current')).toBe('step')
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+  })
+
+  it('opens a full body on its last node', async () => {
+    const all = ['guard:1', 'guard:2', 'guard:3', 'guard:4', 'guard:5']
+    useGame.setState({ status: 'ready', save: await saveWith(all, {}), activeTier: 1 })
+    render(shell('/stars', <Live />))
+    fireEvent.click(screen.getByRole('button', { name: 'Guard, 5 of 5 open' }))
+    expect(await screen.findByRole('dialog', { name: 'Guard V' })).toBeDefined()
+  })
+
+  it('wears a stat mark on each of the six totals', async () => {
+    useGame.setState({ status: 'ready', save: await saveWith([], {}), activeTier: 1 })
+    render(shell('/stars', <Live />))
+    expect([...screen.getByLabelText('Totals').querySelectorAll('[data-stat-mark]')].map((mark) => mark.getAttribute('data-stat-mark'))).toEqual(['hp', 'mp', 'atk', 'matk', 'def', 'mdef'])
+  })
+
   it('Set all lists its lines and sets them in one save write', async () => {
     useGame.setState({ status: 'ready', save: await saveWith(['prowess:1', 'vigor:1', 'guard:1'], { 'jewel-moon-2': 2, 'jewel-planet-1': 3 }), activeTier: 1 })
     render(shell('/stars', <Live />))

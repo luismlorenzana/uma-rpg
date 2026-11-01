@@ -2,6 +2,7 @@
 // `umaDamageSheet` and the battle sheet, so a rule change shows here and no number has a second formula.
 import type { DamageSheet, OffenseStat, RpgDamageKind, SheetGroup } from '@rpg/domain'
 import { kindLabel } from '../../battle/labels'
+import type { StatMarkId } from '../observatory/star-marks'
 import { damageKey, damageLabel, statPartList, type StatPart } from './copy'
 
 /** The colors of Details' sources (`--src-*`, `index.css`). */
@@ -39,13 +40,15 @@ export const damageKeyRows = (sheet: DamageSheet): { source: DamageSource; label
 /** A stat's parts for the line under the rows: `M.ATK 70 · base 52 · armor 10 · accessory 3 · Stars 5`. */
 export const offenseParts = (stat: OffenseStat): StatPart[] => statPartList(stat.base, stat.armor, stat.accessory, stat.stars, stat.moon)
 
+const TILES: readonly (readonly [string, StatMarkId])[] = [['HP', 'hp'], ['MP', 'mp'], ['DEF', 'def'], ['M.DEF', 'mdef'], ['Evasion', 'evasion']]
+
 /** The Stats tiles: final numbers only, and a healer's Mends (PP12). */
-export function statTiles(groups: readonly SheetGroup[]): { label: string; value: string }[] {
+export function statTiles(groups: readonly SheetGroup[]): { label: string; value: string; mark?: StatMarkId }[] {
   const rows = new Map(groups.flatMap((group) => group.rows).map((row) => [row.label, row.value]))
   const shown = (value: string) => (/^\d+$/.test(value) ? Number(value).toLocaleString('en-US') : value)
-  const tiles = ['HP', 'MP', 'DEF', 'M.DEF', 'Evasion'].flatMap((label) => {
+  const tiles = TILES.flatMap(([label, mark]) => {
     const value = rows.get(label)
-    return value === undefined ? [] : [{ label, value: shown(value) }]
+    return value === undefined ? [] : [{ label, value: shown(value), mark }]
   })
   const mends = rows.get('Mends')
   return mends ? [...tiles, { label: 'Mends', value: mends.split(' ')[0]! }] : tiles

@@ -210,7 +210,7 @@ v2](../design/uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229), D23
     zero parts dropped. A strip under each row shows the same parts, scaled to her largest row. That sum is what a fight uses before
     the skill and the foe ([combat](combat.md#damage)). Below them a key, then a line for each stat her weapons use:
     `M.ATK 70 · base 52 · armor 10 · accessory 3 · Stars 5`, ★ for her Moon. An Insignia reads `Bosses +3%` beside the title.
-  - **Stats:** HP, MP, DEF, M.DEF and Evasion as tiles, and a healer's Mends.
+  - **Stats:** HP, MP, DEF, M.DEF and Evasion as tiles with their marks, and a healer's Mends.
   - **All stats** swaps the page, and ‹ Details returns: one column. Offense, Defense, Sustain and Other preserve every row of
     `umaBattleSheet`, including 0; stat rows show their base, armor, accessory and Stars parts, with her Moon marked ★. Core lists
     Speed, Stamina, Power, Guts and Wit with the racing base and growth. Work lists Craft Level and EXP, grades and trade; Since
@@ -315,9 +315,10 @@ tiles, Gear's budget one screen at 390×844. Weapons are chosen on the Class tab
   the line to it lit; **Ready** (a jewel in the Warehouse opens it now) has a green dot and a slow pulse; **Next** is a bright ring; **Later** a dim one.
   A full body closes its figure. A star opens its sheet; a body opens the sheet on its next node, its last when full. The crests are vector
   stand-ins until uma-art's own (H141, H144).
-- **The six totals** ("HP +125", "MP +25", "ATK +25", "M.ATK +13", "DEF +19", "M.DEF +19") of the shared map, then her moon's line in
-  the accent ("★ Evasion +2.4% · DEF +8").
-- **A node's sheet** ("Guard III", "★ Bruiser's moon II"): what it gives for her class ("DEF/M.DEF +6"; Prowess "ATK +6" as a Brawler;
+- **The six totals** ("HP +125", "MP +25", "ATK +25", "M.ATK +13", "DEF +19", "M.DEF +19") of the shared map, each with its stat mark, then her
+  moon's line in the accent ("★ Evasion +2.4% · DEF +8").
+- **A node's sheet** ("Guard III", "★ Bruiser's moon II"): a strip of every node of its body, each with the first number of its value and
+  drawn in the chart's four states (H143); a tap on the strip moves the sheet to that node, without closing or stacking. Then what it gives for her class ("DEF/M.DEF +6"; Prowess "ATK +6" as a Brawler;
   "+4 · all six"), before → after, the first at display size ("DEF 151 → 157", then "M.DEF 129 → 135"), from her battle sheet, a
   moon node it brings included, and its jewel ("Moon Jewel III ×1 · 4 held", "Planet Jewel III ×3 · 4 held"). The footer is **Set**,
   or disabled with what stops it: "Guard II first", "Lv 41", or the jewels held ("Planet Jewel I ×1"). An open node reads Open with no

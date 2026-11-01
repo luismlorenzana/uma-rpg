@@ -84,7 +84,8 @@ button and footer should stay reachable without horizontal page scrolling, in li
 12. **Stars and Template tabs.** Stars reads "Extra Stats · Open n/22 · n ready", then the star chart on a night sky in both themes: Prowess a
     spearhead, Vigor a pentagon, Guard a shield, the Planet a ring, each star numbered, a label and count on each body. Filled and lit lines are
     Open, a green dot and a slow pulse are Ready, a bright ring is Next, a dim one Later; a full body closes its figure. Nothing overlaps at
-    375×667, and no line bulges off its stars. Tap a body's middle: its next node's sheet. Below it the six totals and her moon's ★ line. Tap a closed node: what it gives, before → after, its jewel with what's held, and **Set**, or
+    375×667, and no line bulges off its stars. Tap a body's middle: its next node's sheet, a strip of all its nodes with their values at the top. Tap
+    the strip: the sheet moves along the body and never stacks. Below the chart, six totals with their marks, and her moon's ★ line. Tap a closed node: what it gives, before → after, its jewel with what's held, and **Set**, or
     disabled with `Lv n` or `{Node} first`. **Set**: the sheet stays open on Open and the count falls. **Set all** lists each jewel;
     **Set n** sets them. Her moon's nodes read "With its moons". On Template, expect her name, three reading tiles, "Calling · … ·
     fixed" and her trade, four ★ rows, her racing chips with the sources ringed, and **Racing skill ›**. Tap ★ Signature: Gear's

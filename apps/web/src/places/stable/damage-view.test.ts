@@ -60,8 +60,8 @@ describe('statTiles', () => {
   ]
 
   it('shows her five final numbers, in order', () => {
-    expect(statTiles(groups())).toEqual([{ label: 'HP', value: '1,140' }, { label: 'MP', value: '103' }, { label: 'DEF', value: '65' },
-      { label: 'M.DEF', value: '64' }, { label: 'Evasion', value: '3.6%' }])
+    expect(statTiles(groups())).toEqual([{ label: 'HP', value: '1,140', mark: 'hp' }, { label: 'MP', value: '103', mark: 'mp' }, { label: 'DEF', value: '65', mark: 'def' },
+      { label: 'M.DEF', value: '64', mark: 'mdef' }, { label: 'Evasion', value: '3.6%', mark: 'evasion' }])
   })
 
   it('adds a healer’s Mends, its number alone', () => {

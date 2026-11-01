@@ -2,7 +2,7 @@
 // Observatory's order. Made-up outfits only.
 import { newOwnedUma, type BattleOutfit, type OwnedUma, type StarMap, type TemplateOutfit } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { mapNodeTitle, nodeBeforeAfter, nodeReady, nodeSheet, observatoryOrder, setAllLines, setAllPlan } from './stars-view'
+import { mapNodeTitle, mapNodeValue, nodeBeforeAfter, nodeReady, nodeSheet, nodeStepValue, observatoryOrder, setAllLines, setAllPlan } from './stars-view'
 
 const NOW = '2026-10-31T12:00:00.000Z'
 const map = (...open: string[]): StarMap => ({ open, moons: [] })
@@ -100,5 +100,41 @@ describe('the Observatory\'s order (H122)', () => {
   it('puts the most ready first, then the roster\'s order', () => {
     const rows = [{ id: 'a', n: 1 }, { id: 'b', n: 2 }, { id: 'c', n: 3 }]
     expect(observatoryOrder(rows, (id) => (id === 'c' ? 2 : 0), (x, y) => y.n - x.n).map((r) => r.id)).toEqual(['c', 'b', 'a'])
+  })
+})
+
+describe('a body’s strip (H143, PP27)', () => {
+  const view = (node: string, open: string[], stock: Record<string, number> = {}) => nodeSheet(outfit, uma(open), node, 'brawler', WEAPONS, 1, stock)
+
+  it('reads the first number of every value', () => {
+    expect(nodeStepValue('+4 · all six')).toBe('+4')
+    expect(nodeStepValue('ATK +6')).toBe('+6')
+    expect(nodeStepValue('ATK +4 · M.ATK +2')).toBe('+4')
+    expect(nodeStepValue('HP +30 · MP +6')).toBe('+30')
+    expect(nodeStepValue('DEF/M.DEF +6')).toBe('+6')
+    expect(nodeStepValue('Evasion +2.4%')).toBe('+2.4%')
+    expect(nodeStepValue('Limit start +1')).toBe('+1')
+  })
+
+  it('reads a number for all five knacks’ first node, and both channels’ second', () => {
+    for (const knack of ['tireless', 'clever', 'mighty', 'fleet', 'gritty'] as const) expect(nodeStepValue(mapNodeValue('template:1', 'brawler', knack, 'physical', 1))).toMatch(/^\+/)
+    for (const channel of ['physical', 'magical', 'both'] as const) expect(nodeStepValue(mapNodeValue('template:2', 'brawler', 'fleet', channel, 1))).toMatch(/^\+/)
+  })
+
+  it('lists every node of its body in order, valued, in the chart’s states', () => {
+    const { steps } = view('guard:4', ['guard:1', 'guard:2'], { 'jewel-moon-3': 1 })
+    expect(steps.map((step) => step.id)).toEqual(['guard:1', 'guard:2', 'guard:3', 'guard:4', 'guard:5'])
+    expect(steps.map((step) => step.numeral)).toEqual(['I', 'II', 'III', 'IV', 'V'])
+    expect(steps.map((step) => step.value)).toEqual(['+2', '+4', '+6', '+8', '+10'])
+    expect(steps.map((step) => step.state)).toEqual(['open', 'open', 'ready', 'later', 'later'])
+  })
+
+  it('gives her moon two cells, neither ever Ready', () => {
+    const { steps } = view('template:1', [], { 'jewel-moon-2': 5, 'jewel-moon-4': 5 })
+    expect(steps.map((step) => step.state)).toEqual(['next', 'later'])
+  })
+
+  it('gives Vigor its HP', () => {
+    expect(view('vigor:1', []).steps.map((step) => step.value)).toEqual(['+10', '+20', '+30', '+40', '+50'])
   })
 })

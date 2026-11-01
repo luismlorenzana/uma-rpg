@@ -68,6 +68,8 @@ describe('the Template tab (H123)', () => {
     show(await saveWith('recruit', 0))
     fireEvent.click(row('moon-2'))
     expect(await screen.findByRole('button', { name: 'With its moons' })).toHaveProperty('disabled', true)
+    expect(document.querySelectorAll('[data-body-strip] button')).toHaveLength(2)
+    expect(document.querySelector('[data-step="template:2"]')!.getAttribute('aria-current')).toBe('step')
   })
 
   it('fights as her family from the Flourish sheet: the row reads On, and the sheet stays open on it', async () => {

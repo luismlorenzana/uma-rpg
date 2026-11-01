@@ -7,6 +7,7 @@ import {
   type StarMap, type TemplateOutfit,
 } from '@rpg/domain'
 import { gate, itemCount, nodeGate, nodeValue as nodeValueCopy, setLine, valueStep } from '../stable/copy'
+import { starState, type StarState } from './star-chart'
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V'] as const
 const cap = (word: string) => word[0]!.toUpperCase() + word.slice(1)
@@ -95,9 +96,15 @@ export function nodeBeforeAfter(outfit: BattleOutfit, uma: OwnedUma, node: strin
   })
 }
 
-/** A node's sheet: what it gives, before → after, its jewel with what's held, and the footer: Set, or the gate, disabled; an
- * open node has none and reads Open. */
+/** The first number of a node's value, for its body's strip (PP27): "+30" of "HP +30 · MP +6", "+2.4%" of "Evasion +2.4%". */
+export const nodeStepValue = (value: string): string => /\+[\d.,]+%?/.exec(value)?.[0] ?? value
+/** One node on its body's strip, drawn as the chart draws it. */
+export interface NodeStep { id: string; numeral: string; value: string; state: StarState }
+
+/** A node's sheet: every node of its body, what it gives, before → after, its jewel with what's held, and the footer: Set, or the
+ * gate, disabled; an open node has none and reads Open. */
 export interface NodeView {
+  steps: NodeStep[]
   title: string
   value: string
   open: boolean
@@ -118,7 +125,11 @@ export function nodeSheet(outfit: Outfit, uma: OwnedUma, node: string, classId: 
   const before = Array.from({ length: nodeNumeral(node) - 1 }, (_, i) => `${body}:${i + 1}`).find((id) => !map.open.includes(id))
   const label = body === 'template' ? 'With its moons' : before ? nodeGate(mapNodeTitle(before, type))
     : uma.level < mapNodeGate(node) ? gate('level', mapNodeGate(node)) : held < count ? itemCount(madeName(jewelId) ?? jewelId, held) : 'Set'
-  return { title: mapNodeTitle(node, type), value: mapNodeValue(node, classId, moon.knack, moon.channel, tier, weapons), open,
+  const steps = MAP_NODES.filter((id) => nodeBody(id) === body).map((id): NodeStep => ({
+    id, numeral: ROMAN[nodeNumeral(id) - 1]!, value: nodeStepValue(mapNodeValue(id, classId, moon.knack, moon.channel, tier, weapons)),
+    state: starState(map, id, (other) => nodeReady(map, other, uma.level, stock)),
+  }))
+  return { steps, title: mapNodeTitle(node, type), value: mapNodeValue(node, classId, moon.knack, moon.channel, tier, weapons), open,
     changes: nodeBeforeAfter(outfit, uma, node, classId, tier), jewelId,
     jewel: body === 'template' || open ? null : itemCount(madeName(jewelId) ?? jewelId, count, held),
     footer: open ? null : { label, ready: label === 'Set' } }

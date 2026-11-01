@@ -145,6 +145,7 @@ describe('the Uma profile v2 frame (H119)', () => {
     for (const stat of damage.stats) expect(details.querySelector(`[data-damage-stat="${stat.label}"]`)!.textContent).toContain(`${stat.label} ${stat.total}`)
     expect(within(details).queryByText(/^Bosses/)).toBeNull()
     expect([...details.querySelectorAll('[data-stat-tiles] li')].map((tile) => tile.lastChild!.textContent)).toEqual(['HP', 'MP', 'DEF', 'M.DEF', 'Evasion'])
+    expect([...details.querySelectorAll('[data-stat-mark]')].map((mark) => mark.getAttribute('data-stat-mark'))).toEqual(['hp', 'mp', 'def', 'mdef', 'evasion'])
     expect(document.querySelector('[data-all-stats]')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'All stats' }))
     expect(screen.getByRole('dialog', { name: 'All stats' })).toBeDefined()

@@ -1,6 +1,6 @@
 # H144 — Pin uma-art 2.19.0: pixel crests and stat marks
 
-**uma-rpg · Claude or ChatGPT · S · Needs: H141 (uma-art 2.19.0 published), H143 · Unblocks: nothing**
+**uma-rpg · Claude or ChatGPT · S · Needs: H141 (uma-art 2.19.0 published) · Unblocks: nothing**
 
 ## Why
 
