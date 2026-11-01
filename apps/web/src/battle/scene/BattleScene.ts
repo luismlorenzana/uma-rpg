@@ -4,7 +4,7 @@
 // and the canvas only draws effect text (damage numbers, BREAK).
 import worldIndex from '@luismlorenzana/uma-art/world/atlas.json'
 import fxIndex from '@luismlorenzana/uma-art/fx/atlas.json'
-import { isRpgWeaponKind, type BattleCue, type BattleState, type Biome, type EnemyRank, type RpgDamageKind } from '@rpg/domain'
+import { BATTLE_FAMILIAR_LABEL, isRpgWeaponKind, type BattleCue, type BattleState, type Biome, type EnemyRank, type RpgDamageKind } from '@rpg/domain'
 import Phaser from 'phaser'
 import { stageLayout, type Box } from '../stage-layout'
 import { backgroundLayout } from './background-layout'
@@ -298,6 +298,7 @@ export class BattleScene extends Phaser.Scene {
   private async animate(cue: BattleCue): Promise<void> {
     switch (cue.kind) {
       case 'hit':
+        this.boundFamiliar(cue, false)
         return this.hit(cue.actorId, cue.targetId, cue.amount, cue.element, cue.weak, cue.channel === 'status')
       case 'mp':
         this.number(cue.targetId, `+${cue.amount ?? 0} MP`, '#8fc0ff', 0.75)
@@ -369,6 +370,12 @@ export class BattleScene extends Phaser.Scene {
     }
   }
 
+  /** A Spellblade's extra hit is her bound familiar's (D282). */
+  private boundFamiliar(cue: Extract<BattleCue, { kind: 'hit' }>, reduced: boolean): void {
+    const target = this.actors.get(cue.targetId)
+    if (target && cue.label === BATTLE_FAMILIAR_LABEL) this.pixels.bound(cue.element, target, this.dpr, reduced)
+  }
+
   private async hit(actorId: string, targetId: string, amount: number, kind: RpgDamageKind | null, weak: boolean, tick: boolean): Promise<void> {
     const actor = this.actors.get(actorId)
     const target = this.actors.get(targetId)
@@ -406,6 +413,7 @@ export class BattleScene extends Phaser.Scene {
     const target = this.actors.get(cue.targetId)
     if (!target) return
     const { x, y } = this.center(cue.targetId)
+    if (cue.kind === 'hit') this.boundFamiliar(cue, true)
     if (cue.kind === 'hit' && !this.pixels.hit(cue.element ?? (cue.channel === 'status' ? 'fire' : null), target, this.dpr, true)) {
       const dot = this.add.circle(x, y, 10 * this.dpr, cue.element ? KIND_COLOR[cue.element] : 0xffffff).setAlpha(0.7)
       this.fx.add(dot)

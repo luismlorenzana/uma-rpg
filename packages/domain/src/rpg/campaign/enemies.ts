@@ -51,7 +51,7 @@ const ELEMENT_NAME: Readonly<Record<RpgElement, string>> = { fire: 'Flame', ice:
 
 /** A foe's kit. A dual-element foe (W3) uses her second element for her second elemental move, so her moves split
  * between the two. */
-function moves(role: RpgFoeRole, element: RpgElement, second: RpgElement = element): { moves: BattleEnemyMove[]; phaseTwo?: BattleEnemy['phaseTwo'] } {
+function moves(role: RpgFoeRole, element: RpgElement, second: RpgElement = element, engine: number = BATTLE_ENGINE_VERSION): { moves: BattleEnemyMove[]; phaseTwo?: BattleEnemy['phaseTwo'] } {
   const e = ELEMENT_NAME[element]
   const e2 = ELEMENT_NAME[second]
   const m = (id: string, kind: BattleEnemyMove['kind'], channel: BattleEnemyMove['channel'], el: RpgElement | null,
@@ -62,8 +62,9 @@ function moves(role: RpgFoeRole, element: RpgElement, second: RpgElement = eleme
       m('heavy', 'damage', 'physical', second, 130, 'seeded', `${e2} blow`)] }
     case 'caster': return { moves: [m('bolt', 'damage', 'magical', element, 110, 'lowest-hp', `${e} bolt at the weakest`),
       m('hex', 'debuff', 'magical', second, 0, 'seeded', 'Hex: weaken', 'weaken')] }
+    // v21 (D282): foes no longer cover each other, so a guard only bashes. Covering is pinned for special boss fights.
     case 'guard': return { moves: [m('bash', 'damage', 'physical', null, 80, 'front', 'Shield bash'),
-      m('cover', 'guard', 'physical', null, 0, 'ally', 'Guard an ally')] }
+      ...(rpgRework('pass', engine) ? [] : [m('cover', 'guard', 'physical', null, 0, 'ally', 'Guard an ally')])] }
     case 'skirmisher': return { moves: [m('cut', 'damage', 'physical', element, 90, 'seeded', `${e} cut + mark`, 'mark'),
       m('strike', 'damage', 'physical', null, 100, 'front', 'Strike the front')] }
     // Captains and champions each carry a charged move (D141): shown a round early with locks, answered by Breaks.
@@ -151,7 +152,7 @@ export function rpgFoe(input: { id: string; castId: string; element: RpgElement;
   const shape = ROLE[input.role]
   // Sub-bosses and champions also grow with the skill depth the party can reach (D282): that is where its MP goes.
   const scale = (input.rank === 'boss' ? t.bossHp : input.rank === 'sub-boss' ? t.subBossHp : 1) * (input.rank === 'regular' ? 1 : input.reach ?? 1)
-  const kit = moves(input.role, input.element, input.element2)
+  const kit = moves(input.role, input.element, input.element2, engine)
   // The party's expected gear and Extra Stats at this level, given to the foe's HP and defense (§7.3, D59); her offense is
   // set by the share of an Uma's HP a hit takes (D141). Both read the tier level, scaled to her lifetime stats (Z3, D170).
   const budget = rpgFoeTierBudget(input.level, t.budgetPerLevel, engine)

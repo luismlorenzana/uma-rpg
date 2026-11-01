@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-11-01, after D281.** Tier 1 is built and live: engine v20, save v34. That covers the Tier rework's R1
+> **Status: 2026-11-01, after D282.** Tier 1 is built and live: engine v21, save v34. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H145; decision numbers from D282). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H150; decision numbers from D283). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it.
@@ -38,13 +38,19 @@ pins it.
 
 The audit's bugs and the Hall issues have no packet yet.
 
+**The combat pass** (H145–H149, D282) is built and live: foes no longer guard, one symbol per kind, the healers' one kit and
+rescue, buffs and debuffs on their paths, pure Brawlers and Sorcerers, a Spellblade's bound familiar.
+
+**Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
+`guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
+
 **After hardening:** Tier 2 and Tier 3 are re-planned. Their approved drafts stay in
 [design/tier-rework/](../design/tier-rework/README.md) (Class, Weapon, Extra Stats and Profession Progression, stat
 balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 2026-10-28; the archive lists them.
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v20, save v34; uma-kit 0.16.0, uma-art 2.18.0, uma-data 1.2.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v21, save v34; uma-kit 0.16.0, uma-art 2.18.0, uma-data 1.2.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 - **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
   "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.

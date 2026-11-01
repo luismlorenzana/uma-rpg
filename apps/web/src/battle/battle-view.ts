@@ -2,7 +2,7 @@
 // reworked for D86: every class acts once, picks which of her weapons to attack with (three from v16), and a Spell
 // Blade's act pairs an Arms half with a Tome half (from v15 a Summoner's too, her Tome half leading, D183). Everything
 // reads the fight's own engine version, so an open v15 fight shows v15's rules whatever the live generation (H59).
-import { BATTLE_LIMIT_MAX, bondCapacity, heroLimitFor, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgHand, rpgRework, rpgV2, rpgWeaponKind,
+import { BATTLE_FAMILIAR_LABEL, BATTLE_LIMIT_MAX, bondCapacity, heroLimitFor, heroLimitKinds, isRpgTome, RPG_ELEMENTS, rpgHand, rpgRework, rpgV2, rpgWeaponKind,
   type BattleAction, type BattleAlly, type BattleCue, type BattleHalf, type BattleSkill, type BattleState,
   type HeroLimitId, type RpgDamageKind, type RpgNodeRef, type RpgWeapon } from '@rpg/domain'
 import { BATTLE_LIMIT_NAMES, applyBattleAction, battleActionsLeft, battleActorSkill, battleHasLimit, battleLimitPlan,
@@ -146,7 +146,7 @@ const flourish = (cue: BattleCue, engine: number | undefined): boolean =>
 export function describeCue(cue: BattleCue, name: (id: string) => string, engine?: number): string {
   switch (cue.kind) {
     case 'hit': return cue.label === 'Burn' ? `${name(cue.targetId)} burns for ${cue.amount}`
-      : `${name(cue.actorId)} → ${name(cue.targetId)}: ${cue.amount}${cue.weak ? ' · WEAK' : ''}${cue.label === 'Intercepted' ? ' · guarded' : cue.label === 'Warded' ? ' · warded' : cue.label?.startsWith('Barrier') ? ` · ${cue.label}` : ''}`
+      : `${name(cue.actorId)} → ${name(cue.targetId)}: ${cue.amount}${cue.weak ? ' · WEAK' : ''}${cue.label === 'Intercepted' ? ' · guarded' : cue.label === 'Warded' ? ' · warded' : cue.label === BATTLE_FAMILIAR_LABEL ? ' · familiar' : cue.label?.startsWith('Barrier') ? ` · ${cue.label}` : ''}`
     case 'shield': return `${name(cue.targetId)} shield ${cue.amount}`
     case 'break': return `${name(cue.targetId)} BREAK!`
     case 'recover': return `${name(cue.targetId)} recovers its shield`

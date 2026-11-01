@@ -44,17 +44,21 @@ export const BATTLE_HEAL_SCALE = 300
 // The three accessory slots (D264) need no engine either: a slot reaches a fight as frozen stats and `flat`, and only
 // `validAccessory` widens, which no older fight can notice. Save v34 carries them.
 
+// The combat pass (D282) is engine v21 under one stage, `pass`: no foe guards, the healers' one kit, buffs and debuffs moved
+// to their paths, the pure damage classes, and a Spellblade's bound familiar. `rpg/battle/v20-replays.test.ts` pins v20's
+// fights. No save change: a tree's nodes keep their ids, and only what a fight plays differs.
+
 /** The engine new fights start on, and the generation every rule's default reads (D179). Older versions still replay. */
-export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 20
+export const BATTLE_ENGINE_VERSION: BattleInput['version'] = 21
 /** The first engine of classes v2: the Paladin, the hybrids' hands, healers from ATK or M.ATK, flat Orbs (D160, D179). */
 export const RPG_V2_ENGINE = 15
 /** Whether an engine plays classes v2's rules. Rules call it with their `engine` argument, never bare. */
 export const rpgV2 = (engine: number = BATTLE_ENGINE_VERSION): boolean => engine >= RPG_V2_ENGINE
 /** The first engine of each release (D198): R1 Tier 1's fight, R2 its economy, weaknesses v2 (D235: every foe her own
  * list, by rank, weaknesses-v2.md), Classes v3 with Halls v2 (D240, D241: live since H134), the trim of the halls (D261),
- * the weapon presets (D263, a rule of the save and the screens), and Tier 2's weapons, which has no engine until the Tier 2
+ * the weapon presets (D263, a rule of the save and the screens), the combat pass (D282), and Tier 2's weapons, which has no engine until the Tier 2
  * re-plan (D238 removed R3–R5; the Branch Gem's gates read it, so it stays shut). */
-export const RPG_REWORK_ENGINE = { fight: 16, economy: 17, weak: 18, classes: 19, halls: 20, presets: 20, t2Weapons: Infinity } as const
+export const RPG_REWORK_ENGINE = { fight: 16, economy: 17, weak: 18, classes: 19, halls: 20, presets: 20, pass: 21, t2Weapons: Infinity } as const
 /** A Tier rework release, by its stage name. */
 export type RpgReworkStage = keyof typeof RPG_REWORK_ENGINE
 /** Whether an engine plays a Tier rework release's rules (H64, D200). Rules call it with their `engine` argument; rules
@@ -63,6 +67,10 @@ export const rpgRework = (stage: RpgReworkStage, engine: number = BATTLE_ENGINE_
 /** v15 (D179): a healer's mends, Barriers and revives grow ×(1 + ATK or M.ATK ÷ this). Here so the profile reads it without
  * the engine; H56 uses it, H60 tunes it. */
 export const BATTLE_HEAL_OFFENSE_SCALE = 300
+/** v21 (D282): a mend lifts the Uma it heals most to at least this share of her max HP. */
+export const BATTLE_RESCUE_FLOOR = 0.6
+/** v21 (D282): the cue label of a Spellblade's extra hit, the one her bound familiar lands. */
+export const BATTLE_FAMILIAR_LABEL = 'Familiar'
 /** v15 (classes v2 §4): the round ends a Cleric's Regen mends at, the round she casts her Light spell and the next. */
 export const BATTLE_REGEN_ROUNDS = 2
 /** v16 (SB18, D204): at each round's end every Uma regains this share of her max MP for each skill depth her class has

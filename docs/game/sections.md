@@ -1,6 +1,6 @@
 # Game sections
 
-Every screen and what is on it, as the game runs today (engine v19, save v32). This page says where things show; the
+Every screen and what is on it, as the game runs today (engine v21, save v34). This page says where things show; the
 rules and numbers behind them are on the other pages, linked from each section. The place list comes from
 `packages/domain/src/hub/places.ts`. Each place's screens live in `apps/web/src/places/<place>/`, registered in
 `places/registry.tsx`; the shell and the Hub are `apps/web/src/hub/`.
@@ -256,6 +256,8 @@ and a tap opens one sheet.
 - **Equipped 4/7**: one square per skill slot her Uma Level gives, each equipped skill with its kind marks and rank; empty
   squares are dashed. A tap opens its node sheet: nothing unequips on a tap. **Auto** is On while the game picks for her;
   while she has her own pick, a tap returns to auto.
+- **A tree's status** (D282), above it where it carries one: "Armor Break · every skill" on a healer's Greatsword, "Enfeeble ·
+  line A, depth 3+" on a Bow, and nothing on a tree with none.
 - **A Tier 1 class's tree** ("Lance tree", with **Change ›**): two trunk nodes, a fork, then lines A and B down to depth 5,
   each under a square A or B button, the held line's filled.
   - A node is a circle with the skill's kind marks and a badge: its rank, or the Class Rank that opens a closed depth.
@@ -273,14 +275,15 @@ and a tap opens one sheet.
   promotion sheet.
 - **Change ›** opens the slot's sheet ("Slot 1 · Arms", a Tier 0's "Slot 1 · Any"): each weapon of the slot's channel (all
   ten for a Tier 0, Arms first) with its grade line ("Lance · G2 · Might 4"), "Held", or "Slot 2" when she holds it in
-  another slot, which swaps them. A tap holds it and the sheet stays open. Grades are raised on the Gear tab.
+  another slot, which swaps them. Each row names the buff or debuff that weapon carries for her class, if any. A tap holds it
+  and the sheet stays open. Grades are raised on the Gear tab.
 - **Limit**, one row at the bottom: the Limit Break Auto fires, "{Limit Break} · Learner · Bond 2/10" (" · +1" for a second
   Hero), "{Limit Break} · Hero", or "None". Its sheet has a block for each Limit Break she casts ("Learner · Warrior Dojo ·
   Seat 2", "Bond 2/10 · Strength 60%", "Next · 3/12" of the Bond EXP to the next level, "Hero · {name}", "Power · ×2.5 · ×0.95 as
   Brawler"; a Hero's reads "Hero · Strength 100% · Bond 3/10"), then every other Bond she has. With two blocks a tap selects
   one. **Open {hall}** opens that hall, or her class's hall with none; its Back returns here with the sheet open.
-- The (i) on the first row covers switching, one healer a party, depths, Skill Ranks, equip slots, Tier 0, promotion and
-  Heroes and Learners, one rule a line.
+- The (i) on the first row covers switching, one healer a party, who carries buffs and debuffs, a Spellblade's familiar,
+  depths, Skill Ranks, equip slots, Tier 0, promotion and Heroes and Learners, one rule a line.
 
 **Gear tab** (`GearTab.tsx`, `gear-view.ts`, `gear-equip.ts`, `gear-v3.ts`; H121, D268; the rules are
 [classes](classes.md#armor-and-the-accessory), [loops](loops.md#gear) and [materials](materials.md#gear)): one view of eleven

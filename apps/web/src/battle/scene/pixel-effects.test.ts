@@ -21,12 +21,14 @@ function harness(loaded = true) {
     add: { image(x: number, y: number, _texture: string, frame: string) {
       const image = { x, y, frame, scale: 1, dead: false,
         setFrame(f: string) { this.frame = f; return this }, setScale(s: number) { this.scale = s; return this },
-        setDepth() { return this }, setPosition(x: number, y: number) { this.x = x; this.y = y; return this },
+        setDepth() { return this }, setAlpha() { return this }, setBlendMode() { return this },
+        setPosition(x: number, y: number) { this.x = x; this.y = y; return this },
         destroy() { this.dead = true },
       }
       images.push(image); return image
     } },
     textures: { exists: () => loaded, get: () => ({ has: (f: string) => Object.hasOwn(atlas.frames, f) }) },
+    tweens: { add() { return undefined } },
     time: { timeScale: 1, delayedCall: (ms: number, cb: () => void) => event(ms, cb),
       addEvent: ({ delay, callback }: { delay: number; callback: () => void }) => event(delay, callback, true) },
   }
@@ -107,5 +109,27 @@ describe('pixel battle effects', () => {
     h.fx.destroy(); expect(h.images.every((i) => i.dead)).toBe(true)
     expect(h.timers.every((t) => t.dead)).toBe(true)
     const missing = harness(false); missing.fx.sync(state(), actors, 390, 2, false); expect(missing.images).toHaveLength(0)
+  })
+})
+
+describe('a Spellblade’s bound familiar (D282)', () => {
+  const target = { box: { x: 10, y: 10, w: 100, h: 100 }, side: 'enemy' as const }
+
+  it('flashes its ghost over the foe, then it’s gone', () => {
+    const { fx, images, advance } = harness()
+    fx.bound('katana', target, 1, false)
+    expect(images.map((i) => i.frame)).toEqual(['familiar/katana-1'])
+    advance(340)
+    expect(images[0]!.dead).toBe(true)
+  })
+
+  it('draws nothing without its art, and clears with the hits', () => {
+    const none = harness(false)
+    none.fx.bound('katana', target, 1, false)
+    expect(none.images).toEqual([])
+    const { fx, images } = harness()
+    fx.bound('fire', target, 1, true)
+    fx.clearHits()
+    expect(images[0]!.dead).toBe(true)
   })
 })

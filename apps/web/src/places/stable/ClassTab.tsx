@@ -5,11 +5,11 @@
 // line. The models are the domain's `rpgTreeView`, which reads the catalog (so only this lazy tab imports it), and
 // `class-view.ts`.
 import {
-  activeClass, classOf, rpgActiveSlots, rpgRework, rpgTreeView, SaveRuleError, umaLoadout, umaProfile,
+  activeClass, classOf, rpgActiveSlots, rpgRework, rpgStatusPath, rpgTreeView, SaveRuleError, umaLoadout, umaProfile,
   type OwnedUma, type RosterOutfit, type RpgBranch, type RpgTier0Class, type RpgTier1Class, type RpgTreeViewNode, type TierWorld,
 } from '@rpg/domain'
 import { useMemo, useState } from 'react'
-import { Bar, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { Bar, STATUS_LABEL, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ClassEmblem } from '../../battle/pixel-icons'
 import { masterRoster } from '../../master/master'
 import { equip, takeBranch, useActiveTier } from '../../save/game'
@@ -18,7 +18,7 @@ import { tier0RankWord } from '../../ui/rank-words'
 import { classButton, limitView, promotionFrom, promotionLine, tier0NodeTitle } from './class-view'
 import { LimitSheet, LineSheet, lineTitle, nodeLine, NodeSheet, rankText, SkillMarks } from './class-sheets'
 import { ClassesSheet } from './ClassesSheet'
-import { actions, equipped } from './copy'
+import { actions, equipped, treeStatus } from './copy'
 import { PromotionSheet } from './PromotionSheet'
 import { useSheetReturn } from './sheet-door'
 import { WeaponSheet } from './WeaponSheet'
@@ -58,6 +58,7 @@ export function ClassTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: Ow
     const from = promotionFrom(outfit, uma, tier, child)
     setSheet(from ? { kind: 'promotion', from, child } : null)
   }
+  const statusPath = rpgStatusPath(classId, tree.weapon)
   const openNode = (node: RpgTreeViewNode) => { setError(null); setSheet({ kind: 'node', id: node.id }) }
   const nodeOpen = sheet?.kind === 'node' ? allNodes.find((n) => n.id === sheet.id) : undefined
   const nodeTree = nodeOpen ? view.trees.find((item) => item.nodes.includes(nodeOpen)) : undefined
@@ -91,6 +92,10 @@ export function ClassTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: Ow
           <HelpButton title="Classes and skills">
             <p>Switching class is free; each class keeps its own weapons, lines and skills.</p>
             <p>One healer a party: a Paladin or a Cleric.</p>
+            <p>Paladins and Clerics carry buffs and debuffs on every Greatsword, Lance and Fire Tome skill.</p>
+            <p>Line A of Katana, Bow, Light and Dark adds them from depth 3 for healers, Spellblades and Summoners.</p>
+            <p>Brawlers and Sorcerers deal damage only.</p>
+            <p>A Spellblade's extra hit is her bound familiar's.</p>
             <p>Depths open at R1, R10, R20, R30 and R40.</p>
             <p>A skill gains a rank every 2 Class Ranks, up to 5.</p>
             <p>Uma Level sets how many skills she equips; Auto picks until you do.</p>
@@ -132,6 +137,9 @@ export function ClassTab({ outfit, uma, world }: { outfit: RosterOutfit; uma: Ow
           <button type="button" onClick={() => { setError(null); setSheet({ kind: 'weapon', slot: treeIndex }) }} className="min-h-11 shrink-0 px-2 text-[12.5px] font-semibold text-ink-soft"
             aria-label={`Change ${WEAPON_LABEL[tree.weapon]}`}>Change ›</button>
         </div>
+        {statusPath && <p className="mb-1 px-1 text-[12px] font-semibold text-ink-soft" data-tree-status>
+          {treeStatus(statusPath.statuses.map((key) => STATUS_LABEL[key]), statusPath.on)}
+        </p>}
         {tier0 ? (
           <div className="space-y-2 rounded-sm bg-panel p-2" aria-label={`${WEAPON_LABEL[tree.weapon]} tree`}>
             {trunk.map((node) => (

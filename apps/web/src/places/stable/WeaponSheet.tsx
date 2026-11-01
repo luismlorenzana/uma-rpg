@@ -7,18 +7,18 @@
 import {
   accessoryEffects, BATTLE_ENGINE_VERSION,
   boundGrade, classOf, EFFECT_LABEL, equipBlock, gearById, gearChoices, gearPoints, gearStock, gearV1, isAccessory, isGrades, isOrb,
-  isRpgTome, isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgV2, SaveRuleError,
+  isRpgTome, isWeapon, ITEM_EFFECTS, mightOf, RPG_CLASS_SLOTS, rpgClassWeapons, rpgPicksWeapons, rpgStatusPath, rpgV2, SaveRuleError,
   type AccessoryEffects, type OwnedUma, type RpgClass, type RpgDamageKind, type RpgWeapon,
   type GearTier, type TierWorld,
 } from '@rpg/domain'
 import { useState } from 'react'
-import { kindLabel, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
+import { kindLabel, STATUS_LABEL, trainingName, WEAPON_LABEL, WeaponGlyph } from '../../battle/labels'
 import { ItemIcon } from '../../items/ItemIcon'
 import { outputView } from '../../items/outputs'
 import { hold, useActiveTier } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { pointText } from '../../items/planets'
-import { weaponSlot } from './copy'
+import { treeStatus, weaponSlot } from './copy'
 import { weaponGradeLine } from './gear-v3'
 
 /** Accessories' defensive effects, one phrase each (D124). Regen and the two shields are shares of her max HP (D141). */
@@ -73,6 +73,10 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
   const here = weapons[slot]!
   // In the class's order, so a row stays put when a tap makes it Held and the sheet stays open (G5).
   const kinds = rpgPicksWeapons(classId) ? rpgClassWeapons(classId).filter((w) => w === here || kind === 'any' || (kind === 'tome') === isRpgTome(w)) : [here]
+  const statusOf = (w: RpgWeapon) => {
+    const path = rpgStatusPath(classId, w)
+    return path ? treeStatus(path.statuses.map((key) => STATUS_LABEL[key]), path.on) : null
+  }
   const pieces = (w: RpgWeapon) => gearChoices(uma, gearStock(world), (p) => p.type === w)
   const held = (w: RpgWeapon, id: string | null) => here === w && (gear.equipped[w] ?? null) === id
   // A graded Uma (save v28, R2): a weapon is a grade she raises on the Gear tab, so the sheet only picks the slot's weapon.
@@ -90,7 +94,10 @@ export function WeaponSheet({ outfitId, uma, world, classId, slot, onClose }: {
               <button type="button" disabled={here === w} onClick={() => void choose(w, null)}
                 className={`flex min-h-11 w-full items-center gap-2 rounded-sm p-2 text-left ${here === w ? 'bg-accent/15 ring-1 ring-accent' : 'bg-raised'}`}>
                 <TrainingIcon weapon={w} size={32} />
-                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{weaponGradeLine(graded, w, tier)}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-semibold">{weaponGradeLine(graded, w, tier)}</span>
+                  {statusOf(w) && <span className="block truncate text-[11px] text-ink-soft">{statusOf(w)}</span>}
+                </span>
                 <span className="shrink-0 text-[11px] text-ink-faint">{here === w ? 'Held' : otherSlot >= 0 ? `Slot ${otherSlot + 1}` : ''}</span>
               </button>
             </li>

@@ -16,13 +16,15 @@
 // Spell Blade's Light and Dark cores and the Summoner's Bow, Dark and Light summons; the Brawler's Bow B becomes Barrage, the
 // Sorcerer's Light B Pierce and her Dark B Barrage (`RPG_LINE_B_POWER_V19`). The two new hybrids' trees play v19's shapes
 // in their `skill`: they have no older generation.
+// The combat pass (engine v21, D282) plays new data on old ids as well, kept apart in `skill21` and built after every tree
+// by one rule (`passSkill`), so no older def moves.
 import {
   isRpgTome, RPG_CLASSES, RPG_TIER0_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
   type RpgClass, type RpgDamageKind, type RpgElement, type RpgStatusKind, type RpgTier0Class, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
 import { RPG_TIER0_MP, RPG_TIER0_SKILL } from './class-tree'
 import { RPG_BRANCH_B, RPG_SKILL_MP, RPG_SKILL_POWER, rpgTreeOf } from './node-identity'
-import { BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, rpgRework, rpgV2 } from './battle/caps'
+import { BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, RPG_REWORK_ENGINE, rpgRework, rpgV2 } from './battle/caps'
 export { rpgTreeOf, rpgSideNodeLevel } from './node-identity'
 // The depth tables live with the node identities (H62): the world's foes read them without building this catalog.
 export { RPG_SKILL_MP, RPG_SKILL_POWER } from './node-identity'
@@ -47,10 +49,13 @@ export const RPG_SUPPORT_SHARE_V15 = [0.28, 0.32, 0.36, 0.4, 0.44] as const
 export interface RpgPart { kind: RpgDamageKind; share: number }
 /** `follow` (Halls v2, HV-A; H129): a random double's second hit, which from v19 strikes the foe the hit before it aimed at
  * while she stands. Only Halls v2's Limit Breaks carry it (`heroLimitSkills`); a `one` or `all` cast never reads it. */
-export interface RpgHit { power: number; parts: RpgPart[]; follow?: true }
+export interface RpgHit { power: number; parts: RpgPart[]; follow?: true
+  /** v21 (D282): a Spellblade's extra hit, which her bound familiar lands (`battleExtraHit`). */
+  familiar?: true }
 export type RpgSkillTarget = 'one' | 'all' | 'random'
 /** A Cleric skill's status (D86): an Arms blow debuffs the foe, a Tome spell buffs every ally. */
 export type RpgStatusKey = 'armor-break' | 'mind-break' | 'enfeeble' | 'shatter' | 'hex' | 'brave' | 'faith' | 'aegis' | 'breaker' | 'clarity'
+export interface RpgSkillStatus { key: RpgStatusKey; stacks: number; turns: number; to: 'foe' | 'foes' | 'allies' }
 export interface RpgSkillDef {
   target: RpgSkillTarget
   /** `all`: every foe takes each hit. `one`: every hit on the tapped foe. `random`: each hit on a random living foe. */
@@ -70,7 +75,9 @@ export interface RpgSkillDef {
   allies?: { status: 'barrier'; stacks: number }
   special?: 'pierce' | 'vs-broken' | 'vs-wounded'
   /** The Cleric's status: on the foe hit, on every foe, or on every ally. */
-  status?: { key: RpgStatusKey; stacks: number; turns: number; to: 'foe' | 'foes' | 'allies' }
+  status?: RpgSkillStatus
+  /** v21 (D282): a second status with it, Faith beside Brave on the blessing trees. */
+  also?: RpgSkillStatus
   /** A summon: it stays on the field and acts again at this share when its Summoner next summons (D86). */
   summon?: { linger: number }
   /** v12 (D141): what it does for the party besides its hits. Older engines ignore it, so old fights replay unchanged. */
@@ -122,6 +129,8 @@ export interface RpgNode {
   /** The def engine v19 plays where it differs from v16–v18's (H128): the weapon shapes (CV12) and the moved B lines (CV14).
    * The two new hybrids' nodes have none: their `skill` is v19's. */
   skill19?: RpgSkillDef
+  /** The def engine v21 plays where it differs (D282), built by `passSkill`. */
+  skill21?: RpgSkillDef
   /** One line for the tree screen: the live generation's def. */
   summary: string
 }
@@ -151,7 +160,7 @@ function describe(skill: RpgSkillDef): string {
   const parts = [`${per} · ${n} hit${n === 1 ? '' : 's'} · ${round(total)}`]
   // From v19 (H128) a volley's splash is half its shape, so the live summary names it; older summaries stay as they were.
   if (skill.splash && LIVE19) parts.push(`${round(skill.splash.power)} on every other foe`)
-  if (skill.status) parts.push(`${STATUS_TEXT[skill.status.key]} ${skill.status.stacks} ${skill.status.to === 'allies' ? 'on every ally' : skill.status.to === 'foes' ? 'on every foe' : 'on the foe'}`)
+  if (skill.status) parts.push(`${STATUS_TEXT[skill.status.key]}${skill.also ? ` and ${STATUS_TEXT[skill.also.key]}` : ''} ${skill.status.stacks} ${skill.status.to === 'allies' ? 'on every ally' : skill.status.to === 'foes' ? 'on every foe' : 'on the foe'}`)
   if (skill.summon) parts.push(`lingers at ${skill.summon.linger}`)
   // The live generation's support (D179): the summaries move at the switch.
   const sup = rpgV2() ? skill.support15 : skill.support
@@ -175,6 +184,8 @@ function describe(skill: RpgSkillDef): string {
 const LIVE16 = rpgRework('fight')
 /** Whether the live generation is Classes v3's (v19, H128): the weapon shapes' names and summaries. */
 const LIVE19 = rpgRework('classes')
+/** Whether the live generation is the combat pass (v21, D282). */
+const LIVE21 = rpgRework('pass')
 const NODES: RpgNode[] = []
 interface TreeSpec {
   classId: RpgClass
@@ -647,6 +658,88 @@ function addTier0Tree(classId: RpgTier0Class, weapon: RpgWeapon): void {
 }
 for (const classId of RPG_TIER0_CLASSES) for (const weapon of RPG_WEAPONS) addTier0Tree(classId, weapon)
 
+// --- The combat pass (engine v21, D282) ----------------------------------------------------------------------------------
+
+/** The five buffs and debuffs a tree can still carry (D3, D282): each tree's, with Faith beside Brave. */
+const TREE_STATUS: Readonly<Partial<Record<RpgWeapon, readonly [RpgStatusKey, RpgStatusKey?]>>> = {
+  greatsword: ['armor-break'], lance: ['mind-break'], 'tome-fire': ['brave', 'faith'],
+  katana: ['armor-break'], bow: ['enfeeble'], 'tome-dark': ['mind-break'], 'tome-light': ['brave', 'faith'],
+}
+/** The secondary weapons (D2): the Twilight pair and the Light and Dark Tomes. */
+export const RPG_SECONDARY_WEAPONS: readonly RpgWeapon[] = ['katana', 'bow', 'tome-light', 'tome-dark']
+/** The main weapons only a healer's trees carry a status on (D1). */
+export const RPG_HEALER_STATUS_WEAPONS: readonly RpgWeapon[] = ['greatsword', 'lance', 'tome-fire']
+const healerClass = (classId: RpgClass): boolean => classId === 'paladin' || classId === 'cleric'
+const pathClass = (classId: RpgClass): boolean => ['spellblade', 'tomeblade', 'summoner', 'armsummoner'].includes(classId)
+/** Where a class's tree carries a buff or a debuff: `every` skill of it, or line A from depth 3. Null for no status: the
+ * Brawler and the Sorcerer are pure damage, and a Tier 0 has none. */
+export interface RpgStatusPath { statuses: readonly RpgStatusKey[]; on: 'every' | 'line-a' }
+export function rpgStatusPath(classId: RpgClass, weapon: RpgWeapon, engine: number = BATTLE_ENGINE_VERSION): RpgStatusPath | null {
+  const statuses = TREE_STATUS[weapon]?.filter((key): key is RpgStatusKey => key !== undefined)
+  if (!statuses || !rpgRework('pass', engine)) return null
+  if (healerClass(classId) && RPG_HEALER_STATUS_WEAPONS.includes(weapon)) return { statuses, on: 'every' }
+  return (healerClass(classId) || pathClass(classId)) && RPG_SECONDARY_WEAPONS.includes(weapon) ? { statuses, on: 'line-a' } : null
+}
+/** A Spellblade's or a Summoner's path: its stacks at depths 3, 4 and 5. A healer's are `CLERIC_STACKS`, which go higher. */
+const PATH_STACKS = [1, 1, 2]
+/** What losing a depth-5 rider gives back to the skill's power (S1, D282), so a class gains no damage from the status it
+ * lost and loses none it had. Measured against v20 (`balance-v21.test.ts`). */
+export const RPG_PURE_POWER_V21: Readonly<Partial<Record<RpgClass, number>>> = {
+  brawler: 1.1, mage: 1, spellblade: 1.26, tomeblade: 1.15, summoner: 1.16, armsummoner: 1.08,
+}
+/** Line B on a healer's tree with no status to stack: the mend or Barrier itself, this much larger. */
+export const RPG_HEAVY_SHARE_V21 = 1.15
+const isDebuff = (key: RpgStatusKey): boolean => key === 'armor-break' || key === 'mind-break' || key === 'enfeeble'
+/** A tree's status at `stacks`, on the foe she tapped, on every foe (`wide`), or on every ally. */
+function treeStatus(weapon: RpgWeapon, stacks: number, wide: boolean): Pick<RpgSkillDef, 'status' | 'also'> {
+  const [key, second] = TREE_STATUS[weapon]!
+  const to = !isDebuff(key) ? 'allies' as const : wide ? 'foes' as const : 'foe' as const
+  return { status: { key, stacks, turns: 2, to }, ...(second ? { also: { key: second, stacks, turns: 2, to } } : {}) }
+}
+/** Both healers' one kit (H3): Arms Barrier, Tomes mend and cleanse, and each weapon's own extra: Light's Regen and revive,
+ * Dark's Drain, Blizzard's Barrier on everyone. Its status where `rpgStatusPath` puts one; line B Heavy, one stack more
+ * there and a larger mend or Barrier elsewhere. */
+function healerSkill(node: RpgNode, line: 'trunk' | 'A' | 'B'): RpgSkillDef {
+  const { weapon, depth: d, classId } = node
+  const kind = rpgWeaponKind(weapon)
+  const heavy = line === 'B'
+  const sup = clericSupport(weapon, d, weapon === 'tome-light' && heavy && d === 3, RPG_SUPPORT_SHARE_V15)
+  if (weapon === 'tome-ice') Object.assign(sup, { shield: 'all', shieldShare: round(RPG_PALADIN_SHIELD_SHARE * sup.share) })
+  if (weapon === 'tome-light') sup.regen = true
+  if (weapon === 'tome-dark') sup.drain = 0.3
+  const path = rpgStatusPath(classId, weapon, RPG_REWORK_ENGINE.pass)
+  const carries = path?.on === 'every' || (path?.on === 'line-a' && line === 'A')
+  if (heavy && path?.on !== 'every') {
+    sup.share = round(sup.share * RPG_HEAVY_SHARE_V21)
+    if (sup.shieldShare !== undefined) sup.shieldShare = round(sup.shieldShare * RPG_HEAVY_SHARE_V21)
+  }
+  return { target: 'one', hits: pure(1, power(d), kind), mp: mp(d) + (heavy ? 4 : 0), primary: kind,
+    ...(carries ? treeStatus(weapon, Math.min(3, at(CLERIC_STACKS, d) + (heavy ? 1 : 0)), d === 5) : {}), support15: sup }
+}
+/** A damage class's skill at v21, from the def it played before: no rider anywhere, and line A of a path carries its status
+ * instead of a capstone. Its hits, MP, shape and line B stay. */
+function damageSkill(node: RpgNode, def: RpgSkillDef, line: 'trunk' | 'A' | 'B'): RpgSkillDef {
+  const { rider, allies: _allies, ...rest } = def
+  const plain = rider ? rpgRankedSkill(rest, RPG_PURE_POWER_V21[node.classId] ?? 1) : rest
+  if (line !== 'A' || !rpgStatusPath(node.classId, node.weapon, RPG_REWORK_ENGINE.pass)) return plain
+  const { special: _special, ...carrier } = rest
+  return { ...carrier, ...treeStatus(node.weapon, at(PATH_STACKS, node.depth - 2), false) }
+}
+/** The def a node plays from v21. */
+function passSkill(node: RpgNode, def: RpgSkillDef, line: 'trunk' | 'A' | 'B'): RpgSkillDef {
+  return healerClass(node.classId) ? healerSkill(node, line) : damageSkill(node, def, line)
+}
+for (const node of NODES) {
+  if (RPG_TIER0_CLASSES.includes(node.classId as RpgTier0Class)) continue
+  const line = node.variant === null ? (node.depth <= 2 ? 'trunk' : 'A') : node.depth >= 3 && RPG_BRANCH_B[node.classId][node.weapon] === node.variant ? 'B' : null
+  if (!line) continue
+  const played = node.skill19 ?? node.skill16 ?? node.skill
+  const skill = passSkill(node, played, line)
+  if (sameDef(skill, played)) continue
+  node.skill21 = skill
+  if (LIVE21) node.summary = describe(skill)
+}
+
 /** Every node of every generation (960: 750 to v18, D179; Classes v3's 210 from v19, H126): `rpgNode` finds any of them. */
 export const RPG_ALL_NODES: readonly RpgNode[] = NODES
 /** The live generation's nodes: the five classes' 600 until H61, 750 to v18; 960 since H134. */
@@ -654,11 +747,12 @@ export const RPG_NODES: readonly RpgNode[] = NODES.filter((n) => RPG_CLASSES.inc
 const BY_ID = new Map(NODES.map((n) => [n.id, n]))
 export const rpgNode = (id: string): RpgNode | undefined => BY_ID.get(id)
 export const rpgTreeNodes = (tree: RpgTreeId): RpgNode[] => NODES.filter((n) => n.tree === tree)
-/** The def a node plays in a fight of an engine's version (H65, H128): from v19 its `skill19` where it has one, then from
- * v16 its `skill16`, else `skill`. The engine, Limit Breaks, Auto and a summon's farewell read nodes through this, with the
+/** The def a node plays in a fight of an engine's version (H65, H128, D282): from v21 its `skill21` where it has one, from
+ * v19 its `skill19`, then from v16 its `skill16`, else `skill`. The engine, Limit Breaks, Auto and a summon's farewell read nodes through this, with the
  * fight's version. */
 export const rpgNodeSkill = (node: RpgNode, version: number): RpgSkillDef =>
-  (rpgRework('classes', version) && node.skill19 ? node.skill19
+  (rpgRework('pass', version) && node.skill21 ? node.skill21
+    : rpgRework('classes', version) && node.skill19 ? node.skill19
     : rpgRework('fight', version) && node.skill16 ? node.skill16 : node.skill)
 /** A skill at a Skill Rank's multiplier (v16, CP32): every hit's power (`hits`, `focus`, `splash`, `other`) and its
  * support's mend and Barrier shares (`support15`'s `share` and `shieldShare`) × `factor`. Its MP, hit count, targets,

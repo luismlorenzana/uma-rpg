@@ -40,7 +40,8 @@ import { BATTLE_LIMIT_MAX, battleLimitGain, battleLimitPlan } from './limit'
 import type { BattleAction, BattleAlly, BattleChannel, BattleCue, BattleEnemy, BattleEnemyMove, BattleError, BattleHalf,
   BattleInput, BattleIntent, BattleSide, BattleState, BattleStep, BattleUnit, RpgFlourish } from './types'
 import {
-  BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES,
+  BATTLE_FAMILIAR_LABEL, BATTLE_FLOURISH_FROM, BATTLE_FLOURISH_RATE, BATTLE_FLOURISH_SHARE, BATTLE_MAX_ACTIONS, BATTLE_MAX_EXTRA_WAVES as MAX_EXTRA_WAVES,
+  BATTLE_RESCUE_FLOOR,
 } from './caps'
 export { BATTLE_MAX_ACTIONS } from './caps'
 /** The engine new fights start on, the one switch (D179): it lives in `caps.ts`, so the profile's rules read it without
@@ -50,7 +51,7 @@ export { BATTLE_ENGINE_VERSION, RPG_REWORK_ENGINE, RPG_V2_ENGINE, rpgRework, rpg
 // v15's hands (H55, D183): the hybrids' per-half power, the Spell Blade's extra hit, the Summoner's farewell.
 import { BATTLE_FAREWELL_FACTOR } from './skills'
 import { rpgRework, rpgV2 } from './caps'
-const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const
+const VERSIONS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21] as const
 /** v16 (UT6): the three Flourishes, one by stride. */
 const FLOURISHES: readonly RpgFlourish[] = ['clean-break', 'even-pace', 'late-reserve']
 
@@ -227,7 +228,7 @@ function validEnemy(e: BattleEnemy, version: BattleInput['version']): boolean {
       e.phaseTwo.moves.length <= 8 && e.phaseTwo.moves.every((m) => validMove(m, version))))
 }
 /** Foes on the field at once: five in v6, eight from v7 (W3). Waves: up to two after the first. */
-const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8, 17: 8, 18: 8, 19: 8, 20: 8 } as const
+const MAX_FOES = { 6: 5, 7: 8, 8: 8, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8, 17: 8, 18: 8, 19: 8, 20: 8, 21: 8 } as const
 function validateInput(input: BattleInput): void {
   if (!input || !(VERSIONS as readonly number[]).includes(input.version) || !safeInt(input.seed, 0, 0xffff_ffff) || !Array.isArray(input.allies) ||
     input.allies.length !== 5 || !Array.isArray(input.enemies)) {
@@ -469,9 +470,12 @@ function reach(s: BattleState, how: Reach): BattleUnit[] {
   const u = how === 'hurt' ? mostHurt(s) : mostThreatened(s)
   return u ? [u] : []
 }
-/** One Uma's mend or Barrier: `share` of her max HP × `boost`, and ×0.4 when it reaches every Uma. */
-const portion = (s: BattleState, u: BattleUnit, how: Reach, share: number, boost: number): number =>
-  maxHp(s, u.id) * share * boost * (how === 'all' ? RPG_SUPPORT_ALL : 1)
+/** One Uma's mend or Barrier: `share` of her max HP × `boost`, and ×0.4 when it reaches every Uma (v21: all but `focus`,
+ * who takes it whole, D282). */
+const portion = (s: BattleState, u: BattleUnit, how: Reach, share: number, boost: number, focus?: BattleUnit): number =>
+  maxHp(s, u.id) * share * boost * (how === 'all' && u !== focus ? RPG_SUPPORT_ALL : 1)
+/** v21 (D282): what lifts her to the rescue floor, at any level or gear. */
+const rescue = (s: BattleState, u: BattleUnit): number => Math.max(0, maxHp(s, u.id) * BATTLE_RESCUE_FLOOR - u.hp)
 function heal(s: BattleState, actorId: string, target: BattleUnit, amount: number, cues: BattleCue[], label?: string): void {
   const healed = Math.min(Math.round(amount), maxHp(s, target.id) - target.hp)
   if (healed <= 0 || target.hp <= 0) return
@@ -494,10 +498,18 @@ const bless = (s: BattleState, actor: BattleUnit, u: BattleUnit, status: 'aegis'
  * capacity), which scales the shares alone: its cleanse and revive still land. `dealt` is what the skill's hits took off foes. */
 function support(s: BattleState, actor: BattleUnit, sup: RpgSupport, dealt: number, cues: BattleCue[], scale = 1): void {
   const boost = healOf(s, actor.id) * scale
-  if (sup.mend) for (const u of reach(s, sup.mend)) heal(s, actor.id, u, portion(s, u, sup.mend, sup.share, boost), cues)
+  // v21 (D282): the most hurt and the most threatened take a whole share even from a skill that reaches everyone, and a
+  // mend lifts the most hurt to the rescue floor. Named before any of it lands, so the first heal can't move the focus.
+  const pass = rpgRework('pass', s.engineVersion)
+  const hurt = pass ? mostHurt(s) : undefined
+  const threatened = pass ? mostThreatened(s) : undefined
+  if (sup.mend) for (const u of reach(s, sup.mend)) {
+    const amount = portion(s, u, sup.mend, sup.share, boost, hurt)
+    heal(s, actor.id, u, u === hurt ? Math.max(amount, rescue(s, u)) : amount, cues)
+  }
   if (sup.shield) {
     for (const u of reach(s, sup.shield)) {
-      cover(s, actor.id, u, portion(s, u, sup.shield, sup.shieldShare ?? sup.share, boost), cues)
+      cover(s, actor.id, u, portion(s, u, sup.shield, sup.shieldShare ?? sup.share, boost, threatened), cues)
       // v15: the Paladin's Greatsword blows give Aegis to each Uma their Barrier reaches.
       if (sup.aegis) bless(s, actor, u, 'aegis', sup.aegis, cues)
     }
@@ -549,13 +561,18 @@ export function battleSupportValue(s: BattleState, actorId: string, sup: RpgSupp
   const boost = healOf(s, actorId)
   const missing = (u: BattleUnit) => 1 - u.hp / maxHp(s, u.id)
   const threat = (u: BattleUnit) => threatOn(s, u.id) / maxHp(s, u.id)
+  // v21 (D282): as `support` lands it, the most hurt and the most threatened at a whole share, and the rescue floor.
+  const pass = rpgRework('pass', s.engineVersion)
+  const hurt = pass ? mostHurt(s) : undefined
+  const threatened = pass ? mostThreatened(s) : undefined
+  const mended = (u: BattleUnit, full: boolean) => Math.min(missing(u), Math.max(sup.share * boost * (full ? 1 : RPG_SUPPORT_ALL), u === hurt ? rescue(s, u) / maxHp(s, u.id) : 0))
   let value = 0
-  if (sup.mend === 'all') for (const u of living(s, 'ally')) value += Math.min(missing(u), sup.share * boost * RPG_SUPPORT_ALL)
-  else if (sup.mend === 'hurt') { const u = mostHurt(s); if (u) value += Math.min(missing(u), sup.share * boost) }
+  if (sup.mend === 'all') for (const u of living(s, 'ally')) value += mended(u, u === hurt)
+  else if (sup.mend === 'hurt') { const u = mostHurt(s); if (u) value += mended(u, true) }
   // v15: Regen repeats that mend twice at 0.3, valued at half weight, since the hurt may not need it.
   if (sup.regen) value *= 1 + BATTLE_REGEN_SHARE * BATTLE_REGEN_ROUNDS / 2
   const shield = sup.shieldShare ?? sup.share
-  if (sup.shield === 'all') for (const u of living(s, 'ally')) value += Math.min(threat(u), shield * boost * RPG_SUPPORT_ALL)
+  if (sup.shield === 'all') for (const u of living(s, 'ally')) value += Math.min(threat(u), shield * boost * (u === threatened ? 1 : RPG_SUPPORT_ALL))
   else if (sup.shield === 'threatened') { const u = mostThreatened(s); if (u) value += Math.min(threat(u), shield * boost) }
   if (sup.revive && s.units.some((u) => u.side === 'ally' && u.hp <= 0 && !u.revived)) value += 1
   if (sup.cleanse && living(s, 'ally').some((u) => FOE_AILMENTS.some((k) => stacks(u, k) > 0))) value += 0.1
@@ -953,9 +970,11 @@ function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSki
       note(r.receiver, hit, r.weak)
     })
   } else {
+    // v21 (D282): a Spellblade's extra hit is her bound familiar's, and its cue says so.
+    const bound = rpgRework('pass', s.engineVersion)
     for (const hit of def.hits) {
       if (tapped.hp <= 0) break
-      const r = strike(s, actor, tapped, hit, scale, cues, true, options)
+      const r = strike(s, actor, tapped, hit, scale, cues, true, bound && hit.familiar ? { ...options, label: BATTLE_FAMILIAR_LABEL } : options)
       note(r.receiver, hit, r.weak)
     }
   }
@@ -986,6 +1005,7 @@ function cast(s: BattleState, actor: BattleUnit, tapped: BattleUnit, def: RpgSki
     for (const friend of living(s, 'ally')) addBarrier(s, friend, maxHp(s, friend.id) * BATTLE_BARRIER_PERCENT * def.allies.stacks, actor.id, cues)
   }
   if (def.status) applyStatus(s, actor, def.status, log, cues)
+  if (def.also) applyStatus(s, actor, def.also, log, cues)
   // The generation's support: v12–v14's `support`, or from v15 the healers' `support15` (§3.3).
   const sup = s.engineVersion >= 15 ? def.support15 : def.support
   if (sup && s.engineVersion >= 12 && actor.side === 'ally') {
@@ -1042,7 +1062,7 @@ export function battleExtraHit<T extends Pick<RpgSkillDef, 'hits'>>(def: T): T {
   if (!last) return def
   const total = def.hits.reduce((sum, hit) => sum + hit.power, 0)
   const k = total / (total + last.power)
-  return { ...def, hits: [...def.hits, last].map((hit) => ({ ...hit, power: hit.power * k })) }
+  return { ...def, hits: [...def.hits, { ...last, familiar: true as const }].map((hit) => ({ ...hit, power: hit.power * k })) }
 }
 
 /**

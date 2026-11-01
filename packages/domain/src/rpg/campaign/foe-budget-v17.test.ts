@@ -31,7 +31,7 @@ describe('rpgFoeTierBudget by generation (EP16)', () => {
     }
     expect(r3(rpgFoeTierBudget(100, HP, 16))).toBeCloseTo(1.955, 3)
     // Engine v18 keeps v17's economy curve while it changes the weakness lists, and v19 (live since H134) keeps it too.
-    expect(BATTLE_ENGINE_VERSION).toBe(20)
+    expect(BATTLE_ENGINE_VERSION).toBe(21)
     for (let l = 1; l <= 150; l++) for (const engine of [18, undefined]) expect(rpgFoeTierBudget(l, HP, engine)).toBe(rpgFoeTierBudget(l, HP, 17))
   })
 
@@ -57,7 +57,7 @@ describe('rpgFoeTierBudget by generation (EP16)', () => {
     const t1 = worldContinent({ name: 'T', order: 1 }).regions[0]!, t2 = worldContinent({ name: 'T', order: 6 }).regions[0]!
     const hp = (nodes: ReturnType<typeof regionChapter>['nodes']) => nodes.flatMap((n) => [...n.enemies, ...(n.waves ?? []).flat()]).map((e) => e.stats.hp)
     expect(regionChapter(t1, cast, 17).nodes).toEqual(regionChapter(t1, cast, 16).nodes)
-    expect(regionChapter(t2, cast).nodes).toEqual(regionChapter(t2, cast, 18).nodes)
+    expect(regionChapter(t2, cast, 20).nodes).toEqual(regionChapter(t2, cast, 18).nodes)
     expect(hp(regionChapter(t2, cast).nodes)).toEqual(hp(regionChapter(t2, cast, 17).nodes))
     const v16 = hp(regionChapter(t2, cast, 16).nodes), v17 = hp(regionChapter(t2, cast, 17).nodes)
     expect(v17.every((n, i) => n >= v16[i]!)).toBe(true)

@@ -35,7 +35,7 @@ import {
   LEARNER_MAX_PARENTS, type HeroCast, type HeroHall, type HeroLimitId,
 } from '../rpg/heroes'
 import {
-  RPG_CLERIC_STATUS, RPG_PALADIN_AEGIS, RPG_PALADIN_SHIELD_SHARE, RPG_PIERCE_SCALE, RPG_SKILL_MP, RPG_SKILL_POWER,
+  RPG_PALADIN_AEGIS, RPG_PALADIN_SHIELD_SHARE, RPG_PIERCE_SCALE, RPG_SKILL_MP, RPG_SKILL_POWER, rpgStatusPath,
   RPG_SUPPORT_ALL, RPG_SUPPORT_SHARE, RPG_SUPPORT_SHARE_V15, rpgNode, rpgNodeSkill, rpgTreeOf,
 } from '../rpg/catalog'
 import { RPG_BRANCH_B_NAME, rpgBranchNode } from '../rpg/node-identity'
@@ -151,12 +151,10 @@ function special(c: RpgClass): string {
   if (isTier0(c)) return `Tier 0: one skill, ${RPG_TIER0_SKILL[c]}, on any of her three weapons; promotes at Class Rank ${RPG_TIER0_MAX_RANK}. No healer`
   if (h.pair && h.linger) return `Every act is ${a(lead)} summon and ${a(other)} summon, the ${lead} half first. The ${lead} summon lingers; when her ` +
     `next pair comes, it strikes every foe at ${h.linger} × ${K.BATTLE_FAREWELL_FACTOR}. No support`
-  if (h.pair) return `Every act is ${a(lead)} half and ${a(other)} half, the ${lead} half first; ${h.extra ? 'it lands one extra hit' : 'no extra hit'}`
+  if (h.pair) return `Every act is ${a(lead)} half and ${a(other)} half, the ${lead} half first; ${h.extra ? 'her bound familiar lands one extra hit' : 'no extra hit'}`
   switch (c) {
-    case 'paladin': return 'Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. ' +
-      'Blizzard spells Barrier every Uma, Greatsword blows give Aegis'
-    case 'cleric': return 'Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. ' +
-      'Light spells leave Regen, Dark spells drain'
+    case 'paladin': return 'Healer, from ATK. Arms skills Barrier the threatened Uma, Tome skills mend the most hurt and cleanse'
+    case 'cleric': return 'Healer, from M.ATK. Arms skills Barrier the threatened Uma, Tome skills mend the most hurt and cleanse'
     default: return '—'
   }
 }
@@ -221,9 +219,9 @@ function presets(): string {
 const kindName = (k: string): string => WEAPON_LABEL[(isRpgWeaponKind(k) ? k : `tome-${k}`) as RpgWeapon]
 
 function weapons(): string {
-  return table(['Weapon', 'Id', 'Kind', 'Channel', 'Shape', 'Healer status', 'Classes'], RPG_WEAPONS.map((w) => {
+  return table(['Weapon', 'Id', 'Kind', 'Channel', 'Shape', 'Buff or debuff', 'Classes'], RPG_WEAPONS.map((w) => {
     const kind = rpgWeaponKind(w)
-    return [weaponName(w), `\`${w}\``, cap(kind), isRpgTome(w) ? 'Magical' : 'Physical', SHAPE[kind]!, statusName(RPG_CLERIC_STATUS[w]),
+    return [weaponName(w), `\`${w}\``, cap(kind), isRpgTome(w) ? 'Magical' : 'Physical', SHAPE[kind]!, weaponStatus(w),
       ['Every Tier 0', ...RPG_CLASSES.filter((c) => !isTier0(c) && rpgClassWeapons(c).includes(w)).map((c) => CLASS_NAME[c])].join(', ')]
   }))
 }
@@ -232,6 +230,13 @@ const STATUS_NAME: Readonly<Record<string, string>> = {
   brave: 'Brave', faith: 'Faith', aegis: 'Aegis', breaker: 'Breaker', clarity: 'Clarity',
 }
 const statusName = (key: string) => STATUS_NAME[key] ?? key
+/** Who carries a weapon's buff or debuff, and where. */
+function weaponStatus(w: RpgWeapon): string {
+  const healer = rpgStatusPath('cleric', w)
+  if (!healer) return '—'
+  const names = healer.statuses.map(statusName).join(' and ')
+  return healer.on === 'every' ? `${names}: Paladin and Cleric, every skill` : `${names}: Spellblades, Summoners, Paladin and Cleric, line A from depth 3`
+}
 
 /** Engine v16's depths (CP14, CP16, CP32): a Class Rank gate each, and Skill Ranks every 2 Class Ranks after it. */
 function depths(): string {
@@ -311,7 +316,7 @@ function heroes(): string {
   return table(['Hall', 'Seat', 'Home class', 'Limit Break', 'Power', 'Kinds', 'What it does', 'Casts'], HERO_LIMITS.map((l) => [
     hall(l.hall), l.id.slice(l.id.lastIndexOf('-') + 1), CLASS_NAME[l.classId], l.name, l.power ? `${l.power}×` : '—', heroLimitKinds(l).join(', '), l.blurb,
     l.casts.map((c) => [landed(c) ? `${landed(c)} hit${landed(c) === 1 ? '' : 's'} on ${c.volley ? 'one foe, a volley' : shape(c.target)}` : '', c.splash ? 'splash' : '',
-      c.status ? `${statusName(c.status.key)} ${c.status.stacks} on ${c.status.to === 'allies' ? 'every ally' : c.status.to === 'foes' ? 'every foe' : 'the foe'}` : '',
+      c.status ? `${statusName(c.status.key)}${'also' in c && (c as { also?: { key: string } }).also ? ` and ${statusName((c as { also: { key: string } }).also.key)}` : ''} ${c.status.stacks} on ${c.status.to === 'allies' ? 'every ally' : c.status.to === 'foes' ? 'every foe' : 'the foe'}` : '',
       ...support(c)]
       .filter(Boolean).join(' + ')).join('; '),
   ])) + '\n\n' + table(['Setting', 'Value'], [

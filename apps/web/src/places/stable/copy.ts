@@ -14,6 +14,9 @@ export const exp = (value: number, next: number | null): string => next === null
 /** C8/C9: Class Rank. The expanded wording belongs only in aria labels. */
 export const classRank = (value: number): string => `R${n(value)}`
 export const tier0Rank = (value: number): string => `${classRank(value)}/10`
+/** D282: where a tree carries a buff or a debuff, so it's plain how she gets one. */
+export const treeStatus = (names: readonly string[], on: 'every' | 'line-a'): string =>
+  `${names.join(', ')} · ${on === 'every' ? 'every skill' : 'line A, depth 3+'}`
 /** C7: the class tile while a promotion waits. */
 export const promoteRank = (value: number): string => `${classRank(value)} · Promote`
 export const waitingExp = (value: number): string => `+${n(value)} EXP waiting`

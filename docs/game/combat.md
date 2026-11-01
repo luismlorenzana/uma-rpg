@@ -1,6 +1,6 @@
 # Combat
 
-How a fight works today, on **engine v20**. It is Tier 1's fight from the Tier rework (engine v16, D210:
+How a fight works today, on **engine v21**. It is Tier 1's fight from the Tier rework (engine v16, D210:
 [class progression](../design/tier-rework/class-progression.md)), its economy (engine v17, D218:
 [weapon progression](../design/tier-rework/weapon-progression.md) and
 [Extra Stats progression](../design/tier-rework/extra-stats-progression.md)),
@@ -9,8 +9,10 @@ How a fight works today, on **engine v20**. It is Tier 1's fight from the Tier r
 D241). Engine v19 brings the thirteen classes and Tier 0, the hands' lead half, the volley and the double, the re-paired
 twins (Katana–Light, Bow–Dark), the Brawler's and the Sorcerer's new B lines, the Halls' Limit Breaks with their own
 power, and the Rift's builds by family; every other battle rule is v18's. Engine v20 (D261) only trims the Halls to sixteen
-Limit Breaks. A fight started on an older engine (v6–v19) replays and settles on that engine's own rules: fights from v19
-replay with the twenty, and fights from v18 and before with six classes and the 24 Limit Breaks.
+Limit Breaks. Engine v21 (D282) is the combat pass: foes stop guarding each other, the Paladin and the Cleric share one kit
+and a rescue, buffs and debuffs move to their paths, and a Spellblade's extra hit is her bound familiar's. A fight started on
+an older engine (v6–v20) replays and settles on that engine's own rules: fights from v19 replay with the twenty Limit
+Breaks, and fights from v18 and before with six classes and the 24.
 
 Every number below comes from the code. The tables between `live` markers are generated (see
 [README](README.md#how-these-docs-stay-true)); the rest is written by hand and checked against the engine.
@@ -110,17 +112,19 @@ resolves first whatever order the halves were picked in:
   Tome skill), and the MP is the sum of the halves. **Her lead half lands one extra hit:** its power is spread over one
   more hit, so an Attack lands as two hits at half power and an n-hit skill as n + 1, the total unchanged. Each weak hit
   chips a shield point, so with an Attack in each half she chips three an act. The Arms Spellblade leads with her Arms,
-  the Tome Spellblade with her Tomes.
+  the Tome Spellblade with her Tomes. **That hit is her bound familiar's:** a Spellblade binds a familiar to her weapon where
+  a Summoner calls one onto the field, so its ghost lunges through the foe with the hit, and the hit line says "familiar".
 - **The Summoners:** every act is a pair too, an Arms summon and a Tome summon (an Attack can be either half). Her **lead
   summon lingers**: the Arms Summoner's Arms one, the Tome Summoner's Tome one. When her next pair comes, before either
   half, it strikes **every living foe** once in farewell, one hit of its kind at its linger share (0.3, or 0.4 on her
   lead trees' line B, Bonded) × its hits' power × `BATTLE_FAREWELL_FACTOR` (0.1), then leaves. The farewell can't be
   intercepted, and a weak one chips a shield. Her other half's summon or an Attack leaves nothing. Limit Breaks, Guards
-  and new waves keep the lingering summon; if she falls, it leaves with her. Her skills carry no support.
-- **Paladin and Cleric:** the healers, one skill or Attack an act at ×0.5. Their Arms skills put a debuff on the tapped
-  foe and a **Barrier** on the Uma the shown moves threaten most; their Tome skills put a buff on every Uma, **mend** the
-  most hurt and **cleanse** one foe status from each. At depth 5 the debuff reaches every foe, and the Barrier and the
-  mend every Uma. See [Support](#support).
+  and new waves keep the lingering summon; if she falls, it leaves with her. Her skills carry no support, and no buff or
+  debuff but line A of the secondary weapons ([classes](classes.md#buffs-and-debuffs)).
+- **Paladin and Cleric:** the healers, one skill or Attack an act at ×0.5, with one kit between them. Their Arms skills put
+  a **Barrier** on the Uma the shown moves threaten most; their Tome skills **mend** the most hurt and **cleanse** one foe
+  status from each Uma. At depth 5 the Barrier and the mend reach every Uma, at a whole share on the one who needs it most
+  and ×0.4 on the rest. See [Support](#support).
 
 ## Damage
 
@@ -163,8 +167,9 @@ A foe's hit on an Uma takes steps 1 (the foe's ATK or M.ATK alone, by the move's
 move's power.
 
 - **Guards:** a guard who intercepts a hit takes half of it, at least 1. An Uma's Guard covers one Uma from foes'
-  single-target moves (never a move on everyone). A foe guard covers the foe with the lowest share of HP until the foes'
-  next turn: an Uma's one-foe skills and Attacks on her land on the guard, and a weak one chips the guard's shield.
+  single-target moves (never a move on everyone). Foes don't cover each other from engine v21 (D282): a guard-role foe only
+  bashes. In a fight from v20 and before, a foe guard covers the foe with the lowest share of HP until the foes' next turn,
+  and an Uma's one-foe skills and Attacks on her land on the guard. Covering is pinned for special boss fights.
 - **Barriers:** a foe's hit spends her Barrier first (a healer's, or her Flourish's), then her HP.
 
 Where the stats come from (`projectRpgStats` in `rpg/rules.ts`):
@@ -286,38 +291,34 @@ half the cases. The preset (her stat twice and an Orb) is a good all-round set i
 
 ## Statuses
 
+**Who can put one on** is one rule ([classes](classes.md#buffs-and-debuffs)): the Paladin and the Cleric widely, the
+Spellblades and the Summoners on a path, the Brawler and the Sorcerer never.
+
 | Status | Who puts it on | Effect per stack (cap 3, 2 rounds unless stated) |
 |---|---|---|
-| Armor Break | Paladin and Cleric Greatsword skills; riders on Arms skills (below) | +10% physical damage taken |
-| Mind Break | Paladin and Cleric Lance skills | +10% magical damage taken |
-| Enfeeble | Paladin and Cleric Axe skills (a Paladin's on every foe from depth 4); Ice riders and the Summoners' Dark | −10% damage dealt |
-| Shatter | Paladin and Cleric Bow skills | Removes a shield point a stack, at once |
-| Hex | Paladin and Cleric Katana skills | Weak to Light and Dark while it lasts (one stack) |
-| Shock | Lightning riders | +10% damage taken |
-| Burn | Fire riders, on foes; a champion's phase-two storm when it is Fire, on every Uma | Loses 4% of max HP at the end of each round |
-| Brave | Paladin and Cleric Fire Tome skills, on every Uma | +10% physical damage dealt |
-| Faith | Paladin and Cleric Light Tome skills, on every Uma | +10% magical damage dealt |
-| Aegis | Paladin and Cleric Blizzard Tome skills, on every Uma; a Paladin's Greatsword blows, 1 on each Uma their Barrier reaches | −10% damage taken |
-| Breaker | Paladin and Cleric Thunder Tome skills, on every Uma | A charge: her next weak hit removes two shield points |
-| Clarity | Paladin and Cleric Dark Tome skills, on every Uma | Restores 4% of max MP a stack, at once |
+| Armor Break | Greatsword (healers), Katana line A; a Healer Sanctum Limit Break | +10% physical damage taken |
+| Mind Break | Lance (healers), Dark line A; a Healer Sanctum Limit Break | +10% magical damage taken |
+| Enfeeble | Bow line A | −10% damage dealt |
+| Brave | Fire (healers) and Light line A, on every Uma, with Faith; a Healer Sanctum Limit Break | +10% physical damage dealt |
+| Faith | The same, with Brave; a Healer Sanctum Limit Break | +10% magical damage dealt |
+| Burn | A champion's phase-two storm when it is Fire, on every Uma | Loses 4% of max HP at the end of each round |
 | Mark | Foes: a skirmisher's cut | +10% damage taken |
 | Weaken | Foes: a caster's Hex | −15% damage dealt |
 | Power-up | Foes: a captain's Rally, on herself | +15% damage dealt |
 | Ward | Foes: a champion's guard up, on herself | −15% damage taken |
 
-- **A healer's statuses** come 1, 1, 2, 2 and 3 stacks at depths 1–5. Her line A (Lasting) makes them last 3 rounds;
-  her line B (Heavy) adds a stack. A debuff lands on the tapped foe, on every foe at depth 5 (a Paladin's Enfeeble from
-  depth 4); a buff on every Uma.
-- **Riders and specials** sit on depth-5 skills ([skill trees](skill-trees.md) list them): the Brawler's, the
-  Sorcerer's and both Spellblades' line A, both Summoners' lines, and the two Barrages. Fire puts Burn on the foes it
-  hits, Ice Enfeeble, Lightning Shock, and every Arm but the Katana Armor Break. The Katana and Light deal ×1.3 to a
-  Broken foe instead, and Dark ×1.3 to a foe below half HP; the Summoners' Dark puts on Enfeeble, and their Light has
-  none. A volley's lands on the tapped foe only. A Tier 0's skill has none.
+- **Stacks:** a healer's come 1, 1, 2, 2 and 3 at depths 1–5, and her line B (Heavy) adds one on the trees where every skill
+  carries a status. A healer's debuff lands on the tapped foe, on every foe at depth 5; a buff on every Uma. On a path it is
+  1, 1 and 2 at depths 3–5 for a Spellblade or a Summoner, and the debuff stays on the tapped foe.
+- **Retired** (D282): Aegis, Breaker, Clarity, Hex and Shatter, and the riders Burn, Enfeeble, Shock and Armor Break once sat
+  on damage classes' depth-5 skills. A fight from v20 and before keeps them.
+- **Specials** sit on depth-5 skills ([skill trees](skill-trees.md) list them): the Katana and Light deal ×1.3 to a Broken
+  foe, and Dark ×1.3 to a foe below half HP, where line A doesn't carry a status instead. A Tier 0's skill has none.
 - A status adds up to 3 stacks and its rounds refresh to the longer. Statuses count down at the round's end.
 
 Battle badges show the published status glyph and its stack count, with the full name in the accessible label.
 Statuses without glyphs (including Burn and foes' Power-up) keep text badges. Skill descriptions keep full names
-beside decorative glyphs; Shatter and Clarity act immediately, so they do not create lingering badges.
+beside decorative glyphs.
 
 ## Support
 
@@ -327,13 +328,13 @@ support comes after the skill's hits.
 
 | Support | Who | What it does |
 |---|---|---|
-| **Mend** | Paladin and Cleric Tome skills (the most hurt Uma; every Uma at depth 5) | Heals a share of the target's max HP by depth: 28%, 32%, 36%, 40%, 44%; on every Uma ×0.4 |
-| **Barrier** | Paladin and Cleric Arms skills (the Uma the shown moves threaten most; every Uma at depth 5); a Paladin's Blizzard spells (every Uma, at half the share, ×0.4) | Absorbs any damage first, the same shares, until the end of the round. Cap 60% of max HP |
-| **Cleanse** | Paladin and Cleric Tome skills | Removes one foe-made status (Burn, Mark, Weaken) from each Uma |
-| **Revive** | The Cleric's Rebirth and the Paladin's Valkyrie's Oath, both their Light tree's depth-3 B | Raises the first fallen Uma at 25% of her max HP, once per Uma a fight |
-| **Regen** | Cleric Light spells | Her spell's mend again at ×0.2, at the end of its round and of the next ("Regen" on screen). Her next Light spell replaces it; it ends if she falls |
-| **Drain** | Cleric Dark spells | 30% of the damage its hits deal heals the most hurt Uma |
-| **Aegis** | Paladin Greatsword blows | Aegis 1 on each Uma their Barrier reaches |
+| **Mend** | Tome skills (the most hurt Uma; every Uma at depth 5) | Heals a share of the target's max HP by depth: 28%, 32%, 36%, 40%, 44%. At depth 5 the most hurt takes it whole and every other Uma ×0.4 |
+| **Rescue** | Every mend | A mend lifts the most hurt Uma to at least 60% of her max HP, whatever its share would have healed |
+| **Barrier** | Arms skills (the Uma the shown moves threaten most; every Uma at depth 5), and Blizzard spells (every Uma, at half the share) | Absorbs any damage first, the same shares, until the end of the round. Where it reaches every Uma the most threatened takes it whole and the rest ×0.4. Cap 60% of max HP |
+| **Cleanse** | Tome skills | Removes one foe-made status (Burn, Mark, Weaken) from each Uma |
+| **Revive** | Light line B, depth 3: the Cleric's Rebirth and the Paladin's Valkyrie's Oath | Raises the first fallen Uma at 25% of her max HP, once per Uma a fight |
+| **Regen** | Light spells | Her spell's mend again at ×0.2, at the end of its round and of the next ("Regen" on screen). Her next Light spell replaces it; it ends if she falls |
+| **Drain** | Dark spells | 30% of the damage its hits deal heals the most hurt Uma |
 
 - **Her shares rank:** a mend's and a Barrier's share take her Skill Rank's ×0.95 to ×1.05, as power does.
 - **Her healing scale:** every mend, Barrier and revive ×(1 + offense ÷ 300), offense being a Paladin's ATK and a
@@ -425,7 +426,7 @@ one or two elements, a weakness list and a shield.
 |---|---|---|
 | Striker | Strike the front (damage, 100%, front); Flame blow (damage, 130%, seeded) | — |
 | Caster | Flame bolt at the weakest (damage, 110%, lowest-hp); Hex: weaken (debuff, seeded) | — |
-| Guard | Shield bash (damage, 80%, front); Guard an ally (guard, ally) | — |
+| Guard | Shield bash (damage, 80%, front) | — |
 | Skirmisher | Flame cut + mark (damage, 90%, seeded); Strike the front (damage, 100%, front) | — |
 | Captain | Flame smash (damage, 150%, front); Rally: power up (buff, self); Flame sweep (all) (damage, 55%, all); Flame execution (damage, 260%, lowest-hp, charged, 2 locks) | Flame storm (all) (damage, 75%, all); Crush the weakest (damage, 190%, lowest-hp); Flame cataclysm (all) (damage, 130%, all, charged, 3 locks) |
 | Champion | Flame smash (damage, 160%, front); Flame sweep (all) (damage, 60%, all); Ward: guard up (buff, self); Flame cataclysm (all) (damage, 130%, all, charged, 3 locks) | Flame storm (all) (damage, 85%, all); Crush the weakest (damage, 210%, lowest-hp); Flame lance (damage, 170%, front); Flame apocalypse (all) (damage, 170%, all, charged, 4 locks) |

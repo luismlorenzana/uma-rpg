@@ -14,7 +14,7 @@ const replays = process.env.UPDATE_V14 ? regenerateV14Replays() : loadV14Replays
 
 describe('the frozen v14 replays (H53)', () => {
   it('runs with classes v2, the Tier rework’s fight and economy and Classes v3 live (H61, H72, H82, H134)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(20)
+    expect(BATTLE_ENGINE_VERSION).toBe(21)
     expect(rpgV2()).toBe(true)
     expect(RPG_CLASSES).toEqual(rpgClasses(19))
     expect(HERO_LIMIT_IDS).toHaveLength(16)

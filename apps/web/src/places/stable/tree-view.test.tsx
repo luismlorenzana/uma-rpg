@@ -23,6 +23,20 @@ let outfit: Awaited<ReturnType<typeof albumFixture>>['view']['roster'][number]
 
 /** A Lv 30 Brawler at Class Rank 22 (held in Tier 1's world from Rank 10) on Greatsword, Axe and Lance, her Lance on
  * branch B, skills chosen for her. */
+/** A Lv 30 Uma of a class, on these weapons. */
+async function uma(classId: 'cleric' | 'tomeblade', weapons: ['tome-light' | 'tome-fire', 'tome-ice' | 'tome-fire', 'lance' | 'katana']): Promise<Save> {
+  const { view } = await albumFixture()
+  outfit = view.roster[0]!
+  const save = newSave('Trees', NOW)
+  const base = newOwnedUma(NOW, 'brawler')
+  worldOf(save).umas[outfit.outfitId] = {
+    ...base, level: 30, classId,
+    ranks: withTrack(base.ranks, { kind: 'class', id: classId }, { rank: 22, exp: 0 }),
+    classes: { [classId]: { weapons, lines: {}, loadout: null } },
+  }
+  return save
+}
+
 async function brawler(): Promise<Save> {
   const { view } = await albumFixture()
   outfit = view.roster[0]!
@@ -62,7 +76,23 @@ afterEach(() => {
 })
 
 describe('the Class tab as a tree (H70, H120)', () => {
-  it('runs on engine 19: weaknesses v2 (H116) and Classes v3 (H134) live', () => expect(BATTLE_ENGINE_VERSION).toBe(20))
+  it('runs on engine 19: weaknesses v2 (H116) and Classes v3 (H134) live', () => expect(BATTLE_ENGINE_VERSION).toBe(21))
+
+  it('says what a tree carries and where, so a buff or a debuff is never a guess (D282)', async () => {
+    show(await uma('cleric', ['tome-light', 'tome-fire', 'lance']))
+    const line = () => document.querySelector('[data-tree-status]')?.textContent
+    await waitFor(() => expect(line()).toBe('Brave, Faith · line A, depth 3+'))
+    fireEvent.click(screen.getByRole('tab', { name: /Fire Tome/ }))
+    expect(line()).toBe('Brave, Faith · every skill')
+    fireEvent.click(screen.getByRole('tab', { name: /Lance/ }))
+    expect(line()).toBe('Mind Break · every skill')
+  })
+
+  it('prints no status on a Brawler\'s tree: she is pure damage (D282)', async () => {
+    show(await brawler())
+    await screen.findAllByRole('tab')
+    expect(document.querySelector('[data-tree-status]')).toBeNull()
+  })
 
   it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Sunder\'s detail on tap', async () => {
     show(await brawler())

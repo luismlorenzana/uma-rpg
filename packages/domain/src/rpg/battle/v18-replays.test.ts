@@ -29,7 +29,7 @@ const halves = (a: BattleAction): string[] =>
 
 describe('the frozen v18 replays (H126)', () => {
   it('runs Classes v3 live: engine 20, the classes stage on, thirteen classes (H134, D261)', () => {
-    expect(BATTLE_ENGINE_VERSION).toBe(20)
+    expect(BATTLE_ENGINE_VERSION).toBe(21)
     expect([rpgRework('weak'), rpgRework('classes'), rpgRework('halls'), rpgRework('t2Weapons')]).toEqual([true, true, true, false])
     expect(RPG_CLASSES).toHaveLength(13)
   })

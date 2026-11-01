@@ -255,3 +255,11 @@ describe('the profile wording list (H117)', () => {
     for (const value of ['Fire +1', 'Greatsword ×0.8', 'Empty seat']) check(value, 'fixed')
   })
 })
+
+describe('a tree’s status line (D282)', () => {
+  it('stays within the budget, on the longest it prints', () => {
+    check(copy.treeStatus(['Armor Break'], 'line-a'), 'treeStatus')
+    check(copy.treeStatus(['Brave', 'Faith'], 'line-a'), 'treeStatus')
+    check(copy.treeStatus(['Brave', 'Faith'], 'every'), 'treeStatus')
+  })
+})

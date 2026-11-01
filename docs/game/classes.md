@@ -1,6 +1,6 @@
 # Classes and weapons
 
-Thirteen classes in a tree and ten weapons, as engine v19 and save v32 play them (Classes v3, D240). Every Uma starts as
+Thirteen classes in a tree and ten weapons, as engine v21 and save v34 play them (Classes v3, D240; the combat pass, D282). Every Uma starts as
 her calling's **Tier 0**, an introductory class, and at Class Rank 10 promotes into one of its **Tier 1** classes. She
 has one **active class** at a time and switches freely among the classes she holds; each keeps its own three weapons,
 her line on each of its trees and her equipped skills. A fight already open keeps the setup it started with. Fights from
@@ -46,15 +46,16 @@ promotion from a parent at Class Rank 10; a hybrid has two parents, its All-Roun
 | **A Tier 0** (Warrior, Spellblade, Healer, Summoner, Mage) | An introduction: one skill on any three weapons, one foe and one hit, its power rising with every Class Rank to 10. No lean, no support ([below](#tier-0-and-promotion)) |
 | **Brawler** | Pure physical. Three Arms, one full act a turn |
 | **Sorcerer** | Pure magic. Three Tomes, one full cast a turn. Engine v18's Mage, renamed (her id stays `mage`) |
-| **Arms Spellblade** | Two Arms and a Tome, physical-led multi-hit. Every act is an Arms half and a Tome half, the Arms half the larger and first; it lands one extra hit (the same total), so she chips shields fast. All her skills strike one foe; her line B, Pierce, cuts through a standing shield. Engine v18's Spell Blade, renamed |
-| **Tome Spellblade** | Her mirror, magic-led: two Tomes and an Arm, the Tome half the larger and first, with the extra hit. Her skills carry her own names; line B Pierce on every tree |
+| **Arms Spellblade** | Two Arms and a Tome, physical-led multi-hit. Every act is an Arms half and a Tome half, the Arms half the larger and first; her bound familiar lands one extra hit (the same total), so she chips shields fast. All her skills strike one foe; her line B, Pierce, cuts through a standing shield. Engine v18's Spell Blade, renamed |
+| **Tome Spellblade** | Her mirror, magic-led: two Tomes and an Arm, the Tome half the larger and first, with her familiar's extra hit. Her skills carry her own names; line B Pierce on every tree |
 | **Arms Summoner** | Two Arms and a Tome, physical-led area. Every act is an Arms summon and a Tome summon, the Arms summon first. The Arms summon stays; when her next pair comes it strikes every foe once in farewell and leaves. The Tome summon strikes and goes. No support |
 | **Tome Summoner** | Her mirror, magic-led: the Tome summon first, and it lingers. Engine v18's Summoner, renamed, with new defaults |
-| **Paladin** | Two Arms and a Tome. A healer whose mends and Barriers grow with her ATK. Her blows weaken the foe they hit and Barrier the Uma in most danger; her spells bless the party, mend the most hurt and cleanse. Her Blizzard spells also Barrier every Uma, her Greatsword blows give Aegis to whoever they Barrier, her Axe weakens every foe from depth 4, and Valkyrie's Oath, her Light tree's depth-3 B, raises the fallen |
-| **Cleric** | Two Tomes and an Arm. A healer whose mends and Barriers grow with her M.ATK, with the Paladin's kit. Her Light spells leave Regen, a mend that repeats; her Dark spells drain; Rebirth, her Light tree's depth-3 B, raises the fallen |
+| **Paladin** | Two Arms and a Tome. A healer whose mends and Barriers grow with her ATK. Her Arms skills Barrier the Uma in most danger, her Tome skills mend the most hurt and cleanse. The Cleric's kit, number for number: with two Arms she leans to Barriers |
+| **Cleric** | Two Tomes and an Arm. A healer whose mends and Barriers grow with her M.ATK, the Paladin's kit number for number: with two Tomes she leans to mends |
 
 Every class but the Paladin and the Cleric deals damage only. The two healers act at half power and carry the party's
-support ([combat](combat.md#support)).
+support ([combat](combat.md#support)). What each weapon adds to their kit, and who carries a buff or a debuff, is in
+[Buffs and debuffs](#buffs-and-debuffs).
 
 **One healer a party** (C8, D178): a party fights with one Paladin or Cleric at most. A Tier 0 is no healer, the Healer
 included. A party with two shows "One healer a party" in the Party Hall, on the world map's party bar and in the Rift's
@@ -70,12 +71,12 @@ and class switches are never refused, and Sweeps don't fight, so they don't chec
 | Summoner | 0 | All-Rounder root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Beckon, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 4. End among them (Late + End, or End alone) | Magical |
 | Mage | 0 | Mage root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Primer, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 3. Pace with Late or End | Magical |
 | Brawler | 1 | Promotes from Warrior | 3 Arms | 5 | ×1, MP ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | ×0.95 | — | Physical |
-| Arms Spellblade | 1 | Promotes from Warrior or Spellblade | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; it lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
+| Arms Spellblade | 1 | Promotes from Warrior or Spellblade | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; her bound familiar lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
 | Arms Summoner | 1 | Promotes from Warrior or Summoner | 2 Arms + 1 Tome | 10 | ×0.57 Arms, ×0.46 Tome; MP ×0.5 a half | Every act is an Arms summon and a Tome summon, the Arms half first. The Arms summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
-| Paladin | 1 | Promotes from Healer | 2 Arms + 1 Tome | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Blizzard spells Barrier every Uma, Greatsword blows give Aegis | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | ×0.8 | — | Physical |
-| Cleric | 1 | Promotes from Healer | 2 Tomes + 1 Arm | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Blows debuff the foe and Barrier the threatened Uma; spells bless, mend and cleanse. Light spells leave Regen, Dark spells drain | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | ×0.8 | — | Magical |
+| Paladin | 1 | Promotes from Healer | 2 Arms + 1 Tome | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Arms skills Barrier the threatened Uma, Tome skills mend the most hurt and cleanse | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | ×0.8 | — | Physical |
+| Cleric | 1 | Promotes from Healer | 2 Tomes + 1 Arm | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Arms skills Barrier the threatened Uma, Tome skills mend the most hurt and cleanse | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | ×0.8 | — | Magical |
 | Tome Summoner | 1 | Promotes from Summoner or Mage | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.57 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
-| Tome Spellblade | 1 | Promotes from Spellblade or Mage | 2 Tomes + 1 Arm | 10 | ×0.48 Arms, ×0.72 Tome; MP ×0.5 a half | Every act is a Tome half and an Arms half, the Tome half first; it lands one extra hit | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
+| Tome Spellblade | 1 | Promotes from Spellblade or Mage | 2 Tomes + 1 Arm | 10 | ×0.48 Arms, ×0.72 Tome; MP ×0.5 a half | Every act is a Tome half and an Arms half, the Tome half first; her bound familiar lands one extra hit | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
 | Sorcerer | 1 | Promotes from Mage | 3 Tomes | 5 | ×1, MP ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | ×0.95 | — | Magical |
 <!-- /live -->
 
@@ -300,8 +301,7 @@ in single-target units, by the foes standing (H131 measured every shape within 0
 So the volley is the best act on two foes, second to the sweep on a crowd and better than it on one. Both Spellblades'
 skills strike one foe, their kinds differing only in their hits; the healers' skills each strike one foe once; a Tier 0's
 skill and an Attack are one hit on one foe. A line B can change the shape ([skill
-trees](skill-trees.md#the-lines-at-a-glance)). A Paladin's or a Cleric's skills with a weapon carry its healer status:
-her blows on the foe they hit, her spells on every Uma.
+trees](skill-trees.md#the-lines-at-a-glance)).
 
 **Twins** (CV13): each Arm has a twin element: Greatsword and Fire, Axe and Ice, Lance and Lightning, **Katana and Light**
 (the doubles) and **Bow and Dark** (the volleys); the Bow and the Katana together are **Twilight**, a Light and Dark foe's
@@ -315,21 +315,48 @@ yellow, Light pale gold, Dark violet; Greatsword orange, Axe purple, Lance green
 re-paired the Bow and the Katana swapped their tones, so each still sits beside its twin.
 
 <!-- live:weapons -->
-| Weapon | Id | Kind | Channel | Shape | Healer status | Classes |
+| Weapon | Id | Kind | Channel | Shape | Buff or debuff | Classes |
 |---|---|---|---|---|---|---|
-| Greatsword | `greatsword` | Greatsword | Physical | One foe, heavy | Armor Break | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
-| Axe | `axe` | Axe | Physical | Every foe | Enfeeble | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
-| Lance | `lance` | Lance | Physical | Random foes | Mind Break | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
-| Bow | `bow` | Bow | Physical | A volley: one foe at 0.8, a splash of 0.35 on every other | Shatter | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
-| Katana | `katana` | Katana | Physical | A double: one foe, two hits | Hex | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
-| Fire Tome | `tome-fire` | Fire | Magical | One foe, heavy | Brave | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
-| Blizzard Tome | `tome-ice` | Ice | Magical | Every foe | Aegis | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
-| Thunder Tome | `tome-lightning` | Lightning | Magical | Random foes | Breaker | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
-| Light Tome | `tome-light` | Light | Magical | A double: one foe, two hits | Faith | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
-| Dark Tome | `tome-dark` | Dark | Magical | A volley: one foe at 0.8, a splash of 0.35 on every other | Clarity | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
+| Greatsword | `greatsword` | Greatsword | Physical | One foe, heavy | Armor Break: Paladin and Cleric, every skill | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
+| Axe | `axe` | Axe | Physical | Every foe | — | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
+| Lance | `lance` | Lance | Physical | Random foes | Mind Break: Paladin and Cleric, every skill | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
+| Bow | `bow` | Bow | Physical | A volley: one foe at 0.8, a splash of 0.35 on every other | Enfeeble: Spellblades, Summoners, Paladin and Cleric, line A from depth 3 | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
+| Katana | `katana` | Katana | Physical | A double: one foe, two hits | Armor Break: Spellblades, Summoners, Paladin and Cleric, line A from depth 3 | Every Tier 0, Brawler, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade |
+| Fire Tome | `tome-fire` | Fire | Magical | One foe, heavy | Brave and Faith: Paladin and Cleric, every skill | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
+| Blizzard Tome | `tome-ice` | Ice | Magical | Every foe | — | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
+| Thunder Tome | `tome-lightning` | Lightning | Magical | Random foes | — | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
+| Light Tome | `tome-light` | Light | Magical | A double: one foe, two hits | Brave and Faith: Spellblades, Summoners, Paladin and Cleric, line A from depth 3 | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
+| Dark Tome | `tome-dark` | Dark | Magical | A volley: one foe at 0.8, a splash of 0.35 on every other | Mind Break: Spellblades, Summoners, Paladin and Cleric, line A from depth 3 | Every Tier 0, Arms Spellblade, Arms Summoner, Paladin, Cleric, Tome Summoner, Tome Spellblade, Sorcerer |
 <!-- /live -->
 
-The table's **Shape** is the kind's shape above.
+The table's **Shape** is the kind's shape above, and **Buff or debuff** is [below](#buffs-and-debuffs).
+
+### Buffs and debuffs
+
+Five statuses, three levels of access (D282). The Class tab prints a tree's status above it and the weapon sheet beside each
+weapon, so how she gets one is never a guess.
+
+| Class | Buffs and debuffs |
+|---|---|
+| **Brawler, Sorcerer** | None. Pure damage |
+| **Spellblades, Summoners** | A path: line A of a secondary weapon, from depth 3 |
+| **Paladin, Cleric** | Widely: every skill of Greatsword, Lance and Fire, and the same path |
+
+| Weapon | Status | Paladin, Cleric | Spellblades, Summoners |
+|---|---|---|---|
+| **Greatsword** | Armor Break | Every skill | — |
+| **Lance** | Mind Break | Every skill | — |
+| **Fire Tome** | Brave and Faith on every Uma | Every skill | — |
+| **Katana** | Armor Break | Line A, depth 3+ | Line A, depth 3+ |
+| **Bow** | Enfeeble | Line A, depth 3+ | Line A, depth 3+ |
+| **Dark Tome** | Mind Break | Line A, depth 3+ | Line A, depth 3+ |
+| **Light Tome** | Brave and Faith on every Uma | Line A, depth 3+ | Line A, depth 3+ |
+| Axe, Blizzard, Thunder | None | — | — |
+
+The four secondary weapons' line B stays her pure damage line, so a Spellblade or a Summoner chooses utility or damage tree by
+tree. The healers' weapons add these on top of Barrier and mend: Light leaves Regen and its depth-3 B revives, Dark drains,
+Blizzard Barriers every Uma. Where no status can stack, a healer's line B is a mend or Barrier 15% larger. A Healer Sanctum
+Limit Break carries its one stack whoever casts it ([combat](combat.md#limit-breaks)).
 
 **Three weapon slots, by channel (CP2).** A class has three slots, each an **Arms** or a **Tome** slot, the lead channel
 first: a Brawler three Arms, a Sorcerer three Tomes; an Arms Spellblade, an Arms Summoner and a Paladin two Arms and a
@@ -414,22 +441,19 @@ The presets are the owner's two parties, **Brawler, Sorcerer, Arms Spellblade, T
 Sorcerer, Tome Spellblade, Arms Summoner, Cleric**. The Brawler and the Sorcerer keep the ring. The Paladin and the Cleric
 hold the Lance and Light, both Spellblades the Katana and Thunder, both Summoners Dark and the Bow, and the middle slot
 flexes: the Spellblades' is the kind that reaches two hits soonest (Axe, Blizzard), the Summoners' their area kind (Blizzard,
-Axe), the Paladin's the Greatsword (her Aegis) and the Cleric's Fire (Brave), which are also the Arm and the element of their
-second Hall seats. Each party holds all ten kinds:
+Axe), the Paladin's the Greatsword (Armor Break) and the Cleric's Fire (Brave and Faith), which are also the Arm and the element
+of their second Hall seats. Each party holds all ten kinds:
 
 | Party | Greatsword | Axe | Lance | Bow | Katana | Fire | Blizzard | Thunder | Light | Dark |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Arms Spellblade, Tome Summoner, Paladin | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 1 | 1 |
 | Tome Spellblade, Arms Summoner, Cleric | 1 | 2 | 2 | 1 | 1 | 2 | 2 | 2 | 1 | 1 |
 
-The second party has no Aegis: only the Cleric's and the Paladin's Blizzard and the Paladin's Greatsword give it, and the
-Cleric's preset holds Fire instead.
-
 The defaults follow each class's identity: the Brawler's and the Sorcerer's are the ring (Fire, Ice and Lightning's twins,
 one channel each); the Spellblades hold multi-hit kinds and the Summoners area kinds, and each hybrid holds one twin set in
 both halves, so both halves land weak on a foe weak to it (the Arms Spellblade the Lightning set, the Tome Spellblade the Light
-set, the Arms Summoner the Dark set, the Tome Summoner the Ice set); the Paladin keeps her Barriers, Aegis and Enfeeble on the
-Greatsword and the Axe and her revive on the Light Tome. The balance simulation wears them, with her three accessory
+set, the Arms Summoner the Dark set, the Tome Summoner the Ice set); the Paladin keeps her Barriers on the Greatsword and the
+Axe and her revive on the Light Tome. The balance simulation wears them, with her three accessory
 slots (D266). The balance party (Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Cleric) holds all ten kinds; so do the
 Brawler, the Sorcerer, the Tome Spellblade, the Arms Summoner and a Paladin, and the five Tier 0s. The Rift's fronts suggest
 guided weapons on top of them ([loops](loops.md#the-rift)).

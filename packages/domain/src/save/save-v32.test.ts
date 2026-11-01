@@ -30,7 +30,7 @@ const parsed = (): Save => parseSave(v32Save())
 
 describe('save v32\'s parse (H130), the classes stage live', () => {
   it('runs with the classes stage live, and the schema 34 since D264', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('classes'), SAVE_SCHEMA_VERSION]).toEqual([20, true, 34])
+    expect([BATTLE_ENGINE_VERSION, rpgRework('classes'), SAVE_SCHEMA_VERSION]).toEqual([21, true, 34])
   })
 
   it('parses the v31 save through toV32, round-trips it, and its two open v18 fights replay to their frozen ends', () => {

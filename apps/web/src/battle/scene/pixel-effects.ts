@@ -44,6 +44,21 @@ export class PixelEffects {
     return true
   }
 
+  /** A Spellblade's bound familiar (D282): its ghost lunges through the foe with her extra hit, then it's gone. The same art
+   * as a Summoner's, which stands beside her instead. */
+  bound(kind: RpgDamageKind | null, target: Target, dpr: number, reduced: boolean): void {
+    if (!kind || !this.has(`familiar/${kind}-0`)) return
+    const p = impactPlacement(target, dpr)
+    const image = this.scene.add.image(p.x, p.y, 'battle-fx', `familiar/${kind}-1`).setScale(p.scale).setDepth(2).setAlpha(0.72).setBlendMode('ADD')
+    const end = () => {
+      image.destroy()
+      this.hits.delete(image)
+    }
+    const timers: Timer[] = [this.scene.time.delayedCall(reduced ? 500 : 320, end)]
+    this.hits.set(image, timers)
+    if (!reduced) this.scene.tweens.add({ targets: image, alpha: 0, y: p.y - 18 * dpr, duration: 300, ease: 'Quad.easeOut' })
+  }
+
   sync(state: BattleState, actors: ReadonlyMap<string, Target>, width: number, dpr: number, reduced: boolean): void {
     const next = lingeringFamiliars(state).filter((s) => actors.has(s.id) && this.has(`familiar/${s.kind}-0`))
     for (const [id, old] of this.familiars) {
