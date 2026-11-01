@@ -101,12 +101,15 @@ describe('the profile wording list (H117)', () => {
     expect(copy.party(3)).toBe('Party 3')
     expect(copy.work(null)).toBe('Idle')
     expect(copy.work('Mine', 'done')).toBe('Mine · Done')
-    expect(copy.statParts(42, 8, 3, 1)).toBe('base 42 · gear 8 · Stars 3 · ★ 1')
-    expect(copy.statParts(42, 0, 0, 0)).toBe('base 42')
+    expect(copy.statPartList(42, 8, 2, 3, 1).map((part) => part.text)).toEqual(['base 42', 'armor 8', 'accessory 2', 'Stars 3', '★ 1'])
+    expect(copy.statPartList(42).map((part) => part.source)).toEqual(['base'])
+    expect(copy.bosses(3)).toBe('Bosses +3%')
+    expect(copy.damageLabel('Fire', 86, 'M.ATK', 70, 8, 6, 2)).toBe('Fire 86: M.ATK 70, Might 8, Accessory 6, Signature 2')
+    expect(copy.damageLabel('Axe', 24, 'ATK', 24, 0, 0, 0)).toBe('Axe 24: ATK 24')
     expect(copy.coreSource(102, 20)).toBe('102 · +20%')
     expect(copy.coreSource(90, 0)).toBe('90')
     expect(copy.gradeGate(1, { grade: 2, craft: 6 })).toBe('G1 open · G2 at Craft 6')
-    expect(copy.statFormulaLines).toHaveLength(7)
+    expect(copy.statFormulaLines).toHaveLength(9)
     expect(copy.equipped(7, 7)).toBe('Equipped 7/7')
     expect(copy.line('B', 'Impale')).toBe('Line B · Impale')
     expect(copy.skillRank(3, 14)).toBe('Rank 3 · next R14')
@@ -215,7 +218,7 @@ describe('the profile wording list (H117)', () => {
 
   it('keeps literal JSX terse outside help sheets', () => {
     const files = [
-      'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'TemplateTab.tsx', 'GearTab.tsx',
+      'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'DamageCard.tsx', 'TemplateTab.tsx', 'GearTab.tsx',
       'ClassTab.tsx', 'class-sheets.tsx', 'StableCounter.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'PresetButton.tsx',
       '../observatory/StarsPanel.tsx', '../observatory/ObservatoryPage.tsx',
     ]

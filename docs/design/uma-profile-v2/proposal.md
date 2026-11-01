@@ -266,6 +266,9 @@ A working Uma also fights (D119), so Party and Work are two cells, never one.
 
 ### 3.3 The Details sheet
 
+> **Superseded by H140 (D276):** Details is now two pages, damage first and All stats a tap down
+> ([profile polish](../profile-polish/proposal.md)). Every row below is still there, on All stats.
+
 Today's Battle tab, Work's numbers and the racing base stats, in one read-only sheet (the kit's `BottomSheet`, which
 scrolls under a fixed header). About one screen at 390×844. Every row is a label and a number; where a stat has
 parts, they follow it.

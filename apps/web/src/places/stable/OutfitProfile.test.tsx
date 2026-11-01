@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { domAnimation } from 'motion/react'
 import { MemoryRouter, Route, Routes, useLocation, useNavigate, useParams, type InitialEntry } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { activeClass, placeById, tradePlaces, umaBattleSheet, umaPick, umaTrade } from '@rpg/domain'
+import { activeClass, placeById, tradePlaces, umaBattleSheet, umaPick, umaTrade, umaDamageSheet, isGrades } from '@rpg/domain'
 import { albumFixture } from '../../album/testing'
 import * as copy from './copy'
 import { OutfitProfile } from './OutfitProfile'
@@ -133,10 +133,51 @@ describe('the Uma profile v2 frame (H119)', () => {
     expect(screen.getByRole('button', { name: 'Party Fighting' })).toBeDefined()
   })
 
-  it('shows every battle row, Core, Work and Since in the Details sheet, with a collapsed formula', () => {
+  it('opens Details on her three weapons and her final stats, and returns there from All stats', () => {
     render(profile())
     fireEvent.click(screen.getByRole('button', { name: 'Details' }))
     const details = document.querySelector('[data-profile-details]') as HTMLElement
+    const outfit = fixture.view.roster.find(row => row.outfitId === '81001')!
+    const uma = fixture.world.umas['81001']!
+    const damage = umaDamageSheet(outfit, uma, activeClass(outfit, uma, 1), 1)!
+    expect(details.querySelectorAll('[data-damage-row]')).toHaveLength(3)
+    for (const row of damage.weapons) expect(details.querySelector(`[data-damage-row="${row.kind}"]`)!.textContent).toContain(String(row.total))
+    for (const stat of damage.stats) expect(details.querySelector(`[data-damage-stat="${stat.label}"]`)!.textContent).toContain(`${stat.label} ${stat.total}`)
+    expect(within(details).queryByText(/^Bosses/)).toBeNull()
+    expect([...details.querySelectorAll('[data-stat-tiles] li')].map((tile) => tile.lastChild!.textContent)).toEqual(['HP', 'MP', 'DEF', 'M.DEF', 'Evasion'])
+    expect(document.querySelector('[data-all-stats]')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'All stats' }))
+    expect(screen.getByRole('dialog', { name: 'All stats' })).toBeDefined()
+    expect(document.querySelector('[data-profile-details]')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '‹ Details' }))
+    expect(document.querySelector('[data-profile-details]')).not.toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'All stats' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Details' }))
+    expect(document.querySelector('[data-profile-details]')).not.toBeNull()
+  })
+
+  it('shows a hybrid’s two stats, her Insignia, and no word "gear"', () => {
+    const uma = fixture.world.umas['81001']!
+    uma.classId = 'spellblade'
+    uma.ranks = { ...uma.ranks, classes: { ...uma.ranks.classes, spellblade: { rank: 12, exp: 0 } } }
+    if (isGrades(uma.gear)) uma.gear = { ...uma.gear, accessories: [{ grade: 3, family: 'insignia', form: 'base' }, { grade: 2, family: 'pendant', form: 'base' }, uma.gear.accessories[2]!] }
+    render(profile())
+    fireEvent.click(screen.getByRole('button', { name: 'Details' }))
+    const details = document.querySelector('[data-profile-details]') as HTMLElement
+    expect([...details.querySelectorAll('[data-damage-stat]')].map((line) => line.getAttribute('data-damage-stat'))).toEqual(['ATK', 'M.ATK'])
+    expect(details.querySelector('[data-damage-stat="ATK"]')!.textContent).toContain('accessory 2')
+    expect(within(details).getByText('Bosses +3%')).toBeDefined()
+    fireEvent.click(screen.getByRole('button', { name: 'All stats' }))
+    expect(document.querySelector('[data-all-stats]')!.textContent).not.toMatch(/\bgear\b/)
+    expect(document.querySelector('[data-all-stats]')!.textContent).toContain('accessory 2')
+  })
+
+  it('keeps every battle row, Core, Work and Since on All stats, with a collapsed formula', () => {
+    render(profile())
+    fireEvent.click(screen.getByRole('button', { name: 'Details' }))
+    fireEvent.click(screen.getByRole('button', { name: 'All stats' }))
+    const details = document.querySelector('[data-all-stats]') as HTMLElement
     expect(details).not.toBeNull()
     const outfit = fixture.view.roster.find(row => row.outfitId === '81001')!
     const uma = fixture.world.umas['81001']!
@@ -156,11 +197,13 @@ describe('the Uma profile v2 frame (H119)', () => {
     for (const line of copy.statFormulaLines) expect(within(formula).getByText(line)).toBeDefined()
   })
 
-  it('keeps the healer-only Mends row in Details', () => {
+  it('gives a healer a Mends tile and keeps her Mends row', () => {
     fixture.world.umas['81001']!.classId = 'paladin'
     render(profile())
     fireEvent.click(screen.getByRole('button', { name: 'Details' }))
-    expect(within(document.querySelector('[data-profile-details]') as HTMLElement).getByText('Mends')).toBeDefined()
+    expect(within(document.querySelector('[data-stat-tiles]') as HTMLElement).getByText('Mends')).toBeDefined()
+    fireEvent.click(screen.getByRole('button', { name: 'All stats' }))
+    expect(within(document.querySelector('[data-all-stats]') as HTMLElement).getByText('Mends')).toBeDefined()
   })
 
   it('embeds the shared Stars body and renders Template inline', () => {

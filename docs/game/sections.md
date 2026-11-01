@@ -202,12 +202,19 @@ v2](../design/uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229), D23
   targets; the Wilds plan what maxing them takes, D100). The place header's Back is the only Back.
 - **Facts:** one row of three 44 pt doors. **Party** reads "Party 1", "Fighting" or "No party" and opens the party
   editor or list. **Work** reads "Mine · 1h 20m", "Mine · Done" or "Idle" and opens that place (an idle Uma opens her
-  trade's first place). **Details** opens her read-only battle, core and work ledger. Back from Party or Work returns to
+  trade's first place). **Details** opens what she hits with and her stats, read-only. Back from Party or Work returns to
   this profile and tab.
-- **Details:** two columns. Offense, Defense, Sustain and Other preserve every row of `umaBattleSheet`, including 0;
-  stat rows show their base, gear and Stars parts, with her Moon marked ★. Core lists Speed, Stamina, Power, Guts and
-  Wit with the racing base and growth. Work lists Craft Level and EXP, grades and trade; Since lists her unlock date.
-  **How stats add up** expands the formula one source a line.
+- **Details (H140):** two pages in one sheet, and it always opens on the first.
+  - **Damage:** one row for each of her class's three weapons: its kind's glyph, the total, and its parts in parentheses,
+    `86 (70 +8 +6 +2)`: her ATK or M.ATK, the weapon's Might, her Orbs on that kind and her signature, each in its source's color,
+    zero parts dropped. A strip under each row shows the same parts, scaled to her largest row. That sum is what a fight uses before
+    the skill and the foe ([combat](combat.md#damage)). Below them a key, then a line for each stat her weapons use:
+    `M.ATK 70 · base 52 · armor 10 · accessory 3 · Stars 5`, ★ for her Moon. An Insignia reads `Bosses +3%` beside the title.
+  - **Stats:** HP, MP, DEF, M.DEF and Evasion as tiles, and a healer's Mends.
+  - **All stats** swaps the page, and ‹ Details returns: one column. Offense, Defense, Sustain and Other preserve every row of
+    `umaBattleSheet`, including 0; stat rows show their base, armor, accessory and Stars parts, with her Moon marked ★. Core lists
+    Speed, Stamina, Power, Guts and Wit with the racing base and growth. Work lists Craft Level and EXP, grades and trade; Since
+    lists her unlock date. **How stats add up** expands the formula one source a line.
 - **A locked outfit** has a dimmed portrait, no level and no tabs. Its facts row becomes **Unlock · 1 Ticket**, "In
   Tier 2" or "Unlock in Tier 1"; its Template content remains below. The unlock uses the kit's `UnlockConfirm`.
 - **Tabs:** Class, Gear, Stars and Template, always in that order; the last one used is remembered on the device. Class

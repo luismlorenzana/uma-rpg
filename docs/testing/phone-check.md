@@ -57,9 +57,11 @@ button and footer should stay reachable without horizontal page scrolling, in li
 8. **Profile frame.** Expect the compact bust, name, title and stars, `Lv n` with `current/next` EXP, then the Party,
    Work and Details doors and the four tabs **Class · Gear · Stars · Template**. The tab bar starts within 150 px of
    the profile main. Tap Party and Work, then Back: expect the same profile tab. Mark her as a target and unmark her.
-   Open **Details**: every battle row, 0 included, appears in two columns with Core, Work and Since; **How stats add up**
-   expands in place and the sheet fits without its own scroll at 390×844. A locked profile has **Unlock · 1 Ticket**,
-   Template content, no level, no tabs and no ticket-balance sentence. (D206, D229, D240, D258)
+   Open **Details**: three damage rows, each a glyph and `total (stat +Might +accessory +★)`, a key, a stat line, five stat tiles
+   and **All stats**, with no scroll at 390×844 or 375×667. Add one row up by hand, then check its Might and accessory on Gear. **All
+   stats**: every battle row, 0 included, with Core, Work and Since; **How stats add up** expands in place; ‹ Details returns; closing
+   and reopening lands on the first page. A locked profile has **Unlock · 1 Ticket**,
+   Template content, no level, no tabs and no ticket-balance sentence. (D206, D229, D240, D258, D276)
 9. **Class tab: Classes.** On a Tier 0, the class tile reads "R7/10" with its bar, her weapon tiles carry no letters and her
    trees are one node each ("Drill Strike · Greatsword", "R7/10") with "Promotion at R10 · 3 to go" under them; **Change ›**
    lists all ten weapons, and a tap holds one with the sheet still open. Tap the class tile: **Classes** shows the tree,
@@ -99,7 +101,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
     she holds. Tap a row: the sheet closes and the tile shows it at once; a slot at G0 reads "Off". Set the same accessory in
     two slots, leave and come back: both stick. (D217, D223, D266, D268)
 15. **Facts, Details and doors.** A working Uma's Work fact shows her place and time or Done; an idle one reads Idle and opens
-    her trade's first place. Details shows Craft Level and EXP, grade gates and trade. **Doors:** from the roster, a face opens the
+    her trade's first place. All stats shows Craft Level and EXP, grade gates and trade. **Doors:** from the roster, a face opens the
     remembered tab; with **Can upgrade** on, the first tab with a dot. Expect **‹ n/N ›** in the place header (near the notch): › keeps
     the tab, closes any sheet and wraps at the end; Back returns to the roster at the same scroll. Open her from the Party Hall's
     **View profile** and the world map's party bar (Class, ‹ › through the party), a Hall's **Profile** in a Hero's or a Learner's

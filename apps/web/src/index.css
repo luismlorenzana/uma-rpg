@@ -4,11 +4,19 @@
    of names, base styles and utilities. Tailwind also reads the kit's own classes. */
 @import '@luismlorenzana/uma-kit/theme.css';
 
+/* Damage sources' colors (H140), for Details' numbers and strips: each at least 4.5:1 on a panel and a raised card, in both themes
+   (`damage-view.test.ts`), neighbours apart under simulated colour blindness, fixed in every tint. */
 /* Damage kinds' colors (D234), for the inline glyphs (`KIND_COLOR` in battle/labels.tsx): the elements as uma-art paints
    their Tomes, each Arm beside its twin element's as uma-art 2.15.0 paints it. Classes v3 re-paired the twins to Katana–Light
    and Bow–Dark (CV13; H134 swapped the two Arms' tones to follow). Dark mode keeps the art's light tones; light mode takes
    deeper ones so the pale kinds (Light, Lightning, Ice, the Katana's jade) still read on a white panel. */
 :root {
+  --src-atk: #c2410c;
+  --src-matk: #1d6fd1;
+  --src-might: #3f4b5c;
+  --src-accessory: #a23ac8;
+  --src-star: #8f6410;
+  --src-stars: #0e7490;
   --kind-fire: #e0562a;
   --kind-ice: #2f8fd8;
   --kind-lightning: #b98900;
@@ -21,6 +29,12 @@
   --kind-katana: #1f9e88;
 }
 [data-theme='dark'] {
+  --src-atk: #ff8f5e;
+  --src-matk: #5fb2ff;
+  --src-might: #c3ccd8;
+  --src-accessory: #d48cf0;
+  --src-star: #e8b65a;
+  --src-stars: #7fd4e8;
   --kind-fire: #ff8a5c;
   --kind-ice: #8fd3ff;
   --kind-lightning: #ffd84d;
@@ -34,6 +48,12 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
+    --src-atk: #ff8f5e;
+    --src-matk: #5fb2ff;
+    --src-might: #c3ccd8;
+    --src-accessory: #d48cf0;
+    --src-star: #e8b65a;
+    --src-stars: #7fd4e8;
     --kind-fire: #ff8a5c;
     --kind-ice: #8fd3ff;
     --kind-lightning: #ffd84d;

@@ -113,11 +113,24 @@ export const profileFacts = { party: 'Party', work: 'Work', details: 'Details' }
 export const party = (value: number | 'fighting' | null): string => value === null ? 'No party' : value === 'fighting' ? 'Fighting' : `Party ${n(value)}`
 /** C7: work state. */
 export const work = (place: string | null, state?: string | 'done'): string => !place ? 'Idle' : `${place} · ${state === 'done' ? 'Done' : state ?? ''}`.replace(/ · $/, '')
-/** C7: a stat's compact source line in Details. */
-export function statParts(base: number, gear = 0, stars = 0, moon = 0): string {
-  return [base ? `base ${n(base)}` : '', gear ? `gear ${n(gear)}` : '', stars ? `Stars ${n(stars)}` : '', moon ? `★ ${n(moon)}` : '']
-    .filter(Boolean).join(' · ')
+/** C7: Details' two pages and their sections (H140). */
+export const details = { title: 'Details', all: 'All stats', back: '‹ Details', damage: 'Damage', stats: 'Stats' } as const
+/** C7: where a stat's points come from, each with its color in Details (H140). */
+export type StatSource = 'base' | 'armor' | 'accessory' | 'stars' | 'moon'
+export interface StatPart { source: StatSource; text: string }
+/** C7: a stat's parts in order, zero parts dropped. Armor and accessory apart, since "gear" hid armor (PP14). */
+export function statPartList(base: number, armor = 0, accessory = 0, stars = 0, moon = 0): StatPart[] {
+  const parts: [StatSource, number, string][] = [['base', base, `base ${n(base)}`], ['armor', armor, `armor ${n(armor)}`],
+    ['accessory', accessory, `accessory ${n(accessory)}`], ['stars', stars, `Stars ${n(stars)}`], ['moon', moon, `★ ${n(moon)}`]]
+  return parts.filter(([, value]) => value).map(([source, , text]) => ({ source, text }))
 }
+/** C7: her Insignias on Details' Damage. */
+export const bosses = (percent: number): string => `Bosses +${n(percent)}%`
+/** C7: the sources in Details' key. */
+export const damageKey = { might: 'Might', accessory: 'Accessory', star: '★ Signature' } as const
+/** C7: a damage row for a screen reader: "Fire 86: M.ATK 70, Might 8, Accessory 6, Signature 2". */
+export const damageLabel = (kind: string, total: number, stat: string, base: number, might: number, orb: number, signature: number): string =>
+  `${kind} ${n(total)}: ${[`${stat} ${n(base)}`, might ? `Might ${n(might)}` : '', orb ? `Accessory ${n(orb)}` : '', signature ? `Signature ${n(signature)}` : ''].filter(Boolean).join(', ')}`
 /** C7: a core stat's base and growth. */
 export const coreSource = (base: number, growth: number): string => `${n(base)}${growth ? ` · +${n(growth)}%` : ''}`
 /** C7: the open grade and its next Craft gate. */
@@ -132,6 +145,8 @@ export const statFormulaLines = [
   'DEF · Power × class',
   'M.DEF · (Power + Wit)/2 × class',
   'Totals · core + gear + Stars + moon',
+  'Damage · stat + Might + Orb + ★',
+  'Hit · damage²/(damage + DEF) × skill',
 ] as const
 /** C7: equipped skills. */
 export const equipped = (value: number, slots: number): string => `Equipped ${n(value)}/${n(slots)}`
