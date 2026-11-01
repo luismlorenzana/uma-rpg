@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-10-31, after D274, with the profile polish packets written.** Tier 1 is built and live: engine v20, save v34. That covers the Tier rework's R1
+> **Status: 2026-10-31, after D278.** Tier 1 is built and live: engine v20, save v34. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -23,21 +23,18 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H144; decision numbers from D275). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H145; decision numbers from D279). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it.
 
 **Profile polish** ([proposal](../design/profile-polish/proposal.md), pages: [Details](../design/profile-polish/previews/details.html) and
-[star chart](../design/profile-polish/previews/star-chart.html)), from the owner's screenshots of 2026-10-31. No rule, save or balance change:
+[star chart](../design/profile-polish/previews/star-chart.html)) is built and live, with vector crests and stat marks. Two packets finish it:
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H139](tasks/H139-damage-sheet-domain.md) | The damage numbers, proved equal to a fight's | Claude or ChatGPT | S | — | Ready |
-| [H140](tasks/H140-details-damage-first.md) | Details: damage first, All stats a tap down | Claude or ChatGPT | M | H139 | Waits on H139 |
-| [H141](tasks/H141-star-crests-art.md) | Art: five star crests and eight stat marks, uma-art 2.19.0 | ChatGPT draws and publishes | S | — | Ready |
-| [H142](tasks/H142-star-chart.md) | The star chart | Claude or ChatGPT | M | H141 | Waits on H141 |
-| [H143](tasks/H143-star-sheets-and-marks.md) | A body's sheet, its strip and the stat marks | Claude or ChatGPT | S | H140, H142 | Waits on both |
+| [H141](tasks/H141-star-crests-art.md) | Art: five star crests and eight stat marks, uma-art 2.19.0 | ChatGPT draws and publishes | S | — | Ready: the owner dispatches it |
+| [H144](tasks/H144-pin-star-art.md) | Pin uma-art 2.19.0 and swap the vector marks | Claude or ChatGPT | S | H141 | Waits on H141 |
 
 The audit's bugs and the Hall issues have no packet yet.
 
@@ -58,6 +55,10 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H143 | Profile polish: a body's strip in the node sheet, stat marks on the totals and Details (D278) | `12229df` |
+| H142 | Profile polish: the star chart, on one checked table of coordinates, with vector crests (D277) | `a96132e` |
+| H140 | Profile polish: Details opens on damage, All stats a tap down, sources in color (D276) | `b3d4d67` |
+| H139 | Profile polish: `umaDamageSheet`, each weapon's sum proved equal to a real fight's (D275) | `380d798` |
 | H125 | Uma profile v2 measured: everything about her 5.73 screens from 9.5; the phone check; D229 superseded (D272) | `021ef11` |
 | H124 | Uma profile v2: every door opens a tab, Back returns to it, ‹ n/N › (D271) | `518557f` |
 | H123 | Uma profile v2: the Template tab, no calling pick (D270); B2 1.28 at 390×844 | `36ee376` |
