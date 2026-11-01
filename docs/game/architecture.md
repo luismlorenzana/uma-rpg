@@ -158,7 +158,7 @@ lazy pages import it directly, so its rules load with the first command or page 
 
   uma-rpg gives it its places, currencies, words and art. `main.tsx` wires the uma-art atlases (`KitArtProvider`),
   the appearance and Motion, the shared `ContentProvider`, `AlbumArtProvider` and `WorkArtProvider` (item icons for the
-  work screens). Faces use uma-data's `outfit-faces`, with the icon atlas as fallback; busts and plaza chibis use their
+  work screens). Faces use uma-data's `outfit-faces`, with the icon atlas as fallback; `outfit-glass`, each bust as a stained-glass window, is in the release but no screen draws it yet (D280); busts and plaza chibis use their
   own families. Rules, vocabulary, routes and save v32 stay game-owned.
 - **The battle stage** is Phaser (`battle/scene/`). Every number and control is a DOM element laid over the canvas (D33).
   Each damage kind has one color (`KIND_COLOR` in `battle/labels.tsx`, over `index.css`'s `--kind-*` tokens, D234).

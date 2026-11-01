@@ -2,7 +2,8 @@
 // and the release's aggregate counts match uma-templates §2.4. It runs only where the release is on disk (uma-platform
 // checked out beside this repo, or `MASTER_DIR` pointing at a release), so CI skips it. It prints counts only, never a
 // name: nothing from the original games reaches git or a log. Classes v3 (engine v19, H126) adds a block: the calling by
-// running style, its combinations and types by stride, and none of its new words equal to a master-data string.
+// running style, its combinations and types by stride, and none of its new words equal to a master-data string. The counts
+// are the design's census, so they stop at the outfits it read; a new banner only has to get a template.
 import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import type { Character, LocalText, Outfit } from '@luismlorenzana/uma-data'
@@ -28,10 +29,19 @@ function load<T>(set: string): T[] {
 }
 /** The six callings of engines v16–v18, in `UMA_TYPE_NAMES`'s order (Classes v3's five Tier 0 follow them, H126). */
 const SIX = ['brawler', 'spellblade', 'mage', 'summoner', 'paladin', 'cleric'] as const
+/** The last Japan release the designs counted: their 270 outfits. Later banners stay out of the census (D280). */
+const CENSUS_THROUGH = '2026-09-30'
+const census = (roster: readonly RosterOutfit[]): RosterOutfit[] => roster.filter((outfit) => outfit.releasedJp <= CENSUS_THROUGH)
 const tally = <K extends string>(keys: readonly K[]): Record<K, number> => Object.fromEntries(keys.map((k) => [k, 0])) as Record<K, number>
 
 describe.skipIf(!HAS_RELEASE)('the template against the local master-data release (H67)', () => {
-  const roster: RosterOutfit[] = HAS_RELEASE ? buildRoster({ characters: load<Character>('characters'), outfits: load<Outfit>('outfits') }) : []
+  const roster: RosterOutfit[] = HAS_RELEASE ? census(buildRoster({ characters: load<Character>('characters'), outfits: load<Outfit>('outfits') })) : []
+
+  it('gives every outfit in the release a template, whenever she arrived', () => {
+    const all = buildRoster({ characters: load<Character>('characters'), outfits: load<Outfit>('outfits') })
+    expect(all.length).toBeGreaterThanOrEqual(270)
+    for (const outfit of all) expect(UMA_KNACK_WORDS[umaTemplate(outfit).knack], outfit.outfitId).toBeTruthy()
+  })
 
   it('uses no master-data skill name for a type, a knack word, a template or a Flourish', () => {
     const skills = load<{ name: LocalText }>('skills')
@@ -91,7 +101,7 @@ function strings(value: unknown, out: Set<string>): Set<string> {
 }
 
 describe.skipIf(!HAS_RELEASE)('Classes v3\'s calling and templates against the local release (H126, CV19, CV21)', () => {
-  const roster: RosterOutfit[] = HAS_RELEASE ? buildRoster({ characters: load<Character>('characters'), outfits: load<Outfit>('outfits') }) : []
+  const roster: RosterOutfit[] = HAS_RELEASE ? census(buildRoster({ characters: load<Character>('characters'), outfits: load<Outfit>('outfits') })) : []
   const V19 = 19
 
   it('gives §5\'s callings: Warrior 47 · Spellblade 72 · Mage 72 · Summoner 33 · Healer 46, by §5.2\'s combinations', () => {

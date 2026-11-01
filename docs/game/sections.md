@@ -170,7 +170,7 @@ closes any open sheet, returns to the top and replaces the history entry, so Bac
 hides with one Uma in the list and on a locked profile. Arrows only, no swipe.
 
 **The roster** (`StablePage.tsx` on the kit's `AlbumChrome` and `AlbumGrid`; rows and facets in `album/rows.ts`):
-- "Stable" and "26/270 owned", then All, Owned and Locked tabs with counts. Tier 1 also lists the outfits nobody owns,
+- "Stable" and "26/272 owned", then All, Owned and Locked tabs with counts. Tier 1 also lists the outfits nobody owns,
   to unlock; a later tier lists only its own Umas ([Tiers](#tiers)).
 - **Views:** five columns of faces (the default), three columns of bust cards, or a one-column list. Under each face:
   her title (or her rarity stars) and her best aptitudes; sorted by Craft Level or Class Rank, that number instead.
@@ -428,7 +428,7 @@ Reached from the top bar's initial (`/town/account`). `places/account/AccountPag
 - **Safety copies** (D260, only when this device has one): each row its date, why it was kept and what it held ("Replaced
   by a newer save · 29 Umas · best Lv 20"). **Restore** confirms in a sheet; the current save becomes a safety copy and
   the restored one uploads as the newest.
-- **About:** Tier world, Trainer since, Umas unlocked in every world ("26 / 270"), Cloud save ("Paused · last Oct 27, 7:40
+- **About:** Tier world, Trainer since, Umas unlocked in every world ("26 / 272"), Cloud save ("Paused · last Oct 27, 7:40
   PM" while uploads fail), Game data, App build.
 - "Update ready · Restart" while a new build waits, and **Sign out**.
 
