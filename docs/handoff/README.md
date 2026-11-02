@@ -78,7 +78,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
-| H155 | Windows on screen, dark: her window beside her bust, the Window sheet, the Gallery, Ascend one Uma at a time, latching and the "Window +1" note (D287) | this commit |
+| H155 | Windows on screen, dark: her window beside her bust, the Window sheet, the Gallery, Ascend one Uma at a time, latching and the "Window +1" note (D287) | `3bc65cc` |
 | H154 | Drills and Training Logs, dark: five Drills a tier, ten runs a day banked to thirty, Logs a third of her next level (D286) | `11d2d05` |
 | H153 | Trials: the Echoes' own place on the Battle page, live, on the Knights' Bastion until H156 (D285) | `30b9902` |
 | H152 | Windows, the rules, dark: the board, latching, the World record and the Rift step, save v35's fields, Ascend one Uma at a time (D284) | `cc81286` |
