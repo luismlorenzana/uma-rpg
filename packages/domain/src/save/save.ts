@@ -56,6 +56,8 @@ import {
 } from '../rift/state'
 import { migrateWorld, type TierGrant } from './migrations'
 import { SAVE_SCHEMA_VERSION } from './version'
+import { collectionsLive } from './collections'
+import { validSteps, WINDOW_CHAMPIONS_MAX, type WindowRecord, type WindowRecords } from './window-record'
 
 export type { TierGrant } from './migrations'
 
@@ -85,6 +87,8 @@ export interface Wallet {
   gearMarks?: number
   /** EXP past a max Class Rank, banked at half rate. */
   classMarks: number
+  /** Save v35 (D283, H152): Drills' pay, each one fight's EXP for whoever reads it. Absent before. */
+  trainingLogs?: number
 }
 
 export interface ProfessionLevel { level: number; exp: number }
@@ -197,7 +201,19 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
   /** Save v32 (H130, live since H134): Classes v3's reset in this world, written once by `toV32`; absent in a world made
    * after it. */
   classesV3?: ClassesV3Record
+  /** Save v35 (D283, H152): the day's Drill runs. Absent before. */
+  drills?: DrillsState
 }
+
+/** A world's Drills (D283, CO23, CO24): the last day turned (`YYYY-MM-DD` on the phone's clock, after 04:00), the runs
+ * banked (0–30), and each Drill's first win. */
+export interface DrillsState {
+  day: string | null
+  runs: number
+  won: Record<string, string>
+}
+export const DRILL_RUNS_MAX = 30
+export const DRILL_RUNS_A_DAY = 10
 
 /** A Paladin Bastion or Cleric Chapel seat (engines v15–v18), as save v31 stores it. */
 export type HealerSeatV18 = `${'paladin' | 'cleric'}-${1 | 2 | 3 | 4}`
@@ -271,6 +287,10 @@ export interface Account {
   /** The boss and sub-boss faces this account has defeated in Rift fights only (D168), by cast id: when first (D171). The
    * Bestiary counts them, and a run's picker prefers the faces not defeated before it started. */
   defeated: Record<string, string>
+  /** Save v35 (D283, H152): every Uma's window, by outfit id then tier key (`save/windows.ts`). Absent before. */
+  windows?: WindowRecords
+  /** Save v35: when the switch's credit ran (`latchWindows`), or null until it has. Absent before. */
+  windowsStart?: string | null
 }
 
 export interface Save {
@@ -318,7 +338,7 @@ export function defaultParties(): Party[] {
 
 /** A new world's wallet: v28's has no Gear Marks once R2's economy is live (D208 point 2), v27's has them. */
 export const newWallet = (unlockTickets: number, engine: number = BATTLE_ENGINE_VERSION): Wallet => (rpgRework('economy', engine)
-  ? { unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, classMarks: 0 }
+  ? { unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, classMarks: 0, ...(collectionsLive() ? { trainingLogs: 0 } : {}) }
   : { unlockTickets, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 })
 /** A new Uma's armor kinds (D160 §7): all five magical for a magical starting class, none set (physical) otherwise. */
 export function startingArmorKinds(classId?: RpgClass): UmaGearV1['kinds'] {
@@ -360,16 +380,21 @@ export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run
 export function newTierWorld(now: string, unlockTickets: number, engine: number = BATTLE_ENGINE_VERSION): TierWorld {
   if (rpgRework('economy', engine)) {
     return { createdAt: now, wallet: newWallet(unlockTickets, engine), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, targets: [], heroes: {},
-      rift: newRiftState(), grant: null }
+      rift: newRiftState(), grant: null, ...(collectionsLive() ? { drills: newDrills() } : {}) }
   }
   return { createdAt: now, wallet: newWallet(unlockTickets, engine), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {},
     rift: newRiftState() }
 }
 
+/** A world's Drills before its first day (save v35): a day's runs waiting. */
+export const newDrills = (): DrillsState => ({ day: null, runs: DRILL_RUNS_A_DAY, won: {} })
+
 export function newSave(trainerName: string, now: string, engine: number = BATTLE_ENGINE_VERSION): Save {
   return {
     schemaVersion: SAVE_SCHEMA_VERSION,
-    account: { trainerName: normalizeTrainerName(trainerName) ?? DEFAULT_TRAINER_NAME, createdAt: now, updatedAt: now, achievements: {}, history: {}, defeated: {} },
+    account: { trainerName: normalizeTrainerName(trainerName) ?? DEFAULT_TRAINER_NAME, createdAt: now, updatedAt: now, achievements: {}, history: {}, defeated: {},
+      // A new save has nothing to credit, so its windows start at once (save v35).
+      ...(collectionsLive() ? { windows: {}, windowsStart: now } : {}) },
     tierWorlds: { '1': newTierWorld(now, STARTING_UNLOCK_TICKETS, engine) },
   }
 }
@@ -410,12 +435,53 @@ const OUTFIT_ID = /^[1-9]\d{0,11}$/
 
 /** A wallet: v27's with Gear Marks, v28's without (WP27). */
 function parseWallet(value: unknown, path: string, v28 = false): Wallet {
-  const o = object(value, path, ['unlockTickets', 'shards', 'laurels', 'timeTickets', 'sweepTickets', ...(v28 ? [] : ['gearMarks']), 'classMarks'])
+  const logs = v28 && collectionsLive()
+  const o = object(value, path, ['unlockTickets', 'shards', 'laurels', 'timeTickets', 'sweepTickets', ...(v28 ? [] : ['gearMarks']), 'classMarks',
+    ...(logs ? ['trainingLogs'] : [])])
   return {
     unlockTickets: count(o.unlockTickets, `${path}.unlockTickets`), shards: count(o.shards, `${path}.shards`), laurels: count(o.laurels, `${path}.laurels`),
     timeTickets: count(o.timeTickets, `${path}.timeTickets`), sweepTickets: count(o.sweepTickets, `${path}.sweepTickets`),
     ...(v28 ? {} : { gearMarks: count(o.gearMarks, `${path}.gearMarks`) }), classMarks: count(o.classMarks, `${path}.classMarks`),
+    ...(logs ? { trainingLogs: count(o.trainingLogs, `${path}.trainingLogs`) } : {}),
   }
+}
+
+const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/
+const DRILL_ID = /^drill-[1-5]$/
+
+/** A world's Drills (save v35, D283). */
+function parseDrills(value: unknown, path: string): DrillsState {
+  const d = object(value, path, ['day', 'runs', 'won'])
+  if (d.day !== null && (typeof d.day !== 'string' || !DAY_KEY.test(d.day))) throw new SaveParseError(`${path}.day`, 'expected null or YYYY-MM-DD')
+  const runs = count(d.runs, `${path}.runs`)
+  if (runs > DRILL_RUNS_MAX) throw new SaveParseError(`${path}.runs`, `expected 0–${DRILL_RUNS_MAX}`)
+  const won: Record<string, string> = {}
+  for (const [id, at] of Object.entries(object(d.won, `${path}.won`, Object.keys((d.won as Obj | null) ?? {})))) {
+    if (!DRILL_ID.test(id)) throw new SaveParseError(`${path}.won.${id}`, 'expected drill-1 … drill-5')
+    won[id] = timestamp(at, `${path}.won.${id}`)
+  }
+  return { day: d.day as string | null, runs, won }
+}
+
+/** The account's windows (save v35, D283): by outfit id, then tier key, each a well-formed record. */
+function parseWindows(value: unknown, path: string): WindowRecords {
+  const out: WindowRecords = {}
+  for (const [id, raw] of Object.entries(object(value, path, Object.keys((value as Obj | null) ?? {})))) {
+    const at = `${path}.${id}`
+    if (!OUTFIT_ID.test(id)) throw new SaveParseError(at, 'outfit ids are positive integers')
+    const tiers: Record<string, WindowRecord> = {}
+    for (const [key, rec] of Object.entries(object(raw, at, Object.keys((raw as Obj | null) ?? {})))) {
+      const rp = `${at}.${key}`
+      if (!/^[1-9]\d{0,2}$/.test(key)) throw new SaveParseError(rp, 'tier keys are positive integers')
+      const r = object(rec, rp, ['steps', 'champions'])
+      if (!validSteps(r.steps)) throw new SaveParseError(`${rp}.steps`, 'expected 31 three-character day codes')
+      const champions = count(r.champions, `${rp}.champions`)
+      if (champions > WINDOW_CHAMPIONS_MAX) throw new SaveParseError(`${rp}.champions`, `expected 0–${WINDOW_CHAMPIONS_MAX}`)
+      tiers[key] = { steps: r.steps, champions }
+    }
+    out[id] = tiers
+  }
+  return out
 }
 
 function parseCraft(value: unknown, path: string): ProfessionLevel {
@@ -1170,8 +1236,9 @@ function parseClassesV3(value: unknown, path: string): ClassesV3Record {
  * Umas, ranks and seats read v32's, and it may hold the class reset's record. */
 function parseTierWorldV28(value: unknown, path: string, tier: number, check: CheckBattle): TierWorld {
   const v32 = rpgRework('classes')
+  const v35 = collectionsLive()
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'targets', 'heroes', 'rift', 'grant',
-    ...(v32 ? ['classesV3'] : [])])
+    ...(v32 ? ['classesV3'] : []), ...(v35 ? ['drills'] : [])])
   const umas = parseUmas(w.umas, `${path}.umas`, { tier })
   object(w.buildings, `${path}.buildings`, [])
   return {
@@ -1181,6 +1248,7 @@ function parseTierWorldV28(value: unknown, path: string, tier: number, check: Ch
     targets: parseTargets(w.targets, `${path}.targets`, umas), heroes: parseHeroes(w.heroes, `${path}.heroes`, umas),
     rift: parseRift(w.rift, `${path}.rift`, tier, umas, check), grant: parseGrant(w.grant, `${path}.grant`),
     ...(w.classesV3 === undefined ? {} : { classesV3: parseClassesV3(w.classesV3, `${path}.classesV3`) }),
+    ...(v35 ? { drills: parseDrills(w.drills, `${path}.drills`) } : {}),
   }
 }
 
@@ -1385,9 +1453,12 @@ function checkRiftFight(battle: RiftBattle, path: string, runs: readonly RiftRun
 function parseRift(value: unknown, path: string, tier: number, umas: Record<string, OwnedUma>, check: CheckBattle): RiftState {
   const r = object(value, path, ['runs', 'echoes', 'battle', 'battles'])
   const runs = list(r.runs, `${path}.runs`, 0, MAX_RIFT_RUNS).map((run, i) => parseRiftRun(run, `${path}.runs.${i}`, riftRunId(tier, i + 1)))
+  // From save v35 (D283, CO18) a run is done once it's won, and its twenty ascend one by one; before, a won run waited
+  // for its twenty's Ascend together.
+  const done = (run: RiftRun) => (collectionsLive() ? run.wonAt !== null || run.ascendedAt !== null : run.ascendedAt !== null)
   runs.forEach((run, i) => {
-    if (run.ascendedAt !== null) return
-    if (i < runs.length - 1) throw new SaveParseError(`${path}.runs.${i}.ascendedAt`, 'only the last run may be open')
+    if (done(run)) return
+    if (i < runs.length - 1) throw new SaveParseError(`${path}.runs.${i}.${collectionsLive() ? 'wonAt' : 'ascendedAt'}`, 'only the last run may be open')
     const stray = run.roster.find((id) => !umas[id])
     if (stray) throw new SaveParseError(`${path}.runs.${i}.roster`, `outfit ${stray} isn't owned in this world`)
   })
@@ -1489,7 +1560,8 @@ function checkAccountRefs(account: Account, worlds: Record<string, TierWorld>, p
       const at = `${path}.history.${id}.${i}.run`
       const found = riftRunOf(worlds, e.run)
       if (!found || found.tier !== e.tier - 1) throw new SaveParseError(at, `expected a Tier ${e.tier - 1} run`)
-      if (found.run.ascendedAt === null) throw new SaveParseError(at, `run ${e.run} hasn't ascended`)
+      // From save v35 each Uma ascends on her own once her run is won (D283).
+      if (collectionsLive() ? found.run.wonAt === null : found.run.ascendedAt === null) throw new SaveParseError(at, `run ${e.run} hasn't ${collectionsLive() ? 'been won' : 'ascended'}`)
       if (!found.run.roster.includes(id)) throw new SaveParseError(at, `outfit ${id} isn't on run ${e.run}'s roster`)
     })
     const last = entries.at(-1)!
@@ -1543,13 +1615,22 @@ function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migr
   // world-only. Like the world steps, they overwrite.
   const rawAccount = version < 24 && typeof o.account === 'object' && o.account !== null && !Array.isArray(o.account)
     ? { ...o.account, ...(version < 23 ? { achievements: {}, history: {} } : {}), defeated: {} } : o.account
-  const a = object(rawAccount, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history', 'defeated'])
+  // Save v35 (D283): the windows and when their credit ran, added empty to an older save, whose credit is still to come.
+  const live = collectionsLive()
+  const withWindows = live && version < 35 && typeof rawAccount === 'object' && rawAccount !== null && !Array.isArray(rawAccount)
+    ? { ...rawAccount, windows: {}, windowsStart: null } : rawAccount
+  const a = object(withWindows, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history', 'defeated',
+    ...(live ? ['windows', 'windowsStart'] : [])])
   const trainerName = typeof a.trainerName === 'string' ? normalizeTrainerName(a.trainerName) : null
   if (!trainerName || trainerName !== a.trainerName) throw new SaveParseError(`${path}.account.trainerName`, `must be 1–${TRAINER_NAME_MAX} trimmed characters`)
   const account: Account = {
     trainerName, createdAt: timestamp(a.createdAt, `${path}.account.createdAt`), updatedAt: timestamp(a.updatedAt, `${path}.account.updatedAt`),
     achievements: parseAchievements(a.achievements, `${path}.account.achievements`), history: parseHistory(a.history, `${path}.account.history`),
     defeated: parseDefeated(a.defeated, `${path}.account.defeated`),
+    ...(live ? {
+      windows: parseWindows(a.windows, `${path}.account.windows`),
+      windowsStart: a.windowsStart === null ? null : timestamp(a.windowsStart, `${path}.account.windowsStart`),
+    } : {}),
   }
   const worlds = object(o.tierWorlds, `${path}.tierWorlds`, Object.keys((o.tierWorlds as Obj | null) ?? {}))
   const tierWorlds: Record<string, TierWorld> = {}

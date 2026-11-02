@@ -43,6 +43,10 @@ export * from './items/lines'
 export * from './items/stock-id'
 export * from './rpg'
 export * from './rift/state'
+// The collections (D283, H152): the board's catalog, the switch and the record's codes; the rules are `@rpg/domain/windows`.
+export * from './rpg/windows'
+export * from './save/collections'
+export * from './save/window-record'
 // The achievement catalog's words and art (H49); its earning rules reach the app through the Rift's own subpath.
 export { ACHIEVEMENTS, achievementDef, FRONT_NAME, type AchievementDef, type AchievementGrant } from './rift/achievements'
 export * from './hub/places'

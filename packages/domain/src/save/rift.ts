@@ -26,6 +26,8 @@ import { ownGear } from './forge'
 import { SaveRuleError, TIER_ONE, TIERS, tierKey, worldOf } from './rules'
 import { gearV1, isGrades, MAX_DEFEATED, newOwnedUma, newTierWorld, PARTY_SIZE, type Account, type OwnedUma, type Party, type Save, type TierWorld } from './save'
 import { workOf } from './status'
+import { recordRiftWin, tierHasRift, windowFull } from './windows'
+import { emptyWindow } from './window-record'
 
 /** Echoes pay this many times a stage's Class and gear rank EXP (R6). */
 export const ECHO_RANK_PAY = 2
@@ -342,7 +344,9 @@ function settleRiftFight(save: Save, battle: RiftBattle, state: BattleState, ros
   const achievements = { ...save.account.achievements }
   for (const grant of result.earned) achievements[grant.id] = { at: now, run: grant.run }
   return {
-    save: { ...save, account: { ...save.account, updatedAt: now, defeated, achievements }, tierWorlds: { ...save.tierWorlds, [tier]: { ...next, rift } } },
+    // The run's win lights the Rift step for its twenty (D283; nothing while the collections are dark).
+    save: recordRiftWin({ ...save, account: { ...save.account, updatedAt: now, defeated, achievements }, tierWorlds: { ...save.tierWorlds, [tier]: { ...next, rift } } },
+      tier, result.runWon && run ? run.roster : [], now),
     result,
   }
 }
@@ -562,15 +566,25 @@ function arrivingGrades(uma: OwnedUma, to: number): UmaGrades {
 export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; summary: AscendSummary } {
   const block = ascendBlock(save, tier)
   if (block) throw new SaveRuleError(block.startsWith('Recall') ? 'busy' : 'cannot-fight', block)
+  const run = openRiftRun(worldOf(save, tier).rift)!
+  return moveUp(save, tier, run.roster, now, () => run.id, (rift) => withLastRun(rift, { ...run, ascendedAt: now }), seatArrivals)
+}
+
+/**
+ * The move up itself (R7), for any of this world's Umas: what `ascend` does for a run's twenty and `ascendUmas` for the
+ * Umas whose windows are full (D283). `runOf` names the run each one's history records; `rift` is the old world's Rift
+ * after they go; `seat` places them in the new world's parties.
+ */
+function moveUp(save: Save, tier: string, ids: readonly string[], now: string, runOf: (id: string) => string, rift: (r: RiftState) => RiftState,
+  seat: (parties: readonly Party[], moved: readonly Party[], ids: readonly string[]) => Party[]): { save: Save; summary: AscendSummary } {
   const from = Number(tier), to = from + 1, toKey = tierKey(to)
   const world = worldOf(save, tier)
-  const run = openRiftRun(world.rift)!
-  const leaving = new Set(run.roster)
+  const leaving = new Set(ids)
   // The old world: they leave, and their gear stays in its stock (D15), or their grades' made items in its Warehouse.
   const umas = { ...world.umas }, mp = { ...world.world.run.mp }, work = { ...world.work }, items = { ...world.items }
   const gear = world.gear ? { ...world.gear } : undefined
   let classMarks = 0
-  for (const id of run.roster) {
+  for (const id of ids) {
     const uma = world.umas[id]!
     if (gear) for (const piece of ownGear(uma)) gear[piece] = (gear[piece] ?? 0) + 1
     for (const item of gradeItemsUsed(uma)) items[item] = (items[item] ?? 0) + 1
@@ -580,38 +594,88 @@ export function ascend(save: Save, now: string, tier = TIER_ONE): { save: Save; 
     delete work[id]
   }
   const heroes: TierWorld['heroes'] = {}
-  for (const [seat, held] of Object.entries(world.heroes) as [keyof TierWorld['heroes'], NonNullable<TierWorld['heroes'][keyof TierWorld['heroes']]>][]) {
+  for (const [seatId, held] of Object.entries(world.heroes) as [keyof TierWorld['heroes'], NonNullable<TierWorld['heroes'][keyof TierWorld['heroes']]>][]) {
     if (leaving.has(held.hero)) continue
-    heroes[seat] = { hero: held.hero, learners: held.learners.filter((l) => !leaving.has(l)) }
+    heroes[seatId] = { hero: held.hero, learners: held.learners.filter((l) => !leaving.has(l)) }
   }
   const { parties, moved } = emptyParties(world.parties, leaving)
   const old: TierWorld = {
     ...world, umas, items, ...(gear ? { gear } : {}), work, heroes, parties, targets: world.targets.filter((id) => !leaving.has(id)),
     world: { ...world.world, run: { ...world.world.run, mp } },
-    rift: withLastRun(world.rift, { ...run, ascendedAt: now }),
+    rift: rift(world.rift),
   }
   // The new world: each at Lv 1 with her class, armor halves and calling pick; the purse and the banked EXP's Marks. From
   // v19 (Classes v3, CV10; H126) a Tier 0 arrives with no class, her suggested promotion there (`activeClass`); a Tier 1
   // class arrives as it is; no Tier 0 track or setup goes up.
   const base = save.tierWorlds[toKey] ?? newTierWorld(now, 0)
-  const arrivals = Object.fromEntries(run.roster.map((id) => {
+  const arrivals = Object.fromEntries(ids.map((id) => {
     const uma = world.umas[id]!
     const fresh = newOwnedUma(uma.unlockedAt)
     const gearOut = isGrades(uma.gear) ? arrivingGrades(uma, to) : { ...gearV1(fresh), kinds: { ...gearV1(uma).kinds } }
     const classId = rpgRework('classes') && uma.classId !== null && rpgIsTier0(uma.classId) ? null : uma.classId
     return [id, { ...fresh, classId, gear: gearOut, ...(uma.calling ? { calling: { ...uma.calling } } : {}) }]
   }))
-  const n = run.roster.length
+  const n = ids.length
   const laurels = ASCEND_PURSE.laurels * n, speedTickets = ASCEND_PURSE.speedTickets * n
   const up: TierWorld = {
-    ...base, umas: { ...base.umas, ...arrivals }, parties: seatArrivals(base.parties, moved, run.roster),
+    ...base, umas: { ...base.umas, ...arrivals }, parties: seat(base.parties, moved, ids),
     wallet: { ...base.wallet, laurels: base.wallet.laurels + laurels, timeTickets: base.wallet.timeTickets + speedTickets,
       classMarks: base.wallet.classMarks + classMarks },
   }
   const history = { ...save.account.history }
-  for (const id of run.roster) history[id] = [...(history[id] ?? []), { tier: to, at: now, run: run.id }]
+  for (const id of ids) history[id] = [...(history[id] ?? []), { tier: to, at: now, run: runOf(id) }]
   return {
     save: { ...save, account: { ...save.account, updatedAt: now, history }, tierWorlds: { ...save.tierWorlds, [tier]: old, [toKey]: up } },
-    summary: { from, to, umas: [...run.roster], laurels, speedTickets, classMarks },
+    summary: { from, to, umas: [...ids], laurels, speedTickets, classMarks },
   }
+}
+
+// --- Ascend one Uma at a time (collections.md §5, D283, H152) --------------------------------------------------------
+
+/** The latest won run with her on its roster: the run her Rift step and her history name. */
+function herWonRun(world: TierWorld, id: string): RiftRun | null {
+  return [...world.rift.runs].reverse().find((run) => run.wonAt !== null && run.roster.includes(id)) ?? null
+}
+
+/** Why these Umas can't ascend, or null (save v35): each here with a full window in this tier and a won run, no Rift or
+ * world-map fight open, none at work, and a tier above. `name` names the ones that block. */
+export function ascendUmasBlock(save: Save, ids: readonly string[], tier = TIER_ONE, name: (outfitId: string) => string = (id) => id): string | null {
+  const world = save.tierWorlds[tier]
+  if (!world) return 'No such tier'
+  if (!tierHasRift(Number(tier))) return 'No tier above this one yet'
+  if (ids.length === 0) return 'Pick an Uma'
+  if (new Set(ids).size !== ids.length) return 'An Uma is picked twice'
+  if (ids.some((id) => !world.umas[id])) return 'Only this tier’s Umas'
+  if (world.rift.battle) return 'Finish the open Rift fight first'
+  if (openFightOf(world)) return 'Finish the open fight first'
+  const dark = ids.filter((id) => !windowFull(save.account.windows?.[id]?.[tier] ?? emptyWindow(), Number(tier)) || !herWonRun(world, id))
+  if (dark.length) return `Window not full: ${dark.map(name).join(', ')}`
+  const working = ids.filter((id) => workOf(world, id) !== null)
+  if (working.length) return `Recall or collect: ${working.map(name).join(', ')}`
+  return null
+}
+
+/** Seats arrivals one by one (save v35): a party whose five came up together keeps its name; each other Uma takes the
+ * first free slot. */
+function seatEach(parties: readonly Party[], moved: readonly Party[], ids: readonly string[]): Party[] {
+  const next = seatArrivals(parties, moved, [])
+  const placed = new Set(moved.flatMap((p) => p.slots.filter((s): s is string => s !== null)).filter((id) => next.some((p) => p.slots.includes(id))))
+  for (const id of ids) {
+    if (placed.has(id)) continue
+    const at = next.findIndex((p) => p.slots.includes(null))
+    if (at < 0) break
+    const slots = [...next[at]!.slots]
+    slots[slots.indexOf(null)] = id
+    next[at] = { ...next[at]!, slots }
+  }
+  return next
+}
+
+/** Ascends these Umas (save v35, D283): each as `ascend` sends a run's twenty, her history naming her won run. The
+ * Rift's runs don't change. Throws SaveRuleError for `ascendUmasBlock`'s reasons. */
+export function ascendUmas(save: Save, ids: readonly string[], now: string, tier = TIER_ONE): { save: Save; summary: AscendSummary } {
+  const block = ascendUmasBlock(save, ids, tier)
+  if (block) throw new SaveRuleError(block.startsWith('Recall') ? 'busy' : 'cannot-fight', block)
+  const world = worldOf(save, tier)
+  return moveUp(save, tier, ids, now, (id) => herWonRun(world, id)!.id, (rift) => rift, seatEach)
 }

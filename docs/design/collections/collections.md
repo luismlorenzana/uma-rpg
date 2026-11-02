@@ -478,7 +478,7 @@ Two new places on the drill ground beside the Scenario Gate and the Rift:
 
 | Where | What | Size |
 |---|---|---|
-| `account.windows[outfitId][tier]` | `steps`: 31 day codes in a fixed order, three base-36 characters each ("---" unlit), days since 2026-01-01; `champions`: a 15-bit mask of the tier's capital champions she has beaten | about 110 bytes an Uma a tier; 30 KB for 270 Umas in one tier |
+| `account.windows[outfitId][tier]` | `steps`: 31 day codes in a fixed order, three base-36 characters each ("---" unlit), days since 2026-01-01; `champions`: a 15-bit mask of the tier's capital champions she has beaten | about 140 bytes an Uma a tier; 38 KB for 270 Umas in one tier, every step lit (measured, H152) |
 | `world.drills` | `day` (the last 04:00 turned), `runs` (0–30), `won` (Drill id → date) | tens of bytes |
 | `wallet.trainingLogs` | Logs held | — |
 | `rift.runs[]` | A run is done at its win; `ascendedAt` becomes per Uma (the account's history already says who ascended and when) | — |

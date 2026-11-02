@@ -3,6 +3,7 @@
 // small constants and the selectors the Hub, the Tier sheet and the quick look read.
 import type { BattleAction, BattleInput } from '../rpg/battle/types'
 import { RPG_TIER_MAX_LEVEL } from '../rpg/rules'
+import { collectionsLive } from '../save/collections'
 
 /** The four fronts (rift.md §5). */
 export const RIFT_FRONTS = ['iron', 'arcane', 'duel', 'horde'] as const
@@ -72,10 +73,17 @@ export function riftLevel50s(world: { umas: Readonly<Record<string, { level: num
 export function riftOpen(world: { umas: Readonly<Record<string, { level: number }>> }, tier: number): boolean {
   return (RIFT_TIERS as readonly number[]).includes(tier) && riftLevel50s(world) >= RIFT_OPEN_AT
 }
-/** The world's current run: its last, until it ascends (won or not), else null. */
+/** The world's current run: its last, until it ascends (won or not), else null. From save v35 (D283, CO18) a run is done
+ * once it's won, since its twenty ascend one by one: then the current run is its last until won. */
 export function openRiftRun(rift: Pick<RiftState, 'runs'>): RiftRun | null {
   const last = rift.runs.at(-1)
-  return last && last.ascendedAt === null ? last : null
+  if (!last || last.ascendedAt !== null) return null
+  return collectionsLive() && last.wonAt !== null ? null : last
+}
+
+/** The world's last won run, the one whose twenty may still be ascending (save v35), or null. */
+export function lastWonRiftRun(rift: Pick<RiftState, 'runs'>): RiftRun | null {
+  return [...rift.runs].reverse().find((run) => run.wonAt !== null) ?? null
 }
 export const riftRunId = (tier: number, n: number): string => `t${tier}-r${n}`
 /** `rift:t<tier>:<n>`, n counting this world's Rift fights from 1. */

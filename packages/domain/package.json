@@ -67,6 +67,16 @@
         "default": "./src/save/observatory.ts"
       }
     },
+    "./windows": {
+      "require": {
+        "types": "./dist/cjs/save/windows.d.ts",
+        "default": "./dist/cjs/save/windows.js"
+      },
+      "default": {
+        "types": "./src/save/windows.ts",
+        "default": "./src/save/windows.ts"
+      }
+    },
     "./forge": {
       "require": {
         "types": "./dist/cjs/save/forge.d.ts",

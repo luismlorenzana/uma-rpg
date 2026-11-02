@@ -1,0 +1,205 @@
+// What lights a window (collections.md §3–§5, §9; D283, H152): the steps an Uma's state meets, latched into the account
+// so they stay lit through resets, class switches and ascending; the switch's credit for what came before; and the view
+// the screens read. Dark until save v35 (`collectionsLive`).
+import { RPG_TIER1_CLASSES } from '../rpg/class-tree'
+import { RPG_TIER0_CLASSES } from '../rpg/kinds'
+import {
+  WINDOW_CLASS_NTH, WINDOW_CLASS_RANKS, WINDOW_GRADES, WINDOW_LEVELS, WINDOW_STEP_IDS, WINDOW_TRACKS, windowBoard, type WindowNumeral, type WindowStepId,
+  type WindowTrack,
+} from '../rpg/windows'
+import { ARMOR_SLOTS } from '../economy/ranks'
+import { withHerMoon } from '../economy/planet'
+import { capitalStageIds } from '../world/capital'
+import { activeClass, classOf, type BattleOutfit } from './class'
+import { collectionsLive } from './collections'
+import { TIERS } from './rules'
+import { gradesOf, starMapOf, type OwnedUma, type Save, type TierWorld } from './save'
+import { championBit, championsWon, codeDay, emptyWindow, stepCode, withSteps, WINDOW_DARK, type WindowRecord, type WindowRecords } from './window-record'
+
+/** Whether a tier has a Rift: a tier above it to ascend into. */
+export const tierHasRift = (tier: number): boolean => TIERS.some((t) => t.tier === tier + 1)
+
+/** A tier's board, its Rift by the tier list. */
+export const boardOf = (tier: number) => windowBoard(tier, tierHasRift(tier))
+
+const NUMERALS: readonly WindowNumeral[] = [1, 2, 3, 4, 5]
+
+/** Her ranks in the Tier 1 classes, best first; a class she hasn't touched stands at 1. */
+function tier1Ranks(uma: Pick<OwnedUma, 'ranks'>): number[] {
+  return RPG_TIER1_CLASSES.map((c) => uma.ranks.classes[c]?.rank ?? 1).sort((a, b) => b - a)
+}
+
+/** The lowest grade of her eleven worn slots: the three weapons of the class she fights as, five armor, three accessories. */
+export function wornFloor(uma: OwnedUma, outfit: BattleOutfit, tier: number): number {
+  const grades = gradesOf(uma)
+  const weapons = classOf(uma, activeClass(outfit, uma, tier)).weapons
+  const all = [
+    ...weapons.map((w) => grades.weapons[w]?.grade ?? 0),
+    ...ARMOR_SLOTS.map((s) => grades.armor[s]?.grade ?? 0),
+    ...grades.accessories.map((a) => a.grade),
+  ]
+  return all.length === 0 ? 0 : Math.min(...all)
+}
+
+/** Stars n: every Planet and moon node numbered n or less, and her moon's I from II and II from IV. */
+function starsMet(uma: OwnedUma, n: WindowNumeral): boolean {
+  const open = new Set(withHerMoon(starMapOf(uma).open))
+  for (const body of ['planet', 'prowess', 'vigor', 'guard']) for (let i = 1; i <= n; i++) if (!open.has(`${body}:${i}`)) return false
+  return (n < 2 || open.has('template:1')) && (n < 4 || open.has('template:2'))
+}
+
+/** The steps her state meets now, in her world's `tier`, with her champions mask for World. The Rift is never read from
+ * state: only a won run lights it. */
+export function windowMet(uma: OwnedUma, outfit: BattleOutfit, tier: number, champions: number): Set<WindowStepId> {
+  const met = new Set<WindowStepId>()
+  const t1 = tier1Ranks(uma)
+  const t0 = Math.max(...RPG_TIER0_CLASSES.map((c) => uma.ranks.classes[c]?.rank ?? 1))
+  const floor = wornFloor(uma, outfit, tier)
+  for (const n of NUMERALS) {
+    const i = n - 1
+    if (uma.level >= WINDOW_LEVELS[i]!) met.add(`level-${n}`)
+    if (uma.craft.level >= WINDOW_LEVELS[i]!) met.add(`craft-${n}`)
+    const rank = t1[WINDOW_CLASS_NTH[i]! - 1] ?? 1
+    if (n === 1 ? (tier === 1 && t0 >= WINDOW_CLASS_RANKS[0]) || rank >= WINDOW_CLASS_RANKS[0] : rank >= WINDOW_CLASS_RANKS[i]!) met.add(`class-${n}`)
+    if (floor >= WINDOW_GRADES[i]!) met.add(`gear-${n}`)
+    if (starsMet(uma, n)) met.add(`stars-${n}`)
+    if (championsWon(champions, n)) met.add(`world-${n}`)
+  }
+  return met
+}
+
+/** Whether every step of the tier's board is lit. */
+export function windowFull(record: WindowRecord, tier: number): boolean {
+  return boardOf(tier).every((step) => stepCode(record, step.id) !== WINDOW_DARK)
+}
+
+const recordOf = (windows: WindowRecords | undefined, outfitId: string, tier: string): WindowRecord =>
+  windows?.[outfitId]?.[tier] ?? emptyWindow()
+
+/** The windows with one record replaced, or the same object when it's the one already there. */
+function put(windows: WindowRecords, outfitId: string, tier: string, record: WindowRecord): WindowRecords {
+  if (windows[outfitId]?.[tier] === record) return windows
+  return { ...windows, [outfitId]: { ...windows[outfitId], [tier]: record } }
+}
+
+/** Her record with what her state meets latched, and, once full without a Rift (Tier 3), the Rift's place too, so the
+ * window stays full if a Rift arrives (CO33). */
+function latchOne(record: WindowRecord, uma: OwnedUma, outfit: BattleOutfit, tier: number, now: string): WindowRecord {
+  let next = withSteps(record, windowMet(uma, outfit, tier, record.champions), now)
+  if (!tierHasRift(tier) && windowFull(next, tier)) next = withSteps(next, ['rift'], now)
+  return next
+}
+
+/** The switch's credit (collections.md §9): World for an Uma at its continent's top level in a world that has won all
+ * three champions, the Rift for every roster of a won run, and a full window for each tier an Uma ascended from. */
+function credit(save: Save, outfits: ReadonlyMap<string, BattleOutfit>, now: string): WindowRecords {
+  let windows: WindowRecords = { ...save.account.windows }
+  for (const [key, world] of Object.entries(save.tierWorlds)) {
+    const tier = Number(key)
+    const first = 5 * (tier - 1) + 1
+    const won = (n: number) => [1, 2, 3].every((route) => (world.world.run.wins[capitalStageIds(`w${first + n - 1}`, route).champion] ?? 0) > 0)
+    for (const [id, uma] of Object.entries(world.umas)) {
+      let record = recordOf(windows, id, key)
+      let mask = record.champions
+      for (const n of NUMERALS) {
+        if (uma.level >= WINDOW_LEVELS[n - 1]! && won(n)) for (const route of [1, 2, 3]) mask |= championBit(n, route)
+      }
+      if (mask !== record.champions) record = { ...record, champions: mask }
+      for (const run of world.rift.runs) if (run.wonAt !== null && run.roster.includes(id)) record = withSteps(record, ['rift'], run.wonAt)
+      const outfit = outfits.get(id)
+      if (outfit) record = latchOne(record, uma, outfit, tier, now)
+      windows = put(windows, id, key, record)
+    }
+  }
+  for (const [id, entries] of Object.entries(save.account.history)) {
+    for (const entry of entries) {
+      const from = String(entry.tier - 1)
+      const full = withSteps(recordOf(windows, id, from), WINDOW_STEP_IDS, entry.at)
+      windows = put(windows, id, from, { ...full, champions: 2 ** 15 - 1 })
+    }
+  }
+  return windows
+}
+
+/**
+ * Every Uma's window with what her state meets latched (CO2, CO10), on `now`'s day. The first time it runs on a save
+ * (`windowsStart` null) it pays the switch's credit first. A step never goes dark. Returns the same save when nothing
+ * changed, so a commit can skip the write; `updatedAt` doesn't move, since any device works out the same steps from the
+ * same state, and the steps ride with the change that lit them. An Uma whose outfit isn't in `outfits` yet waits.
+ */
+export function latchWindows(save: Save, outfits: ReadonlyMap<string, BattleOutfit>, now: string): Save {
+  if (!collectionsLive() || !save.account.windows) return save
+  if (save.account.windowsStart === null || save.account.windowsStart === undefined) {
+    return { ...save, account: { ...save.account, windows: credit(save, outfits, now), windowsStart: now } }
+  }
+  let windows = save.account.windows
+  for (const [key, world] of Object.entries(save.tierWorlds)) {
+    for (const [id, uma] of Object.entries(world.umas)) {
+      const outfit = outfits.get(id)
+      if (!outfit) continue
+      windows = put(windows, id, key, latchOne(recordOf(windows, id, key), uma, outfit, Number(key), now))
+    }
+  }
+  return windows === save.account.windows ? save : { ...save, account: { ...save.account, windows } }
+}
+
+/** A won capital champion stage's bit for the party (D283 decision 5), in the world's tier; any other stage, the save. */
+export function recordChampion(save: Save, tier: string, stageId: string, outfitIds: readonly string[]): Save {
+  if (!collectionsLive() || !save.account.windows) return save
+  const m = /^w(\d+)-capital-r([1-3])-s2$/.exec(stageId)
+  if (!m) return save
+  const continent = Number(m[1]) - 5 * (Number(tier) - 1)
+  if (continent < 1 || continent > 5) return save
+  const bit = championBit(continent, Number(m[2]))
+  let windows = save.account.windows
+  for (const id of outfitIds) {
+    const record = recordOf(windows, id, tier)
+    if (Math.floor(record.champions / bit) % 2 === 1) continue
+    windows = put(windows, id, tier, { ...record, champions: record.champions + bit })
+  }
+  return windows === save.account.windows ? save : { ...save, account: { ...save.account, windows } }
+}
+
+/** The Rift's step for a won run's twenty (D283 decision 6). */
+export function recordRiftWin(save: Save, tier: string, roster: readonly string[], now: string): Save {
+  if (!collectionsLive() || !save.account.windows) return save
+  let windows = save.account.windows
+  for (const id of roster) windows = put(windows, id, tier, withSteps(recordOf(windows, id, tier), ['rift'], now))
+  return windows === save.account.windows ? save : { ...save, account: { ...save.account, windows } }
+}
+
+export interface WindowTrackView { track: WindowTrack | 'rift'; lit: number; total: number; percent: number }
+export interface WindowView {
+  tier: number
+  /** Her board's steps in order, each with the day it lit. */
+  steps: { id: WindowStepId; track: WindowTrack | 'rift'; numeral: WindowNumeral | null; rule: string; day: string | null }[]
+  lit: number
+  total: number
+  /** Rounded, for "14/31 · 45%" (CO36). */
+  percent: number
+  tracks: WindowTrackView[]
+  full: boolean
+  champions: number
+}
+
+const percentOf = (lit: number, total: number): number => (total === 0 ? 0 : Math.round((100 * lit) / total))
+
+/** What the screens read of her window in a tier. */
+export function windowOf(save: Save, outfitId: string, tier: number): WindowView {
+  const record = recordOf(save.account.windows, outfitId, String(tier))
+  const steps = boardOf(tier).map((step) => ({ ...step, day: codeDay(stepCode(record, step.id)) }))
+  const lit = steps.filter((s) => s.day !== null).length
+  const tracks = [...WINDOW_TRACKS, ...(tierHasRift(tier) ? ['rift' as const] : [])].map((track) => {
+    const own = steps.filter((s) => s.track === track)
+    const on = own.filter((s) => s.day !== null).length
+    return { track, lit: on, total: own.length, percent: percentOf(on, own.length) }
+  })
+  return { tier, steps, lit, total: steps.length, percent: percentOf(lit, steps.length), tracks, full: lit === steps.length, champions: record.champions }
+}
+
+/** The world's ready Umas: a full window here and a tier above to go to. */
+export function readyToAscend(save: Save, tier: number): string[] {
+  const world: TierWorld | undefined = save.tierWorlds[String(tier)]
+  if (!world || !tierHasRift(tier)) return []
+  return Object.keys(world.umas).filter((id) => windowFull(recordOf(save.account.windows, id, String(tier)), tier))
+}

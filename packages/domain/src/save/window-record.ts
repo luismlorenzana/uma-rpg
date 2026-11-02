@@ -1,0 +1,66 @@
+// A window's record in the save (collections.md §8, D283): kept small, because the save is one document. Each step is
+// three base-36 characters in the catalog's order, the day it lit as days since 2026-01-01 (UTC), `---` while dark; the
+// capital champions she has beaten are a 15-bit mask. No save import here, so `save.ts` can parse it without a cycle.
+import { WINDOW_ROUTES, WINDOW_STEP_IDS, WINDOW_STEPS_MAX, type WindowStepId } from '../rpg/windows'
+
+export interface WindowRecord {
+  /** `WINDOW_STEPS_MAX` × 3 characters. */
+  steps: string
+  /** Bit 3 × (n − 1) + (route − 1): continent n of her tier's five, route 1–3. */
+  champions: number
+}
+
+/** The account's windows: by outfit id, then by tier key ("1", "2"…). */
+export type WindowRecords = Record<string, Record<string, WindowRecord>>
+
+const EPOCH = Date.UTC(2026, 0, 1)
+const DAY = 86_400_000
+export const WINDOW_DARK = '---'
+export const WINDOW_CODE = /^(?:---|[0-9a-z]{3})$/
+export const WINDOW_STEPS_LENGTH = WINDOW_STEPS_MAX * 3
+export const WINDOW_CHAMPIONS_MAX = 2 ** (5 * WINDOW_ROUTES) - 1
+
+export const emptyWindow = (): WindowRecord => ({ steps: WINDOW_DARK.repeat(WINDOW_STEPS_MAX), champions: 0 })
+
+/** The day a time falls on, as the record's code. */
+export function dayCode(now: string): string {
+  const days = Math.max(0, Math.floor((Date.parse(now) - EPOCH) / DAY))
+  return days.toString(36).padStart(3, '0')
+}
+
+/** A code's day, `YYYY-MM-DD` (UTC), or null while dark. */
+export const codeDay = (code: string): string | null =>
+  code === WINDOW_DARK ? null : new Date(EPOCH + parseInt(code, 36) * DAY).toISOString().slice(0, 10)
+
+const indexOf = (id: WindowStepId): number => WINDOW_STEP_IDS.indexOf(id)
+
+/** A step's code in a record. */
+export const stepCode = (record: WindowRecord, id: WindowStepId): string => record.steps.slice(indexOf(id) * 3, indexOf(id) * 3 + 3)
+
+/** The day a step lit, or null. */
+export const stepDay = (record: WindowRecord, id: WindowStepId): string | null => codeDay(stepCode(record, id))
+
+/** The record with these steps lit on `now`'s day; a step already lit keeps its day. The same object when none is new. */
+export function withSteps(record: WindowRecord, ids: Iterable<WindowStepId>, now: string, code = dayCode(now)): WindowRecord {
+  let steps = record.steps
+  for (const id of ids) {
+    const i = indexOf(id) * 3
+    if (steps.slice(i, i + 3) !== WINDOW_DARK) continue
+    steps = steps.slice(0, i) + code + steps.slice(i + 3)
+  }
+  return steps === record.steps ? record : { ...record, steps }
+}
+
+/** The bit of continent n's route (1–3) in her tier's mask. */
+export const championBit = (continent: number, route: number): number => 2 ** (WINDOW_ROUTES * (continent - 1) + (route - 1))
+
+/** Whether all three of continent n's champions are in the mask. */
+export const championsWon = (mask: number, continent: number): boolean =>
+  [1, 2, 3].every((route) => Math.floor(mask / championBit(continent, route)) % 2 === 1)
+
+/** Whether a string is a well-formed record's steps. */
+export function validSteps(steps: unknown): steps is string {
+  if (typeof steps !== 'string' || steps.length !== WINDOW_STEPS_LENGTH) return false
+  for (let i = 0; i < steps.length; i += 3) if (!WINDOW_CODE.test(steps.slice(i, i + 3))) return false
+  return true
+}

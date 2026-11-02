@@ -2,6 +2,7 @@
 // imports this chain only for a save older than the current version; only the API's sync `parseSave` imports it statically,
 // and the web never calls that, so it stays out of the main bundle (H136, scripts/check-size.mjs).
 import { FACILITY_SLOTS, grantProfessionExp, itemMinutes, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
+import { COLLECTIONS_SAVE, collectionsLive } from './collections'
 import { facilitySpec } from '../economy/jobs'
 import { gemIdentity, isStarNode, nodeGem } from '../economy/stars'
 import { ITEM_IDENTITIES as ITEM_FAMILIES, isItemId } from '../items/identity'
@@ -203,7 +204,8 @@ function toV16(world: Record<string, unknown>): Record<string, unknown> {
   return w
 }
 
-/** Every step to v34 for a world of `tier` (v33 → v34, the three accessory slots, since D264). */
+/** Every step to v34 for a world of `tier` (v33 → v34, the three accessory slots, since D264), and to v35 once the
+ * collections are live (D283; H157 bumps the version, which chains it). */
 export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v27 = migrateWorldToV27(raw, version)
   const v28 = version < 28 && isRecord(v27) ? toV28(v27, tier) : v27
@@ -212,7 +214,8 @@ export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v31 = version < 31 && isRecord(v30) ? toV31(v30) : v30
   const v32 = version < 32 && isRecord(v31) ? toV32(v31, tier) : v31
   const v33 = version < 33 && isRecord(v32) ? toV33(v32) : v32
-  return version < 34 && isRecord(v33) ? toV34(v33) : v33
+  const v34 = version < 34 && isRecord(v33) ? toV34(v33) : v33
+  return version < COLLECTIONS_SAVE && collectionsLive() && isRecord(v34) ? toV35(v34) : v34
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
@@ -1303,4 +1306,16 @@ export function toV34(world: Record<string, unknown>): Record<string, unknown> {
   const items: Record<string, unknown> = isRecord(world.items) ? { ...world.items } : {}
   for (const [id, count] of Object.entries(items)) if (id.startsWith('jewel-planet-') && typeof count === 'number') items[id] = count * 3
   return { ...world, umas, ...(isRecord(world.items) ? { items } : {}) }
+}
+
+// --- v34 → v35 (D283, H152): the collections, chained once they're live (H157) ------------------------------------------
+
+/**
+ * v34 → v35 (D283). Per world: Drills with a day's runs waiting and none won, and no Training Logs. The account's windows
+ * are added in `parseSaveChecked`, which the account's steps always are, and their credit runs on the first latch, which
+ * needs the roster. Nothing else moves. Literals, as every step.
+ */
+export function toV35(world: Record<string, unknown>): Record<string, unknown> {
+  const wallet = isRecord(world.wallet) ? { ...world.wallet, trainingLogs: 0 } : world.wallet
+  return { ...world, wallet, drills: { day: null, runs: 10, won: {} } }
 }
