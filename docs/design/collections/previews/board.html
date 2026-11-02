@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Window Board</title>
+<!-- Collections (docs/design/collections/collections.md §3): every step of every tier's board, and one Uma's window over
+     her first month from an explicit model. Self-contained, uma-kit's tokens, light and dark. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd; --accent-ink: #1b1406; --info: #2f6fe0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16); --grid: #e3e8ef;
+    --s1: #2f6fe0; --s2: #c27d12;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --radius: 12px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); --grid: #243041;
+      --s1: #5b8def; --s2: #b8801f; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); --grid: #243041;
+    --s1: #5b8def; --s2: #b8801f; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 17px/1.25 ui-rounded, system-ui, sans-serif; margin: 28px 0 8px; }
+  p, li { color: var(--ink-soft); max-width: 80ch; }
+  a { color: var(--info); }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; cursor: pointer; min-height: 32px; }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--hairline-strong); margin-bottom: 12px; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .step b { display: block; color: var(--ink); }
+  .step span { color: var(--ink-soft); font-size: 12px; }
+  .step em { display: block; color: var(--ink-faint); font-size: 11px; font-style: normal; }
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 20px; margin-bottom: 8px; }
+  .controls label { font-size: 12px; color: var(--ink-soft); font-weight: 600; display: flex; justify-content: space-between; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 4px 0 6px; }
+  .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+  .chart { position: relative; }
+  .chart svg { width: 100%; height: auto; display: block; }
+  .tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgb(0 0 0 / .12); min-width: 170px; display: none; }
+  .tip b { color: var(--ink); }
+  .tip div { color: var(--ink-soft); display: flex; gap: 6px; align-items: center; }
+  .tip i { width: 10px; height: 3px; border-radius: 2px; display: inline-block; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--ink); margin: 6px 0; }
+  .note { font-size: 12px; color: var(--ink-faint); }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--sunken); font-size: 11px; font-weight: 600; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div>
+      <h1>The window's board</h1>
+      <p>31 steps a tier: six tracks of five and the Rift. Every step is a rule the game measures already, except World,
+        which needs one record a fight. <a href="../collections.md#3-her-window-the-board">Doc §3</a>.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Theme">
+      <button data-theme-btn="system" aria-pressed="true">System</button>
+      <button data-theme-btn="light" aria-pressed="false">Light</button>
+      <button data-theme-btn="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+
+  <h2>Every step</h2>
+  <div class="seg" role="group" aria-label="Tier" style="margin-bottom:10px">
+    <button data-tier="1" aria-pressed="true">Tier 1</button>
+    <button data-tier="2" aria-pressed="false">Tier 2</button>
+    <button data-tier="3" aria-pressed="false">Tier 3</button>
+  </div>
+  <div class="card scroll"><table id="board"></table><p class="note" id="boardNote"></p></div>
+
+  <h2>One Uma's window over her first month</h2>
+  <p>Two Umas, one model. <b>Fresh world:</b> she's in its first party, and the forges reach each grade when the pacing
+    ledger's fighting party holds it; the first Rift waits for four parties' campaigns and 52 fights. <b>Mature world:</b>
+    she joins a world whose forges already make G10 and whose Rift runs regularly. Both fight through the Campaign's 119
+    wins and work her own trade.</p>
+  <div class="card">
+    <div class="controls">
+      <div><label for="w">Her party's wins a day <span id="wv"></span></label><input id="w" type="range" min="5" max="60" value="20"></div>
+      <div><label for="u">Her work time <span id="uv"></span></label><input id="u" type="range" min="50" max="100" value="80"></div>
+      <div><label for="t">Trials a day after Lv 50 <span id="tv"></span></label><input id="t" type="range" min="2" max="40" value="10"></div>
+      <div><label>Craft V at</label><div class="seg" role="group" aria-label="Craft V"><button data-craft="50" aria-pressed="true">Lv 50 (CO15)</button><button data-craft="40" aria-pressed="false">Lv 40</button></div></div>
+    </div>
+    <div class="legend"><span><i style="background:var(--s1)"></i>Fresh world's first party</span><span><i style="background:var(--s2)"></i>Joins a mature world</span></div>
+    <div class="chart" id="chart"><svg id="svg" viewBox="0 0 900 360" role="img" aria-label="Steps lit by day"></svg><div class="tip" id="tip"></div></div>
+    <p class="note" id="summary"></p>
+    <details><summary>Show the numbers</summary><div class="scroll"><table id="days"></table></div></details>
+  </div>
+
+  <h2>The long pole: her own Craft Level</h2>
+  <div class="card scroll">
+    <p>Every track but Craft can be pushed by the roster: Logs level her, Trials and Manuals rank her, the forges make her
+      gear and jewels. Craft comes only from her own work, in her own trade's three places, twelve slots a trade.</p>
+    <table id="cap"></table>
+    <p class="note">Trade sizes are the 270-outfit release's callings (Classes v3 §5); the live release has two more.</p>
+  </div>
+</main>
+<script>
+(() => {
+  const root = document.documentElement
+  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.addEventListener('click', () => {
+    const t = b.dataset.themeBtn
+    t === 'system' ? root.removeAttribute('data-theme') : root.setAttribute('data-theme', t)
+    document.querySelectorAll('[data-theme-btn]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+    draw()
+  }))
+  const seg = (attr, fn) => document.querySelectorAll(`[${attr}]`).forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll(`[${attr}]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b))); fn(b.getAttribute(attr))
+  }))
+
+  // ---- The board, by tier
+  const lvGate = (g) => `Uma Lv ${5 * g - 4}`
+  function boardRows(tier) {
+    const c0 = 5 * (tier - 1)
+    return [
+      ['Level', [10, 20, 30, 40, 50].map((l) => [`Lv ${l}`, `Uma Lv ${l}`, 'Lv 1', 'Campaign · Drills\' Logs'])],
+      ['Class', [
+        tier === 1 ? ['R10', 'Her Tier 0 at Class Rank 10: ready to promote', 'Lv 1', 'First continent · 4 Manuals'] : ['R10', 'A Tier 1 class at Class Rank 10 (no Tier 0 here)', 'Lv 1', 'Campaign · Trials · Manuals'],
+        ['R30', 'A Tier 1 class at Class Rank 30', 'Promotion', 'Campaign · Trials · Manuals'],
+        ['R50', 'A Tier 1 class at Class Rank 50', 'Promotion', 'Campaign · Trials · Manuals'],
+        ['2 at R50', 'Two Tier 1 classes at Class Rank 50', 'A second class', 'A campaign\'s Class EXP covers it'],
+        ['3 at R50', 'Three Tier 1 classes at Class Rank 50', 'A third class', 'Trials: about 18 wins at Lv 50 · 24 Manuals'],
+      ]],
+      ['Craft', [10, 20, 30, 40, 50].map((l) => [`Craft ${l}`, `Craft Lv ${l}`, 'Lv 1', 'Her own jobs, her trade\'s places'])],
+      ['Gear', [2, 4, 6, 8, 10].map((g) => [`G${g}`, `All eleven worn slots at G${g}: three weapons, five armor, three accessories`, lvGate(g), 'The Wilds\' made items'])],
+      ['Stars', [['Stars I', 'Planet I and the three moons\' node I: 4 nodes', 'Uma Lv 6'], ['Stars II', 'All node IIs and her moon\'s I: 9 nodes', 'Uma Lv 16'], ['Stars III', 'All node IIIs: 13 nodes', 'Uma Lv 26'], ['Stars IV', 'All node IVs and her moon\'s II: 18 nodes', 'Uma Lv 36'], ['Stars V', 'The whole map: 22 nodes', 'Uma Lv 46']].map((s) => [...s, 'Planet and Moon Jewels'])],
+      ['World', [1, 2, 3, 4, 5].map((n) => [`Continent ${c0 + n}`, `In the party that won all three of continent ${c0 + n}'s capital champions`, 'Its capital', 'Campaign Finals, replays too'])],
+    ]
+  }
+  function drawBoard(tier) {
+    const rows = boardRows(tier)
+    let h = '<thead><tr><th>Track</th>' + ['I', 'II', 'III', 'IV', 'V'].map((s) => `<th>${s}</th>`).join('') + '</tr></thead><tbody>'
+    for (const [track, steps] of rows) {
+      h += `<tr><th>${track}</th>` + steps.map(([k, rule, opens, pays]) => `<td class="step"><b>${k}</b><span>${rule}</span><em>Opens: ${opens} · ${pays}</em></td>`).join('') + '</tr>'
+    }
+    h += tier === 3
+      ? '<tr><th>Rift</th><td colspan="5" class="step"><b>None yet</b><span>Tier 3\'s Rift waits for its rules, so its window has 30 steps and her face lights with the 30th. A full window stays full if a Rift arrives.</span></td></tr>'
+      : `<tr><th>Rift</th><td colspan="5" class="step"><b>Rift</b><span>On the roster of a won Tier ${tier} Rift run. Lights her face only if it's her last step; the face is always the last pane.</span><em>Opens: twenty Lv 50 Umas sign up · The Rift</em></td></tr>`
+    document.getElementById('board').innerHTML = h + '</tbody>'
+    document.getElementById('boardNote').textContent = tier === 1
+      ? '31 steps. Class II–V read her best classes, not the one she fights as; a lit step stays lit (CO2).'
+      : tier === 2 ? '31 steps, read at Tier 2\'s numbers: grades and nodes are worth ×1.8 in play, the board is the same.' : '30 steps, read at Tier 3\'s numbers (×2.6 in play). Nowhere to ascend: the full window is the end of the collection.'
+  }
+  seg('data-tier', (t) => drawBoard(+t))
+  drawBoard(1)
+
+  // ---- The model (doc §3.5)
+  const BANDS = [25, 24, 24, 24, 22]
+  const CRAFT_NONSTOP = [3.75, 8.31, 13.29, 18.69, 24.5] // days to Craft Lv 10..50 at the places' x1.25
+  const FORGE = [2.4, 6.8, 11.6, 16.9, 22.5] // nonstop days until the fighting party holds G2, G4, G6, G8, G10 (forty Umas)
+  let craftV = 50
+  const params = () => ({ W: +document.getElementById('w').value, U: +document.getElementById('u').value / 100, T: +document.getElementById('t').value })
+  function model(mature, { W, U, T }) {
+    const cum = [0]; BANDS.forEach((b) => cum.push(cum[cum.length - 1] + b))
+    const day = (L) => { if (L <= 1) return 0; const b = Math.min(5, Math.floor((L - 1) / 10) + 1); return (cum[b - 1] + (L - 10 * (b - 1)) / 10 * BANDS[b - 1]) / W }
+    const craft = craftV === 50 ? CRAFT_NONSTOP : [2.89, 6.44, 10.25, 14.34, 18.69] // Craft Lv 8, 16, 24, 32, 40
+    const s = []
+    ;[10, 20, 30, 40, 50].forEach((l, i) => s.push(['Level', ['I', 'II', 'III', 'IV', 'V'][i], `Lv ${l}`, day(l)]))
+    s.push(['Class', 'I', 'R10', day(10)], ['Class', 'II', 'R30', day(22)], ['Class', 'III', 'R50', day(36)], ['Class', 'IV', '2 at R50', day(50)], ['Class', 'V', '3 at R50', day(50) + 18 / T])
+    craft.forEach((d, i) => s.push(['Craft', ['I', 'II', 'III', 'IV', 'V'][i], `Craft ${craftV === 40 ? (i + 1) * 8 : (i + 1) * 10}`, d / U]))
+    ;[2, 4, 6, 8, 10].forEach((g, i) => {
+      const t = Math.max(day(5 * g - 4), mature ? 0 : FORGE[i] / U)
+      s.push(['Gear', ['I', 'II', 'III', 'IV', 'V'][i], `G${g}`, t], ['Stars', ['I', 'II', 'III', 'IV', 'V'][i], `Stars ${['I', 'II', 'III', 'IV', 'V'][i]}`, t])
+    })
+    ;[1, 2, 3, 4, 5].forEach((n) => s.push(['World', ['I', 'II', 'III', 'IV', 'V'][n - 1], `Continent ${n}`, day(10 * n)]))
+    s.push(['Rift', '', 'Rift', mature ? day(50) + 3 : (4 * 119 + 52) / W])
+    return s
+  }
+  const lit = (s, d) => s.filter((x) => x[3] <= d + 1e-9).length
+
+  // ---- The chart
+  const svg = document.getElementById('svg'), tip = document.getElementById('tip')
+  const M = { l: 44, r: 150, t: 14, b: 36 }, Wd = 900, Ht = 360
+  let fresh, mature, X = 35
+  const css = (v) => getComputedStyle(root).getPropertyValue(v).trim()
+  const sx = (d) => M.l + d / X * (Wd - M.l - M.r), sy = (n) => Ht - M.b - n / 31 * (Ht - M.t - M.b)
+  function path(s) {
+    const pts = [...s.map((x) => x[3])].sort((a, b) => a - b)
+    let d = `M${sx(0)},${sy(0)}`, n = 0
+    for (const t of pts) { if (t > X) break; d += `H${sx(t)}V${sy(++n)}`; }
+    return d + `H${sx(X)}`
+  }
+  function draw() {
+    const p = params()
+    document.getElementById('wv').textContent = p.W
+    document.getElementById('uv').textContent = Math.round(p.U * 100) + '%'
+    document.getElementById('tv').textContent = p.T
+    fresh = model(false, p); mature = model(true, p)
+    const fullF = Math.max(...fresh.map((x) => x[3])), fullM = Math.max(...mature.map((x) => x[3]))
+    X = Math.max(35, Math.ceil(Math.max(fullF, fullM) / 5) * 5 + 5)
+    let g = ''
+    for (let n = 0; n <= 31; n += 5) g += `<line x1="${M.l}" x2="${Wd - M.r}" y1="${sy(n)}" y2="${sy(n)}" stroke="${css('--grid')}"/><text x="${M.l - 8}" y="${sy(n) + 4}" text-anchor="end" font-size="11" fill="${css('--ink-faint')}">${n}</text>`
+    g += `<line x1="${M.l}" x2="${Wd - M.r}" y1="${sy(31)}" y2="${sy(31)}" stroke="${css('--hairline-strong')}" stroke-dasharray="4 4"/><text x="${M.l - 8}" y="${sy(31) + 4}" text-anchor="end" font-size="11" fill="${css('--ink-soft')}">31</text>`
+    for (let d = 0; d <= X; d += 5) g += `<text x="${sx(d)}" y="${Ht - M.b + 18}" text-anchor="middle" font-size="11" fill="${css('--ink-faint')}">${d}</text>`
+    g += `<text x="${(M.l + Wd - M.r) / 2}" y="${Ht - 4}" text-anchor="middle" font-size="11" fill="${css('--ink-soft')}">Days from her unlock</text>`
+    g += `<line x1="${M.l}" x2="${Wd - M.r}" y1="${sy(0)}" y2="${sy(0)}" stroke="${css('--hairline-strong')}"/>`
+    g += `<path d="${path(fresh)}" fill="none" stroke="${css('--s1')}" stroke-width="2" stroke-linejoin="round"/>`
+    g += `<path d="${path(mature)}" fill="none" stroke="${css('--s2')}" stroke-width="2" stroke-linejoin="round"/>`
+    const lab = (s, color, name, dy) => { const f = Math.max(...s.map((x) => x[3])); return `<circle cx="${sx(f)}" cy="${sy(31)}" r="4" fill="${color}" stroke="${css('--panel')}" stroke-width="2"/><text x="${Wd - M.r + 8}" y="${sy(31) + dy}" font-size="12" fill="${css('--ink')}">${name}</text><text x="${Wd - M.r + 8}" y="${sy(31) + dy + 14}" font-size="11" fill="${css('--ink-soft')}">full on day ${f.toFixed(1)}</text>` }
+    g += lab(fresh, css('--s1'), 'Fresh world', 4) + lab(mature, css('--s2'), 'Mature world', 40)
+    g += `<line id="cross" x1="0" x2="0" y1="${M.t}" y2="${Ht - M.b}" stroke="${css('--ink-faint')}" stroke-dasharray="3 3" visibility="hidden"/><rect id="hit" x="${M.l}" y="${M.t}" width="${Wd - M.l - M.r}" height="${Ht - M.t - M.b}" fill="transparent"/>`
+    svg.innerHTML = g
+    const hit = svg.querySelector('#hit'), cross = svg.querySelector('#cross')
+    hit.addEventListener('pointermove', (e) => {
+      const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * Wd
+      const d = Math.max(0, Math.min(X, (x - M.l) / (Wd - M.l - M.r) * X))
+      cross.setAttribute('x1', sx(d)); cross.setAttribute('x2', sx(d)); cross.setAttribute('visibility', 'visible')
+      const next = (s) => { const n = s.filter((y) => y[3] > d).sort((a, b) => a[3] - b[3])[0]; return n ? `next ${n[2]}, day ${n[3].toFixed(1)}` : 'full' }
+      tip.innerHTML = `<b>Day ${d.toFixed(1)}</b><div><i style="background:${css('--s1')}"></i>Fresh: ${lit(fresh, d)} of 31 · ${next(fresh)}</div><div><i style="background:${css('--s2')}"></i>Mature: ${lit(mature, d)} of 31 · ${next(mature)}</div>`
+      tip.style.display = 'block'
+      const px = (e.clientX - r.left), w = tip.offsetWidth
+      tip.style.left = Math.min(r.width - w - 4, px + 12) + 'px'; tip.style.top = '8px'
+    })
+    hit.addEventListener('pointerleave', () => { tip.style.display = 'none'; cross.setAttribute('visibility', 'hidden') })
+    const at = (d) => `day ${d}: ${lit(fresh, d)} and ${lit(mature, d)}`
+    const lastF = fresh.reduce((a, b) => (b[3] > a[3] ? b : a)), lastM = mature.reduce((a, b) => (b[3] > a[3] ? b : a))
+    document.getElementById('summary').textContent = `Steps lit (fresh, mature): ${[2, 7, 14, 21, 28].map(at).join(' · ')}. The last step is ${lastF[2]} in the fresh world and ${lastM[2]} in the mature one.`
+    let t = '<thead><tr><th>Track</th><th>Step</th><th>Rule</th><th class="num">Fresh world, day</th><th class="num">Mature world, day</th></tr></thead><tbody>'
+    fresh.forEach((x, i) => { t += `<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td class="num">${x[3].toFixed(1)}</td><td class="num">${mature[i][3].toFixed(1)}</td></tr>` })
+    document.getElementById('days').innerHTML = t + '</tbody>'
+    // Trade cap
+    const nonstop = craftV === 50 ? 24.5 : 18.69, real = nonstop / p.U
+    const trades = [['Warrior (Metal)', 47], ['Spellblade (Wood)', 72], ['Mage (Stone)', 72], ['Summoner (Fish)', 33], ['Healer (Vegetables)', 46]]
+    let c = `<thead><tr><th>Trade</th><th class="num">Umas</th><th class="num">Slots</th><th class="num">Craft ${craftV}s a month</th><th class="num">All of them, nonstop</th><th class="num">All of them at ${Math.round(p.U * 100)}%</th></tr></thead><tbody>`
+    for (const [n, u] of trades) c += `<tr><td>${n}</td><td class="num">${u}</td><td class="num">12</td><td class="num">${(12 * 30 / real).toFixed(1)}</td><td class="num">${(u / 12 * nonstop).toFixed(0)} days</td><td class="num">${(u / 12 * real / 30).toFixed(1)} months</td></tr>`
+    c += `<tr><th>The Wilds</th><td class="num">270</td><td class="num">60</td><td class="num">${(60 * 30 / real).toFixed(0)}</td><td class="num">—</td><td class="num">—</td></tr>`
+    document.getElementById('cap').innerHTML = c + '</tbody>'
+  }
+  ;['w', 'u', 't'].forEach((id) => document.getElementById(id).addEventListener('input', draw))
+  seg('data-craft', (v) => { craftV = +v; draw() })
+  draw()
+})()
+</script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Window Screens</title>
+<!-- Collections (docs/design/collections/collections.md §7): the profile picture, the Window sheet, the Gallery, Ascend,
+     Drills, the Logs sheet, Trials and the Rift after a win, at 390x844. Every Uma and window is made up (no original art
+     in git, P6). Self-contained, uma-kit's tokens, light and dark. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --info: #2f6fe0; --locked: #8a94a3;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
+    --radius: 12px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); --scrim: rgb(0 0 0 / 0.55); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+    --success: #4fb37a; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); --scrim: rgb(0 0 0 / 0.55); color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1300px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  .intro p { color: var(--ink-soft); max-width: 86ch; }
+  a { color: var(--info); }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 3px; gap: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; cursor: pointer; min-height: 32px; }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .phones { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 18px; }
+  .shot { width: 390px; }
+  .shot h2 { font: 700 15px/1.25 ui-rounded, system-ui; margin: 0 0 4px; }
+  .shot > p { font-size: 12px; color: var(--ink-soft); margin: 0 0 8px; min-height: 34px; }
+  .phone { width: 390px; height: 844px; border-radius: 44px; background: var(--page); border: 10px solid var(--bezel); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .bar { height: 54px; padding: 18px 16px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--ink-soft); }
+  .bar b { color: var(--ink); }
+  .content { flex: 1; overflow: hidden; padding: 0 14px; display: flex; flex-direction: column; gap: 10px; }
+  .tabs { height: 66px; border-top: 1px solid var(--hairline-strong); background: var(--panel); display: grid; grid-template-columns: repeat(4, 1fr); font-size: 11px; color: var(--ink-faint); text-align: center; padding-top: 10px; font-weight: 600; }
+  .tabs .on { color: var(--accent-strong); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .grow { flex: 1; min-width: 0; }
+  .muted { color: var(--ink-faint); font-size: 12px; }
+  .soft { color: var(--ink-soft); font-size: 12px; }
+  .title { font: 700 18px/1.2 ui-rounded, system-ui; }
+  .btn { border: 0; border-radius: 12px; min-height: 44px; padding: 0 14px; font: 700 14px system-ui; background: var(--raised); color: var(--ink); border: 1px solid var(--hairline-strong); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .btn.ready { background: var(--success); color: #fff; border-color: transparent; }
+  .btn.small { min-height: 36px; font-size: 12px; padding: 0 10px; }
+  .chip { display: inline-flex; padding: 4px 10px; border-radius: 999px; background: var(--sunken); font: 600 12px system-ui; color: var(--ink-soft); }
+  .chip.on { background: var(--accent-wash); color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
+  .win { display: block; border-radius: 4px; }
+  .badge { position: absolute; right: -4px; bottom: -4px; background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 999px; padding: 1px 6px; font: 700 11px system-ui; color: var(--ink); }
+  .tabsrow { display: flex; gap: 4px; background: var(--sunken); border-radius: 999px; padding: 3px; }
+  .tabsrow span { flex: 1; text-align: center; font: 600 12px system-ui; padding: 7px 0; border-radius: 999px; color: var(--ink-soft); }
+  .tabsrow .on { background: var(--panel); color: var(--ink); }
+  .scrim { position: absolute; inset: 0; background: var(--scrim); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-radius: 20px 20px 0 0; padding: 10px 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--hairline-strong); margin: 0 auto 4px; }
+  .sheethead { display: flex; justify-content: space-between; align-items: center; }
+  .x { width: 32px; height: 32px; border-radius: 50%; background: var(--sunken); display: grid; place-items: center; font-weight: 700; color: var(--ink-soft); }
+  .board { display: grid; grid-template-columns: 44px repeat(5, 1fr); gap: 4px; font: 600 10px/1.15 system-ui; }
+  .board .h { color: var(--ink-faint); align-self: center; font-size: 10px; }
+  .t { border-radius: 7px; padding: 5px 2px; text-align: center; background: var(--sunken); color: var(--ink-faint); min-height: 36px; display: flex; flex-direction: column; justify-content: center; }
+  .t.lit { background: var(--accent-wash); color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
+  .t.lit small { color: var(--ink-soft); font-weight: 500; }
+  .t.next { background: var(--raised); color: var(--ink); box-shadow: inset 0 0 0 1px var(--hairline-strong); }
+  .t.next small { color: var(--ink-soft); font-weight: 500; }
+  .t.sel { box-shadow: inset 0 0 0 2px var(--info); }
+  .t.wide { grid-column: 2 / span 5; }
+  .gal { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .gal figure { margin: 0; text-align: center; position: relative; }
+  .gal figcaption { font-size: 10px; color: var(--ink-soft); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .frame1 { outline: 3px solid var(--t1); outline-offset: 1px; }
+  .lock { position: absolute; top: 4px; right: 4px; font-size: 11px; background: rgb(0 0 0 / .55); color: #fff; border-radius: 6px; padding: 0 4px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; }
+  .list > div { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--hairline); }
+  .face { width: 40px; height: 40px; border-radius: 50%; background: var(--sunken); display: grid; place-items: center; font: 700 13px system-ui; color: var(--ink-soft); flex: none; }
+  .tick { width: 22px; height: 22px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; flex: none; }
+  .grid3 { display: grid; grid-template-columns: 70px repeat(3, 1fr); gap: 6px; align-items: center; font-size: 12px; }
+  .cell { border-radius: 10px; padding: 8px 4px; text-align: center; background: var(--raised); border: 1px solid var(--hairline-strong); font-weight: 600; }
+  .cell.won { background: var(--accent-wash); border-color: var(--accent); }
+  .counts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .counts span { text-align: center; padding: 9px 0; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong); font: 700 13px system-ui; }
+  .counts .on { background: var(--accent-wash); border-color: var(--accent); }
+  .bal { height: 8px; background: var(--sunken); border-radius: 4px; overflow: hidden; }
+  .bal i { display: block; height: 100%; background: var(--accent); }
+  .note { font-size: 12px; color: var(--ink-faint); max-width: 390px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="top intro">
+    <div>
+      <h1>The screens</h1>
+      <p>At 390×844, light and dark. Copy keeps the profile's copy test (≤ 6 words a string, the wording list first),
+        G3 one tap one sheet, G4 no sheet over a sheet, green only for Ready. Every Uma and window here is made up.
+        <a href="../collections.md#7-screens">Doc §7</a>.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Theme">
+      <button data-theme-btn="system" aria-pressed="true">System</button>
+      <button data-theme-btn="light" aria-pressed="false">Light</button>
+      <button data-theme-btn="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+
+  <div class="phones">
+    <!-- 1 Profile -->
+    <section class="shot"><h2>1 · Her profile picture</h2><p>The portrait is her window at her share lit, "14/31" on its corner. A tap opens the Window sheet.</p>
+      <div class="phone"><div class="bar"><b>‹ Stable</b><span>4 / 26 ›</span></div>
+        <div class="content">
+          <div class="card row" style="gap:12px">
+            <div style="position:relative"><svg class="win" data-win="14" data-p="0" width="96" height="96" viewBox="0 0 512 512"></svg><span class="badge">14/31</span></div>
+            <div class="grow"><div class="title">Uma A</div><div class="soft">Brawler · Lv 34</div><div class="muted" style="margin-top:6px">Craft 22 · Metal</div></div>
+          </div>
+          <div class="tabsrow"><span class="on">Class</span><span>Gear</span><span>Stars</span><span>Template</span></div>
+          <div class="card"><div class="row"><b class="grow">Brawler R41</b><span class="soft">Class</span></div><div class="bal" style="margin-top:8px"><i style="width:40%"></i></div></div>
+          <div class="card soft">The Class tab as today.</div>
+        </div>
+        <div class="tabs"><span class="on">Town Hall</span><span>Learning</span><span>Battle</span><span>Wilds</span></div></div>
+    </section>
+
+    <!-- 2 Window sheet -->
+    <section class="shot"><h2>2 · The Window sheet</h2><p>The window large and her board. A lit tile shows its date, the next of a track what's left. A tap opens its line inline.</p>
+      <div class="phone"><div class="bar"><b>‹ Stable</b><span></span></div>
+        <div class="scrim"></div>
+        <div class="sheet" style="top:70px">
+          <div class="grab"></div>
+          <div class="sheethead"><div><div class="title">Window</div><div class="soft">Tier 1 · 14/31</div></div><span class="x">✕</span></div>
+          <svg class="win" data-win="14" data-p="0" width="220" height="220" viewBox="0 0 512 512" style="margin:0 auto"></svg>
+          <div class="board" id="sheetBoard"></div>
+          <div class="card" style="background:var(--raised);box-shadow:none;padding:10px"><b style="font-size:13px">Gear III · G6</b><div class="soft">8 of 11 at G6 · Wilds</div></div>
+        </div></div>
+    </section>
+
+    <!-- 3 Gallery -->
+    <section class="shot"><h2>3 · The Gallery</h2><p>Where the Observatory stood. Every outfit: owned at her share, locked unlit with a lock. Ready first.</p>
+      <div class="phone"><div class="bar"><b>‹ Learning</b><span></span></div>
+        <div class="content">
+          <div class="row"><div class="grow"><div class="title">Gallery</div><div class="soft">3 full · 2 ready</div></div><button class="btn ready small">Ascend 2</button></div>
+          <div class="row" style="flex-wrap:wrap"><span class="chip on">All</span><span class="chip">Ready</span><span class="chip">Owned</span><span class="chip">Locked</span></div>
+          <div class="gal" id="gallery"></div>
+        </div>
+        <div class="tabs"><span>Town Hall</span><span class="on">Learning</span><span>Battle</span><span>Wilds</span></div></div>
+    </section>
+
+    <!-- 4 Ascend -->
+    <section class="shot"><h2>4 · Ascend</h2><p>From the Gallery's Ascend: the ready Umas, each ticked, today's lines, one button. One who can't go says why.</p>
+      <div class="phone"><div class="bar"><b>‹ Learning</b><span></span></div>
+        <div class="scrim"></div>
+        <div class="sheet" style="top:250px">
+          <div class="grab"></div>
+          <div class="sheethead"><div class="title">Ascend to Tier 2</div><span class="x">✕</span></div>
+          <div class="list">
+            <div><span class="tick">✓</span><svg class="win frame1" data-win="31" data-p="1" width="40" height="40" viewBox="0 0 512 512"></svg><div class="grow"><b>Uma B</b><div class="muted">Sorcerer · Lv 50</div></div></div>
+            <div><span class="tick">✓</span><svg class="win frame1" data-win="31" data-p="2" width="40" height="40" viewBox="0 0 512 512"></svg><div class="grow"><b>Uma C</b><div class="muted">Cleric · Lv 50</div></div></div>
+            <div style="opacity:.55"><span class="face">D</span><div class="grow"><b>Uma D</b><div class="muted">At work · recall first</div></div></div>
+          </div>
+          <div class="soft">Lv 1 in Tier 2<br>Ranks, skills and stars restart<br>Gear returns to Tier 1's stock<br>+2,000 Laurels · +10 Speed Tickets</div>
+          <button class="btn primary">Ascend 2</button>
+        </div></div>
+    </section>
+
+    <!-- 5 Drills -->
+    <section class="shot"><h2>5 · Drills</h2><p>Ten runs a day, banked to thirty. A won Drill sweeps free; Read Logs opens the Logs sheet.</p>
+      <div class="phone"><div class="bar"><b>‹ Battle</b><span></span></div>
+        <div class="content">
+          <div class="row"><div class="grow"><div class="title">Drills</div><div class="soft">Runs 18 · +10 at 4:00</div></div><button class="btn small">Read Logs · 42</button></div>
+          <div id="drillRows" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+        <div class="tabs"><span>Town Hall</span><span>Learning</span><span class="on">Battle</span><span>Wilds</span></div></div>
+    </section>
+
+    <!-- 6 Logs sheet -->
+    <section class="shot"><h2>6 · The Logs sheet</h2><p>The Class Manual sheet's twin: pick an Uma, then a count. Three Logs, one level.</p>
+      <div class="phone"><div class="bar"><b>‹ Battle</b><span></span></div>
+        <div class="scrim"></div>
+        <div class="sheet" style="top:300px">
+          <div class="grab"></div>
+          <div class="sheethead"><div><div class="title">Read Logs</div><div class="soft">42 Training Logs</div></div><span class="x">✕</span></div>
+          <div class="row card" style="background:var(--raised);box-shadow:none"><span class="face">E</span><div class="grow"><b>Uma E</b><div class="muted">Lv 23 · Healer R23</div></div><span class="soft">Change</span></div>
+          <div class="counts"><span>1</span><span>5</span><span class="on">10</span><span>To Lv 30</span><span>Max</span></div>
+          <div class="soft">Lv 23 → 26 · Healer R23 → R26</div>
+          <button class="btn primary">Read 10</button>
+          <div class="muted">Lv 50 · Trials pay ranks</div>
+        </div></div>
+    </section>
+
+    <!-- 7 Trials -->
+    <section class="shot"><h2>7 · Trials</h2><p>Today's Echo rows in their own place: four fronts × Lv 45, 50, 55. Each opens today's Echo sheet, retitled.</p>
+      <div class="phone"><div class="bar"><b>‹ Battle</b><span></span></div>
+        <div class="content">
+          <div><div class="title">Trials</div><div class="soft">Class EXP ×2 · Lv 50 parties</div></div>
+          <div class="card"><div class="grid3">
+            <span></span><span class="muted" style="text-align:center">Lv 45</span><span class="muted" style="text-align:center">Lv 50</span><span class="muted" style="text-align:center">Lv 55</span>
+            <b>Iron</b><span class="cell won">✓</span><span class="cell won">✓</span><span class="cell">Fight</span>
+            <b>Arcane</b><span class="cell won">✓</span><span class="cell">Fight</span><span class="cell">Fight</span>
+            <b>Duel</b><span class="cell won">✓</span><span class="cell won">✓</span><span class="cell won">✓</span>
+            <b>Horde</b><span class="cell">Fight</span><span class="cell">Fight</span><span class="cell">Fight</span>
+          </div></div>
+          <div class="card"><div class="row"><b class="grow">Iron Trial · Lv 50</b><span class="soft">Won</span></div><div class="row" style="margin-top:8px"><button class="btn small">Fight again</button><button class="btn small">Sweep ×1</button><button class="btn small">Sweep ×5</button></div><div class="muted" style="margin-top:6px">Sweep Tickets 24</div></div>
+        </div>
+        <div class="tabs"><span>Town Hall</span><span>Learning</span><span class="on">Battle</span><span>Wilds</span></div></div>
+    </section>
+
+    <!-- 8 Rift after a win -->
+    <section class="shot"><h2>8 · The Rift, won</h2><p>The run without its Echoes or its Ascend. A win lights the Rift step for its twenty; the Gallery ascends them.</p>
+      <div class="phone"><div class="bar"><b>‹ Battle</b><span></span></div>
+        <div class="content">
+          <div><div class="title">The Rift</div><div class="soft">Tier 1 · Run 1 · Won</div></div>
+          <div class="card row"><div class="grow"><b>Rift won · 3 ready</b><div class="muted">Full windows ascend</div></div><button class="btn small">Gallery</button></div>
+          <div class="card"><div class="soft" style="margin-bottom:6px">Roster</div><div class="gal" id="roster"></div></div>
+          <div class="card row"><div class="grow"><b>Sign up twenty</b><div class="muted">22 at Lv 50</div></div><button class="btn small">Sign up</button></div>
+        </div>
+        <div class="tabs"><span>Town Hall</span><span>Learning</span><span class="on">Battle</span><span>Wilds</span></div></div>
+    </section>
+  </div>
+  <p class="note">Ascend's purse line counts each Uma: 1,000 Laurels and 5 Speed Tickets an Uma, as today.</p>
+</main>
+<script>
+(() => {
+  const root = document.documentElement
+  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.addEventListener('click', () => {
+    const t = b.dataset.themeBtn
+    t === 'system' ? root.removeAttribute('data-theme') : root.setAttribute('data-theme', t)
+    document.querySelectorAll('[data-theme-btn]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+  }))
+
+  // ---- Made-up windows: window.html's generator, with a palette an Uma.
+  const PAL = [
+    { hair: ['#2b3f8f', '#36509f', '#253370', '#3f5aa8'], body: ['#a82a2a', '#c23b33'], sky: ['#fbe6bb', '#f5c67a', '#eca250', '#de8236', '#c3632a'], bar: ['#f3d3a2', '#8a3d22'] },
+    { hair: ['#7a4a2a', '#8f5a34', '#6a3f22', '#9c6a40'], body: ['#2f6fa8', '#3f82c0'], sky: ['#d6ecfb', '#9ccdf2', '#5aa7e3', '#2f83cc', '#1f62a8'], bar: ['#cfe6f7', '#28406a'] },
+    { hair: ['#c9c9d6', '#b5b5c8', '#dedee8', '#a8a8bd'], body: ['#2f7a4f', '#3f9a62'], sky: ['#f7e7f0', '#ecc3da', '#dc93bd', '#c66a9e', '#a84a80'], bar: ['#f3d6e6', '#6a2a4a'] },
+    { hair: ['#2a2a32', '#3a3a46', '#1f1f26', '#46465a'], body: ['#d6a23e', '#e8b65a'], sky: ['#e9e3fb', '#c9bdf2', '#a08ee3', '#7a64cc', '#5a46a8'], bar: ['#ddd5f7', '#3a2a6a'] },
+  ]
+  function windowPanes(pal, seedStart) {
+    let seed = seedStart
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646 }
+    const hex = (c) => '#' + c.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('')
+    const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+    const jitter = (h, a) => hex(rgb(h).map((v) => v + (rnd() - 0.5) * a))
+    const panes = [], S = 512, B = 26, C = { x: 256, y: 196 }
+    const pt = (cx, cy, r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)]
+    const span = (S - 2 * B) / 12
+    for (let i = 0; i < 12; i++) {
+      const fill = pal.bar[i % 2], x = B + i * span
+      panes.push({ d: `M${x} 0h${span}v${B}h${-span}Z`, fill: jitter(fill, 14), g: 0, cx: x, cy: 13 })
+      panes.push({ d: `M${x} ${S - B}h${span}v${B}h${-span}Z`, fill: jitter(fill, 14), g: 0, cx: x, cy: S - 13 })
+      panes.push({ d: `M0 ${x}h${B}v${span}h${-B}Z`, fill: jitter(fill, 14), g: 0, cx: 13, cy: x })
+      panes.push({ d: `M${S - B} ${x}h${B}v${span}h${-B}Z`, fill: jitter(fill, 14), g: 0, cx: S - 13, cy: x })
+    }
+    for (const [x, y] of [[0, 0], [S - B, 0], [0, S - B], [S - B, S - B]]) panes.push({ d: `M${x} ${y}h${B}v${B}h${-B}Z`, fill: '#e8c25a', g: 0, cx: x, cy: y })
+    const hair = { x: 256, y: 252, rx: 132, ry: 168 }
+    const inHair = (x, y) => ((x - hair.x) / hair.rx) ** 2 + ((y - hair.y) / hair.ry) ** 2 < 1
+    const inBody = (x, y) => y > 388 && Math.abs(x - 256) < 70 + (y - 388) * 1.6
+    const rings = [0, 92, 150, 208, 270, 420], wedges = [18, 24, 30, 36, 42]
+    for (let i = 0; i < 5; i++) for (let s = 0; s < wedges[i]; s++) {
+      const a0 = (s + (i % 2) * 0.5) / wedges[i] * Math.PI * 2, a1 = (s + 1 + (i % 2) * 0.5) / wedges[i] * Math.PI * 2
+      const r0 = Math.max(rings[i], 1), r1 = rings[i + 1], mid = (a0 + a1) / 2, rm = (r0 + r1) / 2
+      const [mx, my] = pt(C.x, C.y, Math.min(rm, 240), mid)
+      if (inHair(mx, my) || inBody(mx, my)) continue
+      const p = [pt(C.x, C.y, r0, a0), pt(C.x, C.y, r1, a0), pt(C.x, C.y, r1, a1), pt(C.x, C.y, r0, a1)]
+      panes.push({ d: `M${p[0]}L${p[1]}A${r1} ${r1} 0 0 1 ${p[2]}L${p[3]}A${r0} ${r0} 0 0 0 ${p[0]}Z`, fill: jitter(pal.sky[i], s % 2 ? 22 : 8), g: 1, cx: mx, cy: my })
+    }
+    for (let s = 0; s < 16; s++) {
+      const a0 = s / 16 * Math.PI * 2 - Math.PI / 2, a1 = (s + 1) / 16 * Math.PI * 2 - Math.PI / 2, am = (a0 + a1) / 2
+      const p0 = [hair.x + hair.rx * Math.cos(a0), hair.y + hair.ry * Math.sin(a0)], p1 = [hair.x + hair.rx * Math.cos(a1), hair.y + hair.ry * Math.sin(a1)]
+      panes.push({ d: `M${hair.x} ${hair.y}L${p0}A${hair.rx} ${hair.ry} 0 0 1 ${p1}Z`, fill: jitter(pal.hair[s % 4], 10), g: 2, cx: 0, cy: hair.y + hair.ry * 0.8 * Math.sin(am) })
+    }
+    for (const side of [-1, 1]) {
+      const bx = 256 + side * 70
+      panes.push({ d: `M${bx - side * 30} 118L${bx + side * 8} 36L${bx + side * 34} 104Z`, fill: pal.hair[0], g: 2, cy: 86 })
+      panes.push({ d: `M${bx - side * 14} 108L${bx + side * 8} 58L${bx + side * 22} 100Z`, fill: '#e9a1a8', g: 2, cy: 92 })
+    }
+    const top = 388, base = S - B
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 7; c++) {
+      const y0 = top + r * (base - top) / 2, y1 = top + (r + 1) * (base - top) / 2, w0 = 70 + (y0 - 388) * 1.6, w1 = 70 + (y1 - 388) * 1.6
+      const x00 = 256 - w0 + c * (2 * w0 / 7), x01 = x00 + 2 * w0 / 7, x10 = 256 - w1 + c * (2 * w1 / 7), x11 = x10 + 2 * w1 / 7
+      panes.push({ d: `M${x00} ${y0}L${x01} ${y0}L${x11} ${y1}L${x10} ${y1}Z`, fill: jitter(pal.body[c % 2], 14), g: 2, cy: (y0 + y1) / 2 })
+    }
+    panes.push({ d: 'M236 318h40v52h-40Z', fill: '#f2cdb9', g: 2, cy: 344 })
+    panes.push({ d: 'M256 166A70 84 0 1 1 255.9 166Z', fill: '#f8dccb', g: 3, cy: 250 })
+    for (let i = 0; i < 6; i++) { const x = 186 + i * 23.3; panes.push({ d: `M${x} 160L${x + 23.3} 160L${x + 14 + (i % 2) * 8} ${206 + (i % 3) * 8}Z`, fill: jitter(pal.hair[i % 4], 12), g: 2, cy: 178 }) }
+    const dist = (p) => Math.hypot((p.cx ?? 256) - C.x, (p.cy ?? 256) - C.y)
+    const nonFace = panes.map((_, i) => i).filter((i) => panes[i].g !== 3)
+    const order = nonFace.sort((a, b) => panes[a].g !== panes[b].g ? panes[a].g - panes[b].g : panes[a].g === 2 ? panes[b].cy - panes[a].cy : dist(panes[b]) - dist(panes[a]))
+    return { panes, order, face: panes.findIndex((p) => p.g === 3) }
+  }
+  const hexrgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+  const dark = (h) => { const c = hexrgb(h), y = 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]; return '#' + c.map((v, i) => Math.round((0.3 * v + 0.7 * y) * 0.16 + [9, 11, 18][i]).toString(16).padStart(2, '0')).join('') }
+  const cache = PAL.map((p, i) => windowPanes(p, 11 + i * 7))
+  function draw(svg, n, pi) {
+    const { panes, order, face } = cache[pi % cache.length]
+    const P = order.length, k = n >= 30 ? P : Math.ceil(P * n / 30)
+    const lit = new Set(order.slice(0, k)); if (n >= 31) lit.add(face)
+    let h = '<rect width="512" height="512" fill="#0e1117"/>'
+    panes.forEach((p, i) => { h += `<path d="${p.d}" fill="${lit.has(i) ? p.fill : dark(p.fill)}" stroke="#0e1117" stroke-width="4" stroke-linejoin="round"/>` })
+    h += `<g opacity="${n >= 31 ? 1 : .3}" fill="#5a3fa0"><ellipse cx="232" cy="256" rx="9" ry="11"/><ellipse cx="280" cy="256" rx="9" ry="11"/></g>`
+    svg.innerHTML = h
+  }
+
+  // Window sheet board
+  const tiles = [
+    ['Level', [['Lv 10', 'lit', '21 Oct'], ['Lv 20', 'lit', '24 Oct'], ['Lv 30', 'lit', '29 Oct'], ['Lv 40', 'next', '34/40'], ['Lv 50', '', '']]],
+    ['Class', [['R10', 'lit', '21 Oct'], ['R30', 'lit', '27 Oct'], ['R50', 'next', 'R41/50'], ['2 at R50', '', ''], ['3 at R50', '', '']]],
+    ['Craft', [['Craft 10', 'lit', '26 Oct'], ['Craft 20', 'lit', '31 Oct'], ['Craft 30', 'next', '22/30'], ['Craft 40', '', ''], ['Craft 50', '', '']]],
+    ['Gear', [['G2', 'lit', '22 Oct'], ['G4', 'lit', '27 Oct'], ['G6', 'next sel', '8 of 11'], ['G8', '', ''], ['G10', '', '']]],
+    ['Stars', [['Stars I', 'lit', '22 Oct'], ['Stars II', 'lit', '28 Oct'], ['Stars III', 'next', '10/13'], ['Stars IV', '', ''], ['Stars V', '', '']]],
+    ['World', [['Cont. 1', 'lit', '21 Oct'], ['Cont. 2', 'lit', '24 Oct'], ['Cont. 3', 'lit', '30 Oct'], ['Cont. 4', 'next', '1 of 3'], ['Cont. 5', '', '']]],
+  ]
+  const sb = document.getElementById('sheetBoard')
+  for (const [h, row] of tiles) {
+    sb.insertAdjacentHTML('beforeend', `<span class="h">${h}</span>`)
+    for (const [k, cls, sub] of row) sb.insertAdjacentHTML('beforeend', `<span class="t ${cls}">${k}${sub ? `<small>${sub}</small>` : ''}</span>`)
+  }
+  sb.insertAdjacentHTML('beforeend', '<span class="h">Rift</span><span class="t wide">On a won Rift run</span>')
+
+  // Gallery
+  const gal = [['Uma B', 31, 'ready'], ['Uma C', 31, 'ready'], ['Uma F', 31, 'full'], ['Uma A', 14], ['Uma G', 24], ['Uma H', 12], ['Uma J', 8], ['Uma K', 3], ['Uma L', 0, 'lock'], ['Uma M', 0, 'lock'], ['Uma N', 0, 'lock'], ['Uma P', 0, 'lock']]
+  const ge = document.getElementById('gallery')
+  gal.forEach(([n, k, s], i) => {
+    const f = document.createElement('figure')
+    f.innerHTML = `<svg class="win${k === 31 ? ' frame1' : ''}" width="100%" viewBox="0 0 512 512"></svg>${s === 'lock' ? '<span class="lock">🔒</span>' : ''}<figcaption>${s === 'ready' ? '<span class="dot"></span> ' : ''}${n} · ${s === 'lock' ? 'Locked' : k + '/31'}</figcaption>`
+    ge.append(f); draw(f.querySelector('svg'), k, i)
+  })
+  // Roster on the Rift
+  const ro = document.getElementById('roster')
+  ;[31, 31, 31, 29, 28, 30, 27, 26].forEach((k, i) => { const f = document.createElement('figure'); f.innerHTML = `<svg class="win${k === 31 ? ' frame1' : ''}" width="100%" viewBox="0 0 512 512"></svg><figcaption>${k}/31</figcaption>`; ro.append(f); draw(f.querySelector('svg'), k, i + 1) })
+  // Drills
+  const dr = document.getElementById('drillRows')
+  ;[['Drill I', 'Lv 10', 2, true], ['Drill II', 'Lv 20', 3, true], ['Drill III', 'Lv 30', 4, true], ['Drill IV', 'Lv 40', 5, true], ['Drill V', 'Lv 50', 6, false]].forEach(([n, l, p, won]) => {
+    dr.insertAdjacentHTML('beforeend', `<div class="card row"><div class="grow"><b>${n} · ${l}</b><div class="muted">${p} Logs a win</div></div>${won ? '<button class="btn small">Sweep ×1</button><button class="btn small">×5</button>' : '<button class="btn small primary">Fight</button>'}</div>`)
+  })
+  document.querySelectorAll('svg[data-win]').forEach((s) => draw(s, +s.dataset.win, +s.dataset.p))
+})()
+</script>
+</body>
+</html>

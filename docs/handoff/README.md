@@ -41,6 +41,12 @@ The audit's bugs and the Hall issues have no packet yet.
 **The combat pass** (H145–H149, D282) is built and live: foes no longer guard, one symbol per kind, the healers' one kit and
 rescue, buffs and debuffs on their paths, pure Brawlers and Sorcerers, a Spellblade's bound familiar.
 
+**Collections** ([proposal](../design/collections/collections.md), pages: [window](../design/collections/previews/window.html),
+[board](../design/collections/previews/board.html), [content](../design/collections/previews/content.html) and
+[screens](../design/collections/previews/screens.html)) is with the owner for review: every Uma's stained-glass window
+lit by a 31-step board a tier, Ascend one Uma at a time once her window is full, Trials (the Echoes' own place) and Drills
+paying Training Logs. Its packets, H150–H156, are written once CO1–CO34 are answered.
+
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
 

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Four Kinds of Content</title>
+<!-- Collections (docs/design/collections/collections.md §6): the Campaign, Trials, Drills and the Rift, what each pays and
+     which of the window's tracks it feeds; the Drills calculator. Self-contained, uma-kit's tokens, light and dark. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd; --accent-ink: #1b1406; --info: #2f6fe0; --success: #2f7a4f;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --k-camp: #2f6fe0; --k-trial: #8a52c7; --k-drill: #2f9a6a; --k-rift: #c23b33; --k-wilds: #8a6a3a;
+    --radius: 12px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --success: #4fb37a;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --k-camp: #5b8def; --k-trial: #b388ec; --k-drill: #4fc08c; --k-rift: #e0645c; --k-wilds: #c9a46a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --success: #4fb37a;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --k-camp: #5b8def; --k-trial: #b388ec; --k-drill: #4fc08c; --k-rift: #e0645c; --k-wilds: #c9a46a; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 17px/1.25 ui-rounded, system-ui, sans-serif; margin: 28px 0 8px; }
+  h3 { font: 700 14px/1.3 system-ui; margin: 0 0 6px; }
+  p, li { color: var(--ink-soft); max-width: 80ch; }
+  a { color: var(--info); }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; cursor: pointer; min-height: 32px; }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--hairline-strong); margin-bottom: 12px; }
+  .kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+  .kind { border-top: 4px solid var(--c); }
+  .kind dl { display: grid; grid-template-columns: 70px 1fr; gap: 4px 8px; margin: 8px 0 0; font-size: 13px; }
+  .kind dt { color: var(--ink-faint); font-weight: 600; }
+  .kind dd { margin: 0; color: var(--ink); }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink-soft); margin-left: 6px; vertical-align: middle; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; }
+  .flow svg { width: 100%; height: auto; display: block; }
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 20px; }
+  .controls label { font-size: 12px; color: var(--ink-soft); font-weight: 600; display: flex; justify-content: space-between; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 14px; }
+  .stat { background: var(--raised); border-radius: 10px; padding: 12px; }
+  .stat b { display: block; font: 700 24px/1.1 ui-rounded, system-ui; color: var(--ink); }
+  .stat span { font-size: 12px; color: var(--ink-soft); }
+  .map { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 520px; }
+  .place { border: 1.5px solid var(--hairline-strong); border-radius: 12px; padding: 12px; background: var(--raised); }
+  .place.new { border-style: dashed; border-color: var(--accent); background: var(--accent-wash); }
+  .place b { display: block; }
+  .place span { font-size: 12px; color: var(--ink-soft); }
+  .note { font-size: 12px; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div>
+      <h1>Four kinds of content</h1>
+      <p>The owner's split: the story, the Rift, content for maxing ranks, and a daily-limited farm. Each feeds some of
+        the window's tracks; the Wilds feed the rest. <a href="../collections.md#6-four-kinds-of-content">Doc §6</a>.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Theme">
+      <button data-theme-btn="system" aria-pressed="true">System</button>
+      <button data-theme-btn="light" aria-pressed="false">Light</button>
+      <button data-theme-btn="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+
+  <div class="kinds">
+    <div class="card kind" style="--c:var(--k-camp)"><h3>The Campaign<span class="tag">today</span></h3>
+      <p>The world map: five continents a tier, their capitals' Finals.</p>
+      <dl><dt>For</dt><dd>Leveling the party you fight with; the scenarios</dd><dt>Pays</dt><dd>Uma EXP, Class EXP ×2, Laurels, Shards, Bonds</dd><dt>Limit</dt><dd>None; Sweeps with tickets</dd><dt>Feeds</dt><dd>Level, Class I–IV, World</dd><dt>New</dt><dd>A capital champion won is recorded on each Uma in the party</dd></dl></div>
+    <div class="card kind" style="--c:var(--k-trial)"><h3>Trials<span class="tag">moved</span></h3>
+      <p>Today's Echoes, out of the Rift into their own place.</p>
+      <dl><dt>For</dt><dd>Class Ranks for Lv 50 Umas</dd><dt>Pays</dt><dd>Class EXP ×2 a stage's, to the class she fights as; Class Marks past R50</dd><dt>Limit</dt><dd>None; Sweeps with tickets</dd><dt>Feeds</dt><dd>Class II–V</dd><dt>Opens</dt><dd>Five Lv 50 Umas, with the Rift</dd></dl></div>
+    <div class="card kind" style="--c:var(--k-drill)"><h3>Drills<span class="tag">new</span></h3>
+      <p>Five fights at the tier's Lv 10–50, swept free once won.</p>
+      <dl><dt>For</dt><dd>Leveling the Umas you don't fight with</dd><dt>Pays</dt><dd>Training Logs: one fight's EXP each, read onto any Uma</dd><dt>Limit</dt><dd>10 runs a day, banked to 30</dd><dt>Feeds</dt><dd>Level, and Class through a Log's class share</dd><dt>Opens</dt><dd>The tier's first win</dd></dl></div>
+    <div class="card kind" style="--c:var(--k-rift)"><h3>The Rift<span class="tag">today</span></h3>
+      <p>The tier's end: four fronts and the Convergence, twenty Lv 50 Umas.</p>
+      <dl><dt>For</dt><dd>Ending the tier</dd><dt>Pays</dt><dd>Achievements; the Rift step for its twenty</dd><dt>Limit</dt><dd>One run at a time; a new one once the last is won</dd><dt>Feeds</dt><dd>Rift</dd><dt>Loses</dt><dd>Echoes (to Trials) and Ascend (to the Gallery)</dd></dl></div>
+  </div>
+
+  <h2>Which content lights which steps</h2>
+  <div class="card flow"><svg id="flow" viewBox="0 0 900 380" role="img" aria-label="Content to tracks"></svg>
+    <p class="note">The Wilds aren't fights: they're the work behind Craft, Gear and Stars. Craft is the only track the roster can't push for her.</p></div>
+
+  <h2>Drills: the calculator</h2>
+  <div class="card">
+    <div class="controls">
+      <div><label for="runs">Runs a day <span id="runsv"></span></label><input id="runs" type="range" min="3" max="20" value="10"></div>
+      <div><label>Drill</label><div class="seg" role="group" aria-label="Drill" id="drills"></div></div>
+      <div><label for="from">Read onto an Uma from Lv <span id="fromv"></span></label><input id="from" type="range" min="1" max="49" value="1"></div>
+    </div>
+    <div class="tiles">
+      <div class="stat"><b id="logs"></b><span>Logs a day</span></div>
+      <div class="stat"><b id="lvls"></b><span>Levels a day, read on one Uma</span></div>
+      <div class="stat"><b id="per"></b><span id="perl">Logs from Lv 1 to 50</span></div>
+      <div class="stat"><b id="days"></b><span>Days for one Uma</span></div>
+    </div>
+    <p class="note">A Log: ⌈EXP to next ÷ 3⌉ Uma EXP and twice that to the class she fights as. Three Logs, one level, at
+      any level (D102's measure: her own level). The Campaign levels five Umas 49 levels in about 120 wins, about two
+      levels a win; a Drill V run pays two levels.</p>
+    <div class="scroll"><table id="drillTable"></table></div>
+  </div>
+
+  <h2>EXP or items</h2>
+  <div class="card scroll">
+    <table>
+      <thead><tr><th></th><th>Drills pay EXP to the five who fought</th><th>Drills pay Training Logs (CO21)</th></tr></thead>
+      <tbody>
+        <tr><th>Who levels</th><td>The five in the farming party: your strongest, who need it least</td><td>Whoever you read them onto: the bench, a new unlock, a Rift roster's last Uma</td></tr>
+        <tr><th>The play pattern</th><td>One party for everything</td><td>One party farms; dozens of Umas progress, as they already do in the Wilds</td></tr>
+        <tr><th>Class Ranks</th><td>Twice her EXP to the class she fought as</td><td>The same, from each Log: a Log-leveled Uma is ranked like a fought one</td></tr>
+        <tr><th>New things</th><td>None</td><td>One item, one sheet (the Class Manual sheet's twin)</td></tr>
+        <tr><th>Other games</th><td>—</td><td>Every farm in the research pays EXP as items (Arknights, Star Rail, Blue Archive, FGO)</td></tr>
+        <tr><th>D102</th><td>Holds</td><td>Holds: a Log is one fight's share of her own level, never sold</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Trials: how fast they rank a class</h2>
+  <div class="card scroll">
+    <table>
+      <thead><tr><th>Trial</th><th class="num">Class EXP a win, Lv 50 Uma</th><th class="num">Wins, R10 → R50</th><th class="num">Wins, R1 → R50 (Tier 2)</th><th>Who wins it</th></tr></thead>
+      <tbody>
+        <tr><td>Lv 45</td><td class="num">652</td><td class="num">37</td><td class="num">about 40</td><td>A party with one Uma at Class Rank 1</td></tr>
+        <tr><td>Lv 50</td><td class="num">1,300</td><td class="num">19</td><td class="num">about 20</td><td>An on-curve party</td></tr>
+        <tr><td>Lv 55</td><td class="num">1,300</td><td class="num">19</td><td class="num">about 20</td><td>The hard step, hardest on the Horde</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Numbers are today's Echoes' (H51, D176): Trials are the same fights. Class V (three classes at R50) is
+      about 18 Lv 50 wins past a campaign, swept with Sweep Tickets at 15 Laurels each.</p>
+  </div>
+
+  <h2>The Battle page</h2>
+  <div class="card">
+    <div class="map">
+      <div class="place"><b>Scenario Gate</b><span>The Campaign</span></div>
+      <div class="place new"><b>Drills</b><span>Runs 18 · +10 at 4:00</span></div>
+      <div class="place new"><b>Trials</b><span>Opens at five Lv 50 Umas</span></div>
+      <div class="place"><b>The Rift</b><span>Rift won · 3 ready</span></div>
+    </div>
+    <p class="note">Dashed: new places. Buildings come from one ChatGPT art packet; until then each uses an existing
+      uma-art building (CO31). The Gallery stands on the Learning page, where the Observatory stood.</p>
+  </div>
+</main>
+<script>
+(() => {
+  const root = document.documentElement
+  const css = (v) => getComputedStyle(root).getPropertyValue(v).trim()
+  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.addEventListener('click', () => {
+    const t = b.dataset.themeBtn
+    t === 'system' ? root.removeAttribute('data-theme') : root.setAttribute('data-theme', t)
+    document.querySelectorAll('[data-theme-btn]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+    flow()
+  }))
+
+  // ---- Content to tracks
+  function flow() {
+    const kinds = [['Campaign', '--k-camp'], ['Trials', '--k-trial'], ['Drills', '--k-drill'], ['The Rift', '--k-rift'], ['The Wilds', '--k-wilds']]
+    const tracks = ['Level', 'Class', 'Craft', 'Gear', 'Stars', 'World', 'Rift']
+    const links = [[0, 0, 'Fights'], [0, 1, 'I–IV'], [0, 5, 'Finals'], [1, 1, 'II–V'], [2, 0, 'Logs'], [2, 1, 'Logs\' share'], [3, 6, 'A won run'], [4, 2, 'Her jobs'], [4, 3, 'Made items'], [4, 4, 'Jewels']]
+    const ky = (i) => 40 + i * 70, ty = (i) => 30 + i * 52
+    let g = ''
+    for (const [k, t, label] of links) {
+      const x1 = 200, y1 = ky(k), x2 = 640, y2 = ty(t)
+      g += `<path d="M${x1},${y1} C${x1 + 180},${y1} ${x2 - 180},${y2} ${x2},${y2}" fill="none" stroke="${css(kinds[k][1])}" stroke-width="2.5" opacity=".75"/>`
+      const t = 0.72, bx = (u0, u1, u2, u3) => (1 - t) ** 3 * u0 + 3 * (1 - t) ** 2 * t * u1 + 3 * (1 - t) * t * t * u2 + t ** 3 * u3
+      const mx = bx(x1, x1 + 180, x2 - 180, x2), my = bx(y1, y1, y2, y2)
+      g += `<text x="${mx}" y="${my - 4}" text-anchor="middle" font-size="11" fill="${css('--ink-soft')}" paint-order="stroke" stroke="${css('--panel')}" stroke-width="4">${label}</text>`
+    }
+    kinds.forEach(([n, c], i) => { g += `<rect x="40" y="${ky(i) - 18}" width="160" height="36" rx="10" fill="${css('--raised')}" stroke="${css(c)}" stroke-width="2"/><text x="120" y="${ky(i) + 5}" text-anchor="middle" font-size="13" font-weight="600" fill="${css('--ink')}">${n}</text>` })
+    tracks.forEach((n, i) => { g += `<rect x="640" y="${ty(i) - 16}" width="200" height="32" rx="8" fill="${css('--accent-wash')}" stroke="${css('--accent')}" stroke-width="1.5"/><text x="740" y="${ty(i) + 5}" text-anchor="middle" font-size="13" font-weight="600" fill="${css('--ink')}">${n}${n === 'Rift' ? ' · 1 step' : ' · 5 steps'}</text>` })
+    document.getElementById('flow').innerHTML = g
+  }
+  flow()
+
+  // ---- Drills
+  const DRILLS = [['I', 10, 2], ['II', 20, 3], ['III', 30, 4], ['IV', 40, 5], ['V', 50, 6]]
+  let pick = 4
+  const dEl = document.getElementById('drills')
+  DRILLS.forEach(([n], i) => { const b = document.createElement('button'); b.textContent = n; b.setAttribute('aria-pressed', String(i === pick)); b.onclick = () => { pick = i; [...dEl.children].forEach((x, j) => x.setAttribute('aria-pressed', String(j === i))); calc() }; dEl.append(b) })
+  const toNext = (l) => 120 + 16 * l
+  const logsFrom = (l) => { let n = 0; for (let x = l; x < 50; x++) n += Math.ceil(toNext(x) / Math.ceil(toNext(x) / 3)); return n }
+  function calc() {
+    const runs = +document.getElementById('runs').value, from = +document.getElementById('from').value
+    document.getElementById('runsv').textContent = runs
+    document.getElementById('fromv').textContent = from
+    const perRun = DRILLS[pick][2], logs = runs * perRun, need = logsFrom(from)
+    document.getElementById('logs').textContent = logs
+    document.getElementById('lvls').textContent = (logs / 3).toFixed(1)
+    document.getElementById('per').textContent = need
+    document.getElementById('perl').textContent = `Logs from Lv ${from} to 50`
+    document.getElementById('days').textContent = (need / logs).toFixed(1)
+    let t = '<thead><tr><th>Drill</th><th class="num">Level</th><th class="num">Logs a win</th><th class="num">A day\'s runs</th><th class="num">Levels a day</th><th class="num">Days, Lv 1 → 50</th></tr></thead><tbody>'
+    for (const [n, l, p] of DRILLS) t += `<tr><td>Drill ${n}</td><td class="num">Lv ${l}</td><td class="num">${p}</td><td class="num">${runs * p}</td><td class="num">${(runs * p / 3).toFixed(1)}</td><td class="num">${(logsFrom(1) / (runs * p)).toFixed(1)}</td></tr>`
+    document.getElementById('drillTable').innerHTML = t + '</tbody>'
+  }
+  ;['runs', 'from'].forEach((id) => document.getElementById(id).addEventListener('input', calc))
+  calc()
+})()
+</script>
+</body>
+</html>

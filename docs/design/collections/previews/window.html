@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Window Reveal</title>
+<!-- Collections (docs/design/collections/collections.md §4): the reveal, step by step, on a made-up window built like the
+     bake's (a frame of bars, a sunburst behind her, her figure in panes, her face one sheet). No original art: the real
+     windows stay out of git (P6). Self-contained, uma-kit's tokens, light and dark. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --info: #2f6fe0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --radius: 12px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+    --success: #4fb37a; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 17px/1.25 ui-rounded, system-ui, sans-serif; margin: 28px 0 8px; }
+  p, li { color: var(--ink-soft); max-width: 78ch; }
+  a { color: var(--info); }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 3px; gap: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; cursor: pointer; min-height: 32px; }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .stage { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
+  .win { width: 100%; aspect-ratio: 1; border-radius: 6px; display: block; background: #0b0e16; }
+  .count { font: 700 28px/1 ui-rounded, system-ui; margin: 14px 0 4px; }
+  .count small { font-size: 14px; color: var(--ink-soft); font-weight: 600; }
+  .controls { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  label.lab { font-size: 12px; color: var(--ink-soft); font-weight: 600; min-width: 52px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .btn { border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); font: 600 13px system-ui; padding: 8px 14px; border-radius: 10px; cursor: pointer; min-height: 40px; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .board { display: grid; grid-template-columns: 70px repeat(5, minmax(0, 1fr)); gap: 6px; font-size: 12px; }
+  .board .h { color: var(--ink-faint); font-weight: 600; align-self: center; }
+  .tile { border: 1px solid var(--hairline-strong); border-radius: 8px; padding: 6px 4px; text-align: center; background: var(--sunken); color: var(--ink-faint); cursor: pointer; min-height: 40px; font: 600 11px/1.2 system-ui; }
+  .tile.on { background: var(--accent-wash); color: var(--ink); border-color: var(--accent); }
+  .tile.rift { grid-column: 2 / span 5; }
+  .strip { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+  .strip figure { margin: 0; text-align: center; font-size: 12px; color: var(--ink-soft); }
+  .strip svg { width: 100%; aspect-ratio: 1; display: block; border-radius: 4px; }
+  @media (max-width: 700px) { .strip { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  .note { font-size: 12px; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div>
+      <h1>The window reveal</h1>
+      <p>Each Uma's stained-glass window starts as dark glass and lights pane by pane, one step of her board at a time,
+        her face with the last. A made-up window, cut the way the bake cuts the real ones: a frame of bars, a sunburst
+        behind her, her figure in panes and her face as one sheet. <a href="../collections.md#4-the-reveal">Doc §4</a>.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Theme">
+      <button data-theme-btn="system" aria-pressed="true">System</button>
+      <button data-theme-btn="light" aria-pressed="false">Light</button>
+      <button data-theme-btn="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+
+  <div class="card stage">
+    <div>
+      <svg id="big" class="win" viewBox="0 0 512 512" role="img" aria-label="A made-up window"></svg>
+      <div class="count"><span id="n">0</span><small> of 31 lit</small></div>
+      <div class="note" id="what">Every pane dark. The lead shows whose window it is.</div>
+    </div>
+    <div class="controls">
+      <div class="row"><label class="lab" for="slider">Steps</label><input id="slider" type="range" min="0" max="31" value="0"></div>
+      <div class="row">
+        <button class="btn primary" id="play">Play</button>
+        <button class="btn" id="minus">−1</button>
+        <button class="btn" id="plus">+1</button>
+        <button class="btn" id="zero">0</button>
+        <button class="btn" id="full">31</button>
+      </div>
+      <div class="row"><span class="lab">Order</span>
+        <div class="seg" role="group" aria-label="Order">
+          <button data-order="outside" aria-pressed="true">Outside in (CO4)</button>
+          <button data-order="rising" aria-pressed="false">Rising</button>
+          <button data-order="mosaic" aria-pressed="false">Mosaic</button>
+        </div>
+      </div>
+      <div class="row"><span class="lab">Unlit</span>
+        <div class="seg" role="group" aria-label="Unlit look">
+          <button data-look="dark" aria-pressed="true">Dark glass (CO3)</button>
+          <button data-look="gray" aria-pressed="false">Gray</button>
+        </div>
+      </div>
+      <div>
+        <div class="note" style="margin-bottom:6px">Her board, Tier 1: tap a tile to earn or drop it. The window counts tiles, not which ones.</div>
+        <div class="board" id="board"></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Eight moments</h2>
+  <p>The same window at 0, 4, 10, 15, 20, 25, 30 and 31 of 31, in the order and look picked above.</p>
+  <div class="card"><div class="strip" id="strip"></div></div>
+
+  <h2>The three orders</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Order</th><th>What lights first</th><th>Around step 15</th><th>At 30 of 31</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><b>Outside in</b> (CO4)</td><td>The frame's bars and corners, then the sunburst from its rim toward her head</td><td>A dark figure against lit glass: her silhouette</td><td>Everything but her face</td><td><b>Recommended:</b> one story, frame, light, her, her face</td></tr>
+        <tr><td>Rising</td><td>Everything near the sill: the frame's foot and her dress</td><td>The lower half lit</td><td>Everything but her face</td><td>Reads well, but her clothes come before the frame</td></tr>
+        <tr><td>Mosaic</td><td>Panes at random</td><td>Scattered color everywhere</td><td>Everything but her face</td><td>Shows her colors earliest, reads as noise, loses the silhouette</td></tr>
+      </tbody>
+    </table>
+    <p class="note">All three keep the face for the last step, so a full window always means "ready to ascend". On real
+      windows the same three were tried on the bake's own panes; those images went to the owner only.</p>
+  </div>
+
+  <h2>How the game draws it</h2>
+  <div class="card">
+    <table>
+      <tbody>
+        <tr><th>The art</th><td><code>outfit-glass</code>, 512 × 512, already in the release for every outfit</td></tr>
+        <tr><th>The pane map</th><td><code>outfit-glass-order</code> (new): the same size, grayscale, each pixel its pane's place in the order, 1–250; the face 255; the lead 0. Lossless WebP, about 8–15 KB</td></tr>
+        <tr><th>Lit</th><td>A pixel whose value is at most 250 × lit ÷ 30 is drawn as is; at 31 the face too</td></tr>
+        <tr><th>Unlit</th><td>A sixth of its light, three quarters of its color drained, a cold tint. Lead always as is</td></tr>
+        <tr><th>Cost</th><td>One canvas pass over 262,144 pixels, cached by the share lit</td></tr>
+        <tr><th>A step lit</th><td>The new panes fade up over 600 ms (at once under reduced motion)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+<script>
+(() => {
+  const N = 31
+  // Theme
+  const root = document.documentElement
+  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.addEventListener('click', () => {
+    const t = b.dataset.themeBtn
+    if (t === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t)
+    document.querySelectorAll('[data-theme-btn]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+  }))
+
+  // A seeded random, so the made-up window is the same every load.
+  let seed = 11
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646 }
+  const hex = (c) => '#' + c.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('')
+  const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+  const jitter = (h, a) => hex(rgb(h).map((v) => v + (rnd() - 0.5) * a))
+
+  // --- The window: panes {d, fill, group, cx, cy}
+  const panes = []
+  const S = 512, B = 26, C = { x: 256, y: 196 }
+  const pt = (cx, cy, r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)]
+  // Frame: twelve bars a side, four corners.
+  const span = (S - 2 * B) / 12
+  for (let i = 0; i < 12; i++) {
+    const fill = i % 2 ? '#8a3d22' : '#f3d3a2'
+    const x = B + i * span
+    panes.push({ d: `M${x} 0h${span}v${B}h${-span}Z`, fill: jitter(fill, 14), group: 'frame', cx: x + span / 2, cy: B / 2 })
+    panes.push({ d: `M${x} ${S - B}h${span}v${B}h${-span}Z`, fill: jitter(fill, 14), group: 'frame', cx: x + span / 2, cy: S - B / 2 })
+    panes.push({ d: `M0 ${x}h${B}v${span}h${-B}Z`, fill: jitter(fill, 14), group: 'frame', cx: B / 2, cy: x + span / 2 })
+    panes.push({ d: `M${S - B} ${x}h${B}v${span}h${-B}Z`, fill: jitter(fill, 14), group: 'frame', cx: S - B / 2, cy: x + span / 2 })
+  }
+  for (const [x, y] of [[0, 0], [S - B, 0], [0, S - B], [S - B, S - B]]) panes.push({ d: `M${x} ${y}h${B}v${B}h${-B}Z`, fill: '#e8c25a', group: 'frame', cx: x + B / 2, cy: y + B / 2 })
+  // Her figure's outline, to drop sunburst panes hidden behind her.
+  const hair = { x: 256, y: 252, rx: 132, ry: 168 }
+  const inHair = (x, y) => ((x - hair.x) / hair.rx) ** 2 + ((y - hair.y) / hair.ry) ** 2 < 1
+  const inBody = (x, y) => y > 388 && Math.abs(x - 256) < 70 + (y - 388) * 1.6
+  // Sunburst: five rings of wedges from her head, palest at the centre.
+  const rings = [0, 92, 150, 208, 270, 420], wedges = [18, 24, 30, 36, 42]
+  const tones = ['#fbe6bb', '#f5c67a', '#eca250', '#de8236', '#c3632a']
+  for (let i = 0; i < 5; i++) {
+    for (let s = 0; s < wedges[i]; s++) {
+      const a0 = (s + (i % 2) * 0.5) / wedges[i] * Math.PI * 2, a1 = (s + 1 + (i % 2) * 0.5) / wedges[i] * Math.PI * 2
+      const r0 = Math.max(rings[i], 1), r1 = rings[i + 1]
+      const mid = (a0 + a1) / 2, rm = (r0 + r1) / 2
+      const [mx, my] = pt(C.x, C.y, Math.min(rm, 240), mid)
+      if (inHair(mx, my) || inBody(mx, my)) continue
+      const p = [pt(C.x, C.y, r0, a0), pt(C.x, C.y, r1, a0), pt(C.x, C.y, r1, a1), pt(C.x, C.y, r0, a1)]
+      const d = `M${p[0]}L${p[1]}A${r1} ${r1} 0 0 1 ${p[2]}L${p[3]}A${r0} ${r0} 0 0 0 ${p[0]}Z`
+      panes.push({ d, fill: jitter(tones[i], s % 2 ? 22 : 8), group: 'sky', cx: mx, cy: my, r: rm })
+    }
+  }
+  // Back hair: slices of an ellipse around her head.
+  const hairTones = ['#2b3f8f', '#36509f', '#253370', '#3f5aa8']
+  const HS = 16
+  for (let s = 0; s < HS; s++) {
+    const a0 = s / HS * Math.PI * 2 - Math.PI / 2, a1 = (s + 1) / HS * Math.PI * 2 - Math.PI / 2
+    const p0 = [hair.x + hair.rx * Math.cos(a0), hair.y + hair.ry * Math.sin(a0)], p1 = [hair.x + hair.rx * Math.cos(a1), hair.y + hair.ry * Math.sin(a1)]
+    const am = (a0 + a1) / 2
+    panes.push({ d: `M${hair.x} ${hair.y}L${p0}A${hair.rx} ${hair.ry} 0 0 1 ${p1}Z`, fill: jitter(hairTones[s % 4], 10), group: 'figure', cx: hair.x + hair.rx * 0.8 * Math.cos(am), cy: hair.y + hair.ry * 0.8 * Math.sin(am) })
+  }
+  // Ears and a ribbon.
+  for (const side of [-1, 1]) {
+    const bx = 256 + side * 70
+    panes.push({ d: `M${bx - side * 30} 118L${bx + side * 8} 36L${bx + side * 34} 104Z`, fill: '#2f468f', group: 'figure', cx: bx, cy: 86 })
+    panes.push({ d: `M${bx - side * 14} 108L${bx + side * 8} 58L${bx + side * 22} 100Z`, fill: '#e9a1a8', group: 'figure', cx: bx + side * 4, cy: 92 })
+  }
+  panes.push({ d: 'M306 70L350 46L344 92Z', fill: '#d23a6a', group: 'figure', cx: 334, cy: 70 })
+  panes.push({ d: 'M306 70L276 40L272 84Z', fill: '#e0507e', group: 'figure', cx: 284, cy: 64 })
+  // Body: shoulders and dress in shards, a white collar.
+  const cols = 7, top = 388, base = S - B
+  for (let r = 0; r < 2; r++) {
+    for (let c = 0; c < cols; c++) {
+      const y0 = top + r * (base - top) / 2, y1 = top + (r + 1) * (base - top) / 2
+      const w0 = 70 + (y0 - 388) * 1.6, w1 = 70 + (y1 - 388) * 1.6
+      const x00 = 256 - w0 + c * (2 * w0 / cols), x01 = x00 + 2 * w0 / cols
+      const x10 = 256 - w1 + c * (2 * w1 / cols), x11 = x10 + 2 * w1 / cols
+      panes.push({ d: `M${x00} ${y0}L${x01} ${y0}L${x11} ${y1}L${x10} ${y1}Z`, fill: jitter(c % 2 ? '#a82a2a' : '#c23b33', 14), group: 'figure', cx: (x00 + x11) / 2, cy: (y0 + y1) / 2 })
+    }
+  }
+  panes.push({ d: 'M226 360L256 420L200 404Z', fill: '#f1f1f5', group: 'figure', cx: 228, cy: 395 })
+  panes.push({ d: 'M286 360L256 420L312 404Z', fill: '#e6e8f0', group: 'figure', cx: 284, cy: 395 })
+  panes.push({ d: 'M236 318h40v52h-40Z', fill: '#f2cdb9', group: 'figure', cx: 256, cy: 344 })
+  // The face: one sheet. Bangs over its brow.
+  panes.push({ d: 'M256 166A70 84 0 1 1 255.9 166Z', fill: '#f8dccb', group: 'face', cx: 256, cy: 250 })
+  for (let i = 0; i < 6; i++) {
+    const x = 186 + i * 23.3
+    panes.push({ d: `M${x} 160L${x + 23.3} 160L${x + 14 + (i % 2) * 8} ${206 + (i % 3) * 8}Z`, fill: jitter(hairTones[i % 4], 12), group: 'figure', cx: x + 12, cy: 178 })
+  }
+  // Enamel: the face's painted lines, always faintly there.
+  const enamel = '<g fill="none" stroke="#3a2a2a" stroke-width="3" stroke-linecap="round" opacity=".85"><path d="M218 244q14-10 28 0"/><path d="M266 244q14-10 28 0"/><ellipse cx="232" cy="256" rx="9" ry="11" fill="#5a3fa0" stroke="none"/><ellipse cx="280" cy="256" rx="9" ry="11" fill="#5a3fa0" stroke="none"/><path d="M242 292q14 10 28 0"/></g>'
+
+  // --- Orders
+  const order = {}
+  const nonFace = panes.map((p, i) => i).filter((i) => panes[i].group !== 'face')
+  const face = panes.findIndex((p) => p.group === 'face')
+  const dist = (p) => Math.hypot(p.cx - C.x, p.cy - C.y)
+  const grp = { frame: 0, sky: 1, figure: 2 }
+  order.outside = [...nonFace].sort((a, b) => {
+    const pa = panes[a], pb = panes[b]
+    if (grp[pa.group] !== grp[pb.group]) return grp[pa.group] - grp[pb.group]
+    return pa.group === 'figure' ? pb.cy - pa.cy : dist(pb) - dist(pa)
+  })
+  const jit = nonFace.map(() => (rnd() - 0.5) * 36)
+  order.rising = [...nonFace].sort((a, b) => (panes[b].cy + jit[nonFace.indexOf(b)]) - (panes[a].cy + jit[nonFace.indexOf(a)]))
+  order.mosaic = [...nonFace]
+  for (let i = order.mosaic.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order.mosaic[i], order.mosaic[j]] = [order.mosaic[j], order.mosaic[i]] }
+
+  const unlit = (h, look) => {
+    const c = rgb(h), y = 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]
+    if (look === 'gray') return hex([y * 0.62 + 18, y * 0.62 + 18, y * 0.62 + 18])
+    return hex(c.map((v, i) => (0.3 * v + 0.7 * y) * 0.16 + [9, 11, 18][i]))
+  }
+  const litSet = (n, ord) => {
+    const P = ord.length
+    const k = n >= N - 1 ? P : Math.ceil(P * n / (N - 1))
+    const s = new Set(ord.slice(0, k))
+    if (n >= N) s.add(face)
+    return s
+  }
+  const render = (svg, n, ord, look, fade) => {
+    const lit = litSet(n, ord)
+    const prev = svg.__lit || new Set()
+    let html = '<rect width="512" height="512" fill="#0e1117"/>'
+    panes.forEach((p, i) => {
+      const on = lit.has(i)
+      const fresh = fade && on && !prev.has(i)
+      html += `<path d="${p.d}" fill="${on ? p.fill : unlit(p.fill, look)}" stroke="#0e1117" stroke-width="3.5" stroke-linejoin="round"${fresh ? ' class="fresh"' : ''}/>`
+    })
+    html += `<g opacity="${lit.has(face) ? 1 : 0.32}">${enamel}</g>`
+    html += '<rect x="1.5" y="1.5" width="509" height="509" fill="none" stroke="#0e1117" stroke-width="3"/>'
+    svg.innerHTML = html
+    svg.__lit = lit
+    if (fade && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      svg.querySelectorAll('.fresh').forEach((el) => el.animate([{ filter: 'brightness(.25)' }, { filter: 'brightness(1)' }], { duration: 600, easing: 'ease-out' }))
+    }
+  }
+
+  // --- Board
+  const board = [
+    ['Level', ['Lv 10', 'Lv 20', 'Lv 30', 'Lv 40', 'Lv 50']],
+    ['Class', ['R10', 'R30', 'R50', '2 at R50', '3 at R50']],
+    ['Craft', ['Craft 10', 'Craft 20', 'Craft 30', 'Craft 40', 'Craft 50']],
+    ['Gear', ['G2', 'G4', 'G6', 'G8', 'G10']],
+    ['Stars', ['Stars I', 'Stars II', 'Stars III', 'Stars IV', 'Stars V']],
+    ['World', ['Cont. 1', 'Cont. 2', 'Cont. 3', 'Cont. 4', 'Cont. 5']],
+  ]
+  // A typical earn order (the board page's fresh-world model), so the slider fills tiles as play would.
+  const typical = ['Lv 10', 'R10', 'Cont. 1', 'G2', 'Stars I', 'Lv 20', 'Cont. 2', 'Craft 10', 'R30', 'Lv 30', 'Cont. 3', 'R50', 'G4', 'Stars II', 'Lv 40', 'Cont. 4', 'Lv 50', 'Cont. 5', '2 at R50', '3 at R50', 'Craft 20', 'G6', 'Stars III', 'Craft 30', 'G8', 'Stars IV', 'Craft 40', 'Rift', 'G10', 'Stars V', 'Craft 50']
+  const earned = new Set()
+  const boardEl = document.getElementById('board')
+  const tiles = {}
+  board.forEach(([track, steps]) => {
+    boardEl.insertAdjacentHTML('beforeend', `<div class="h">${track}</div>`)
+    steps.forEach((s) => { const b = document.createElement('button'); b.className = 'tile'; b.textContent = s; b.dataset.k = s; boardEl.append(b); tiles[s] = b })
+  })
+  boardEl.insertAdjacentHTML('beforeend', '<div class="h">Rift</div>')
+  const rift = document.createElement('button'); rift.className = 'tile rift'; rift.textContent = 'On a won Rift run'; rift.dataset.k = 'Rift'; boardEl.append(rift); tiles.Rift = rift
+  boardEl.addEventListener('click', (e) => {
+    const k = e.target.dataset && e.target.dataset.k
+    if (!k) return
+    earned.has(k) ? earned.delete(k) : earned.add(k)
+    set(earned.size, false, true)
+  })
+
+  // --- State
+  let n = 0, ord = 'outside', look = 'dark', timer = null
+  const big = document.getElementById('big'), slider = document.getElementById('slider')
+  const what = (n) => n === 0 ? 'Every pane dark. The lead shows whose window it is.'
+    : n < 4 ? 'The frame lights first.'
+    : n < 14 ? 'The glass behind her, from the rim inward.'
+    : n < 22 ? 'Her silhouette against lit glass; her figure lights from the bottom up.'
+    : n < 30 ? 'Her colors fill in toward her face.'
+    : n === 30 ? 'Everything but her face: one step to go.'
+    : 'Full: her face is lit, and she can ascend.'
+  function set(v, fade = true, fromBoard = false) {
+    n = Math.max(0, Math.min(N, v))
+    if (!fromBoard) { earned.clear(); typical.slice(0, n).forEach((k) => earned.add(k)) }
+    Object.entries(tiles).forEach(([k, el]) => el.classList.toggle('on', earned.has(k)))
+    slider.value = n
+    document.getElementById('n').textContent = n
+    document.getElementById('what').textContent = what(n)
+    render(big, n, order[ord], look, fade)
+  }
+  function strip() {
+    const el = document.getElementById('strip')
+    el.innerHTML = ''
+    for (const k of [0, 4, 10, 15, 20, 25, 30, 31]) {
+      const f = document.createElement('figure')
+      f.innerHTML = `<svg viewBox="0 0 512 512"></svg><figcaption>${k} of 31</figcaption>`
+      el.append(f)
+      render(f.querySelector('svg'), k, order[ord], look, false)
+    }
+  }
+  slider.addEventListener('input', () => set(+slider.value))
+  document.getElementById('plus').onclick = () => set(n + 1)
+  document.getElementById('minus').onclick = () => set(n - 1, false)
+  document.getElementById('zero').onclick = () => set(0, false)
+  document.getElementById('full').onclick = () => set(N)
+  document.getElementById('play').onclick = (e) => {
+    if (timer) { clearInterval(timer); timer = null; e.target.textContent = 'Play'; return }
+    if (n >= N) set(0, false)
+    e.target.textContent = 'Pause'
+    timer = setInterval(() => { if (n >= N) { clearInterval(timer); timer = null; e.target.textContent = 'Play'; return } set(n + 1) }, 420)
+  }
+  const seg = (attr, fn) => document.querySelectorAll(`[${attr}]`).forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll(`[${attr}]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+    fn(b.getAttribute(attr)); set(n, false, true); strip()
+  }))
+  seg('data-order', (v) => { ord = v })
+  seg('data-look', (v) => { look = v })
+  set(0, false); strip()
+})()
+</script>
+</body>
+</html>
