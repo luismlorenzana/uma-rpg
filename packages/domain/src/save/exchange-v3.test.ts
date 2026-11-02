@@ -21,7 +21,7 @@ function worldWith(tier: number, continents: readonly number[], overrides: Parti
 }
 const saveOf = (tier: number, world: TierWorld): Save => ({
   schemaVersion: SAVE_SCHEMA_VERSION,
-  account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
+  account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {}, windows: {}, windowsStart: NOW },
   tierWorlds: { [String(tier)]: world },
 })
 

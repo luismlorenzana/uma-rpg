@@ -51,9 +51,6 @@ export const PLACE_UI: Record<string, PlaceUi> = {
   warehouse: {
     Page: lazy(() => import('./warehouse/WarehousePage')),
   },
-  observatory: {
-    Page: lazy(() => import('./observatory/ObservatoryPage')),
-  },
   gallery: {
     Page: lazy(() => import('./gallery/GalleryPage')),
   },

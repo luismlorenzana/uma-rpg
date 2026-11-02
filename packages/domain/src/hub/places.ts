@@ -5,7 +5,6 @@ import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import { rpgClassName } from '../rpg/class-tree'
 import { HERO_HALL_PLACES, heroSeatHome, type HeroHall } from '../rpg/hero-id'
-import { collectionsLive } from '../save/collections'
 
 export const HUB_PAGES = ['town', 'learning', 'battle', 'wilds'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
@@ -223,7 +222,7 @@ export function learningPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] 
       hallV19('summoner', 'Summoner Circle', 'familiars, summoned', { x: 0.78, y: 0.33 }, engine),
       hallV19('healer', 'Healer Sanctum', 'a followed deity', { x: 0.5, y: 0.56 }, engine),
       // The owner: the Observatory goes, and the Gallery stands in its place (D283, CO7).
-      collectionsLive() ? GALLERY : OBSERVATORY,
+      GALLERY,
     ]
   }
   if (!rpgV2(engine)) {
@@ -305,8 +304,8 @@ const BATTLE: Place[] = [
   },
   {
     id: 'tier-finale', page: 'battle', kind: 'battle', name: 'The Rift', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.72 }, frame: 'rift',
-    blurb: 'Twenty Lv 50 Umas seal four fronts, then ascend together.',
-    details: ['Four fronts of twelve stages, then the Convergence', 'Ascend: all twenty move up a tier'],
+    blurb: 'Twenty Lv 50 Umas seal four fronts and win the Rift step.',
+    details: ['Four fronts of twelve stages, then the Convergence', 'A win lights the Rift step of all twenty windows'],
   },
   {
     // Its own building comes with H156's art; until then uma-art's unused Knights' Bastion.
@@ -319,7 +318,6 @@ const BATTLE: Place[] = [
     id: 'drills', page: 'battle', kind: 'battle', name: 'Drills', opensIn: 'S8', slots: 0, at: { x: 0.8, y: 0.52 }, frame: 'gym',
     blurb: 'Five fights a day pay Training Logs.',
     details: ['Ten runs a day, banked to thirty', 'A Training Log holds one fight’s EXP'],
-    ...(collectionsLive() ? {} : { hidden: true }),
   },
 ]
 
@@ -337,10 +335,10 @@ export function placeById(id: string | undefined): Place | undefined {
 }
 
 /** Places a later generation folded into another (HV21): since H134 the Paladin Bastion and the Cleric Chapel stand as the
- * Healer Sanctum. */
+ * Healer Sanctum, and since H157 the Observatory as the Gallery. */
 const MOVED_PLACES: Readonly<Record<string, string>> = { 'paladin-bastion': 'healer-sanctum', 'cleric-chapel': 'healer-sanctum',
-  // From save v35 the Observatory's links land on the Gallery (D283).
-  ...(collectionsLive() ? { observatory: 'gallery' } : {}) }
+  // Since save v35 the Observatory's links land on the Gallery (D283).
+  observatory: 'gallery' }
 
 /** Where an old link's place stands now, for an id the live generation has no place for (an old bookmark, an Inheritance
  * row read before save v32): the place it folded into, or undefined. */

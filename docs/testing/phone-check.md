@@ -1,7 +1,7 @@
 # Current phone check
 
 Use this script for a release, in order, on the [live game](https://uma-rpg.web.app). It tests the game as it runs today
-(engine v20, save v34); the screens are in [Game sections](../game/sections.md) and the rules in the [game
+(engine v21, save v35); the screens are in [Game sections](../game/sections.md) and the rules in the [game
 manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
 
 Use your existing save; do not reset it. Before you start, have: one full party of five with one healer; an Uma at Lv 10
@@ -12,7 +12,7 @@ you are away, or with Speed Tickets (step 22).
 
 **Phone only** means an installed iPhone app or the production service is required; local auth-off previews cannot check
 it. Check the other steps at 390×844, then repeat the busy screens at 375×667: the Wilds page, the profile's four tabs and Details,
-the Classes and promotion sheets, a Wilds job sheet, the Learning page, the fight and the Exchange's Manual sheet. Every
+the Classes and promotion sheets, a Wilds job sheet, the Learning page, the Window sheet, the Gallery, the Drills page, the fight and the Exchange's Manual sheet. Every
 button and footer should stay reachable without horizontal page scrolling, in light and dark.
 
 1. **Phone only — install.** In Safari open the live game, tap Share → Add to Home Screen, then open Uma RPG from its
@@ -126,8 +126,14 @@ button and footer should stay reachable without horizontal page scrolling, in li
     **+** for a Learner: the picker shows `Bond n/10 · n/2 Heroes` and "Adds …", and Umas that can't sit there show why.
     Open the Learner's sheet: expect `Bond n/10 · Strength n%` and **Leave**. A Hero's sheet says
     `Hero · Strength 100%`; emptying its seat uses the compact **Empty seat** confirmation. (D106, D241, D255, D258)
-19. **Observatory.** Expect a list of her Umas, those with a jewel ready first, each `Open n/22 · n ready`. Tap one: her profile
-    on Stars. Back returns to the list. (D269)
+19. **Windows and the Gallery** (save v35). On an owned Uma's profile expect her stained-glass window beside the bust, "n%"
+    on its corner; a locked outfit has none. Tap it: the Window sheet, "Tier 1 · n/31 · n%", her window, six rows of five
+    tiles with each row's share and the Rift tile; a lit tile shows its day, a row's next tile what's left ("Lv 34/40",
+    "8 of 11 at G6"). Tap a tile: its rule and where it comes from under the board. Open **Learning → Gallery** (where the
+    Observatory stood): "n full · n ready", "Collection n%", All · Ready · Owned · Locked, and the grid ranked most complete
+    first, "1. Name" and "n/31 · n%", then the locked outfits dark with a lock. Tap an owned Uma: her Window sheet; a
+    locked one: her Stable profile. Do something that crosses a step (a level, a grade): expect "Window +1 · …" with her
+    name for a moment, and the tile lit with today's date. (D283, D287)
 20. **Wilds: gather.** At **Wilds → Mine** (or her trade's gathering place) tap a free slot. Expect Who → How many →
     What: her trade's Umas first with "C{Craft Level}", others greyed "Another trade" (unless the header says "Open
     shop: …"); sizes ×1, ×2, ×3, ×5, ×10, ×15 and ×20, each with its time, about half an hour to 8 hours; ten raw tiles,
@@ -179,17 +185,23 @@ button and footer should stay reachable without horizontal page scrolling, in li
     result like a win, and MP unchanged. An elite, a boss or an uncleared stage offers no Sweep. (D79)
 31. **Spring.** With some MP spent, tap the region's **Spring · MP** (or a continent's Spring). Expect the party's MP
     refilled and its recharge time; it is off during an open fight. (D72)
-32. **The Rift** (a tier with five Lv 50 Umas; skip otherwise). Open its quick look and page: each front's guidance by
-    family ("2 Brawler · Arms Spellblade · Arms Summoner · Paladin"). Open an Echo: its foes ("Shield n · Weak:" and the
-    ward), a party, its guided weapons with **Use the guided weapons**, and under them each guided class the party
-    lacks ("Needs an Arms Summoner") with the Umas who could fill it, "Ready to promote" first, then "Holds it"; a row
-    opens her Class tab. **Fight**; win or give up, and expect "Back to the Rift". If a run is on, open a front's chain
-    (the next stage ringed), its stage sheet and the Convergence card. Sign up twenty only for a run you mean to play.
-    (H50, D206, CV23)
-33. **Tiers.** Tap the crest: the Tier sheet shows one card per tier, a tier with no world locked with "Promote Umas
+32. **Drills** (save v35; after the tier's first map win). Open **Battle → Drills**: "Runs n · +10 at 4:00", **Read Logs ·
+    n** and five rows, "Drill I · Lv 10" to "Drill V · Lv 50", "2 Logs a win" to "6". Fight Drill I: expect the fight,
+    "+2 Training Logs" and one run fewer. Then **Sweep ×1**: one run spent and the Logs added. **Read Logs**: pick an Uma
+    below Lv 50, a count, **Read n**: "Lv a → b · Ra → Rb", and the sheet stays open. (D286)
+33. **The Rift and Trials** (a tier with five Lv 50 Umas; skip otherwise). Open the Rift's quick look and page: each
+    front's guidance by family ("2 Brawler · Arms Spellblade · Arms Summoner · Paladin"). Open **Battle → Trials** and a
+    Trial: its foes ("Shield n · Weak:" and the ward), a party, its guided weapons with **Use the guided weapons**, and
+    under them each guided class the party lacks ("Needs an Arms Summoner") with the Umas who could fill it, "Ready to
+    promote" first, then "Holds it"; a row opens her Class tab. **Fight**; win or give up, and expect "Back to Trials". If
+    a run is on, open a front's chain (the next stage ringed), its stage sheet, the Convergence card and **Roster**: the
+    twenty windows with "n/31". After a won run, the Rift shows a **Gallery** door, "Rift won · n ready", and **Sign up
+    twenty** again. With a ready Uma, the Gallery's **Ascend n** lists her ticked, "Lv 1 in Tier 2" and the purse;
+    ascend only an Uma you mean to move up. Sign up twenty only for a run you mean to play. (H50, H153, D206, D283, CV23)
+34. **Tiers.** Tap the crest: the Tier sheet shows one card per tier, a tier with no world locked with "Promote Umas
     through the Tier n Rift". With a Tier 2 world, pick it: expect the veil, Tier 2's Town Hall in dusk amber and its
     own wallet with no Uma Tickets chip; its Umas' Classes sheet has no Tier 0 row. Switch back. (H35, H36)
-34. **Phone only — push.** In the Home Screen app open **Account → Notifications**, turn it on, allow the prompt and tap
+35. **Phone only — push.** In the Home Screen app open **Account → Notifications**, turn it on, allow the prompt and tap
     **Send a test**. Expect the test push. Leave a job near its end and close the app: expect "Work done" with its
     place, item and count within about five minutes of the end; tap it and expect that place on its tier, its Ready
     state and the app badge.

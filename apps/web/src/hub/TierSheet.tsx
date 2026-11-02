@@ -19,8 +19,8 @@ export const umaCount = (n: number): string => (n === 0 ? 'No Umas yet' : n === 
 /** A world's Rift, in one line (H50): none in this tier, shut, open, a run's sealed fronts, or a won run. */
 export function riftLine(world: Pick<TierWorld, 'umas' | 'rift'>, tier: number): string {
   if (!(RIFT_TIERS as readonly number[]).includes(tier)) return 'No Rift in this tier yet'
+  // A won run is done (save v35, D283): its twenty ascend from the Gallery, and the Rift is open for the next twenty.
   const run = openRiftRun(world.rift)
-  if (run?.wonAt) return 'Rift won · ready to ascend'
   if (run) return `Rift run · ${RIFT_FRONTS.filter((f) => run.fronts[f] >= RIFT_STAGES).length} of 4 fronts sealed`
   return riftOpen(world, tier) ? 'The Rift is open' : 'The Rift opens at five Lv 50 Umas'
 }

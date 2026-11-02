@@ -1,10 +1,10 @@
 // The Rift (H50, rift.md §4–§8): the Battle page's end-of-tier event. Routes under `/battle/tier-finale/`: `` the Rift,
 // `front/<front>` (and `/<stage>`) a front's chain, `convergence`, `signup` and `fight`. The Rift shows the open fight's
-// Resume, sign-up or the run's four fronts and the Convergence, Ascend once won, and the run's roster. Its Echoes are
-// fought at Trials since H153 (D283). From save v35 a won run's Umas ascend from the Gallery, one by one (H155): the Rift
-// shows the win, how many are ready and the Gallery's door, and the roster's faces are their windows.
+// Resume, sign-up or the run's four fronts and the Convergence, and the run's roster. Its Echoes are fought at Trials
+// since H153 (D283). Since save v35 a won run's Umas ascend from the Gallery, one by one (H155): the Rift shows the win,
+// how many are ready and the Gallery's door, and the roster's faces are their windows.
 import {
-  collectionsLive, CONVERGENCE_FIGHTS, FRONT_NAME, lastWonRiftRun, placeById, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, riftLevel50s, SaveRuleError,
+  CONVERGENCE_FIGHTS, FRONT_NAME, lastWonRiftRun, placeById, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, riftLevel50s, SaveRuleError,
   type RiftFront, type RiftRun,
 } from '@rpg/domain'
 import { cancelRiftBlock } from '@rpg/domain/rift'
@@ -17,10 +17,8 @@ import { cancelRiftSignUp } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import { GlassWindow } from '../gallery/GlassWindow'
 import type { PageProps } from '../registry'
-import { AscendSheet } from './AscendSheet'
 import { ConvergenceView } from './ConvergenceView'
 import { frontCount, FrontChain, ResumeRift } from './FrontChain'
-import { Faces } from './PartyPick'
 import { partyGuidance } from './rift-view'
 import { RiftFightRoute } from './RiftFightRoute'
 import { SignUp } from './SignUp'
@@ -72,13 +70,11 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
   const { save, world, run, tier, key } = useRift()
   const nav = useHubNavigation()
   const [roster, setRoster] = useState(false)
-  const [ascending, setAscending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   if (!save || !world) return null
   const n50 = riftLevel50s(world)
   const cancelBlock = run ? cancelRiftBlock(save, key) : 'No run'
-  const live = collectionsLive()
-  const won = live && !run ? lastWonRiftRun(world.rift) : null
+  const won = run ? null : lastWonRiftRun(world.rift)
   const gallery = placeById('gallery')
   return (
     <div className="space-y-4 p-3 pb-6">
@@ -90,11 +86,6 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
             className="flex min-h-14 w-full flex-col items-center justify-center rounded-sm bg-accent font-display font-bold text-accent-ink disabled:opacity-50">
             Sign up twenty
             {n50 < RIFT_ROSTER && <span className="text-[12px] font-semibold">{n50} of {RIFT_ROSTER} at Lv 50</span>}
-          </button>
-        )}
-        {!live && run?.wonAt && (
-          <button type="button" onClick={() => setAscending(true)} className="flex min-h-14 w-full items-center justify-center rounded-sm bg-accent font-display text-[17px] font-bold text-accent-ink">
-            Ascend to Tier {tier + 1}
           </button>
         )}
         {won && gallery && (
@@ -152,7 +143,6 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
         ) : undefined}>
           <ul className="grid grid-cols-5 gap-2">
             {run.roster.map((id) => {
-              if (!live) return <li key={id} className="flex justify-center"><Faces campaign={campaign} ids={[id]} size={52} /></li>
               const w = windowOf(save, id, tier)
               return (
                 <li key={id} className="flex flex-col items-center gap-0.5 text-[11px] text-ink-soft" data-rift-window={id}>
@@ -165,7 +155,6 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
           {error && <p role="alert" className="mt-2 text-[13px] text-danger">{error}</p>}
         </BottomSheet>
       )}
-      {!live && <AscendSheet campaign={campaign} open={ascending} onClose={() => setAscending(false)} />}
     </div>
   )
 }

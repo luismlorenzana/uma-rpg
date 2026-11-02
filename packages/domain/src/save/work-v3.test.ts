@@ -26,7 +26,7 @@ function saveOf(umas: Record<string, number>, items: Record<string, number> = {}
     umas: Object.fromEntries(Object.entries(umas).map(([id, level]) => [id, gradedUma({ craft: { level, exp: 0 } })])) })
   return {
     schemaVersion: SAVE_SCHEMA_VERSION,
-    account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
+    account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {}, windows: {}, windowsStart: ECONOMY_V3_NOW },
     tierWorlds: { [tier]: world },
   }
 }

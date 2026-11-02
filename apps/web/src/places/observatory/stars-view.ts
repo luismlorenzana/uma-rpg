@@ -135,7 +135,3 @@ export function nodeSheet(outfit: Outfit, uma: OwnedUma, node: string, classId: 
     footer: open ? null : { label, ready: label === 'Set' } }
 }
 
-/** The Observatory's list (H122 decision 6): owned Umas, those with the most ready first, then the roster's default. */
-export function observatoryOrder<R extends { id: string }>(rows: readonly R[], readyOf: (id: string) => number, tie: (a: R, b: R) => number): R[] {
-  return [...rows].sort((a, b) => readyOf(b.id) - readyOf(a.id) || tie(a, b))
-}

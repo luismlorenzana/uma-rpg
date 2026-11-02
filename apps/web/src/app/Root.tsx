@@ -4,7 +4,7 @@
 // (H36) sits here, outside the shell that remounts per tier.
 import { useAuth } from '@luismlorenzana/uma-kit/auth'
 import { BootGates, UpdateNotice } from '@luismlorenzana/uma-kit/places'
-import { collectionsLive, DEFAULT_TRAINER_NAME, STARTING_UNLOCK_TICKETS, TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
+import { DEFAULT_TRAINER_NAME, STARTING_UNLOCK_TICKETS, TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 import { lastPage } from '../hub/start'
@@ -14,7 +14,7 @@ import { boot, createAccount, latchOnLoad, settleClassResetTrades, startSyncTrig
 import { TicketIcon } from '../ui/icons'
 import { signInEnabled } from './firebase-config'
 
-/** "Window +1" after a change lights steps (H155), from save v35. */
+/** "Window +1" after a change lights steps (H155). */
 const WindowToast = lazy(() => import('../places/gallery/WindowToast'))
 
 function FirstLaunch({ onDone }: { onDone: () => void }) {
@@ -88,7 +88,7 @@ export function Root() {
         words={{ name: 'Uma RPG', tagline: 'A party RPG for one trainer.' }}>
         <ClassResetTrades />
         <Outlet />
-        {collectionsLive() && <Suspense fallback={null}><WindowToast /></Suspense>}
+        <Suspense fallback={null}><WindowToast /></Suspense>
       </BootGates>
       <TierVeil />
     </>

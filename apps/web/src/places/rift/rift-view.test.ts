@@ -4,7 +4,7 @@ import {
 } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
 import {
-  ascendLines, ascendNumbers, bestParty, convergenceMissing, frontPartyBlock, guidanceFit, guidanceMatch, guidanceNeeds, guidedPlan, guidedWeapons,
+  bestParty, convergenceMissing, frontPartyBlock, guidanceFit, guidanceMatch, guidanceNeeds, guidedPlan, guidedWeapons,
   levelPartyBlock, needLine, partyClassesOf, partyFit, partyGuidance, partyHeldOf, partyHolding, riftFinaleFaces, riftFinalePlans, riftHome,
   riftRefLabel, riftRefTitle, suggestConvergence,
 } from './rift-view'
@@ -149,22 +149,6 @@ describe('the guided weapons (CP7, H70)', () => {
     expect(live).toEqual(guidedWeapons(GUIDED[0]!, 'iron', 19))
     expect(live[1]).toEqual(['bow', 'katana', 'axe'])
     expect(live.every((w) => w !== null)).toBe(true)
-  })
-})
-
-describe('the Ascend sheet', () => {
-  it('pays the purse for each of the twenty and their banked EXP as Class Marks', () => {
-    const { world, run } = fixture()
-    world.umas['101'] = { ...world.umas['101']!, exp: 25_000 } // capped at 2,000 Marks
-    world.umas['102'] = { ...world.umas['102']!, exp: 14_509 } // 1,450
-    const numbers = ascendNumbers(world, run, 1)
-    expect(numbers).toEqual({ to: 2, umas: 20, laurels: 20_000, speedTickets: 100, classMarks: 3_450 })
-    expect(ascendLines(numbers, 1)).toEqual([
-      '20 Umas move to Tier 2 at Lv 1',
-      'Ranks, skills and Extra Stats start over',
-      'Their gear returns to Tier 1’s stock',
-      'Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 3,450 Class Marks',
-    ])
   })
 })
 

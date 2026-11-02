@@ -24,8 +24,8 @@ v2](../design/classes-v3/halls-v2.md).
 | **Healer Sanctum** | Healer | Paladin 1–2, Cleric 3–4 | A followed deity | Two kinds on one foe, and one stack of a blessing or a curse |
 
 On the Learning page the Warrior Dojo and the Mage Tower stand at the top, the Spellblade Salle and the Summoner Circle
-below them, the Healer Sanctum in the middle on its own temple, the Observatory under it
-([sections](sections.md#learning)). The Warrior Dojo keeps the Brawler Dojo's id, `brawler-dojo`; the Sanctum is
+below them, the Healer Sanctum in the middle on its own temple, the Gallery under it where the Observatory stood (save
+v35, D283; [sections](sections.md#learning)). The Warrior Dojo keeps the Brawler Dojo's id, `brawler-dojo`; the Sanctum is
 `healer-sanctum`, where the Paladin Bastion and the Cleric Chapel stood ([below](#the-merge-save-v32)).
 
 - **Any owned Uma may sit in any seat,** Hero or Learner, whatever class she fights as, a Tier 0 too: there is no Tier 0

@@ -114,8 +114,8 @@ describe('the Rift line (H50)', () => {
     expect(riftLine(world(5), 1)).toBe('The Rift is open')
     expect(riftLine(world(5), 2)).toBe('The Rift is open')
     expect(riftLine(world(20, { fronts: { iron: 12, arcane: 5, duel: 12, horde: 0 } }), 1)).toBe('Rift run · 2 of 4 fronts sealed')
-    expect(riftLine(world(20, { fronts: { iron: 12, arcane: 12, duel: 12, horde: 12 }, wonAt: NOW }), 1)).toBe('Rift won · ready to ascend')
-    // After the twenty ascend, the tier's Rift is open again for its next twenty (R9).
+    // Once a run is won, the tier's Rift is open again for its next twenty (R9; save v35, D283).
+    expect(riftLine(world(20, { fronts: { iron: 12, arcane: 12, duel: 12, horde: 12 }, wonAt: NOW }), 1)).toBe('The Rift is open')
     expect(riftLine(world(5, { wonAt: NOW, ascendedAt: NOW }), 1)).toBe('The Rift is open')
   })
 })

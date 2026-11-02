@@ -82,7 +82,7 @@ describe('graded battle projection (R2)', () => {
     world.wallet.classMarks = MANUAL_PRICE
     expect(manualBlock(world, '101', { kind: 'weapon', id: 'greatsword' })).toBe('Gear Manuals are retired')
     expect(manualBlock(world, '101', { kind: 'class', id: 'brawler' })).toBeNull()
-    const save: Save = { schemaVersion: SAVE_SCHEMA_VERSION, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} }, tierWorlds: { '1': world } }
+    const save: Save = { schemaVersion: SAVE_SCHEMA_VERSION, account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {}, windows: {}, windowsStart: NOW }, tierWorlds: { '1': world } }
     expect(readManuals(save, '101', { kind: 'class', id: 'brawler' }, 1, NOW).tierWorlds['1']!.wallet.classMarks).toBe(0)
   })
 

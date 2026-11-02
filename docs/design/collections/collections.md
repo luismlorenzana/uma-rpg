@@ -592,4 +592,7 @@ every call as recommended on 2026-11-02 (D283)** and added CO35–CO37.
 
 - **Before approval:** a local prototype of CO3–CO5 on two real outfits' windows (the bake's own panes, three orders,
   both looks), sent to the owner as images; not in git (P6). This doc and its four pages.
-- **After approval:** the packets H150–H158 ([§10](#10-packets)).
+- **After approval:** the packets H150–H158 ([§10](#10-packets)). Live on 2026-11-02 with save v35 (H157, D288): H150–H155
+  and H157 built (D284–D288); the three buildings' art (H156) and its pin (H158) are open. The manual has the rules as
+  built: [windows](../../game/loops.md#windows), [Drills](../../game/loops.md#drills-and-training-logs),
+  [Ascend](../../game/loops.md#ascend) and [the screens](../../game/sections.md#gallery).

@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-11-02, after D283.** Tier 1 is built and live: engine v21, save v34. That covers the Tier rework's R1
+> **Status: 2026-11-02, after D288.** Tier 1 is built and live: engine v21, save v35. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -45,17 +45,16 @@ rescue, buffs and debuffs on their paths, pure Brawlers and Sorcerers, a Spellbl
 [board](../design/collections/previews/board.html), [content](../design/collections/previews/content.html) and
 [screens](../design/collections/previews/screens.html)): every Uma's stained-glass window, lit by a 31-step board a
 tier and standing beside her bust; the Gallery, ranked, in the Observatory's place; Ascend one Uma at a time once her
-window is full; Trials (the Echoes' own place); Drills paying Training Logs. H152, H154 and H155 build dark; H157 is the
-switch to save v35.
+window is full; Trials (the Echoes' own place); Drills paying Training Logs. Live since H157 (save v35, D288); only the
+three buildings' art (H156) and its pin (H158) are open.
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
 | [H156](tasks/H156-collections-buildings-art.md) | Art: the Gallery, Trials and Drills buildings, uma-art 2.20.0 | ChatGPT draws and publishes | S | H141's 2.19.0 | Ready after H141: the owner dispatches it |
-| [H157](tasks/H157-collections-switch.md) | The switch: save v35, the manual, the phone check | Claude | M | H152–H155 | Next |
-| [H158](tasks/H158-pin-collections-art.md) | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | S | H156, H157 | Waits |
+| [H158](tasks/H158-pin-collections-art.md) | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | S | H156 | Waits on H156 |
 
-**Done:** H150–H155 (2026-11-02, below). **Order now:** H157. H156 and H158 can land any time after,
-since the places borrow existing buildings until then. uma-platform's `latest` is release `01ba1c71f403` (2026-11-02),
+**Done:** H150–H155 and H157 (2026-11-02, below). **Order now:** H156 (the owner dispatches it to ChatGPT), then H158;
+the places borrow existing buildings until then. uma-platform's `latest` is release `01ba1c71f403` (2026-11-02),
 which carries the pane maps; undo with `pnpm release:publish -- --rollback f8ab287029e8` in uma-platform.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
@@ -67,7 +66,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v21, save v34; uma-kit 0.17.0, uma-art 2.18.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v21, save v35; uma-kit 0.17.0, uma-art 2.18.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 - **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
   "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.
@@ -78,6 +77,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H157 | Collections live, save v35: the switch, the run-wide Ascend and the Observatory removed, the manual and the phone check (D288) | this commit |
 | H155 | Windows on screen, dark: her window beside her bust, the Window sheet, the Gallery, Ascend one Uma at a time, latching and the "Window +1" note (D287) | `3bc65cc` |
 | H154 | Drills and Training Logs, dark: five Drills a tier, ten runs a day banked to thirty, Logs a third of her next level (D286) | `11d2d05` |
 | H153 | Trials: the Echoes' own place on the Battle page, live, on the Knights' Bastion until H156 (D285) | `30b9902` |

@@ -35,11 +35,11 @@ function expectSpaced(places: readonly Place[]): void {
 }
 
 describe('place registry', () => {
-  it('has 27 visible places on four pages in the bar\'s order (D147; fifteen in the Wilds since H114, five halls since H134) plus the hidden Account', () => {
-    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(28)
+  it('has 29 visible places on four pages in the bar\'s order (D147; fifteen in the Wilds since H114, five halls since H134, Trials and Drills since H153–H157) plus the hidden Account', () => {
+    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(29)
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
     expect(HUB_PAGES).toEqual(['town', 'learning', 'battle', 'wilds'])
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 6, 3, 15])
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 6, 4, 15])
     expect(PLACES.filter((p) => p.direct).map((p) => p.id)).toEqual(['scenario-gate'])
   })
 
@@ -111,7 +111,8 @@ describe('the Learning page by generation (H59, D178)', () => {
       ['spell-blade-salle', 'Spellblade Salle', 0.22, 0.33, null], ['summoner-circle', 'Summoner Circle', 0.78, 0.33, null],
       // Its own building (uma-art 2.17.0, H135): no frame override, so the map draws `healer-sanctum`.
       ['healer-sanctum', 'Healer Sanctum', 0.5, 0.56, null],
-      ['observatory', 'Observatory', 0.5, 0.84, null],
+      // The Gallery in the Observatory's place since save v35 (D283), on uma-art's Cleric Chapel until H156.
+      ['gallery', 'Gallery', 0.5, 0.84, 'cleric-chapel'],
     ])
     expect(v19.map((p) => p.id)).not.toContain('paladin-bastion')
     expect(v19.map((p) => p.id)).not.toContain('cleric-chapel')
@@ -159,10 +160,10 @@ describe('the Rift (H50)', () => {
 
   it('keeps the Tier Finale id under its new name and building frame', () => {
     expect(rift).toMatchObject({ page: 'battle', name: 'The Rift', frame: 'rift', opensIn: 'S8' })
-    expect(rift.blurb).toBe('Twenty Lv 50 Umas seal four fronts, then ascend together.')
+    expect(rift.blurb).toBe('Twenty Lv 50 Umas seal four fronts and win the Rift step.')
     expect(CURRENT_SLICE).toBe('S8')
-    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['tier-finale', 'rift'], ['trials', 'knights-bastion'], ['drills', 'gym'],
-      ['fields', 'vegetable-garden'], ['armorer', 'lancers-barracks']])
+    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['gallery', 'cleric-chapel'], ['tier-finale', 'rift'], ['trials', 'knights-bastion'],
+      ['drills', 'gym'], ['fields', 'vegetable-garden'], ['armorer', 'lancers-barracks']])
   })
 
   it('opens only with five Lv 50 Umas, in Tiers 1 and 2', () => {
@@ -184,7 +185,7 @@ describe('the Rift (H50)', () => {
   it('opens Trials with it, on the Battle page, and says why it waits (D283, H153)', () => {
     const trials = placeById('trials')!
     expect(trials).toMatchObject({ page: 'battle', kind: 'battle', name: 'Trials', at: { x: 0.2, y: 0.52 } })
-    expect(placesOn('battle').map((p) => p.id)).toEqual(['scenario-gate', 'tier-finale', 'trials'])
+    expect(placesOn('battle').map((p) => p.id)).toEqual(['scenario-gate', 'tier-finale', 'trials', 'drills'])
     expect(placeOpen(trials, world(4), 1)).toBe(false)
     expect(placeLock(trials, world(4), 1)).toBe('Opens at five Lv 50 Umas')
     expect(placeOpen(trials, world(5), 2)).toBe(true)

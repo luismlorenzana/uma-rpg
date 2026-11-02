@@ -10,13 +10,13 @@ import { CLASS_EXP_SHARE, weaponExpShares } from '../economy/ranks'
 import { balanceMember } from '../world/balance-party'
 import { classOf, usedWeapons } from './battle'
 import {
-  abandonConvergence, actInRiftFight, ascend, ascendBlock, ASCEND_PURSE, bankedMarks, beginConvergence, cancelRiftBlock, cancelRiftRun, convergenceBlock,
+  abandonConvergence, actInRiftFight, ascendUmas, ascendUmasBlock, ASCEND_PURSE, bankedMarks, beginConvergence, cancelRiftBlock, cancelRiftRun, convergenceBlock,
   ECHO_RANK_PAY, echoFoeLevel, leaveRiftFight, riftBattleStep, riftContextFor, riftFightBlock, riftTraces, signUpBlock, signUpRift, startRiftFight,
   sweepEcho, sweepEchoBlock,
 } from './rift'
 import { RPG_CLASS_PARENTS } from '../rpg/class-tree'
 import { rpgIsTier0, type RpgTier1Class } from '../rpg/kinds'
-import { doom, ids, OUTFITS, play, riftWorldSave as balanceWorldSave, ROSTER, T, TWENTY, weaken } from './rift-rules.fixture'
+import { doom, fullWindows, ids, OUTFITS, play, riftWorldSave as balanceWorldSave, ROSTER, T, TWENTY, weaken } from './rift-rules.fixture'
 import { setPartySlot, worldOf } from './rules'
 import { newOwnedUma, newTierWorld, parseSave, type Save, type TierWorld } from './save'
 
@@ -395,27 +395,30 @@ describe('Ascend (tiers.md §5, R7)', () => {
     })
   }
 
+  // From save v35 the twenty go up one by one once their windows are full (D283); here all twenty at once.
+  const full = (save: Save): Save => fullWindows(save, TWENTY)
+
   it('is blocked before the win, by an open Rift or world-map fight, by a working Uma, and once ascended', () => {
-    const save = wonRun()
+    const save = full(wonRun())
     roundTrip(save)
-    expect(ascendBlock(signedUp())).toBe('Win the Rift first')
+    expect(ascendUmasBlock(full(signedUp()), TWENTY)).toMatch(/^Window not full: 101, 102/)
     const fullFive = edit(save, (w) => { w.parties[4]!.slots[4] = '121'; w.parties[3]!.slots[4] = null })
-    expect(ascendBlock(startRiftFight(fullFive, { kind: 'echo', front: 'iron', level: '50' }, 4, OUTFITS, ROSTER, T(60)))).toBe('Finish the open Rift fight first')
+    expect(ascendUmasBlock(startRiftFight(fullFive, { kind: 'echo', front: 'iron', level: '50' }, 4, OUTFITS, ROSTER, T(60)), TWENTY)).toBe('Finish the open Rift fight first')
     const mapFight = edit(save, (w) => { w.world.run.battle = { battleId: 'battle:0:world:1', nodeId: 'w1-1-1-s1', startedAt: T(60), input: {} as never, actions: [] } })
-    expect(ascendBlock(mapFight)).toBe('Finish the open fight first')
+    expect(ascendUmasBlock(mapFight, TWENTY)).toBe('Finish the open fight first')
     const working = edit(save, (w) => { w.work['105'] = { outfitId: '105', slot: { building: 'mine', slot: 0 }, entries: [{} as never], queue: [], last: null, dropped: null } })
-    expect(ascendBlock(working)).toBe('Recall or collect: 105')
-    expect(ascendBlock(working, '1', (id) => `Uma ${id}`)).toBe('Recall or collect: Uma 105')
-    expect(() => ascend(working, T(70))).toThrow('Recall or collect: 105')
-    const done = ascend(save, T(70)).save
-    expect(ascendBlock(done)).toBe('Win the Rift first')
-    expect(() => ascend(done, T(71))).toThrow('Win the Rift first')
+    expect(ascendUmasBlock(working, TWENTY)).toBe('Recall or collect: 105')
+    expect(ascendUmasBlock(working, TWENTY, '1', (id) => `Uma ${id}`)).toBe('Recall or collect: Uma 105')
+    expect(() => ascendUmas(working, TWENTY, T(70))).toThrow('Recall or collect: 105')
+    const done = ascendUmas(save, TWENTY, T(70)).save
+    expect(ascendUmasBlock(done, TWENTY)).toBe('Only this tier’s Umas')
+    expect(() => ascendUmas(done, TWENTY, T(71))).toThrow('Only this tier’s Umas')
   })
 
   it('moves the twenty to Tier 2 at Lv 1 in one transaction, with the purse, their banked EXP as Marks and their parties', () => {
-    const save = wonRun()
+    const save = full(wonRun())
     const before = world1(save)
-    const { save: after, summary } = ascend(save, T(70))
+    const { save: after, summary } = ascendUmas(save, TWENTY, T(70))
     expect(bankedMarks(12_345)).toBe(1_234)
     expect(bankedMarks(30_000)).toBe(2_000)
     expect(summary).toEqual({ from: 1, to: 2, umas: TWENTY, laurels: 20_000, speedTickets: 100, classMarks: 3_234 })
@@ -434,7 +437,8 @@ describe('Ascend (tiers.md §5, R7)', () => {
     // 101's seat empties and sends its Learner 125 away; 103 leaves 124's seat.
     expect(old.heroes).toEqual({ 'mage-2': { hero: '124', learners: [] } })
     expect(old.wallet).toEqual(before.wallet)
-    expect(old.rift.runs[0]!.ascendedAt).toBe(T(70))
+    // The run stays as it was won: its twenty went up by their windows, not by the run.
+    expect(old.rift.runs[0]!.ascendedAt).toBeNull()
 
     // The new world: Lv 1, Class Rank 1, no skills, every grade G0, an empty map, Craft Lv 1, no Bonds; her class kept.
     const up = worldOf(after, '2')
@@ -454,14 +458,15 @@ describe('Ascend (tiers.md §5, R7)', () => {
     roundTrip(after)
   })
 
-  it('lands in an existing Tier 2 world: whole parties into its first empty ones, the rest after them', () => {
-    const save = wonRun()
+  it('lands in an existing Tier 2 world: whole parties into its first empty ones, each other Uma in the first free slot', () => {
+    const save = full(wonRun())
     save.tierWorlds['2'] = { ...newTierWorld(T(0), 0), umas: { '201': newOwnedUma(T(0)) }, wallet: { ...newTierWorld(T(0), 0).wallet, laurels: 5000 } }
     save.tierWorlds['2'].parties[0]!.slots[0] = '201'
-    const up = worldOf(ascend(save, T(70)).save, '2')
+    const up = worldOf(ascendUmas(save, TWENTY, T(70)).save, '2')
     expect(up.parties.slice(0, 6).map((p) => [p.name, p.slots[0]])).toEqual([
-      ['Party 1', '201'], ['Iron Team', '101'], ['Party 2', '106'], ['Party 3', '111'], ['Party 5', '116'], ['Party 6', null],
+      ['Party 1', '201'], ['Iron Team', '101'], ['Party 2', '106'], ['Party 3', '111'], ['Party 5', '120'], ['Party 6', null],
     ])
+    expect(up.parties[0]!.slots).toEqual(['201', '116', '117', '118', '119'])
     expect(up.wallet.laurels).toBe(25_000)
     expect(up.umas['201']).toBeDefined()
   })

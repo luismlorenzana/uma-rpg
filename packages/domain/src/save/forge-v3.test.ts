@@ -11,7 +11,7 @@ import { parseSave, type Save } from './save'
 const weapon: GradeTarget = { kind: 'weapon', weapon: 'greatsword' }
 const saveOf = (items: Record<string, number>, level = 1, gear = newGrades(1)): Save => ({
   schemaVersion: SAVE_SCHEMA_VERSION,
-  account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
+  account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {}, windows: {}, windowsStart: NOW },
   tierWorlds: { '1': gradedWorld({ items, umas: { '101': gradedUma({ level, gear }) } }) },
 })
 const world = (save: Save) => save.tierWorlds['1']!

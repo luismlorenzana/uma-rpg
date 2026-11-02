@@ -15,8 +15,8 @@ import {
 import { umaHeldClasses } from './class'
 import { umaClassTree } from './class-tiles'
 import { manualBlock, readManuals } from './exchange'
-import { ascend, signUpRift } from './rift'
-import { riftWorldSave, T as RT, TWENTY } from './rift-rules.fixture'
+import { ascendUmas, signUpRift } from './rift'
+import { fullWindows, riftWorldSave, T as RT, TWENTY } from './rift-rules.fixture'
 import { SaveRuleError, setPartySlot, unlockUma, worldOf } from './rules'
 import { newSave, type OwnedUma, type Save, type TierWorld } from './save'
 
@@ -224,7 +224,7 @@ describe('Ascend (CV10)', () => {
       w.umas[TWENTY[1]!]!.classId = 'paladin'
       return s
     })()
-    const up = worldOf(ascend(save, RT(70)).save, '2')
+    const up = worldOf(ascendUmas(fullWindows(save, TWENTY), TWENTY, RT(70)).save, '2')
     const first = up.umas[TWENTY[0]!]!, second = up.umas[TWENTY[1]!]!
     expect([first.classId, second.classId]).toEqual([null, 'paladin'])
     expect(first.ranks.classes).toEqual({})

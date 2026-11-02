@@ -1,5 +1,5 @@
 // The Rift page's pure helpers (H50): fight labels, which world parties can take a fight, the Convergence's coverage, the
-// Ascend sheet's numbers, the result screen's lines and the finale's faces (H52). Lazy, with the page.
+// result screen's lines and the finale's faces (H52). Lazy, with the page. Ascend's words are the Gallery's since H157.
 import {
   activeClass, BATTLE_ENGINE_VERSION, CONVERGENCE_FIGHTS, FRONT_NAME, healerBlock, PARTY_SIZE, RIFT_FRONTS, RIFT_STAGES, RPG_TIER_MAX_LEVEL, rpgRework,
   umaClassTree, umaHeldClasses,
@@ -7,7 +7,7 @@ import {
   type TierWorld,
 } from '@rpg/domain'
 import {
-  ASCEND_PURSE, bankedMarks, RIFT_FRONT_SPECS, riftConvergence, riftFight, riftGuidedBuild, riftParty, type RiftContext, type RiftFightPlan, type RiftFightResult,
+  RIFT_FRONT_SPECS, riftConvergence, riftFight, riftGuidedBuild, riftParty, type RiftContext, type RiftFightPlan, type RiftFightResult,
 } from '@rpg/domain/rift'
 import { CLASS_LABEL } from '../../battle/labels'
 
@@ -241,27 +241,6 @@ export function partyHolding(world: Pick<TierWorld, 'parties'>, five: readonly s
     return !!members && members.length === five.length && five.every((id) => members.includes(id))
   })
   return at < 0 ? null : at
-}
-
-/** What Ascend gives the next tier (tiers.md §5, T3, T5): the purse for each of the twenty and their banked EXP as Marks. */
-export function ascendNumbers(world: Pick<TierWorld, 'umas'>, run: Pick<RiftRun, 'roster'>, tier: number):
-  { to: number; umas: number; laurels: number; speedTickets: number; classMarks: number } {
-  const n = run.roster.length
-  return {
-    to: tier + 1, umas: n, laurels: ASCEND_PURSE.laurels * n, speedTickets: ASCEND_PURSE.speedTickets * n,
-    classMarks: run.roster.reduce((sum, id) => sum + bankedMarks(world.umas[id]?.exp ?? 0), 0),
-  }
-}
-
-/** The Ascend sheet's lines. */
-export function ascendLines(numbers: ReturnType<typeof ascendNumbers>, tier: number): string[] {
-  const f = (n: number) => n.toLocaleString('en-US')
-  return [
-    `${numbers.umas} Umas move to Tier ${numbers.to} at Lv 1`,
-    'Ranks, skills and Extra Stats start over',
-    `Their gear returns to Tier ${tier}’s stock`,
-    `Tier ${numbers.to} gets ${f(numbers.laurels)} Laurels, ${f(numbers.speedTickets)} Speed Tickets and ${f(numbers.classMarks)} Class Marks`,
-  ]
 }
 
 /** The result screen's words: its heading, its lines and its two buttons ("again" null when there's none). */

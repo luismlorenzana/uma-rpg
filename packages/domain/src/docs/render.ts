@@ -58,6 +58,10 @@ import { CONVERGENCE_FIGHTS, ECHO_LEVELS, RIFT_FRONTS, RIFT_OPEN_AT, RIFT_ROSTER
 import { ASCEND_PURSE, BANKED_EXP_PER_MARK, BANKED_MARKS_CAP, ECHO_RANK_PAY, echoFoeLevel } from '../save/rift'
 import { weaponPreset } from '../save/presets'
 import { TIERS } from '../save/rules'
+import { DRILL_RUNS_A_DAY, DRILL_RUNS_MAX } from '../save/save'
+import { DRILL_LOGS, DRILL_NUMERALS, logExp } from '../rpg/drills'
+import { WINDOW_STEP_IDS, windowBoard, type WindowStepId } from '../rpg/windows'
+import { rpgTierLevel } from '../rpg/campaign/chapters'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import {
   FLOURISH_NAMES, KNACK_STAT, STRIDE_FLOURISH, STRIDE_LABEL, UMA_KNACK_WORDS, UMA_KNACKS, UMA_ROW_CALLING_V3, UMA_STRIDES, UMA_TYPE_NAMES,
@@ -798,9 +802,48 @@ function riftRules(): string {
     ['Echoes', `Each front at Lv ${ECHO_LEVELS.join(', ')}`],
     ['Echo pay', `×${ECHO_RANK_PAY} a stage's Class Rank EXP (a Tier 0 at Rank 10 keeps it waiting for her promotion); no Uma EXP, Laurels, Shards or Bonds`],
     ['Class EXP an Echo win, Lv 50 Uma', ECHO_LEVELS.map((l) => `Lv ${l}: ${n(ECHO_RANK_PAY * CLASS_EXP_SHARE * echoE(l))}`).join(' · ')],
-    ['Ascension purse, per Uma', `${n(ASCEND_PURSE.laurels)} Laurels and ${ASCEND_PURSE.speedTickets} Speed Tickets (${n(ASCEND_PURSE.laurels * RIFT_ROSTER)} and ${ASCEND_PURSE.speedTickets * RIFT_ROSTER} a run)`],
+    ['A won run', `Lights the Rift step of its ${RIFT_ROSTER} Umas' windows; the next run can sign up at once`],
+    ['Ascend', 'One Uma at a time, from the Gallery, once her window is full'],
+    ['Ascension purse, per Uma', `${n(ASCEND_PURSE.laurels)} Laurels and ${ASCEND_PURSE.speedTickets} Speed Tickets`],
     ['Banked EXP on Ascend, per Uma', `1 Class Mark per ${BANKED_EXP_PER_MARK} EXP, ${n(BANKED_MARKS_CAP)} at most`],
   ])
+}
+
+// --- Windows and Drills (collections, D283) -------------------------------------------------------------------------
+
+const STEP_TRACK: Readonly<Record<string, string>> = { level: 'Level', class: 'Class', craft: 'Craft', gear: 'Gear', stars: 'Stars', world: 'World' }
+const stepName = (id: WindowStepId): string => {
+  if (id === 'rift') return 'Rift'
+  const [track, n] = id.split('-') as [string, string]
+  return `${STEP_TRACK[track]} ${DRILL_NUMERALS[Number(n) - 1]}`
+}
+
+/** Every tier's board (D283): its steps in the save's order, with each tier's rule; a tier with no tier above has no Rift. */
+function windows(): string {
+  const boards = TIERS.map((t) => windowBoard(t.tier, TIERS.some((u) => u.tier === t.tier + 1)))
+  return table(['Step', ...TIERS.map((t) => `Tier ${t.tier}`)],
+    WINDOW_STEP_IDS.map((id) => [stepName(id), ...boards.map((board) => board.find((step) => step.id === id)?.rule ?? '—')])) +
+    `\n\n${boards.map((b, i) => `Tier ${TIERS[i]!.tier}: ${b.length} steps`).join(' · ')}.`
+}
+
+/** The Drills (D283, D286): each tier's five, their levels, what they pay and the runs. */
+function drills(): string {
+  const n = (v: number) => v.toLocaleString('en-US')
+  const level = (tier: number, i: number) =>
+    worldContinent({ name: '', order: 5 * (tier - 1) + i + 1 }).regions.find((r) => r.row === WORLD_ROWS - 1 && r.col === 0)!.levelTop
+  return table(['Drill', ...TIERS.map((t) => `Tier ${t.tier}`), 'Training Logs a win or a sweep'],
+    DRILL_NUMERALS.map((numeral, i) => [`Drill ${numeral}`, ...TIERS.map((t) => {
+      const at = rpgTierLevel(level(t.tier, i))
+      return `${at.tier === 1 ? '' : `T${at.tier} `}Lv ${at.level}`
+    }), DRILL_LOGS[i]!])) + '\n\n' +
+    table(['Rule', 'Value'], [
+      ['Runs', `${DRILL_RUNS_A_DAY} a day, banked up to ${DRILL_RUNS_MAX}; the day turns at 04:00 on the phone's clock`],
+      ['A fight', 'The active party at full HP and MP; a win spends a run, a loss or a retreat nothing'],
+      ['A sweep', 'A won Drill, one run each: no party, no ticket'],
+      ['Opens', "With the tier's first map win"],
+      ['A Training Log', `A third of her next level in Uma EXP (${[1, 10, 30, 49].map((l) => `Lv ${l}: ${n(logExp(l))}`).join(' · ')}), ` +
+        `${CLASS_EXP_SHARE}× that to the class she fights as, and Uma Shards by level in Tier 1; read up to Lv ${RPG_TIER_MAX_LEVEL}`],
+    ])
 }
 
 // --- Tiers ----------------------------------------------------------------------------------------------------------
@@ -811,7 +854,7 @@ function tiers(): string {
 
 // --- Achievements ---------------------------------------------------------------------------------------------------
 
-const ACHIEVEMENT_KIND: Readonly<Record<AchievementDef['kind'], string>> = { seal: 'Required', conquered: 'Required; unlocks Ascend', title: 'Title' }
+const ACHIEVEMENT_KIND: Readonly<Record<AchievementDef['kind'], string>> = { seal: 'Required', conquered: 'Required; lights the Rift step', title: 'Title' }
 function achievements(): string {
   return table(['Name', 'How', 'Kind'], ACHIEVEMENTS.map((a) => [a.tier === null ? a.name : `${a.name} · Tier ${a.tier}`, a.how, ACHIEVEMENT_KIND[a.kind]]))
 }
@@ -832,7 +875,7 @@ export function renderBlock(key: string, context: { packages: readonly { path: s
     classes, tier0, templates, presets, weapons, depths, 'skill-trees': skillTrees, limits, heroes, 'battle-constants': battleConstants, 'foe-roles': foeRoles, 'foe-scaling': foeScaling,
     'damage-sources': damageSources,
     families, items, gems, gear, 'star-map': starMap, ranks, laurels, levels, prices, jobs, places, facilities, biomes, faces, formations, continents,
-    'region-sample': regionSample, world, tiers, achievements, 'rift-fronts': riftFronts, 'rift-rules': riftRules,
+    'region-sample': regionSample, world, tiers, achievements, 'rift-fronts': riftFronts, 'rift-rules': riftRules, windows, drills,
     dependencies: () => dependencies(context.packages),
     'active-slots': () => `${RPG_BASE_ACTIVE_SLOTS} equipped skills at Lv 1, one more at Lv ${RPG_ACTIVE_SLOT_GATES.join(', ')} (${RPG_BASE_ACTIVE_SLOTS + RPG_ACTIVE_SLOT_GATES.length} at most). ` +
       `No points and no side skills: every skill on her path is hers at its depth's Class Rank, and ranks up every ${RPG_SKILL_RANK_STEP} Class Ranks ` +

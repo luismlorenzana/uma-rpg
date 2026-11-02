@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  BATTLE_ENGINE_VERSION, collectionsLive, drillDay, markClassesV3Seen, markGrantSeen, newSave, ownerTier, parseSaveAsync, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass, type RpgTier1Class,
+  BATTLE_ENGINE_VERSION, drillDay, markClassesV3Seen, markGrantSeen, newSave, ownerTier, parseSaveAsync, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass, type RpgTier1Class,
   type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
@@ -116,12 +116,12 @@ async function commit(save: Save): Promise<void> {
 }
 
 /**
- * Lights what each Uma's state now meets on her window (D283, H155; CO2), on the day it's committed: from save v35, once
- * the roster has loaded. True when a step lit.
+ * Lights what each Uma's state now meets on her window (D283, H155; CO2), on the day it's committed, once the roster has
+ * loaded. True when a step lit.
  */
 async function latch(): Promise<boolean> {
   const roster = masterRoster()
-  if (!collectionsLive() || !roster) return false
+  if (!roster) return false
   const { latchWindows } = await import('@rpg/domain/windows')
   const { save } = useGame.getState()
   if (!save) return false
@@ -331,17 +331,6 @@ export async function ascendWindows(ids: readonly string[]): Promise<AscendSumma
   const { save } = useGame.getState()
   if (!save) throw new Error('No save loaded')
   const r = ascendUmas(save, ids, nowIso(), tier)
-  await commit(r.save)
-  return r.summary
-}
-
-/** Ascends the won run's twenty to the next tier. It doesn't switch tiers: the caller does, behind the veil. */
-export async function ascendRun(): Promise<AscendSummary> {
-  const tier = activeKey()
-  const { ascend } = await import('@rpg/domain/rift')
-  const { save } = useGame.getState()
-  if (!save) throw new Error('No save loaded')
-  const r = ascend(save, nowIso(), tier)
   await commit(r.save)
   return r.summary
 }

@@ -23,7 +23,7 @@ function saveWith(timeTickets: number): Save {
     umas: Object.fromEntries(['101', '102', '103'].map((id) => [id, gradedUma({ craft: { level: 1, exp: 0 } })])) })
   return {
     schemaVersion: SAVE_SCHEMA_VERSION,
-    account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {} },
+    account: { trainerName: 'Tester', createdAt: ECONOMY_V3_NOW, updatedAt: ECONOMY_V3_NOW, achievements: {}, history: {}, defeated: {}, windows: {}, windowsStart: ECONOMY_V3_NOW },
     tierWorlds: { 1: world },
   }
 }

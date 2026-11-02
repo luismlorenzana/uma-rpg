@@ -10,7 +10,7 @@ describe('save', () => {
   it('starts Tier 1 with 20 Uma Tickets and nothing else', () => {
     const save = newSave('  Luis  ', NOW)
     expect(save.account.trainerName).toBe('Luis')
-    expect(save.tierWorlds['1']?.wallet).toEqual({ unlockTickets: STARTING_UNLOCK_TICKETS, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, classMarks: 0 })
+    expect(save.tierWorlds['1']?.wallet).toEqual({ unlockTickets: STARTING_UNLOCK_TICKETS, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, classMarks: 0, trainingLogs: 0 })
     expect(STARTING_UNLOCK_TICKETS).toBe(20)
   })
 
@@ -62,6 +62,15 @@ describe('save', () => {
 
 /** JSON copies of the populated v24 fixtures, to edit. */
 const rift = (): any => JSON.parse(JSON.stringify(riftSave()))
+/** An old save as it was stored: no windows on the account, no Drills or Training Logs in a world (save v35). */
+function stripV35(save: any): void {
+  delete save.account.windows
+  delete save.account.windowsStart
+  for (const w of Object.values(save.tierWorlds) as any[]) {
+    delete w.drills
+    delete w.wallet.trainingLogs
+  }
+}
 const convergence = (): any => JSON.parse(JSON.stringify(convergenceSave()))
 const [T0, T1, T2, T3, T4] = RIFT_TIMES
 
@@ -155,7 +164,7 @@ describe('save v23–v24: achievements, tier history, defeated faces and the Rif
     ['tiers that don\'t climb', (s) => { s.account.history['201'].push({ tier: 2, at: T3, run: 't1-r1' }) }, `${A}\\.history\\.201\\.1\\.tier: expected above the entry before`],
     ['a promotion before the one before it', (s) => { s.account.history['201'].push({ tier: 3, at: T0, run: 't2-r1' }) }, `${A}\\.history\\.201\\.1\\.at: before the entry before`],
     ['a history entry naming no run', (s) => { s.account.history['201'][0].run = 'ascended' }, `${A}\\.history\\.201\\.0\\.run: expected a run id`],
-    ['a history entry naming an open run', (s) => { s.account.history['201'][0].run = 't1-r2' }, `${A}\\.history\\.201\\.0\\.run: run t1-r2 hasn't ascended`],
+    ['a history entry naming an open run', (s) => { s.account.history['201'][0].run = 't1-r2' }, `${A}\\.history\\.201\\.0\\.run: run t1-r2 hasn't been won`],
     ['a history entry naming a run of the wrong tier', (s) => { s.account.history['201'][0].run = 't2-r1' }, `${A}\\.history\\.201\\.0\\.run: expected a Tier 1 run`],
     ['a history entry naming a run that doesn\'t exist', (s) => { s.account.history['201'][0].run = 't1-r3' }, `${A}\\.history\\.201\\.0\\.run: expected a Tier 1 run`],
     ['a history entry whose run lacks her', (s) => { s.tierWorlds['2'].umas['301'] = s.tierWorlds['2'].umas['201']; s.account.history['301'] = s.account.history['201'] },
@@ -182,7 +191,8 @@ describe('save v23–v24: achievements, tier history, defeated faces and the Rif
     ['wonAt before the run started', (s) => { s.tierWorlds['1'].rift.runs[0].startedAt = T4 }, `${RUN}\\.0\\.wonAt: before the run started`],
     ['ascendedAt without wonAt', (s) => { s.tierWorlds['1'].rift.runs[0].wonAt = null }, `${RUN}\\.0\\.ascendedAt: the run must be won first`],
     ['ascendedAt before wonAt', (s) => { s.tierWorlds['1'].rift.runs[0].ascendedAt = T1 }, `${RUN}\\.0\\.ascendedAt: before the run was won`],
-    ['two open runs', (s) => { s.tierWorlds['1'].rift.runs[0].ascendedAt = null }, `${RUN}\\.0\\.ascendedAt: only the last run may be open`],
+    // From save v35 a won run is done, ascended or not (D283): an earlier run open is one neither won nor ascended.
+    ['two open runs', (s) => { Object.assign(s.tierWorlds['1'].rift.runs[0], { wonAt: null, ascendedAt: null }) }, `${RUN}\\.0\\.wonAt: only the last run may be open`],
     ['an open run\'s Uma not owned', (s) => { s.tierWorlds['1'].rift.runs[1].roster[0] = '999' }, `${RUN}\\.1\\.roster: outfit 999 isn't owned in this world`],
     ['an Echo front fire', (s) => { s.tierWorlds['1'].rift.echoes.fire = {} }, `${R}\\.echoes: unknown keys fire`],
     ['an Echo level 60', (s) => { s.tierWorlds['1'].rift.echoes.iron['60'] = T1 }, `${R}\\.echoes\\.iron: unknown keys 60`],
@@ -309,6 +319,7 @@ describe('the v23 migration (D163)', () => {
     delete save.account.achievements
     delete save.account.history
     delete save.account.defeated
+    stripV35(save)
     return save
   }
 
@@ -317,7 +328,7 @@ describe('the v23 migration (D163)', () => {
     expect(Object.keys(raw.account)).toEqual(['trainerName', 'createdAt', 'updatedAt'])
     const migrated = parseSave(raw)
     expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
-    expect(migrated.account).toEqual({ trainerName: 'Luis', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} })
+    expect(migrated.account).toEqual({ trainerName: 'Luis', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {}, windows: {}, windowsStart: null })
     expect(migrated.tierWorlds['1']!.rift).toEqual({ runs: [], echoes: {}, battle: null, battles: 0 })
     expect(migrated.tierWorlds['2']!.rift).toEqual({ runs: [], echoes: {}, battle: null, battles: 0 })
     expect(parseSave(JSON.parse(JSON.stringify(migrated)))).toEqual(migrated)
@@ -342,6 +353,7 @@ describe('the v24 migration (D171)', () => {
     const save = rift()
     save.schemaVersion = 23
     delete save.account.defeated
+    stripV35(save)
     for (const w of Object.values(save.tierWorlds) as any[]) {
       delete w.rift.battle
       delete w.rift.battles

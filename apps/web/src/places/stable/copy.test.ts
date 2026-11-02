@@ -236,7 +236,7 @@ describe('the profile wording list (H117)', () => {
     const files = [
       'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'DamageCard.tsx', 'TemplateTab.tsx', 'GearTab.tsx',
       'ClassTab.tsx', 'class-sheets.tsx', 'StableCounter.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'PresetButton.tsx',
-      '../observatory/StarsPanel.tsx', '../observatory/ObservatoryPage.tsx',
+      '../observatory/StarsPanel.tsx',
       '../gallery/GalleryPage.tsx', '../gallery/WindowSheet.tsx', '../gallery/WindowDoor.tsx', '../gallery/AscendSheet.tsx', '../gallery/WindowToast.tsx',
     ]
     const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.', 'Unlock an Uma first.'])

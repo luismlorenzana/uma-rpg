@@ -11,8 +11,8 @@ import { RPG_BUILDINGS_V4 } from '../work/env-v4'
 import { ECONOMY_V3_NOW as NOW, gradedUma, gradedWorld } from './economy-v3.fixture'
 import { buyRawItem, rawPriceV4, sellPrice, stockedTypes } from './exchange'
 import { raiseGrade, raiseGradeTo } from './forge'
-import { ascend, signUpRift } from './rift'
-import { riftWorldSave, T, TWENTY } from './rift-rules.fixture'
+import { ascendUmas, signUpRift } from './rift'
+import { fullWindows, riftWorldSave, T, TWENTY } from './rift-rules.fixture'
 import { worldOf } from './rules'
 import type { Save, TierWorld } from './save'
 import { facilityTargets, targetPlan } from './targets'
@@ -22,7 +22,7 @@ import { planJob, startJob } from './work'
 
 const saveOf = (world: TierWorld, tier = 1): Save => ({
   schemaVersion: SAVE_SCHEMA_VERSION,
-  account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {} },
+  account: { trainerName: 'Tester', createdAt: NOW, updatedAt: NOW, achievements: {}, history: {}, defeated: {}, windows: {}, windowsStart: NOW },
   tierWorlds: { [String(tier)]: world },
 })
 const one = (items: Record<string, number>, uma = gradedUma()) => saveOf(gradedWorld({ items, umas: { '101': uma } }))
@@ -36,8 +36,8 @@ function worldWith(tier: number, continents: readonly number[]): TierWorld {
 }
 
 describe('the farm by line (save v31)', () => {
-  it('is in the live save (v34 since D264, which keeps the farm by line as it is)', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(34)
+  it('is in the live save (v35 since H157; v34 kept the farm by line as it is, D264)', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(35)
   })
 
   it('lets the Warehouse hold the hundred line items and Tome Ink (FL5, FL14)', () => {
@@ -100,7 +100,7 @@ describe('gear by channel (FL4, FL16)', () => {
     const w = save.tierWorlds['1']!
     Object.assign(w.rift.runs[0]!, { fronts: { iron: 12, arcane: 12, duel: 12, horde: 12 }, convergence: { attempts: 1, open: null }, wonAt: T(50) })
     w.umas['101']!.gear = { weapons: { 'tome-fire': { grade: 2 }, katana: { grade: 1 } }, armor: {}, accessories: [{ grade: 0, family: null, form: 'base' }] }
-    expect(worldOf(ascend(save, T(70)).save, '1').items).toEqual({ 'tome-ink-g1': 1, 'tome-ink-g2': 1, 'weapon-gem-g1': 1 })
+    expect(worldOf(ascendUmas(fullWindows(save, TWENTY), TWENTY, T(70)).save, '1').items).toEqual({ 'tome-ink-g1': 1, 'tome-ink-g2': 1, 'weapon-gem-g1': 1 })
   })
 })
 

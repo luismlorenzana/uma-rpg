@@ -2,7 +2,7 @@
 // Observatory's order. Made-up outfits only.
 import { newOwnedUma, type BattleOutfit, type OwnedUma, type StarMap, type TemplateOutfit } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { mapNodeTitle, mapNodeValue, nodeBeforeAfter, nodeReady, nodeSheet, nodeStepValue, observatoryOrder, setAllLines, setAllPlan } from './stars-view'
+import { mapNodeTitle, mapNodeValue, nodeBeforeAfter, nodeReady, nodeSheet, nodeStepValue, setAllLines, setAllPlan } from './stars-view'
 
 const NOW = '2026-10-31T12:00:00.000Z'
 const map = (...open: string[]): StarMap => ({ open, moons: [] })
@@ -93,13 +93,6 @@ describe('a node\'s sheet (H122)', () => {
     expect(view('template:1', [])).toMatchObject({ jewel: null, footer: { label: 'With its moons', ready: false } })
     expect(nodeReady(map(), 'template:1', 50, { 'jewel-moon-2': 5 })).toBe(false)
     expect(mapNodeTitle('template:2', 'bruiser')).toBe('★ Bruiser\'s moon II')
-  })
-})
-
-describe('the Observatory\'s order (H122)', () => {
-  it('puts the most ready first, then the roster\'s order', () => {
-    const rows = [{ id: 'a', n: 1 }, { id: 'b', n: 2 }, { id: 'c', n: 3 }]
-    expect(observatoryOrder(rows, (id) => (id === 'c' ? 2 : 0), (x, y) => y.n - x.n).map((r) => r.id)).toEqual(['c', 'b', 'a'])
   })
 })
 

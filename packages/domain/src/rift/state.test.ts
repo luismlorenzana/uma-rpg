@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { openRiftRun, RIFT_OPEN_AT, riftLevel50s, riftOpen, type RiftRun } from './state'
+import { lastWonRiftRun, openRiftRun, RIFT_OPEN_AT, riftLevel50s, riftOpen, type RiftRun } from './state'
 
 const run = (n: number, ascendedAt: string | null): RiftRun => ({
   id: `t1-r${n}`, roster: [], startedAt: '2026-10-01T00:00:00.000Z', fronts: { iron: 12, arcane: 12, duel: 12, horde: 12 },
@@ -18,12 +18,13 @@ describe('the Rift’s selectors (H48)', () => {
     expect(riftOpen(world(Array(20).fill(50)), 3)).toBe(false)
   })
 
-  it('reads the current run: the last, until it ascends', () => {
+  it('reads the current run: the last, until it is won (save v35, D283) or ascended', () => {
     expect(openRiftRun({ runs: [] })).toBeNull()
     expect(openRiftRun({ runs: [run(1, '2026-10-03T00:00:00.000Z')] })).toBeNull()
     const open = run(2, null)
     expect(openRiftRun({ runs: [run(1, '2026-10-03T00:00:00.000Z'), open] })).toBe(open)
     const won = { ...run(1, null), wonAt: '2026-10-02T00:00:00.000Z' }
-    expect(openRiftRun({ runs: [won] })).toBe(won)
+    expect(openRiftRun({ runs: [won] })).toBeNull()
+    expect(lastWonRiftRun({ runs: [won, open] })).toBe(won)
   })
 })

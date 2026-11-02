@@ -9,8 +9,10 @@ import type { BattleAlly, BattleEnemy, BattleInput } from '../rpg/battle/types'
 import { BALANCE_PARTY } from '../world/balance-party'
 import type { BattleOutfit } from './battle'
 import { actInRiftFight, riftBattleStep, type RiftFightResult } from './rift'
+import { WINDOW_STEP_IDS } from '../rpg/windows'
 import { worldOf } from './rules'
 import { newOwnedUma, newSave, type Save } from './save'
+import { emptyWindow, withSteps } from './window-record'
 
 /** Minute `n` after the fixture's start. */
 export const T = (n: number): string => new Date(Date.UTC(2026, 9, 20, 12) + n * 60_000).toISOString()
@@ -38,6 +40,13 @@ export function riftWorldSave(count = 25, level = 50): Save {
     if (party) party.slots[i % 5] = id
   })
   return save
+}
+
+/** These Umas with every step of their window in `tier` lit (save v35): ready to ascend once a won run names them. */
+export function fullWindows(save: Save, outfitIds: readonly string[], tier = '1', at = T(55)): Save {
+  const windows = { ...save.account.windows }
+  for (const id of outfitIds) windows[id] = { ...windows[id], [tier]: withSteps(emptyWindow(), WINDOW_STEP_IDS, at) }
+  return { ...save, account: { ...save.account, windows } }
 }
 
 function withInput(save: Save, tier: string, change: (input: BattleInput) => BattleInput): Save {

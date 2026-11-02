@@ -39,7 +39,7 @@ function describe(placeId: string): { title: string; help: string[] } {
   const level = `Each job raises her ${CRAFT_LABEL}; grade g opens at ${CRAFT_LABEL} 5g − 4.`
   if (family) return { title: familyNameV1(family.id)!, help: [`Gathers ${familyNameV1(family.id)!.toLowerCase()}, the ${EFFECT_LABEL[family.effect]} family, in ten grades.`, level] }
   if (spec.kind === 'craft') return { title: 'Crafting', help: ['Crafts weapons, armor and accessories from two refined items of the same grade.', level] }
-  if (spec.kind === 'cut') return { title: 'Cutting', help: ['Cuts Star Gems from refined materials. Set one at the Observatory to open its Extra Stats node.', level] }
+  if (spec.kind === 'cut') return { title: 'Cutting', help: ['Cuts Star Gems from refined materials. Set one on an Uma’s Stars tab to open its Extra Stats node.', level] }
   return { title: 'Refining', help: ['Refines raw materials one into one, in a quarter of their gathering time.', level] }
 }
 

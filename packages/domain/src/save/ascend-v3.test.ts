@@ -3,8 +3,8 @@
 // back to the old world's Warehouse, her open jewels don't, and she arrives at G0 with her slot's form (H78; R2's build
 // decision 9, WP §3.10, GE14).
 import { describe, expect, it } from 'vitest'
-import { ascend, signUpRift } from './rift'
-import { riftWorldSave, T, TWENTY } from './rift-rules.fixture'
+import { ascendUmas, signUpRift } from './rift'
+import { fullWindows, riftWorldSave, T, TWENTY } from './rift-rules.fixture'
 import { worldOf } from './rules'
 import type { Save, TierWorld } from './save'
 
@@ -23,7 +23,7 @@ describe('ascending with R2\'s Warehouse (PP23)', () => {
       w.items = { ...stock }
       for (const id of TWENTY) w.umas[id]!.craft = { level: 46, exp: 120 }
     })
-    const after = ascend(save, T(70)).save
+    const after = ascendUmas(fullWindows(save, TWENTY), TWENTY, T(70)).save
     expect(worldOf(after, '1').items).toEqual(stock)
     const up = worldOf(after, '2')
     expect(up.items).toEqual({})
@@ -41,7 +41,7 @@ describe('ascending with R2\'s Warehouse (PP23)', () => {
       }
       w.umas['101']!.stars = { open: ['planet:1', 'prowess:1'], moons: [] }
     })
-    const after = ascend(save, T(70)).save
+    const after = ascendUmas(fullWindows(save, TWENTY), TWENTY, T(70)).save
     const back: Record<string, number> = {}
     for (let g = 1; g <= 7; g++) back[`weapon-gem-g${g}`] = 1
     for (let g = 1; g <= 5; g++) back[`armor-fittings-g${g}`] = 5

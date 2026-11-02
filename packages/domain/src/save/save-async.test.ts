@@ -130,7 +130,7 @@ describe('asynchronous strict save parsing (H16)', () => {
     expect(await parseSaveAsync(rawOf(s))).toEqual(s)
     const open = rawOf(s); open.account.history['201']![0]!.run = 't1-r2'
     expect(() => parseSave(open)).toThrow(SaveParseError)
-    await expect(parseSaveAsync(open)).rejects.toThrow(/hasn't ascended/)
+    await expect(parseSaveAsync(open)).rejects.toThrow(/hasn't been won/)
   })
 
   it('replays the open Rift fight after the lazy engine import, front or Convergence, and refuses what the engine refuses', async () => {

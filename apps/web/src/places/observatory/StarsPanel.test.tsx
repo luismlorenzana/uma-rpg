@@ -1,22 +1,19 @@
 // The Stars tab on the real store with a test save (H122): Set opens a node and stays on Open; Set all lists its lines and sets
-// them in one save write. The Observatory: its list, ready first; a row's door; the old route lands on Stars.
+// them in one save write.
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
 import { configureKit, MotionRoot, setReducedMotion } from '@luismlorenzana/uma-kit/ui'
-import { newSave, placeById, worldOf, type Save } from '@rpg/domain'
+import { worldOf, type Save } from '@rpg/domain'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { domMax } from 'motion/react'
-import { MemoryRouter, Route, Routes, useLocation, type Location } from 'react-router'
+import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { albumFixture } from '../../album/testing'
 import { resetGame, useGame } from '../../save/game'
-import ObservatoryPage from './ObservatoryPage'
 import { StarsPanel } from './StarsPanel'
 
 let fixture: Awaited<ReturnType<typeof albumFixture>>
 vi.mock('../../master/master', async (orig) => ({ ...await orig<typeof import('../../master/master')>(), useMaster: () => ({ status: 'ready', view: fixture.view }) }))
 
-const NOW = '2026-10-31T12:00:00.000Z'
-let location: Location
 const outfit = () => fixture.view.roster[0]!
 
 async function saveWith(open: string[], items: Record<string, number>): Promise<Save> {
@@ -27,17 +24,13 @@ async function saveWith(open: string[], items: Record<string, number>): Promise<
   world.umas[outfit().outfitId] = { ...world.umas[outfit().outfitId]!, level: 40, stars: { open, moons: [] } }
   return save
 }
-function Probe() {
-  location = useLocation()
-  return null
-}
 function Live() {
   const world = worldOf(useGame((s) => s.save)!)
   return <StarsPanel outfit={outfit()} uma={world.umas[outfit().outfitId]!} world={world} tier={1} />
 }
 function shell(path: string, element: React.ReactNode) {
   return <MemoryRouter initialEntries={[{ pathname: path, state: { back: true } }]}><MotionRoot features={domMax}><AlbumArtProvider art={{ useUrl: () => null }}>
-    <Probe />{element}
+    {element}
   </AlbumArtProvider></MotionRoot></MemoryRouter>
 }
 const stars = () => worldOf(useGame.getState().save!).umas[outfit().outfitId]!.stars as { open: string[] }
@@ -136,44 +129,5 @@ describe('the Stars tab (H122)', () => {
     render(shell('/stars', <Live />))
     expect(screen.getByText('Extra Stats · Open 1/22')).toBeDefined()
     expect(screen.queryByRole('button', { name: 'Set all' })).toBeNull()
-  })
-})
-
-describe('the Observatory as a door (H122)', () => {
-  const place = () => placeById('observatory')!
-
-  it('lists her Umas, those with a jewel ready first, and a row opens Stars with the list', async () => {
-    fixture = await albumFixture()
-    const save = { ...fixture.save }
-    const world = worldOf(save)
-    const last = Object.keys(world.umas).at(-1)!
-    world.umas[last] = { ...world.umas[last]!, level: 40 }
-    world.items = { 'jewel-moon-1': 1 }
-    for (const id of Object.keys(world.umas)) if (id !== last) world.umas[id] = { ...world.umas[id]!, level: 1 }
-    useGame.setState({ status: 'ready', save, activeTier: 1 })
-    render(shell('/learning/observatory', <Routes><Route path="/learning/observatory" element={<ObservatoryPage place={place()} rest="" />} /><Route path="*" element={<p>Her Stars</p>} /></Routes>))
-    const rows = within(await screen.findByRole('list', { name: 'Umas' })).getAllByRole('button')
-    expect(rows).toHaveLength(Object.keys(world.umas).length)
-    expect(rows[0]!.textContent).toContain('Open 0/22')
-    fireEvent.click(rows[0]!)
-    await waitFor(() => expect(location.pathname).toMatch(/\/town\/stable\/outfit\/\d+\/stars$/))
-    expect(location.state).toMatchObject({ back: true })
-    expect((location.state as { list: string[] }).list).toHaveLength(rows.length)
-  })
-
-  it('says so with no Uma', async () => {
-    fixture = await albumFixture()
-    const save = newSave('Empty', NOW)
-    useGame.setState({ status: 'ready', save, activeTier: 1 })
-    render(shell('/learning/observatory', <ObservatoryPage place={place()} rest="" />))
-    expect(await screen.findByText('Unlock an Uma first.')).toBeDefined()
-  })
-
-  it('redirects the old route to her Stars tab, keeping its state', async () => {
-    fixture = await albumFixture()
-    useGame.setState({ status: 'ready', save: fixture.save, activeTier: 1 })
-    render(shell('/learning/observatory/81001', <Routes><Route path="/learning/observatory/*" element={<ObservatoryPage place={place()} rest="81001" />} /><Route path="*" element={<p>Her Stars</p>} /></Routes>))
-    await waitFor(() => expect(location.pathname).toBe('/town/stable/outfit/81001/stars'))
-    expect(location.state).toEqual({ back: true })
   })
 })

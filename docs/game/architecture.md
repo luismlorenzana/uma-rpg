@@ -1,6 +1,6 @@
 # Architecture and technical setup
 
-How uma-rpg is built and run: engine v21, save v34. Values come from the code and `docs/technical/infrastructure.md`,
+How uma-rpg is built and run: engine v21, save v35. Values come from the code and `docs/technical/infrastructure.md`,
 which holds every production value and is the place to change them.
 
 ## The pieces
@@ -43,14 +43,16 @@ lazy pages import it directly, so its rules load with the first command or page 
 | `@rpg/domain` | `src/index.ts` | The save and its parser, the Hub's readers, ids, gates, caps and types |
 | `/engine` | `rpg/battle/index.ts` | The fight engine, Limit Breaks and Auto (H62) |
 | `/battle` | `save/battle.ts` | The world map's fights, classes, promotion and lines; save v32's trade step (`save/classes-v3.ts`) |
-| `/rift` | `rift/index.ts` | The Rift's generator, run rules and Ascend |
+| `/rift` | `rift/index.ts` | The Rift's generator, run rules and Ascend one Uma at a time |
+| `/windows` | `save/windows.ts` | Every Uma's window: the board, latching, the switch's credit (save v35) |
+| `/drills` | `save/drills.ts` | Drills and Training Logs, and the Drills' fights (save v35) |
 | `/work`, `/forge`, `/exchange`, `/observatory`, `/targets`, `/heroes` | `save/<name>.ts` | Each place's rules |
 
 ## Domain map
 
 | Folder | What |
 |---|---|
-| `save/` | The save: `version.ts` (`SAVE_SCHEMA_VERSION` 34, in a module with no imports), `save.ts` (the shape and its strict parse: `parseSave` for the API, `parseSaveAsync` for the device) and `migrations.ts` (every step to v32, `toV32` the last; loaded on demand: `parseSaveAsync` imports it only for an old save, and only the API's `parseSave` imports it statically, H136). Its rules, pure functions that return a new save or throw `SaveRuleError`: `class.ts` (an Uma's starting and active class, the classes she holds, her setup per class, one healer a party; main bundle), `class-tiles.ts` (the class tree's tiles; the Stable's chunk), `battle.ts` (switching class, promotion, weapons, lines, the world map's fights, rewards, Springs; through `@rpg/domain/battle`, H62), `classes-v3.ts` (save v32's trade step, `settleClassesV3Trades`; lazy), `sheet.ts` (her battle sheet; the Stable's chunk), `status.ts` (where an Uma is: in a fight or at work), `work.ts` (jobs on the shared engine, Finish all, the slot view the screens read), `forge.ts` (raising grades with made items, the accessory's family and kind), `observatory.ts` (setting jewels), `presets.ts` (each class's standard preset), `targets.ts` (targets), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts` (raw items and tickets for Laurels, selling, Class Manuals), `rules.ts` (unlocks, parties, the grant and the classes' reset seen), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion; through `@rpg/domain/rift`) |
+| `save/` | The save: `version.ts` (`SAVE_SCHEMA_VERSION` 35, in a module with no imports), `save.ts` (the shape and its strict parse: `parseSave` for the API, `parseSaveAsync` for the device) and `migrations.ts` (every step to v35, `toV35` the last; loaded on demand: `parseSaveAsync` imports it only for an old save, and only the API's `parseSave` imports it statically, H136). Its rules, pure functions that return a new save or throw `SaveRuleError`: `class.ts` (an Uma's starting and active class, the classes she holds, her setup per class, one healer a party; main bundle), `class-tiles.ts` (the class tree's tiles; the Stable's chunk), `battle.ts` (switching class, promotion, weapons, lines, the world map's fights, rewards, Springs; through `@rpg/domain/battle`, H62), `classes-v3.ts` (save v32's trade step, `settleClassesV3Trades`; lazy), `sheet.ts` (her battle sheet; the Stable's chunk), `status.ts` (where an Uma is: in a fight or at work), `work.ts` (jobs on the shared engine, Finish all, the slot view the screens read), `forge.ts` (raising grades with made items, the accessory's family and kind), `observatory.ts` (setting jewels), `presets.ts` (each class's standard preset), `targets.ts` (targets), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts` (raw items and tickets for Laurels, selling, Class Manuals), `rules.ts` (unlocks, parties, the grant and the classes' reset seen), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion one Uma at a time; through `@rpg/domain/rift`), `windows.ts` (every Uma's window: the board met, latching, the switch's credit, the champions and the Rift step; through `@rpg/domain/windows`), `window-record.ts` (the record's day codes; main bundle), `collections.ts` (`collectionsLive`, save v35), `drills.ts` (Drills and Training Logs; through `@rpg/domain/drills`) |
 | `rpg/` | `kinds.ts` (the classes by generation, weapons, damage kinds, twins, statuses), `class-tree.ts` (Classes v3's tree: roots, parents and children, Tier 0's ladder and skill, the suggestion, names by generation, the gates), `rules.ts` (classes, stats, levels, hands, lines, Skill Ranks, the base MP regen, each by generation), `node-identity.ts` (node ids, lines and the skill depth tables, light enough for the parse), `catalog.ts` (every skill tree of every generation), `tree-view.ts` (the Class tab's tree model), `heroes.ts` and `hero-id.ts` (the five halls' sixteen Limit Breaks, and each older engine's for its fights; Bonds) |
 | `rpg/battle/` | The fight: `engine.ts` (the deterministic reducer, engine v21), `limit.ts` (Limit Breaks), `skills.ts`, `auto.ts` (Auto's policy), `types.ts`. `caps.ts` holds the switch: `BATTLE_ENGINE_VERSION` 19 and `rpgRework(stage, engine)` over `RPG_REWORK_ENGINE` (`fight` 16, `economy` 17, `weak` 18, `classes` 19: Classes v3 and Halls v2, live since H134; `t2Weapons` at no engine until the Tier 2 re-plan). A rule outside the engine takes `engine`, defaulting to the live one; the engine passes the fight's own version, so v6–v18 fights replay as they were, pinned by the frozen `v14`- to `v18-replays` fixtures. The engine's functions load through `@rpg/domain/engine`; the main index keeps its types, caps and skill numbers (H62) |
 | `rpg/campaign/` | Foes and their scaling (`enemies.ts`), rewards, Finals and the chapter machinery regions reuse; `weaknesses.ts` deals each stage's foes their own Arms and element lists from v18 (D236) |
@@ -108,6 +110,9 @@ lazy pages import it directly, so its rules load with the first command or page 
     `settleClassResetTrades` runs `settleClassesV3Trades` for a world whose reset record hasn't traded yet (its module
     loads only then): an Uma whose calling's trade moved has her work settled. A second boot changes nothing. (D220's
     calling repair retired with the calling pick at save v32.)
+  - **The windows' latch** (save v35, D283): every commit, once master data has loaded, runs `latchWindows` (its
+    module loads on demand) over every Uma after the change is on screen, in the same write; after the trade step, boot
+    does the same, and the first time it pays the switch's credit (`windowsStart`). A latch doesn't move `updatedAt`.
   - **Her trade** (`save/trade.ts`): built from the master roster once per world and passed to every work action.
   - **The active tier** (H35, `save/tier.ts`): `activeTier` picks the tier world every screen reads (`useWorld()`) and
     every action writes. It's remembered on the device as `rpg.tier`, written on every change, boot included.
@@ -198,7 +203,7 @@ lazy pages import it directly, so its rules load with the first command or page 
 
 ## The save
 
-- **Schema v32** (`save/version.ts`, re-exported by `save/save.ts`).
+- **Schema v35** (`save/version.ts`, re-exported by `save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse: `migrations.ts`' `migrateWorld` runs each world's steps in order, and `save.ts` adds the
   account's own. A world older than v10 is reset, keeping its Umas and parties (D69).
@@ -279,6 +284,10 @@ Recent steps:
   slot stays slot 1 with its grade and two empty ones join it, a Bell loses its kind as it becomes the Charm, Planet Jewels
   in the Warehouse count three each, and her moon opens where all three moons hold its rank. Grades, set jewels, stock and
   running jobs stay; an open fight holds its frozen inputs.
+- **v35:** the collections (D283; [windows](loops.md#windows), [Drills](loops.md#drills-and-training-logs), [Ascend](loops.md#ascend)),
+  once per world (`toV35(world)`): each world gains its Drills (no day yet, 10 runs) and an empty Training Logs count;
+  the account gains empty `windows` and `windowsStart` null, so the first latch pays the switch's credit. A run is done
+  once won, ascended or not, and a history entry names a won run. Nothing else moves.
 
 At every schema bump the API's GET migrates the stored save without writing it; in Firestore the first write of the
 new version copies the stored document to `saveBackups/{uid}-v{n}` (D69), and an older app's write is refused once
@@ -287,16 +296,18 @@ the newer version is stored (D45).
 ### The shape
 
 ```
-Save { schemaVersion: 32, account, tierWorlds: { "1": TierWorld, … } }
+Save { schemaVersion: 35, account, tierWorlds: { "1": TierWorld, … } }
 account { trainerName, createdAt, updatedAt, achievements { <id>: { at, run | null } },
-  history { <outfitId>: [{ tier, at, run }] }, defeated { <castId>: at } }
-TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, sweepTickets, classMarks },
+  history { <outfitId>: [{ tier, at, run }] }, defeated { <castId>: at },
+  windows { <outfitId>: { <tier>: { steps: 31 × 3 base-36 day codes ("---" dark), champions: 15-bit mask } } },
+  windowsStart | null }
+TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, sweepTickets, classMarks, trainingLogs },
   umas: { <outfitId>: OwnedUma }, parties: [20 × { name, slots[5], lead | null }],
   world { activeParty, run { wins, mp, battle | null, battles, … }, springs },
   items { <line item or made item id>: count }, buildings: {}, work: { <outfitId>: WorkRow }, targets [≤10],
   heroes: { <seat>: { hero, learners[≤10] } },
   rift { runs [RiftRun], echoes { <front>: { <level>: at } }, battle: RiftBattle | null, battles },
-  grant: TierGrant | null, classesV3?: ClassesV3Record }
+  grant: TierGrant | null, classesV3?: ClassesV3Record, drills { day | null, runs, won { drill-<n>: true } } }
 TierGrant { tickets, floor, umas { <outfitId>: { level, exp, tickets } }, deleted { gear, gems, upgrades },
   back { laurels, items, stock }, seen }
 ClassesV3Record { manuals, marks, umas { <outfitId>: { classId, ranks, pick, manuals, left, trade? { from, to } } },

@@ -1,9 +1,10 @@
 # Game loops
 
-What the player does, what it pays and what it costs, as the game runs on engine v19 and save v32. Numbers come from the
+What the player does, what it pays and what it costs, as the game runs on engine v21 and save v35. Numbers come from the
 code: generated tables between `live` markers, the rest checked against `packages/domain/src/economy/`, `items/`,
-`work/`, `save/`, `rpg/campaign/rewards.ts` and `rift/`. A tier's next world opens when the Rift below it ascends twenty
-Umas ([the Rift](#the-rift); the page is in [sections](sections.md#the-rift)).
+`work/`, `save/`, `rpg/campaign/rewards.ts` and `rift/`. A tier's next world opens when the first Uma whose window is
+full ascends from the tier below ([windows](#windows), [Ascend](#ascend); the pages are in
+[sections](sections.md#the-gallery)).
 
 ## The loop
 
@@ -21,6 +22,9 @@ Umas ([the Rift](#the-rift); the page is in [sections](sections.md#the-rift)).
                                                            │    Accessory Settings, Planet and Moon Jewels)
                                                            ▼
                            grades raised, Extra Stats nodes opened ─► a stronger party fights higher levels
+
+ each bar she maxes lights a step of her window ─► a full window, and a won Rift run ─► she ascends a tier (the Gallery)
+ Drills, ten runs a day ─► Training Logs ─► Uma EXP and Class EXP, read on any Uma
 ```
 
 Fights are active play. Everything else is jobs that run in real time, offline included, and pay when collected. Each
@@ -142,6 +146,7 @@ Each world has its own wallet (`TierWorld.wallet`).
 | Uma Tickets | 20 at the start (Tier 1); 5 Uma Shards each | Unlocking an outfit |
 | Uma Shards | Lv 10, 20, 30, 40, 50, Tier 1 only | Turned into Uma Tickets automatically |
 | Class Marks | Class EXP past Rank 50 (or past a Tier 0's waiting room), at half rate; EXP banked past Lv 50, on Ascend; Classes v3's refund ([below](#the-classes-are-rebuilt-save-v32)) | Class Manuals |
+| Training Logs | Drills: 2–6 a win or a sweep ([below](#drills-and-training-logs)) | Read on an Uma: a third of her next level each, and Class EXP |
 
 ### The Exchange
 
@@ -365,7 +370,7 @@ places (`economy/professions.ts`, `economy/places-v4.ts`, `work/env-v4.ts`; the 
 
 ### Extra Stats
 
-The Observatory's map (EP1–EP8; `economy/planet.ts`, `save/observatory.ts`):
+Her Extra Stats map, on her profile's Stars tab (EP1–EP8; `economy/planet.ts`, `save/observatory.ts`):
 - Each Uma has a map of a **Planet** and three moons, **Prowess**, **Vigor** and **Guard**, five nodes each (20, the same
   for every class), and beside them **her moon**, two nodes read from her template ★.
 - **Jewels open nodes,** in order, three a rank (D264): Planet n takes three Planet Jewels n, a moon's node n one Moon
@@ -418,7 +423,42 @@ Every made item and value is in [materials](materials.md#gear); `economy/grades.
 - **Working and fighting (D119)** never block each other: an Uma at a job fights, and one in the open fight takes jobs.
 - **One open fight** on the whole world map. While it's open, its Umas can't change parties, and the active
   party, Springs and Sweeps are locked. The fight is stored as its input plus every action ([combat](combat.md)). The
-  Rift has its own open fight ([below](#the-rift)).
+  Rift has its own open fight ([below](#the-rift)); a Drill is the world map's.
+
+## Drills and Training Logs
+
+The daily farm (D283, D286; `save/drills.ts`, behind `@rpg/domain/drills`; the page is in
+[sections](sections.md#drills)): five fights a tier on the Battle page, at its Lv 10 to 50, paying **Training Logs**.
+- **A Drill is a real stage:** its continent's top row's first region's stage 10, that biome's own formation at the
+  continent's top level, copied under its own id, so it's balanced as the map's stages are and never clears one.
+- **Runs:** ten a day on the phone's clock (the day turns at 04:00), banked up to thirty. A win spends one; a loss or a
+  retreat spends nothing. Drills open with the tier's first map win.
+- **The fight** is the world map's open fight, so one fight is open at a time. The active party starts at full HP and
+  MP, the world's carried MP stays as it was, and a win pays its Logs and nothing else.
+- **Sweeps:** a won Drill sweeps one run each, ×1 or ×5: no party, no Sweep Ticket, no free fight slot.
+- **Reading Logs** ("Read Logs" on the Drills page, for any of the world's Umas): each Log gives her a third of her next
+  level in Uma EXP, so three make a level; they're read one at a time, so a level reprices the next. The class she
+  fights as gets twice that by a win's rules (a Tier 0 at Rank 10 keeps it waiting for her promotion; past Rank 50 it
+  banks as Class Marks at half), and in Tier 1 she earns Uma Shards by level as a fight pays them. She stops at Lv 50 and
+  the Logs left stay in the wallet. "To Lv n" reads exactly as many as it takes, offered only when the wallet has them.
+
+<!-- live:drills -->
+| Drill | Tier 1 | Tier 2 | Tier 3 | Training Logs a win or a sweep |
+|---|---|---|---|---|
+| Drill I | Lv 10 | T2 Lv 10 | T3 Lv 10 | 2 |
+| Drill II | Lv 20 | T2 Lv 20 | T3 Lv 20 | 3 |
+| Drill III | Lv 30 | T2 Lv 30 | T3 Lv 30 | 4 |
+| Drill IV | Lv 40 | T2 Lv 40 | T3 Lv 40 | 5 |
+| Drill V | Lv 50 | T2 Lv 50 | T3 Lv 50 | 6 |
+
+| Rule | Value |
+|---|---|
+| Runs | 10 a day, banked up to 30; the day turns at 04:00 on the phone's clock |
+| A fight | The active party at full HP and MP; a win spends a run, a loss or a retreat nothing |
+| A sweep | A won Drill, one run each: no party, no ticket |
+| Opens | With the tier's first map win |
+| A Training Log | A third of her next level in Uma EXP (Lv 1: 46 · Lv 10: 94 · Lv 30: 200 · Lv 49: 302), 2× that to the class she fights as, and Uma Shards by level in Tier 1; read up to Lv 50 |
+<!-- /live -->
 
 ## The Rift
 
@@ -427,8 +467,9 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
 - **Opening:** a world's Rift opens once it has five Lv 50 Umas, in Tiers 1 and 2 (Tier 3's waits for its fifth
   scenario). Echoes and sign-up need it open.
 - **Sign-up and the roster:** twenty different Lv 50 Umas of this world sign up as a run's roster. A world runs one
-  Rift at a time, until its run ascends. An untouched run (no stage cleared, no Convergence attempt, no Rift fight open)
-  can be cancelled.
+  Rift at a time, until its run is won (save v35, CO18; before, until it ascended): the next twenty can sign up at
+  once, an Uma who already has the Rift step among them. An untouched run (no stage cleared, no Convergence attempt, no
+  Rift fight open) can be cancelled.
 - **The roster lock:** front and Convergence fights take only the twenty. Between fights, arrange them into any of the
   world's parties, and change their classes, skills and gear freely.
 - **The guidance** (the guided builds, engine v16, CP7; by family from v19, CV23): each front suggests a build of five
@@ -454,7 +495,8 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   leaving a fight, ends the attempt, and the next one starts from the first fight. An attempt can also be ended between
   fights. The fourth win wins the run.
 - **What they pay:** front and Convergence fights pay [achievements](#achievements) only: no EXP, Laurels, Marks or
-  Bonds. Every won Rift fight records the boss and sub-boss faces it defeated, with the time of the first defeat.
+  Bonds. Every won Rift fight records the boss and sub-boss faces it defeated, with the time of the first defeat. The
+  won run lights the **Rift step** of its twenty's windows ([windows](#windows)).
 - **Echoes,** fought at **Trials** on the Battle page since H153 (D283; [sections](sections.md#trials)): each front at
   Lv 45, 50 and 55, for any full party of Lv 50 Umas while the Rift is open, with or without a run. A win fills each Uma's Class Rank for the class she fought as at twice a stage's rule, E being a regular stage's
   EXP at the Echo's level for her: Lv 45 pays half, Lv 55 the same as Lv 50 (fighting above her never pays more). Past
@@ -466,21 +508,7 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
     Lv 55 is the hard step, hardest on the Horde.
 - **Sweeps:** a won Echo, by a full party of Lv 50 Umas, one Sweep Ticket each, 1–99 at a time. Each pays an Echo win.
   They record no faces and earn no achievements.
-- **Ascend:** once the run is won, its twenty move up a tier together, in one step: no Rift or world-map fight open,
-  and none of them at work ("Recall or collect").
-  - **They leave** the old world's Stable, parties, targets, carried MP, Hall seats and work. A Hero's seat empties and
-    its Learners leave it. The made items her grades used go back to the old world's Warehouse (a G5 Arms weapon returns
-    Arms Gems G1–G5, a G5 Tome Tome Ink G1–G5); the jewels she set are gone.
-  - **They arrive** at Lv 1 with Class Rank 1 everywhere, her classes' weapons, lines and equipped skills back to their
-    defaults, every grade G0, an empty Extra Stats map, Craft Lv 1 and no Bonds. Each keeps her class and her accessory
-    slot's family and kind; her calling is her racing profile's, as always. A later tier has no Tier 0 and every Tier 1
-    class is open there from Class Rank 1 (CV10), so an Uma who ascends as a Tier 0 arrives as her **suggested
-    promotion** (the Warrior a Brawler, the Mage a Sorcerer; a Spellblade, a Summoner or a Healer her Arms child or the
-    Paladin with Power over Wit, else her Tome child or the Cleric), at Class Rank 1.
-  - **The new world** gets the purse, 1,000 Laurels and 5 Speed Tickets an Uma, and their banked EXP as Class Marks. A
-    party whose five all ascend moves, with its name, into its first empty party; the rest fill the next empty parties,
-    five at a time.
-  - Each Uma's history records the climb. The tier's next twenty Lv 50 Umas can run its Rift again.
+- **Ascend** is one Uma at a time since save v35, once her window is full ([below](#ascend)).
 
 <!-- live:rift-rules -->
 | Rule | Value |
@@ -490,16 +518,111 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
 | Echoes | Each front at Lv 45, 50, 55 |
 | Echo pay | ×2 a stage's Class Rank EXP (a Tier 0 at Rank 10 keeps it waiting for her promotion); no Uma EXP, Laurels, Shards or Bonds |
 | Class EXP an Echo win, Lv 50 Uma | Lv 45: 652 · Lv 50: 1,300 · Lv 55: 1,300 |
-| Ascension purse, per Uma | 1,000 Laurels and 5 Speed Tickets (20,000 and 100 a run) |
+| A won run | Lights the Rift step of its 20 Umas' windows; the next run can sign up at once |
+| Ascend | One Uma at a time, from the Gallery, once her window is full |
+| Ascension purse, per Uma | 1,000 Laurels and 5 Speed Tickets |
 | Banked EXP on Ascend, per Uma | 1 Class Mark per 10 EXP, 2,000 at most |
 <!-- /live -->
+
+## Windows
+
+Every Uma's collection (D283; [the design](../design/collections/collections.md)): a stained-glass window of her that
+lights pane by pane as she earns her tier's **board**, her face last, and only a full window ascends. The catalog is
+`rpg/windows.ts`; the rules are `save/windows.ts`, behind `@rpg/domain/windows`. The pages are in
+[sections](sections.md#her-window-and-the-window-sheet).
+- **The board:** six tracks of five steps (Level, Class, Craft, Gear, Stars, World) and, in a tier with a tier above,
+  the Rift: 31 steps in Tiers 1 and 2, 30 in Tier 3 (the table below).
+  - **Level and Craft:** Lv 10, 20, 30, 40 and 50.
+  - **Class:** her best class at Rank 10, 30 and 50 (I in Tier 1 is a Tier 0's Rank 10), then two and three Tier 1
+    classes at Rank 50. The ranks are her classes', not only the one she fights as.
+  - **Gear:** all eleven worn slots (her active class's three weapons, five armor slots, three accessory slots) at G2,
+    G4, G6, G8 and G10.
+  - **Stars:** every node to I, II, III and IV (4, 9, 13, 18 open, her moon's from II and IV), then the whole map, 22.
+  - **World:** continent n's capital's three champions beaten with her in the party (Tier 2's are continents 6 to 10).
+    Each won champion records the bit for the party's five (`recordChampion`).
+  - **The Rift:** on the roster of a won run (`recordRiftWin`). Tier 3 has none yet: its board is 30.
+- **Latching (CO2):** the first time her state meets a step it's hers, dated that day, for good. A class switch, a lower
+  grade, Classes v3's kind of reset and an ascension never darken one. Every change on the device checks every Uma
+  (`latchWindows`, in the store's commit), and so does opening the save once the roster has loaded. A latch doesn't move
+  `updatedAt`: any device works out the same steps from the same state.
+- **Per tier:** a step is earned in the tier she's in. Her lower tiers' windows stay as they were when she ascended.
+- **The switch's credit** (collections.md §9): the first time a save latches (`windowsStart` empty), every step each
+  Uma's state meets; World for an Uma at a continent's top level (10n in Tier 1) in a world that has won its three
+  champions; the Rift step for every roster of a won run; and a full window for each tier an Uma ascended from, dated
+  the day she did.
+- **The record:** `account.windows[outfit][tier]`, 31 three-character day codes (`---` dark) and a 15-bit mask of the
+  champions she beat, about 130 bytes an Uma a tier; `account.windowsStart` is the switch's day.
+- **The reveal** (P84): her window is drawn from the release's `outfit-glass` and its pane map, `outfit-glass-order`.
+  The lead is always drawn, panes light outside in as 250 × lit ÷ (steps − 1) reaches their value, and her face only
+  when every step is lit. An unlit pane is dark glass.
+- **A step lit** shows "Window +1 · Craft 30" with her name for a moment (several Umas: "Windows +5 · 3 Umas"); a sync
+  that brings steps lit on another device, and the switch's credit, stay quiet.
+
+<!-- live:windows -->
+| Step | Tier 1 | Tier 2 | Tier 3 |
+|---|---|---|---|
+| Level I | Uma Lv 10 | Uma Lv 10 | Uma Lv 10 |
+| Level II | Uma Lv 20 | Uma Lv 20 | Uma Lv 20 |
+| Level III | Uma Lv 30 | Uma Lv 30 | Uma Lv 30 |
+| Level IV | Uma Lv 40 | Uma Lv 40 | Uma Lv 40 |
+| Level V | Uma Lv 50 | Uma Lv 50 | Uma Lv 50 |
+| Class I | A Tier 0 class at Class Rank 10 | A Tier 1 class at Class Rank 10 | A Tier 1 class at Class Rank 10 |
+| Class II | A Tier 1 class at Class Rank 30 | A Tier 1 class at Class Rank 30 | A Tier 1 class at Class Rank 30 |
+| Class III | A Tier 1 class at Class Rank 50 | A Tier 1 class at Class Rank 50 | A Tier 1 class at Class Rank 50 |
+| Class IV | Two Tier 1 classes at Class Rank 50 | Two Tier 1 classes at Class Rank 50 | Two Tier 1 classes at Class Rank 50 |
+| Class V | Three Tier 1 classes at Class Rank 50 | Three Tier 1 classes at Class Rank 50 | Three Tier 1 classes at Class Rank 50 |
+| Craft I | Craft Lv 10 | Craft Lv 10 | Craft Lv 10 |
+| Craft II | Craft Lv 20 | Craft Lv 20 | Craft Lv 20 |
+| Craft III | Craft Lv 30 | Craft Lv 30 | Craft Lv 30 |
+| Craft IV | Craft Lv 40 | Craft Lv 40 | Craft Lv 40 |
+| Craft V | Craft Lv 50 | Craft Lv 50 | Craft Lv 50 |
+| Gear I | All eleven worn slots at G2 | All eleven worn slots at G2 | All eleven worn slots at G2 |
+| Gear II | All eleven worn slots at G4 | All eleven worn slots at G4 | All eleven worn slots at G4 |
+| Gear III | All eleven worn slots at G6 | All eleven worn slots at G6 | All eleven worn slots at G6 |
+| Gear IV | All eleven worn slots at G8 | All eleven worn slots at G8 | All eleven worn slots at G8 |
+| Gear V | All eleven worn slots at G10 | All eleven worn slots at G10 | All eleven worn slots at G10 |
+| Stars I | Every node to I: 4 nodes | Every node to I: 4 nodes | Every node to I: 4 nodes |
+| Stars II | Every node to II: 9 nodes | Every node to II: 9 nodes | Every node to II: 9 nodes |
+| Stars III | Every node to III: 13 nodes | Every node to III: 13 nodes | Every node to III: 13 nodes |
+| Stars IV | Every node to IV: 18 nodes | Every node to IV: 18 nodes | Every node to IV: 18 nodes |
+| Stars V | The whole map: 22 nodes | The whole map: 22 nodes | The whole map: 22 nodes |
+| World I | Continent 1: its capital's three champions | Continent 6: its capital's three champions | Continent 11: its capital's three champions |
+| World II | Continent 2: its capital's three champions | Continent 7: its capital's three champions | Continent 12: its capital's three champions |
+| World III | Continent 3: its capital's three champions | Continent 8: its capital's three champions | Continent 13: its capital's three champions |
+| World IV | Continent 4: its capital's three champions | Continent 9: its capital's three champions | Continent 14: its capital's three champions |
+| World V | Continent 5: its capital's three champions | Continent 10: its capital's three champions | Continent 15: its capital's three champions |
+| Rift | On a won Rift run | On a won Rift run | — |
+
+Tier 1: 31 steps · Tier 2: 31 steps · Tier 3: 30 steps.
+<!-- /live -->
+
+## Ascend
+
+From save v35, one Uma at a time (collections.md §5, D283), from the Gallery's **Ascend** ([sections](sections.md#the-gallery)).
+- **When:** her window in this tier is full, every step (the Rift's included, so she was on a won run's roster); no
+  Rift or world-map fight open, and she isn't at work ("At work · recall first"). Any number of ready Umas go at once;
+  each can be left out.
+- **She leaves** the old world's Stable, parties, targets, carried MP, Hall seats and work. A Hero's seat empties and its
+  Learners leave it. The made items her grades used go back to the old world's Warehouse (a G5 Arms weapon returns Arms
+  Gems G1–G5, a G5 Tome Tome Ink G1–G5); the jewels she set are gone.
+- **She arrives** at Lv 1 with Class Rank 1 everywhere, her classes' weapons, lines and equipped skills back to their
+  defaults, every grade G0, an empty Extra Stats map, Craft Lv 1 and no Bonds. She keeps her class and her accessory
+  slots' families and kinds; her calling is her racing profile's, as always. A later tier has no Tier 0 and every Tier 1
+  class is open there from Class Rank 1 (CV10), so an Uma who ascends as a Tier 0 arrives as her **suggested
+  promotion** (the Warrior a Brawler, the Mage a Sorcerer; a Spellblade, a Summoner or a Healer her Arms child or the
+  Paladin with Power over Wit, else her Tome child or the Cleric), at Class Rank 1.
+- **The new world** gets her purse, 1,000 Laurels and 5 Speed Tickets, and her banked EXP as Class Marks. A party whose
+  five all ascend together moves, with its name, into its first empty party; each other Uma takes the first free slot.
+- **Her history** records the climb: the tier, the day and her won run. The run itself stays as it was won.
+- The whole tier switches behind the veil and lands on the new tier's Town Hall.
 
 ## Achievements
 
 The Rift pays achievements instead of EXP ([the Rift](../design/rift.md) §7, D172). They're the account's, not a
 world's: each is earned once, in any tier, and the Account lists them with the date and the run they came from.
-- **Required:** each tier's four front seals and Rift Conquered, the ones that gate Ascend (R8). A front's champion
-  (stage 12) seals it; the Convergence's last fight conquers the Rift.
+- **Required:** each tier's four front seals and Rift Conquered, the ones that win the run and with it the Rift step
+  (R8; since save v35 a full window, not the run, ascends). A front's champion (stage 12) seals it; the Convergence's
+  last fight conquers the Rift.
 - **Titles:** the other nine, earned once per account in any tier, each with its run. The Bestiary counts the boss and
   sub-boss faces defeated in Rift fights across every run and tier, so it names no run.
 - **How a fight earns them** (`achievementsEarned`, `rift/achievements.ts`): every won Rift fight earns each one whose
@@ -516,12 +639,12 @@ world's: each is earned once, in any tier, and the Account lists them with the d
 | Arcane Seal · Tier 1 | Win the Arcane front’s champion | Required |
 | Duel Seal · Tier 1 | Win the Duel front’s champion | Required |
 | Horde Seal · Tier 1 | Win the Horde front’s champion | Required |
-| Rift Conquered · Tier 1 | Win the Convergence | Required; unlocks Ascend |
+| Rift Conquered · Tier 1 | Win the Convergence | Required; lights the Rift step |
 | Iron Seal · Tier 2 | Win the Iron front’s champion | Required |
 | Arcane Seal · Tier 2 | Win the Arcane front’s champion | Required |
 | Duel Seal · Tier 2 | Win the Duel front’s champion | Required |
 | Horde Seal · Tier 2 | Win the Horde front’s champion | Required |
-| Rift Conquered · Tier 2 | Win the Convergence | Required; unlocks Ascend |
+| Rift Conquered · Tier 2 | Win the Convergence | Required; lights the Rift step |
 | Iron Will | Seal Iron with no magic dealt | Title |
 | Arcane Purity | Seal Arcane with no physical damage | Title |
 | Untouched · Iron | Seal Iron with no Uma knocked out | Title |

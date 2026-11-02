@@ -37,10 +37,10 @@ describe('the Wilds by generation (H77)', () => {
 
   it('has no place for the five removed ids, and the other pages as they were', () => {
     for (const id of ['ley-spring', 'crystal-cavern', 'quarry', 'meadow', 'fossil-dig']) expect(placeById(id), id).toBeUndefined()
-    // Learning is Halls v2's five and the Observatory since H134 (`places.test.ts`).
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 6, 3, 15])
+    // Learning is Halls v2's five since H134 and the Gallery since H157 (`places.test.ts`).
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 6, 4, 15])
     expect(placesOn('learning')).toEqual(learningPlaces(19))
-    expect(placesOn('battle').map((p) => p.id)).toEqual(['scenario-gate', 'tier-finale', 'trials'])
+    expect(placesOn('battle').map((p) => p.id)).toEqual(['scenario-gate', 'tier-finale', 'trials', 'drills'])
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
   })
 

@@ -50,7 +50,7 @@ Phaser).
   - a hall: its seats, each with its Hero's face, its Limit Break and "3/10" Learners or "Open";
   - a Wilds place: [its compact page](#wilds);
   - the Rift: [its line and fronts](#the-rift);
-  - the Warehouse, the Exchange and the Observatory: their line from the list below.
+  - the Warehouse, the Exchange, the Gallery, Trials and Drills: their line from the list below.
 - **Routes** (`app/router.tsx`): `/:page` and `/:page/:placeId/*`, nothing else (D31). `/` returns to the last page
   viewed. A link to a place under another page (an old link, a push) moves to the place's own page. A link to a place
   that no longer exists (the Ley Spring, the Quarry, the Workbench, the Forge, the Charm Shop…) opens the page it names,
@@ -62,10 +62,11 @@ Phaser).
 - **Learning:** the five Halls of Heroes, one per family (Halls v2, H133, D255; [heroes](heroes.md#the-five-halls)):
   physical-led halls on the left, magic-led on the right. The Warrior Dojo (the Brawler Dojo's id) and the Mage Tower on
   top, the Spellblade Salle and the Summoner Circle below them, the **Healer Sanctum** (`healer-sanctum`, uma-art's own
-  temple) in the middle where the Paladin Bastion and the Cleric Chapel stood, the Observatory under it.
+  temple) in the middle where the Paladin Bastion and the Cleric Chapel stood, and the **Gallery** under it, where the
+  Observatory stood (H155, D283), on uma-art's unused Cleric Chapel until its own building lands (H156).
 - **Battle:** a drill ground of its own, with flagstone roads, banners, weapon racks, training dummies and torches (H31,
-  D148): the Scenario Gate above, the Rift below, and **Trials** on the left between them (H153, D283), on uma-art's
-  unused Knights' Bastion until its own building lands (H156). The Rift keeps the Tier Finale's id, `tier-finale`, and
+  D148): the Scenario Gate above, the Rift below, **Trials** on the left between them (H153, D283) and **Drills** on the
+  right (H154), on uma-art's unused Knights' Bastion and Gym until their own buildings land (H156). The Rift keeps the Tier Finale's id, `tier-finale`, and
   draws uma-art's `rift` building (`Place.frame`, H50).
 - **Wilds:** fifteen places in five rows of three, a row a line, in the order Metal, Vegetables, Wood, Fish and Stone.
   The gathering place is on the left, its workbench on the trunk road, its making place on the right (D230, H114). The
@@ -96,15 +97,16 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 | Spellblade Salle | `spell-blade-salle` | class-hall | 4 | The Spellblade Salle: power from pacts with familiars. Four Heroes, each with her own Limit Break, and their Learners. |
 | Summoner Circle | `summoner-circle` | class-hall | 4 | The Summoner Circle: power from familiars, summoned. Four Heroes, each with her own Limit Break, and their Learners. |
 | Healer Sanctum | `healer-sanctum` | class-hall | 4 | The Healer Sanctum: power from a followed deity. Four Heroes, each with her own Limit Break, and their Learners. |
-| Observatory | `observatory` | town | — | Each Uma's Extra Stats: a Planet, three moons and her own moon. |
+| Gallery | `gallery` | town | — | Every Uma’s window, most complete first. |
 
 ### Battle (`battle`)
 
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
 | Scenario Gate | `scenario-gate` | battle | — | The world map: five continents of regions to clear. |
-| The Rift | `tier-finale` | battle | — | Twenty Lv 50 Umas seal four fronts, then ascend together. |
+| The Rift | `tier-finale` | battle | — | Twenty Lv 50 Umas seal four fronts and win the Rift step. |
 | Trials | `trials` | battle | — | Class EXP ×2 for Lv 50 parties. |
+| Drills | `drills` | battle | — | Five fights a day pay Training Logs. |
 
 ### Wilds (`wilds`)
 
@@ -162,7 +164,7 @@ pushes too, and Back returns to her on the same tab.
 | World map's party bar, a face | Class | The active party |
 | Rift, a guided Uma | Class | That guidance's Umas |
 | Plaza, **Profile** | The remembered tab | No list: the roster's |
-| Observatory, a row | Stars | That list, jewels ready first |
+| Gallery, a locked or ascended Uma | The remembered tab | No list: the roster's |
 | Hall of Heroes, **Profile** in a Hero's or a Learner's sheet | Class | That seat's Hero and Learners |
 | A Wilds place, a worker's face | The remembered tab | That place's workers, in slot order |
 | A shared link | Its tab | The roster's |
@@ -200,8 +202,10 @@ hides with one Uma in the list and on a locked profile. Arrows only, no swipe.
 
 **Her profile** (`OutfitProfile.tsx` in the kit's compact `ProfileFrame`; its contract is [Uma profile
 v2](../design/uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229), D239):
-- **Header:** a 64 px bust, her name, title and rarity stars, "Lv 50", the EXP bar and the **target** icon (up to ten
-  targets; the Wilds plan what maxing them takes, D100). The place header's Back is the only Back.
+- **Header:** a 64 px bust and beside it **her window** (the kit's `companion`, H151, H155): her stained-glass window at
+  this tier's share lit with "45%" on its corner, a tap opening the [Window sheet](#her-window-and-the-window-sheet);
+  then her name, title and rarity stars, "Lv 50", the EXP bar and the **target** icon (up to ten targets; the Wilds plan
+  what maxing them takes, D100). A locked outfit has no window. The place header's Back is the only Back.
 - **Facts:** one row of three 44 pt doors. **Party** reads "Party 1", "Fighting" or "No party" and opens the party
   editor or list. **Work** reads "Mine · 1h 20m", "Mine · Done" or "Idle" and opens that place (an idle Uma opens her
   trade's first place). **Details** opens what she hits with and her stats, read-only. Back from Party or Work returns to
@@ -222,6 +226,28 @@ v2](../design/uma-profile-v2/proposal.md#9-the-contract-that-replaces-d229), D23
 - **Tabs:** Class, Gear, Stars and Template, always in that order; the last one used is remembered on the device. Class
   carries a Ready dot while a promotion waits, Gear while a grade can rise, Stars while a jewel can be set. Template never does:
   her uniqueness is optional (D274).
+
+### Her window and the Window sheet
+
+The collections on screen (H155, D283, D287; the rules are [loops](loops.md#windows); screens in `places/gallery/`).
+- **Her window** (`GlassWindow.tsx`): drawn on a canvas from the release's window and its pane map by the lit rule, at
+  the size it shows (up to 512 device pixels), and kept as an image for that share and size. Newly lit panes fade up over
+  600 ms, at once under reduced motion. A release with no pane map draws a full window whole and any other dark. The art
+  is only ever loaded from the private release.
+- **The Window sheet** (`WindowSheet.tsx`, one sheet: nothing opens over it):
+  - "Tier 1 · 14/31 · 45%" and her window, 232 pt at 390 wide;
+  - **the board:** six rows, Level, Class, Craft, Gear, Stars and World, each with its share under its name ("60%"), of
+    five tiles ("Lv 30", "R30", "2 at R50", "Craft 20", "G6", "Stars III", "Cont. 7"), then the **Rift** tile across. A
+    lit tile shows its day ("2 Nov"), a row's next tile what's left ("Lv 34/40", "R41/50", "Craft 22/30", "8 of 11 at
+    G6", "10/13", "1 of 3"), the rest are dark. A tap writes the tile's rule and where it comes from under the board
+    ("All eleven worn slots at G6 · Made items");
+  - a full window in a tier with a Rift: **Ready to ascend · Gallery** (from the Gallery, **Ready to ascend** opens its
+    Ascend sheet);
+  - her earlier tiers' full windows, small, each with its tier's name in its frame's colour (Tier 1 `#e8c25a`, Tier 2
+    `#c07a3a`, Tier 3 `#7a5ad0`).
+- **"Window +1 · Craft 30"** (`WindowToast.tsx`): a note above the menu, with her name, for 2.6 s after a change on this
+  device lights a step, a fight's included; "Windows +5 · 3 Umas" for several. It stands in for a line on the fight's
+  result (D287).
 
 **Class tab** (`ClassTab.tsx`, `class-sheets.tsx`, `ClassesSheet.tsx`, `PromotionSheet.tsx`, `WeaponSheet.tsx`, `class-view.ts`;
 H120, D267; the rules are [classes](classes.md#the-class-tree) and [skill trees](skill-trees.md)). Every change here is free,
@@ -487,14 +513,25 @@ The five halls share `places/halls/HallPage.tsx` (D106; Halls v2's page, H133, D
 - The map's pips, the quick look, the Hero and Learner sheets and the pickers are Halls v1's; her profile's Limit sheet opens the
   seat's hall (`HERO_HALL_PLACES`).
 
-### Observatory
+### Gallery
 
-`places/observatory/ObservatoryPage.tsx` (the rules are [loops](loops.md#extra-stats), [jewels](materials.md#jewels) and [Extra
-Stats](../design/tier-rework/extra-stats-progression.md)): a door to her Stars tab (H122, D269). The page lists the world's owned
-Umas, those with a jewel ready first, then by Uma Level: a face, a name and "Open 13/22 · 2 ready" ("Open 13/22" with none), with the
-green dot on a ready one, or "Unlock an Uma first." A tap opens her profile on **Stars**, and Back returns to the list. The route
-`/learning/observatory/:id` redirects to `/town/stable/outfit/:id/stars`. Its quick look and (i) show the place's line, "Each Uma's
-Extra Stats: a Planet, three moons and her own moon."
+`places/gallery/GalleryPage.tsx` (H155, D283, D287; the rules are [loops](loops.md#windows) and [Ascend](loops.md#ascend)):
+every Uma's window in the world, most complete first, where the Observatory stood. `/learning/observatory` and its old
+`/:id` route land here; `/learning/gallery/:id` opens her Window sheet.
+- **Head:** "3 full · 2 ready", "Collection 62%" (lit steps over every owned Uma's steps) and **Ascend 2** while any Uma
+  is ready.
+- **Filters:** All · Ready · Owned · Locked.
+- **The grid,** four a row at 375 and 390: the world's Umas ranked by share, ties to whoever lit her last step first,
+  then by name. Each tile is her window, "1. Name" (the green dot first on a ready one) and "31/31 · 100%"; a full window
+  wears its tier's 3 px ring. Then every outfit nobody owns, dark, with a lock and "Locked"; then the Umas who ascended
+  from this world, their windows full and ringed, "Ascended" (All only). A tile mounts as it nears the screen, so a
+  world's few hundred windows load as they scroll in.
+- **A tap** on a world's Uma opens her [Window sheet](#her-window-and-the-window-sheet); on a locked or ascended one, her
+  Stable profile.
+- **Ascend** (`AscendSheet.tsx`): "Ascend to Tier 2"; the ready Umas, each ticked (untick to leave one), one who can't
+  go greyed with why ("At work · recall first"); "Lv 1 in Tier 2", "Ranks, skills and stars restart", "Gear returns to
+  Tier 1's stock", "+2,000 Laurels · +10 Speed Tickets" (and "+40 Class Marks" when any bank) for the ticked; and
+  **Ascend 2**, which runs behind the tier veil and lands on the new tier's Town Hall.
 
 ## Battle
 
@@ -565,8 +602,8 @@ The end-of-tier event ([the Rift](../design/rift.md), H50; its rules in [loops](
 [combat](combat.md#the-rifts-foes)). Routes: `/battle/tier-finale`, `front/:front` (and `front/:front/:stage`, its sheet
 open), `convergence`, `signup` and `fight`; screens in `places/rift/`. It opens once the tier's world has five Lv 50
 Umas (Tiers 1 and 2).
-- **Quick look:** the Rift's line ("The Rift is open", "Rift run · 2 of 4 fronts sealed", "Rift won · ready to ascend")
-  and "12 of 20 at Lv 50 to sign up", or the run's four fronts ("5/12", "Sealed").
+- **Quick look:** the Rift's line ("The Rift is open", "Rift run · 2 of 4 fronts sealed") and "12 of 20 at Lv 50 to sign
+  up", or the run's four fronts ("5/12", "Sealed").
 - **The Rift:**
   - "Tier 1 · 21 Lv 50 Umas" (or "Tier 1 · Run 1 · 2 of 4 fronts sealed"), and **Resume the open fight** when a Rift
     fight is open;
@@ -574,8 +611,9 @@ Umas (Tiers 1 and 2).
   - a run: its four **fronts** (crest, name, "5/12" or "Sealed", the party guidance "2 Brawler · Arms Spellblade · Arms
     Summoner · Paladin") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts",
     "Fight 2 of 4 · Arcane", "Won");
-  - a won run: **Ascend to Tier 2**;
-  - **Roster:** the run's twenty faces, with **Cancel sign-up** while the run is untouched.
+  - a won run, with no new one open: a **Gallery** door, "Rift won · 3 ready" (the world's Umas whose windows are full);
+    a new run can sign up at once;
+  - **Roster:** the run's twenty windows with "14/31" under each, with **Cancel sign-up** while the run is untouched.
 - **Sign up twenty:** **Four parties** (the party picker: four parties of five Lv 50 Umas) or **Twenty Umas** (the Uma
   picker, twenty, "Below Lv 50" disabled), then a sheet of the twenty faces: "They fight this Rift together until it
   ends." and **Sign up**.
@@ -608,9 +646,7 @@ Umas (Tiers 1 and 2).
   "Tier 1", "The Rift is won", the champions' faces four to a row, revealed one after another (at rest under reduced
   motion), "Twenty Umas, four fronts, 14 champions" and **Continue**. The faces are every boss face of the four fronts'
   champions, Iron to Horde, then of the Convergence's four fights, each once.
-- **Ascend** (`AscendSheet.tsx`): "20 Umas move to Tier 2 at Lv 1", "Ranks, skills and Extra Stats start over", "Their
-  gear returns to Tier 1's stock", "Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 3,450 Class Marks", the reason
-  when it can't yet, and **Ascend**, which runs behind the tier veil and lands on the new tier's Town Hall.
+- **Ascend** is the [Gallery's](#gallery) since save v35, one Uma at a time.
 
 ### Trials
 
@@ -624,6 +660,19 @@ and code and save keep the name `echo`; the screen says Trial.
   and needs (from the world's Lv 50 Umas), and **Fight** ("Fight again" once won). Once won, **Sweep ×1** and **Sweep ×5**
   with the Sweep Tickets held; a Sweep's result shows like a win.
 - **The fight** is the Rift's fight route, titled "Trial · Iron · Lv 55"; its result's button reads **Back to Trials**.
+
+### Drills
+
+The daily farm (H154, D283, D286; the rules are [loops](loops.md#drills-and-training-logs)). Routes: `/battle/drills` and
+`fight`; screens in `places/drills/`. It opens with the tier's first map win.
+- **The page:** "Runs 18 · +10 at 4:00" ("Runs 30 · full") and **Read Logs · 18**; **Resume the open fight** while a
+  Drill is open; then five rows, "Drill III · Lv 30" ("T2 Lv 30" in Tier 2) and "4 Logs a win", each with **Fight**, or
+  once won **Sweep ×1** and **×5** (greyed without the runs, or while a fight is open).
+- **The fight** is the world map's open fight on the shared fight screen ("Back to Drills"); its result reads "+4
+  Training Logs", or "No runs spent" on a loss.
+- **Read Logs** (the Class Manual sheet's twin; it stays open after reading): an Uma picker (a Lv 50 Uma greyed, "Lv 50 ·
+  Trials pay ranks"), then the counts, 1, 5, 10, "To Lv 40" (the next ten, only when the wallet holds that many) and
+  Max, "Three Logs, one level", and **Read 5**, which says "Lv 34 → 36 · R22 → R23"; **Choose another Uma**.
 
 ## Wilds
 
@@ -695,7 +744,7 @@ kit's `uma-kit/work`.
 Each tier is its own world, with its own Stable, parties, world map, Wilds, Warehouse, wallet and halls (D159). The
 account, its achievements and each Uma's tier history are shared.
 - **One world on screen at a time:** the active tier (`apps/web/src/save/game.ts`, `save/tier.ts`, H35). Every screen
-  reads its world and every action writes to it. A tier's world exists once the Rift below it has ascended Umas.
+  reads its world and every action writes to it. A tier's world exists once an Uma has ascended into it.
 - **The tiers** (`TIERS`, `packages/domain/src/save/rules.ts`): three, as master data has, each with a name and a look:
 
 <!-- live:tiers -->
@@ -710,7 +759,7 @@ account, its achievements and each Uma's tier history are shared.
   or ✕ closes it. One card per tier, 1 to 3:
   - a tier with a world shows its crest, "Tier 1 · Apprentice", its Uma count ("No Umas yet", "1 Uma", "12 Umas") and
     its Rift (`riftLine`): "No Rift in this tier yet" (Tier 3), "The Rift opens at five Lv 50 Umas", "The Rift is open",
-    "Rift run · 2 of 4 fronts sealed" or "Rift won · ready to ascend". The active tier's card has an accent border, and
+    or "Rift run · 2 of 4 fronts sealed" (a won run's world reads "The Rift is open" again). The active tier's card has an accent border, and
     tapping it just closes the sheet;
   - a tier with no world is locked: its crest at half opacity, a lock, and "Promote Umas through the Tier 1 Rift".
 - **Picking another tier** fades a veil in the page colour over the screen (120 ms), switches the active tier and lands

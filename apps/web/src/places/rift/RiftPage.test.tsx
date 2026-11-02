@@ -1,6 +1,6 @@
 import { MotionRoot, setReducedMotion } from '@luismlorenzana/uma-kit/ui'
-import { newOwnedUma, newSave, placeById, type RiftRun, type Save } from '@rpg/domain'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { emptyWindow, newOwnedUma, newSave, placeById, WINDOW_STEP_IDS, withSteps, type RiftRun, type Save } from '@rpg/domain'
+import { cleanup, render, screen } from '@testing-library/react'
 import { domMax } from 'motion/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -74,14 +74,14 @@ describe('the Rift (H50)', () => {
     expect(screen.getByRole('button', { name: 'Roster' })).not.toBeNull()
   })
 
-  it('offers Ascend once the run is won, with its numbers', () => {
+  it('points a won run to the Gallery with how many are ready, and opens sign-up again (H155, D283)', () => {
     const won = save(20, { fronts: { iron: 12, arcane: 12, duel: 12, horde: 12 }, wonAt: NOW, convergence: { attempts: 2, open: null } })
+    won.account.windows = { '101': { '1': withSteps(emptyWindow(), WINDOW_STEP_IDS, NOW) } }
     show(won)
-    expect(document.querySelector('[data-rift-status]')!.textContent).toBe('Tier 1 · Run 1 · won')
-    act(() => { fireEvent.click(screen.getByRole('button', { name: 'Ascend to Tier 2' })) })
-    const lines = [...document.querySelectorAll('[data-ascend-lines] li')].map((li) => li.textContent)
-    expect(lines).toEqual(['20 Umas move to Tier 2 at Lv 1', 'Ranks, skills and Extra Stats start over', 'Their gear returns to Tier 1’s stock',
-      'Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 0 Class Marks'])
+    expect(document.querySelector('[data-rift-status]')!.textContent).toBe('Tier 1 · 20 Lv 50 Umas')
+    expect(screen.queryByRole('button', { name: /Ascend/ })).toBeNull()
+    expect(document.querySelector('[data-rift-won]')!.textContent).toBe('GalleryRift won · 1 ready')
+    expect(signUp()).not.toBeNull()
   })
 
   it('reads the status and the Convergence card', () => {

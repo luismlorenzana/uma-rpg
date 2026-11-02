@@ -4,10 +4,10 @@ import { mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
-  newOwnedUma, newSave, parseSavePut, SAVE_SCHEMA_VERSION as V, type BattleOutfit, type RiftFightRef, type RosterMember, type Save,
+  emptyWindow, newOwnedUma, newSave, parseSavePut, SAVE_SCHEMA_VERSION as V, WINDOW_STEP_IDS, withSteps, type BattleOutfit, type RiftFightRef, type RosterMember, type Save,
 } from '@rpg/domain'
 import { autoAction, battleActionsLeft } from '@rpg/domain/engine'
-import { actInRiftFight, ascend, beginConvergence, riftBattleStep, signUpRift, startRiftFight } from '@rpg/domain/rift'
+import { actInRiftFight, ascendUmas, beginConvergence, riftBattleStep, signUpRift, startRiftFight } from '@rpg/domain/rift'
 import { describe, expect, it } from 'vitest'
 import { LocalSaveRepository } from './local-save.repository'
 
@@ -70,7 +70,9 @@ describe('the Rift’s saves through the API (H48)', () => {
     save = win(save, { kind: 'echo', front: 'horde', level: '50' }, 4, 200)
     expect(put(save).save).toEqual(save)
     for (let fight = 0; fight < 4; fight += 1) save = win(save, { kind: 'convergence', fight }, null, 300 + 100 * fight)
-    const ascended = ascend(save, T(800)).save
+    // Their windows full (save v35, D283), the twenty go up together.
+    const windows = Object.fromEntries(ids(101, 20).map((id) => [id, { '1': withSteps(emptyWindow(), WINDOW_STEP_IDS, T(750)) }]))
+    const ascended = ascendUmas({ ...save, account: { ...save.account, windows } }, ids(101, 20), T(800)).save
     const parsed = put(ascended)
     expect(parsed).toMatchObject({ baseRevision: 3, sentSchemaVersion: V })
     expect(parsed.save).toEqual(ascended)
