@@ -81,6 +81,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H153 | Trials: the Echoes' own place on the Battle page, live, on the Knights' Bastion until H156 (D285) | `30b9902` |
 | H152 | Windows, the rules, dark: the board, latching, the World record and the Rift step, save v35's fields, Ascend one Uma at a time (D284) | `cc81286` |
 | H151 | Both apps: `ProfileFrame`'s companion square, uma-kit 0.17.0 (platform P85) | Kit `82c23db`, release `a6bef9f` |
 | H150 | The window's pane map, `outfit-glass-order`, uma-data 1.3.0; all 272 windows byte for byte as before, the maps 2.8 MB; candidate release `01ba1c71f403` (platform P84) | Platform `fc7906f`, release `a6bef9f` |
