@@ -57,5 +57,5 @@ function rule(track: WindowTrack, n: WindowNumeral, tier: number): string {
  */
 export function windowBoard(tier: number, hasRift: boolean): WindowStep[] {
   const steps: WindowStep[] = WINDOW_TRACKS.flatMap((track) => NUMERALS.map((n) => ({ id: `${track}-${n}` as const, track, numeral: n, rule: rule(track, n, tier) })))
-  return hasRift ? [...steps, { id: 'rift', track: 'rift', numeral: null, rule: 'On the roster of a won Rift run' }] : steps
+  return hasRift ? [...steps, { id: 'rift', track: 'rift', numeral: null, rule: 'On a won Rift run' }] : steps
 }

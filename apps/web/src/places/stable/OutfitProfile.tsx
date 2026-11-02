@@ -1,10 +1,11 @@
 // The Uma profile v2 frame (H119, UP25–UP27): one compact identity header, three fact doors and four stable skeleton tabs.
-// Later packets replace each skeleton's body without moving this header, route or tab contract.
+// Later packets replace each skeleton's body without moving this header, route or tab contract. From save v35 her window
+// stands beside her bust (H155).
 import { AtlasSprite, imagePath, useArtUrl } from '@luismlorenzana/uma-kit/content'
 import { ProfileFrame, UnlockConfirm } from '@luismlorenzana/uma-kit/places'
 import { UiMark } from '@luismlorenzana/uma-kit/ui'
 import {
-  RPG_TIER_MAX_LEVEL, SaveRuleError, rpgExpToNext,
+  collectionsLive, RPG_TIER_MAX_LEVEL, SaveRuleError, rpgExpToNext,
   type OwnedUma, type Place, type RosterOutfit, type TierWorld,
 } from '@rpg/domain'
 import { useEffect, useState } from 'react'
@@ -15,6 +16,7 @@ import { useHubNavigation } from '../../hub/navigation'
 import type { MasterView } from '../../master/master'
 import { markTarget, unlock, useActiveTier, useOwnerTier, useWorld } from '../../save/game'
 import { TargetIcon, TicketIcon } from '../../ui/icons'
+import { WindowDoor } from '../gallery/WindowDoor'
 import { StarsPanel } from '../observatory/StarsPanel'
 import { ClassTab } from './ClassTab'
 import { DetailsSheet } from './DetailsSheet'
@@ -85,6 +87,8 @@ export function OutfitProfile({ view, outfitId, place, route }: OutfitProfilePro
         portrait={bust
           ? <img src={bust} alt="" className="size-full object-cover object-top" />
           : <AtlasSprite art={view.art} family="outfit-icons" frameKey={outfit.outfitId} size={64} />}
+        // Her window beside her bust, from save v35 (D283 note 2).
+        companion={owned && world && collectionsLive() ? <WindowDoor outfit={outfit} uma={owned} tier={tier} /> : undefined}
         name={outfit.name}
         title={outfit.title}
         level={owned ? level(owned.level) : undefined}

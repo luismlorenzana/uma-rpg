@@ -84,6 +84,12 @@
   .star-pulse { animation: none; opacity: 0.45; }
 }
 
+/* A window's newly lit panes fade up over the old state (D283, H155); the component skips it under reduced motion. */
+@keyframes glass-light {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* Latin-only variable faces, loaded from the workspace; the kit's theme names them. */
 @font-face {
   font-family: 'Outfit Variable';

@@ -36,7 +36,12 @@ Gallery in the Observatory's place, Drills and Training Logs, and Ascend one Uma
    - `pnpm docs:update`.
 4. **The phone check** gains the windows: a profile's companion, the Window sheet, the Gallery's order and percentages,
    a Drill's sweep, a Log read, an Ascend.
-5. **A won run waiting to ascend** at the switch keeps its twenty in their world; they ascend from the Gallery once their
+5. **From H155 (D287), for the manual and the check:** the Gallery's words are in `places/gallery/glass-view.ts`; the
+   Observatory's page and registry entry are still there for the dark period (delete them, and `copy.test.ts`'s
+   `ObservatoryPage.tsx` line); the Rift's `riftWonLine` and the windows in its roster sheet; the "Window +1" note
+   (`WindowToast`) stands in for a fight result's line; the 390×844 and 375×667 look at the profile, the sheet, the
+   Gallery and an Ascend happens here (H155 moved it).
+6. **A won run waiting to ascend** at the switch keeps its twenty in their world; they ascend from the Gallery once their
    windows are full (collections.md §9; the owner was told on 2026-11-02).
 
 ## Do

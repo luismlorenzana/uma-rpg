@@ -4,15 +4,18 @@
 // (H36) sits here, outside the shell that remounts per tier.
 import { useAuth } from '@luismlorenzana/uma-kit/auth'
 import { BootGates, UpdateNotice } from '@luismlorenzana/uma-kit/places'
-import { DEFAULT_TRAINER_NAME, STARTING_UNLOCK_TICKETS, TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
-import { useEffect, useState } from 'react'
+import { collectionsLive, DEFAULT_TRAINER_NAME, STARTING_UNLOCK_TICKETS, TRAINER_NAME_MAX, normalizeTrainerName } from '@rpg/domain'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 import { lastPage } from '../hub/start'
 import { TierVeil } from '../hub/TierVeil'
 import { useMaster } from '../master/master'
-import { boot, createAccount, settleClassResetTrades, startSyncTriggers, useGame } from '../save/game'
+import { boot, createAccount, latchOnLoad, settleClassResetTrades, startSyncTriggers, useGame } from '../save/game'
 import { TicketIcon } from '../ui/icons'
 import { signInEnabled } from './firebase-config'
+
+/** "Window +1" after a change lights steps (H155), from save v35. */
+const WindowToast = lazy(() => import('../places/gallery/WindowToast'))
 
 function FirstLaunch({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState(DEFAULT_TRAINER_NAME)
@@ -57,12 +60,13 @@ async function bootFor({ uid }: { uid: string }): Promise<{ firstLaunch: boolean
   return { firstLaunch: useGame.getState().status === 'first-launch' }
 }
 
-/** Save v32's trade step (H130, CV28) reads private master data, so it runs once both roster and save are ready. */
+/** Save v32's trade step (H130, CV28) and the windows' latch (H155) read private master data, so they run once both roster
+ * and save are ready. */
 function ClassResetTrades() {
   const master = useMaster()
   const ready = useGame((state) => state.status === 'ready')
   useEffect(() => {
-    if (ready && master.status === 'ready') void settleClassResetTrades(master.view.roster)
+    if (ready && master.status === 'ready') void settleClassResetTrades(master.view.roster).then(latchOnLoad)
   }, [master, ready])
   return null
 }
@@ -84,6 +88,7 @@ export function Root() {
         words={{ name: 'Uma RPG', tagline: 'A party RPG for one trainer.' }}>
         <ClassResetTrades />
         <Outlet />
+        {collectionsLive() && <Suspense fallback={null}><WindowToast /></Suspense>}
       </BootGates>
       <TierVeil />
     </>

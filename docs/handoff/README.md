@@ -50,13 +50,11 @@ switch to save v35.
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H154](tasks/H154-drills-logs.md) | Drills and Training Logs, dark | Claude | L | H152 | Ready |
-| [H155](tasks/H155-windows-web.md) | Her window beside her bust, the Window sheet, the Gallery, Ascend, dark | Claude | L | — | Ready |
 | [H156](tasks/H156-collections-buildings-art.md) | Art: the Gallery, Trials and Drills buildings, uma-art 2.20.0 | ChatGPT draws and publishes | S | H141's 2.19.0 | Ready after H141: the owner dispatches it |
-| [H157](tasks/H157-collections-switch.md) | The switch: save v35, the manual, the phone check | Claude | M | H152–H155 | Waits |
+| [H157](tasks/H157-collections-switch.md) | The switch: save v35, the manual, the phone check | Claude | M | H152–H155 | Next |
 | [H158](tasks/H158-pin-collections-art.md) | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | S | H156, H157 | Waits |
 
-**Done:** H150–H153 (2026-11-02, below). **Order now:** H154 and H155, then H157. H156 and H158 can land any time after,
+**Done:** H150–H155 (2026-11-02, below). **Order now:** H157. H156 and H158 can land any time after,
 since the places borrow existing buildings until then. uma-platform's `latest` is release `01ba1c71f403` (2026-11-02),
 which carries the pane maps; undo with `pnpm release:publish -- --rollback f8ab287029e8` in uma-platform.
 
@@ -69,7 +67,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v21, save v34; uma-kit 0.16.0, uma-art 2.18.0, uma-data 1.2.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v21, save v34; uma-kit 0.17.0, uma-art 2.18.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 - **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
   "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.
@@ -80,6 +78,8 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H155 | Windows on screen, dark: her window beside her bust, the Window sheet, the Gallery, Ascend one Uma at a time, latching and the "Window +1" note (D287) | this commit |
+| H154 | Drills and Training Logs, dark: five Drills a tier, ten runs a day banked to thirty, Logs a third of her next level (D286) | `11d2d05` |
 | H153 | Trials: the Echoes' own place on the Battle page, live, on the Knights' Bastion until H156 (D285) | `30b9902` |
 | H152 | Windows, the rules, dark: the board, latching, the World record and the Rift step, save v35's fields, Ascend one Uma at a time (D284) | `cc81286` |
 | H151 | Both apps: `ProfileFrame`'s companion square, uma-kit 0.17.0 (platform P85) | Kit `82c23db`, release `a6bef9f` |

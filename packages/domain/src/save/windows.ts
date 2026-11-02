@@ -7,6 +7,7 @@ import {
   WINDOW_CLASS_NTH, WINDOW_CLASS_RANKS, WINDOW_GRADES, WINDOW_LEVELS, WINDOW_STEP_IDS, WINDOW_TRACKS, windowBoard, type WindowNumeral, type WindowStepId,
   type WindowTrack,
 } from '../rpg/windows'
+export { windowBoard } from '../rpg/windows'
 import { ARMOR_SLOTS } from '../economy/ranks'
 import { withHerMoon } from '../economy/planet'
 import { capitalStageIds } from '../world/capital'
@@ -195,6 +196,47 @@ export function windowOf(save: Save, outfitId: string, tier: number): WindowView
     return { track, lit: on, total: own.length, percent: percentOf(on, own.length) }
   })
   return { tier, steps, lit, total: steps.length, percent: percentOf(lit, steps.length), tracks, full: lit === steps.length, champions: record.champions }
+}
+
+/** A track's next dark step and how far she is toward it, for the board's "what's left" ("Lv 34/40", "8 of 11 at G6"). */
+export interface WindowNext { track: WindowTrack; numeral: WindowNumeral; have: number; need: number; grade?: number }
+
+/** Each track's first dark step and her progress toward it; a track with every step lit has none. */
+export function windowNext(save: Save, uma: OwnedUma, outfit: BattleOutfit, outfitId: string, tier: number): WindowNext[] {
+  const record = recordOf(save.account.windows, outfitId, String(tier))
+  const t1 = tier1Ranks(uma)
+  const t0 = Math.max(...RPG_TIER0_CLASSES.map((c) => uma.ranks.classes[c]?.rank ?? 1))
+  const grades = gradesOf(uma)
+  const worn = [...classOf(uma, activeClass(outfit, uma, tier)).weapons.map((w) => grades.weapons[w]?.grade ?? 0),
+    ...ARMOR_SLOTS.map((slot) => grades.armor[slot]?.grade ?? 0), ...grades.accessories.map((a) => a.grade)]
+  const open = new Set(withHerMoon(starMapOf(uma).open))
+  const out: WindowNext[] = []
+  for (const track of WINDOW_TRACKS) {
+    const n = NUMERALS.find((k) => stepCode(record, `${track}-${k}`) === WINDOW_DARK)
+    if (!n) continue
+    const i = n - 1
+    switch (track) {
+      case 'level': out.push({ track, numeral: n, have: uma.level, need: WINDOW_LEVELS[i]! }); break
+      case 'craft': out.push({ track, numeral: n, have: uma.craft.level, need: WINDOW_LEVELS[i]! }); break
+      case 'class': out.push({ track, numeral: n, have: n === 1 && tier === 1 ? Math.max(t0, t1[0] ?? 1) : t1[WINDOW_CLASS_NTH[i]! - 1] ?? 1, need: WINDOW_CLASS_RANKS[i]! }); break
+      case 'gear': out.push({ track, numeral: n, have: worn.filter((g) => g >= WINDOW_GRADES[i]!).length, need: worn.length, grade: WINDOW_GRADES[i]! }); break
+      case 'stars': {
+        const nodes = ['planet', 'prowess', 'vigor', 'guard'].flatMap((body) => Array.from({ length: n }, (_, k) => `${body}:${k + 1}`))
+        if (n >= 2) nodes.push('template:1')
+        if (n >= 4) nodes.push('template:2')
+        out.push({ track, numeral: n, have: nodes.filter((id) => open.has(id)).length, need: nodes.length })
+        break
+      }
+      case 'world': out.push({ track, numeral: n, have: [1, 2, 3].filter((route) => Math.floor(record.champions / championBit(n, route)) % 2 === 1).length, need: 3 }); break
+    }
+  }
+  return out
+}
+
+/** The day of her last lit step in a tier, or null: the Gallery's tie-break. */
+export function lastLitDay(save: Save, outfitId: string, tier: number): string | null {
+  const days = windowOf(save, outfitId, tier).steps.map((s) => s.day).filter((d): d is string => d !== null).sort()
+  return days.at(-1) ?? null
 }
 
 /** The world's ready Umas: a full window here and a tier above to go to. */

@@ -176,6 +176,14 @@ function hall(id: string, name: string, cls: string, at: { x: number; y: number 
     details: ['A Hero always uses her seat’s Limit Break, at full strength.', 'Learners inherit it at 50%, plus 5% a Bond Level.'] }
 }
 
+/** The Gallery (D283, H155): every Uma's window, where the Observatory stood, from save v35. Its own building comes with
+ * H156; until then uma-art's unused Cleric Chapel, a chapel of windows. */
+const GALLERY: Place = {
+  id: 'gallery', page: 'learning', kind: 'town', name: 'Gallery', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.84 }, frame: 'cleric-chapel',
+  blurb: 'Every Uma’s window, most complete first.',
+  details: ['31 steps light a window', 'A full window ascends'],
+}
+
 const OBSERVATORY: Place = {
   id: 'observatory', page: 'learning', kind: 'town', name: 'Observatory', opensIn: 'S6', slots: 0, at: { x: 0.5, y: 0.84 },
   blurb: "Each Uma's Extra Stats: a Planet, three moons and her own moon.",
@@ -214,7 +222,8 @@ export function learningPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] 
       hallV19('spellblade', 'Spellblade Salle', 'pacts with familiars', { x: 0.22, y: 0.33 }, engine),
       hallV19('summoner', 'Summoner Circle', 'familiars, summoned', { x: 0.78, y: 0.33 }, engine),
       hallV19('healer', 'Healer Sanctum', 'a followed deity', { x: 0.5, y: 0.56 }, engine),
-      OBSERVATORY,
+      // The owner: the Observatory goes, and the Gallery stands in its place (D283, CO7).
+      collectionsLive() ? GALLERY : OBSERVATORY,
     ]
   }
   if (!rpgV2(engine)) {
@@ -329,7 +338,9 @@ export function placeById(id: string | undefined): Place | undefined {
 
 /** Places a later generation folded into another (HV21): since H134 the Paladin Bastion and the Cleric Chapel stand as the
  * Healer Sanctum. */
-const MOVED_PLACES: Readonly<Record<string, string>> = { 'paladin-bastion': 'healer-sanctum', 'cleric-chapel': 'healer-sanctum' }
+const MOVED_PLACES: Readonly<Record<string, string>> = { 'paladin-bastion': 'healer-sanctum', 'cleric-chapel': 'healer-sanctum',
+  // From save v35 the Observatory's links land on the Gallery (D283).
+  ...(collectionsLive() ? { observatory: 'gallery' } : {}) }
 
 /** Where an old link's place stands now, for an id the live generation has no place for (an old bookmark, an Inheritance
  * row read before save v32): the place it folded into, or undefined. */

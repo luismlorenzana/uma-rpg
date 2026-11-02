@@ -54,6 +54,9 @@ export const PLACE_UI: Record<string, PlaceUi> = {
   observatory: {
     Page: lazy(() => import('./observatory/ObservatoryPage')),
   },
+  gallery: {
+    Page: lazy(() => import('./gallery/GalleryPage')),
+  },
   exchange: {
     Page: lazy(() => import('./exchange/ExchangePage')),
     Counter: lazy(() => import('./scenario-gate/LaurelCounter')),

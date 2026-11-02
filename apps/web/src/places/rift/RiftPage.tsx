@@ -1,17 +1,21 @@
 // The Rift (H50, rift.md §4–§8): the Battle page's end-of-tier event. Routes under `/battle/tier-finale/`: `` the Rift,
 // `front/<front>` (and `/<stage>`) a front's chain, `convergence`, `signup` and `fight`. The Rift shows the open fight's
 // Resume, sign-up or the run's four fronts and the Convergence, Ascend once won, and the run's roster. Its Echoes are
-// fought at Trials since H153 (D283).
+// fought at Trials since H153 (D283). From save v35 a won run's Umas ascend from the Gallery, one by one (H155): the Rift
+// shows the win, how many are ready and the Gallery's door, and the roster's faces are their windows.
 import {
-  CONVERGENCE_FIGHTS, FRONT_NAME, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, riftLevel50s, SaveRuleError, type RiftFront, type RiftRun,
+  collectionsLive, CONVERGENCE_FIGHTS, FRONT_NAME, lastWonRiftRun, placeById, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, riftLevel50s, SaveRuleError,
+  type RiftFront, type RiftRun,
 } from '@rpg/domain'
 import { cancelRiftBlock } from '@rpg/domain/rift'
+import { readyToAscend, windowOf } from '@rpg/domain/windows'
 import { useState } from 'react'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
 import { FrontCrest } from '../../battle/pixel-icons'
 import { useHubNavigation } from '../../hub/navigation'
 import { cancelRiftSignUp } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
+import { GlassWindow } from '../gallery/GlassWindow'
 import type { PageProps } from '../registry'
 import { AscendSheet } from './AscendSheet'
 import { ConvergenceView } from './ConvergenceView'
@@ -51,6 +55,9 @@ export function riftStatus(run: RiftRun | null, level50s: number): string {
   return `Run ${n} · ${RIFT_FRONTS.filter((f) => run.fronts[f] >= RIFT_STAGES).length} of 4 fronts sealed`
 }
 
+/** A won run's line from save v35: "Rift won · 3 ready". */
+export const riftWonLine = (ready: number): string => `Rift won · ${ready} ready`
+
 /** The Convergence card's line. */
 export function convergenceLine(run: RiftRun): string {
   if (run.wonAt) return 'Won'
@@ -70,6 +77,9 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
   if (!save || !world) return null
   const n50 = riftLevel50s(world)
   const cancelBlock = run ? cancelRiftBlock(save, key) : 'No run'
+  const live = collectionsLive()
+  const won = live && !run ? lastWonRiftRun(world.rift) : null
+  const gallery = placeById('gallery')
   return (
     <div className="space-y-4 p-3 pb-6">
       <section className="space-y-2">
@@ -82,9 +92,16 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
             {n50 < RIFT_ROSTER && <span className="text-[12px] font-semibold">{n50} of {RIFT_ROSTER} at Lv 50</span>}
           </button>
         )}
-        {run?.wonAt && (
+        {!live && run?.wonAt && (
           <button type="button" onClick={() => setAscending(true)} className="flex min-h-14 w-full items-center justify-center rounded-sm bg-accent font-display text-[17px] font-bold text-accent-ink">
             Ascend to Tier {tier + 1}
+          </button>
+        )}
+        {won && gallery && (
+          <button type="button" onClick={() => nav.open(gallery)} data-rift-won
+            className="flex min-h-14 w-full flex-col items-center justify-center rounded-sm border border-accent/50 bg-raised font-display font-bold">
+            Gallery
+            <span className="text-[12px] font-semibold text-ink-soft">{riftWonLine(readyToAscend(save, tier).length)}</span>
           </button>
         )}
       </section>
@@ -134,12 +151,21 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
             className="min-h-12 w-full rounded-sm border border-hairline-strong font-semibold text-ink-soft">Cancel sign-up</button>
         ) : undefined}>
           <ul className="grid grid-cols-5 gap-2">
-            {run.roster.map((id) => <li key={id} className="flex justify-center"><Faces campaign={campaign} ids={[id]} size={52} /></li>)}
+            {run.roster.map((id) => {
+              if (!live) return <li key={id} className="flex justify-center"><Faces campaign={campaign} ids={[id]} size={52} /></li>
+              const w = windowOf(save, id, tier)
+              return (
+                <li key={id} className="flex flex-col items-center gap-0.5 text-[11px] text-ink-soft" data-rift-window={id}>
+                  <GlassWindow outfitId={id} lit={w.lit} steps={w.total} size={52} className="rounded-sm" label={campaign.outfits.get(id)?.name ?? id} />
+                  {w.lit}/{w.total}
+                </li>
+              )
+            })}
           </ul>
           {error && <p role="alert" className="mt-2 text-[13px] text-danger">{error}</p>}
         </BottomSheet>
       )}
-      <AscendSheet campaign={campaign} open={ascending} onClose={() => setAscending(false)} />
+      {!live && <AscendSheet campaign={campaign} open={ascending} onClose={() => setAscending(false)} />}
     </div>
   )
 }

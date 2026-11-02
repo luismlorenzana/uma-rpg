@@ -12,7 +12,7 @@ import { OUTFITS, riftWorldSave, T, TWENTY } from './rift-rules.fixture'
 import { worldOf } from './rules'
 import { newOwnedUma, newSave, parseSave, type OwnedUma, type Save } from './save'
 import { championBit, codeDay, dayCode, emptyWindow, stepDay, WINDOW_STEPS_LENGTH, withSteps, type WindowRecord } from './window-record'
-import { latchWindows, recordChampion, recordRiftWin, windowFull, windowMet, windowOf, wornFloor } from './windows'
+import { lastLitDay, latchWindows, readyToAscend, recordChampion, recordRiftWin, windowFull, windowMet, windowNext, windowOf, wornFloor } from './windows'
 
 const outfit = OUTFITS.get('101')!
 const uma = (change: (u: OwnedUma) => void = () => {}): OwnedUma => {
@@ -171,6 +171,36 @@ describe('the hooks', () => {
     const view = windowOf(lit, '101', 1)
     expect(view).toMatchObject({ lit: 3, total: 31, percent: 10, full: false })
     expect(view.tracks.find((t) => t.track === 'level')).toEqual({ track: 'level', lit: 3, total: 5, percent: 60 })
+  })
+})
+
+describe('the board on screen (H155)', () => {
+  it('gives each track\'s next dark step and what she has toward it', () => {
+    const lit = latchWindows(started(riftWorldSave(1, 34)), OUTFITS, T(10))
+    const her = worldOf(lit, '1').umas['101']!
+    const next = new Map(windowNext(lit, her, outfit, '101', 1).map((n) => [n.track, n]))
+    expect(next.get('level')).toEqual({ track: 'level', numeral: 4, have: 34, need: 40 })
+    expect(next.get('craft')).toMatchObject({ numeral: 1, need: 10 })
+    expect(next.get('gear')).toMatchObject({ numeral: 1, need: 11, grade: 2 })
+    expect(next.get('stars')).toMatchObject({ numeral: 1, need: 4 })
+    expect(next.get('world')).toEqual({ track: 'world', numeral: 1, have: 0, need: 3 })
+  })
+
+  it('counts a continent\'s champions and the moon\'s nodes toward the next step', () => {
+    const save = recordChampion(started(riftWorldSave(1, 10)), '1', capitalStageIds('w1', 2).champion, ['101'])
+    const her = uma((u) => nodes(u, 1))
+    const next = new Map(windowNext(save, her, outfit, '101', 1).map((n) => [n.track, n]))
+    expect(next.get('world')).toMatchObject({ numeral: 1, have: 1, need: 3 })
+    expect(next.get('stars')).toMatchObject({ numeral: 1, have: 4, need: 4 })
+  })
+
+  it('names her last lit day, and the world\'s ready Umas', () => {
+    const save = started(riftWorldSave(1, 30))
+    expect(lastLitDay(save, '101', 1)).toBeNull()
+    expect(lastLitDay(latchWindows(save, OUTFITS, T(10)), '101', 1)).toBe(T(10).slice(0, 10))
+    const full = { ...save, account: { ...save.account, windows: { '101': { '1': withSteps(emptyWindow(), WINDOW_STEP_IDS, T(3)) } } } }
+    expect(readyToAscend(full, 1)).toEqual(['101'])
+    expect(readyToAscend(full, 3)).toEqual([])
   })
 })
 

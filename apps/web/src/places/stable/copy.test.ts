@@ -9,6 +9,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
+import { windowBoard } from '@rpg/domain/windows'
+import {
+  ascendCount, ascendLines, cantGo, collectionLine, GALLERY_FILTERS, GALLERY_WORDS, galleryHead, nextLabel, rankedName, stepLabel, TRACK_NAME, TRACK_SOURCE,
+  windowCount, windowToast,
+} from '../gallery/glass-view'
 import { mapNodeValue, nodeSheet, setAllLines, setAllPlan } from '../observatory/stars-view'
 import * as copy from './copy'
 import { accessoryChoices, accessoryTile } from './gear-equip'
@@ -194,6 +199,17 @@ describe('the profile wording list (H117)', () => {
       }
     }
     for (const value of ['even-pace', 'late-reserve', 'clean-break'] as RpgFlourish[]) values.push({ source: `flourish ${value}`, value: flourishLine(value) })
+    // The windows (H155): the board, the Gallery and Ascend.
+    for (const tier of [1, 2, 3]) {
+      values.push({ source: `window board T${tier}`, value: windowBoard(tier, tier < 3).map((step) => [step.rule, stepLabel(step, tier)]) })
+      values.push({ source: `ascend T${tier}`, value: ascendLines({ to: tier + 1, laurels: 20_000, speedTickets: 100, classMarks: 1_250 }, tier) })
+    }
+    values.push({ source: 'window words', value: [TRACK_NAME, TRACK_SOURCE, GALLERY_FILTERS, GALLERY_WORDS, windowCount({ lit: 14, total: 31, percent: 45 }),
+      galleryHead(12, 3), collectionLine(62), rankedName(120, 'Mihono Bourbon'), ascendCount(20), cantGo('Recall or collect: Mihono Bourbon'),
+      cantGo('Finish the open fight first'),
+      nextLabel({ track: 'gear', numeral: 3, have: 8, need: 11, grade: 6 }), nextLabel({ track: 'stars', numeral: 3, have: 10, need: 13 }),
+      windowToast([{ outfitId: 'a', tier: 1, ids: ['craft-3'] }], () => 'Mihono Bourbon'),
+      windowToast([{ outfitId: 'a', tier: 1, ids: ['craft-3'] }, { outfitId: 'b', tier: 1, ids: ['rift'] }], () => 'x')] })
     for (const knack of ['tireless', 'clever', 'mighty', 'fleet', 'gritty'] as const) values.push({ source: `moon ${knack}`, value: mapNodeValue('template:1', 'spellblade', knack, 'physical', 1) })
     const gearWorld = { ...newTierWorld('2026-10-29T00:00:00.000Z', 3), items: { 'weapon-gem-g1': 1, 'armor-fittings-g1': 1, 'accessory-setting-g1': 1 },
       umas: { '81001': { ...owned, classId: 'brawler' as const, gear: { ...grades, accessories: [{ grade: 0, family: 'orb' as const, form: 'base' as const, kind: 'fire' as const }, ...grades.accessories.slice(1)] } } } }
@@ -221,6 +237,7 @@ describe('the profile wording list (H117)', () => {
       'OutfitProfile.tsx', 'FactsRow.tsx', 'DetailsSheet.tsx', 'DamageCard.tsx', 'TemplateTab.tsx', 'GearTab.tsx',
       'ClassTab.tsx', 'class-sheets.tsx', 'StableCounter.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'PresetButton.tsx',
       '../observatory/StarsPanel.tsx', '../observatory/ObservatoryPage.tsx',
+      '../gallery/GalleryPage.tsx', '../gallery/WindowSheet.tsx', '../gallery/WindowDoor.tsx', '../gallery/AscendSheet.tsx', '../gallery/WindowToast.tsx',
     ]
     const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.', 'Unlock an Uma first.'])
     const root = path.dirname(new URL(import.meta.url).pathname)
