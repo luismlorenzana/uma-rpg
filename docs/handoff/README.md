@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-11-01, after D282.** Tier 1 is built and live: engine v21, save v34. That covers the Tier rework's R1
+> **Status: 2026-11-02, after D283.** Tier 1 is built and live: engine v21, save v34. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H150; decision numbers from D283). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H159; decision numbers from D284). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it.
@@ -41,11 +41,27 @@ The audit's bugs and the Hall issues have no packet yet.
 **The combat pass** (H145–H149, D282) is built and live: foes no longer guard, one symbol per kind, the healers' one kit and
 rescue, buffs and debuffs on their paths, pure Brawlers and Sorcerers, a Spellblade's bound familiar.
 
-**Collections** ([proposal](../design/collections/collections.md), pages: [window](../design/collections/previews/window.html),
+**Collections** ([design](../design/collections/collections.md), approved D283; pages: [window](../design/collections/previews/window.html),
 [board](../design/collections/previews/board.html), [content](../design/collections/previews/content.html) and
-[screens](../design/collections/previews/screens.html)) is with the owner for review: every Uma's stained-glass window
-lit by a 31-step board a tier, Ascend one Uma at a time once her window is full, Trials (the Echoes' own place) and Drills
-paying Training Logs. Its packets, H150–H156, are written once CO1–CO34 are answered.
+[screens](../design/collections/previews/screens.html)): every Uma's stained-glass window, lit by a 31-step board a
+tier and standing beside her bust; the Gallery, ranked, in the Observatory's place; Ascend one Uma at a time once her
+window is full; Trials (the Echoes' own place); Drills paying Training Logs. H152, H154 and H155 build dark; H157 is the
+switch to save v35.
+
+| Id | What | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| [H150](tasks/H150-glass-pane-map.md) | uma-platform: the window's pane map, `outfit-glass-order`, uma-data 1.3.0, a candidate release | Claude | M | — | Ready; the owner moves `latest` after |
+| [H151](tasks/H151-profile-companion.md) | Both apps: `ProfileFrame`'s companion square, uma-kit 0.17.0 | Claude or ChatGPT | S | — | Ready |
+| [H152](tasks/H152-windows-domain.md) | The board, latching, the World record, save v35 dark, per-Uma Ascend, the Rift's runs | Claude | L | — | Ready |
+| [H153](tasks/H153-trials.md) | Trials: the Echoes' own place on the Battle page (live) | Claude or ChatGPT | M | — | Ready |
+| [H154](tasks/H154-drills-logs.md) | Drills and Training Logs, dark | Claude | L | H152 | Waits |
+| [H155](tasks/H155-windows-web.md) | Her window beside her bust, the Window sheet, the Gallery, Ascend, dark | Claude | L | H150, H151, H152, H153 | Waits |
+| [H156](tasks/H156-collections-buildings-art.md) | Art: the Gallery, Trials and Drills buildings, uma-art 2.20.0 | ChatGPT draws and publishes | S | H141's 2.19.0 | Ready after H141: the owner dispatches it |
+| [H157](tasks/H157-collections-switch.md) | The switch: save v35, the manual, the phone check | Claude | M | H152–H155 | Waits |
+| [H158](tasks/H158-pin-collections-art.md) | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | S | H156, H157 | Waits |
+
+**Order:** H150, H151, H152 and H153 can run at once; then H154 and H155; then H157. H156 and H158 can land any time
+after, since the places borrow existing buildings until then.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.

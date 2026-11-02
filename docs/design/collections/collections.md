@@ -1,6 +1,10 @@
 # Collections: every Uma's stained-glass window
 
-> **Status: proposal for the owner's review, 2026-11-02.** Nothing here is built except what [§13](#13-built-now) lists.
+> **Status: approved by the owner on 2026-11-02 (D283), with four notes, now in the doc:** Craft V stays at Lv 50 (many
+> Umas level at once, and Speed Tickets fast-forward the few who need it); the window stands **beside** her bust, not in
+> its place ([§7.1](#71-her-window-beside-her-bust), CO35); every count shows its **percentage** too (CO36); and the
+> Gallery **ranks** the most complete Umas first (CO37). Every other call stands as recommended. The packets are
+> H150–H158 ([§10](#10-packets)).
 > It builds on the live game (engine v21, save v34; the [manual](../../game/README.md)) and on the stained-glass family
 > `outfit-glass` in uma-data 1.2.0 (D280, platform P81–P83), which every outfit already has and no screen draws yet.
 > Calls are **CO1–CO34** ([§12](#12-decisions)), each with a recommendation. As the owner asked, each is marked:
@@ -30,10 +34,11 @@
 >    Rift (the tier's end). Craft, Gear and Stars come from the Wilds ([§6](#6-four-kinds-of-content)).
 > 7. **Drills pay items, not EXP:** a **Training Log** holds one fight's EXP for whoever reads it, a third of her level
 >    and twice that to her class. The name avoids "Tome", which is a weapon here ([§6.4](#64-drills-the-daily-farm)).
-> 8. **Her profile picture becomes her window.** A tap opens the Window sheet with her board. The **Gallery** takes the
->    Observatory's place on the Learning page: every window of the world, and the Ascend button ([§7](#7-screens)).
-> 9. **The long pole is her own Craft Level:** about 25 days of her own work to Lv 50, and twelve work slots a trade, so a
->    trade of 72 Umas needs five to six months for all of them ([§3.5](#35-what-it-takes-the-long-poles)).
+> 8. **Her window stands beside her bust** in her profile; a tap opens the Window sheet with her board. The **Gallery**
+>    takes the Observatory's place on the Learning page: every window of the world, the most complete first, and the
+>    Ascend button ([§7](#7-screens)).
+> 9. **The long pole is her own Craft Level:** about 25 days of her own work to Lv 50. The owner: not a bottleneck in
+>    play, since many Umas level at once and Speed Tickets fast-forward the few who need it ([§3.5](#35-what-it-takes-the-long-poles)).
 > 10. **At the switch** every Uma gets the steps her state already meets, so nobody starts from zero
 >     ([§9](#9-the-switch)).
 >
@@ -59,17 +64,17 @@
 | "A more repeatable content that is maybe unlocked on like a daily limit basis… more of a farming content" | [§6.4](#64-drills-the-daily-farm): **Drills**, ten runs a day, banked up to thirty, swept free once won |
 | "Decide if these specific farming stages would grant actual exp or just tomes that I can allocate" | **Items** (CO21): a Training Log, read onto any Uma. Why, in [§6.4](#64-drills-the-daily-farm); the case for EXP is listed there too |
 | "After you have determined the max amount of achievements" | **31 a tier**: 30 on the board and the Rift ([§3.1](#31-six-tracks-five-steps-and-the-rift)). Every tier has the same shape; Tier 3 has 30 until its Rift exists |
-| "Link this to the Stained Glass Uma profile picture… either be grayed out or completely black" | [§4.1](#41-unlit-dark-glass): **dark glass** (CO3): darker than gray, so the reveal is the reward, yet her outline shows in the lead from the first day |
+| "Link this to the Stained Glass Uma profile picture… either be grayed out or completely black" (2026-11-02, later: side by side with the bust) | [§4.1](#41-unlit-dark-glass): **dark glass** (CO3): darker than gray, so the reveal is the reward, yet her outline shows in the lead from the first day |
 | "As we get achievements it will start revealing pieces of the uma, you decide how it can work better" | [§4.2](#42-the-order-outside-in-her-face-last): pane by pane, from the frame inward, then her figure from the bottom up, **her face last**. [The window page](previews/window.html) plays all three orders considered |
 | "Once the Uma gets all their achievements for Tier 1… only those Umas to be eligible for promotion into Tier 2 and Tier 3" | [§5](#5-promotion-only-a-full-window-ascends): Ascend one Uma at a time once her window is full (CO16), from the Gallery |
-| "Separating things that can be straight up implemented than things that need doc authoring and review" | Every call is marked **Build** or **Yours** ([§12](#12-decisions)); [§13](#13-built-now) says what is built already and why the rest waits |
+| "Separating things that can be straight up implemented than things that need doc authoring and review" | Every call is marked **Build** or **Yours** ([§12](#12-decisions)); [§13](#13-built) says what was built before approval |
 
 ## 0. At a glance
 
 | | Today (engine v21, save v34) | With windows (save v35) |
 |---|---|---|
 | **Per-Uma collection** | None. Achievements are the account's: the Rift's seals and nine titles | **Her window, one a tier:** 31 steps, six tracks of five and the Rift |
-| **The window art** | In the release (`outfit-glass`), drawn nowhere | Her profile picture; the Gallery; dark glass that lights pane by pane |
+| **The window art** | In the release (`outfit-glass`), drawn nowhere | Beside her bust in her profile; the Gallery, ranked; dark glass that lights pane by pane |
 | **Promotion to Tier 2** | Win a Rift run; its twenty ascend together | **A full window**, one Uma at a time, any time after; the Rift is one of the 31 steps |
 | **The Rift** | Sign-up at Lv 50; one run until it ascends; Echoes inside | Sign-up at Lv 50; a new run once the last is won; Echoes move out |
 | **Rank content** | Echoes, inside the Rift page | **Trials**, a place of their own on the Battle page: the same fights |
@@ -225,9 +230,9 @@ capped by the slots, not by play:
 | The whole Wilds a month, all sixty slots full | about 73 | about 59 |
 | The largest trades (about 72 Umas each in the 270-outfit release), all of them | about 4.9 months | about **6 months** |
 
-That cap is the owner's to weigh (CO15). It doesn't touch the first twenty: a fresh world's first Rift run takes about
-as long as its first Craft 50s ([board page](previews/board.html), the chart). If it feels too long in play, the
-smallest lever is Craft V at Lv 40 (steps at 8, 16, 24, 32 and 40; 18.7 days nonstop) rather than 50.
+**The owner's call (2026-11-02): not a bottleneck in play.** Many Umas level at once, and Speed Tickets fast-forward the
+ones that need it, so Craft V stays at Lv 50 (CO15). The cap doesn't touch the first twenty: a fresh world's first Rift run takes about
+as long as its first Craft 50s ([board page](previews/board.html), the chart).
 
 **The first month, one Uma** (the [board page](previews/board.html) draws it with sliders; assumptions: her party wins
 20 fights a day through the Campaign's 119 wins, she works 80% of the time, ten Trials a day after Lv 50; in a fresh
@@ -416,18 +421,22 @@ win: "Rift won · 3 ready" and a door to the Gallery.
 Mockups at 390×844 are on the [screens page](previews/screens.html). Copy follows the profile's copy test (≤ 6 words a
 surface string, new facts in `places/stable/copy.ts` first), G3–G5 and the green-for-Ready rule.
 
-### 7.1 Her profile picture
+### 7.1 Her window, beside her bust
 
-Her profile's portrait (today the bust) becomes **her window** at her share lit, with a small "17/31" on its corner.
-A tap opens the Window sheet. The bust stays where it's a picture of her, not her progress: the featured sheet, the
-fight's cut-ins, the Hall's seats.
+**Owner, 2026-11-02: the window doesn't replace her profile picture; they stand side by side** (CO35). Her profile's
+compact header keeps her bust at 64 px and gains her window beside it, the same size, at her share lit, with "45%" on
+its corner. A tap on the window opens the Window sheet; the bust does what it does today.
+
+The compact header is uma-kit's `ProfileFrame`, whose portrait slot holds one square, so a second square is a kit
+change: a **"Both apps:"** request for an optional `companion` slot beside the portrait (H151, uma-kit 0.17.0). uma-racer
+passes nothing and draws as before.
 
 ### 7.2 The Window sheet
 
 One sheet (G3), opened from her picture or from the Gallery:
 
-- **Her window,** large, and "Window · Tier 1 · 17/31".
-- **The board:** six rows of five tiles and the Rift tile. A lit tile shows its date ("2 Nov"); the next tile of a track
+- **Her window,** large, and "Window · Tier 1 · 14/31 · 45%".
+- **The board:** six rows of five tiles and the Rift tile, each row's share at its end ("Level 60%"). A lit tile shows its date ("2 Nov"); the next tile of a track
   shows what's left ("Lv 34/40", "8 of 11 at G6", "Craft 22/30"); the rest are dark. A tap on a tile opens its line
   under the board, inline: the rule and where it comes from ("Trials · Class EXP"). No sheet over the sheet (G4).
 - **A full window:** "Ready to ascend", a door to the Gallery.
@@ -437,9 +446,11 @@ One sheet (G3), opened from her picture or from the Gallery:
 
 **Where the Observatory stood** on the Learning page (CO7). A page, not a sheet:
 
-- **Head:** "Gallery" and "3 full · 2 ready", the Ascend button while any Uma is ready.
-- **The grid:** every outfit, windows at list size, sorted ready first, then most lit. An owned Uma's window is at her
-  share; an outfit nobody owns shows her window unlit with a lock, her outline only, a reason to unlock her (CO9).
+- **Head:** "Gallery", "3 full · 2 ready" and the world's share, "Collection 23%" (her lit steps over every owned Uma's
+  31), the Ascend button while any Uma is ready.
+- **The grid, ranked** (CO37): every owned Uma, most complete first, each tile her window at list size with her rank,
+  her name and "14/31 · 45%" (CO36). Ties go to whoever lit her last step first. A ready Uma carries the green dot. Then
+  the outfits nobody owns, unlit with a lock, her outline only, a reason to unlock her (CO9).
 - **Filters:** All · Ready · Owned · Locked.
 - **Ascended:** the world's alumni at the end, their full windows framed, read from the account's history.
 - A tap opens her Window sheet.
@@ -502,13 +513,20 @@ The first time a save opens at v35, every world, every Uma:
 
 | Id | What | Who | Needs |
 |---|---|---|---|
-| H150 | uma-platform: the order map in the bake, `outfit-glass-order` in uma-data 1.3.0, the review sheet; a candidate release (the owner moves `latest`) | Claude | Your look at the reveal |
-| H151 | Domain: the catalog, `windowSteps`, latching, the World record, save v35 (all four fields), the switch, per-Uma Ascend; dark behind the save stage | Claude | CO11–CO18, CO25 |
-| H152 | Web: `GlassWindow`, her profile picture, the Window sheet, the Gallery on the Learning page, the Ascend sheet; pins uma-data 1.3.0 | Claude | H150, H151 |
-| H153 | Trials: the Echoes' own place; the Rift page without them | Claude or ChatGPT | H151 |
-| H154 | Drills and Training Logs: the five fights, the day's runs, the Logs sheet | Claude | H151 |
-| H155 | Art: three buildings, Gallery, Trials, Drills | ChatGPT draws and publishes | — |
-| H156 | The switch: save v35 live, the manual, the phone check | Claude | H151–H154 (H155 can land after) |
+The packets are in [docs/handoff/tasks/](../../handoff/tasks/); the [handoff](../../handoff/README.md) has the queue and
+the dispatch table.
+
+| Id | What | Who | Needs |
+|---|---|---|---|
+| H150 | uma-platform: the pane map, `outfit-glass-order`, in the bake and uma-data 1.3.0; a candidate release (the owner moves `latest`) | Claude | — |
+| H151 | Both apps: `ProfileFrame`'s `companion` slot, uma-kit 0.17.0 | Claude or ChatGPT | — |
+| H152 | Domain: the board, latching, the World record, save v35 written dark, per-Uma Ascend, the Rift's run | Claude | — |
+| H153 | Trials: the Echoes' own place on the Battle page | Claude or ChatGPT | — |
+| H154 | Drills and Training Logs | Claude | H152 |
+| H155 | Web: `GlassWindow`, her window beside her bust, the Window sheet, the Gallery, the Ascend sheet | Claude | H150, H151, H152, H153 |
+| H156 | Art: three buildings, Gallery, Trials, Drills (uma-art 2.20.0) | ChatGPT draws and publishes | H141's 2.19.0 first |
+| H157 | The switch: save v35 live, the manual, the phone check | Claude | H152–H155 |
+| H158 | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | H156, H157 |
 
 ## 11. Considered and left out
 
@@ -527,8 +545,8 @@ The first time a save opens at v35, every world, every Uma:
 
 ## 12. Decisions
 
-**Build** = follows from the request or the game's rules; built as written unless you object. **Yours** = a choice
-between real options; needs your yes.
+**Build** = follows from the request or the game's rules. **Yours** = a choice between real options. **The owner approved
+every call as recommended on 2026-11-02 (D283)** and added CO35–CO37.
 
 | Id | Call | Recommendation | Kind |
 |---|---|---|---|
@@ -546,7 +564,7 @@ between real options; needs your yes.
 | CO12 | Class V | Three Tier 1 classes at R50 (alternatives: two, which a campaign covers so Trials aren't needed; all eight, about 140 Trial wins) | **Yours** |
 | CO13 | Gear | All eleven worn slots at G2·G4·G6·G8·G10 (alternative: all 18) | **Yours** |
 | CO14 | A completed scenario | Her party won all three of the capital's champions with her in it | **Yours** |
-| CO15 | Craft on the board | Craft Lv 10–50 as you listed, knowing it caps the roster at about 60–73 full windows a month (alternative: Craft V at Lv 40, steps 8·16·24·32·40) | **Yours** |
+| CO15 | Craft on the board | Craft Lv 10–50 as you listed; the owner: not a bottleneck, Speed Tickets fast-forward the few who need it | **Yours** |
 | CO16 | Ascend | One Uma at a time, once her window is full, from the Gallery | **Yours** |
 | CO17 | Rift sign-up | Stays at twenty Lv 50 Umas, not gated on the window | **Yours** |
 | CO18 | Runs | A new run once the last is won; an Uma with the step may sign up again | Build (follows from CO16) |
@@ -566,14 +584,12 @@ between real options; needs your yes.
 | CO32 | Save | v35, one compact record an Uma a tier on the account; engine stays v21 | Build |
 | CO33 | Tier 3 | 30 steps until its Rift exists; full stays full | Build |
 | CO34 | Copy | Every screen string through the copy test; "Window", "Gallery", "Trials", "Drills", "Training Log" in `copy.ts` | Build |
+| CO35 | Her window in her profile | **Beside her bust**, the same size, through uma-kit's new `companion` slot (owner, 2026-11-02) | Owner |
+| CO36 | Percentages | Every count shows its share too: "14/31 · 45%", each board row's share, the Gallery's "Collection 23%" (owner) | Owner |
+| CO37 | The Gallery's order | Ranked, most complete first, each tile with its rank; ties to the earlier last step (owner) | Owner |
 
-## 13. Built now
+## 13. Built
 
-- **The reveal, on real windows:** a local prototype of CO3–CO5 on two real outfits' windows (the bake's own panes,
-  three orders, both looks), sent to the owner as images. Not in git (P6).
-- **This doc and its four pages.**
-
-**Why nothing ships yet:** every screen draws the share lit, and the share is the board's count (CO11); Ascend is the
-board's gate (CO16). The two pieces that stand alone wait for one look each: the pane map (H150) for your reaction to
-the reveal, since the order is baked into it, and the Observatory's removal for the Gallery that takes its place, so the
-Learning page doesn't lose a building for weeks.
+- **Before approval:** a local prototype of CO3–CO5 on two real outfits' windows (the bake's own panes, three orders,
+  both looks), sent to the owner as images; not in git (P6). This doc and its four pages.
+- **After approval:** the packets H150–H158 ([§10](#10-packets)).

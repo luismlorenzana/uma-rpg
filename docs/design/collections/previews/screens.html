@@ -123,11 +123,11 @@
 
   <div class="phones">
     <!-- 1 Profile -->
-    <section class="shot"><h2>1 · Her profile picture</h2><p>The portrait is her window at her share lit, "14/31" on its corner. A tap opens the Window sheet.</p>
+    <section class="shot"><h2>1 · Her window, beside her bust</h2><p>The bust stays her picture; her window stands beside it at her share lit, "45%" on its corner (CO35, uma-kit's new companion slot). A tap on the window opens the Window sheet.</p>
       <div class="phone"><div class="bar"><b>‹ Stable</b><span>4 / 26 ›</span></div>
         <div class="content">
           <div class="card row" style="gap:12px">
-            <div style="position:relative"><svg class="win" data-win="14" data-p="0" width="96" height="96" viewBox="0 0 512 512"></svg><span class="badge">14/31</span></div>
+            <div class="face" style="width:64px;height:64px;border-radius:12px;font-size:11px">Bust</div><div style="position:relative"><svg class="win" data-win="14" data-p="0" width="64" height="64" viewBox="0 0 512 512"></svg><span class="badge">45%</span></div>
             <div class="grow"><div class="title">Uma A</div><div class="soft">Brawler · Lv 34</div><div class="muted" style="margin-top:6px">Craft 22 · Metal</div></div>
           </div>
           <div class="tabsrow"><span class="on">Class</span><span>Gear</span><span>Stars</span><span>Template</span></div>
@@ -143,7 +143,7 @@
         <div class="scrim"></div>
         <div class="sheet" style="top:70px">
           <div class="grab"></div>
-          <div class="sheethead"><div><div class="title">Window</div><div class="soft">Tier 1 · 14/31</div></div><span class="x">✕</span></div>
+          <div class="sheethead"><div><div class="title">Window</div><div class="soft">Tier 1 · 14/31 · 45%</div></div><span class="x">✕</span></div>
           <svg class="win" data-win="14" data-p="0" width="220" height="220" viewBox="0 0 512 512" style="margin:0 auto"></svg>
           <div class="board" id="sheetBoard"></div>
           <div class="card" style="background:var(--raised);box-shadow:none;padding:10px"><b style="font-size:13px">Gear III · G6</b><div class="soft">8 of 11 at G6 · Wilds</div></div>
@@ -151,10 +151,10 @@
     </section>
 
     <!-- 3 Gallery -->
-    <section class="shot"><h2>3 · The Gallery</h2><p>Where the Observatory stood. Every outfit: owned at her share, locked unlit with a lock. Ready first.</p>
+    <section class="shot"><h2>3 · The Gallery</h2><p>Where the Observatory stood. Ranked, most complete first, each with its share (CO36, CO37); then locked outfits, unlit.</p>
       <div class="phone"><div class="bar"><b>‹ Learning</b><span></span></div>
         <div class="content">
-          <div class="row"><div class="grow"><div class="title">Gallery</div><div class="soft">3 full · 2 ready</div></div><button class="btn ready small">Ascend 2</button></div>
+          <div class="row"><div class="grow"><div class="title">Gallery</div><div class="soft">3 full · 2 ready</div><div class="muted">Collection 62%</div></div><button class="btn ready small">Ascend 2</button></div>
           <div class="row" style="flex-wrap:wrap"><span class="chip on">All</span><span class="chip">Ready</span><span class="chip">Owned</span><span class="chip">Locked</span></div>
           <div class="gal" id="gallery"></div>
         </div>
@@ -327,17 +327,18 @@
   ]
   const sb = document.getElementById('sheetBoard')
   for (const [h, row] of tiles) {
-    sb.insertAdjacentHTML('beforeend', `<span class="h">${h}</span>`)
+    const pct = Math.round(row.filter((t) => t[1] === 'lit').length / 5 * 100)
+    sb.insertAdjacentHTML('beforeend', `<span class="h">${h}<br><b style="color:var(--ink)">${pct}%</b></span>`)
     for (const [k, cls, sub] of row) sb.insertAdjacentHTML('beforeend', `<span class="t ${cls}">${k}${sub ? `<small>${sub}</small>` : ''}</span>`)
   }
   sb.insertAdjacentHTML('beforeend', '<span class="h">Rift</span><span class="t wide">On a won Rift run</span>')
 
   // Gallery
-  const gal = [['Uma B', 31, 'ready'], ['Uma C', 31, 'ready'], ['Uma F', 31, 'full'], ['Uma A', 14], ['Uma G', 24], ['Uma H', 12], ['Uma J', 8], ['Uma K', 3], ['Uma L', 0, 'lock'], ['Uma M', 0, 'lock'], ['Uma N', 0, 'lock'], ['Uma P', 0, 'lock']]
+  const gal = [['Uma B', 31, 'ready'], ['Uma C', 31, 'ready'], ['Uma F', 31, 'full'], ['Uma G', 24], ['Uma A', 14], ['Uma H', 12], ['Uma J', 8], ['Uma K', 3], ['Uma L', 0, 'lock'], ['Uma M', 0, 'lock'], ['Uma N', 0, 'lock'], ['Uma P', 0, 'lock']]
   const ge = document.getElementById('gallery')
   gal.forEach(([n, k, s], i) => {
     const f = document.createElement('figure')
-    f.innerHTML = `<svg class="win${k === 31 ? ' frame1' : ''}" width="100%" viewBox="0 0 512 512"></svg>${s === 'lock' ? '<span class="lock">🔒</span>' : ''}<figcaption>${s === 'ready' ? '<span class="dot"></span> ' : ''}${n} · ${s === 'lock' ? 'Locked' : k + '/31'}</figcaption>`
+    f.innerHTML = `<svg class="win${k === 31 ? ' frame1' : ''}" width="100%" viewBox="0 0 512 512"></svg>${s === 'lock' ? '<span class="lock">🔒</span>' : ''}<figcaption>${s === 'ready' ? '<span class="dot"></span> ' : ''}${s === 'lock' ? n : `${i + 1}. ${n}`}<br>${s === 'lock' ? 'Locked' : `${k}/31 · ${Math.round(k / 31 * 100)}%`}</figcaption>`
     ge.append(f); draw(f.querySelector('svg'), k, i)
   })
   // Roster on the Rift
