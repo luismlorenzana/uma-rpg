@@ -57,9 +57,8 @@ switch to save v35.
 | [H158](tasks/H158-pin-collections-art.md) | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | S | H156, H157 | Waits |
 
 **Done:** H150–H153 (2026-11-02, below). **Order now:** H154 and H155, then H157. H156 and H158 can land any time after,
-since the places borrow existing buildings until then. **The owner's step:** move uma-platform's `latest` to the
-candidate release `01ba1c71f403`, which carries the pane maps (`cd ~/workspace/uma-platform && pnpm release:publish`;
-undo: `pnpm release:publish -- --rollback f8ab287029e8`); H155 needs it live before H157.
+since the places borrow existing buildings until then. uma-platform's `latest` is release `01ba1c71f403` (2026-11-02),
+which carries the pane maps; undo with `pnpm release:publish -- --rollback f8ab287029e8` in uma-platform.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
