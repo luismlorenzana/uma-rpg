@@ -5,6 +5,7 @@
 // docs/archive/design/class-rework.md, docs/archive/design/progression.md.
 import type { BattleAction, BattleInput, BattleState, BattleStep, RpgFlourish } from '../rpg/battle/types'
 import { recordChampion } from './windows'
+import { DRILL_LOGS, drillId, drillOfNode, isDrillChapter } from '../rpg/drill-id'
 import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
 import { FIRST_CLEAR_LAURELS, LATE_LAURELS, REPLAY_SHARE } from '../economy/pacing'
@@ -422,6 +423,8 @@ export interface FightResult {
   classMarks: number
   /** The stage's first clear: its Laurels pay triple (D66); later wins pay a quarter of it (D79). */
   firstClear?: boolean
+  /** A Drill's pay (save v35, D283): Training Logs into the wallet, and nothing else. */
+  logs?: number
 }
 
 /** One bar a member filled: which, how much EXP, and the track before and after. */
@@ -467,6 +470,7 @@ export function stageLaurels(kind: ReturnType<typeof rpgRewardKind>, tier: numbe
  * MP carries. A loss leaves the run as it was before.
  */
 export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun, state: BattleState, now: string, tier = TIER_ONE): { save: Save; result: FightResult } {
+  if (isDrillChapter(chapter)) return settleDrill(save, chapter, run, state, now, tier)
   const world = worldOf(save, tier)
   const battle = run.battle
   if (!battle) throw new SaveRuleError('cannot-fight', 'no open fight')
@@ -490,6 +494,28 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   const next: TierWorld = { ...paid.world, world: { ...world.world, run: closed } }
   // A won capital champion counts toward each entrant's World step (D283; nothing while the collections are dark).
   return { save: recordChampion(withWorld(save, tier, next, now), String(tier), node.id, entrants.map((e) => e.outfitId)), result }
+}
+
+/**
+ * Closes a Drill (D283, H154): a win pays its Training Logs, spends one of the day's runs and records the Drill's first
+ * win; a loss pays and spends nothing. Nobody gains EXP, Laurels, Shards or Bonds, and the world's carried MP and wins
+ * don't move: a Drill started its five at full MP and isn't a map stage.
+ */
+function settleDrill(save: Save, chapter: RpgCampaignChapter, run: RpgRun, state: BattleState, now: string, tier: string): { save: Save; result: FightResult } {
+  const world = worldOf(save, tier)
+  const nodeId = run.battle!.nodeId
+  const closed: RpgRun = { ...run, battle: null, updatedAt: now }
+  const result: FightResult = { outcome: state.outcome === 'victory' ? 'victory' : 'loss', chapterId: chapter.id, nodeId, rounds: state.round, members: [],
+    laurels: 0, shards: 0, tickets: 0, gearMarks: 0, classMarks: 0, logs: 0 }
+  const n = drillOfNode(nodeId)
+  if (state.outcome !== 'victory' || n === null || !world.drills) return { save: withRun(save, closed, now, tier), result }
+  const logs = DRILL_LOGS[n - 1]!
+  const id = drillId(n)
+  result.logs = logs
+  result.firstClear = !world.drills.won[id]
+  const drills = { ...world.drills, runs: Math.max(0, world.drills.runs - 1), won: { ...world.drills.won, [id]: world.drills.won[id] ?? now } }
+  const wallet = { ...world.wallet, trainingLogs: (world.wallet.trainingLogs ?? 0) + logs }
+  return { save: withWorld(save, tier, { ...world, wallet, drills, world: { ...world.world, run: closed } }, now), result }
 }
 
 /** Her bars after a win worth `exp` Uma EXP, and the Marks that passed their caps. */

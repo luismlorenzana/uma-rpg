@@ -20,6 +20,8 @@ export interface Campaign {
   regionInfo: (id: string) => WorldRegion | null
   /** The region chapter a stage belongs to. */
   stageRegion: (stageId: string) => RpgCampaignChapter | null
+  /** The enemy roster the chapters draw faces from. */
+  roster: EnemyRoster
   /** A region's biome color. */
   color: (regionId: string) => string
   outfits: Map<string, RosterOutfit>
@@ -46,7 +48,7 @@ export function buildCampaign(view: MasterView, cast: Cast, tier = 1): Campaign 
   }
   const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
   return {
-    view, cast, tier, continents, outfits, region,
+    view, cast, tier, continents, outfits, region, roster,
     regionInfo: (id) => regions.get(id) ?? null,
     stageRegion: (stageId) => region(stageRegionId(stageId)),
     color: (id) => {

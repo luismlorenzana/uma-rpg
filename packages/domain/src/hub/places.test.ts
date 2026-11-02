@@ -161,7 +161,7 @@ describe('the Rift (H50)', () => {
     expect(rift).toMatchObject({ page: 'battle', name: 'The Rift', frame: 'rift', opensIn: 'S8' })
     expect(rift.blurb).toBe('Twenty Lv 50 Umas seal four fronts, then ascend together.')
     expect(CURRENT_SLICE).toBe('S8')
-    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['tier-finale', 'rift'], ['trials', 'knights-bastion'],
+    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['tier-finale', 'rift'], ['trials', 'knights-bastion'], ['drills', 'gym'],
       ['fields', 'vegetable-garden'], ['armorer', 'lancers-barracks']])
   })
 

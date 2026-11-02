@@ -5,6 +5,7 @@ import { RIFT_OPEN_AT, RIFT_TIERS, riftOpen } from '../rift/state'
 import { BATTLE_ENGINE_VERSION, rpgRework, rpgV2 } from '../rpg/battle/caps'
 import { rpgClassName } from '../rpg/class-tree'
 import { HERO_HALL_PLACES, heroSeatHome, type HeroHall } from '../rpg/hero-id'
+import { collectionsLive } from '../save/collections'
 
 export const HUB_PAGES = ['town', 'learning', 'battle', 'wilds'] as const
 export type HubPage = (typeof HUB_PAGES)[number]
@@ -303,6 +304,13 @@ const BATTLE: Place[] = [
     id: 'trials', page: 'battle', kind: 'battle', name: 'Trials', opensIn: 'S8', slots: 0, at: { x: 0.2, y: 0.52 }, frame: 'knights-bastion',
     blurb: 'Class EXP ×2 for Lv 50 parties.',
     details: ['Four fronts at Lv 45, 50 and 55', 'A won Trial sweeps with Sweep Tickets'],
+  },
+  {
+    // D283, H154: hidden until the collections switch on (save v35); its building comes with H156, uma-art's Gym till then.
+    id: 'drills', page: 'battle', kind: 'battle', name: 'Drills', opensIn: 'S8', slots: 0, at: { x: 0.8, y: 0.52 }, frame: 'gym',
+    blurb: 'Five fights a day pay Training Logs.',
+    details: ['Ten runs a day, banked to thirty', 'A Training Log holds one fight’s EXP'],
+    ...(collectionsLive() ? {} : { hidden: true }),
   },
 ]
 

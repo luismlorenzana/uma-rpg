@@ -77,6 +77,16 @@
         "default": "./src/save/windows.ts"
       }
     },
+    "./drills": {
+      "require": {
+        "types": "./dist/cjs/save/drills.d.ts",
+        "default": "./dist/cjs/save/drills.js"
+      },
+      "default": {
+        "types": "./src/save/drills.ts",
+        "default": "./src/save/drills.ts"
+      }
+    },
     "./forge": {
       "require": {
         "types": "./dist/cjs/save/forge.d.ts",

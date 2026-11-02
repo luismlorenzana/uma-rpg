@@ -21,6 +21,7 @@ import { regionLayout, springForRegion } from './map/layout'
 import { BiomeIcon, MapCanvas } from './map/MapCanvas'
 import { MapViewSwitch, useMapView } from './map/MapView'
 import { FightResult } from './FightResult'
+import { fightPlace } from './fight-place'
 
 /** The elements a stage's foes carry: one, or a pair. */
 const signatureOf = (n: RpgMapNode): RpgElement[] => (n.note ? (n.note.split(' + ') as RpgElement[]) : n.element ? [n.element] : [])
@@ -135,7 +136,7 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
         <ActivePartyBar campaign={campaign} />
         {error && !open && <p role="alert" className="text-[12px] text-danger">{error}</p>}
         {fightOpen?.battle && (
-          <button type="button" onClick={() => nav.sub(place, 'fight')} className="flex min-h-11 w-full items-center justify-center rounded-sm bg-accent font-display font-bold text-accent-ink">
+          <button type="button" onClick={() => nav.sub(fightPlace(place, fightOpen.battle?.nodeId), 'fight')} className="flex min-h-11 w-full items-center justify-center rounded-sm bg-accent font-display font-bold text-accent-ink">
             Resume the open fight
           </button>
         )}

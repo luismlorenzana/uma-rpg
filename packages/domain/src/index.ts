@@ -47,6 +47,8 @@ export * from './rift/state'
 export * from './rpg/windows'
 export * from './save/collections'
 export * from './save/window-record'
+// Drills (D283, H154): the five, their ids and the day's key; the rules are `@rpg/domain/drills`.
+export * from './rpg/drill-id'
 // The achievement catalog's words and art (H49); its earning rules reach the app through the Rift's own subpath.
 export { ACHIEVEMENTS, achievementDef, FRONT_NAME, type AchievementDef, type AchievementGrant } from './rift/achievements'
 export * from './hub/places'

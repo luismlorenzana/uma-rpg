@@ -3,7 +3,7 @@
 // a time (H35): `activeTier` picks it, every screen reads it and every action writes to it.
 import {
   type AccessoryFamily, type AccessorySlot, type ArmorKind, type ArmorSlot, type GradeTarget, type RankRef, type RpgQueueInput, type Shelf, type WorkOutfit, type GearSlot,
-  BATTLE_ENGINE_VERSION, markClassesV3Seen, markGrantSeen, newSave, ownerTier, parseSaveAsync, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass, type RpgTier1Class,
+  BATTLE_ENGINE_VERSION, drillDay, markClassesV3Seen, markGrantSeen, newSave, ownerTier, parseSaveAsync, renameParty, renameTrainer, savedTiers, setPartyLead, setPartySlot, startingClass, tierKey, type StartingOutfit, unlockUma, wearClassPreset, type BattleAction, type BattleOutfit, type BattleStep, type CallingOutfit, type FightResult, type RpgBranch, type RpgClass, type RpgTier1Class,
   type RpgCampaignChapter, type RpgDamageKind, type RpgWeapon, type Save, type TierWorld, type EchoLevel, type EnemyRoster, type RiftFightRef, type RiftFront,
   type WorkContext,
 } from '@rpg/domain'
@@ -217,6 +217,36 @@ export const drinkAtSpring = (springId: string) => edit(import('@rpg/domain/batt
 export const chooseActiveParty = (party: number) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.setActiveParty(s, party, now, t))
 
 /** One action in the party's open fight. Saved at once; when it ends the fight, the rewards land in the same save. */
+// --- Drills and Training Logs (D283, H154; dark until save v35) -------------------------------------------------------
+// The day turns at 04:00 on this phone's clock (`drillDay`).
+
+/** Starts Drill `n` with the active party, at full MP. */
+export const beginDrill = (chapter: RpgCampaignChapter, n: number, outfits: ReadonlyMap<string, BattleOutfit>) =>
+  edit(import('@rpg/domain/drills'), (d, s, now, t) => d.startDrill(s, chapter, n, outfits, drillDay(new Date(now)), now, t))
+
+/** Sweeps a won Drill `times` times; the Logs it paid. */
+export async function sweepDrills(n: number, times: number): Promise<number> {
+  const tier = activeKey()
+  const { sweepDrill } = await import('@rpg/domain/drills')
+  const { save } = useGame.getState()
+  if (!save) throw new Error('No save loaded')
+  const now = nowIso()
+  const swept = sweepDrill(save, n, times, drillDay(new Date(now)), now, tier)
+  await commit(swept.save)
+  return swept.logs
+}
+
+/** Reads `count` Training Logs onto one Uma; what they did. */
+export async function readTrainingLogs(outfitId: string, count: number, outfits: ReadonlyMap<string, BattleOutfit>) {
+  const tier = activeKey()
+  const { readLogs } = await import('@rpg/domain/drills')
+  const { save } = useGame.getState()
+  if (!save) throw new Error('No save loaded')
+  const read = readLogs(save, outfitId, count, outfits, nowIso(), tier)
+  await commit(read.save)
+  return read.result
+}
+
 export async function fightAction(region: RpgCampaignChapter, action: BattleAction): Promise<{ step: BattleStep; result: FightResult | null }> {
   const tier = activeKey()
   const { actInFight } = await import('@rpg/domain/battle')
