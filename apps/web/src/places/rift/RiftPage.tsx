@@ -1,8 +1,9 @@
 // The Rift (H50, rift.md §4–§8): the Battle page's end-of-tier event. Routes under `/battle/tier-finale/`: `` the Rift,
 // `front/<front>` (and `/<stage>`) a front's chain, `convergence`, `signup` and `fight`. The Rift shows the open fight's
-// Resume, sign-up or the run's four fronts and the Convergence, Ascend once won, the Echoes, and the run's roster.
+// Resume, sign-up or the run's four fronts and the Convergence, Ascend once won, and the run's roster. Its Echoes are
+// fought at Trials since H153 (D283).
 import {
-  CONVERGENCE_FIGHTS, ECHO_LEVELS, FRONT_NAME, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, riftLevel50s, SaveRuleError, type EchoLevel, type RiftFront, type RiftRun,
+  CONVERGENCE_FIGHTS, FRONT_NAME, RIFT_FRONTS, RIFT_ROSTER, RIFT_STAGES, riftLevel50s, SaveRuleError, type RiftFront, type RiftRun,
 } from '@rpg/domain'
 import { cancelRiftBlock } from '@rpg/domain/rift'
 import { useState } from 'react'
@@ -14,7 +15,6 @@ import { BottomSheet } from '../../ui/BottomSheet'
 import type { PageProps } from '../registry'
 import { AscendSheet } from './AscendSheet'
 import { ConvergenceView } from './ConvergenceView'
-import { EchoSheet } from './EchoSheet'
 import { frontCount, FrontChain, ResumeRift } from './FrontChain'
 import { Faces } from './PartyPick'
 import { partyGuidance } from './rift-view'
@@ -64,7 +64,6 @@ export function convergenceLine(run: RiftRun): string {
 export function RiftOverview({ campaign, place }: { campaign: Campaign; place: PageProps['place'] }) {
   const { save, world, run, tier, key } = useRift()
   const nav = useHubNavigation()
-  const [echo, setEcho] = useState<{ front: RiftFront; level: EchoLevel } | null>(null)
   const [roster, setRoster] = useState(false)
   const [ascending, setAscending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -122,28 +121,6 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
         </section>
       )}
 
-      <section>
-        <h3 className="text-micro mb-2">Echoes</h3>
-        <ul className="space-y-2" data-rift-echoes>
-          {RIFT_FRONTS.map((front) => (
-            <li key={front} className="flex items-center gap-2 rounded-md bg-raised p-2">
-              <FrontCrest front={front} />
-              <span className="w-14 shrink-0 text-[13px] font-semibold">{FRONT_NAME[front]}</span>
-              <span className="grid flex-1 grid-cols-3 gap-1.5">
-                {ECHO_LEVELS.map((level) => {
-                  const won = !!world.rift.echoes[front]?.[level]
-                  return (
-                    <button key={level} type="button" onClick={() => setEcho({ front, level })} aria-label={`${FRONT_NAME[front]} Echo, Lv ${level}${won ? ', won' : ''}`}
-                      className={`min-h-11 rounded-sm border text-[12px] font-semibold ${won ? 'border-accent/60 text-accent' : 'border-hairline-strong'}`}>
-                      Lv {level}{won ? ' ✓' : ''}
-                    </button>
-                  )
-                })}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
 
       {run && (
         <button type="button" onClick={() => setRoster(true)} className="flex min-h-11 w-full items-center justify-center rounded-sm border border-hairline-strong font-semibold">
@@ -151,7 +128,6 @@ export function RiftOverview({ campaign, place }: { campaign: Campaign; place: P
         </button>
       )}
 
-      {echo && <EchoSheet campaign={campaign} place={place} front={echo.front} level={echo.level} onClose={() => setEcho(null)} />}
       {roster && run && (
         <BottomSheet title={`Roster · ${run.roster.length}`} onClose={() => setRoster(false)} footer={cancelBlock === null ? (
           <button type="button" onClick={() => void cancelRiftSignUp().then(() => setRoster(false), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'Couldn’t cancel.'))}

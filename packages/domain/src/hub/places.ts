@@ -285,8 +285,8 @@ export function townPlaces(engine: number = BATTLE_ENGINE_VERSION): Place[] {
 /** Where the featured Uma stands on Town Hall's road, kept clear of props (D147). */
 export const TOWN_PLAZA = { x: 0.5, y: 0.45 } as const
 
-/** Battle (D147), the raised centre tab: the world map, straight from the map, and the Rift (H50; the id is the Tier
- * Finale's, so saves, links and the menu don't move). */
+/** Battle (D147), the raised centre tab: the world map, straight from the map, the Rift (H50; the id is the Tier
+ * Finale's, so saves, links and the menu don't move), and Trials, the Echoes' own place (D283, H153). */
 const BATTLE: Place[] = [
   {
     id: 'scenario-gate', page: 'battle', kind: 'battle', name: 'Scenario Gate', opensIn: 'S1', slots: 0, at: { x: 0.5, y: 0.3 }, direct: true,
@@ -296,7 +296,13 @@ const BATTLE: Place[] = [
   {
     id: 'tier-finale', page: 'battle', kind: 'battle', name: 'The Rift', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.72 }, frame: 'rift',
     blurb: 'Twenty Lv 50 Umas seal four fronts, then ascend together.',
-    details: ['Four fronts of twelve stages, then the Convergence', 'Echoes: repeatable fights for Class and gear ranks', 'Ascend: all twenty move up a tier'],
+    details: ['Four fronts of twelve stages, then the Convergence', 'Ascend: all twenty move up a tier'],
+  },
+  {
+    // Its own building comes with H156's art; until then uma-art's unused Knights' Bastion.
+    id: 'trials', page: 'battle', kind: 'battle', name: 'Trials', opensIn: 'S8', slots: 0, at: { x: 0.2, y: 0.52 }, frame: 'knights-bastion',
+    blurb: 'Class EXP ×2 for Lv 50 parties.',
+    details: ['Four fronts at Lv 45, 50 and 55', 'A won Trial sweeps with Sweep Tickets'],
   },
 ]
 
@@ -341,21 +347,24 @@ export function isOpen(place: Place, current: SliceId): boolean {
 /** The slice the deployed build implements. */
 export const CURRENT_SLICE: SliceId = 'S8'
 
-/** The Rift's place id (the Tier Finale's, kept). */
+/** The Rift's place id (the Tier Finale's, kept), and Trials', which opens with it. */
 const RIFT_PLACE = 'tier-finale'
+const TRIALS_PLACE = 'trials'
+const riftGated = (place: Place): boolean => place.id === RIFT_PLACE || place.id === TRIALS_PLACE
 const COUNT_WORDS: readonly string[] = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
 
-/** Whether a place is open in this tier's world (H50): built in this slice, and the Rift only when the world has five Lv 50
- * Umas in a tier that runs one (`riftOpen`). No world (before boot) keeps the Rift shut. */
+/** Whether a place is open in this tier's world (H50): built in this slice, and the Rift and Trials only when the world
+ * has five Lv 50 Umas in a tier that runs a Rift (`riftOpen`). No world (before boot) keeps them shut. */
 export function placeOpen(place: Place, world: { umas: Readonly<Record<string, { level: number }>> } | null, tier: number): boolean {
   if (!isOpen(place, CURRENT_SLICE)) return false
-  return place.id !== RIFT_PLACE || (world !== null && riftOpen(world, tier))
+  return !riftGated(place) || (world !== null && riftOpen(world, tier))
 }
 
 /** Why a place is shut, in a few words, or null when it's open: the Rift waits on its world, the rest on their slice. */
 export function placeLock(place: Place, world: { umas: Readonly<Record<string, { level: number }>> } | null, tier: number): string | null {
   if (placeOpen(place, world, tier)) return null
-  if (place.id !== RIFT_PLACE || !isOpen(place, CURRENT_SLICE)) return 'Not open yet'
-  return (RIFT_TIERS as readonly number[]).includes(tier) ? `Opens at ${COUNT_WORDS[RIFT_OPEN_AT] ?? RIFT_OPEN_AT} Lv 50 Umas` : 'No Rift in this tier yet'
+  if (!riftGated(place) || !isOpen(place, CURRENT_SLICE)) return 'Not open yet'
+  if (!(RIFT_TIERS as readonly number[]).includes(tier)) return place.id === TRIALS_PLACE ? 'No Trials in this tier yet' : 'No Rift in this tier yet'
+  return `Opens at ${COUNT_WORDS[RIFT_OPEN_AT] ?? RIFT_OPEN_AT} Lv 50 Umas`
 }
 

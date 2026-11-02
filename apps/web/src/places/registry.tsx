@@ -39,6 +39,9 @@ export const PLACE_UI: Record<string, PlaceUi> = {
     Peek: lazy(() => import('./rift/RiftPeek')),
     Page: lazy(() => import('./rift/RiftPage')),
   },
+  trials: {
+    Page: lazy(() => import('./trials/TrialsPage')),
+  },
   account: {
     Page: lazy(() => import('./account/AccountPage')),
   },

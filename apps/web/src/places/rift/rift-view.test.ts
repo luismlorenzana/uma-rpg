@@ -58,7 +58,7 @@ describe('the Rift’s labels (H50)', () => {
     expect(riftRefLabel({ kind: 'echo', front: 'horde', level: '55' })).toBe('Lv 55')
     expect(riftRefTitle({ kind: 'front', front: 'iron', stage: 5 })).toBe('Iron front')
     expect(riftRefTitle({ kind: 'convergence', fight: 3 })).toBe('Convergence')
-    expect(riftRefTitle({ kind: 'echo', front: 'arcane', level: '45' })).toBe('Echo · Arcane')
+    expect(riftRefTitle({ kind: 'echo', front: 'arcane', level: '45' })).toBe('Trial · Arcane')
     expect(riftHome({ kind: 'front', front: 'arcane', stage: 2 })).toBe('front/arcane')
     expect(riftHome({ kind: 'convergence', fight: 0 })).toBe('convergence')
     expect(riftHome({ kind: 'echo', front: 'iron', level: '50' })).toBe('')

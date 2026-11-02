@@ -49,13 +49,13 @@ afterEach(() => {
 })
 
 describe('the Rift (H50)', () => {
-  it('holds sign-up shut under twenty Lv 50 Umas, with the Echoes open', () => {
+  it('holds sign-up shut under twenty Lv 50 Umas; its Echoes are at Trials now (H153)', () => {
     show(save(12))
     expect(document.querySelector('[data-rift-status]')!.textContent).toBe('Tier 1 · 12 Lv 50 Umas')
     expect(signUp()!.disabled).toBe(true)
     expect(signUp()!.textContent).toContain('12 of 20 at Lv 50')
     expect(fronts()).toEqual([])
-    expect(document.querySelectorAll('[data-rift-echoes] button')).toHaveLength(12)
+    expect(document.querySelector('[data-rift-echoes]')).toBeNull()
     expect(screen.queryByRole('button', { name: /^Ascend/ })).toBeNull()
   })
 

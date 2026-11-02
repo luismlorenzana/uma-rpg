@@ -48,7 +48,7 @@ export function RiftFightRoute({ campaign, place }: { campaign: Campaign; place:
       if (!next || !world) return
       setError(null)
       const party = next.kind === 'convergence' ? null : partyHolding(world, ended.five)
-      // No party holds the five any more: pick one on the stage's sheet (an Echo, on the Rift's page).
+      // No party holds the five any more: pick one on the stage's sheet (a Trial, on its page).
       if (next.kind !== 'convergence' && party === null) {
         navigate(pagePath(place, next.kind === 'front' ? `front/${next.front}/${next.stage}` : ''), { replace: true })
         return
@@ -72,7 +72,7 @@ export function RiftFightRoute({ campaign, place }: { campaign: Campaign; place:
     )
   }
   const source: FightSource<RiftFightResult> = {
-    battle, title: riftRefTitle(fight.ref), name: riftRefLabel(fight.ref), biome: 'rift', back: 'Back to the Rift', rank,
+    battle, title: riftRefTitle(fight.ref), name: riftRefLabel(fight.ref), biome: 'rift', back: fight.ref.kind === 'echo' ? 'Back to Trials' : 'Back to the Rift', rank,
     act: (action) => riftFightAction(action, campaign.cast.members), leave: retreatRift,
   }
   return <FightScreen key={fight.battleId} campaign={campaign} source={source} onMap={() => home(fight.ref)}

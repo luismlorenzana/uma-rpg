@@ -455,8 +455,8 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   fights. The fourth win wins the run.
 - **What they pay:** front and Convergence fights pay [achievements](#achievements) only: no EXP, Laurels, Marks or
   Bonds. Every won Rift fight records the boss and sub-boss faces it defeated, with the time of the first defeat.
-- **Echoes:** each front at Lv 45, 50 and 55, for any full party of Lv 50 Umas while the Rift is open, with or without
-  a run. A win fills each Uma's Class Rank for the class she fought as at twice a stage's rule, E being a regular stage's
+- **Echoes,** fought at **Trials** on the Battle page since H153 (D283; [sections](sections.md#trials)): each front at
+  Lv 45, 50 and 55, for any full party of Lv 50 Umas while the Rift is open, with or without a run. A win fills each Uma's Class Rank for the class she fought as at twice a stage's rule, E being a regular stage's
   EXP at the Echo's level for her: Lv 45 pays half, Lv 55 the same as Lv 50 (fighting above her never pays more). Past
   Rank 50 it banks as Class Marks; on a Tier 0 at Rank 10 it waits for her promotion. No Uma EXP, Laurels, Shards or
   Bonds.

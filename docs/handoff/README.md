@@ -50,18 +50,16 @@ switch to save v35.
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H150](tasks/H150-glass-pane-map.md) | uma-platform: the window's pane map, `outfit-glass-order`, uma-data 1.3.0, a candidate release | Claude | M | — | Ready; the owner moves `latest` after |
-| [H151](tasks/H151-profile-companion.md) | Both apps: `ProfileFrame`'s companion square, uma-kit 0.17.0 | Claude or ChatGPT | S | — | Ready |
-| [H152](tasks/H152-windows-domain.md) | The board, latching, the World record, save v35 dark, per-Uma Ascend, the Rift's runs | Claude | L | — | Ready |
-| [H153](tasks/H153-trials.md) | Trials: the Echoes' own place on the Battle page (live) | Claude or ChatGPT | M | — | Ready |
-| [H154](tasks/H154-drills-logs.md) | Drills and Training Logs, dark | Claude | L | H152 | Waits |
-| [H155](tasks/H155-windows-web.md) | Her window beside her bust, the Window sheet, the Gallery, Ascend, dark | Claude | L | H150, H151, H152, H153 | Waits |
+| [H154](tasks/H154-drills-logs.md) | Drills and Training Logs, dark | Claude | L | H152 | Ready |
+| [H155](tasks/H155-windows-web.md) | Her window beside her bust, the Window sheet, the Gallery, Ascend, dark | Claude | L | — | Ready |
 | [H156](tasks/H156-collections-buildings-art.md) | Art: the Gallery, Trials and Drills buildings, uma-art 2.20.0 | ChatGPT draws and publishes | S | H141's 2.19.0 | Ready after H141: the owner dispatches it |
 | [H157](tasks/H157-collections-switch.md) | The switch: save v35, the manual, the phone check | Claude | M | H152–H155 | Waits |
 | [H158](tasks/H158-pin-collections-art.md) | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | S | H156, H157 | Waits |
 
-**Order:** H150, H151, H152 and H153 can run at once; then H154 and H155; then H157. H156 and H158 can land any time
-after, since the places borrow existing buildings until then.
+**Done:** H150–H153 (2026-11-02, below). **Order now:** H154 and H155, then H157. H156 and H158 can land any time after,
+since the places borrow existing buildings until then. **The owner's step:** move uma-platform's `latest` to the
+candidate release `01ba1c71f403`, which carries the pane maps (`cd ~/workspace/uma-platform && pnpm release:publish`;
+undo: `pnpm release:publish -- --rollback f8ab287029e8`); H155 needs it live before H157.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
@@ -83,6 +81,9 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H152 | Windows, the rules, dark: the board, latching, the World record and the Rift step, save v35's fields, Ascend one Uma at a time (D284) | `cc81286` |
+| H151 | Both apps: `ProfileFrame`'s companion square, uma-kit 0.17.0 (platform P85) | Kit `82c23db`, release `a6bef9f` |
+| H150 | The window's pane map, `outfit-glass-order`, uma-data 1.3.0; all 272 windows byte for byte as before, the maps 2.8 MB; candidate release `01ba1c71f403` (platform P84) | Platform `fc7906f`, release `a6bef9f` |
 | H143 | Profile polish: a body's strip in the node sheet, stat marks on the totals and Details (D278) | `12229df` |
 | H142 | Profile polish: the star chart, on one checked table of coordinates, with vector crests (D277) | `a96132e` |
 | H140 | Profile polish: Details opens on damage, All stats a tap down, sources in color (D276) | `b3d4d67` |

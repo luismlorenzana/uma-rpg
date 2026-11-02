@@ -20,12 +20,12 @@ export function riftRefLabel(ref: RiftFightRef): string {
   }
 }
 
-/** A fight's small line: "Iron front", "Convergence", "Echo · Iron". */
+/** A fight's small line: "Iron front", "Convergence", "Trial · Iron" (an Echo, fought at Trials since H153). */
 export function riftRefTitle(ref: RiftFightRef): string {
   switch (ref.kind) {
     case 'front': return `${FRONT_NAME[ref.front]} front`
     case 'convergence': return 'Convergence'
-    case 'echo': return `Echo · ${FRONT_NAME[ref.front]}`
+    case 'echo': return `Trial · ${FRONT_NAME[ref.front]}`
   }
 }
 
@@ -270,7 +270,7 @@ export function riftResultView(result: RiftFightResult): { heading: string; line
   const { ref } = result
   const rounds = result.swept ? `Swept ${result.swept > 1 ? `${result.swept} times` : 'with a ticket'}`
     : `${result.rounds} round${result.rounds === 1 ? '' : 's'}`
-  const back = 'Back to the Rift'
+  const back = ref.kind === 'echo' ? 'Back to Trials' : 'Back to the Rift'
   const heading = win ? 'Victory!' : 'Defeated'
   switch (ref.kind) {
     case 'front': {

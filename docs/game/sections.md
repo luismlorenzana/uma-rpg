@@ -64,8 +64,9 @@ Phaser).
   top, the Spellblade Salle and the Summoner Circle below them, the **Healer Sanctum** (`healer-sanctum`, uma-art's own
   temple) in the middle where the Paladin Bastion and the Cleric Chapel stood, the Observatory under it.
 - **Battle:** a drill ground of its own, with flagstone roads, banners, weapon racks, training dummies and torches (H31,
-  D148): the Scenario Gate above, the Rift below. The Rift keeps the Tier Finale's id, `tier-finale`, and draws
-  uma-art's `rift` building (`Place.frame`, H50).
+  D148): the Scenario Gate above, the Rift below, and **Trials** on the left between them (H153, D283), on uma-art's
+  unused Knights' Bastion until its own building lands (H156). The Rift keeps the Tier Finale's id, `tier-finale`, and
+  draws uma-art's `rift` building (`Place.frame`, H50).
 - **Wilds:** fifteen places in five rows of three, a row a line, in the order Metal, Vegetables, Wood, Fish and Stone.
   The gathering place is on the left, its workbench on the trunk road, its making place on the right (D230, H114). The
   rows sit at y 0.155 … 0.795 so they keep an even spacing on a short screen (D233).
@@ -103,6 +104,7 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 |---|---|---|---|---|
 | Scenario Gate | `scenario-gate` | battle | — | The world map: five continents of regions to clear. |
 | The Rift | `tier-finale` | battle | — | Twenty Lv 50 Umas seal four fronts, then ascend together. |
+| Trials | `trials` | battle | — | Class EXP ×2 for Lv 50 parties. |
 
 ### Wilds (`wilds`)
 
@@ -573,7 +575,6 @@ Umas (Tiers 1 and 2).
     Summoner · Paladin") and the **Convergence** card ("Seal all four fronts", "Assign four parties · 2 attempts",
     "Fight 2 of 4 · Arcane", "Won");
   - a won run: **Ascend to Tier 2**;
-  - the **Echoes:** four rows (crest, front) of Lv 45, 50 and 55, "✓" on each won;
   - **Roster:** the run's twenty faces, with **Cancel sign-up** while the run is untouched.
 - **Sign up twenty:** **Four parties** (the party picker: four parties of five Lv 50 Umas) or **Twenty Umas** (the Uma
   picker, twenty, "Below Lv 50" disabled), then a sheet of the twenty faces: "They fight this Rift together until it
@@ -595,12 +596,9 @@ Umas (Tiers 1 and 2).
   (suggested from the fronts' guidance; a party picked for another row is disabled). **Begin** when the four cover the
   twenty (else "Missing: …") starts the attempt and its first fight. With an attempt on: its four parties, "Won · 6
   rounds", "Next" or "—", **Fight: Arcane** and **End this attempt** ("The next attempt starts from Iron.").
-- **An Echo's sheet** ("Iron Echo · Lv 55"): its foes, a party of five Lv 50 Umas, its guided weapons and needs (from
-  the world's Lv 50 Umas), and **Fight** ("Fight again" once won). Once won, **Sweep ×1** and **Sweep ×5** with the
-  Sweep Tickets held; a Sweep's result shows like a win.
 - **The fight:** the shared fight screen on the Twilight Rift's backdrop, titled "Iron front · Stage 5", "Convergence ·
-  Fight 2 of 4" or "Echo · Iron · Lv 55". Foes stand and are tagged by their face; a warded foe carries her front's
-  crest. Back and the menu return to the Rift ("Give up" ends a Convergence attempt).
+  Fight 2 of 4" or "Trial · Iron · Lv 55". Foes stand and are tagged by their face; a warded foe carries her front's
+  crest. Back and the menu return to the Rift, or to Trials from a Trial ("Give up" ends a Convergence attempt).
 - **The result** (`RiftResult.tsx`): Victory! or Defeated and the rounds; then "Stage 5 cleared · 5/12", "Iron sealed",
   "Fight 2 of 4 won", "The Rift is won!" or "The attempt is over"; each Uma's Class Rank bar and rank-up lines and the
   Class Marks (no EXP line). Buttons: **Next stage** (the same five again while one party holds them, else the stage's
@@ -613,6 +611,19 @@ Umas (Tiers 1 and 2).
 - **Ascend** (`AscendSheet.tsx`): "20 Umas move to Tier 2 at Lv 1", "Ranks, skills and Extra Stats start over", "Their
   gear returns to Tier 1's stock", "Tier 2 gets 20,000 Laurels, 100 Speed Tickets and 3,450 Class Marks", the reason
   when it can't yet, and **Ascend**, which runs behind the tier veil and lands on the new tier's Town Hall.
+
+### Trials
+
+The rank content (H153, D283; [collections](../design/collections/collections.md) §6.3): the Echoes, out of the Rift into
+a place of their own. Routes: `/battle/trials` and `fight`; screens in `places/trials/`. It opens and locks with the Rift
+(five Lv 50 Umas, Tiers 1 and 2; "No Trials in this tier yet" in Tier 3). The rules are the Echoes' ([loops](loops.md#the-rift)),
+and code and save keep the name `echo`; the screen says Trial.
+- **The page:** "Class EXP ×2 · Lv 50 parties", **Resume the open fight** while a Trial is open, and four rows (crest,
+  front) of Lv 45, 50 and 55, "✓" on each won.
+- **A Trial's sheet** ("Iron Trial · Lv 55", `TrialSheet.tsx`): its foes, a party of five Lv 50 Umas, its guided weapons
+  and needs (from the world's Lv 50 Umas), and **Fight** ("Fight again" once won). Once won, **Sweep ×1** and **Sweep ×5**
+  with the Sweep Tickets held; a Sweep's result shows like a win.
+- **The fight** is the Rift's fight route, titled "Trial · Iron · Lv 55"; its result's button reads **Back to Trials**.
 
 ## Wilds
 

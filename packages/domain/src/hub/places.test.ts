@@ -36,10 +36,10 @@ function expectSpaced(places: readonly Place[]): void {
 
 describe('place registry', () => {
   it('has 27 visible places on four pages in the bar\'s order (D147; fifteen in the Wilds since H114, five halls since H134) plus the hidden Account', () => {
-    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(27)
+    expect(PLACES.filter((p) => !p.hidden)).toHaveLength(28)
     expect(new Set(PLACES.map((p) => p.id)).size).toBe(PLACES.length)
     expect(HUB_PAGES).toEqual(['town', 'learning', 'battle', 'wilds'])
-    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 6, 2, 15])
+    expect(HUB_PAGES.map((page) => placesOn(page).length)).toEqual([4, 6, 3, 15])
     expect(PLACES.filter((p) => p.direct).map((p) => p.id)).toEqual(['scenario-gate'])
   })
 
@@ -161,7 +161,7 @@ describe('the Rift (H50)', () => {
     expect(rift).toMatchObject({ page: 'battle', name: 'The Rift', frame: 'rift', opensIn: 'S8' })
     expect(rift.blurb).toBe('Twenty Lv 50 Umas seal four fronts, then ascend together.')
     expect(CURRENT_SLICE).toBe('S8')
-    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['tier-finale', 'rift'],
+    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['tier-finale', 'rift'], ['trials', 'knights-bastion'],
       ['fields', 'vegetable-garden'], ['armorer', 'lancers-barracks']])
   })
 
@@ -181,8 +181,18 @@ describe('the Rift (H50)', () => {
     expect(placeLock(rift, world(25), 3)).toBe('No Rift in this tier yet')
   })
 
+  it('opens Trials with it, on the Battle page, and says why it waits (D283, H153)', () => {
+    const trials = placeById('trials')!
+    expect(trials).toMatchObject({ page: 'battle', kind: 'battle', name: 'Trials', at: { x: 0.2, y: 0.52 } })
+    expect(placesOn('battle').map((p) => p.id)).toEqual(['scenario-gate', 'tier-finale', 'trials'])
+    expect(placeOpen(trials, world(4), 1)).toBe(false)
+    expect(placeLock(trials, world(4), 1)).toBe('Opens at five Lv 50 Umas')
+    expect(placeOpen(trials, world(5), 2)).toBe(true)
+    expect(placeLock(trials, world(25), 3)).toBe('No Trials in this tier yet')
+  })
+
   it('leaves every other place as its slice says, whatever the world', () => {
-    for (const place of PLACES.filter((p) => p.id !== 'tier-finale')) {
+    for (const place of PLACES.filter((p) => p.id !== 'tier-finale' && p.id !== 'trials')) {
       for (const [w, tier] of [[null, 1], [world(0), 1], [world(25), 2], [world(25), 3]] as const) {
         expect(placeOpen(place, w, tier), place.id).toBe(isOpen(place, CURRENT_SLICE))
         expect(placeLock(place, w, tier), place.id).toBe(isOpen(place, CURRENT_SLICE) ? null : 'Not open yet')

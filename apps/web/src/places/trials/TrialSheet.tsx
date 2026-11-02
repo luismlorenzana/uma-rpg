@@ -1,5 +1,6 @@
-// An Echo's sheet (H50, rift.md §8): its front and level, its foes, a party of five Lv 50 Umas and Fight (from v16 with
-// the front's guided weapons, H70); once won, Sweeps with Sweep Tickets, whose result shows like a win.
+// A Trial's sheet (an Echo's, H50, rift.md §8; at Trials since H153, D283): its front and level, its foes, a party of
+// five Lv 50 Umas and Fight (from v16 with the front's guided weapons, H70); once won, Sweeps with Sweep Tickets, whose
+// result shows like a win. Code and save keep `echo`; the screen says Trial.
 import { FRONT_NAME, RPG_TIER_MAX_LEVEL, SaveRuleError, type EchoLevel, type RiftFront } from '@rpg/domain'
 import { riftFight, riftFightBlock, sweepEchoBlock, type RiftFightResult } from '@rpg/domain/rift'
 import { useMemo, useState } from 'react'
@@ -8,14 +9,14 @@ import { useHubNavigation } from '../../hub/navigation'
 import { beginRiftFight, sweepEchoes } from '../../save/game'
 import { BottomSheet } from '../../ui/BottomSheet'
 import type { PageProps } from '../registry'
-import { GuidanceNeeds, GuidedWeapons } from './GuidedWeapons'
-import { PartyPick } from './PartyPick'
-import { bestParty, levelPartyBlock } from './rift-view'
-import { RiftResult } from './RiftResult'
-import { planLine, PlanFoes } from './StageSheet'
-import { useRift } from './use-rift'
+import { GuidanceNeeds, GuidedWeapons } from '../rift/GuidedWeapons'
+import { PartyPick } from '../rift/PartyPick'
+import { bestParty, levelPartyBlock } from '../rift/rift-view'
+import { RiftResult } from '../rift/RiftResult'
+import { planLine, PlanFoes } from '../rift/StageSheet'
+import { useRift } from '../rift/use-rift'
 
-export function EchoSheet({ campaign, place, front, level, onClose }: {
+export function TrialSheet({ campaign, place, front, level, onClose }: {
   campaign: Campaign; place: PageProps['place']; front: RiftFront; level: EchoLevel; onClose: () => void
 }) {
   const { save, world, tier, key } = useRift()
@@ -56,7 +57,7 @@ export function EchoSheet({ campaign, place, front, level, onClose }: {
       onAgain={() => { if (!sweepBlock) void sweep(1) }} onBack={() => { setSwept(null); onClose() }} />
   }
   return (
-    <BottomSheet title={`${FRONT_NAME[front]} Echo · Lv ${level}`} onClose={onClose} footer={
+    <BottomSheet title={`${FRONT_NAME[front]} Trial · Lv ${level}`} onClose={onClose} footer={
       <div className="space-y-2">
         {!open && <PartyPick campaign={campaign} world={world} value={party} block={(i) => levelPartyBlock(world, i)} onChange={setParty} title="Who fights?" />}
         {!open && <GuidedWeapons campaign={campaign} world={world} front={front} party={party} />}

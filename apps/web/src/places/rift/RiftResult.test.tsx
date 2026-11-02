@@ -103,7 +103,7 @@ describe('the Rift result', () => {
     expect(text).toContain('Sorcerer Rank 9')
     expect(text).toContain('+120 Class Marks')
     expect(text).not.toContain('EXP')
-    expect(buttons()).toEqual(['Fight again', 'Back to the Rift'])
+    expect(buttons()).toEqual(['Fight again', 'Back to Trials'])
   })
 
   it('plays the achievement cut-in first, then shows the result', () => {
