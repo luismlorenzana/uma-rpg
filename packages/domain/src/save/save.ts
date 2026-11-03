@@ -1030,10 +1030,16 @@ function parseParties(value: unknown, path: string, umas: Record<string, OwnedUm
 const NODE_ID = /^[A-Za-z0-9_.:-]{1,120}$/
 const CHAPTER_ID = /^[1-9]\d{0,11}$/
 
-function counts(value: unknown, path: string, min: number): Record<string, number> {
+/** The world's wins by stage and carried MP by Uma. A tier holds about 2,440 stages (five continents of 480, their
+ * capitals, the Drills) and a few hundred Umas, so these bounds only stop a runaway save; the old 200 refused every
+ * upload once a world's wins passed it (D292). */
+export const WINS_MAX = 5_000
+export const MP_MAX = 1_000
+
+function counts(value: unknown, path: string, min: number, max: number): Record<string, number> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
   const entries = Object.entries(value)
-  if (entries.length > 200) throw new SaveParseError(path, 'too many entries')
+  if (entries.length > max) throw new SaveParseError(path, 'too many entries')
   for (const [key, n] of entries) {
     if (!NODE_ID.test(key)) throw new SaveParseError(`${path}.${key}`, 'bad key')
     if (count(n, `${path}.${key}`) < min) throw new SaveParseError(`${path}.${key}`, `expected at least ${min}`)
@@ -1092,7 +1098,7 @@ function parseWorldState(value: unknown, path: string, check: CheckBattle): Worl
   if (party >= PARTY_COUNT) throw new SaveParseError(`${at}.party`, `expected 0–${PARTY_COUNT - 1}`)
   if (r.chapterId !== 'world') throw new SaveParseError(`${at}.chapterId`, 'expected world')
   const run: RpgRun = {
-    party, chapterId: 'world', wins: counts(r.wins, `${at}.wins`, 1), mp: counts(r.mp, `${at}.mp`, 0),
+    party, chapterId: 'world', wins: counts(r.wins, `${at}.wins`, 1, WINS_MAX), mp: counts(r.mp, `${at}.mp`, 0, MP_MAX),
     battle: r.battle === null ? null : parseBattle(r.battle, `${at}.battle`, check), battles: count(r.battles, `${at}.battles`),
     clearedAt: r.clearedAt === null ? null : timestamp(r.clearedAt, `${at}.clearedAt`), updatedAt: timestamp(r.updatedAt, `${at}.updatedAt`),
   }
