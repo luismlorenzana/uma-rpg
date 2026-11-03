@@ -58,6 +58,9 @@ three buildings' art (H156) and its pin (H158) are open.
 the places borrow existing buildings until then. uma-platform's `latest` is release `01ba1c71f403` (2026-11-02),
 which carries the pane maps; undo with `pnpm release:publish -- --rollback f8ab287029e8` in uma-platform.
 
+**For the owner's review:** [Reclass](../design/reclass/reclass.md) ([preview](../design/reclass/previews/reclass.html)):
+every calling promotes into three Tier 1 classes, by four identity limits (RC1–RC7). Not packeted until approved.
+
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
 

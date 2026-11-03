@@ -4,14 +4,34 @@
     {
       "name": "rpg-api",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@rpg/api", "dev"],
+      "runtimeArgs": [
+        "--filter",
+        "@rpg/api",
+        "dev"
+      ],
       "port": 8081
     },
     {
       "name": "rpg-web",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@rpg/web", "dev"],
+      "runtimeArgs": [
+        "--filter",
+        "@rpg/web",
+        "dev"
+      ],
       "port": 5174
+    },
+    {
+      "name": "design-docs",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8771",
+        "--directory",
+        "docs/design"
+      ],
+      "port": 8771
     }
   ]
 }
