@@ -57,8 +57,10 @@ stays false until H162 sets `SAVE_SCHEMA_VERSION` to 37. Live play doesn't chang
      - `CapitalLane { party: number, umas: string[5], generals: 0 | 1 | 2 | 3, finalAt: string | null }`.
      - `party` is the Party Hall index the lane was signed from, kept for display only.
      - The lane order is the routes' order.
-   - `capitals: Record<continentId, { started: number; won: number }>`. `started` numbers the runs
-     (`capitalRunId(c, started + 1)`), so an abandoned run's id is never reused.
+   - `capitals: Record<continentId, { started: number; won: number; recent: CapitalWin[] }>`. `started` numbers the
+     runs (`capitalRunId(c, started + 1)`), so an abandoned run's id is never reused. `recent` holds the last three won
+     runs, newest first: `CapitalWin { id, wonAt, lanes: string[5][] }`. The capital page and the honeycomb map's
+     capital panel show it (docs/design/world-map/honeycomb.md, HM8).
    - **Parse:** each id is well formed and its continent is in this world's tier. Each lane has five different Umas, all
      owned in this world, and no Uma appears in two lanes or two runs. `finalAt` may be set only once every lane in the
      run has beaten all three generals. Counters are whole numbers.
@@ -96,7 +98,8 @@ stays false until H162 sets `SAVE_SCHEMA_VERSION` to 37. Live play doesn't chang
      - Class EXP, Shards and Bonds follow `payEntrants` as for any fight.
    - **The lane advances:** `generals + 1`, or `finalAt = now`.
    - **The run is won** when all four lanes have `finalAt`. `recordCapitalWin` lights `world-n` on all twenty records,
-     dated now. Then `capitals[c].won` gains 1 and the run is removed.
+     dated now. Then `capitals[c].won` gains 1, the run goes to the front of `recent` (three kept), and it's removed
+     from `capitalRuns`.
    - **A run fight's win is never written to `world.run.wins`** (D292): drop the node from the closed run's wins.
    - `FightResult` gains `capital?: { runId, lane, general?: 1 | 2 | 3, final?: number, won: boolean }`. Here `final` is
      the count of finals now won, out of 4.
