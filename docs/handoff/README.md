@@ -73,8 +73,9 @@ lights on a won run. Built dark behind `capitalRunsLive()` (save v37), switched 
 | [H162](tasks/H162-capital-runs-switch.md) | The switch: save v37 live, the old capital removed, the manual, the phone check | ChatGPT or Claude | M | H159–H161 | Waits |
 
 **For the owner's review:** [the continent map as a honeycomb](../design/world-map/honeycomb.md)
-([preview](../design/world-map/previews/honeycomb.html)): the capital at the centre, rows spiralling in two to a ring,
-Springs as hexes, each region's claiming and clearing five on top (HM1–HM10). A draft; not packeted until approved.
+([preview](../design/world-map/previews/honeycomb.html)), second pass: the capital and its city at the centre, Lv 6–10
+inside and Lv 1–5 on the shore only, six symmetric Springs, each region's claiming and clearing five on the hex
+(HM1–HM11). A draft; not packeted until approved.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.

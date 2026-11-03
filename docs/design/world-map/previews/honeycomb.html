@@ -112,9 +112,10 @@
   <div class="bar"><span style="color:var(--ink-soft);font-size:12.5px">Theme</span>
     <button type="button" data-t="system" aria-pressed="true">System</button><button type="button" data-t="light" aria-pressed="false">Light</button><button type="button" data-t="dark" aria-pressed="false">Dark</button></div>
   <h1>The continent map as a honeycomb</h1>
-  <p class="lead">A draft for review (honeycomb.md). Continent 1's real 40 regions, 5 Springs and capital, spiralling in from the
-    shore: rows 1–2 on the outer arc at the bottom, two rows a ring, row 10 beside the capital at the centre. The progress and the
-    faces are made up. <b>Tap any hex</b>; the panel on the right is the game's side panel (its quick look).</p>
+  <p class="lead">A draft for review (honeycomb.md), second pass. Continent 1's real 40 regions: Lv 1–5 only on the shore, Lv 6–10
+    only in the inner band, the capital and its city at the centre, and <b>six Springs</b> on the inner band's corners. Completed
+    regions carry their five faces across the hex. The progress and the faces are made up. <b>Tap any hex</b>; the panel on the
+    right is the game's side panel (its quick look).</p>
   <div class="stage">
     <div class="phone" aria-label="The continent map on a phone">
       <div class="ph-head">
@@ -133,11 +134,10 @@
   <table>
     <thead><tr><th>From the centre</th><th>Hexes</th><th>What sits there</th></tr></thead>
     <tbody>
-      <tr><td>Centre</td><td>1</td><td>The capital (Lv 10)</td></tr>
-      <tr><td>Ring 1</td><td>6</td><td>Row 10 (♛♛, double bosses) and half of row 9</td></tr>
-      <tr><td>Ring 2</td><td>12</td><td>The rest of row 9, the Spring of rows 9–10, rows 8 and 7, the Spring of rows 7–8</td></tr>
-      <tr><td>Ring 3</td><td>18</td><td>Rows 6, 5, 4 and 3, with the Springs of rows 5–6 and 3–4 (Lv 6–10 meets Lv 1–5 here)</td></tr>
-      <tr><td>Ring 4, an arc</td><td>9</td><td>Rows 2 and 1 and the first Spring: the way in, at the bottom</td></tr>
+      <tr><td>Centre and ring 1</td><td>7</td><td>The capital and its city: one tap target</td></tr>
+      <tr><td>Ring 2</td><td>12</td><td>Rows 10 (♛♛, double bosses), 9 and 8: Lv 6–10</td></tr>
+      <tr><td>Ring 3</td><td>18</td><td>The six Springs on its corners; rows 7 and 6 on its slanted sides (Lv 6–10); open ground on its top and bottom</td></tr>
+      <tr><td>Ring 4, the shore</td><td>24</td><td>Rows 1–5 (Lv 1–5), from the bottom round; open ground on its four diagonal corners</td></tr>
     </tbody>
   </table>
 </div>
@@ -156,102 +156,133 @@ const STATE = {
   'w1-7-1': { done: 12, clear: team(1), claim: team(1), on: 'Nov 3' }, 'w1-7-2': { done: 12, clear: team(2), claim: team(2), on: 'Nov 3' },
   'w1-8-1': { done: 3, claim: team(3) },
 };
-const SPRING = { 'w1-spring1': 'Ready', 'w1-spring2': 'Ready', 'w1-spring3': '1h 20m', 'w1-spring4': 'Ready', 'w1-spring5': 'Ready' };
 const CAPITAL = { open: [{ id: 3, done: 7, parties: [9, 10, 11, 12] }], recent: [{ id: 2, on: 'Nov 3', parties: [1, 2, 5, 6] }, { id: 1, on: 'Nov 2', parties: [3, 4, 7, 8] }] };
 
-// The order from the centre out: the capital, then rows 10 → 1, each pair of rows followed by its Spring.
-const byRow = (row) => DATA.regions.filter((r) => r.row === row).sort((a, b) => a.col - b.col).map((r) => ({ kind: 'region', ...r }));
-const spring = (row) => ({ kind: 'spring', ...DATA.springs.find((s) => s.row === row) });
-const outward = [...byRow(10), ...byRow(9), spring(9), ...byRow(8), ...byRow(7), spring(7), ...byRow(6), ...byRow(5), spring(5),
-  ...byRow(4), ...byRow(3), spring(3), ...byRow(2), ...byRow(1), spring(1)];
-
-// Pointy-top axial hexes. Ring k: start k steps south-west, walk the six sides.
-const S = 46, DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
+// The honeycomb (HM2, HM3): the capital's city at the centre (the centre hex and ring 1); ring 2 rows 10, 9 and 8; ring 3
+// the six Springs on its corners, rows 7 and 6 on its slanted sides, open ground on its top and bottom; ring 4, the
+// shore, rows 1–5, with open ground on its four diagonal corners. Lv 6–10 never touches the shore, Lv 1–5 never the core.
+const S = 50, DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
 const px = ([q, r]) => [S * Math.sqrt(3) * (q + r / 2), S * 1.5 * r];
+const same = (a, b) => a[0] === b[0] && a[1] === b[1];
 function ring(k) {
   const out = []; let cur = [DIRS[4][0] * k, DIRS[4][1] * k];
   for (let i = 0; i < 6; i++) for (let j = 0; j < k; j++) { out.push(cur); cur = [cur[0] + DIRS[i][0], cur[1] + DIRS[i][1]] }
   return out;
 }
-// Lay each ring's tiles as one arc, turned so the lower rows (later in the outward order) sit lowest on screen.
+const corner = (k, i) => [DIRS[i][0] * k, DIRS[i][1] * k];
+// Clockwise on screen from a start angle (degrees, screen y down: 90 is the bottom, 270 the top).
+const clockwise = (list, start) => [...list].sort((a, b) => {
+  const ang = (c) => { const [x, y] = px(c); return ((Math.atan2(y, x) * 180 / Math.PI - start) % 360 + 360) % 360 };
+  return ang(a) - ang(b);
+});
+const byRow = (row) => DATA.regions.filter((r) => r.row === row).sort((a, b) => a.col - b.col).map((r) => ({ kind: 'region', ...r }));
 const cells = [{ tile: { kind: 'capital' }, at: [0, 0] }];
-let next = 0;
-for (const [k, count] of [[1, 6], [2, 12], [3, 18], [4, 9]]) {
-  const slots = ring(k), tiles = outward.slice(next, next + count); next += count;
-  let best = null;
-  for (const dir of [1, -1]) for (let off = 0; off < slots.length; off++) {
-    const pick = tiles.map((_, i) => slots[((off + dir * i) % slots.length + slots.length) % slots.length]);
-    const score = pick.reduce((sum, c, i) => sum + i * px(c)[1], 0) + (count < slots.length ? 50 * pick.reduce((s, c) => s + px(c)[1], 0) : 0);
-    if (!best || score > best.score) best = { score, pick };
-  }
-  tiles.forEach((tile, i) => cells.push({ tile, at: best.pick[i] }));
+for (const c of ring(1)) cells.push({ tile: { kind: 'city' }, at: c });
+// Ring 2, from the top round: rows 10, 9, 8.
+clockwise(ring(2), 270).forEach((c, i) => cells.push({ tile: [...byRow(10), ...byRow(9), ...byRow(8)][i], at: c }));
+// Ring 3: Springs on the six corners, open ground on the top and bottom sides, rows 7 then 6 on the slanted sides.
+const r3 = ring(3), corners3 = DIRS.map((_, i) => corner(3, i));
+const springs = corners3.map((c, i) => ({ kind: 'spring', id: `w1-spring${i + 1}`, n: i + 1 }));
+corners3.forEach((c, i) => cells.push({ tile: springs[i], at: c }));
+const sides3 = r3.filter((c) => !corners3.some((k) => same(k, c)));
+const flat3 = sides3.filter((c) => Math.abs(c[1]) === 3);
+flat3.forEach((c) => cells.push({ tile: { kind: 'ground' }, at: c }));
+clockwise(sides3.filter((c) => Math.abs(c[1]) !== 3), 270).forEach((c, i) => cells.push({ tile: [...byRow(7), ...byRow(6)][i], at: c }));
+// Ring 4, the shore: open ground on the four diagonal corners, rows 1–5 clockwise from the bottom.
+const r4 = ring(4), diag4 = [1, 2, 4, 5].map((i) => corner(4, i));
+diag4.forEach((c) => cells.push({ tile: { kind: 'ground' }, at: c }));
+const shore = [1, 2, 3, 4, 5].flatMap(byRow);
+clockwise(r4.filter((c) => !diag4.some((k) => same(k, c))), 90).forEach((c, i) => cells.push({ tile: shore[i], at: c }));
+// Each region refills at its nearest Spring (HM3).
+const springOf = new Map();
+for (const cell of cells) if (cell.tile.kind === 'region') {
+  const [x, y] = px(cell.at); let best = null;
+  corners3.forEach((c, i) => { const [sx, sy] = px(c); const dd = (sx - x) ** 2 + (sy - y) ** 2; if (!best || dd < best.dd) best = { dd, n: i + 1 } });
+  springOf.set(cell.tile.id, best.n);
 }
+const SPRING_STATE = { 1: 'Ready', 2: 'Ready', 3: '1h 20m', 4: 'Ready', 5: 'Ready', 6: 'Ready' };
 
 const svg = document.getElementById('map'), ns = 'http://www.w3.org/2000/svg';
 const el = (tag, attrs, parent) => { const e = document.createElementNS(ns, tag); for (const [a, v] of Object.entries(attrs)) e.setAttribute(a, v); parent.appendChild(e); return e };
 const hexPts = (r) => Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 90); return `${(r * Math.cos(a)).toFixed(1)},${(r * Math.sin(a)).toFixed(1)}` }).join(' ');
 const pos = cells.map((c) => px(c.at));
 const minX = Math.min(...pos.map((p) => p[0])) - S - 6, maxX = Math.max(...pos.map((p) => p[0])) + S + 6;
-const minY = Math.min(...pos.map((p) => p[1])) - S - 14, maxY = Math.max(...pos.map((p) => p[1])) + S + 6;
+const minY = Math.min(...pos.map((p) => p[1])) - S - 6, maxY = Math.max(...pos.map((p) => p[1])) + S + 6;
 const W = maxX - minX, H = maxY - minY;
 svg.setAttribute('viewBox', `${minX} ${minY} ${W} ${H}`);
 const defs = el('defs', {}, svg);
 const gold = el('linearGradient', { id: 'gold', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
 el('stop', { offset: '0', 'stop-color': '#f3cf6a' }, gold); el('stop', { offset: '1', 'stop-color': '#c48b1f' }, gold);
 
-// Small biome glyphs: a handful of shapes, enough to tell biomes apart at a glance.
 const GLYPH = { meadow: 'tree', forest: 'tree', jungle: 'tree', coast: 'wave', swamp: 'wave', desert: 'sun', canyon: 'peak', volcano: 'flame', geyser: 'flame',
   peaks: 'peak', highlands: 'peak', glacier: 'crystal', crystal: 'crystal', tundra: 'snow', underworld: 'moon', haunted: 'moon', sky: 'cloud', ruins: 'pillar', twilight: 'star' };
-function glyph(kind, g, color) {
-  const p = { tree: 'M0,-7 L6,2 L2,2 L2,7 L-2,7 L-2,2 L-6,2 Z', wave: 'M-8,2 Q-4,-4 0,2 T8,2 L8,6 L-8,6 Z', sun: 'M0,-6 A6,6 0 1,1 -0.1,-6 Z', peak: 'M-8,6 L-2,-6 L2,0 L4,-3 L8,6 Z',
-    flame: 'M0,-8 C5,-2 6,2 3,6 C2,3 0,3 0,1 C-1,4 -4,4 -4,6 C-7,2 -4,-3 0,-8 Z', crystal: 'M0,-8 L5,-2 L0,8 L-5,-2 Z', snow: 'M0,-7 L0,7 M-6,-3.5 L6,3.5 M-6,3.5 L6,-3.5',
-    moon: 'M3,-7 A7,7 0 1,0 3,7 A5,5 0 1,1 3,-7 Z', cloud: 'M-7,4 A4,4 0 0,1 -5,-3 A5,5 0 0,1 4,-4 A4,4 0 0,1 7,4 Z', pillar: 'M-5,-6 L5,-6 L4,-4 L4,5 L5,7 L-5,7 L-4,5 L-4,-4 Z',
-    star: 'M0,-8 L2,-2 L8,-2 L3,2 L5,8 L0,4 L-5,8 L-3,2 L-8,-2 L-2,-2 Z' }[kind];
-  el('path', { d: p, fill: kind === 'snow' ? 'none' : color, stroke: kind === 'snow' ? color : 'none', 'stroke-width': 2, transform: 'translate(0,-17)' }, g);
+const SHAPES = { tree: 'M0,-7 L6,2 L2,2 L2,7 L-2,7 L-2,2 L-6,2 Z', wave: 'M-8,2 Q-4,-4 0,2 T8,2 L8,6 L-8,6 Z', sun: 'M0,-6 A6,6 0 1,1 -0.1,-6 Z', peak: 'M-8,6 L-2,-6 L2,0 L4,-3 L8,6 Z',
+  flame: 'M0,-8 C5,-2 6,2 3,6 C2,3 0,3 0,1 C-1,4 -4,4 -4,6 C-7,2 -4,-3 0,-8 Z', crystal: 'M0,-8 L5,-2 L0,8 L-5,-2 Z', snow: 'M0,-7 L0,7 M-6,-3.5 L6,3.5 M-6,3.5 L6,-3.5',
+  moon: 'M3,-7 A7,7 0 1,0 3,7 A5,5 0 1,1 3,-7 Z', cloud: 'M-7,4 A4,4 0 0,1 -5,-3 A5,5 0 0,1 4,-4 A4,4 0 0,1 7,4 Z', pillar: 'M-5,-6 L5,-6 L4,-4 L4,5 L5,7 L-5,7 L-4,5 L-4,-4 Z',
+  star: 'M0,-8 L2,-2 L8,-2 L3,2 L5,8 L0,4 L-5,8 L-3,2 L-8,-2 L-2,-2 Z' };
+function glyph(kind, g, color, y, scale = 1) {
+  el('path', { d: SHAPES[kind], fill: kind === 'snow' ? 'none' : color, stroke: kind === 'snow' ? color : 'none', 'stroke-width': 2, transform: `translate(0,${y}) scale(${scale})` }, g);
 }
+// The five faces sit on the hex (HM5): larger once completed, smaller while claimed.
 function faces(g, t, big) {
-  const r = big ? 6.2 : 4.6, gap = big ? 12.5 : 9.5, y = -S * 0.86;
+  const r = big ? 8 : 5.6, gap = big ? 16.4 : 12, y = -5;
   for (let i = 0; i < 5; i++) {
     const x = (i - 2) * gap;
-    el('circle', { cx: x, cy: y, r: r + 1.4, fill: 'var(--page)' }, g);
-    el('circle', { cx: x, cy: y, r, fill: t.color, opacity: big ? 1 : 0.8 }, g);
-    el('circle', { cx: x, cy: y - r * 0.25, r: r * 0.45, fill: '#fff', opacity: 0.45 }, g);
+    el('circle', { cx: x, cy: y, r: r + 1.6, fill: big ? '#e8b65a' : 'rgb(10 16 24 / 0.7)' }, g);
+    el('circle', { cx: x, cy: y, r, fill: t.color, opacity: big ? 1 : 0.85 }, g);
+    el('circle', { cx: x, cy: y - r * 0.28, r: r * 0.42, fill: '#fff', opacity: 0.45 }, g);
   }
 }
 let selected = null;
 cells.forEach((cell, i) => {
   const [x, y] = pos[i], t = cell.tile;
-  const g = el('g', { class: 'hex', transform: `translate(${x.toFixed(1)},${y.toFixed(1)})`, tabindex: 0, role: 'button' }, svg);
+  const g = el('g', { transform: `translate(${x.toFixed(1)},${y.toFixed(1)})` }, svg);
+  if (t.kind === 'ground') {
+    el('polygon', { points: hexPts(S - 3), fill: 'color-mix(in srgb, var(--success) 18%, var(--sunken))', stroke: 'var(--hairline)', 'stroke-width': 1 }, g);
+    glyph('peak', g, 'rgb(255 255 255 / 0.12)', 0, 1.4);
+    g.setAttribute('aria-hidden', 'true');
+    return;
+  }
+  if (t.kind === 'city') {
+    el('polygon', { points: hexPts(S - 2), fill: '#9a7a3a', stroke: '#6b4f18', 'stroke-width': 2 }, g);
+    el('path', { d: 'M-14,8 L-14,-2 L-8,-8 L-2,-2 L-2,8 Z M2,8 L2,-4 L8,-10 L14,-4 L14,8 Z', fill: '#e8d3a0', opacity: 0.8 }, g);
+    g.setAttribute('aria-hidden', 'true');
+    g.addEventListener('click', () => cells[0].pick());
+    g.style.cursor = 'pointer';
+    return;
+  }
+  g.setAttribute('class', 'hex'); g.setAttribute('tabindex', 0); g.setAttribute('role', 'button');
   if (t.kind === 'capital') {
     el('polygon', { points: hexPts(S - 2), fill: 'url(#gold)', class: 'rim', stroke: '#8a5a10', 'stroke-width': 2 }, g);
-    el('path', { d: 'M-12,8 L-12,-6 L-8,-6 L-8,-10 L-4,-10 L-4,-6 L4,-6 L4,-10 L8,-10 L8,-6 L12,-6 L12,8 Z M-3,8 L-3,1 L3,1 L3,8 Z', fill: '#4a2e06', transform: 'translate(0,-12)' }, g);
-    el('text', { y: 12, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 800, fill: '#2b1a03' }, g).textContent = 'Capital';
-    el('text', { y: 26, 'text-anchor': 'middle', 'font-size': 10, 'font-weight': 600, fill: '#3b2605' }, g).textContent = '2 runs won';
+    el('path', { d: 'M-12,8 L-12,-6 L-8,-6 L-8,-10 L-4,-10 L-4,-6 L4,-6 L4,-10 L8,-10 L8,-6 L12,-6 L12,8 Z M-3,8 L-3,1 L3,1 L3,8 Z', fill: '#4a2e06', transform: 'translate(0,-14)' }, g);
+    el('text', { y: 12, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 800, fill: '#2b1a03' }, g).textContent = 'Capital';
+    el('text', { y: 27, 'text-anchor': 'middle', 'font-size': 10.5, 'font-weight': 600, fill: '#3b2605' }, g).textContent = '2 runs won';
     g.setAttribute('aria-label', 'Capital, Lv 10, 2 runs won, 1 open');
   } else if (t.kind === 'spring') {
     el('polygon', { points: hexPts(S - 2), fill: 'color-mix(in srgb, var(--info) 70%, #0b2a52)', class: 'rim', stroke: 'var(--info)', 'stroke-width': 2 }, g);
     el('path', { d: 'M0,-10 C5,-3 7,0 7,4 A7,7 0 0,1 -7,4 C-7,0 -5,-3 0,-10 Z', fill: '#d8ecff', transform: 'translate(0,-12)' }, g);
-    el('text', { y: 12, 'text-anchor': 'middle', 'font-size': 11.5, 'font-weight': 800, fill: '#fff' }, g).textContent = 'Spring';
-    el('text', { y: 25, 'text-anchor': 'middle', 'font-size': 10, fill: '#dbe9ff' }, g).textContent = SPRING[t.id];
-    g.setAttribute('aria-label', `Spring, rows ${t.row}–${t.row + 1}, ${SPRING[t.id]}`);
+    el('text', { y: 12, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 800, fill: '#fff' }, g).textContent = 'Spring';
+    el('text', { y: 26, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#dbe9ff' }, g).textContent = SPRING_STATE[t.n];
+    g.setAttribute('aria-label', `Spring ${t.n}, ${SPRING_STATE[t.n]}`);
   } else {
-    const st = STATE[t.id] ?? { done: 0 }, complete = st.done === 12, touched = st.done > 0;
+    const st = STATE[t.id] ?? { done: 0 }, complete = st.done === 12, touched = st.done > 0, who = st.clear ?? st.claim;
     el('polygon', { points: hexPts(S - 2), fill: t.color, opacity: touched ? 1 : 0.5, class: 'rim', stroke: complete ? '#e8b65a' : 'var(--hairline-strong)', 'stroke-width': complete ? 3.5 : 1.5 }, g);
     el('polygon', { points: hexPts(S - 9), fill: 'rgb(10 16 24 / 0.42)' }, g);
     if (touched && !complete) {
       const len = 6 * (S - 9), part = len * st.done / 12;
-      el('polygon', { points: hexPts(S - 9), fill: 'none', stroke: '#e8b65a', 'stroke-width': 3, 'stroke-dasharray': `${part} ${len}`, transform: 'rotate(0)' }, g);
+      el('polygon', { points: hexPts(S - 9), fill: 'none', stroke: '#e8b65a', 'stroke-width': 3, 'stroke-dasharray': `${part} ${len}` }, g);
     }
-    glyph(GLYPH[t.biome] ?? 'star', g, 'rgb(255 255 255 / 0.85)');
+    glyph(GLYPH[t.biome] ?? 'star', g, 'rgb(255 255 255 / 0.85)', who ? -25 : -16, who ? 0.8 : 1);
+    if (who) faces(g, who, !!st.clear);
     const short = t.name.length > 12 ? t.name.replace('Ancient ', '').replace('Crystal ', '') : t.name;
-    el('text', { y: 3, 'text-anchor': 'middle', 'font-size': 10.5, 'font-weight': 700, fill: '#fff' }, g).textContent = short;
-    el('text', { y: 16, 'text-anchor': 'middle', 'font-size': 9.5, fill: '#e6edf5' }, g).textContent = `Lv ${t.level}–${t.top}`;
-    el('text', { y: 29, 'text-anchor': 'middle', 'font-size': 9.5, 'font-weight': 700, fill: complete ? '#f3cf6a' : '#e6edf5' }, g).textContent = complete ? '✓' : `${st.done}/12`;
-    if (t.row === 10) el('text', { x: 20, y: -22, 'text-anchor': 'middle', 'font-size': 9, fill: '#f3cf6a' }, g).textContent = '♛♛';
-    if (st.clear) faces(g, st.clear, true); else if (st.claim) faces(g, st.claim, false);
+    el('text', { y: who ? 16 : 4, 'text-anchor': 'middle', 'font-size': 10.5, 'font-weight': 700, fill: '#fff' }, g).textContent = short;
+    el('text', { y: who ? 29 : 17, 'text-anchor': 'middle', 'font-size': 9.5, 'font-weight': complete ? 800 : 400, fill: complete ? '#f3cf6a' : '#e6edf5' }, g)
+      .textContent = complete ? `✓ · Lv ${t.level}–${t.top}` : `Lv ${t.level}–${t.top} · ${st.done}/12`;
+    if (t.row === 10) el('text', { x: 22, y: -26, 'text-anchor': 'middle', 'font-size': 9.5, fill: '#f3cf6a' }, g).textContent = '♛♛';
     g.setAttribute('aria-label', `${t.name}, Lv ${t.level}–${t.top}, ${complete ? 'completed' : `${st.done} of 12`}${st.clear ? `, by Party ${st.clear.party}` : st.claim ? `, claimed by Party ${st.claim.party}` : ''}`);
   }
   const pick = () => { selected?.classList.remove('sel'); g.classList.add('sel'); selected = g; show(t) };
+  cell.pick = pick;
   g.addEventListener('click', pick); g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick() } });
   if (t.kind === 'capital') queueMicrotask(pick);
 });
@@ -265,15 +296,17 @@ function show(t) {
       CAPITAL.recent.map((r) => `<div class="runrow"><b>Run ${r.id}</b> <span class="k">· won ${r.on}</span>${r.parties.map(faceRow).join('')}</div>`).join('') +
       `<span class="btn">Open capital</span>`;
   } else if (t.kind === 'spring') {
-    panel.innerHTML = `<h3>Spring</h3><div class="k">Rows ${t.row}–${t.row + 1} · refills the active party's MP, then recharges for 2 hours</div>` +
-      `<p style="margin:14px 0 0;font-size:15px"><b>${SPRING[t.id]}</b></p><span class="btn">${SPRING[t.id] === 'Ready' ? 'Refill · Party 1' : 'Recharging'}</span>`;
+    const served = [...springOf.entries()].filter(([, n]) => n === t.n).map(([id]) => DATA.regions.find((r) => r.id === id).name);
+    panel.innerHTML = `<h3>Spring ${t.n}</h3><div class="k">Refills the active party's MP, then recharges for 2 hours · the ${served.length} regions nearest it refill here</div>` +
+      `<p style="margin:10px 0 0;font-size:13px;color:var(--ink-soft)">${served.join(' · ')}</p>` +
+      `<p style="margin:12px 0 0;font-size:15px"><b>${SPRING_STATE[t.n]}</b></p><span class="btn">${SPRING_STATE[t.n] === 'Ready' ? 'Refill · Party 1' : 'Recharging'}</span>`;
   } else {
     const st = STATE[t.id] ?? { done: 0 };
     const rows = [];
     if (st.clear) rows.push(`<div class="runrow"><b>First clear</b> <span class="k">· boss won ${st.on}</span>${faceRow(st.clear.party)}</div>`);
     if (st.claim && !st.clear) rows.push(`<div class="runrow"><b>Claimed</b> <span class="k">· first stage won</span>${faceRow(st.claim.party)}</div>`);
     if (st.old) rows.push(`<div class="runrow"><b>Completed</b> <span class="k">· before the record began: no faces kept</span></div>`);
-    panel.innerHTML = `<h3>${t.name}</h3><div class="k">Row ${t.row} · Lv ${t.level}–${t.top} · ${st.done}/12${t.row === 10 ? ' · double bosses' : ''}</div>` +
+    panel.innerHTML = `<h3>${t.name}</h3><div class="k">Row ${t.row} · Lv ${t.level}–${t.top} · ${st.done}/12${t.row === 10 ? ' · double bosses' : ''} · refills at Spring ${springOf.get(t.id)}</div>` +
       rows.join('') + `<div class="runrow"><b>Next</b> <span class="k">· ${st.done === 12 ? 'every stage cleared: replays and Sweeps' : `stage ${st.done + 1} · Lv ${Math.min(t.top, t.level + Math.floor(st.done / 2))}`}</span></div>` +
       `<span class="btn">Enter</span>`;
   }
@@ -293,13 +326,14 @@ setZoom(fit());
 const legend = document.getElementById('legend');
 const lgItem = (svgInner, text) => { const d = document.createElement('div'); d.className = 'lg'; d.innerHTML = `<svg width="46" height="46" viewBox="-26 -30 52 56">${svgInner}</svg><span>${text}</span>`; legend.appendChild(d) };
 const mini = (fill, stroke, extra = '', op = 1) => `<polygon points="${hexPts(22)}" fill="${fill}" opacity="${op}" stroke="${stroke}" stroke-width="2"/>${extra}`;
-const dots = (big) => Array.from({ length: 5 }, (_, i) => `<circle cx="${(i - 2) * (big ? 7 : 5.5)}" cy="-19" r="${big ? 3.4 : 2.6}" fill="${PARTY[0]}" stroke="var(--panel)" stroke-width="1"/>`).join('');
+const dots = (big) => Array.from({ length: 5 }, (_, i) => `<circle cx="${(i - 2) * (big ? 8 : 6)}" cy="-2" r="${big ? 3.8 : 2.8}" fill="${PARTY[0]}" stroke="${big ? '#e8b65a' : 'var(--panel)'}" stroke-width="1"/>`).join('');
 lgItem(mini('#7fbf5a', 'var(--hairline-strong)', '', 0.5), '<b>Untouched</b>: muted, 0/12');
 lgItem(mini('#7fbf5a', 'var(--hairline-strong)', `<polygon points="${hexPts(16)}" fill="none" stroke="#e8b65a" stroke-width="3" stroke-dasharray="40 200"/>` + dots(false)), '<b>Claimed</b>: the five who won its first stage, small; its progress as an arc');
-lgItem(mini('#7fbf5a', '#e8b65a', '<text y="6" text-anchor="middle" font-size="14" fill="#f3cf6a">✓</text>' + dots(true)), '<b>Completed</b>: the five who first won its boss, a gold rim and ✓');
+lgItem(mini('#7fbf5a', '#e8b65a', dots(true)), '<b>Completed</b>: the five who first won its boss, large across the hex, a gold rim and ✓');
 lgItem(mini('#7fbf5a', '#e8b65a', '<text y="6" text-anchor="middle" font-size="14" fill="#f3cf6a">✓</text>'), '<b>Completed before the record</b>: ✓, no faces');
-lgItem(mini('color-mix(in srgb, var(--info) 70%, #0b2a52)', 'var(--info)', '<path d="M0,-9 C4,-3 6,0 6,3 A6,6 0 0,1 -6,3 C-6,0 -4,-3 0,-9 Z" fill="#d8ecff"/>'), '<b>Spring</b>: between the two rows it serves; tap to refill');
-lgItem(mini('url(#gold)', '#8a5a10', '<text y="5" text-anchor="middle" font-size="9" font-weight="800" fill="#2b1a03">Capital</text>'), '<b>Capital</b>: the centre; tap for its open and last three won runs');
+lgItem(mini('color-mix(in srgb, var(--info) 70%, #0b2a52)', 'var(--info)', '<path d="M0,-9 C4,-3 6,0 6,3 A6,6 0 0,1 -6,3 C-6,0 -4,-3 0,-9 Z" fill="#d8ecff"/>'), '<b>Spring</b>: six, on the inner band\'s corners; each region refills at its nearest');
+lgItem(mini('url(#gold)', '#8a5a10', '<text y="5" text-anchor="middle" font-size="9" font-weight="800" fill="#2b1a03">Capital</text>'), '<b>Capital</b>: the centre and its city ring; tap for its open and last three won runs');
+lgItem(mini('color-mix(in srgb, var(--success) 18%, var(--sunken))', 'var(--hairline)'), '<b>Open ground</b>: eight hexes that keep the bands clean and the honeycomb symmetric');
 legend.querySelectorAll('svg').forEach((s) => { const d = document.createElementNS(ns, 'defs'); d.innerHTML = gold.outerHTML; s.prepend(d) });
 
 for (const b of document.querySelectorAll('.bar button')) b.addEventListener('click', () => {
