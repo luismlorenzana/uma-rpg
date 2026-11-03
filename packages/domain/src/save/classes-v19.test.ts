@@ -169,7 +169,7 @@ describe('her class tree (§14.1, UP23)', () => {
     expect(tiles(save)).toEqual([
       'recruit 0 on R10 +400', 'duelist 0 open R1', 'acolyte 0 open R1', 'caller 0 available R3', 'apprentice 0 open R1',
       'brawler 1 ready R1 · Suggested', 'spellblade 1 ready R1', 'armsummoner 1 ready R1',
-      'paladin 1 closed R1 · Opens with Healer R10', 'cleric 1 closed R1 · Opens with Healer R10',
+      'paladin 1 closed R1 · Opens with Healer R10 or Spellblade R10', 'cleric 1 closed R1 · Opens with Healer R10 or Summoner R10',
       'summoner 1 closed R1 · Opens with Summoner, Mage or Healer R10', 'tomeblade 1 closed R1 · Opens with Spellblade, Mage or Summoner R10',
       'mage 1 closed R1 · Opens with Mage R10',
     ])

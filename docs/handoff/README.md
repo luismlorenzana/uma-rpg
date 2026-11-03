@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-11-02, after D290.** Tier 1 is built and live: engine v21, save v36. That covers the Tier rework's R1
+> **Status: 2026-11-02, after D291.** Tier 1 is built and live: engine v21, save v36. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -59,7 +59,7 @@ the places borrow existing buildings until then. uma-platform's `latest` is rele
 which carries the pane maps; undo with `pnpm release:publish -- --rollback f8ab287029e8` in uma-platform.
 
 **The reclass** ([doc](../design/reclass/reclass.md), [preview](../design/reclass/previews/reclass.html)) is live (D290):
-every calling promotes into three Tier 1 classes, the Healer into four.
+the Warrior and the Mage promote into three Tier 1 classes, the Spellblade, the Summoner and the Healer into four (D291).
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.

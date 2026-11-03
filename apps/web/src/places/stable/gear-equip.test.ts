@@ -57,6 +57,7 @@ describe('the standard presets (D263)', () => {
       { pick: 'spellblade', title: 'Arms Spellblade', detail: 'Katana · Axe · Thunder Tome', accessories: 'Pendant · Pendant · Orb', on: false },
       { pick: 'tomeblade', title: 'Tome Spellblade', detail: 'Thunder Tome · Blizzard Tome · Katana', accessories: 'Pendant · Charm · Orb', on: false },
       { pick: 'armsummoner', title: 'Arms Summoner', detail: 'Bow · Axe · Dark Tome', accessories: 'Pendant · Pendant · Orb', on: false },
+      { pick: 'paladin', title: 'Paladin', detail: 'Lance · Greatsword · Light Tome', accessories: 'Pendant · Pendant · Orb', on: false },
     ])
     expect(presetRows(world('recruit'), '101', 'recruit', 'bell').map((r) => r.title)).toEqual(['Brawler', 'Arms Spellblade', 'Arms Summoner'])
   })

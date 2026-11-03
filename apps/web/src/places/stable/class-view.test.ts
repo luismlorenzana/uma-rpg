@@ -120,7 +120,7 @@ describe('the Classes sheet from v19 (Uma C)', () => {
     expect(footer('armsummoner')).toEqual({ label: 'Promote to Arms Summoner', act: 'promote' })
     expect(footer('duelist')).toEqual({ label: 'Start Spellblade · R1', act: 'start' })
     expect(footer('tomeblade')).toEqual({ label: 'Opens with Spellblade, Mage or Summoner R10', act: null })
-    expect(footer('paladin')).toEqual({ label: 'Opens with Healer R10', act: null })
+    expect(footer('paladin')).toEqual({ label: 'Opens with Healer R10 or Spellblade R10', act: null })
   })
 
   it('writes the selection\'s line: name and state, slots and role, defaults and hand; a Tier 0 its skill and children', () => {
@@ -157,10 +157,10 @@ describe('the promotion sheet from v19', () => {
     expect(rows('recruit', wit)).toEqual(['Promote · Warrior R10', ['Brawler · Suggested', 'Arms Spellblade', 'Arms Summoner'], 'Brawler'])
     expect(rows('apprentice', power)).toEqual(['Promote · Mage R10', ['Sorcerer · Suggested', 'Tome Spellblade', 'Tome Summoner'], 'Sorcerer'])
     // The kin classes (D290) follow the family's own, never Suggested.
-    expect(rows('duelist', power)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade · Suggested', 'Tome Spellblade', 'Arms Summoner'], 'Arms Spellblade'])
-    expect(rows('duelist', wit)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade', 'Tome Spellblade · Suggested', 'Arms Summoner'], 'Tome Spellblade'])
-    expect(rows('caller', power)[1]).toEqual(['Arms Summoner · Suggested', 'Tome Summoner', 'Tome Spellblade'])
-    expect(rows('caller', wit)[1]).toEqual(['Arms Summoner', 'Tome Summoner · Suggested', 'Tome Spellblade'])
+    expect(rows('duelist', power)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade · Suggested', 'Tome Spellblade', 'Arms Summoner', 'Paladin'], 'Arms Spellblade'])
+    expect(rows('duelist', wit)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade', 'Tome Spellblade · Suggested', 'Arms Summoner', 'Paladin'], 'Tome Spellblade'])
+    expect(rows('caller', power)[1]).toEqual(['Arms Summoner · Suggested', 'Tome Summoner', 'Tome Spellblade', 'Cleric'])
+    expect(rows('caller', wit)[1]).toEqual(['Arms Summoner', 'Tome Summoner · Suggested', 'Tome Spellblade', 'Cleric'])
     expect(rows('acolyte', power)[1]).toEqual(['Paladin · Suggested', 'Arms Spellblade', 'Cleric', 'Tome Summoner'])
     expect(rows('acolyte', wit)[1]).toEqual(['Paladin', 'Arms Spellblade', 'Cleric · Suggested', 'Tome Summoner'])
   })
@@ -168,8 +168,10 @@ describe('the promotion sheet from v19', () => {
   it('leaves out a row the same on every tile, which since the kin (D290) no Tier 0\'s sheet has', () => {
     const tiles = (tier0: 'recruit' | 'duelist' | 'acolyte' | 'caller') => promotionSheet(C, at10(tier0), 1, tier0).tiles.map((t) => [t.slots, t.role])
     expect(tiles('recruit')).toEqual([['3 Arms', 'One act ×1'], ['2 Arms + 1 Tome', 'Multi-hit'], ['2 Arms + 1 Tome', 'Area · lingers']])
-    expect(tiles('duelist')).toEqual([['2 Arms + 1 Tome', 'Multi-hit'], ['2 Tomes + 1 Arm', 'Multi-hit'], ['2 Arms + 1 Tome', 'Area · lingers']])
-    expect(tiles('caller')).toEqual([['2 Arms + 1 Tome', 'Area · lingers'], ['2 Tomes + 1 Arm', 'Area · lingers'], ['2 Tomes + 1 Arm', 'Multi-hit']])
+    expect(tiles('duelist')).toEqual([['2 Arms + 1 Tome', 'Multi-hit'], ['2 Tomes + 1 Arm', 'Multi-hit'], ['2 Arms + 1 Tome', 'Area · lingers'],
+      ['2 Arms + 1 Tome', 'Healer · ATK']])
+    expect(tiles('caller')).toEqual([['2 Arms + 1 Tome', 'Area · lingers'], ['2 Tomes + 1 Arm', 'Area · lingers'], ['2 Tomes + 1 Arm', 'Multi-hit'],
+      ['2 Tomes + 1 Arm', 'Healer · M.ATK']])
     expect(tiles('acolyte')).toEqual([['2 Arms + 1 Tome', 'Healer · ATK'], ['2 Arms + 1 Tome', 'Multi-hit'], ['2 Tomes + 1 Arm', 'Healer · M.ATK'],
       ['2 Tomes + 1 Arm', 'Area · lingers']])
     expect(promotionSheet(C, at10('recruit'), 1, 'recruit').tiles[2]!.weapons).toEqual(['bow', 'axe', 'tome-dark'])

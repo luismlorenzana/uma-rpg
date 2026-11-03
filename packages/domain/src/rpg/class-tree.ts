@@ -26,14 +26,15 @@ export const RPG_CLASS_OWN: Readonly<Record<RpgTier0Class, readonly RpgTier1Clas
   caller: ['armsummoner', 'summoner'],
   apprentice: ['mage', 'tomeblade', 'summoner'],
 }
-/** Each Tier 0's children, in the promotion sheet's order: its own and, since the reclass (D290), its kin, so every Tier
- * 0 promotes into three or more. The pure roots stay pure and healing stays the Healer's; the Spellblade and the
- * Summoner open one of each other's (pacts with familiars), the Healer both hybrids' other halves. */
+/** Each Tier 0's children, in the promotion sheet's order: its own and, since the reclass (D290, D291), its kin, so every
+ * Tier 0 promotes into three or more. The pure roots stay pure; the Spellblade and the Summoner open one of each other's
+ * (pacts with familiars) and a healer each, the Spellblade the Paladin and the Summoner the Cleric; the Healer opens both
+ * hybrids' other halves. */
 export const RPG_CLASS_CHILDREN: Readonly<Record<RpgTier0Class, readonly RpgTier1Class[]>> = {
   recruit: ['brawler', 'spellblade', 'armsummoner'],
-  duelist: ['spellblade', 'tomeblade', 'armsummoner'],
+  duelist: ['spellblade', 'tomeblade', 'armsummoner', 'paladin'],
   acolyte: ['paladin', 'spellblade', 'cleric', 'summoner'],
-  caller: ['armsummoner', 'summoner', 'tomeblade'],
+  caller: ['armsummoner', 'summoner', 'tomeblade', 'cleric'],
   apprentice: ['mage', 'tomeblade', 'summoner'],
 }
 /** Each Tier 1 class's parents, in its gate text's order ("Opens with Warrior R10 or Summoner R10"): its own Tier 0s
@@ -42,8 +43,8 @@ export const RPG_CLASS_PARENTS: Readonly<Record<RpgTier1Class, readonly RpgTier0
   brawler: ['recruit'],
   spellblade: ['recruit', 'duelist', 'acolyte'],
   armsummoner: ['recruit', 'caller', 'duelist'],
-  paladin: ['acolyte'],
-  cleric: ['acolyte'],
+  paladin: ['acolyte', 'duelist'],
+  cleric: ['acolyte', 'caller'],
   summoner: ['caller', 'apprentice', 'acolyte'],
   tomeblade: ['duelist', 'apprentice', 'caller'],
   mage: ['apprentice'],

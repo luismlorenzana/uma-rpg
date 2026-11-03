@@ -21,25 +21,25 @@ describe('the class tree (CV1, §1)', () => {
       brawler: ['●', '', '', '', ''],
       spellblade: ['●', '●', '●', '', ''],
       armsummoner: ['●', '●', '', '●', ''],
-      paladin: ['', '', '●', '', ''],
-      cleric: ['', '', '●', '', ''],
+      paladin: ['', '●', '●', '', ''],
+      cleric: ['', '', '●', '●', ''],
       summoner: ['', '', '●', '●', '●'],
       tomeblade: ['', '●', '', '●', '●'],
       mage: ['', '', '', '', '●'],
     })
     // The parents in the gate's order, and children the promotion sheet's.
     expect(RPG_CLASS_PARENTS).toEqual({
-      brawler: ['recruit'], spellblade: ['recruit', 'duelist', 'acolyte'], armsummoner: ['recruit', 'caller', 'duelist'], paladin: ['acolyte'],
-      cleric: ['acolyte'], summoner: ['caller', 'apprentice', 'acolyte'], tomeblade: ['duelist', 'apprentice', 'caller'], mage: ['apprentice'],
+      brawler: ['recruit'], spellblade: ['recruit', 'duelist', 'acolyte'], armsummoner: ['recruit', 'caller', 'duelist'], paladin: ['acolyte', 'duelist'],
+      cleric: ['acolyte', 'caller'], summoner: ['caller', 'apprentice', 'acolyte'], tomeblade: ['duelist', 'apprentice', 'caller'], mage: ['apprentice'],
     })
-    // The reclass (D290): three children for every Tier 0, four for the Healer; the pure roots and the healers stay their own.
+    // The reclass (D290, D291): three for the Warrior and the Mage, four for the hybrids; the pure roots stay their own.
     expect(RPG_CLASS_CHILDREN).toEqual({
-      recruit: ['brawler', 'spellblade', 'armsummoner'], duelist: ['spellblade', 'tomeblade', 'armsummoner'],
-      acolyte: ['paladin', 'spellblade', 'cleric', 'summoner'], caller: ['armsummoner', 'summoner', 'tomeblade'], apprentice: ['mage', 'tomeblade', 'summoner'],
+      recruit: ['brawler', 'spellblade', 'armsummoner'], duelist: ['spellblade', 'tomeblade', 'armsummoner', 'paladin'],
+      acolyte: ['paladin', 'spellblade', 'cleric', 'summoner'], caller: ['armsummoner', 'summoner', 'tomeblade', 'cleric'],
+      apprentice: ['mage', 'tomeblade', 'summoner'],
     })
     expect(RPG_CLASS_PARENTS.brawler).toEqual(['recruit'])
     expect(RPG_CLASS_PARENTS.mage).toEqual(['apprentice'])
-    expect([RPG_CLASS_PARENTS.paladin, RPG_CLASS_PARENTS.cleric]).toEqual([['acolyte'], ['acolyte']])
     // Every edge both ways.
     for (const t0 of RPG_TIER0_CLASSES) for (const c of RPG_CLASS_CHILDREN[t0]) expect(RPG_CLASS_PARENTS[c], `${t0} → ${c}`).toContain(t0)
     for (const c of RPG_TIER1_CLASSES) for (const p of RPG_CLASS_PARENTS[c]) expect(RPG_CLASS_CHILDREN[p], `${p} → ${c}`).toContain(c)
@@ -109,7 +109,7 @@ describe('names and gates (CV3, CV4, CV8–CV10)', () => {
     expect(rpgClassGate(fresh, 'armsummoner', 1, V19)).toBe('Opens with Warrior, Summoner or Spellblade R10')
     expect(RPG_TIER1_CLASSES.map(rpgClassClosedText)).toEqual([
       'Opens with Warrior R10', 'Opens with Warrior, Spellblade or Healer R10', 'Opens with Warrior, Summoner or Spellblade R10',
-      'Opens with Healer R10', 'Opens with Healer R10', 'Opens with Summoner, Mage or Healer R10',
+      'Opens with Healer R10 or Spellblade R10', 'Opens with Healer R10 or Summoner R10', 'Opens with Summoner, Mage or Healer R10',
       'Opens with Spellblade, Mage or Summoner R10', 'Opens with Mage R10',
     ])
     // Ready to promote: the gate names the parent; held from Rank 10.

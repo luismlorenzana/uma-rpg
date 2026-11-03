@@ -1,8 +1,8 @@
 # Reclass: every calling promotes into three classes
 
-**Status:** approved and built, 2026-11-02 (D290), with the owner's one change: the Healer promotes into four, the
-Paladin, the **Arms Spellblade**, the Cleric and the **Tome Summoner** ("more symmetric"), not three. Everything else
-stands as proposed. The preview page is [previews/reclass.html](previews/reclass.html) (the tree before and after, each
+**Status:** approved and built, 2026-11-02 (D290, D291), with the owner's two changes: the Healer promotes into four, the
+Paladin, the **Arms Spellblade**, the Cleric and the **Tome Summoner** ("more symmetric"); and the Spellblade can become a
+**Paladin** and the Summoner a **Cleric**, so limit 2 below no longer holds. Everything else stands as proposed. The preview page is [previews/reclass.html](previews/reclass.html) (the tree before and after, each
 calling's classes and their weapons). The manual's [reclassing](../../game/classes.md#reclassing) has the rules as built.
 
 ## The owner's points
@@ -37,8 +37,8 @@ Four limits, so every class keeps what it is:
 
 1. **The pure roots stay pure.** The Brawler opens only from the Warrior, the Sorcerer only from the Mage. These are
    the owner's balanced pair: the physical root and the magical root, never a hybrid's side door.
-2. **Healing stays the Healer's.** The Paladin and the Cleric open only from the Healer, so the one-healer-a-party rule
-   keeps its weight and a healer is still a calling, not a pick-up.
+2. ~~**Healing stays the Healer's.**~~ Dropped by the owner (D291): the Spellblade also opens the **Paladin** (her Arms
+   side) and the Summoner the **Cleric** (her Tome side). One healer a party still holds.
 3. **The Spellblade and the Summoner are kin.** The Spellblade Salle's word is "pacts with familiars", the Summoner
    Circle's "familiars, summoned": each opens one of the other's classes, on the side it already leans to. The
    Spellblade (modelled on the Arms Spellblade) opens the **Arms Summoner**; the Summoner (modelled on the Tome
@@ -50,12 +50,12 @@ Four limits, so every class keeps what it is:
 |---|---|---|---|
 | Warrior | Brawler, Arms Spellblade, Arms Summoner | — | 7 |
 | Mage | Sorcerer, Tome Spellblade, Tome Summoner | — | 6 |
-| Spellblade | Arms Spellblade, Tome Spellblade, **Arms Summoner** | Arms Summoner | 6 |
-| Summoner | Arms Summoner, Tome Summoner, **Tome Spellblade** | Tome Spellblade | 6 |
+| Spellblade | Arms Spellblade, Tome Spellblade, **Arms Summoner**, **Paladin** | Arms Summoner, Paladin | 9 |
+| Summoner | Arms Summoner, Tome Summoner, **Tome Spellblade**, **Cleric** | Tome Spellblade, Cleric | 9 |
 | Healer | Paladin, **Arms Spellblade**, Cleric, **Tome Summoner** | Arms Spellblade, Tome Summoner | 10 (all of them) |
 
 Every calling then reaches Class V and the Weapons track inside its own family, on the presets alone. The tree gets
-four new edges; no class closes, none is removed.
+six new edges; no class closes, none is removed.
 
 **Each Tier 1 class's parents, after:**
 
@@ -64,8 +64,8 @@ four new edges; no class closes, none is removed.
 | Brawler | Warrior |
 | Arms Spellblade | Warrior, Spellblade, **Healer** |
 | Arms Summoner | Warrior, Summoner, **Spellblade** |
-| Paladin | Healer |
-| Cleric | Healer |
+| Paladin | Healer, **Spellblade** |
+| Cleric | Healer, **Summoner** |
 | Tome Summoner | Mage, Summoner, **Healer** |
 | Tome Spellblade | Mage, Spellblade, **Summoner** |
 | Sorcerer | Mage |
@@ -91,7 +91,7 @@ and each link has a reason already in the game (the halls' words, the Sanctum's 
   stays valid, since only new doors open. An Uma whose Spellblade, Summoner or Healer is already at Rank 10 sees her new
   child **Ready** at once.
 - **No engine bump either.** A fight reads the class she fights as, never the tree, so an open fight replays the same.
-- **The promotion sheet:** three children for every Tier 0 (four for the Healer), the Suggested badge unchanged in spirit (the family's own
+- **The promotion sheet:** three children for the Warrior and the Mage, four for the hybrids, the Suggested badge unchanged in spirit (the family's own
   class first: the Spellblade's Arms or Tome Spellblade by Power and Wit, the Summoner's Arms or Tome Summoner, the
   Healer's Paladin or Cleric), the kin class never suggested.
 - **The manual:** classes.md's tree, its Tier 0 table (live, from the code) and the reclass table; the class tree preview
@@ -106,7 +106,7 @@ and each link has a reason already in the game (the halls' words, the Sanctum's 
 |---|---|---|
 | RC1 | Three children for every Tier 0 | Approved |
 | RC2 | The pure roots stay pure (Brawler from the Warrior, Sorcerer from the Mage) | Approved |
-| RC3 | Healers only from the Healer | Approved |
+| RC3 | Healers only from the Healer | Dropped (D291): the Spellblade opens the Paladin, the Summoner the Cleric |
 | RC4 | Kin: the Spellblade opens the Arms Summoner, the Summoner the Tome Spellblade | Approved |
 | RC5 | The Healer opens the Arms Spellblade and the Tome Summoner (the owner's change; proposed: the Tome Summoner) | Approved |
 | RC6 | The kin class is never Suggested, and a Flourish doesn't work as it; its preset is offered | Approved |

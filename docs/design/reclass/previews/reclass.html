@@ -108,20 +108,20 @@
   <div class="bar"><span style="color:var(--ink-soft);font-size:12.5px">Theme</span>
     <button type="button" data-t="system" aria-pressed="true">System</button><button type="button" data-t="light" aria-pressed="false">Light</button><button type="button" data-t="dark" aria-pressed="false">Dark</button></div>
   <h1>Reclass: three classes for every calling</h1>
-  <p class="lead">Approved and built (reclass.md, D290). Every Tier 0 promotes into three Tier 1 classes, the Healer into four, by
-    four identity limits: the pure roots stay pure, healing stays the Healer's, the Spellblade and the Summoner are kin, and the
-    Healer opens both hybrids' other halves. Four new links, nothing closed.</p>
+  <p class="lead">Approved and built (reclass.md, D290, D291). The Warrior and the Mage promote into three Tier 1 classes, the
+    Spellblade, the Summoner and the Healer into four: the pure roots stay pure, the Spellblade and the Summoner are kin and each
+    opens a healer, and the Healer opens both hybrids' other halves. Six new links, nothing closed.</p>
 
   <div class="trees">
     <div class="card"><h3>Before</h3><p class="sub">Spellblade, Summoner and Healer reached two classes inside their family.</p><svg class="tree" id="today" viewBox="0 0 520 250" role="img" aria-label="The class tree before"></svg></div>
-    <div class="card"><h3>Built</h3><p class="sub">Every Tier 0 reaches three, the Healer four. The new links are gold.</p><svg class="tree" id="proposed" viewBox="0 0 520 250" role="img" aria-label="The class tree built"></svg></div>
+    <div class="card"><h3>Built</h3><p class="sub">Every Tier 0 reaches three or four. The new links are gold.</p><svg class="tree" id="proposed" viewBox="0 0 520 250" role="img" aria-label="The class tree built"></svg></div>
   </div>
   <div class="legend"><span><i></i>Promoted into before</span><span><i class="new"></i>New</span><span>Top row: the five Tier 0s (callings). Bottom row: the eight Tier 1 classes.</span></div>
 
   <h2>The four limits</h2>
   <div class="rules">
     <div class="rule"><b>1 · The pure roots stay pure</b><span>The Brawler opens only from the Warrior, the Sorcerer only from the Mage: the physical and the magical root, never a hybrid's side door.</span></div>
-    <div class="rule"><b>2 · Healing stays the Healer's</b><span>The Paladin and the Cleric open only from the Healer, so a healer is still a calling and one-healer-a-party keeps its weight.</span></div>
+    <div class="rule"><b>2 · Each hybrid opens a healer</b><span>The Spellblade opens the Paladin (Arms), the Summoner the Cleric (Tomes); the owner's change. One healer a party still holds.</span></div>
     <div class="rule"><b>3 · The Spellblade and the Summoner are kin</b><span>"Pacts with familiars" and "familiars, summoned": the Spellblade opens the Arms Summoner, the Summoner the Tome Spellblade, each on the side it leans to.</span></div>
     <div class="rule"><b>4 · The Healer opens both hybrids' other halves</b><span>The Arms Spellblade and the Tome Summoner, one of each channel: her four are symmetric, Arms and Tome, healer and hybrid (the owner's change).</span></div>
   </div>
@@ -138,7 +138,7 @@ const T0 = ['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'];
 const T1 = ['brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage'];
 const TODAY = { recruit: ['brawler', 'spellblade', 'armsummoner'], duelist: ['spellblade', 'tomeblade'], acolyte: ['paladin', 'cleric'],
   caller: ['armsummoner', 'summoner'], apprentice: ['mage', 'tomeblade', 'summoner'] };
-const ADDED = { duelist: ['armsummoner'], caller: ['tomeblade'], acolyte: ['spellblade', 'summoner'] };
+const ADDED = { duelist: ['armsummoner', 'paladin'], caller: ['tomeblade', 'cleric'], acolyte: ['spellblade', 'summoner'] };
 const COUNT = { recruit: 48, duelist: 72, acolyte: 46, caller: 34, apprentice: 72 };
 const PRESET = { brawler: ['greatsword', 'axe', 'lance'], spellblade: ['katana', 'axe', 'lightning'], armsummoner: ['bow', 'axe', 'dark'],
   paladin: ['lance', 'greatsword', 'light'], cleric: ['light', 'fire', 'lance'], summoner: ['dark', 'ice', 'bow'],
