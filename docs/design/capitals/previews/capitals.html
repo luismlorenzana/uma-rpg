@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capital Runs</title>
+<!-- Capitals v2 (docs/design/capitals/capitals.md): a capital as a mini Rift. A run's shape (four parties, four lanes of three
+     generals, four final bosses), the three screens as phone mockups, and the pacing against today's capitals.
+     Self-contained: uma-kit's tokens, light and dark; no external scripts, fonts or images. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #b8770a; --info: #2f6fe0; --locked: #8a94a3;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --neutral: #a9b4c2; --neutral-strong: #7d8a9b;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --bad: #c23b33; --bad-wash: #fbe4e2; --good-wash: #e2f2e8;
+    --cl-recruit: #8f6a58; --cl-apprentice: #5c78aa; --cl-duelist: #9c8642; --cl-caller: #8873aa; --cl-acolyte: #4f907a;
+    --cl-brawler: #b9532f; --cl-mage: #3466c9; --cl-spellblade: #b97900; --cl-tomeblade: #1d8aa2; --cl-armsummoner: #6c7d1c;
+    --cl-summoner: #8a52c7; --cl-paladin: #2e8b57; --cl-cleric: #c94a80;
+    --k-greatsword: #d9772b; --k-axe: #8a52c7; --k-lance: #2f9a4f; --k-bow: #3aa38f; --k-katana: #c4466e;
+    --k-fire: #d23a2f; --k-ice: #2f7fd6; --k-lightning: #c9a400; --k-light: #b89a3a; --k-dark: #6d48b8;
+    --f-pendant: #2a78d6; --f-orb: #eb6834; --f-bell: #1baf7a; --f-insignia: #6250d6;
+    --bezel: #0d1117; --scrim: rgb(8 12 18 / 0.45);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+      --cl-recruit: #c09482; --cl-apprentice: #8ea8d8; --cl-duelist: #cdb672; --cl-caller: #b8a3da; --cl-acolyte: #7ec2aa;
+      --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-tomeblade: #45bad4; --cl-armsummoner: #a8bb46;
+      --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+      --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+      --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+      --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+      --scrim: rgb(0 0 0 / 0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312; --accent-ink: #1b1406;
+    --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --grid: #243041; --neutral: #4a586b; --neutral-strong: #6b7a8e;
+    --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+    --bad: #e0645c; --bad-wash: #3a1d1c; --good-wash: #173023;
+    --cl-recruit: #c09482; --cl-apprentice: #8ea8d8; --cl-duelist: #cdb672; --cl-caller: #b8a3da; --cl-acolyte: #7ec2aa;
+    --cl-brawler: #e0764e; --cl-mage: #6b93ec; --cl-spellblade: #e0a42c; --cl-tomeblade: #45bad4; --cl-armsummoner: #a8bb46;
+    --cl-summoner: #b388ec; --cl-paladin: #4cb57d; --cl-cleric: #ec79aa;
+    --k-greatsword: #f0904a; --k-axe: #b388ec; --k-lance: #4cc072; --k-bow: #5cc9b2; --k-katana: #ec6d97;
+    --k-fire: #f0645a; --k-ice: #5ea4f0; --k-lightning: #e8c84a; --k-light: #dcc06a; --k-dark: #9a7ae6;
+    --f-pendant: #3987e5; --f-orb: #d95926; --f-bell: #199e70; --f-insignia: #9085e9;
+    --scrim: rgb(0 0 0 / 0.55);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 32px 24px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 36px 0 10px; }
+  p.lead { color: var(--ink-soft); margin: 0 0 20px; max-width: 800px; }
+  .sub { color: var(--ink-soft); font-size: 13px; margin: 0 0 12px; max-width: 820px; }
+  .bar { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+  .bar button { border: 1px solid var(--hairline-strong); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 6px 12px; font: inherit; cursor: pointer; }
+  .bar button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .card { background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px; padding: 16px; }
+  svg.flow { width: 100%; height: auto; display: block; }
+  svg.flow text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--ink); }
+  .phones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .phone { background: #0f1620; color: #e9eef4; border-radius: 28px; border: 6px solid var(--bezel); padding: 14px 12px 18px; min-height: 690px; font-size: 13px; position: relative; overflow: hidden; }
+  .phone h4 { margin: 0 0 2px; font-size: 16px; }
+  .phone .muted { color: #a6b3c2; font-size: 12px; }
+  .ptop { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .pcard { background: #1f2a37; border-radius: 12px; padding: 10px; margin: 8px 0; }
+  .pbtn { display: block; text-align: center; background: #d6a23e; color: #1b1406; font-weight: 700; border-radius: 10px; padding: 10px; margin-top: 10px; }
+  .pbtn.ghost { background: transparent; color: #a6b3c2; border: 1px solid rgb(255 255 255 / 0.16); font-weight: 600; }
+  .pbtn.off { opacity: 0.45; }
+  .faces { display: flex; gap: 4px; margin: 6px 0; }
+  .face { width: 26px; height: 26px; border-radius: 50%; background: #2b3a4c; border: 1px solid rgb(255 255 255 / 0.16); }
+  .pips { display: inline-flex; gap: 4px; vertical-align: middle; }
+  .pip { width: 9px; height: 9px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
+  .pip.on { background: #d6a23e; }
+  .el { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 3px; vertical-align: middle; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .pick { background: #17202b; border: 1px solid rgb(255 255 255 / 0.16); border-radius: 8px; padding: 6px 8px; font-size: 12px; }
+  .locked { color: #6f7d8e; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 70px; background: #17202b; border-radius: 18px 18px 0 0; padding: 14px 12px; box-shadow: 0 -8px 24px rgb(0 0 0 / 0.4); }
+  .grab { width: 40px; height: 4px; border-radius: 2px; background: #4a586b; margin: 0 auto 10px; }
+  table { border-collapse: collapse; width: 100%; background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px; overflow: hidden; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  th { font-size: 12px; color: var(--ink-soft); font-weight: 600; background: var(--raised); }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .cap { font-size: 12px; color: var(--ink-soft); text-align: center; margin-top: 8px; }
+  @media (max-width: 900px) { .phones { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"><span style="color:var(--ink-soft);font-size:12.5px">Theme</span>
+    <button type="button" data-t="system" aria-pressed="true">System</button><button type="button" data-t="light" aria-pressed="false">Light</button><button type="button" data-t="dark" aria-pressed="false">Dark</button></div>
+  <h1>Capitals v2: the Finals as a mini Rift</h1>
+  <p class="lead">A proposal for review (capitals.md). A capital becomes <b>runs</b> of four full parties: each party walks its own
+    lane of three generals, the lanes converge on four final bosses, and a won run lights World n for all twenty. Every run is
+    fresh, so every party's first run pays full.</p>
+
+  <h2>1 · A run</h2>
+  <div class="card"><svg class="flow" id="flow" viewBox="0 0 1100 560" role="img" aria-label="A capital run: four parties, four lanes of three generals, four final bosses"></svg></div>
+
+  <h2>2 · The screens</h2>
+  <p class="sub">The capital page on the continent map, New run (a sheet), and a run's page. Ura Finale's lanes: its three authored
+    routes and a fourth, the Medium Final, authored new.</p>
+  <div class="phones">
+    <div>
+      <div class="phone">
+        <div class="ptop"><h4>Ura Finale · Capital</h4><span class="muted">Lv 10</span></div>
+        <div class="muted">Runs won: 2</div>
+        <div class="pcard">
+          <div class="row"><b>Run 3</b><span class="muted">7/16</span></div>
+          <div class="muted">Parties 1, 2, 5, 6</div>
+          <div class="muted" style="margin-top:4px">Lanes <span class="pips"><span class="pip on"></span><span class="pip on"></span><span class="pip"></span><span class="pip"></span></span> · Final locked</div>
+        </div>
+        <div class="pcard">
+          <div class="row"><b>Run 4</b><span class="muted">14/16</span></div>
+          <div class="muted">Parties 3, 4, 7, 8</div>
+          <div class="muted" style="margin-top:4px">Final <span class="pips"><span class="pip on"></span><span class="pip on"></span><span class="pip"></span><span class="pip"></span></span> · 2 of 4</div>
+        </div>
+        <span class="pbtn">New run</span>
+        <div class="muted" style="margin-top:12px">Four full parties. Each party walks a lane of three generals; the four finals open once every lane is through.</div>
+      </div>
+      <p class="cap">The capital page: open runs and New run</p>
+    </div>
+    <div>
+      <div class="phone">
+        <div class="ptop"><h4>Ura Finale · Capital</h4><span class="muted">Lv 10</span></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="row"><h4>New run</h4><span class="muted">✕</span></div>
+          <div class="pcard"><div class="row"><b>Sprint Final</b><span><span class="el" style="background:var(--k-lightning)"></span><span class="el" style="background:var(--k-fire)"></span></span></div>
+            <div class="muted">Short and fierce: a lightning start, then a blazing finish.</div><div class="pick" style="margin-top:6px">Party 9 · 5/5 · Lv 11 ▾</div></div>
+          <div class="pcard"><div class="row"><b>Mile Final</b><span><span class="el" style="background:var(--k-ice)"></span><span class="el" style="background:var(--k-light)"></span></span></div>
+            <div class="muted">Clean and balanced: frost first, then a radiant miler.</div><div class="pick" style="margin-top:6px">Party 10 · 5/5 · Lv 11 ▾</div></div>
+          <div class="pcard"><div class="row"><b>Medium Final</b><span><span class="el" style="background:var(--k-lightning)"></span><span class="el" style="background:var(--k-dark)"></span></span></div>
+            <div class="muted">New: a duel at middle distance, the dark horse kicking late.</div><div class="pick" style="margin-top:6px">Party 11 · 5/5 · Lv 10 ▾</div></div>
+          <div class="pcard"><div class="row"><b>Long-Distance Final</b><span><span class="el" style="background:var(--k-dark)"></span><span class="el" style="background:var(--k-ice)"></span></span></div>
+            <div class="muted">A stayer's grind through dusk and cold.</div><div class="pick" style="margin-top:6px">Pick a party ▾</div></div>
+          <span class="pbtn off">Start run · 3 of 4 parties</span>
+        </div>
+      </div>
+      <p class="cap">New run: a full party for each lane</p>
+    </div>
+    <div>
+      <div class="phone">
+        <div class="ptop"><h4>Run 3</h4><span class="muted">7/16</span></div>
+        <div class="pcard"><div class="row"><b>Sprint Final</b><span class="muted">Party 1</span></div>
+          <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span></div>
+          <div class="row"><span class="muted">Generals <span class="pips"><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span></span> · through</span><span class="muted">✓</span></div></div>
+        <div class="pcard"><div class="row"><b>Mile Final</b><span class="muted">Party 2</span></div>
+          <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span></div>
+          <div class="row"><span class="muted">General 3 of 3 · Lv 10</span><span class="pbtn" style="margin:0;padding:5px 12px">Fight</span></div></div>
+        <div class="pcard"><div class="row"><b>Medium Final</b><span class="muted">Party 5</span></div>
+          <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span></div>
+          <div class="row"><span class="muted">General 2 of 3 · Lv 10</span><span class="pbtn" style="margin:0;padding:5px 12px">Fight</span></div></div>
+        <div class="pcard"><div class="row"><b>Long-Distance Final</b><span class="muted">Party 6</span></div>
+          <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span></div>
+          <div class="row"><span class="muted">General 1 of 3 · Lv 10</span><span class="pbtn" style="margin:0;padding:5px 12px">Fight</span></div></div>
+        <div class="pcard locked"><div class="row"><b>The Final</b><span>🔒</span></div><div>Beat every lane's generals · 7 of 12</div></div>
+        <span class="pbtn ghost">Abandon run</span>
+      </div>
+      <p class="cap">A run: four lanes, then the Final</p>
+    </div>
+  </div>
+
+  <h2>3 · Pacing, per Uma, a continent's capital</h2>
+  <table>
+    <thead><tr><th></th><th>Today: 3 routes, shared</th><th>Proposed: runs of four parties</th></tr></thead>
+    <tbody>
+      <tr><td>In the world's first party</td><td>3 Vanguards and 3 Champions, halved: <span class="num">≈ 1.3 levels</span></td><td>Her first run: 3 generals (halved) and her lane's two-wave final: <span class="num">≈ 1.3 levels</span></td></tr>
+      <tr><td>In any later party</td><td>3 Champion replays at a quarter: <span class="num">≈ 0.16 levels</span></td><td>Her first run, as everyone's: <span class="num">≈ 1.3 levels</span></td></tr>
+      <tr><td>Again, a later run</td><td>—</td><td>A quarter: <span class="num">≈ 0.3 levels</span></td></tr>
+      <tr><td>Fights for 20 parties</td><td><span class="num">63</span>, 57 of them replays</td><td><span class="num">80</span>, five runs of 16, every first run at full pay</td></tr>
+      <tr><td>World n for 100 Umas</td><td>Each in a party for all three Champions</td><td>Each on one won run</td></tr>
+    </tbody>
+  </table>
+</div>
+<script>
+(() => {
+  const svg = document.getElementById('flow'), ns = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs, parent = svg) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); parent.appendChild(e); return e };
+  const text = (x, y, t, size = 13, weight = 600, anchor = 'middle', fill = 'var(--ink)') => { const e = el('text', { x, y, 'font-size': size, 'font-weight': weight, 'text-anchor': anchor, fill }); e.textContent = t; return e };
+  const box = (x, y, w, h, fill, stroke, r = 10) => el('rect', { x, y, width: w, height: h, rx: r, fill, stroke, 'stroke-width': 1.5 });
+  const arrow = (x1, y1, x2, y2, color = 'var(--neutral-strong)') => { el('path', { d: `M ${x1} ${y1} C ${x1} ${(y1 + y2) / 2}, ${x2} ${(y1 + y2) / 2}, ${x2} ${y2}`, fill: 'none', stroke: color, 'stroke-width': 2 }); el('path', { d: `M ${x2 - 5} ${y2 - 8} L ${x2} ${y2} L ${x2 + 5} ${y2 - 8}`, fill: 'none', stroke: color, 'stroke-width': 2 }) };
+  box(390, 10, 320, 52, 'var(--accent-wash)', 'var(--accent)');
+  text(550, 32, 'Sign-up: four full parties, twenty Umas', 14, 700); text(550, 51, 'A fresh run, created on the capital page', 12, 400, 'middle', 'var(--ink-soft)');
+  const lanes = [['Sprint Final', 'lightning', 'fire', 'Party 1'], ['Mile Final', 'ice', 'light', 'Party 2'], ['Medium Final', 'lightning', 'dark', 'Party 3'], ['Long-Distance Final', 'dark', 'ice', 'Party 4']];
+  lanes.forEach(([name, e1, e2, party], i) => {
+    const cx = 160 + i * 260;
+    arrow(550, 62, cx, 92);
+    box(cx - 110, 94, 220, 50, 'var(--raised)', 'var(--hairline-strong)');
+    text(cx, 115, name, 14, 700); text(cx, 134, `${party} · two elements`, 12, 400, 'middle', 'var(--ink-soft)');
+    el('circle', { cx: cx + 84, cy: 128, r: 5, fill: `var(--k-${e1})` }); el('circle', { cx: cx + 97, cy: 128, r: 5, fill: `var(--k-${e2})` });
+    ['General I', 'General II', 'General III'].forEach((g, k) => {
+      const y = 170 + k * 62;
+      arrow(cx, y - 16 - (k === 0 ? 10 : 0), cx, y);
+      box(cx - 80, y, 160, 40, 'var(--panel)', 'var(--neutral-strong)');
+      text(cx, y + 18, g, 13, 700); text(cx, y + 33, `sub-boss · ${k === 1 ? e2 : e1}`, 11, 400, 'middle', 'var(--ink-soft)');
+    });
+    arrow(cx, 350, cx, 398, 'var(--accent)');
+  });
+  box(30, 380, 1040, 110, 'var(--accent-wash)', 'var(--accent)', 14);
+  text(60, 402, 'The Final · opens when all twelve generals have fallen · any order · free retries', 13, 700, 'start', 'var(--accent-strong)');
+  lanes.forEach(([name, , e2], i) => {
+    const cx = 160 + i * 260;
+    box(cx - 95, 418, 190, 56, 'var(--panel)', 'var(--accent)');
+    text(cx, 440, `Final boss · ${name.split(' ')[0]}`, 13, 700); text(cx, 459, `boss, two waves · ${e2}`, 11, 400, 'middle', 'var(--ink-soft)');
+  });
+  arrow(550, 490, 550, 512, 'var(--success)');
+  box(360, 514, 380, 40, 'var(--good-wash)', 'var(--success)');
+  text(550, 539, 'Won: World I lights on all twenty windows', 14, 700);
+})();
+for (const b of document.querySelectorAll('.bar button')) b.addEventListener('click', () => {
+  const t = b.dataset.t; if (t === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
+  for (const o of document.querySelectorAll('.bar button')) o.setAttribute('aria-pressed', String(o === b));
+});
+</script>
+</body>
+</html>

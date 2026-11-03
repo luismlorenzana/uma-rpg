@@ -61,6 +61,10 @@ which carries the pane maps; undo with `pnpm release:publish -- --rollback f8ab2
 **The reclass** ([doc](../design/reclass/reclass.md), [preview](../design/reclass/previews/reclass.html)) is live (D290):
 the Warrior and the Mage promote into three Tier 1 classes, the Spellblade, the Summoner and the Healer into four (D291).
 
+**For the owner's review:** [Capitals v2](../design/capitals/capitals.md) ([preview](../design/capitals/previews/capitals.html)):
+each capital becomes runs of four full parties (four lanes of three generals, then four final bosses), World n on a won
+run (CA1–CA15). Not packeted until approved.
+
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
 
