@@ -104,12 +104,12 @@ describe('toV33: chained', () => {
     const raw = world({ 1: uma({ 'mage-3': bond(1) }) }, { 'mage-3': { hero: '1', learners: [] } })
     expect(migrateWorld(raw, 32)).toEqual(toV35(toV34(toV33(raw))))
     expect(migrateWorld(raw, SAVE_SCHEMA_VERSION)).toBe(raw)
-    expect(SAVE_SCHEMA_VERSION).toBe(35)
+    expect(SAVE_SCHEMA_VERSION).toBe(36)
   })
 
   it('parses a stored save with seats to fold to v33, which round-trips, its Heroes and Learners in the kept seats', () => {
     const parsed: Save = parseSave(v32Save())
-    expect(parsed.schemaVersion).toBe(35)
+    expect(parsed.schemaVersion).toBe(36)
     expect(parseSave(JSON.parse(JSON.stringify(parsed)))).toEqual(parsed)
     const w = parsed.tierWorlds['1']!
     expect(Object.keys(w.heroes).filter((id) => /^(brawler|mage)-[34]$/.test(id))).toEqual([])

@@ -19,17 +19,17 @@ const richWorld = (): Raw => richV27Save().tierWorlds['1'] as Raw
 const v28 = (world: Raw, tier = 1): World => toV28(world, tier) as World
 
 describe('toV28 (D214): R2\'s economy and the compensation, chained by H82 (D218)', () => {
-  it('is chained: every world before v28 runs through v35, and a v35 world is left', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(35)
+  it('is chained: every world before v28 runs through v35’s world steps, and a v35 world is left', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(36)
     const raw = richWorld()
     expect(migrateWorld(raw, 27)).toEqual(toV35(toV34(toV32(toV31(toV30(toV29(toV28(raw))))))))
     const done = toV32(toV31(toV30(toV29(toV28(raw)))))
     expect(migrateWorld(done, 35)).toBe(done)
   })
 
-  it('the rich v27 save is a real one: it parses through the chain to v35, its work settled and its grant paid in tickets only', () => {
+  it('the rich v27 save is a real one: it parses through the chain to v36, its work settled and its grant paid in tickets only', () => {
     const save = parseSave(richV27Save())
-    expect(save.schemaVersion).toBe(35)
+    expect(save.schemaVersion).toBe(36)
     expect(save.tierWorlds['1']!.work).toEqual({})
     const grant = v28(richWorld()).grant!
     expect(save.tierWorlds['1']!.grant).toEqual({ ...grant, back: { ...grant.back, items: 0, stock: 0 } })
@@ -151,9 +151,9 @@ describe('toV28 (D214): R2\'s economy and the compensation, chained by H82 (D218
     expect(toV28(richWorld(), 2)).toEqual(toV28(richWorld(), 1))
   })
 
-  it('starts new saves as v35\'s, which round-trip; engine 16 still builds v27\'s for an old save\'s fixtures', () => {
+  it('starts new saves as v36\'s, which round-trip; engine 16 still builds v27\'s for an old save\'s fixtures', () => {
     const save = newSave('Today', '2026-10-25T12:00:00.000Z')
-    expect(save.schemaVersion).toBe(35)
+    expect(save.schemaVersion).toBe(36)
     expect(save.tierWorlds['1']).toMatchObject({ grant: null, buildings: {} })
     expect(['gems', 'gear'].some((k) => k in save.tierWorlds['1']!)).toBe(false)
     expect('gearMarks' in save.tierWorlds['1']!.wallet).toBe(false)

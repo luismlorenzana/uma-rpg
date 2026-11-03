@@ -1,6 +1,6 @@
 # Game loops
 
-What the player does, what it pays and what it costs, as the game runs on engine v21 and save v35. Numbers come from the
+What the player does, what it pays and what it costs, as the game runs on engine v21 and save v36. Numbers come from the
 code: generated tables between `live` markers, the rest checked against `packages/domain/src/economy/`, `items/`,
 `work/`, `save/`, `rpg/campaign/rewards.ts` and `rift/`. A tier's next world opens when the first Uma whose window is
 full ascends from the tier below ([windows](#windows), [Ascend](#ascend); the pages are in
@@ -530,13 +530,16 @@ Every Uma's collection (D283; [the design](../design/collections/collections.md)
 lights pane by pane as she earns her tier's **board**, her face last, and only a full window ascends. The catalog is
 `rpg/windows.ts`; the rules are `save/windows.ts`, behind `@rpg/domain/windows`. The pages are in
 [sections](sections.md#her-window-and-the-window-sheet).
-- **The board:** six tracks of five steps (Level, Class, Craft, Gear, Stars, World) and, in a tier with a tier above,
-  the Rift: 31 steps in Tiers 1 and 2, 30 in Tier 3 (the table below).
+- **The board:** seven tracks of five steps (Level, Class, Craft, Gear, Weapons, Stars, World) and, in a tier with a
+  tier above, the Rift: 36 steps in Tiers 1 and 2, 35 in Tier 3 (the table below; Weapons since save v36, D289).
   - **Level and Craft:** Lv 10, 20, 30, 40 and 50.
   - **Class:** her best class at Rank 10, 30 and 50 (I in Tier 1 is a Tier 0's Rank 10), then two and three Tier 1
     classes at Rank 50. The ranks are her classes', not only the one she fights as.
   - **Gear:** all eleven worn slots (her active class's three weapons, five armor slots, three accessory slots) at G2,
     G4, G6, G8 and G10.
+  - **Weapons:** five weapon kinds at G2, G4, G6, G8 and G10, any of her classes' (there's no Weapon Rank: a weapon
+    grows by its grade, raised on the Gear tab of a class that holds it). With Class V's three classes at Rank 50, it's
+    the board's ask of a well-rounded Uma.
   - **Stars:** every node to I, II, III and IV (4, 9, 13, 18 open, her moon's from II and IV), then the whole map, 22.
   - **World:** continent n's capital's three champions beaten with her in the party (Tier 2's are continents 6 to 10).
     Each won champion records the bit for the party's five (`recordChampion`).
@@ -550,8 +553,10 @@ lights pane by pane as she earns her tier's **board**, her face last, and only a
   Uma's state meets; World for an Uma at a continent's top level (10n in Tier 1) in a world that has won its three
   champions; the Rift step for every roster of a won run; and a full window for each tier an Uma ascended from, dated
   the day she did.
-- **The record:** `account.windows[outfit][tier]`, 31 three-character day codes (`---` dark) and a 15-bit mask of the
-  champions she beat, about 130 bytes an Uma a tier; `account.windowsStart` is the switch's day.
+- **The record:** `account.windows[outfit][tier]`, 36 three-character day codes (`---` dark: save v35's 31 in their
+  order, then the five Weapons steps) and a 15-bit mask of the champions she beat, about 150 bytes an Uma a tier;
+  `account.windowsStart` is the switch's day. Save v36 gave every v35 record its Weapons steps dark, or, on a window
+  already full, lit on its last day.
 - **The reveal** (P84): her window is drawn from the release's `outfit-glass` and its pane map, `outfit-glass-order`.
   The lead is always drawn, panes light outside in as 250 × lit ÷ (steps − 1) reaches their value, and her face only
   when every step is lit. An unlit pane is dark glass.
@@ -581,6 +586,11 @@ lights pane by pane as she earns her tier's **board**, her face last, and only a
 | Gear III | All eleven worn slots at G6 | All eleven worn slots at G6 | All eleven worn slots at G6 |
 | Gear IV | All eleven worn slots at G8 | All eleven worn slots at G8 | All eleven worn slots at G8 |
 | Gear V | All eleven worn slots at G10 | All eleven worn slots at G10 | All eleven worn slots at G10 |
+| Weapons I | Five weapons at G2 | Five weapons at G2 | Five weapons at G2 |
+| Weapons II | Five weapons at G4 | Five weapons at G4 | Five weapons at G4 |
+| Weapons III | Five weapons at G6 | Five weapons at G6 | Five weapons at G6 |
+| Weapons IV | Five weapons at G8 | Five weapons at G8 | Five weapons at G8 |
+| Weapons V | Five weapons at G10 | Five weapons at G10 | Five weapons at G10 |
 | Stars I | Every node to I: 4 nodes | Every node to I: 4 nodes | Every node to I: 4 nodes |
 | Stars II | Every node to II: 9 nodes | Every node to II: 9 nodes | Every node to II: 9 nodes |
 | Stars III | Every node to III: 13 nodes | Every node to III: 13 nodes | Every node to III: 13 nodes |
@@ -593,7 +603,7 @@ lights pane by pane as she earns her tier's **board**, her face last, and only a
 | World V | Continent 5: its capital's three champions | Continent 10: its capital's three champions | Continent 15: its capital's three champions |
 | Rift | On a won Rift run | On a won Rift run | — |
 
-Tier 1: 31 steps · Tier 2: 31 steps · Tier 3: 30 steps.
+Tier 1: 36 steps · Tier 2: 36 steps · Tier 3: 35 steps.
 <!-- /live -->
 
 ## Ascend

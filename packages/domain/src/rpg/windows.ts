@@ -1,16 +1,21 @@
-// Every Uma's stained-glass window (collections.md §3, D283): a board of six tracks of five steps and the Rift, one a
+// Every Uma's stained-glass window (collections.md §3, D283): a board of seven tracks of five steps and the Rift, one a
 // tier. This is the catalog only, pure: its ids, the order the save keeps them in, and each step's numbers. What her state
-// meets is `save/windows.ts`'s.
+// meets is `save/windows.ts`'s. Weapons joined the board with save v36 (D289), at the record's end.
 
-export const WINDOW_TRACKS = ['level', 'class', 'craft', 'gear', 'stars', 'world'] as const
+/** The tracks in the board's order, top to bottom. */
+export const WINDOW_TRACKS = ['level', 'class', 'craft', 'gear', 'weapons', 'stars', 'world'] as const
 export type WindowTrack = (typeof WINDOW_TRACKS)[number]
 export type WindowNumeral = 1 | 2 | 3 | 4 | 5
 export type WindowStepId = `${WindowTrack}-${WindowNumeral}` | 'rift'
 
 const NUMERALS: readonly WindowNumeral[] = [1, 2, 3, 4, 5]
+const steps = (track: WindowTrack) => NUMERALS.map((n) => `${track}-${n}` as const)
 
-/** Every step in the record's order: the tracks, I to V each, then the Rift. Never reorder: the save is positional. */
-export const WINDOW_STEP_IDS: readonly WindowStepId[] = [...WINDOW_TRACKS.flatMap((track) => NUMERALS.map((n) => `${track}-${n}` as const)), 'rift']
+/** Every step in the record's order: save v35's six tracks, I to V each, the Rift, then v36's Weapons. Never reorder:
+ * the save is positional. */
+export const WINDOW_STEP_IDS: readonly WindowStepId[] = [
+  ...(['level', 'class', 'craft', 'gear', 'stars', 'world'] as const).flatMap(steps), 'rift', ...steps('weapons'),
+]
 export const WINDOW_STEPS_MAX = WINDOW_STEP_IDS.length
 
 /** Level and Craft Level n: 10n. */
@@ -19,8 +24,10 @@ export const WINDOW_LEVELS = [10, 20, 30, 40, 50] as const
 export const WINDOW_CLASS_RANKS = [10, 30, 50, 50, 50] as const
 /** Class n: which of her classes, by rank, has to reach it: her best, her best, her best, her second, her third. */
 export const WINDOW_CLASS_NTH = [1, 1, 1, 2, 3] as const
-/** Gear n: the lowest grade of her eleven worn slots. */
+/** Gear n: the lowest grade of her eleven worn slots. Weapons n: the grade five of her weapons reach. */
 export const WINDOW_GRADES = [2, 4, 6, 8, 10] as const
+/** Weapons n: how many weapon kinds, any of her classes', at Gear n's grade (D289). */
+export const WINDOW_WEAPONS = 5
 /** Stars n: her open nodes then (every Planet and moon node numbered n or less, her moon's I from II and II from IV). */
 export const WINDOW_NODES = [4, 9, 13, 18, 22] as const
 /** World n: a continent's three capital champions. */
@@ -46,14 +53,15 @@ function rule(track: WindowTrack, n: WindowNumeral, tier: number): string {
       if (n === 1) return tier === 1 ? 'A Tier 0 class at Class Rank 10' : 'A Tier 1 class at Class Rank 10'
       return n <= 3 ? `A Tier 1 class at Class Rank ${WINDOW_CLASS_RANKS[i]}` : `${n === 4 ? 'Two' : 'Three'} Tier 1 classes at Class Rank 50`
     case 'gear': return `All eleven worn slots at G${WINDOW_GRADES[i]}`
+    case 'weapons': return `Five weapons at G${WINDOW_GRADES[i]}`
     case 'stars': return n === 5 ? 'The whole map: 22 nodes' : `Every node to ${['I', 'II', 'III', 'IV'][i]}: ${WINDOW_NODES[i]} nodes`
     case 'world': return `Continent ${tierFirstContinent(tier) + i}: its capital's three champions`
   }
 }
 
 /**
- * A tier's board: 30 steps and, in a tier with a Rift, the Rift's (31). `hasRift` is whether a tier above exists, which
- * is what gives a tier its Rift (Tiers 1 and 2 today; Tier 3 has none yet, so 30).
+ * A tier's board in its order on screen: 35 steps and, in a tier with a Rift, the Rift's (36). `hasRift` is whether a
+ * tier above exists, which is what gives a tier its Rift (Tiers 1 and 2 today; Tier 3 has none yet, so 35).
  */
 export function windowBoard(tier: number, hasRift: boolean): WindowStep[] {
   const steps: WindowStep[] = WINDOW_TRACKS.flatMap((track) => NUMERALS.map((n) => ({ id: `${track}-${n}` as const, track, numeral: n, rule: rule(track, n, tier) })))

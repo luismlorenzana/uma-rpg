@@ -45,7 +45,7 @@ export function dayLabel(day: string): string {
   return `${d} ${MONTHS[(m ?? 1) - 1]}`
 }
 
-/** The board's short label for a step: "Lv 10", "R30", "2 at R50", "Craft 20", "G6", "Stars III", "Cont. 7", "Rift". */
+/** The board's short label for a step: "Lv 10", "R30", "2 at R50", "Craft 20", "G6", "5 at G6", "Stars III", "Cont. 7", "Rift". */
 export function stepLabel(step: Pick<WindowView['steps'][number], 'track' | 'numeral' | 'rule'>, tier: number): string {
   const n = step.numeral ?? 0
   const roman = ['I', 'II', 'III', 'IV', 'V'][n - 1] ?? ''
@@ -54,19 +54,21 @@ export function stepLabel(step: Pick<WindowView['steps'][number], 'track' | 'num
     case 'craft': return `Craft ${10 * n}`
     case 'class': return n === 1 ? 'R10' : n === 2 ? 'R30' : n === 3 ? 'R50' : `${n - 2} at R50`
     case 'gear': return `G${2 * n}`
+    case 'weapons': return `5 at G${2 * n}`
     case 'stars': return `Stars ${roman}`
     case 'world': return `Cont. ${5 * (tier - 1) + n}`
     case 'rift': return 'Rift'
   }
 }
 
-/** What's left on a track's next step: "Lv 34/40", "R41/50", "Craft 22/30", "8 of 11 at G6", "10/13", "1 of 3". */
+/** What's left on a track's next step: "Lv 34/40", "R41/50", "Craft 22/30", "8 of 11 at G6", "3 of 5 at G6", "10/13", "1 of 3". */
 export function nextLabel(next: WindowNext): string {
   switch (next.track) {
     case 'level': return `Lv ${next.have}/${next.need}`
     case 'class': return `R${next.have}/${next.need}`
     case 'craft': return `Craft ${next.have}/${next.need}`
-    case 'gear': return `${next.have} of ${next.need} at G${next.grade}`
+    case 'gear':
+    case 'weapons': return `${next.have} of ${next.need} at G${next.grade}`
     case 'stars': return `${next.have}/${next.need}`
     case 'world': return `${next.have} of ${next.need}`
   }
@@ -74,13 +76,13 @@ export function nextLabel(next: WindowNext): string {
 
 /** Where a track's steps come from, for a tile's inline line. */
 export const TRACK_SOURCE: Readonly<Record<WindowView['steps'][number]['track'], string>> = {
-  level: 'Campaign · Drills', class: 'Campaign · Trials · Manuals', craft: 'Wilds jobs', gear: 'Made items', stars: 'Planet and Moon Jewels',
+  level: 'Campaign · Drills', class: 'Campaign · Trials · Manuals', craft: 'Wilds jobs', gear: 'Made items', weapons: 'Made items · any class', stars: 'Planet and Moon Jewels',
   world: 'Capital Finals', rift: 'The Rift',
 }
 
 /** The track names for the board's rows. */
 export const TRACK_NAME: Readonly<Record<WindowView['steps'][number]['track'], string>> = {
-  level: 'Level', class: 'Class', craft: 'Craft', gear: 'Gear', stars: 'Stars', world: 'World', rift: 'Rift',
+  level: 'Level', class: 'Class', craft: 'Craft', gear: 'Gear', weapons: 'Weapons', stars: 'Stars', world: 'World', rift: 'Rift',
 }
 
 export interface GalleryEntry { id: string; percent: number; lit: number; total: number; last: string | null; name: string }
@@ -133,7 +135,8 @@ export function litBetween(before: WindowRecords | undefined, after: WindowRecor
     for (const [tier, record] of Object.entries(tiers)) {
       const was = before?.[outfitId]?.[tier]?.steps
       if (was === record.steps) continue
-      const ids = WINDOW_STEP_IDS.filter((_, i) => record.steps.slice(3 * i, 3 * i + 3) !== WINDOW_DARK && (was?.slice(3 * i, 3 * i + 3) ?? WINDOW_DARK) === WINDOW_DARK)
+      const code = (steps: string | undefined, i: number) => steps?.slice(3 * i, 3 * i + 3) || WINDOW_DARK
+      const ids = WINDOW_STEP_IDS.filter((_, i) => code(record.steps, i) !== WINDOW_DARK && code(was, i) === WINDOW_DARK)
       if (ids.length) out.push({ outfitId, tier: Number(tier), ids })
     }
   }

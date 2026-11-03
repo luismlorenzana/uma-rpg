@@ -34,6 +34,7 @@ import {
 import { RPG_CLASSES, RPG_DAMAGE_KINDS, RPG_V2_CLASSES, rpgClasses, rpgIsTier0, type RpgDamageKind } from '../rpg/kinds'
 import { RPG_TIER0_BANK, RPG_TIER0_MAX_RANK, rpgClassGate, rpgTier0ExpToNext } from '../rpg/class-tree'
 import { BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, HERO_MAX_LEARNERS, isHeroLimitId, LEARNER_MAX_PARENTS, type HeroLimitId } from '../rpg/hero-id'
+import { WINDOW_STEPS_MAX } from '../rpg/windows'
 import { isGemId, isStarNode } from '../economy/stars'
 import {
   accessoryFits, GEAR_SLOTS, gearIdentity as gearById, gearLevel, gearLevelName, isAccessory, isAccessorySlot, isArmor, slotOf, type GearSlot,
@@ -56,8 +57,8 @@ import {
 } from '../rift/state'
 import { migrateWorld, type TierGrant } from './migrations'
 import { SAVE_SCHEMA_VERSION } from './version'
-import { collectionsLive } from './collections'
-import { validSteps, WINDOW_CHAMPIONS_MAX, type WindowRecord, type WindowRecords } from './window-record'
+import { collectionsLive, WEAPONS_SAVE } from './collections'
+import { validSteps, widenSteps, WINDOW_CHAMPIONS_MAX, type WindowRecord, type WindowRecords } from './window-record'
 
 export type { TierGrant } from './migrations'
 
@@ -474,7 +475,7 @@ function parseWindows(value: unknown, path: string): WindowRecords {
       const rp = `${at}.${key}`
       if (!/^[1-9]\d{0,2}$/.test(key)) throw new SaveParseError(rp, 'tier keys are positive integers')
       const r = object(rec, rp, ['steps', 'champions'])
-      if (!validSteps(r.steps)) throw new SaveParseError(`${rp}.steps`, 'expected 31 three-character day codes')
+      if (!validSteps(r.steps)) throw new SaveParseError(`${rp}.steps`, `expected ${WINDOW_STEPS_MAX} three-character day codes`)
       const champions = count(r.champions, `${rp}.champions`)
       if (champions > WINDOW_CHAMPIONS_MAX) throw new SaveParseError(`${rp}.champions`, `expected 0–${WINDOW_CHAMPIONS_MAX}`)
       tiers[key] = { steps: r.steps, champions }
@@ -1604,6 +1605,19 @@ export async function parseSaveAsync(value: unknown, path = 'save'): Promise<Sav
   return parsed
 }
 
+/** A v35 account with every window record widened to v36's (D289); anything else as it was, for the parse to judge. */
+function widenAccount(account: unknown): unknown {
+  if (typeof account !== 'object' || account === null || Array.isArray(account)) return account
+  const windows = (account as Obj).windows
+  if (typeof windows !== 'object' || windows === null || Array.isArray(windows)) return account
+  const wide = Object.fromEntries(Object.entries(windows as Obj).map(([id, tiers]) => [id,
+    typeof tiers !== 'object' || tiers === null || Array.isArray(tiers) ? tiers
+      : Object.fromEntries(Object.entries(tiers as Obj).map(([key, r]) => [key,
+        typeof r === 'object' && r !== null && !Array.isArray(r) ? { ...(r as Obj), steps: widenSteps((r as Obj).steps) } : r])),
+  ]))
+  return { ...(account as Obj), windows: wide }
+}
+
 function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migrate: typeof migrateWorld): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion
@@ -1619,7 +1633,9 @@ function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migr
   const live = collectionsLive()
   const withWindows = live && version < 35 && typeof rawAccount === 'object' && rawAccount !== null && !Array.isArray(rawAccount)
     ? { ...rawAccount, windows: {}, windowsStart: null } : rawAccount
-  const a = object(withWindows, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history', 'defeated',
+  // Save v36 (D289): each record gains the Weapons steps at its end (`widenSteps`).
+  const widened = version < WEAPONS_SAVE ? widenAccount(withWindows) : withWindows
+  const a = object(widened, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history', 'defeated',
     ...(live ? ['windows', 'windowsStart'] : [])])
   const trainerName = typeof a.trainerName === 'string' ? normalizeTrainerName(a.trainerName) : null
   if (!trainerName || trainerName !== a.trainerName) throw new SaveParseError(`${path}.account.trainerName`, `must be 1–${TRAINER_NAME_MAX} trimmed characters`)

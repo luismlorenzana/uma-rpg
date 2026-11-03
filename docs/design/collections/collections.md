@@ -145,6 +145,9 @@ the rest are listed so the owner can vote any of them in.
 
 ### 3.1 Six tracks, five steps and the Rift
 
+> **Since save v36 (D289), seven tracks:** Weapons joined after Gear, five weapon kinds at G2, G4, G6, G8 and G10, so the
+> board is 36 steps (35 in Tier 3). The manual's [windows](../../game/loops.md#windows) has the board as built.
+
 A window has **31 steps**: six tracks of five on a board, and the Rift. Each step lights about a thirtieth of her
 panes; the 31st lights her face ([§4.2](#42-the-order-outside-in-her-face-last)). Six rules shape the board:
 

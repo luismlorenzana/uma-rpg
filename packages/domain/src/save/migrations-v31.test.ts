@@ -31,13 +31,13 @@ describe('toV31 (D230, FL31)', () => {
     expect(migrateWorld(v32, 35)).toBe(v32)
   })
 
-  it('parses a stored v30 save through v31 to v35 and starts new saves at v35', () => {
+  it('parses a stored v30 save through v31 to v36 and starts new saves at v36', () => {
     const parsed = parseSave(JSON.parse(JSON.stringify(v30Save())))
-    expect(parsed.schemaVersion).toBe(35)
+    expect(parsed.schemaVersion).toBe(36)
     expect(Object.values(parsed.tierWorlds).every((world) => Object.keys(world.work).length === 0)).toBe(true)
-    expect(SAVE_SCHEMA_VERSION).toBe(35)
+    expect(SAVE_SCHEMA_VERSION).toBe(36)
     const fresh = newSave('Today', '2026-10-27T12:00:00.000Z')
-    expect(fresh.schemaVersion).toBe(35)
+    expect(fresh.schemaVersion).toBe(36)
     expect(parseSave(JSON.parse(JSON.stringify(fresh)))).toEqual(fresh)
   })
 })

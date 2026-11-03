@@ -235,11 +235,12 @@ The collections on screen (H155, D283, D287; the rules are [loops](loops.md#wind
   600 ms, at once under reduced motion. A release with no pane map draws a full window whole and any other dark. The art
   is only ever loaded from the private release.
 - **The Window sheet** (`WindowSheet.tsx`, one sheet: nothing opens over it):
-  - "Tier 1 · 14/31 · 45%" and her window, 232 pt at 390 wide;
-  - **the board:** six rows, Level, Class, Craft, Gear, Stars and World, each with its share under its name ("60%"), of
-    five tiles ("Lv 30", "R30", "2 at R50", "Craft 20", "G6", "Stars III", "Cont. 7"), then the **Rift** tile across. A
+  - "Tier 1 · 14/36 · 39%" and her window, 232 pt at 390 wide;
+  - **the board:** seven rows, Level, Class, Craft, Gear, Weapons, Stars and World, each with its share under its name
+    ("60%"), of five tiles ("Lv 30", "R30", "2 at R50", "Craft 20", "G6", "5 at G6", "Stars III", "Cont. 7"), then the
+    **Rift** tile across. A
     lit tile shows its day ("2 Nov"), a row's next tile what's left ("Lv 34/40", "R41/50", "Craft 22/30", "8 of 11 at
-    G6", "10/13", "1 of 3"), the rest are dark. A tap writes the tile's rule and where it comes from under the board
+    G6", "3 of 5 at G6", "10/13", "1 of 3"), the rest are dark. A tap writes the tile's rule and where it comes from under the board
     ("All eleven worn slots at G6 · Made items");
   - a full window in a tier with a Rift: **Ready to ascend · Gallery** (from the Gallery, **Ready to ascend** opens its
     Ascend sheet);
@@ -522,7 +523,7 @@ every Uma's window in the world, most complete first, where the Observatory stoo
   is ready.
 - **Filters:** All · Ready · Owned · Locked.
 - **The grid,** four a row at 375 and 390: the world's Umas ranked by share, ties to whoever lit her last step first,
-  then by name. Each tile is her window, "1. Name" (the green dot first on a ready one) and "31/31 · 100%"; a full window
+  then by name. Each tile is her window, "1. Name" (the green dot first on a ready one) and "36/36 · 100%"; a full window
   wears its tier's 3 px ring. Then every outfit nobody owns, dark, with a lock and "Locked"; then the Umas who ascended
   from this world, their windows full and ringed, "Ascended" (All only). A tile mounts as it nears the screen, so a
   world's few hundred windows load as they scroll in.
@@ -613,7 +614,7 @@ Umas (Tiers 1 and 2).
     "Fight 2 of 4 · Arcane", "Won");
   - a won run, with no new one open: a **Gallery** door, "Rift won · 3 ready" (the world's Umas whose windows are full);
     a new run can sign up at once;
-  - **Roster:** the run's twenty windows with "14/31" under each, with **Cancel sign-up** while the run is untouched.
+  - **Roster:** the run's twenty windows with "14/36" under each, with **Cancel sign-up** while the run is untouched.
 - **Sign up twenty:** **Four parties** (the party picker: four parties of five Lv 50 Umas) or **Twenty Umas** (the Uma
   picker, twenty, "Below Lv 50" disabled), then a sheet of the twenty faces: "They fight this Rift together until it
   ends." and **Sign up**.

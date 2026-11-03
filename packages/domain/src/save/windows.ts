@@ -4,8 +4,8 @@
 import { RPG_TIER1_CLASSES } from '../rpg/class-tree'
 import { RPG_TIER0_CLASSES } from '../rpg/kinds'
 import {
-  WINDOW_CLASS_NTH, WINDOW_CLASS_RANKS, WINDOW_GRADES, WINDOW_LEVELS, WINDOW_STEP_IDS, WINDOW_TRACKS, windowBoard, type WindowNumeral, type WindowStepId,
-  type WindowTrack,
+  WINDOW_CLASS_NTH, WINDOW_CLASS_RANKS, WINDOW_GRADES, WINDOW_LEVELS, WINDOW_STEP_IDS, WINDOW_TRACKS, WINDOW_WEAPONS, windowBoard, type WindowNumeral,
+  type WindowStepId, type WindowTrack,
 } from '../rpg/windows'
 export { windowBoard } from '../rpg/windows'
 import { ARMOR_SLOTS } from '../economy/ranks'
@@ -42,6 +42,11 @@ export function wornFloor(uma: OwnedUma, outfit: BattleOutfit, tier: number): nu
   return all.length === 0 ? 0 : Math.min(...all)
 }
 
+/** How many of her weapon kinds stand at `grade` or more, any class's (Weapons, save v36). */
+function weaponsAt(uma: OwnedUma, grade: number): number {
+  return Object.values(gradesOf(uma).weapons).filter((g) => (g?.grade ?? 0) >= grade).length
+}
+
 /** Stars n: every Planet and moon node numbered n or less, and her moon's I from II and II from IV. */
 function starsMet(uma: OwnedUma, n: WindowNumeral): boolean {
   const open = new Set(withHerMoon(starMapOf(uma).open))
@@ -63,6 +68,7 @@ export function windowMet(uma: OwnedUma, outfit: BattleOutfit, tier: number, cha
     const rank = t1[WINDOW_CLASS_NTH[i]! - 1] ?? 1
     if (n === 1 ? (tier === 1 && t0 >= WINDOW_CLASS_RANKS[0]) || rank >= WINDOW_CLASS_RANKS[0] : rank >= WINDOW_CLASS_RANKS[i]!) met.add(`class-${n}`)
     if (floor >= WINDOW_GRADES[i]!) met.add(`gear-${n}`)
+    if (weaponsAt(uma, WINDOW_GRADES[i]!) >= WINDOW_WEAPONS) met.add(`weapons-${n}`)
     if (starsMet(uma, n)) met.add(`stars-${n}`)
     if (championsWon(champions, n)) met.add(`world-${n}`)
   }
@@ -220,6 +226,7 @@ export function windowNext(save: Save, uma: OwnedUma, outfit: BattleOutfit, outf
       case 'craft': out.push({ track, numeral: n, have: uma.craft.level, need: WINDOW_LEVELS[i]! }); break
       case 'class': out.push({ track, numeral: n, have: n === 1 && tier === 1 ? Math.max(t0, t1[0] ?? 1) : t1[WINDOW_CLASS_NTH[i]! - 1] ?? 1, need: WINDOW_CLASS_RANKS[i]! }); break
       case 'gear': out.push({ track, numeral: n, have: worn.filter((g) => g >= WINDOW_GRADES[i]!).length, need: worn.length, grade: WINDOW_GRADES[i]! }); break
+      case 'weapons': out.push({ track, numeral: n, have: Math.min(WINDOW_WEAPONS, weaponsAt(uma, WINDOW_GRADES[i]!)), need: WINDOW_WEAPONS, grade: WINDOW_GRADES[i]! }); break
       case 'stars': {
         const nodes = ['planet', 'prowess', 'vigor', 'guard'].flatMap((body) => Array.from({ length: n }, (_, k) => `${body}:${k + 1}`))
         if (n >= 2) nodes.push('template:1')

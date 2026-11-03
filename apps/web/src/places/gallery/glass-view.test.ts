@@ -79,7 +79,7 @@ describe('the Gallery', () => {
 })
 
 describe('the toast', () => {
-  const dark = '---'.repeat(31)
+  const dark = '---'.repeat(36)
   const at = (steps: string, i: number) => `${steps.slice(0, 3 * i)}0a1${steps.slice(3 * i + 3)}`
 
   it('finds the steps a change lit, and only those', () => {

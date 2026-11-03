@@ -180,7 +180,7 @@ function hall(id: string, name: string, cls: string, at: { x: number; y: number 
 const GALLERY: Place = {
   id: 'gallery', page: 'learning', kind: 'town', name: 'Gallery', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.84 }, frame: 'cleric-chapel',
   blurb: 'Every Uma’s window, most complete first.',
-  details: ['31 steps light a window', 'A full window ascends'],
+  details: ['36 steps light a window', 'A full window ascends'],
 }
 
 const OBSERVATORY: Place = {

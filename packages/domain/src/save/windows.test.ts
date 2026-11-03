@@ -1,8 +1,5 @@
-// Windows with the collections switched on (save v35, D283, H152): the switch is mocked here, as H157 will set it.
-import { describe, expect, it, vi } from 'vitest'
-
-vi.mock('./version', async (orig) => ({ ...(await orig<typeof import('./version')>()), SAVE_SCHEMA_VERSION: 35 }))
-
+// Windows with the collections live (save v35, D283, H152; the Weapons track since v36, D289).
+import { describe, expect, it } from 'vitest'
 import { WINDOW_STEP_IDS, windowBoard } from '../rpg/windows'
 import { capitalStageIds } from '../world/capital'
 import { collectionsLive } from './collections'
@@ -11,7 +8,7 @@ import { ascendUmas, ascendUmasBlock, signUpBlock, signUpRift } from './rift'
 import { OUTFITS, riftWorldSave, T, TWENTY } from './rift-rules.fixture'
 import { worldOf } from './rules'
 import { newOwnedUma, newSave, parseSave, type OwnedUma, type Save } from './save'
-import { championBit, codeDay, dayCode, emptyWindow, stepDay, WINDOW_STEPS_LENGTH, withSteps, type WindowRecord } from './window-record'
+import { championBit, codeDay, dayCode, emptyWindow, stepCode, stepDay, widenSteps, WINDOW_STEPS_LENGTH, withSteps, type WindowRecord } from './window-record'
 import { lastLitDay, latchWindows, readyToAscend, recordChampion, recordRiftWin, windowFull, windowMet, windowNext, windowOf, wornFloor } from './windows'
 
 const outfit = OUTFITS.get('101')!
@@ -40,7 +37,7 @@ describe('the switch', () => {
   it('is on here, and a new save starts its windows at once', () => {
     expect(collectionsLive()).toBe(true)
     const save = newSave('W', T(0))
-    expect(save.schemaVersion).toBe(35)
+    expect(save.schemaVersion).toBe(36)
     expect(save.account).toMatchObject({ windows: {}, windowsStart: T(0) })
     expect(save.tierWorlds['1']!.drills).toEqual({ day: null, runs: 10, won: {} })
     expect(save.tierWorlds['1']!.wallet.trainingLogs).toBe(0)
@@ -48,9 +45,12 @@ describe('the switch', () => {
 })
 
 describe('the board', () => {
-  it('has 31 steps in Tiers 1 and 2, 30 in Tier 3, in the record order', () => {
-    expect(windowBoard(1, true).map((s) => s.id)).toEqual(WINDOW_STEP_IDS)
-    expect(windowBoard(3, false)).toHaveLength(30)
+  it('has 36 steps in Tiers 1 and 2, 35 in Tier 3: the record v35\'s 31 then Weapons, the board Weapons after Gear (D289)', () => {
+    expect(new Set(windowBoard(1, true).map((s) => s.id))).toEqual(new Set(WINDOW_STEP_IDS))
+    expect(WINDOW_STEP_IDS.slice(30)).toEqual(['rift', 'weapons-1', 'weapons-2', 'weapons-3', 'weapons-4', 'weapons-5'])
+    expect(windowBoard(1, true).map((s) => s.track).filter((t, i, all) => all.indexOf(t) === i)).toEqual(['level', 'class', 'craft', 'gear', 'weapons', 'stars', 'world', 'rift'])
+    expect(windowBoard(3, false)).toHaveLength(35)
+    expect(windowBoard(1, true).find((s) => s.id === 'weapons-3')!.rule).toBe('Five weapons at G6')
     expect(windowBoard(2, true).find((s) => s.id === 'world-1')!.rule).toBe("Continent 6: its capital's three champions")
   })
 })
@@ -108,10 +108,10 @@ describe('the record', () => {
     expect(lit.steps).toHaveLength(WINDOW_STEPS_LENGTH)
   })
 
-  it('stays inside the budget: 270 Umas, one tier, under 40 KB', () => {
+  it('stays inside the budget: 270 Umas, one tier, under 45 KB (36 steps since v36)', () => {
     const full = withSteps(emptyWindow(), WINDOW_STEP_IDS, T(0))
     const windows = Object.fromEntries(Array.from({ length: 270 }, (_, i) => [String(100101 + i), { '1': { ...full, champions: 32767 } }]))
-    expect(JSON.stringify(windows).length).toBeLessThan(40_000)
+    expect(JSON.stringify(windows).length).toBeLessThan(45_000)
   })
 })
 
@@ -163,14 +163,50 @@ describe('the hooks', () => {
 
   it('records the Rift step for a won run\'s twenty', () => {
     const after = recordRiftWin(started(riftWorldSave()), '1', TWENTY, T(5))
-    expect(TWENTY.every((id) => after.account.windows![id]!['1']!.steps.endsWith(dayCode(T(5))))).toBe(true)
+    expect(TWENTY.every((id) => stepCode(after.account.windows![id]!['1']!, 'rift') === dayCode(T(5)))).toBe(true)
   })
 
   it('shows each track\'s share and the window\'s percent', () => {
     const lit = latchWindows(started(riftWorldSave(1, 30)), OUTFITS, T(10))
     const view = windowOf(lit, '101', 1)
-    expect(view).toMatchObject({ lit: 3, total: 31, percent: 10, full: false })
+    expect(view).toMatchObject({ lit: 3, total: 36, percent: 8, full: false })
     expect(view.tracks.find((t) => t.track === 'level')).toEqual({ track: 'level', lit: 3, total: 5, percent: 60 })
+  })
+})
+
+describe('Weapons (save v36, D289)', () => {
+  const graded = (grades: Record<string, number>) => uma((u) => {
+    const g = u.gear as { weapons: Record<string, { grade: number }> }
+    g.weapons = Object.fromEntries(Object.entries(grades).map(([w, grade]) => [w, { grade }]))
+  })
+
+  it('lights a step at five weapon kinds of that grade, any class\'s', () => {
+    expect(ids(windowMet(graded({ greatsword: 4, axe: 4, lance: 4, bow: 4 }), outfit, 1, 0)).filter((id) => id.startsWith('weapons'))).toEqual([])
+    expect(ids(windowMet(graded({ greatsword: 6, axe: 4, lance: 4, bow: 4, katana: 4 }), outfit, 1, 0)).filter((id) => id.startsWith('weapons')))
+      .toEqual(['weapons-1', 'weapons-2'])
+  })
+
+  it('says what\'s left toward the next one', () => {
+    const save = started(riftWorldSave(1, 50))
+    const next = windowNext(save, graded({ greatsword: 2, axe: 2, lance: 2 }), outfit, '101', 1).find((n) => n.track === 'weapons')
+    expect(next).toEqual({ track: 'weapons', numeral: 1, have: 3, need: 5, grade: 2 })
+  })
+
+  it('widens a v35 record: five dark steps, or a full window\'s last day', () => {
+    const v35 = (codes: string[]) => codes.join('')
+    expect(widenSteps(v35(Array(31).fill('---')))).toBe('---'.repeat(36))
+    const full = Array.from({ length: 31 }, (_, i) => (i === 7 ? '0a9' : '08h'))
+    expect(widenSteps(v35(full))).toBe(v35(full) + '0a9'.repeat(5))
+    expect(widenSteps('---'.repeat(36))).toBe('---'.repeat(36))
+  })
+
+  it('parses a v35 save\'s windows into v36\'s', () => {
+    const save = JSON.parse(JSON.stringify(newSave('W', T(0))))
+    save.schemaVersion = 35
+    save.account.windows = { '101': { '1': { steps: '08h'.repeat(5) + '---'.repeat(26), champions: 0 } } }
+    const parsed = parseSave(save)
+    expect(parsed.schemaVersion).toBe(36)
+    expect(parsed.account.windows!['101']!['1']!.steps).toBe('08h'.repeat(5) + '---'.repeat(31))
   })
 })
 
@@ -227,9 +263,9 @@ describe('save v35', () => {
 
   it('refuses a malformed record', () => {
     const save = JSON.parse(JSON.stringify(newSave('W', T(0))))
-    save.account.windows = { '101': { '1': { steps: '#'.repeat(93), champions: 0 } } }
+    save.account.windows = { '101': { '1': { steps: '#'.repeat(108), champions: 0 } } }
     expect(() => parseSave(save)).toThrow(/steps/)
-    save.account.windows = { '101': { '1': { steps: '---'.repeat(31), champions: 32768 } } }
+    save.account.windows = { '101': { '1': { steps: '---'.repeat(36), champions: 32768 } } }
     expect(() => parseSave(save)).toThrow(/champions/)
   })
 })

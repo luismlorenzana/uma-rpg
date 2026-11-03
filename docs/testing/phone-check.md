@@ -1,7 +1,7 @@
 # Current phone check
 
 Use this script for a release, in order, on the [live game](https://uma-rpg.web.app). It tests the game as it runs today
-(engine v21, save v35); the screens are in [Game sections](../game/sections.md) and the rules in the [game
+(engine v21, save v36); the screens are in [Game sections](../game/sections.md) and the rules in the [game
 manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
 
 Use your existing save; do not reset it. Before you start, have: one full party of five with one healer; an Uma at Lv 10
@@ -127,11 +127,11 @@ button and footer should stay reachable without horizontal page scrolling, in li
     Open the Learner's sheet: expect `Bond n/10 · Strength n%` and **Leave**. A Hero's sheet says
     `Hero · Strength 100%`; emptying its seat uses the compact **Empty seat** confirmation. (D106, D241, D255, D258)
 19. **Windows and the Gallery** (save v35). On an owned Uma's profile expect her stained-glass window beside the bust, "n%"
-    on its corner; a locked outfit has none. Tap it: the Window sheet, "Tier 1 · n/31 · n%", her window, six rows of five
+    on its corner; a locked outfit has none. Tap it: the Window sheet, "Tier 1 · n/36 · n%", her window, seven rows of five
     tiles with each row's share and the Rift tile; a lit tile shows its day, a row's next tile what's left ("Lv 34/40",
     "8 of 11 at G6"). Tap a tile: its rule and where it comes from under the board. Open **Learning → Gallery** (where the
     Observatory stood): "n full · n ready", "Collection n%", All · Ready · Owned · Locked, and the grid ranked most complete
-    first, "1. Name" and "n/31 · n%", then the locked outfits dark with a lock. Tap an owned Uma: her Window sheet; a
+    first, "1. Name" and "n/36 · n%", then the locked outfits dark with a lock. Tap an owned Uma: her Window sheet; a
     locked one: her Stable profile. Do something that crosses a step (a level, a grade): expect "Window +1 · …" with her
     name for a moment, and the tile lit with today's date. (D283, D287)
 20. **Wilds: gather.** At **Wilds → Mine** (or her trade's gathering place) tap a free slot. Expect Who → How many →
@@ -195,7 +195,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
     under them each guided class the party lacks ("Needs an Arms Summoner") with the Umas who could fill it, "Ready to
     promote" first, then "Holds it"; a row opens her Class tab. **Fight**; win or give up, and expect "Back to Trials". If
     a run is on, open a front's chain (the next stage ringed), its stage sheet, the Convergence card and **Roster**: the
-    twenty windows with "n/31". After a won run, the Rift shows a **Gallery** door, "Rift won · n ready", and **Sign up
+    twenty windows with "n/36". After a won run, the Rift shows a **Gallery** door, "Rift won · n ready", and **Sign up
     twenty** again. With a ready Uma, the Gallery's **Ascend n** lists her ticked, "Lv 1 in Tier 2" and the purse;
     ascend only an Uma you mean to move up. Sign up twenty only for a run you mean to play. (H50, H153, D206, D283, CV23)
 34. **Tiers.** Tap the crest: the Tier sheet shows one card per tier, a tier with no world locked with "Promote Umas

@@ -35,21 +35,21 @@ describe('save v29 (D220): the grant is tickets only', () => {
     expect(toV29(once)).toEqual(once)
   })
 
-  it('is chained after v28: a v27 save parses to v35 with no material in a granted world', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(35)
+  it('is chained after v28: a v27 save parses to v36 with no material in a granted world', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(36)
     const world = toV28(fullRoster())
     expect(migrateWorld(world, 28)).toEqual(toV35(toV34(toV32(toV31(toV30(toV29(world)))))))
     const save = parseSave(richV27Save())
-    expect(save.schemaVersion).toBe(35)
+    expect(save.schemaVersion).toBe(36)
     for (const w of Object.values(save.tierWorlds)) {
       if (!w.grant) continue
       expect(Object.keys(w.items).filter((id) => R2_TYPES.some((m) => m.id === id))).toEqual([])
     }
   })
 
-  it('starts new saves at v35 with no grant, so nothing is taken', () => {
+  it('starts new saves at v36 with no grant, so nothing is taken', () => {
     const save = newSave('Today', '2026-10-26T12:00:00.000Z')
-    expect(save.schemaVersion).toBe(35)
+    expect(save.schemaVersion).toBe(36)
     expect(save.tierWorlds['1']!.grant).toBeNull()
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })

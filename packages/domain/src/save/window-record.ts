@@ -58,6 +58,16 @@ export const championBit = (continent: number, route: number): number => 2 ** (W
 export const championsWon = (mask: number, continent: number): boolean =>
   [1, 2, 3].every((route) => Math.floor(mask / championBit(continent, route)) % 2 === 1)
 
+/** A save v35 record's steps (31) as v36's (D289): the five Weapons steps at the end, dark, or, when every v35 step was
+ * lit (a full window, an ascended Uma's among them), lit on its latest day so a full window stays full. */
+export function widenSteps(steps: unknown): unknown {
+  const v35 = WINDOW_STEP_IDS.indexOf('rift') + 1
+  if (typeof steps !== 'string' || steps.length !== v35 * 3) return steps
+  const codes = Array.from({ length: v35 }, (_, i) => steps.slice(3 * i, 3 * i + 3))
+  const last = codes.every((c) => c !== WINDOW_DARK) ? codes.reduce((a, b) => (parseInt(b, 36) > parseInt(a, 36) ? b : a)) : WINDOW_DARK
+  return steps + last.repeat(WINDOW_STEPS_MAX - v35)
+}
+
 /** Whether a string is a well-formed record's steps. */
 export function validSteps(steps: unknown): steps is string {
   if (typeof steps !== 'string' || steps.length !== WINDOW_STEPS_LENGTH) return false

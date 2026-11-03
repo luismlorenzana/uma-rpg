@@ -1,8 +1,5 @@
-// Drills and Training Logs with the collections switched on (save v35, D283, H154); the switch is mocked, as H157 sets it.
-import { describe, expect, it, vi } from 'vitest'
-
-vi.mock('./version', async (orig) => ({ ...(await orig<typeof import('./version')>()), SAVE_SCHEMA_VERSION: 35 }))
-
+// Drills and Training Logs (save v35, D283, H154).
+import { describe, expect, it } from 'vitest'
 import { autoAction } from '../rpg/battle/auto'
 import { battleActionsLeft, replayBattle } from '../rpg/battle/engine'
 import type { BattleEnemy } from '../rpg/battle/types'

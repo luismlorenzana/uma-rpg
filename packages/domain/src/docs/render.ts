@@ -60,7 +60,7 @@ import { weaponPreset } from '../save/presets'
 import { TIERS } from '../save/rules'
 import { DRILL_RUNS_A_DAY, DRILL_RUNS_MAX } from '../save/save'
 import { DRILL_LOGS, DRILL_NUMERALS, logExp } from '../rpg/drills'
-import { WINDOW_STEP_IDS, windowBoard, type WindowStepId } from '../rpg/windows'
+import { windowBoard, type WindowStepId } from '../rpg/windows'
 import { rpgTierLevel } from '../rpg/campaign/chapters'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import {
@@ -811,18 +811,18 @@ function riftRules(): string {
 
 // --- Windows and Drills (collections, D283) -------------------------------------------------------------------------
 
-const STEP_TRACK: Readonly<Record<string, string>> = { level: 'Level', class: 'Class', craft: 'Craft', gear: 'Gear', stars: 'Stars', world: 'World' }
+const STEP_TRACK: Readonly<Record<string, string>> = { level: 'Level', class: 'Class', craft: 'Craft', gear: 'Gear', weapons: 'Weapons', stars: 'Stars', world: 'World' }
 const stepName = (id: WindowStepId): string => {
   if (id === 'rift') return 'Rift'
   const [track, n] = id.split('-') as [string, string]
   return `${STEP_TRACK[track]} ${DRILL_NUMERALS[Number(n) - 1]}`
 }
 
-/** Every tier's board (D283): its steps in the save's order, with each tier's rule; a tier with no tier above has no Rift. */
+/** Every tier's board (D283, D289): its steps in the board's order, with each tier's rule; a tier with no tier above has no Rift. */
 function windows(): string {
   const boards = TIERS.map((t) => windowBoard(t.tier, TIERS.some((u) => u.tier === t.tier + 1)))
   return table(['Step', ...TIERS.map((t) => `Tier ${t.tier}`)],
-    WINDOW_STEP_IDS.map((id) => [stepName(id), ...boards.map((board) => board.find((step) => step.id === id)?.rule ?? '—')])) +
+    windowBoard(1, true).map((step) => step.id).map((id) => [stepName(id), ...boards.map((board) => board.find((step) => step.id === id)?.rule ?? '—')])) +
     `\n\n${boards.map((b, i) => `Tier ${TIERS[i]!.tier}: ${b.length} steps`).join(' · ')}.`
 }
 

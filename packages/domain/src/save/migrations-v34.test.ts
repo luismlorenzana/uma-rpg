@@ -60,7 +60,7 @@ describe('toV34: the chain', () => {
     const raw = world({ 1: uma() }, { 'jewel-planet-1': 1 })
     expect(migrateWorld(raw, 33)).toEqual(toV35(toV34(raw)))
     expect(migrateWorld(raw, SAVE_SCHEMA_VERSION)).toBe(raw)
-    expect(SAVE_SCHEMA_VERSION).toBe(35)
+    expect(SAVE_SCHEMA_VERSION).toBe(36)
   })
 
   it('leaves anything malformed for the strict parse', () => {
@@ -68,14 +68,14 @@ describe('toV34: the chain', () => {
     expect(() => toV34({})).not.toThrow()
   })
 
-  it('parses a stored v33 save to v35, three slots on every Uma, which round-trips', () => {
+  it('parses a stored v33 save to v36, three slots on every Uma, which round-trips', () => {
     const save = newSave('Slots', '2026-10-30T12:00:00.000Z') as unknown as Raw
     const w = (save.tierWorlds as Record<string, Raw>)['1']!
     w.items = { 'jewel-planet-2': 2 }
     w.umas = { 101: { ...newOwnedUma('2026-10-30T12:00:00.000Z'), gear: { weapons: {}, armor: {}, accessories: [EMPTY] } } }
     const stored = JSON.parse(JSON.stringify({ ...save, schemaVersion: 33 })) as Raw
     const parsed: Save = parseSave(stored)
-    expect(parsed.schemaVersion).toBe(35)
+    expect(parsed.schemaVersion).toBe(36)
     expect(worldOf(parsed).umas['101']!.gear).toMatchObject({ accessories: [EMPTY, EMPTY, EMPTY] })
     expect(worldOf(parsed).items).toEqual({ 'jewel-planet-2': 6 })
     expect(parseSave(JSON.parse(JSON.stringify(parsed)))).toEqual(parsed)

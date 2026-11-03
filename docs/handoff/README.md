@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-11-02, after D288.** Tier 1 is built and live: engine v21, save v35. That covers the Tier rework's R1
+> **Status: 2026-11-02, after D289.** Tier 1 is built and live: engine v21, save v36. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -45,7 +45,8 @@ rescue, buffs and debuffs on their paths, pure Brawlers and Sorcerers, a Spellbl
 [board](../design/collections/previews/board.html), [content](../design/collections/previews/content.html) and
 [screens](../design/collections/previews/screens.html)): every Uma's stained-glass window, lit by a 31-step board a
 tier and standing beside her bust; the Gallery, ranked, in the Observatory's place; Ascend one Uma at a time once her
-window is full; Trials (the Echoes' own place); Drills paying Training Logs. Live since H157 (save v35, D288); only the
+window is full; Trials (the Echoes' own place); Drills paying Training Logs. Live since H157 (save v35, D288), with a
+Weapons track since save v36 (D289); only the
 three buildings' art (H156) and its pin (H158) are open.
 
 | Id | What | Who | Size | Needs | State |
@@ -66,7 +67,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v21, save v35; uma-kit 0.17.0, uma-art 2.18.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v21, save v36; uma-kit 0.17.0, uma-art 2.18.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 - **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
   "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.
