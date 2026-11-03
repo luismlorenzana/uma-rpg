@@ -61,7 +61,7 @@ describe('the weapon presets (D263)', () => {
   it('offer a Tier 1 class its own, and a Tier 0 one for each class it promotes into', () => {
     for (const c of RPG_TIER1_CLASSES) expect(rpgPresetClasses(c)).toEqual([c])
     for (const t of RPG_TIER0_CLASSES) expect(rpgPresetClasses(t)).toEqual(RPG_CLASS_CHILDREN[t])
-    expect(rpgPresetClasses('acolyte')).toEqual(['paladin', 'cleric'])
+    expect(rpgPresetClasses('acolyte')).toEqual(['paladin', 'spellblade', 'cleric', 'summoner'])
     expect(rpgPresetClasses('recruit')).toEqual(['brawler', 'spellblade', 'armsummoner'])
     for (const c of RPG_TIER1_CLASSES) for (const t of RPG_CLASS_PARENTS[c]) expect(rpgPresetClasses(t), t).toContain(c)
   })

@@ -213,7 +213,7 @@ export const RPG_WEAPON_PRESETS: Readonly<Record<RpgTier1Class, readonly RpgWeap
 /** A Tier 1 class's preset weapons in an engine's generation: the table from `presets`, its defaults before. */
 export const rpgPresetWeapons = (classId: RpgTier1Class, engine: number = BATTLE_ENGINE_VERSION): RpgWeapon[] =>
   (rpgRework('presets', engine) ? [...RPG_WEAPON_PRESETS[classId]] : rpgDefaultWeapons(classId, engine))
-/** The presets a class offers (D263): a Tier 1 class its own, a Tier 0 one for each class it promotes into. */
+/** The presets a class offers (D263): a Tier 1 class its own, a Tier 0 one for each class it promotes into, kin too (D290). */
 export const rpgPresetClasses = (classId: RpgClass): readonly RpgTier1Class[] => (rpgIsTier0(classId) ? RPG_CLASS_CHILDREN[classId] : [classId])
 /** Different weapons of her class's trees, one a slot, in this engine's generation: to v15 five, as many Tomes and Arms as
  * the class's slots say; from v16 three, each in a slot of its channel by position (CP2: her first slot is always her

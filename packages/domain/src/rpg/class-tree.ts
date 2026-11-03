@@ -18,28 +18,38 @@ export const RPG_TIER0_ROOT: Readonly<Record<RpgTier0Class, RpgClassRoot>> = {
 }
 /** The eight Tier 1 classes in the tree's order, left to right (§1). */
 export const RPG_TIER1_CLASSES: readonly RpgTier1Class[] = ['brawler', 'spellblade', 'armsummoner', 'paladin', 'cleric', 'summoner', 'tomeblade', 'mage']
-/** Each Tier 0's children, in the promotion sheet's order (§2.6). */
-export const RPG_CLASS_CHILDREN: Readonly<Record<RpgTier0Class, readonly RpgTier1Class[]>> = {
+/** Each Tier 0's own children, its family (§2.6): what its Flourish works as (CV21). */
+export const RPG_CLASS_OWN: Readonly<Record<RpgTier0Class, readonly RpgTier1Class[]>> = {
   recruit: ['brawler', 'spellblade', 'armsummoner'],
   duelist: ['spellblade', 'tomeblade'],
   acolyte: ['paladin', 'cleric'],
   caller: ['armsummoner', 'summoner'],
   apprentice: ['mage', 'tomeblade', 'summoner'],
 }
-/** Each Tier 1 class's parents, in its gate text's order ("Opens with Warrior R10 or Summoner R10"): a hybrid has two, its
- * All-Rounder Tier 0 and its channel's root class (CV1). */
+/** Each Tier 0's children, in the promotion sheet's order: its own and, since the reclass (D290), its kin, so every Tier
+ * 0 promotes into three or more. The pure roots stay pure and healing stays the Healer's; the Spellblade and the
+ * Summoner open one of each other's (pacts with familiars), the Healer both hybrids' other halves. */
+export const RPG_CLASS_CHILDREN: Readonly<Record<RpgTier0Class, readonly RpgTier1Class[]>> = {
+  recruit: ['brawler', 'spellblade', 'armsummoner'],
+  duelist: ['spellblade', 'tomeblade', 'armsummoner'],
+  acolyte: ['paladin', 'spellblade', 'cleric', 'summoner'],
+  caller: ['armsummoner', 'summoner', 'tomeblade'],
+  apprentice: ['mage', 'tomeblade', 'summoner'],
+}
+/** Each Tier 1 class's parents, in its gate text's order ("Opens with Warrior R10 or Summoner R10"): its own Tier 0s
+ * (a hybrid's All-Rounder and its channel's root, CV1), then its kin's (D290). */
 export const RPG_CLASS_PARENTS: Readonly<Record<RpgTier1Class, readonly RpgTier0Class[]>> = {
   brawler: ['recruit'],
-  spellblade: ['recruit', 'duelist'],
-  armsummoner: ['recruit', 'caller'],
+  spellblade: ['recruit', 'duelist', 'acolyte'],
+  armsummoner: ['recruit', 'caller', 'duelist'],
   paladin: ['acolyte'],
   cleric: ['acolyte'],
-  summoner: ['caller', 'apprentice'],
-  tomeblade: ['duelist', 'apprentice'],
+  summoner: ['caller', 'apprentice', 'acolyte'],
+  tomeblade: ['duelist', 'apprentice', 'caller'],
   mage: ['apprentice'],
 }
-/** A Tier 0's family: itself and its children (CV21: her Flourish works as any of them). */
-export const rpgClassFamily = (tier0: RpgTier0Class): readonly RpgClass[] => [tier0, ...RPG_CLASS_CHILDREN[tier0]]
+/** A Tier 0's family: itself and its own children (CV21: her Flourish works as any of them); a kin class isn't family. */
+export const rpgClassFamily = (tier0: RpgTier0Class): readonly RpgClass[] => [tier0, ...RPG_CLASS_OWN[tier0]]
 /** The child carrying the Suggested badge (CV11): Warrior the Brawler, Mage the Sorcerer; for a two-way choice the
  * Arms child (or the Paladin) when her base Power beats her base Wit, else the Tome child (or the Cleric). */
 export function rpgSuggestedPromotion(tier0: RpgTier0Class, stats: { power: number; wit: number }): RpgTier1Class {
@@ -117,8 +127,12 @@ const rankIn = (ranks: RpgClassRanks, classId: RpgClass): number => ranks.classe
 /** A Tier 1 class she holds in Tier 1's world (CV9 R5): one with a Class Rank track, always Rank 10 or more. */
 export const rpgHoldsTier1 = (ranks: RpgClassRanks, classId: RpgTier1Class): boolean => (ranks.classes[classId]?.rank ?? 0) >= RPG_TIER0_MAX_RANK
 /** A Tier 1 class's closed gate (CV9 R4): "Opens with Warrior R10 or Summoner R10", her parents in the table's order. */
-export const rpgClassClosedText = (classId: RpgTier1Class): string =>
-  `Opens with ${RPG_CLASS_PARENTS[classId].map((p) => `${NAME_V3[p]} R${RPG_TIER0_MAX_RANK}`).join(' or ')}`
+export function rpgClassClosedText(classId: RpgTier1Class): string {
+  const names = RPG_CLASS_PARENTS[classId].map((p) => NAME_V3[p])
+  // Three parents (D290) share one rank, so the line keeps to six words: "Opens with Summoner, Mage or Healer R10".
+  if (names.length > 2) return `Opens with ${names.slice(0, -1).join(', ')} or ${names.at(-1)} R${RPG_TIER0_MAX_RANK}`
+  return `Opens with ${names.map((n) => `${n} R${RPG_TIER0_MAX_RANK}`).join(' or ')}`
+}
 /** Her parent Tier 0 at Class Rank 10 she can promote into this Tier 1 class from, the first in the table's order, or null. */
 export const rpgReadyParent = (ranks: RpgClassRanks, classId: RpgTier1Class): RpgTier0Class | null =>
   RPG_CLASS_PARENTS[classId].find((p) => rankIn(ranks, p) >= RPG_TIER0_MAX_RANK) ?? null

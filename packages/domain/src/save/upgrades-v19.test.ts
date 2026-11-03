@@ -31,9 +31,10 @@ describe('Promote: a waiting promotion counts as an upgrade (H137)', () => {
     expect(up('recruit', { recruit: { rank: 10, exp: 0 } }, 1, 18).promote).toBe(false)
   })
 
-  it('reads the rule from the class tree: the Healer\'s two, the Mage\'s three', () => {
+  it('reads the rule from the class tree: the Healer\'s four (D290), the Mage\'s three', () => {
     expect(umaPromotionWaits({ classes: { acolyte: { rank: 10 }, paladin: { rank: 10 } } }, 'acolyte')).toBe(true)
-    expect(umaPromotionWaits({ classes: { acolyte: { rank: 10 }, paladin: { rank: 10 }, cleric: { rank: 11 } } }, 'acolyte')).toBe(false)
+    expect(umaPromotionWaits({ classes: { acolyte: { rank: 10 }, paladin: { rank: 10 }, cleric: { rank: 11 } } }, 'acolyte')).toBe(true)
+    expect(umaPromotionWaits({ classes: { acolyte: { rank: 10 }, paladin: { rank: 10 }, cleric: { rank: 11 }, spellblade: { rank: 10 }, summoner: { rank: 10 } } }, 'acolyte')).toBe(false)
     expect(umaPromotionWaits({ classes: { apprentice: { rank: 10 }, mage: { rank: 30 }, tomeblade: { rank: 10 } } }, 'apprentice')).toBe(true)
     expect(umaPromotionWaits({ classes: {} }, 'apprentice')).toBe(false)
   })

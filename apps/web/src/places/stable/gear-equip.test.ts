@@ -56,6 +56,7 @@ describe('the standard presets (D263)', () => {
     expect(presetRows(world('duelist'), '101', 'duelist', 'pendant')).toEqual([
       { pick: 'spellblade', title: 'Arms Spellblade', detail: 'Katana · Axe · Thunder Tome', accessories: 'Pendant · Pendant · Orb', on: false },
       { pick: 'tomeblade', title: 'Tome Spellblade', detail: 'Thunder Tome · Blizzard Tome · Katana', accessories: 'Pendant · Charm · Orb', on: false },
+      { pick: 'armsummoner', title: 'Arms Summoner', detail: 'Bow · Axe · Dark Tome', accessories: 'Pendant · Pendant · Orb', on: false },
     ])
     expect(presetRows(world('recruit'), '101', 'recruit', 'bell').map((r) => r.title)).toEqual(['Brawler', 'Arms Spellblade', 'Arms Summoner'])
   })
@@ -64,6 +65,7 @@ describe('the standard presets (D263)', () => {
     const on = { ...world('acolyte', ['tome-light', 'tome-fire', 'lance']) }
     on.umas['101'] = { ...on.umas['101']!, gear: { ...newGrades(1), accessories: [{ grade: 0, family: 'orb', form: 'base', kind: 'light' },
       { grade: 0, family: 'bell', form: 'base' }, { grade: 0, family: 'bell', form: 'base' }] } }
-    expect(presetRows(on, '101', 'acolyte', 'orb').map((r) => [r.title, r.on])).toEqual([['Paladin', false], ['Cleric · On', true]])
+    expect(presetRows(on, '101', 'acolyte', 'orb').map((r) => [r.title, r.on])).toEqual([['Paladin', false], ['Arms Spellblade', false], ['Cleric · On', true],
+      ['Tome Summoner', false]])
   })
 })

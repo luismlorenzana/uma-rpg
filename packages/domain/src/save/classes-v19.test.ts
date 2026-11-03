@@ -62,7 +62,7 @@ describe('the start and the switch (CV9, CV10, CV19)', () => {
       save = chooseClass(save, '101', c, T(1))
       expect(her(save).classId).toBe(c)
     }
-    expect(message(() => chooseClass(save, '101', 'armsummoner', T(2)))).toBe('Opens with Warrior R10 or Summoner R10')
+    expect(message(() => chooseClass(save, '101', 'armsummoner', T(2)))).toBe('Opens with Warrior, Summoner or Spellblade R10')
     expect(message(() => chooseClass(save, '101', 'mage', T(2)))).toBe('Opens with Mage R10')
     expect(message(() => chooseClass(track(save, '101', 'recruit', 10), '101', 'brawler', T(2)))).toBe('Promote from Warrior')
     expect(umaHeldClasses(her(save))).toEqual(['recruit', 'duelist', 'acolyte', 'caller', 'apprentice'])
@@ -152,7 +152,7 @@ describe('Class EXP on a Tier 0 (CV5, CV8)', () => {
   it('reads Manuals onto a Tier 0 at Rank 10 until her bank is full; refuses a closed class with its gate', () => {
     const world = (save: Save) => worldOf(marks(save, 50_000))
     const save = unlocked()
-    expect(manualBlock(world(save), '101', { kind: 'class', id: 'armsummoner' })).toBe('Opens with Warrior R10 or Summoner R10')
+    expect(manualBlock(world(save), '101', { kind: 'class', id: 'armsummoner' })).toBe('Opens with Warrior, Summoner or Spellblade R10')
     expect(manualBlock(world(track(save, '101', 'recruit', 10)), '101', { kind: 'class', id: 'brawler' })).toBe('Promote from Warrior')
     expect(manualBlock(world(track(save, '101', 'recruit', 10, 5_000)), '101', { kind: 'class', id: 'recruit' })).toBeNull()
     expect(manualBlock(world(track(save, '101', 'recruit', 10, RPG_TIER0_BANK)), '101', { kind: 'class', id: 'recruit' })).toBe('Already at the top rank')
@@ -170,7 +170,7 @@ describe('her class tree (§14.1, UP23)', () => {
       'recruit 0 on R10 +400', 'duelist 0 open R1', 'acolyte 0 open R1', 'caller 0 available R3', 'apprentice 0 open R1',
       'brawler 1 ready R1 · Suggested', 'spellblade 1 ready R1', 'armsummoner 1 ready R1',
       'paladin 1 closed R1 · Opens with Healer R10', 'cleric 1 closed R1 · Opens with Healer R10',
-      'summoner 1 closed R1 · Opens with Summoner R10 or Mage R10', 'tomeblade 1 closed R1 · Opens with Spellblade R10 or Mage R10',
+      'summoner 1 closed R1 · Opens with Summoner, Mage or Healer R10', 'tomeblade 1 closed R1 · Opens with Spellblade, Mage or Summoner R10',
       'mage 1 closed R1 · Opens with Mage R10',
     ])
     save = promoteUma(save, '101', 'recruit', 'brawler', T(1))

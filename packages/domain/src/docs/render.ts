@@ -68,7 +68,7 @@ import {
   type UmaCallingRowV3,
 } from '../roster/template'
 import {
-  RPG_CLASS_PARENTS, RPG_ROOT_NAME, RPG_TIER0_BANK, RPG_TIER0_MAX_RANK, RPG_TIER0_MODEL, RPG_TIER0_ROOT, RPG_TIER0_SKILL, rpgClassFamily,
+  RPG_CLASS_CHILDREN, RPG_CLASS_OWN, RPG_CLASS_PARENTS, RPG_ROOT_NAME, RPG_TIER0_BANK, RPG_TIER0_MAX_RANK, RPG_TIER0_MODEL, RPG_TIER0_ROOT, RPG_TIER0_SKILL, rpgClassFamily,
   rpgClassName, rpgSuggestedPromotion, rpgTier0ExpToNext, rpgTier0Power,
 } from '../rpg/class-tree'
 import { RPG_ALL_CLASSES, RPG_TIER0_CLASSES, type RpgTier0Class } from '../rpg/kinds'
@@ -190,7 +190,8 @@ function tier0(): string {
   }
   return table(['Tier 0', 'Root', 'Her skill', 'Defaults and form of', 'Promotes into', 'Suggested', 'Her Flourish works as'], RPG_TIER0_CLASSES.map((t) => [
     CLASS_NAME[t], RPG_ROOT_NAME[RPG_TIER0_ROOT[t]], RPG_TIER0_SKILL[t], CLASS_NAME[RPG_TIER0_MODEL[t]],
-    rpgClassFamily(t).slice(1).map((c) => CLASS_NAME[c]).join(', '), suggested(t), rpgClassFamily(t).map((c) => CLASS_NAME[c]).join(', '),
+    RPG_CLASS_CHILDREN[t].map((c) => (RPG_CLASS_OWN[t].includes(c) ? CLASS_NAME[c] : `${CLASS_NAME[c]} (kin)`)).join(', '), suggested(t),
+    rpgClassFamily(t).map((c) => CLASS_NAME[c]).join(', '),
   ])) + '\n\n' + table(['Class Rank', 'EXP to next', 'EXP from Rank 1', "Her skill's power"], ladder) +
     `\n\nAt Rank ${RPG_TIER0_MAX_RANK} her EXP waits for her promotion, up to ${RPG_TIER0_BANK.toLocaleString('en-US')}; past that it banks as Class Marks at half.`
 }

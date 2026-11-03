@@ -71,12 +71,12 @@ and class switches are never refused, and Sweeps don't fight, so they don't chec
 | Summoner | 0 | All-Rounder root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Beckon, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 4. End among them (Late + End, or End alone) | Magical |
 | Mage | 0 | Mage root | Any 3 | Any | ×1, MP ×1 | Tier 0: one skill, Primer, on any of her three weapons; promotes at Class Rank 10. No healer | ×1 ×1 ×1 ×1 ×1 ×1 | ×1 | 3. Pace with Late or End | Magical |
 | Brawler | 1 | Promotes from Warrior | 3 Arms | 5 | ×1, MP ×1 | — | ×1.15 ×1.1 ×0.9 ×1.1 ×0.9 ×0.8 | ×0.95 | — | Physical |
-| Arms Spellblade | 1 | Promotes from Warrior or Spellblade | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; her bound familiar lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
-| Arms Summoner | 1 | Promotes from Warrior or Summoner | 2 Arms + 1 Tome | 10 | ×0.57 Arms, ×0.46 Tome; MP ×0.5 a half | Every act is an Arms summon and a Tome summon, the Arms half first. The Arms summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
+| Arms Spellblade | 1 | Promotes from Warrior or Spellblade or Healer | 2 Arms + 1 Tome | 10 | ×0.72 Arms, ×0.44 Tome; MP ×0.5 a half | Every act is an Arms half and a Tome half, the Arms half first; her bound familiar lands one extra hit | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
+| Arms Summoner | 1 | Promotes from Warrior or Summoner or Spellblade | 2 Arms + 1 Tome | 10 | ×0.57 Arms, ×0.46 Tome; MP ×0.5 a half | Every act is an Arms summon and a Tome summon, the Arms half first. The Arms summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×1.1 ×0.95 ×1 ×1 ×1 | ×0.95 | — | Physical |
 | Paladin | 1 | Promotes from Healer | 2 Arms + 1 Tome | 10 | ×0.5, MP ×0.6 | Healer, from ATK. Arms skills Barrier the threatened Uma, Tome skills mend the most hurt and cleanse | ×1 ×1 ×0.8 ×1.15 ×1 ×1.3 | ×0.8 | — | Physical |
 | Cleric | 1 | Promotes from Healer | 2 Tomes + 1 Arm | 10 | ×0.5, MP ×0.6 | Healer, from M.ATK. Arms skills Barrier the threatened Uma, Tome skills mend the most hurt and cleanse | ×1 ×0.8 ×1 ×1 ×1.15 ×1.3 | ×0.8 | — | Magical |
-| Tome Summoner | 1 | Promotes from Summoner or Mage | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.57 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
-| Tome Spellblade | 1 | Promotes from Spellblade or Mage | 2 Tomes + 1 Arm | 10 | ×0.48 Arms, ×0.72 Tome; MP ×0.5 a half | Every act is a Tome half and an Arms half, the Tome half first; her bound familiar lands one extra hit | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
+| Tome Summoner | 1 | Promotes from Summoner or Mage or Healer | 2 Tomes + 1 Arm | 10 | ×0.5 Arms, ×0.57 Tome; MP ×0.5 a half | Every act is a Tome summon and an Arms summon, the Tome half first. The Tome summon lingers; when her next pair comes, it strikes every foe at 0.3 × 0.1. No support | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
+| Tome Spellblade | 1 | Promotes from Spellblade or Mage or Summoner | 2 Tomes + 1 Arm | 10 | ×0.48 Arms, ×0.72 Tome; MP ×0.5 a half | Every act is a Tome half and an Arms half, the Tome half first; her bound familiar lands one extra hit | ×1 ×0.95 ×1.1 ×1 ×1 ×1 | ×0.95 | — | Magical |
 | Sorcerer | 1 | Promotes from Mage | 3 Tomes | 5 | ×1, MP ×1 | — | ×0.9 ×0.9 ×1.15 ×0.9 ×1.1 ×1.3 | ×0.95 | — | Magical |
 <!-- /live -->
 
@@ -133,9 +133,9 @@ is open to every Uma** at Class Rank 1, free.
 | Tier 0 | Root | Her skill | Defaults and form of | Promotes into | Suggested | Her Flourish works as |
 |---|---|---|---|---|---|---|
 | Warrior | Warrior | Drill Strike | Brawler | Brawler, Arms Spellblade, Arms Summoner | Brawler | Warrior, Brawler, Arms Spellblade, Arms Summoner |
-| Spellblade | All-Rounder | Feint | Arms Spellblade | Arms Spellblade, Tome Spellblade | Arms Spellblade (Power over Wit), Tome Spellblade (Wit at or over Power) | Spellblade, Arms Spellblade, Tome Spellblade |
-| Healer | All-Rounder | Vigil | Cleric | Paladin, Cleric | Paladin (Power over Wit), Cleric (Wit at or over Power) | Healer, Paladin, Cleric |
-| Summoner | All-Rounder | Beckon | Tome Summoner | Arms Summoner, Tome Summoner | Arms Summoner (Power over Wit), Tome Summoner (Wit at or over Power) | Summoner, Arms Summoner, Tome Summoner |
+| Spellblade | All-Rounder | Feint | Arms Spellblade | Arms Spellblade, Tome Spellblade, Arms Summoner (kin) | Arms Spellblade (Power over Wit), Tome Spellblade (Wit at or over Power) | Spellblade, Arms Spellblade, Tome Spellblade |
+| Healer | All-Rounder | Vigil | Cleric | Paladin, Arms Spellblade (kin), Cleric, Tome Summoner (kin) | Paladin (Power over Wit), Cleric (Wit at or over Power) | Healer, Paladin, Cleric |
+| Summoner | All-Rounder | Beckon | Tome Summoner | Arms Summoner, Tome Summoner, Tome Spellblade (kin) | Arms Summoner (Power over Wit), Tome Summoner (Wit at or over Power) | Summoner, Arms Summoner, Tome Summoner |
 | Mage | Mage | Primer | Sorcerer | Sorcerer, Tome Spellblade, Tome Summoner | Sorcerer | Mage, Sorcerer, Tome Spellblade, Tome Summoner |
 
 | Class Rank | EXP to next | EXP from Rank 1 | Her skill's power |
@@ -159,7 +159,7 @@ At Rank 10 her EXP waits for her promotion, up to 23,680; past that it banks as 
 | Rule | |
 |---|---|
 | **When** | Her Tier 0 reaches Class Rank 10, by fights, Sweeps, Echoes or Class Manuals |
-| **What it opens** | Each child: the Warrior's three, the Mage's three, the Spellblade's, the Summoner's and the Healer's two. A child she can promote into now is **Ready**; she can't switch to it or read Manuals onto it before she promotes |
+| **What it opens** | Each child: three for the Warrior, the Mage, the Spellblade and the Summoner, four for the Healer (the reclass, D290: [below](#reclassing)). A child she can promote into now is **Ready**; she can't switch to it or read Manuals onto it before she promotes |
 | **Promoting** | Free and final, from the promotion sheet. The child opens **at Class Rank 10** with depths 1 and 2 open (six skills on her three weapons), on its [weapon preset](#standard-presets) with every line on A, and she fights as it from then |
 | **The waiting EXP** | Everything her Tier 0 earned past Rank 10 flows into the new class's bar at once (past Rank 50 it banks as Class Marks at half). Her Tier 0 stays at Rank 10 with nothing waiting |
 | **More children** | Promoting into a sibling later is free too: it opens at Rank 10 with whatever waits then |
@@ -183,15 +183,24 @@ The class tree is the reclass map, on the Classes sheet ([sections](sections.md#
   into, each with its own Class Rank, weapons, lines and equipped skills.
 - **Every Tier 0 is open to every Uma,** at Class Rank 1, free ("Start Summoner · R1"). Her calling's is where she starts,
   not a lock.
-- **A Tier 1 class opens by promotion** from either parent at Class Rank 10, and is hers for good: a Tier 1 class she
-  holds in Tier 1's world is one with a Class Rank, always 10 or more. A closed one says how it opens ("Opens with
-  Warrior R10 or Summoner R10").
+- **A Tier 1 class opens by promotion** from any of its parents at Class Rank 10, and is hers for good: a Tier 1 class
+  she holds in Tier 1's world is one with a Class Rank, always 10 or more. A closed one says how it opens ("Opens with
+  Warrior R10 or Spellblade R10", "Opens with Warrior, Summoner or Spellblade R10").
+- **Every Tier 0 promotes into three or more** (the reclass, D290; [the proposal](../design/reclass/reclass.md)): its
+  own children and its **kin**, by four limits.
+  - **The pure roots stay pure:** the Brawler opens only from the Warrior, the Sorcerer only from the Mage.
+  - **Healing stays the Healer's:** the Paladin and the Cleric open only from the Healer.
+  - **The Spellblade and the Summoner are kin** (pacts with familiars): the Spellblade opens the Arms Summoner, the
+    Summoner the Tome Spellblade.
+  - **The Healer opens both hybrids' other halves:** the Arms Spellblade and the Tome Summoner, one of each channel.
+  - A kin class is never **Suggested** and her Flourish doesn't work as it; its preset is offered like the rest.
 
 | From | To | What it takes |
 |---|---|---|
 | Brawler | Arms Spellblade or Arms Summoner | Nothing: her Warrior is at Rank 10, so its other children are one tap |
-| Brawler | Tome Spellblade | A Spellblade or a Mage to Rank 10: 3,600 Class EXP, 4 Class Manuals or the first continent's fights |
+| Brawler | Tome Spellblade | A Spellblade, a Mage or a Summoner to Rank 10: 3,600 Class EXP, 4 Class Manuals or the first continent's fights |
 | Brawler | Cleric | A Healer to Rank 10: the same 3,600 |
+| Spellblade, Summoner or Healer | A third class | Nothing more: each now promotes into three (the Healer four) |
 | Any | A class she holds | Nothing |
 | Any | Gear | Only the new class's weapons she hasn't raised: a grade belongs to the weapon and serves every class |
 
@@ -412,12 +421,12 @@ to the weapon, so it follows her from a Tier 0 into a class whose preset slots t
 | Class | Offered by | Weapons | Armor | Accessory |
 |---|---|---|---|---|
 | Brawler | Warrior | Greatsword, Axe, Lance | Physical | Pendant, Pendant, Orb (Greatsword) |
-| Arms Spellblade | Warrior, Spellblade | Katana, Axe, Thunder Tome | Physical | Pendant, Pendant, Orb (Katana) |
-| Arms Summoner | Warrior, Summoner | Bow, Axe, Dark Tome | Physical | Pendant, Pendant, Orb (Bow) |
+| Arms Spellblade | Warrior, Spellblade, Healer | Katana, Axe, Thunder Tome | Physical | Pendant, Pendant, Orb (Katana) |
+| Arms Summoner | Warrior, Summoner, Spellblade | Bow, Axe, Dark Tome | Physical | Pendant, Pendant, Orb (Bow) |
 | Paladin | Healer | Lance, Greatsword, Light Tome | Physical | Pendant, Pendant, Orb (Lance) |
 | Cleric | Healer | Light Tome, Fire Tome, Lance | Magical | Charm, Charm, Orb (Light Tome) |
-| Tome Summoner | Summoner, Mage | Dark Tome, Blizzard Tome, Bow | Magical | Charm, Charm, Orb (Dark Tome) |
-| Tome Spellblade | Spellblade, Mage | Thunder Tome, Blizzard Tome, Katana | Magical | Charm, Charm, Orb (Thunder Tome) |
+| Tome Summoner | Summoner, Mage, Healer | Dark Tome, Blizzard Tome, Bow | Magical | Charm, Charm, Orb (Dark Tome) |
+| Tome Spellblade | Spellblade, Mage, Summoner | Thunder Tome, Blizzard Tome, Katana | Magical | Charm, Charm, Orb (Thunder Tome) |
 | Sorcerer | Mage | Fire Tome, Blizzard Tome, Thunder Tome | Magical | Charm, Charm, Orb (Fire Tome) |
 
 | Class | Holds until she picks |

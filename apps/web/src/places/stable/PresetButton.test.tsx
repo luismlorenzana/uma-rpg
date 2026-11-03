@@ -39,11 +39,11 @@ describe('PresetButton (D263)', () => {
     expect((await screen.findByRole('button', { name: /Standard preset · On/ })).hasAttribute('disabled')).toBe(true)
   })
 
-  it('lets a Healer pick between the Paladin and the Cleric, and swap', async () => {
+  it('lets a Healer pick among the classes she promotes into, kin too (D290), and swap', async () => {
     await show('acolyte')
     expect(screen.getByRole('heading').textContent).toBe('Standard preset')
     expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual([
-      expect.stringContaining('Paladin'), expect.stringContaining('Cleric'),
+      expect.stringContaining('Paladin'), expect.stringContaining('Arms Spellblade'), expect.stringContaining('Cleric'), expect.stringContaining('Tome Summoner'),
     ])
     fireEvent.click(screen.getByRole('button', { name: /Cleric/ }))
     await waitFor(() => expect(held().acolyte?.weapons).toEqual(['tome-light', 'tome-fire', 'lance']))

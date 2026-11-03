@@ -109,7 +109,7 @@ describe('the Classes sheet on the Class tab', () => {
     show(await umaC())
     fireEvent.click(screen.getByRole('button', { name: 'Class: Brawler, R34' }))
     fireEvent.click(tile('tomeblade'))
-    expect(footer().textContent).toBe('Opens with Spellblade R10 or Mage R10')
+    expect(footer().textContent).toBe('Opens with Spellblade, Mage or Summoner R10')
     expect(footer().disabled).toBe(true)
     fireEvent.click(tile('caller'))
     expect(footer().textContent).toBe('Start Summoner · R1')

@@ -119,7 +119,7 @@ describe('the Classes sheet from v19 (Uma C)', () => {
     expect(footer('acolyte')).toEqual({ label: 'Fight as Healer', act: 'switch' })
     expect(footer('armsummoner')).toEqual({ label: 'Promote to Arms Summoner', act: 'promote' })
     expect(footer('duelist')).toEqual({ label: 'Start Spellblade · R1', act: 'start' })
-    expect(footer('tomeblade')).toEqual({ label: 'Opens with Spellblade R10 or Mage R10', act: null })
+    expect(footer('tomeblade')).toEqual({ label: 'Opens with Spellblade, Mage or Summoner R10', act: null })
     expect(footer('paladin')).toEqual({ label: 'Opens with Healer R10', act: null })
   })
 
@@ -156,20 +156,22 @@ describe('the promotion sheet from v19', () => {
     const power = outfit('81004'), wit = outfit('81005', true)
     expect(rows('recruit', wit)).toEqual(['Promote · Warrior R10', ['Brawler · Suggested', 'Arms Spellblade', 'Arms Summoner'], 'Brawler'])
     expect(rows('apprentice', power)).toEqual(['Promote · Mage R10', ['Sorcerer · Suggested', 'Tome Spellblade', 'Tome Summoner'], 'Sorcerer'])
-    expect(rows('duelist', power)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade · Suggested', 'Tome Spellblade'], 'Arms Spellblade'])
-    expect(rows('duelist', wit)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade', 'Tome Spellblade · Suggested'], 'Tome Spellblade'])
-    expect(rows('caller', power)[1]).toEqual(['Arms Summoner · Suggested', 'Tome Summoner'])
-    expect(rows('caller', wit)[1]).toEqual(['Arms Summoner', 'Tome Summoner · Suggested'])
-    expect(rows('acolyte', power)[1]).toEqual(['Paladin · Suggested', 'Cleric'])
-    expect(rows('acolyte', wit)[1]).toEqual(['Paladin', 'Cleric · Suggested'])
+    // The kin classes (D290) follow the family's own, never Suggested.
+    expect(rows('duelist', power)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade · Suggested', 'Tome Spellblade', 'Arms Summoner'], 'Arms Spellblade'])
+    expect(rows('duelist', wit)).toEqual(['Promote · Spellblade R10', ['Arms Spellblade', 'Tome Spellblade · Suggested', 'Arms Summoner'], 'Tome Spellblade'])
+    expect(rows('caller', power)[1]).toEqual(['Arms Summoner · Suggested', 'Tome Summoner', 'Tome Spellblade'])
+    expect(rows('caller', wit)[1]).toEqual(['Arms Summoner', 'Tome Summoner · Suggested', 'Tome Spellblade'])
+    expect(rows('acolyte', power)[1]).toEqual(['Paladin · Suggested', 'Arms Spellblade', 'Cleric', 'Tome Summoner'])
+    expect(rows('acolyte', wit)[1]).toEqual(['Paladin', 'Arms Spellblade', 'Cleric · Suggested', 'Tome Summoner'])
   })
 
-  it('leaves out a row the same on every tile: the Spellblade\'s and the Summoner\'s roles', () => {
+  it('leaves out a row the same on every tile, which since the kin (D290) no Tier 0\'s sheet has', () => {
     const tiles = (tier0: 'recruit' | 'duelist' | 'acolyte' | 'caller') => promotionSheet(C, at10(tier0), 1, tier0).tiles.map((t) => [t.slots, t.role])
     expect(tiles('recruit')).toEqual([['3 Arms', 'One act ×1'], ['2 Arms + 1 Tome', 'Multi-hit'], ['2 Arms + 1 Tome', 'Area · lingers']])
-    expect(tiles('duelist')).toEqual([['2 Arms + 1 Tome', null], ['2 Tomes + 1 Arm', null]])
-    expect(tiles('caller')).toEqual([['2 Arms + 1 Tome', null], ['2 Tomes + 1 Arm', null]])
-    expect(tiles('acolyte')).toEqual([['2 Arms + 1 Tome', 'Healer · ATK'], ['2 Tomes + 1 Arm', 'Healer · M.ATK']])
+    expect(tiles('duelist')).toEqual([['2 Arms + 1 Tome', 'Multi-hit'], ['2 Tomes + 1 Arm', 'Multi-hit'], ['2 Arms + 1 Tome', 'Area · lingers']])
+    expect(tiles('caller')).toEqual([['2 Arms + 1 Tome', 'Area · lingers'], ['2 Tomes + 1 Arm', 'Area · lingers'], ['2 Tomes + 1 Arm', 'Multi-hit']])
+    expect(tiles('acolyte')).toEqual([['2 Arms + 1 Tome', 'Healer · ATK'], ['2 Arms + 1 Tome', 'Multi-hit'], ['2 Tomes + 1 Arm', 'Healer · M.ATK'],
+      ['2 Tomes + 1 Arm', 'Area · lingers']])
     expect(promotionSheet(C, at10('recruit'), 1, 'recruit').tiles[2]!.weapons).toEqual(['bow', 'axe', 'tome-dark'])
     // D263: each tile shows the preset she lands on.
     expect(promotionSheet(C, at10('recruit'), 1, 'recruit').tiles[1]!.weapons).toEqual(['katana', 'axe', 'tome-lightning'])
@@ -222,7 +224,8 @@ describe('the Skills tab\'s pieces from v19', () => {
     expect(promotionLine(uma('recruit', {}), 'recruit')).toMatchObject({ text: 'Promotion at R10 · 9 to go', value: 0 })
     expect(promotionLine(uma('recruit', { recruit: { rank: 10, exp: 400 } }), 'recruit')).toEqual({ text: 'Promotion · +400 EXP waiting', value: 1, max: 1, opens: true })
     expect(promotionLine(uma('recruit', { recruit: { rank: 10, exp: 0 } }), 'recruit')?.text).toBe('Promotion · Ready')
-    const all: Tracks = { acolyte: { rank: 10, exp: 50 }, paladin: { rank: 10, exp: 0 }, cleric: { rank: 10, exp: 0 } }
+    const all: Tracks = { acolyte: { rank: 10, exp: 50 }, paladin: { rank: 10, exp: 0 }, cleric: { rank: 10, exp: 0 }, spellblade: { rank: 10, exp: 0 },
+      summoner: { rank: 10, exp: 0 } }
     expect(promotionLine(uma('acolyte', all), 'acolyte')).toBeNull()
     expect(tier0Progress('recruit', { rank: 10, exp: 400 })).toEqual({ value: 3_600, max: 3_600 })
   })
