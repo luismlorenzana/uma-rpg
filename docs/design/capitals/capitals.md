@@ -1,6 +1,7 @@
 # Capitals v2: the Finals as a mini Rift
 
-**Status:** proposal for the owner's review, 2026-11-02. Nothing is built. The preview page is
+**Status:** approved 2026-11-03 (D293): packets H159–H162. One call changed in packeting: CA14 needs no engine bump. Nothing
+is built yet. The preview page is
 [previews/capitals.html](previews/capitals.html): a run's shape, the three screens and the pacing against today's.
 
 ## The owner's points
@@ -138,8 +139,11 @@ Vanguards (a sub-boss's weight, halved), the final boss as a two-wave boss.
 - **Save v37,** each world: `capitalRuns`, its open runs (id, continent, the four lanes' parties, each lane's generals
   beaten and final won, start time, seed), and `capitalWins`, runs won by continent. The account's window records lose
   `champions`. A save before v37 had no runs, so it gains them empty; its old capital wins stay in the record harmlessly.
-- **Engine v22** for the new capital fights (`world/capital.ts`'s generator: generals and finals by lane); an open fight
-  on a v21 capital settles on v21.
+- **No engine bump** (D293): a fight replays from its frozen input, and the run's foes come from a new generator, not a
+  rule change. An open fight on an old capital stage at the switch settles as a regular fight at its foes' level, as a
+  removed node always has.
+- **A run's wins live in the run,** never in `world.run.wins`, which holds one entry a map stage (D292's bound): sixteen new
+  ids a run would grow it without end.
 - **The fourth route** joins `rpg/campaign/finals.ts` for each of the fourteen scenarios (names and lines original).
 - **Rules** in a new `save/capital.ts` behind a lazy `@rpg/domain/capital`, like the Rift's; screens in
   `places/scenario-gate/capital/`.
@@ -154,27 +158,27 @@ Vanguards (a sub-boss's weight, halved), the final boss as a two-wave boss.
   two regions. Three keeps a run near today's pay with one more fight per Uma.
 - **D. Keep shared Champions and only add instances on top:** two systems for one step.
 
-## 12. Decisions to take
+## 12. Decisions (approved, D293)
 
-| Id | Call | Recommended |
+| Id | Call | Owner |
 |---|---|---|
-| CA1 | A capital becomes runs of four full parties; a run must be started before any capital fight | Yes |
-| CA2 | Four lanes, one per party, each an authored route; a fourth route authored for every scenario | Yes |
-| CA3 | Three generals a lane, in order, by the lane's own party | Yes |
-| CA4 | The Final opens when every lane's generals are beaten: four final bosses, one per lane, any order, free retries | Yes |
-| CA5 | The run keeps its twenty as the four parties stood at sign-up; builds can change between fights | Yes |
-| CA6 | One open run per Uma; any number of runs at once | Yes |
-| CA7 | No level gate; one healer a party | Yes |
-| CA8 | HP and MP full each run fight; the map's open fight; no Sweeps | Yes |
-| CA9 | Faces drawn fresh each run, lanes and elements fixed | Yes |
-| CA10 | Generals pay as halved sub-bosses, the final as a two-wave boss: about 1.3 levels a first run | Yes |
-| CA11 | Her first run of a continent pays full, later ones a quarter | Yes |
-| CA12 | World n lights on a won run for its twenty; the champions mask leaves the record | Yes |
-| CA13 | Abandon at any time, progress lost, nothing to refund | Yes |
-| CA14 | Save v37 and engine v22; the old capitals' wins stay inert | Yes |
-| CA15 | "Run" on screen, as the Rift's | Yes |
+| CA1 | A capital becomes runs of four full parties; a run must be started before any capital fight | Approved |
+| CA2 | Four lanes, one per party, each an authored route; a fourth route authored for every scenario | Approved |
+| CA3 | Three generals a lane, in order, by the lane's own party | Approved |
+| CA4 | The Final opens when every lane's generals are beaten: four final bosses, one per lane, any order, free retries | Approved |
+| CA5 | The run keeps its twenty as the four parties stood at sign-up; builds can change between fights | Approved |
+| CA6 | One open run per Uma; any number of runs at once | Approved |
+| CA7 | No level gate; one healer a party | Approved |
+| CA8 | HP and MP full each run fight; the map's open fight; no Sweeps | Approved |
+| CA9 | Faces drawn fresh each run, lanes and elements fixed | Approved |
+| CA10 | Generals pay as halved sub-bosses, the final as a two-wave boss: about 1.3 levels a first run | Approved |
+| CA11 | Her first run of a continent pays full, later ones a quarter | Approved |
+| CA12 | World n lights on a won run for its twenty; the champions mask leaves the record | Approved |
+| CA13 | Abandon at any time, progress lost, nothing to refund | Approved |
+| CA14 | Save v37, no engine bump (D293); the old capitals' wins stay inert; a run's wins live in the run | Approved |
+| CA15 | "Run" on screen, as the Rift's | Approved |
 
-## 13. Packets, once approved
+## 13. Packets
 
 1. The fourth Finals route for the fourteen scenarios, and the run's foe generator (engine v22, dark).
 2. The run rules and save v37 (dark), the window's World step and record change.

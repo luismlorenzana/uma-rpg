@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-11-02, after D291.** Tier 1 is built and live: engine v21, save v36. That covers the Tier rework's R1
+> **Status: 2026-11-03, after D293.** Tier 1 is built and live: engine v21, save v36. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -61,9 +61,16 @@ which carries the pane maps; undo with `pnpm release:publish -- --rollback f8ab2
 **The reclass** ([doc](../design/reclass/reclass.md), [preview](../design/reclass/previews/reclass.html)) is live (D290):
 the Warrior and the Mage promote into three Tier 1 classes, the Spellblade, the Summoner and the Healer into four (D291).
 
-**For the owner's review:** [Capitals v2](../design/capitals/capitals.md) ([preview](../design/capitals/previews/capitals.html)):
-each capital becomes runs of four full parties (four lanes of three generals, then four final bosses), World n on a won
-run (CA1–CA15). Not packeted until approved.
+**Capitals v2** ([design](../design/capitals/capitals.md), [preview](../design/capitals/previews/capitals.html), approved
+D293): each capital becomes runs of four full parties, four lanes of three generals, then four final bosses; World n
+lights on a won run. Built dark behind `capitalRunsLive()` (save v37), switched on by H162. Every packet can go to ChatGPT.
+
+| Id | What | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| [H159](tasks/H159-capital-run-foes.md) | The fourth Finals route for every scenario, and the run's foes | ChatGPT or Claude | M | — | Ready |
+| [H160](tasks/H160-capital-run-rules.md) | The run rules and save v37, dark: start, lanes, the Final, pay, the World step | ChatGPT or Claude | L | H159 | Waits |
+| [H161](tasks/H161-capital-run-screens.md) | The screens, dark: the capital page, New run, a run's page, the result | ChatGPT or Claude | L | H160 | Waits |
+| [H162](tasks/H162-capital-runs-switch.md) | The switch: save v37 live, the old capital removed, the manual, the phone check | ChatGPT or Claude | M | H159–H161 | Waits |
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
