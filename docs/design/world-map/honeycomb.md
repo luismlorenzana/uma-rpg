@@ -1,8 +1,8 @@
 # The continent map as a honeycomb
 
-**Status:** a draft for the owner's review, second pass 2026-11-03. Nothing is built. The preview is
-[previews/honeycomb.html](previews/honeycomb.html): Continent 1's real 40 regions, 5 Springs and capital, with made-up
-progress. Tap any hex.
+**Status:** a draft for the owner's review, third pass 2026-11-03. Nothing is built. The preview is
+[previews/honeycomb.html](previews/honeycomb.html): Continent 1's real 40 regions and eight made-up new ones, the six
+Springs, the capital and its run seats, with made-up progress. Tap any hex.
 
 
 ## The owner's points
@@ -16,25 +16,26 @@ progress. Tap any hex.
 
 ## 1. The layout
 
-Second pass, from the owner's notes on the first (2026-11-03): only Lv 1–5 on the edge, only Lv 6–10 inside, the Springs
-at symmetrical points, the faces larger and on the hex.
+Third pass, from the owner's notes (2026-11-03): only Lv 1–5 on the edge and only Lv 6–10 inside; the Springs at
+symmetrical points; the faces larger and on the hex; the plain hexes filled with regions; the capital's ring used for the
+parties that completed it.
 
-A continent is 40 regions in 10 rows (rows 1–5 Lv 1–5, rows 6–10 Lv 6–10) and the capital (Lv 10). On a honeycomb of four
-rings round the centre:
+A continent becomes **48 regions** (the 40 of today and eight new) and the capital, for **24 parties**:
 
 | From the centre | Hexes | What sits there |
 |---|---|---|
-| Centre and ring 1 | 7 | The **capital and its city**: one tap target, the capital drawn large |
+| Centre | 1 | The **capital**: its open runs, New run |
+| Ring 1 | 6 | The **six run seats**: the newest won runs, then the open ones, each with its four parties |
 | Ring 2 | 12 | Rows 10 (its bosses come in twos), 9 and 8: Lv 6–10 |
-| Ring 3 | 18 | The **six Springs** on its six corners; rows 7 and 6 on its four slanted sides (Lv 6–10); open ground on its top and bottom sides |
-| Ring 4, the shore | 24 | Rows 1–5 (Lv 1–5), from the bottom round; open ground on its four diagonal corners |
+| Ring 3 | 18 | The **six Springs** on its corners; rows 7 and 6 and **four new Lv 6–10 regions** on its sides |
+| Ring 4, the shore | 24 | Rows 1–5 and **four new Lv 1–5 regions**, from the bottom round: Lv 1–5 only |
 
-- **The bands are clean:** no Lv 6–10 region touches the shore and no Lv 1–5 region sits inside it.
-- **Six Springs, not five,** one on each corner of the ring between the bands: the honeycomb's six symmetrical points, each
-  a step from the shore and a step from the core. **Each region refills at its nearest Spring**, so each serves the six or
-  seven regions round it.
-- **Open ground** (eight plain hexes) fills what 40 regions leave, two-fold symmetric, so both bands stay whole and the
-  honeycomb stays a hexagon.
+- **The bands are clean** and every hex is used: 24 Lv 1–5 on the shore, 24 Lv 6–10 inside.
+- **24 parties, everything in sixes:** a fresh region in each band for every party, six capital runs of four parties, six
+  run seats, six Springs, each Spring the nearest for exactly eight regions.
+- **Six Springs, not five,** on the corners of the ring between the bands. **Each region refills at its nearest.**
+- **The run seats:** a won run's seat holds its four parties' leads in a gold rim, an open run's its leads dimmed and its
+  progress ("7/16"), the rest "Open seat". With 24 parties, six won runs seat every party, and every Uma has World n.
 
 ## 2. A hex
 
@@ -48,6 +49,7 @@ rings round the centre:
 - **Completed before the record began:** a ✓ and no faces; the game never noted who it was.
 - **A Spring:** water blue with a drop, "Spring", and "Ready" or its recharge ("1h 20m").
 - **The capital:** gold, a castle, "Capital · Lv 10" and its runs ("2 runs won", or "Open run").
+- **A run seat:** see §1; a tap shows the run's four parties, all twenty faces, and its date or progress.
 
 ## 3. Tapping
 
@@ -55,8 +57,8 @@ The **side panel** (the quick look every Hub place has) shows the hex:
 - **A region:** its levels and progress, its claim and its first clear with their faces and dates, its next stage, and
   **Enter**.
 - **A Spring:** its charge, the regions that refill there, and **Refill** for the active party.
-- **The capital:** its open runs (each "Run 3 · 7/16" with its four parties), then **the last three won runs**, each with
-  its date and its four parties' twenty faces, then **Open capital**.
+- **The capital:** its open runs (each "Run 3 · 7/16" with its four parties), then its won runs, each with its date and its
+  four parties' twenty faces, then **Open capital**; a seat shows its own run the same way.
 
 ## 4. Moving around
 
@@ -69,8 +71,12 @@ The map opens **fitted to the screen**, centred on the frontier (the lowest regi
 - **A record of who claimed and cleared each region,** in each world: `regionTeams[regionId] = { claim: [five ids, the
   day], clear?: [five ids, the day] }`, written on a region's first stage win and its first boss win. One entry a region,
   200 a tier at most, so it can't grow the way the wins did (D292). A save bump (the next after capital runs').
-- **Capital runs keep their last three wins** (`capitals[c].recent`), for the capital's panel: added to H160 now, so the
-  honeycomb needs no second change to it.
+- **Capital runs keep their last six wins** (`capitals[c].recent`), for the seats: in H160 now, so the honeycomb needs
+  no second change to it.
+- **Eight new regions a continent,** with ids of their own (`w1-x-1` …) so no region of today moves: 576 stages a continent,
+  inside the save's bounds (D292). Four join the Lv 1–5 band and four the Lv 6–10 one, generated as any region is.
+- **24 parties, not 20** (`PARTY_COUNT`): a save change that adds four empty parties to every world; the Party Hall and
+  the pickers show 24.
 - **The map is SVG**, not the pixel canvas: crisp at any zoom, every hex a real button with its label, the kit's tokens in
   light and dark. The biome colours exist already; the glyphs are simple vector marks. No art packet.
 - **Six Springs a continent** (today five, one every two rows): `WORLD_SPRINGS` becomes 6, each region's Spring is its
@@ -91,4 +97,5 @@ The map opens **fitted to the screen**, centred on the frontier (the lowest regi
 | HM8 | Tapping opens the side panel: a region's teams and Enter, a Spring's Refill, the capital's open and last three won runs | Yes |
 | HM9 | Opens fitted, centred on the frontier; pinch and − ⊙ + zoom | Yes |
 | HM10 | The world view and the region view stay for now | Yes |
-| HM11 | Eight hexes of open ground keep the bands whole and the honeycomb a symmetric hexagon | Yes |
+| HM11 | 48 regions a continent (eight new, own ids) and 24 parties, so every hex is a region and everything comes in sixes | Yes |
+| HM12 | Ring 1 is six run seats: the newest won runs, then the open ones, each with its four parties | Yes |
