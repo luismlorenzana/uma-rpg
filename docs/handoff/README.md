@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H159; decision numbers from D284). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H167; decision numbers from D296). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it.
@@ -72,10 +72,20 @@ lights on a won run. Built dark behind `capitalRunsLive()` (save v37), switched 
 | [H161](tasks/H161-capital-run-screens.md) | The screens, dark: the capital page, New run, a run's page, the result | ChatGPT or Claude | L | H160 | Waits |
 | [H162](tasks/H162-capital-runs-switch.md) | The switch: save v37 live, the old capital removed, the manual, the phone check | ChatGPT or Claude | M | H159–H161 | Waits |
 
-**For the owner's review:** [the continent map as a honeycomb](../design/world-map/honeycomb.md)
-([preview](../design/world-map/previews/honeycomb.html)), third pass: 48 regions a continent for 24 parties, Lv 6–10
-inside and Lv 1–5 on the shore only, six symmetric Springs, the capital ringed by six run seats, each region's claiming and
-clearing five on the hex (HM1–HM12). A draft; not packeted until approved.
+**The honeycomb continent map** ([design](../design/world-map/honeycomb.md), [preview](../design/world-map/previews/honeycomb.html),
+approved D295): every continent as an SVG honeycomb of 48 regions (eight new) for 24 parties, the capital at the centre
+ringed by six run seats, Lv 6–10 inside and Lv 1–5 on the shore, six Springs each serving its nearest eight, and the five
+who claimed and cleared each region on its hex. Built dark behind `honeycombLive()` (save v38), switched on by H166.
+Every packet can go to ChatGPT; no art packet.
+
+| Id | What | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| [H163](tasks/H163-honeycomb-world-shape.md) | The world's shape, dark: eight new regions a continent, six Springs, the layout, each region's Spring | ChatGPT or Claude | M | — | Ready |
+| [H164](tasks/H164-honeycomb-save.md) | Save v38, dark: who claimed and cleared each region, 24 parties, six open runs | ChatGPT or Claude | L | H160, H163 | Waits |
+| [H165](tasks/H165-honeycomb-screen.md) | The screen, dark: the SVG honeycomb, its hexes, the quick looks, zoom, 24 parties on screen | ChatGPT or Claude | L | H161, H164 | Waits |
+| [H166](tasks/H166-honeycomb-switch.md) | The switch: save v38 live, the pixel continent map removed, the manual, the phone check | ChatGPT or Claude | M | H162, H165 | Waits |
+
+**Order:** H163 can start now, beside H159. Then H164 after H160, H165 after H161, and H166 after H162.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.

@@ -201,12 +201,17 @@ const r4 = ring(4), diag4 = [1, 2, 4, 5].map((i) => corner(4, i));
 diag4.forEach((c, i) => cells.push({ tile: EXTRA[i], at: c }));
 const shore = [1, 2, 3, 4, 5].flatMap(byRow);
 clockwise(r4.filter((c) => !diag4.some((k) => same(k, c))), 90).forEach((c, i) => cells.push({ tile: shore[i], at: c }));
-// Each region refills at its nearest Spring (HM3).
+// Each region refills at its nearest Spring (HM3). Twelve hexes sit exactly between two: each goes to the one that follows
+// it clockwise on screen, so every Spring serves eight.
 const springOf = new Map();
+const angle = (c) => { const [x, y] = px(c); return ((Math.atan2(y, x) * 180 / Math.PI) % 360 + 360) % 360 };
 for (const cell of cells) if (cell.tile.kind === 'region') {
-  const [x, y] = px(cell.at); let best = null;
-  corners3.forEach((c, i) => { const [sx, sy] = px(c); const dd = (sx - x) ** 2 + (sy - y) ** 2; if (!best || dd < best.dd) best = { dd, n: i + 1 } });
-  springOf.set(cell.tile.id, best.n);
+  const [x, y] = px(cell.at);
+  const dist = corners3.map((c) => { const [sx, sy] = px(c); return (sx - x) ** 2 + (sy - y) ** 2 });
+  const min = Math.min(...dist);
+  const near = corners3.map((_, i) => i).filter((i) => dist[i] - min < 1e-6);
+  const ahead = (i) => ((angle(corners3[i]) - angle(cell.at)) % 360 + 360) % 360;
+  springOf.set(cell.tile.id, near.sort((a, b) => ahead(a) - ahead(b))[0] + 1);
 }
 const SPRING_STATE = { 1: 'Ready', 2: 'Ready', 3: '1h 20m', 4: 'Ready', 5: 'Ready', 6: 'Ready' };
 

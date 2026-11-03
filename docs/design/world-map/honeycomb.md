@@ -1,6 +1,6 @@
 # The continent map as a honeycomb
 
-**Status:** a draft for the owner's review, third pass 2026-11-03. Nothing is built. The preview is
+**Status:** approved 2026-11-03 (D295), third pass; packets H163–H166. Nothing is built. The preview is
 [previews/honeycomb.html](previews/honeycomb.html): Continent 1's real 40 regions and eight made-up new ones, the six
 Springs, the capital and its run seats, with made-up progress. Tap any hex.
 
@@ -33,7 +33,8 @@ A continent becomes **48 regions** (the 40 of today and eight new) and the capit
 - **The bands are clean** and every hex is used: 24 Lv 1–5 on the shore, 24 Lv 6–10 inside.
 - **24 parties, everything in sixes:** a fresh region in each band for every party, six capital runs of four parties, six
   run seats, six Springs, each Spring the nearest for exactly eight regions.
-- **Six Springs, not five,** on the corners of the ring between the bands. **Each region refills at its nearest.**
+- **Six Springs, not five,** on the corners of the ring between the bands. **Each region refills at its nearest.** Twelve
+  hexes sit exactly between two Springs: each goes to the one that follows it clockwise, so every Spring serves eight.
 - **The run seats:** a won run's seat holds its four parties' leads in a gold rim, an open run's its leads dimmed and its
   progress ("7/16"), the rest "Open seat". With 24 parties, six won runs seat every party, and every Uma has World n.
 
@@ -70,7 +71,7 @@ The map opens **fitted to the screen**, centred on the frontier (the lowest regi
 
 - **A record of who claimed and cleared each region,** in each world: `regionTeams[regionId] = { claim: [five ids, the
   day], clear?: [five ids, the day] }`, written on a region's first stage win and its first boss win. One entry a region,
-  200 a tier at most, so it can't grow the way the wins did (D292). A save bump (the next after capital runs').
+  240 a tier at most (48 × 5), so it can't grow the way the wins did (D292). A save bump (the next after capital runs').
 - **Capital runs keep their last six wins** (`capitals[c].recent`), for the seats: in H160 now, so the honeycomb needs
   no second change to it.
 - **Eight new regions a continent,** with ids of their own (`w1-x-1` …) so no region of today moves: 576 stages a continent,
@@ -83,18 +84,18 @@ The map opens **fitted to the screen**, centred on the frontier (the lowest regi
   nearest on the honeycomb, and a world's Spring record gains the sixth; a region's header shows its own.
 - **Unchanged:** the world view (five continents) and a region's own map of twelve stages.
 
-## 6. Decisions to take
+## 6. Decisions (approved, D295)
 
 | Id | Call | Recommended |
 |---|---|---|
 | HM1 | The continent map becomes an SVG honeycomb; the List stays | Yes |
 | HM2 | The capital and its city at the centre; Lv 6–10 on rings 2 and 3 only, Lv 1–5 on the shore only, rows 1–5 from the bottom round | Yes |
-| HM3 | Six Springs on ring 3's corners; each region refills at its nearest | Yes |
+| HM3 | Six Springs on ring 3's corners; each region refills at its nearest, a tie going clockwise | Yes |
 | HM4 | Each hex: biome colour and glyph, name, levels, progress arc; ♛♛ on row 10 | Yes |
 | HM5 | Claimed: the five who won its first stage, small, across the hex; completed: the five who first won its boss, large across its middle, gold rim and ✓ | Yes |
 | HM6 | Regions completed before the record show ✓ with no faces | Yes |
 | HM7 | `regionTeams` in each world, one entry a region | Yes |
-| HM8 | Tapping opens the side panel: a region's teams and Enter, a Spring's Refill, the capital's open and last three won runs | Yes |
+| HM8 | Tapping opens the side panel: a region's teams and Enter, a Spring's Refill, the capital's open and last six won runs | Yes |
 | HM9 | Opens fitted, centred on the frontier; pinch and − ⊙ + zoom | Yes |
 | HM10 | The world view and the region view stay for now | Yes |
 | HM11 | 48 regions a continent (eight new, own ids) and 24 parties, so every hex is a region and everything comes in sixes | Yes |
