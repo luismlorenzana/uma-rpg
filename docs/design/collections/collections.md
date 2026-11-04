@@ -527,7 +527,7 @@ the dispatch table.
 | H153 | Trials: the Echoes' own place on the Battle page | Claude or ChatGPT | — |
 | H154 | Drills and Training Logs | Claude | H152 |
 | H155 | Web: `GlassWindow`, her window beside her bust, the Window sheet, the Gallery, the Ascend sheet | Claude | H150, H151, H152, H153 |
-| H156 | Art: three buildings, Gallery, Trials, Drills (uma-art 2.20.0) | ChatGPT draws and publishes | H141's 2.19.0 first |
+| [H156](https://github.com/luismlorenzana/uma-platform/pull/67) | Art: Gallery, Trials and Drills, published in uma-art 2.20.0 | ChatGPT draws and publishes | H141's 2.19.0 first |
 | H157 | The switch: save v35 live, the manual, the phone check | Claude | H152–H155 |
 | H158 | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | H156, H157 |
 
@@ -596,6 +596,6 @@ every call as recommended on 2026-11-02 (D283)** and added CO35–CO37.
 - **Before approval:** a local prototype of CO3–CO5 on two real outfits' windows (the bake's own panes, three orders,
   both looks), sent to the owner as images; not in git (P6). This doc and its four pages.
 - **After approval:** the packets H150–H158 ([§10](#10-packets)). Live on 2026-11-02 with save v35 (H157, D288): H150–H155
-  and H157 built (D284–D288); the three buildings' art (H156) and its pin (H158) are open. The manual has the rules as
+  and H157 built (D284–D288). H156's three buildings are published in uma-art 2.20.0; H158's pin remains open. The manual has the rules as
   built: [windows](../../game/loops.md#windows), [Drills](../../game/loops.md#drills-and-training-logs),
   [Ascend](../../game/loops.md#ascend) and [the screens](../../game/sections.md#gallery).
