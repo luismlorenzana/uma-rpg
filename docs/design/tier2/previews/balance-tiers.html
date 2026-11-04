@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Balance by Tier</title>
+<!-- docs/design/tier2/balance.md (T2B): Tier 1 → 2 → 3, every balance system. Self-contained; kit colours from
+     tier-rework/previews/_template.html. Every Tier 1 number is from the live code (engine v21). -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    /* Chart series: tiers (validated: adjacent and all pairs, light on #fff, dark on #17202b) and sources (reference slots 1–6). */
+    --s1: #c49a1c; --s2: #a8482a; --s3: #7a5ad0;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --band: rgb(47 122 79 / 0.10); --grid: rgb(16 26 36 / 0.08);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --s1: #b3902a; --s2: #b5452e; --s3: #8b76e2;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+      --band: rgb(79 179 122 / 0.12); --grid: rgb(255 255 255 / 0.08);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 24px 64px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 8px; }
+  h2 { font: 700 18px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 6px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .lead { font-size: 15px; max-width: 900px; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.k { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .chip.kc { background: color-mix(in srgb, var(--info) 16%, transparent); color: var(--info); }
+  .chip.br { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.hl td { background: var(--raised); }
+  nav.top { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 18px; position: sticky; top: 0; background: var(--page); padding: 8px 0; z-index: 5; }
+  nav.top a { padding: 4px 11px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; }
+  nav.top a.out { background: transparent; border: 1px solid var(--hairline-strong); }
+  .two { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); gap: 22px; align-items: start; }
+  .say { font-size: 14px; color: var(--ink-soft); }
+  .say b { color: var(--ink); }
+  .calls { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .seg { display: inline-flex; gap: 4px; background: var(--sunken); padding: 3px; border-radius: 999px; margin: 4px 0 8px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12.5px system-ui, sans-serif; padding: 4px 11px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 6px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; flex: none; }
+  .sw.dot { border-radius: 50%; }
+  .sw.ring { border-radius: 50%; background: transparent !important; border: 2px solid; }
+  .sw.line { width: 18px; height: 3px; border-radius: 2px; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: system-ui, -apple-system, sans-serif; }
+  .ax { fill: var(--ink-faint); font-size: 11.5px; }
+  .lab { fill: var(--ink); font-size: 12.5px; font-weight: 600; }
+  .val { fill: var(--ink); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .soft { fill: var(--ink-soft); font-size: 11.5px; }
+  .gridl { stroke: var(--grid); stroke-width: 1; }
+  .hit { fill: transparent; cursor: default; }
+  .hit:focus { outline: none; } .hit:focus-visible { stroke: var(--accent); stroke-width: 2; }
+  details { margin-top: 10px; } summary { cursor: pointer; color: var(--ink-soft); font-size: 13px; font-weight: 650; }
+  .free { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .free div { background: var(--raised); border-radius: 10px; padding: 12px 14px; }
+  .free b { display: block; color: var(--ink); margin-bottom: 2px; }
+  .free span { color: var(--ink-soft); font-size: 13px; }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12.5px; line-height: 1.4; opacity: 0; transition: opacity .08s; left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 900px) { .two, .free { grid-template-columns: 1fr; } main { padding: 16px 16px 48px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Balance, Tier 1 → 2 → 3</h1>
+  <p class="lead">Every balance system by tier, on Tier 1 as it is live (engine v21). <b>Tier 1's numbers are from the code</b>;
+    Tiers 2 and 3 are today's code (Tier 1's rules × tier) and this doc's calls, the term marked provisional. Every chart opens its numbers underneath.</p>
+  <nav class="top">
+    <a href="#glance">At a glance</a><a href="#sources">Sources (SB1)</a><a href="#term">The foe term</a><a href="#weak">Weaknesses and shields</a><a href="#mp">MP</a><a href="#free">What stays tier-free</a>
+    <a class="out" href="../balance.md">The doc →</a><a class="out" href="balance-sim.html">The simulation →</a><a class="out" href="balance-calls.html">Every call →</a>
+  </nav>
+
+  <section id="glance" class="card">
+    <div class="head"><h2>At a glance</h2><span class="calls"><span class="chip">T2B1–T2B15</span></span></div>
+    <div class="scroll"><table>
+      <thead><tr><th></th><th><span class="tier t1">Tier 1</span> live</th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th><th>Call</th></tr></thead>
+      <tbody>
+        <tr><td>Flat build values</td><td>×1</td><td>×1.8</td><td>×2.6</td><td>T2B1</td></tr>
+        <tr><td>Build share of her lead offense, Lv 50</td><td>61–63%</td><td>61–63%</td><td>61–63%</td><td>T2B1</td></tr>
+        <tr class="hl"><td>Foes' HP and DEF term, Lv 1 → 50 (provisional)</td><td>—</td><td>1.08 → 1.28</td><td>1.12 → 1.42</td><td>T2B4, T2B5</td></tr>
+        <tr><td>Foes' offense term, by Lv 50</td><td>—</td><td>+10%</td><td>+10%</td><td>T2B4, T2B5</td></tr>
+        <tr><td>Bosses</td><td>—</td><td>term × 1.1</td><td>term × 1.1</td><td>T2B6</td></tr>
+        <tr class="hl"><td>Shields: regulars · sub-bosses · bosses</td><td>1–6 · 6 · 8</td><td>1–6 · 7 · 9 from the breadth gate</td><td>1–6 · 7 · 10</td><td>T2B7</td></tr>
+        <tr class="hl"><td>Weak kinds: regulars · sub-bosses · bosses</td><td>4 · 3 · 3</td><td>4 to Lv 20, then 3 by role · 3 · 3</td><td>3 by role · 3 · 3</td><td>T2B8</td></tr>
+        <tr class="hl"><td>Skill MP</td><td>×1</td><td>×1.7 <span class="muted">(code ×2)</span></td><td>×2.4 <span class="muted">(code ×3)</span></td><td>T2B10</td></tr>
+        <tr><td>MP back a round</td><td>1% of her bar a depth, 5% at most</td><td>same</td><td>same</td><td>T2B11</td></tr>
+        <tr class="hl"><td>Class Rank pace: depths 2–5 at Uma Lv</td><td>10 · 16 · 22 · 29</td><td>same <span class="muted">(code 7 · 13 · 20 · 27)</span></td><td>same</td><td>T2B3</td></tr>
+        <tr><td>A regular's 100% hit, on-curve Brawler, Lv 50</td><td>19.0%</td><td>18.4% (≈21% with the term)</td><td>18.2% (≈21%)</td><td>T2B15</td></tr>
+      </tbody>
+    </table></div>
+    <p class="say" style="margin-bottom:0"><b>The breadth gate:</b> the tier level her Tier 2 two-kind weapon can open (G5, Lv 21; Tier 3 from Lv 1 if her branch carries). The lists narrow and the shields grow there, together.</p>
+  </section>
+
+  <section id="sources" class="card">
+    <div class="head"><h2>Every source keeps its share</h2><span class="calls"><span class="chip k">SB1 kept</span><span class="chip">T2B1</span></span></div>
+    <div class="two">
+      <div>
+        <p class="say">Her lead offense at each tier's Lv 50, on curve, split by source. <b>The bars are the same shape in every tier:</b> every flat value is ×1.8 and ×2.6, and her level's stat grows about as fast. The build is 61–63% of it in all three.</p>
+        <div class="seg" role="group" aria-label="Class" id="src-pick"></div>
+        <div class="legend" id="src-legend"></div>
+        <div id="src-chart"></div>
+      </div>
+      <div>
+        <h3>Each stat's build share at Lv 50, Brawler</h3>
+        <div class="scroll"><table>
+          <thead><tr><th>Stat</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th><th class="num">Drift</th></tr></thead>
+          <tbody>
+            <tr><td>HP</td><td class="num">27.7%</td><td class="num">28.8%</td><td class="num">29.2%</td><td class="num">+1.5</td></tr>
+            <tr><td>MP</td><td class="num">38.2%</td><td class="num">39.8%</td><td class="num">40.4%</td><td class="num">+2.2</td></tr>
+            <tr><td>ATK</td><td class="num">45.9%</td><td class="num">45.9%</td><td class="num">45.9%</td><td class="num">0</td></tr>
+            <tr><td>M.ATK</td><td class="num">18.4%</td><td class="num">18.5%</td><td class="num">18.6%</td><td class="num">+0.2</td></tr>
+            <tr><td>DEF</td><td class="num">44.6%</td><td class="num">44.6%</td><td class="num">44.5%</td><td class="num">−0.1</td></tr>
+            <tr><td>M.DEF</td><td class="num">50.3%</td><td class="num">50.6%</td><td class="num">50.6%</td><td class="num">+0.3</td></tr>
+          </tbody>
+        </table></div>
+        <p class="say">Worst drift in any class: +2.2 points (MP). HP and MP's level parts carry constants that don't scale. <b>Mid-tier the build is a smaller share</b> (a Brawler's lead offense at Lv 10: 32.8 · 22.5 · 19.3%): her level restarts high, her grades at G0; the foes' build budget follows the same curve. Her ★ is 1.6–1.8% of it in every tier.</p>
+      </div>
+    </div>
+    <details><summary>Show the numbers</summary><div class="scroll" id="src-table"></div></details>
+  </section>
+
+  <section id="term" class="card">
+    <div class="head"><h2>The foe term prices the toolbox</h2><span class="calls"><span class="chip br">SB3, SB4 broken</span><span class="chip kc">SB5 kept, changed</span><span class="chip">T2B4 · T2B5 · T2B6</span></span></div>
+    <div class="two">
+      <div>
+        <p class="say">Today a Tier 2 world is Tier 1's × tier and plays at Tier 1's rounds (0.93–1.08). The term is what the foes' HP and DEF need <b>once the set's Tier 2–3 tools exist</b>: the dots are the factor that prices them, the lines the proposed term.</p>
+        <div class="legend" id="term-legend"></div>
+        <div id="term-chart"></div>
+      </div>
+      <div>
+        <h3>The toolbox K, by piece (provisional, from the drafts)</h3>
+        <div class="scroll"><table>
+          <thead><tr><th>Piece (owner)</th><th class="num">Tier 2 Lv 10 · 30 · 50</th><th class="num">Tier 3</th></tr></thead>
+          <tbody>
+            <tr><td>The focus (T2C)</td><td class="num">1.12</td><td class="num">1.12</td></tr>
+            <tr><td>Weapon branches (T2G, G5)</td><td class="num">1.00 · 1.05 · 1.05</td><td class="num">1.05 · 1.10 · 1.10</td></tr>
+            <tr><td>Accessory branch forms (T2G)</td><td class="num">1.00 · 1.03 · 1.04</td><td class="num">1.01 · 1.05 · 1.08</td></tr>
+            <tr><td>Weapon moons (T2E)</td><td class="num">1.03 · 1.10 · 1.14</td><td class="num">1.05 · 1.15 · 1.23</td></tr>
+            <tr><td>The lists (WK8 at the gate)</td><td class="num">1.00</td><td class="num">1.00</td></tr>
+            <tr class="hl"><td><b>K</b></td><td class="num"><b>1.15 · 1.33 · 1.39</b></td><td class="num"><b>1.25 · 1.49 · 1.64</b></td></tr>
+          </tbody>
+        </table></div>
+        <p class="say"><b>Why Tier 2 starts at 1.08 now:</b> the drafts' narrowing cancelled the focus at Lv 1; with Tier 1's lists until the gate nothing does. <b>Tier 3 ends at 1.42, was 1.48:</b> the third accessory slot is Tier 1's since D264. Each 1% a dropped piece took off K takes 0.7% off the term.</p>
+      </div>
+    </div>
+    <details><summary>Show the numbers</summary><div class="scroll" id="term-table"></div></details>
+  </section>
+
+  <section id="weak" class="card">
+    <div class="head"><h2>Weaknesses and shields: one gate, two rules</h2><span class="calls"><span class="chip kc">WK8 kept, changed</span><span class="chip kc">SB6 kept, changed</span><span class="chip">T2B7 · T2B8</span></span></div>
+    <div class="two">
+      <div>
+        <p class="say">WK8 gives every Tier 2–3 foe three kinds. On today's weapons that leaves a member nothing weak on <b>one stage in six</b>, the owner's original complaint. With T2G's two-kind weapon the answers return to Tier 1's. So the lists narrow, and the shields grow, at the level her weapons widen.</p>
+        <h3>Stages that leave a member nothing weak (owner's two parties, 2,400 a tier)</h3>
+        <div class="legend" id="idle-legend"></div>
+        <div id="idle-chart"></div>
+      </div>
+      <div>
+        <h3>By tier (T2B7, T2B8)</h3>
+        <div class="scroll"><table>
+          <thead><tr><th></th><th>Tier 1</th><th>Tier 2, Lv 1–20</th><th>Tier 2, Lv 21–50</th><th>Tier 3</th></tr></thead>
+          <tbody>
+            <tr><td>Regulars' kinds</td><td>2 + 2</td><td>2 + 2</td><td>3 by role</td><td>3 by role</td></tr>
+            <tr><td>Sub-bosses, bosses</td><td>3</td><td>3</td><td>3</td><td>3</td></tr>
+            <tr class="hl"><td>Shields, sub-boss · boss</td><td>6 · 8</td><td>6 · 8</td><td><b>7 · 9</b></td><td><b>7 · 10</b></td></tr>
+            <tr><td>Regulars' shields</td><td>1–6</td><td>1–6</td><td>1–6</td><td>1–6</td></tr>
+            <tr><td>Answering a regular · a boss</td><td>4.33 · 3.77</td><td>≈ 4.3 · 3.7</td><td>4.31 · 4.32</td><td>4.57 · 4.65</td></tr>
+          </tbody>
+        </table></div>
+        <p class="say"><b>The rule:</b> Tier 1's shield × its rank's answers ÷ Tier 1's, rounded: sub-bosses 6 × 4.40 ÷ 3.73 → 7, bosses 8 × 4.32 ÷ 3.77 → 9 and 8 × 4.65 ÷ 3.77 → 10. <b>Without a two-kind weapon</b> there is no gate: 2 + 2 and Tier 1's shields in every tier. The Rift keeps its fronts' draws (WK9).</p>
+      </div>
+    </div>
+    <details><summary>Show the numbers</summary><div class="scroll" id="idle-table"></div></details>
+  </section>
+
+  <section id="mp" class="card">
+    <div class="head"><h2>Skill MP grows with her bar</h2><span class="calls"><span class="chip kc">SB18 kept, changed</span><span class="chip">T2B10 · T2B11</span></span></div>
+    <div class="two">
+      <div>
+        <p class="say">The code multiplies a skill's MP by the tier (×2, ×3) while her bar grows ×1.73 and ×2.46, so the share of a deep cast a round gives back falls a tier at a time. <b>×1.7 and ×2.4</b>, the drafts' factor, puts every class back within 2 points of Tier 1's.</p>
+        <div class="legend" id="mp-legend"></div>
+        <div id="mp-chart"></div>
+      </div>
+      <div>
+        <h3>Deep casts a bar, Lv 50</h3>
+        <div class="scroll"><table>
+          <thead><tr><th>Class</th><th class="num">Tier 1</th><th class="num">Tier 2 today → ×1.7</th><th class="num">Tier 3 today → ×2.4</th></tr></thead>
+          <tbody>
+            <tr><td>Brawler</td><td class="num">7.1</td><td class="num">6.1 → 7.2</td><td class="num">5.8 → 7.3</td></tr>
+            <tr><td>Sorcerer</td><td class="num">9.8</td><td class="num">8.4 → 9.9</td><td class="num">8.0 → 10.0</td></tr>
+            <tr><td>Spellblades</td><td class="num">9.4</td><td class="num">8.1 → 9.6</td><td class="num">7.7 → 9.7</td></tr>
+            <tr><td>Summoners</td><td class="num">8.4</td><td class="num">7.3 → 8.5</td><td class="num">6.9 → 8.6</td></tr>
+            <tr><td>Paladin, Cleric</td><td class="num">18.4</td><td class="num">15.8 → 18.7</td><td class="num">14.9 → 18.9</td></tr>
+          </tbody>
+        </table></div>
+        <p class="say">The regen stays 1% of her bar a depth, five at most, in every tier; no deep act is refunded by a round (a healer's 95% the most).</p>
+      </div>
+    </div>
+    <details><summary>Show the numbers</summary><div class="scroll" id="mp-table"></div></details>
+  </section>
+
+  <section id="free" class="card">
+    <div class="head"><h2>What stays tier-free</h2><span class="calls"><span class="chip k">D282 kept</span><span class="chip">T2B12 · T2B13 · T2B15</span></span></div>
+    <div class="free">
+      <div><b>Statuses</b><span>+10% a stack (foes' 15%), cap 3, two rounds, Burn 4%. Three levels of access (D282): none on Brawlers and Sorcerers, a path on Spellblades and Summoners, Greatsword, Lance and Fire on the healers.</span></div>
+      <div><b>Limit Breaks</b><span>Her seat's power × her class's scale (1 · 0.95 · 0.8) × her open depth's power, at most 10 hits on one foe, gauge 12. The offense it multiplies carries the tier.</span></div>
+      <div><b>The damage stack</b><span>WP31's ten steps. Ceiling on one weak hit before statuses ×1.69 · ×2.24 · ×2.54 (Insignias, then Pure or Keen with the focus).</span></div>
+      <div><b>Defense</b><span>A regular's 100% hit 19.0 · 18.4 · 18.2% of the on-curve Brawler's HP at Lv 50; about 21% with the term's +10% offense.</span></div>
+      <div><b>The healers</b><span>One shared kit (D282): Paladin ÷ Cleric 99–106% of mends and absorbed Barriers in every tier.</span></div>
+      <div><b>Her uniqueness</b><span>The ★ 0.1 a level × tier, 1.6–1.8% of her lead offense in every tier; the Flourish 4% of her max HP (T2U).</span></div>
+    </div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg'
+  const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (parent) parent.appendChild(n); return n }
+  const tip = document.getElementById('tip')
+  const showTip = (e, html) => { tip.innerHTML = html; tip.style.opacity = 1; const r = tip.getBoundingClientRect(); let x = (e.clientX ?? e.target.getBoundingClientRect().right) + 14, y = (e.clientY ?? e.target.getBoundingClientRect().top) + 14; if (x + r.width > innerWidth - 8) x = innerWidth - r.width - 8; if (y + r.height > innerHeight - 8) y -= r.height + 28; tip.style.left = x + 'px'; tip.style.top = y + 'px' }
+  const hideTip = () => { tip.style.opacity = 0 }
+  const hover = (node, html) => { node.setAttribute('tabindex', '0'); node.setAttribute('aria-label', html.replace(/<[^>]+>/g, ' ')); node.addEventListener('pointermove', (e) => showTip(e, html)); node.addEventListener('pointerleave', hideTip); node.addEventListener('focus', (e) => showTip(e, html)); node.addEventListener('blur', hideTip) }
+  const legend = (id, items) => { document.getElementById(id).innerHTML = items.map(([c, t, k = '']) => `<span><i class="sw ${k}" style="background:var(${c});border-color:var(${c})"></i>${t}</span>`).join('') }
+  const table = (id, head, rows) => { document.getElementById(id).innerHTML = `<table><thead><tr>${head.map((h, i) => `<th${i ? ' class="num"' : ''}>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => `<td${i ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>` }
+
+  // 1. Sources: 100% stacked bars, one class at a time.
+  const SRC = ['Her level’s stat', 'Armor', 'Extra Stats', 'Pendants or Charms', 'Orb', 'Might']
+  const SRC_C = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6']
+  const CLASSES = {
+    brawler: ['Brawler · Greatsword', [[113, 25, 51, 20, 20, 68], [204, 45, 92, 36, 36, 122], [295, 65, 133, 52, 52, 177]]],
+    mage: ['Sorcerer · Fire', [[118, 25, 51, 20, 20, 68], [213, 45, 92, 36, 36, 122], [308, 65, 133, 52, 52, 177]]],
+    spellblade: ['Arms Spellblade · Katana', [[113, 25, 42, 20, 20, 68], [204, 45, 77, 36, 36, 122], [295, 65, 110, 52, 52, 177]]],
+    paladin: ['Paladin · Lance', [[103, 25, 45, 20, 20, 68], [185, 45, 81, 36, 36, 122], [268, 65, 118, 52, 52, 177]]],
+  }
+  legend('src-legend', SRC.map((s, i) => [SRC_C[i], s]))
+  const pick = document.getElementById('src-pick')
+  const drawSources = (key) => {
+    const [name, tiers] = CLASSES[key]
+    const host = document.getElementById('src-chart'); host.innerHTML = ''
+    const W = 640, L = 70, R = 70, rowH = 40, top = 22, H = top + rowH * 3 + 28
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `${name}: lead offense by source at Lv 50, Tiers 1 to 3` }, host)
+    const pw = W - L - R
+    for (const t of [0, 25, 50, 75, 100]) { const x = L + pw * t / 100; el('line', { x1: x, x2: x, y1: top - 6, y2: top + rowH * 3 - 8, class: 'gridl' }, svg); el('text', { x, y: H - 6, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `${t}%` }
+    tiers.forEach((vals, ti) => {
+      const total = vals.reduce((a, b) => a + b, 0), y = top + ti * rowH
+      el('text', { x: L - 10, y: y + 15, 'text-anchor': 'end', class: 'lab' }, svg).textContent = `Tier ${ti + 1}`
+      let x = L
+      vals.forEach((v, si) => {
+        const w = pw * v / total, gap = si < vals.length - 1 ? 2 : 0
+        const r = el('rect', { x, y, width: Math.max(0, w - gap), height: 22, rx: si === vals.length - 1 ? 4 : 0, style: `fill:var(${SRC_C[si]})` }, svg)
+        hover(r, `<b>Tier ${ti + 1} · ${SRC[si]}</b>${v} of ${total} offense (${(100 * v / total).toFixed(1)}%)`)
+        x += w
+      })
+      const build = total - vals[0]
+      el('text', { x: L + pw + 8, y: y + 15, class: 'val' }, svg).textContent = `${total}`
+      el('text', { x: L + pw + 8, y: y + 29, class: 'soft' }, svg).textContent = `build ${(100 * build / total).toFixed(1)}%`
+    })
+    table('src-table', ['Tier', ...SRC, 'Offense', 'Build share'], tiers.map((v, i) => { const t = v.reduce((a, b) => a + b, 0); return [`${name}, Tier ${i + 1}`, ...v, t, `${(100 * (t - v[0]) / t).toFixed(1)}%`] }))
+  }
+  Object.entries(CLASSES).forEach(([key, [name]], i) => {
+    const b = document.createElement('button'); b.textContent = name.split(' · ')[0]; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false')
+    b.onclick = () => { pick.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); drawSources(key) }
+    pick.appendChild(b)
+  })
+  drawSources('brawler')
+
+  // 2. The term: lines (proposed) and dots (what prices K).
+  const LV = [1, 10, 20, 30, 40, 50]
+  const term2 = (l) => 1.08 + 0.20 * (l - 1) / 49, term3 = (l) => 1.12 + 0.30 * (l - 1) / 49
+  const need2 = [[10, 1.11], [20, 1.14], [30, 1.23], [40, 1.25], [50, 1.26]], need3 = [[10, 1.17], [20, 1.22], [30, 1.33], [40, 1.37], [50, 1.40]]
+  legend('term-legend', [['--s2', 'Tier 2 term', 'line'], ['--s2', 'Tier 2: what prices K', 'dot'], ['--s3', 'Tier 3 term', 'line'], ['--s3', 'Tier 3: what prices K', 'dot']])
+  ;(() => {
+    const host = document.getElementById('term-chart')
+    const W = 640, H = 300, L = 46, R = 70, T = 14, B = 30, pw = W - L - R, ph = H - T - B
+    const X = (l) => L + pw * (l - 1) / 49, Y = (v) => T + ph * (1 - (v - 1) / 0.5)
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'The toolbox term on foes’ HP and DEF by tier level, Tier 2 and Tier 3' }, host)
+    for (const v of [1, 1.1, 1.2, 1.3, 1.4, 1.5]) { el('line', { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: 'gridl' }, svg); el('text', { x: L - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = `×${v.toFixed(1)}` }
+    for (const l of LV) el('text', { x: X(l), y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `Lv ${l}`
+    for (const [f, c, name, need] of [[term2, '--s2', 'Tier 2', need2], [term3, '--s3', 'Tier 3', need3]]) {
+      el('path', { d: `M${X(1)},${Y(f(1))} L${X(50)},${Y(f(50))}`, style: `stroke:var(${c});stroke-width:2;fill:none;stroke-linecap:round` }, svg)
+      el('text', { x: X(50) + 8, y: Y(f(50)) + 4, class: 'lab' }, svg).textContent = `${name} ×${f(50).toFixed(2)}`
+      for (const [l, v] of need) {
+        el('circle', { cx: X(l), cy: Y(v), r: 5, style: `fill:var(${c});stroke:var(--panel);stroke-width:2` }, svg)
+        const h = el('circle', { cx: X(l), cy: Y(v), r: 12, class: 'hit' }, svg)
+        hover(h, `<b>${name}, Lv ${l}</b>Prices K: ×${v.toFixed(2)} · the term: ×${f(l).toFixed(2)}`)
+      }
+    }
+    table('term-table', ['Tier level', ...LV.map((l) => `Lv ${l}`)], [
+      ['Tier 2 term, 1.08 + 0.20 (ℓ − 1) ÷ 49', ...LV.map((l) => term2(l).toFixed(2))],
+      ['Tier 2: what prices K', '—', ...need2.map(([, v]) => v.toFixed(2))],
+      ['Tier 3 term, 1.12 + 0.30 (ℓ − 1) ÷ 49', ...LV.map((l) => term3(l).toFixed(2))],
+      ['Tier 3: what prices K', '—', ...need3.map(([, v]) => v.toFixed(2))],
+      ['Was: SB3 (Tier 2)', '1.00', '1.05', '1.10', '1.16', '1.22', '1.27'],
+      ['Was: SB4 (Tier 3)', '1.08', '1.15', '1.24', '1.32', '1.40', '1.48'],
+    ])
+  })()
+
+  // 3. Idle stages: horizontal bars with the 10% band line.
+  const IDLE = [
+    ['Tier 1 (4 · 3 · 3 kinds)', '--s1', 77, 111], ['Tier 2, today’s weapons', '--s2', 391, 421], ['Tier 2, one two-kind weapon', '--s2', 193, 210],
+    ['Tier 3, today’s weapons', '--s3', 394, 410], ['Tier 3, two two-kind weapons', '--s3', 142, 134],
+  ]
+  legend('idle-legend', [['--s1', 'Tier 1'], ['--s2', 'Tier 2'], ['--s3', 'Tier 3']])
+  ;(() => {
+    const host = document.getElementById('idle-chart')
+    const W = 640, L = 210, R = 56, rowH = 34, T = 22, H = T + rowH * IDLE.length + 26, pw = W - L - R, max = 20
+    const X = (v) => L + pw * v / max
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Share of stages that leave a party member nothing weak, by tier and weapons' }, host)
+    for (const t of [0, 5, 10, 15, 20]) { el('line', { x1: X(t), x2: X(t), y1: T, y2: T + rowH * IDLE.length, class: 'gridl' }, svg); el('text', { x: X(t), y: H - 6, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `${t}%` }
+    el('rect', { x: X(0), y: T, width: X(10) - X(0), height: rowH * IDLE.length, style: 'fill:var(--band)' }, svg)
+    el('text', { x: X(10), y: T - 8, 'text-anchor': 'middle', class: 'soft' }, svg).textContent = 'the check: ≤ 10%'
+    IDLE.forEach(([name, c, a, b], i) => {
+      const v = 100 * (a + b) / 4800, y = T + i * rowH + 8
+      el('text', { x: L - 10, y: y + 13, 'text-anchor': 'end', class: 'lab' }, svg).textContent = name
+      const r = el('rect', { x: X(0), y, width: X(v) - X(0), height: 18, rx: 4, style: `fill:var(${c})` }, svg)
+      el('rect', { x: X(0), y, width: 4, height: 18, style: `fill:var(${c})` }, svg)
+      hover(r, `<b>${name}</b>Party 1 ${a} of 2,400 (${(a / 24).toFixed(1)}%) · Party 2 ${b} (${(b / 24).toFixed(1)}%)`)
+      el('text', { x: X(v) + 6, y: y + 13, class: 'val' }, svg).textContent = `${v.toFixed(1)}%`
+    })
+    table('idle-table', ['Scenario', 'Party 1', 'Party 2', 'Regular answers', 'Sub-boss', 'Boss'], [
+      ['Tier 1', '77 (3.2%)', '111 (4.6%)', '4.32 · 4.35', '3.75 · 3.71', '3.77 · 3.77'],
+      ['Tier 2, today’s weapons', '391 (16.3%)', '421 (17.5%)', '3.64 · 3.69', '3.62 · 3.71', '3.70 · 3.74'],
+      ['Tier 2, one two-kind weapon', '193 (8.0%)', '210 (8.8%)', '4.33 · 4.30', '4.47 · 4.33', '4.29 · 4.35'],
+      ['Tier 3, today’s weapons', '394 (16.4%)', '410 (17.1%)', '3.63 · 3.67', '3.69 · 3.71', '3.73 · 3.76'],
+      ['Tier 3, two two-kind weapons', '142 (5.9%)', '134 (5.6%)', '4.59 · 4.56', '4.67 · 4.56', '4.65 · 4.65'],
+    ])
+  })()
+
+  // 4. MP: refund a round at Lv 50, today (ring) → ×1.7 · ×2.4 (dot), Tier 1 as a tick.
+  const MP = [['Brawler', 37, [30, 35], [29, 36]], ['Sorcerer', 50, [42, 49], [40, 50]], ['Spellblades', 46, [40, 48], [38, 48]], ['Summoners', 41, [36, 42], [34, 43]], ['Paladin, Cleric', 94, [78, 93], [75, 95]]]
+  legend('mp-legend', [['--s1', 'Tier 1', 'line'], ['--s2', 'Tier 2 today (×2)', 'ring'], ['--s2', 'Tier 2 at ×1.7', 'dot'], ['--s3', 'Tier 3 today (×3)', 'ring'], ['--s3', 'Tier 3 at ×2.4', 'dot']])
+  ;(() => {
+    const host = document.getElementById('mp-chart')
+    const W = 640, L = 120, R = 24, rowH = 46, T = 8, H = T + rowH * MP.length + 26, pw = W - L - R
+    const X = (v) => L + pw * v / 100
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'MP a round as a share of her deepest act, Lv 50, by class and tier' }, host)
+    for (const t of [0, 25, 50, 75, 100]) { el('line', { x1: X(t), x2: X(t), y1: T, y2: T + rowH * MP.length, class: 'gridl' }, svg); el('text', { x: X(t), y: H - 6, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `${t}%` }
+    MP.forEach(([name, t1, t2, t3], i) => {
+      const y0 = T + i * rowH
+      el('text', { x: L - 10, y: y0 + 26, 'text-anchor': 'end', class: 'lab' }, svg).textContent = name
+      el('line', { x1: X(t1), x2: X(t1), y1: y0 + 6, y2: y0 + 40, style: 'stroke:var(--s1);stroke-width:2;stroke-linecap:round' }, svg)
+      ;[[t2, '--s2', 'Tier 2', '×1.7', 16], [t3, '--s3', 'Tier 3', '×2.4', 32]].forEach(([[a, b], c, tn, f, dy]) => {
+        const y = y0 + dy
+        el('line', { x1: X(a), x2: X(b), y1: y, y2: y, style: `stroke:var(${c});stroke-width:2;opacity:.55` }, svg)
+        el('circle', { cx: X(a), cy: y, r: 4.5, style: `fill:var(--panel);stroke:var(${c});stroke-width:2` }, svg)
+        el('circle', { cx: X(b), cy: y, r: 5, style: `fill:var(${c});stroke:var(--panel);stroke-width:2` }, svg)
+        const h = el('rect', { x: X(Math.min(a, b, t1)) - 8, y: y - 8, width: Math.abs(X(Math.max(a, b, t1)) - X(Math.min(a, b, t1))) + 16, height: 16, class: 'hit' }, svg)
+        hover(h, `<b>${name}, ${tn}</b>Refund a round: today ${a}% → at ${f} ${b}% (Tier 1 ${t1}%)`)
+      })
+    })
+    table('mp-table', ['Class (Lv 50)', 'Tier 1', 'Tier 2 today', 'Tier 2 ×1.7', 'Tier 3 today', 'Tier 3 ×2.4'], MP.map(([n, a, [b, c], [d, e]]) => [n, `${a}%`, `${b}%`, `${c}%`, `${d}%`, `${e}%`]))
+  })()
+})()
+</script>
+</body>
+</html>

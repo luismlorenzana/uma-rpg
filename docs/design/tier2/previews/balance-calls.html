@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Balance Calls Review</title>
+<!-- docs/design/tier2/balance.md (T2B): every old call carried with its status, every new call with its recommendation,
+     and the old previews carried or retired. Self-contained; kit colours from tier-rework/previews/_template.html. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 24px 64px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 8px; }
+  h2 { font: 700 18px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 8px; }
+  p, li { color: var(--ink-soft); }
+  .lead { font-size: 15px; max-width: 900px; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .st-k { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .st-kc { background: color-mix(in srgb, var(--info) 16%, transparent); color: var(--info); }
+  .st-s { background: color-mix(in srgb, var(--locked) 22%, transparent); color: var(--ink-soft); }
+  .st-b { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td:first-child { white-space: nowrap; font-weight: 700; color: var(--ink); }
+  nav.top { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 18px; position: sticky; top: 0; background: var(--page); padding: 8px 0; z-index: 5; }
+  nav.top a { padding: 4px 11px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; }
+  nav.top a.out { background: transparent; border: 1px solid var(--hairline-strong); }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .tile { background: var(--panel); border-radius: var(--radius); padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .tile .n { font: 800 30px/1 ui-rounded, system-ui, sans-serif; color: var(--ink); }
+  .tile .t { margin-top: 6px; font-size: 13px; color: var(--ink-soft); }
+  .tile .w { margin-top: 4px; font-size: 12px; color: var(--ink-faint); }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 10px; }
+  .filters button { border: 1px solid var(--hairline-strong); background: transparent; color: var(--ink-soft); font: 600 12.5px system-ui, sans-serif; padding: 4px 11px; border-radius: 999px; cursor: pointer; }
+  .filters button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .rec { color: var(--ink); }
+  .muted { color: var(--ink-faint); }
+  @media (max-width: 900px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } main { padding: 16px 16px 48px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Balance in Tiers 2 and 3: every call</h1>
+  <p class="lead">For the owner's review: <b>42 old calls</b> carried from stat balance (SB), weaknesses v2 (WK) and the combat pass (D282),
+    each with its status and why; then <b>19 new calls</b> (T2B1–T2B19), each with its recommendation. Statuses follow the set's brief:
+    kept, kept and changed (by a Tier 1 decision), superseded, or broken (written for a Tier 1 that no longer exists).</p>
+  <nav class="top">
+    <a href="#old">Old calls</a><a href="#new">New calls</a><a href="#pages">Old previews</a>
+    <a class="out" href="../balance.md">The doc →</a><a class="out" href="balance-tiers.html">By tier →</a><a class="out" href="balance-sim.html">The simulation →</a>
+  </nav>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section id="old" class="card">
+    <h2>The approved drafts, call by call</h2>
+    <div class="filters" id="filters" role="group" aria-label="Filter by status"></div>
+    <div class="scroll"><table>
+      <thead><tr><th>Call</th><th>What it said</th><th>Status</th><th>Why</th><th>Now</th></tr></thead>
+      <tbody id="old-body"></tbody>
+    </table></div>
+  </section>
+
+  <section id="new" class="card">
+    <h2>New calls (T2B1–T2B19), each with its recommendation</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Call</th><th>Recommendation</th><th>Alternatives</th><th>Why</th></tr></thead>
+      <tbody id="new-body"></tbody>
+    </table></div>
+  </section>
+
+  <section id="pages" class="card">
+    <h2>The old previews, carried or retired</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Page (tier-rework/previews/)</th><th>Status</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><a href="../../tier-rework/previews/balance-summary.html">balance-summary.html</a></td><td><span class="chip st-k">Carried</span> into <a href="balance-tiers.html">balance-tiers.html</a></td><td>Its three problems on today's Tier 1: the term re-sized, the mirror as data, MP as the skill MP factor</td></tr>
+        <tr><td><a href="../../tier-rework/previews/balance-sheets.html">balance-sheets.html</a></td><td><span class="chip st-k">Carried</span> into balance-tiers.html § Sources</td><td>The sheets by source, now from the code</td></tr>
+        <tr><td><a href="../../tier-rework/previews/stats-by-tier.html">stats-by-tier.html</a></td><td><span class="chip st-k">Carried</span> into balance-tiers.html § Sources</td><td>Max stats by tier and their sources</td></tr>
+        <tr><td><a href="../../tier-rework/previews/balance-damage.html">balance-damage.html</a></td><td><span class="chip st-k">Carried</span> into <a href="balance-sim.html">balance-sim.html</a>; viability <span class="chip st-s">retired</span></td><td>Damage and the checks are the simulation's; the forms it ranked are gone (D264, D266)</td></tr>
+        <tr><td><a href="../../tier-rework/previews/class-weaknesses.html">class-weaknesses.html</a></td><td><span class="chip st-s">Retired</span>; by-tier rows carried into balance-tiers.html § Weaknesses</td><td>Its twins and CP6's narrowing are superseded (D235); the Rift's fronts row carried; its Limit Break coverage is T2C's</td></tr>
+        <tr><td><a href="../../tier-rework/previews/weaknesses-v2.html">weaknesses-v2.html</a></td><td><span class="chip st-s">Retired</span></td><td>Built and in the manual (D236, D237); its Tiers 2–3 row carried into balance-tiers.html</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</main>
+<script>
+(() => {
+  const ST = { k: ['Kept', 'st-k'], kc: ['Kept, changed', 'st-kc'], s: ['Superseded', 'st-s'], b: ['Broken', 'st-b'] }
+  const OLD = [
+    ['SB1', 'Flat values × 1 · 1.8 · 2.6; percentages stay', 'k', '', 'Measured on today’s sources: shares within 2.2 points', 'T2B1'],
+    ['SB2', 'An analytic model is the pre-simulation yardstick', 's', 'D249, D266, D282', 'Every Tier 1 number since R1 is measured on the engine’s harness', 'T2B2'],
+    ['SB3', 'Tier 2’s term: HP and DEF × (1 + 0.27 (ℓ − 1) ÷ 49), offense +10%', 'b', '', 'Sized on a toolbox that held the second accessory slot (D264 moved all three into Tier 1) and on CP6’s narrowing (WK8 replaced it)', 'T2B4'],
+    ['SB4', 'Tier 3’s term: × (1.08 + 0.40 (ℓ − 1) ÷ 49)', 'b', '', 'The same: the third slot is Tier 1’s, the narrowing gone', 'T2B5'],
+    ['SB5', 'Bosses: the term × 1.1', 'kc', 'D235', 'New reason: with WK8 a regular loses a kind and a boss doesn’t, so two-kind weapons lift a boss’s answers 14–23% over Tier 1’s', 'T2B6'],
+    ['SB6', 'Boss shields 6 · 9 · 10', 'kc', 'D207, WK5', 'Tier 1’s boss is 8 and sub-boss 6; the +1 a tier stands on 8', 'T2B7'],
+    ['SB7', 'Ceilings ×1.50 · ×2.16 · ×2.49; the Rift prices the tuned peak', 'kc', 'D264, D266', 'Three Insignias make Tier 1’s ceiling ×1.69; the Rift rule stands', 'T2B9, T2B14'],
+    ['SB8', 'Toll Bell +0.05; Great Pendant 0.55', 'b', '', 'The Bell retired and the Pendant became +ATK (D264); branch forms are T2G’s; the viability rule stands', 'T2B19'],
+    ['SB9', 'Channel parity within 0.4 points', 'kc', 'D264', 'The Pendant and the Charm mirror by construction; the Bell row goes', 'T2B19'],
+    ['SB10', 'A hybrid’s single-kind forms and Full moon on her lead half', 'kc', 'D263, D266', 'Built: her stat twice and an Orb on her lead half’s twin; the moon is T2E’s', 'T2E'],
+    ['SB11', 'The Summoner’s Arms hand 0.56 → 0.48', 's', 'D249', 'Arms Summoner 0.57 + 0.46, Tome Summoner 0.57 + 0.5', 'T2B16'],
+    ['SB12', 'Paladin and Cleric equal; branch pairs ±10%', 's', 'D282', 'One kit, every number shared (H3); the ±10% band carries', 'T2B17'],
+    ['SB13', 'A regular’s hit 18.7 · 18.3 · 18.1%; armor kept', 'k', '', 'The code: 19.0 · 18.4 · 18.2%', 'T2B15'],
+    ['SB14', 'No MP pool change; the regen’s share, Vigor, then legs', 'k', '', 'Still the order; T2B10 is a separate Tier 2–3 fix', 'T2B11'],
+    ['SB15', 'The signature +0.2 a level × tier', 's', 'D266', '0.1 a level × tier: 1.6–1.8% of her lead offense', 'T2U'],
+    ['SB16', 'Skill Ranks ×0.95–×1.05; the balance party on the real pace', 'kc', 'D249', 'Tier 1’s pace now banks the Tier 0’s Ranks (depths at Lv 10 · 16 · 22 · 29)', 'T2B3'],
+    ['SB17', 'The follow-ups land as logged edits', 's', 'D238', 'Done; the drafts move to the archive after this set’s review', '—'],
+    ['SB18', 'A base MP regen, 0.8% a depth, tier-free', 'kc', 'D215', '1.0% a depth, 5% at most; tier-free only with T2B10’s skill MP', 'T2B10, T2B11'],
+    ['WK1', 'Regulars 2 + 2; sub-bosses and bosses 3', 'k', '', 'Tier 1’s rule, and Tiers 2–3’s before the breadth gate', 'T2B8'],
+    ['WK2', 'The ring’s answer leads', 'k', '', 'Every tier', '—'],
+    ['WK3', 'Arms from the stage’s deck', 'k', '', 'Every tier', '—'],
+    ['WK4', 'Fixed per stage', 'k', '', 'Every tier', '—'],
+    ['WK5', 'Shields stay: 2–3, 6, 8', 'k', '', 'Tier 1’s; Tiers 2–3 step from it', 'T2B7'],
+    ['WK6', 'Locks stay', 'k', '', 'Every tier', '—'],
+    ['WK7', 'Icons on the foe card', 'k', '', 'Three or four in every tier', '—'],
+    ['WK8', 'Tiers 2–3 every rank 3, a regular by role; shields by R4/R5', 'kc', 'D238', 'R4 and R5 deferred, so shields are T2B7’s; three kinds hold only with two-kind weapons: one stage in six idle without', 'T2B7, T2B8'],
+    ['WK9', 'The Rift unchanged', 'kc', 'D240, D249', 'The twins re-paired; RIFT_TUNING_V19', 'T2B9'],
+    ['WK10', 'One helper for every generator', 'k', '', 'rpgStageWeaknesses, every tier', '—'],
+    ['WK11', 'Engine v18; R3–R5 on v19–v21', 's', 'D238, D257, D261, D282', 'v19–v21 went to Classes v3, the halls’ trim and the combat pass', '§6'],
+    ['WK12', 'The checks', 'kc', 'D263', 'On the owner’s two parties, in every tier, plus ≤ 10% idle stages', 'T2B8, T2B18'],
+    ['WK13', 'The Summoner’s Tome 0.62', 's', 'D249', 'The lead hand is 0.57', 'T2B16'],
+    ['D282 B1', 'Foes don’t guard', 'k', '', 'Every tier; a Tier 2–3 special boss is T2W’s', '—'],
+    ['D282 I1', 'One symbol per kind', 'k', '', '—', '—'],
+    ['D282 H1', 'Depth 5 heals the most hurt whole, the rest ×0.4', 'k', '', 'A share: tier-free', 'T2B17'],
+    ['D282 H2', 'A mend lifts the most hurt to 60%', 'k', '', 'A share: tier-free', '—'],
+    ['D282 H3', 'The Paladin and the Cleric share every number', 'k', '', 'T2C’s branches keep it', 'T2B17'],
+    ['D282 S1', 'Summoners keep no legacy debuff', 'k', '', '—', 'T2B12'],
+    ['D282 F1', 'A Spellblade’s extra hit is her familiar’s', 'k', '', 'The rail counts it', 'T2B9'],
+    ['D282 D1', 'Buffs and debuffs on Greatsword, Lance and Fire for the healers', 'k', '', '—', 'T2B12'],
+    ['D282 D2', 'Three levels of access', 'k', '', 'Widening is T2C’s', 'T2B12'],
+    ['D282 D3', 'Aegis, Breaker, Clarity, Hex and Shatter retire', 'k', '', '—', 'T2B12'],
+    ['D282 D4', 'The Healer Sanctum’s stacks stay', 'k', '', '—', 'T2B13'],
+  ]
+  const NEW = [
+    ['T2B1', 'Every flat value (armor, Might, Pendant, Charm, Orb, Extra Stats, ★ and every new Tier 2–3 flat source) is Tier 1’s × 1.8 and × 2.6; percentages stay; a new source joins the sources table before it ships', 'Per-stat multipliers for HP and MP', 'Within 2.2 points at every tier’s Lv 50 on the code'],
+    ['T2B2', 'Every Tier 2–3 number is measured on the harness (balance-t2.test.ts); an analytic estimate only sizes a knob', 'SB2’s analytic model', 'Every Tier 1 number since R1 came from the engine'],
+    ['T2B3', 'A Tier 1 class’s Ranks 1–10 in a later world take the Tier 0 ladder’s Class EXP (3,600), so depths open at Lv 10 · 16 · 22 · 29 in every tier', 'Accept the faster pace (fights 5–17% short at Lv 13–29); the foes’ reach reads it', 'One curve for every tier; the foes stay tuned; T2C or T2W implements'],
+    ['T2B4', 'Tier 2: foes’ HP and DEF × (1.08 + 0.20 (ℓ − 1) ÷ 49), offense × (1 + 0.10 (ℓ − 1) ÷ 49); provisional until the simulation sets it', 'SB3’s 1.00 → 1.27; no term', 'Prices the kept toolbox (K 1.15 → 1.39) with no narrowing to cancel the focus'],
+    ['T2B5', 'Tier 3: × (1.12 + 0.30 (ℓ − 1) ÷ 49), offense +10%; provisional', 'SB4’s 1.08 → 1.48', 'K 1.25 → 1.64; the third slot is Tier 1’s now'],
+    ['T2B6', 'Bosses’ HP and DEF × 1.1 on the term in Tiers 2–3', 'No boss factor', 'Two-kind weapons lift a boss’s answers 14–23% over Tier 1’s'],
+    ['T2B7', 'Regulars by formation in every tier; sub-bosses 6 · 7 · 7 and bosses 8 · 9 · 10, stepping at the breadth gate; Keys, guards and escorts as Tier 1’s; Tier 1’s everywhere if there is no two-kind weapon', 'Today’s 6 and 8 in every tier; SB6’s 6 · 9 · 10', 'Tier 1’s shield × answers ÷ Tier 1’s (CP8’s rule)'],
+    ['T2B8', 'WK8’s three kinds by role from the breadth gate, Tier 1’s 2 + 2 before it; without a two-kind weapon, 2 + 2 everywhere; WK12’s checks in every tier plus ≤ 10% idle stages', 'WK8 from Lv 1 (16–18% idle before G5); 3 + 1 by role everywhere', 'The lists narrow when her weapons widen; the floor holds'],
+    ['T2B9', 'The Rift draws by front in every tier; a Tier 2 front takes the world’s term and RIFT_TUNING_V19; the Duel’s shields are the best act’s or Limit Break’s chips + 3, at least 13; Tier 3’s Rift the same rule', 'New Tier 2 draws; fixed shields', 'A hit chips one point whatever its kinds'],
+    ['T2B10', 'Skill MP × 1.7 in Tier 2 and × 2.4 in Tier 3 at the engine stage; the code’s × tier goes', 'Keep × 2 · × 3; × 1.8 · × 2.6', 'Her bar grows × 1.73 and × 2.46; every class within 2 points of Tier 1’s'],
+    ['T2B11', 'The base regen stays 1% of her bar a depth, five at most, in every tier', 'A per-tier share', 'Tier-free once T2B10 lands'],
+    ['T2B12', 'Statuses tier-free: +10% a stack (foes’ 15%), cap 3, two rounds, Burn 4%; a new status keeps the step and cap; D282’s three levels carry unless T2C widens them', 'A step by tier', 'Percentages hold their share'],
+    ['T2B13', 'Limit Breaks tier-free: power × scale × open depth’s power, ≤ 10 hits a foe, gauge 12; the Bond restart priced by the harness’s ramp', 'A power by tier', 'The offense it multiplies carries the tier'],
+    ['T2B14', 'WP31’s steps; Tier 2–3 multipliers in steps 3–4; ceilings ×1.69 · ×2.24 · ×2.54 before statuses; no cap', 'Cap the product', 'The terms price the on-curve act, the Rift the tuned one'],
+    ['T2B15', 'Armor as it is: a regular’s hit 19.0 · 18.4 · 18.2%, about 21% with the term’s offense; armor’s HP a grade the knob', 'More armor HP for Tiers 2–3', 'Inside SB13’s target'],
+    ['T2B16', 'Classes v3’s mirror bands carry into every tier; the hands first, then T2C’s class skills; no hand moves before the toolbox is measured', 'Tune Tier 3’s Tome Summoner now', 'A hand moves Tier 1 too'],
+    ['T2B17', 'Paladin ÷ Cleric within ±10% in every tier (today 99–106%); T2C’s healer branches keep one shared kit', 'Per-branch healer numbers', 'D282’s H3 closed D249’s miss'],
+    ['T2B18', 'The simulation’s thirteen checks, bands and knobs, against the Tier 1 reference row', '—', 'One list for the packet that builds Tiers 2–3'],
+    ['T2B19', 'D266’s viability rule for every Tier 2–3 form, re-run at Tier 2 and 3 Lv 50; parity by construction', 'SB8’s values', 'The Bell retired; T2G owns the forms'],
+  ]
+  const count = (s) => OLD.filter((r) => r[2] === s).length
+  document.getElementById('tiles').innerHTML = [['k', 'Most stand on today’s Tier 1'], ['kc', 'A Tier 1 decision changed them'], ['s', 'A Tier 1 decision replaced them'], ['b', 'SB3, SB4, SB8: fixed by T2B4, T2B5, T2B19']]
+    .map(([s, w]) => `<div class="tile"><div class="n">${count(s)}</div><div class="t"><span class="chip ${ST[s][1]}">${ST[s][0]}</span></div><div class="w">${w}</div></div>`).join('')
+  const body = document.getElementById('old-body')
+  const draw = (f) => { body.innerHTML = OLD.filter((r) => !f || r[2] === f).map(([id, what, s, by, why, now]) => `<tr><td>${id}</td><td>${what}</td><td><span class="chip ${ST[s][1]}">${ST[s][0]}</span>${by ? ` <span class="muted">(${by})</span>` : ''}</td><td>${why}</td><td>${now}</td></tr>`).join('') }
+  const filters = document.getElementById('filters')
+  ;[['', `All ${OLD.length}`], ...Object.entries(ST).map(([k, [n]]) => [k, `${n} ${count(k)}`])].forEach(([k, n], i) => {
+    const b = document.createElement('button'); b.textContent = n; b.setAttribute('aria-pressed', i ? 'false' : 'true')
+    b.onclick = () => { filters.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); draw(k) }
+    filters.appendChild(b)
+  })
+  draw('')
+  document.getElementById('new-body').innerHTML = NEW.map(([id, rec, alt, why]) => `<tr><td>${id}</td><td class="rec">${rec}</td><td>${alt}</td><td>${why}</td></tr>`).join('')
+})()
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Balance Simulation by Tier</title>
+<!-- docs/design/tier2/balance.md (T2B): the fight simulation's Tier 1 reference row, today's Tiers 2–3, the Class Rank
+     pace, the mirrors and the healers, and the checklist. Measured on engine v21 (the owner's two parties, on curve,
+     Auto, 8 seeds a stage). Self-contained; kit colours from tier-rework/previews/_template.html. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    --s1: #c49a1c; --s2: #a8482a; --s3: #7a5ad0;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100;
+    --band: rgb(47 122 79 / 0.10); --grid: rgb(16 26 36 / 0.08);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --s1: #b3902a; --s2: #b5452e; --s3: #8b76e2;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500;
+      --band: rgb(79 179 122 / 0.12); --grid: rgb(255 255 255 / 0.08);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 24px 64px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 8px; }
+  h2 { font: 700 18px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 6px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .lead { font-size: 15px; max-width: 900px; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.ok { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .chip.out { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.hl td { background: var(--raised); }
+  td.bad { color: var(--danger); font-weight: 700; }
+  nav.top { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 18px; position: sticky; top: 0; background: var(--page); padding: 8px 0; z-index: 5; }
+  nav.top a { padding: 4px 11px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; }
+  nav.top a.out { background: transparent; border: 1px solid var(--hairline-strong); }
+  .two { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); gap: 22px; align-items: start; }
+  .say { font-size: 14px; color: var(--ink-soft); } .say b { color: var(--ink); }
+  .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .calls { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 6px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
+  .sw.line { width: 18px; height: 3px; border-radius: 2px; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: system-ui, -apple-system, sans-serif; }
+  .ax { fill: var(--ink-faint); font-size: 11.5px; }
+  .lab { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .soft { fill: var(--ink-soft); font-size: 11.5px; }
+  .gridl { stroke: var(--grid); stroke-width: 1; }
+  .hit { fill: transparent; } .hit:focus { outline: none; } .hit:focus-visible { stroke: var(--accent); stroke-width: 2; }
+  details { margin-top: 10px; } summary { cursor: pointer; color: var(--ink-soft); font-size: 13px; font-weight: 650; }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12.5px; line-height: 1.4; opacity: 0; transition: opacity .08s; left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 900px) { .two { grid-template-columns: 1fr; } main { padding: 16px 16px 48px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The fight simulation, Tier 1 → 2 → 3</h1>
+  <p class="lead">Measured on <b>engine v21 today</b>: the owner's two parties (Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Paladin;
+    Brawler, Sorcerer, Tome Spellblade, Arms Summoner, Cleric) at their presets and three accessory slots, on curve, first try on Auto,
+    8 seeds a stage, every region stage at the level. <b>Wins are 100% in every cell.</b> Tiers 2 and 3 are Tier 1's rules × tier, the toolbox unbuilt.</p>
+  <nav class="top">
+    <a href="#ref">The reference row</a><a href="#tiers">Tiers 2–3 today</a><a href="#pace">The Class Rank pace</a><a href="#mirror">Mirrors and healers</a><a href="#check">The checklist</a>
+    <a class="out" href="../balance.md">The doc →</a><a class="out" href="balance-tiers.html">By tier →</a><a class="out" href="balance-calls.html">Every call →</a>
+  </nav>
+
+  <section id="ref" class="card">
+    <div class="head"><h2>The Tier 1 reference row</h2><span class="calls"><span class="chip">T2B18</span></span></div>
+    <p class="say">Rounds a fight · rounds to her first Break, every Tier 1 region stage at the level. Lv 40 from the committed <code>balance-v21.test.ts</code> (rounds only).</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Lv</th><th class="num">Party 1 regular</th><th class="num">sub-boss</th><th class="num">boss</th><th class="num">Party 2 regular</th><th class="num">sub-boss</th><th class="num">boss</th></tr></thead>
+      <tbody id="ref-body"></tbody>
+    </table></div>
+  </section>
+
+  <section id="tiers" class="card">
+    <div class="head"><h2>Tiers 2 and 3 today play at Tier 1's pace, until the Class Rank differs</h2><span class="calls"><span class="chip">T2B3</span><span class="chip">T2B4</span></span></div>
+    <div class="two">
+      <div>
+        <p class="say">Rounds a fight ÷ Tier 1's at the same tier level, the mean of regulars, sub-bosses and bosses over both parties. <b>At Tier 1's Class Rank pace</b> (solid dots) every cell is inside ±10%. <b>From Class Rank 1</b> (rings), what a later tier does today, Lv 20's fights run 9–12% short on average, sub-bosses to 17%.</p>
+        <div class="legend" id="r-legend"></div>
+        <div id="r-chart"></div>
+      </div>
+      <div>
+        <h3>What it means</h3>
+        <p class="say"><b>With no Tier 2 tools, no term is needed:</b> a Tier 2 world is Tier 1's × tier and the build budget restarts with her grades. The term (T2B4, T2B5) prices only what the set adds.</p>
+        <p class="say"><b>The pace is the one gap today:</b> with no Tier 0 bank a later tier opens depths two to three levels sooner (§ below). T2B3 puts it on Tier 1's curve.</p>
+        <p class="say"><b>Breaks:</b> rounds to her first Break within ±0.6 of Tier 1's in every cell, so today's shields hold until the two-kind weapons arrive (T2B7).</p>
+      </div>
+    </div>
+    <details><summary>Show the numbers</summary><div class="scroll" id="r-table"></div></details>
+  </section>
+
+  <section id="pace" class="card">
+    <div class="head"><h2>The Class Rank pace</h2><span class="calls"><span class="chip">T2B3</span></span></div>
+    <div class="two">
+      <div>
+        <p class="say">The balance party's Class Rank by Uma Level (2E Class EXP a win). <b>Tier 1</b> fights a Tier 0 to Rank 10 at Lv 10 and opens her class there. <b>A later tier</b> starts her class at Rank 1 with no Tier 0 bank, so she reaches each depth sooner.</p>
+        <div class="legend" id="p-legend"></div>
+        <div id="p-chart"></div>
+      </div>
+      <div>
+        <h3>Depths open at Uma Lv</h3>
+        <div class="scroll"><table>
+          <thead><tr><th>Depth (Class Rank)</th><th class="num">Tier 1</th><th class="num">A later tier today</th></tr></thead>
+          <tbody>
+            <tr><td>2 (10)</td><td class="num">10</td><td class="num">7</td></tr>
+            <tr><td>3 (20)</td><td class="num">16</td><td class="num">13</td></tr>
+            <tr><td>4 (30)</td><td class="num">22</td><td class="num">20</td></tr>
+            <tr><td>5 (40)</td><td class="num">29</td><td class="num">27</td></tr>
+            <tr><td>Rank 50</td><td class="num">36</td><td class="num">34</td></tr>
+          </tbody>
+        </table></div>
+        <p class="say"><b>Recommended (T2B3):</b> a Tier 1 class's Ranks 1–10 in a later world take the Tier 0 ladder's Class EXP (3,600, twice their 1,800). Then the two lines are one, and the foes stay tuned.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="mirror" class="card">
+    <div class="head"><h2>The mirrors and the healers, where they stood</h2><span class="calls"><span class="chip">T2B16</span><span class="chip">T2B17</span></span></div>
+    <p class="say">Damage a turn on regular stages; this doc's run at Lv 10 · 20 · 30 · 50. <span class="chip out">red</span> is outside its band.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Measure (band)</th><th>D236 · v18</th><th>D249 · v19</th><th>Today, Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr></thead>
+      <tbody id="m-body"></tbody>
+    </table></div>
+    <p class="say"><b>Tier 3's Lv 50 dip</b> is MP's: her pair costs 87 of a 600 bar at ×3; T2B10's ×2.4 gives her 70. <b>No hand moves for Tiers 2–3</b> before the toolbox is measured: a hand moves Tier 1 too.</p>
+  </section>
+
+  <section id="check" class="card">
+    <div class="head"><h2>What the simulation must confirm (T2B18)</h2><span class="calls"><span class="chip">32 seeds for a delivery</span></span></div>
+    <div class="scroll"><table>
+      <thead><tr><th>#</th><th>Check</th><th>Band</th><th>Tier 1 reference</th><th>Today, Tiers 2–3</th><th>Knob, in order</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Wins on curve</td><td>100%</td><td>100%</td><td>100%</td><td>—</td></tr>
+        <tr class="hl"><td>2</td><td>Rounds a fight</td><td>±10% of Tier 1's</td><td>2.9–4.0 · 3.1–4.9 · 5.0–7.8</td><td>0.93–1.08; 0.83–0.95 at Lv 20 from Rank 1</td><td>The term; bosses × 1.1</td></tr>
+        <tr><td>3</td><td>Rounds to her first Break</td><td>±0.5</td><td>1.2–1.4 · 2.0–3.0 · 2.2–3.1</td><td>within ±0.6</td><td>Shields (T2B7)</td></tr>
+        <tr class="hl"><td>4</td><td>Stages leaving a member nothing</td><td>≤ 10% at every level</td><td>3–5%</td><td>16–18% without a two-kind weapon</td><td>The breadth gate (T2B8)</td></tr>
+        <tr><td>5</td><td>MP over a region</td><td>10–12 of 12; late pace ±10%</td><td>12 of 12 (D236)</td><td>not measured</td><td>T2B10, then the regen's share</td></tr>
+        <tr class="hl"><td>6</td><td>Deep casts a bar; refund</td><td>±10%; none refunded</td><td>7.1–18.4; 37–94%</td><td>13–19% fewer; 29–78%</td><td>T2B10</td></tr>
+        <tr><td>7</td><td>The mirrors (S3–S5)</td><td>±5%; 90–110%; 70/30 ± 5</td><td>92–106%; 99–117%; 72–81%</td><td>89–111%</td><td>The hands, then T2C's class skills</td></tr>
+        <tr><td>8</td><td>The healers</td><td>±10%</td><td>101–106%</td><td>99–106%</td><td>T2C's healer focus</td></tr>
+        <tr><td>9</td><td>Accessories</td><td>No mix best in over half; every family someone's best</td><td>met (D266)</td><td>not measured</td><td>T2G's branch rows</td></tr>
+        <tr><td>10</td><td>Defense</td><td>≈ 21% at Lv 50 with the term</td><td>19.0%</td><td>18.4 · 18.2%</td><td>Armor's HP a grade</td></tr>
+        <tr><td>11</td><td>The Rift's fronts</td><td>Right party 91–100%, champions 60–68%</td><td>D249's</td><td>not measured</td><td><code>riftTuning</code>'s scales</td></tr>
+        <tr><td>12</td><td>The Duel's rail</td><td>No act Breaks a Duel boss</td><td>10 chips, shields 13</td><td>the same</td><td>The Duel's shields (T2B9)</td></tr>
+        <tr><td>13</td><td>SB1</td><td>Shares within 2.2 points</td><td>—</td><td>met</td><td>—</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg'
+  const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (parent) parent.appendChild(n); return n }
+  const tip = document.getElementById('tip')
+  const showTip = (e, html) => { tip.innerHTML = html; tip.style.opacity = 1; const r = tip.getBoundingClientRect(); let x = (e.clientX ?? e.target.getBoundingClientRect().right) + 14, y = (e.clientY ?? e.target.getBoundingClientRect().top) + 14; if (x + r.width > innerWidth - 8) x = innerWidth - r.width - 8; if (y + r.height > innerHeight - 8) y -= r.height + 28; tip.style.left = x + 'px'; tip.style.top = y + 'px' }
+  const hideTip = () => { tip.style.opacity = 0 }
+  const hover = (node, html) => { node.setAttribute('tabindex', '0'); node.setAttribute('aria-label', html.replace(/<[^>]+>/g, ' ')); node.addEventListener('pointermove', (e) => showTip(e, html)); node.addEventListener('pointerleave', hideTip); node.addEventListener('focus', (e) => showTip(e, html)); node.addEventListener('blur', hideTip) }
+  const legend = (id, items) => { document.getElementById(id).innerHTML = items.map(([c, t, k = '', ring]) => `<span><i class="sw ${k}" style="${ring ? `background:transparent;border:2px solid var(${c})` : `background:var(${c})`}"></i>${t}</span>`).join('') }
+
+  // The reference row (rounds · first Break), Tier 1, v21.
+  const REF = [
+    [10, ['4.0 · 1.3', '4.2 · 3.0', '7.4 · 3.1'], ['4.0 · 1.4', '4.2 · 2.9', '7.5 · 2.9']],
+    [20, ['3.4 · 1.3', '3.9 · 2.7', '6.0 · 2.5'], ['3.3 · 1.3', '3.8 · 2.3', '6.0 · 2.5']],
+    [30, ['2.9 · 1.2', '3.1 · 2.0', '5.1 · 2.2'], ['2.9 · 1.2', '3.1 · 2.1', '5.0 · 2.3']],
+    [40, ['3.3', '4.0', '6.0'], ['3.3', '3.8', '5.9']],
+    [50, ['4.0 · 1.3', '4.9 · 2.7', '7.8 · 2.7'], ['3.9 · 1.4', '4.8 · 2.4', '7.3 · 2.6']],
+  ]
+  document.getElementById('ref-body').innerHTML = REF.map(([lv, a, b]) => `<tr><td>Lv ${lv}</td>${[...a, ...b].map((c) => `<td class="num">${c}</td>`).join('')}</tr>`).join('')
+
+  // Rounds ÷ Tier 1: [party][tier][pace][level] = [regular, sub-boss, boss].
+  const LV = [10, 20, 30, 50]
+  const R = {
+    'Party 1': { 2: { tier1: [[1.04, 1.02, 0.97], [1.00, 0.96, 0.98], [1.03, 1.03, 1.00], [1.03, 1.02, 0.98]], rank1: [[1.01, 1.00, 0.94], [0.90, 0.86, 0.89], [1.03, 1.02, 0.97], [1.03, 1.02, 0.98]] },
+                 3: { tier1: [[0.99, 1.00, 0.96], [1.02, 0.99, 0.96], [1.06, 1.03, 1.01], [1.01, 1.03, 0.97]], rank1: [[0.96, 0.98, 0.93], [0.92, 0.88, 0.89], [1.06, 1.02, 1.00], [1.01, 1.03, 0.97]] } },
+    'Party 2': { 2: { tier1: [[1.08, 0.99, 0.99], [1.01, 0.96, 0.98], [1.02, 0.99, 0.98], [1.01, 0.93, 1.01]], rank1: [[1.04, 0.97, 0.95], [0.93, 0.83, 0.88], [1.01, 0.98, 0.96], [1.01, 0.93, 1.01]] },
+                 3: { tier1: [[1.03, 1.01, 0.98], [1.02, 0.98, 0.99], [1.02, 1.02, 1.01], [0.99, 0.94, 1.00]], rank1: [[1.00, 0.99, 0.95], [0.95, 0.88, 0.91], [1.02, 1.01, 1.01], [0.99, 0.94, 1.00]] } },
+  }
+  const mean = (tier, pace, i) => { const xs = ['Party 1', 'Party 2'].flatMap((p) => R[p][tier][pace][i]); return xs.reduce((a, b) => a + b, 0) / xs.length }
+  const SERIES = [[2, 'tier1', '--s2', 'Tier 2, Tier 1’s pace', false], [3, 'tier1', '--s3', 'Tier 3, Tier 1’s pace', false], [2, 'rank1', '--s2', 'Tier 2, from Class Rank 1', true], [3, 'rank1', '--s3', 'Tier 3, from Class Rank 1', true]]
+  legend('r-legend', SERIES.map(([, , c, n, ring]) => [c, n, '', ring]))
+  ;(() => {
+    const host = document.getElementById('r-chart')
+    const W = 640, H = 290, L = 46, Rr = 24, T = 14, B = 30, pw = W - L - Rr, ph = H - T - B
+    const X = (i) => L + pw * (i + 0.5) / LV.length, Y = (v) => T + ph * (1 - (v - 0.8) / 0.35)
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Rounds a fight against Tier 1, by tier level, for Tiers 2 and 3 at two Class Rank paces' }, host)
+    el('rect', { x: L, y: Y(1.1), width: pw, height: Y(0.9) - Y(1.1), style: 'fill:var(--band)' }, svg)
+    el('text', { x: L + pw - 4, y: Y(1.1) + 13, 'text-anchor': 'end', class: 'soft' }, svg).textContent = 'the band: ±10%'
+    for (const v of [0.8, 0.9, 1.0, 1.1]) { el('line', { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: 'gridl' }, svg); el('text', { x: L - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = v.toFixed(1) }
+    LV.forEach((l, i) => el('text', { x: X(i), y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `Lv ${l}`)
+    SERIES.forEach(([tier, pace, c, name, ring], si) => {
+      const pts = LV.map((l, i) => [X(i) + (si - 1.5) * 9, Y(mean(tier, pace, i))])
+      el('path', { d: pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x},${y}`).join(' '), style: `stroke:var(${c});stroke-width:2;fill:none;stroke-linejoin:round;opacity:${ring ? 0.5 : 0.9}` }, svg)
+      pts.forEach(([x, y], i) => {
+        el('circle', { cx: x, cy: y, r: ring ? 4.5 : 5, style: ring ? `fill:var(--panel);stroke:var(${c});stroke-width:2` : `fill:var(${c});stroke:var(--panel);stroke-width:2` }, svg)
+        const cells = ['Party 1', 'Party 2'].map((p) => `${p}: ${R[p][tier][pace][i].map((v) => v.toFixed(2)).join(' · ')}`).join('<br>')
+        hover(el('circle', { cx: x, cy: y, r: 11, class: 'hit' }, svg), `<b>${name}, Lv ${LV[i]}</b>Mean ${mean(tier, pace, i).toFixed(2)}<br>${cells}<br><span>regular · sub-boss · boss</span>`)
+      })
+    })
+    const rows = []
+    for (const p of ['Party 1', 'Party 2']) for (const t of [2, 3]) for (const pace of ['tier1', 'rank1']) rows.push(`<tr><td>${p}, Tier ${t}, ${pace === 'tier1' ? 'Tier 1’s pace' : 'from Rank 1'}</td>${R[p][t][pace].map((c) => `<td class="num">${c.map((v) => `<span${v < 0.9 || v > 1.1 ? ' style="color:var(--danger);font-weight:700"' : ''}>${v.toFixed(2)}</span>`).join(' · ')}</td>`).join('')}</tr>`)
+    document.getElementById('r-table').innerHTML = `<table><thead><tr><th>Regular · sub-boss · boss</th>${LV.map((l) => `<th class="num">Lv ${l}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`
+  })()
+
+  // The Class Rank pace (balanceClassRank on v21 and on the from-Rank-1 curve).
+  const T1 = [10,10,10,10,10,10,10,10,10,10,11,13,15,17,19,20,22,24,25,27,28,30,31,33,34,36,37,39,40,42,43,45,46,48,49,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50]
+  const LT = [1,2,4,6,7,9,11,12,14,15,17,18,20,21,23,24,25,27,28,30,31,33,34,36,37,38,40,41,43,44,46,47,49,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50]
+  legend('p-legend', [['--s1', 'Tier 1 (a Tier 0 below Lv 10)', 'line'], ['--s2', 'A later tier today', 'line']])
+  ;(() => {
+    const host = document.getElementById('p-chart')
+    const W = 640, H = 280, L = 46, Rr = 60, T = 12, B = 30, pw = W - L - Rr, ph = H - T - B
+    const X = (l) => L + pw * (l - 1) / 49, Y = (r) => T + ph * (1 - r / 50)
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Class Rank by Uma Level, Tier 1 against a later tier' }, host)
+    for (const [r, d] of [[0, ''], [10, 'depth 2'], [20, 'depth 3'], [30, 'depth 4'], [40, 'depth 5'], [50, '']]) {
+      el('line', { x1: L, x2: L + pw, y1: Y(r), y2: Y(r), class: 'gridl' }, svg)
+      el('text', { x: L - 8, y: Y(r) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = r
+      if (d) el('text', { x: L + pw + 6, y: Y(r) + 4, class: 'soft' }, svg).textContent = d
+    }
+    for (const l of [1, 10, 20, 30, 40, 50]) el('text', { x: X(l), y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `Lv ${l}`
+    const path = (xs, from) => xs.map((r, i) => i + 1 < from ? null : `${i + 1 === from ? 'M' : 'L'}${X(i + 1)},${Y(r)}`).filter(Boolean).join(' ')
+    el('path', { d: path(T1, 10), style: 'stroke:var(--s1);stroke-width:2;fill:none;stroke-linejoin:round' }, svg)
+    el('path', { d: path(LT, 1), style: 'stroke:var(--s2);stroke-width:2;fill:none;stroke-linejoin:round' }, svg)
+    for (let l = 1; l <= 50; l++) hover(el('rect', { x: X(l) - pw / 98, y: T, width: pw / 49, height: ph, class: 'hit' }, svg), `<b>Uma Lv ${l}</b>Tier 1: ${l < 10 ? `a Tier 0 at Rank ${l}` : `Class Rank ${T1[l - 1]}`}<br>A later tier: Class Rank ${LT[l - 1]}`)
+  })()
+
+  // Mirrors and healers.
+  const M = [
+    ['S5 Tome Summoner ÷ Arms Spellblade (90–110%)', 'Summoner ÷ Spell Blade 110 · 88 · 90 (Lv 10 · 30 · 50)', '102–104; 114 at Lv 10', [117, 103, 102, 99], [103, 110, 95, 96], [111, 97, 94, 89], [90, 110]],
+    ['S5 Arms Summoner ÷ Tome Spellblade (90–110%)', '—', '98–106', [107, 106, 99, 99], [104, 106, 94, 98], [107, 103, 99, 95], [90, 110]],
+    ['S3 Tome ÷ Arms Spellblade, across the parties (±5%)', '—', '102–103', [101, 103, 106, 101], null, null, [95, 105]],
+    ['S4 Arms ÷ Tome Summoner, across the parties (±5%)', '—', '96–103', [92, 106, 102, 101], null, null, [95, 105]],
+    ['Arms Spellblade, physical (65–75%)', '—', '74–80 (missed)', [77, 75, 74, 77], null, null, [65, 75]],
+    ['Tome Spellblade, magical (65–75%)', '—', '68–74', [77, 74, 78, 81], null, null, [65, 75]],
+    ['Arms Summoner, physical (65–75%)', '—', '68–73', [72, 73, 74, 75], null, null, [65, 75]],
+    ['Tome Summoner, magical (65–75%)', 'Summoner 71 · 66 · 71', '66–72', [72, 70, 71, 74], null, null, [65, 75]],
+    ['Paladin ÷ Cleric, mends and absorbed Barriers (90–110%; Lv 10 · 30 · 50)', 'R1 111, R2 112', '89 · 147 · 121', [101, 104, 106], [99, 106, 104], [102, 101, 106], [90, 110]],
+  ]
+  const cell = (xs, [lo, hi]) => xs ? xs.map((v) => `<span${v < lo || v > hi ? ' style="color:var(--danger);font-weight:700"' : ''}>${v}</span>`).join(' · ') + '%' : '—'
+  document.getElementById('m-body').innerHTML = M.map(([n, a, b, t1, t2, t3, band]) => `<tr><td>${n}</td><td>${a}</td><td>${b}</td><td class="num">${cell(t1, band)}</td><td class="num">${cell(t2, band)}</td><td class="num">${cell(t3, band)}</td></tr>`).join('')
+})()
+</script>
+</body>
+</html>
