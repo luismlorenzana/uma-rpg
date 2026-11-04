@@ -105,7 +105,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
-| H167 | Skill names, one grammar for every Tier 1 tree (D298, [skill-names.md](../design/skill-names/skill-names.md)): a word a tree, Greater · Grand · Supreme, a capstone, line B as A's name with its word; 528 of the 560 live names, the Summoners' Bonded line now Oath and the healers' Heavy Surge; names only, no engine or save change | (this commit) |
+| H167 | Skill names, one grammar for every Tier 1 tree (D298, [skill-names.md](../design/skill-names/skill-names.md)): a word a tree, Greater · Grand · Supreme, a capstone, line B as A's name with its word; 528 of the 560 live names, the Summoners' Bonded line now Oath and the healers' Heavy Surge; names only, no engine or save change | `9d88510` |
 | H141 | Five native 24px star crests and eight native 16px stat marks (platform P80); the 120×220 UI atlas preserves every earlier frame, and native/2×/4× white, dark and night-sky previews passed review. Uma-art 2.19.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41880067892); H144 owns the pin and is Ready, as is H156's next art release. | Art `b612403` ([platform #64](https://github.com/luismlorenzana/uma-platform/pull/64)) |
 | H159 | Capital runs' foes: a fourth Finals route for all fourteen scenarios, the run's ids and its sixteen fights, the map's capitals byte for byte as before (D296) | `2938491` |
 | H157 | Collections live, save v35: the switch, the run-wide Ascend and the Observatory removed, the manual and the phone check (D288) | `ceab990` |
