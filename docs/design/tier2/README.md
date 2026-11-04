@@ -388,3 +388,74 @@ stays the template):
 | T2W13 | The fifteenth scenario's capital | Its own four authored Finals routes (original names, checked against the release), with Tier 3's world packets |
 | T2W14 | A sixteenth scenario | Tier 4 stays closed: it shows "Tier 4 locked" and joins no world until the owner opens Tier 4; Tier 3's Rift step completes her window only |
 | T2W15 | The version plan | The worlds first on today's engine (leans, packs, prices, Tier 3's Rift), then the toolbox as one release a tier: Tier 2 at engine v22 and save v39, Tier 3 at v23 and v40, each dark behind its switch |
+
+## 9. Round 2: the owner's requirements (2026-11-04)
+
+The owner, after reading the set:
+
+> - currently I've started introducing some slight variety to my parties with Arms and Tome summoners and spellblades as
+>   well as with clerics and paladins, however, I'm really scared of doing too extreme variants that may become hard to
+>   balance which is something very common in other games that add things like healers or buffers or hybrid dps and they
+>   become useless overall.
+> - I consider Tier 1 in it's current state in a "nice", "balanced-enough" state, so I want to try the more broad-reaching
+>   things in Tier 2 and later in Tier 3.
+> - Starting with classes, I definitely want to add at least 2 more Key Classes to evolve into, for each class, 1 class
+>   will keep most of it's identity, while the second branch will expand the class, for balance I will swap back and
+>   forth between each one, here is some baseline example.
+>   - Brawler → True Brawler: remains full physical and we add a self-buff mechanic. → Wild Magic Brawler: gets the
+>     chance to wear dual phys and magic weapons where magic weapons deal damage based on ATK.
+>   - Sorcerer → True Sorcerer: remains full magical and we add a self-buff mechanic. → Blade wielding Sorcerer: gets the
+>     chance to wear dual magic and phys weapons, where phys weapons deal damage based on MATK.
+>   - All other classes you'll have to cover, suggest further specializations, make supporters that deal a bit more
+>     damage, while having spellblades and summoners that support a bit.
+> - With the above I will be able to make either party comps that will look pretty similar to Tier 1 comps, or parties
+>   where I will swap both Brawler and Sorc, or parties where I will swap Paladin for dps and then spellblade to support
+>   so they balance each other. I would like you to include multiple party comps with proposed new classes and the
+>   overall party capabilities, how many weapons, pure damage capability vs supporting and healing capabilities.
+> - I want the new class to be selected on Tier 2 promotion.
+> - Then Weapons, I want for sure for them to be selected to their new weapon types on Tier 2 promotion, as weapons it's
+>   easier to swap around.
+> - Accessories I want to add some real complexity and have more of a upgrading tree for accessories, either Dual
+>   ATK+MATK increase, multi-damage type increases, and so on.
+> - Extra stats I want to get out there where unlocking the moon is one thing but then maybe slotting the actual extra
+>   stat per moon is something else, can we have moons boosting AoE damage and multi-hit damage in different
+>   proportions? different damage types? a little mp recovery here and there, a little life steal here and there? I craft
+>   and unlock the Sun and the moons but then in Tier 2 I have branches for every stat granted that I can select and swap
+>   freely.
+> - Finally professions, this I also want to increase greatly, in Tier 2 to at least every farming type having 2 types of
+>   materials being farmed and processed and finally crafted, these will feed every dual path we have on the other
+>   systems. I want Umas to gain Exp differently for each branch, but then I also want an Uma to be able to pick a
+>   sub-profession from another branch entirely, so each Uma would have the ability to farm and level 3 total
+>   professions now.
+> - If you haven't looked at the Uma Stained glass achievement mechanics, now would be a good time for it.
+
+### 9.1 How round 2 reads the requirements (the main session's calls; each doc may refine, never contradict)
+
+| Id | Call |
+|---|---|
+| R2-1 | **Tier 1 stays as built.** Everything below is Tier 2 and up; Tier 3 deepens what Tier 2 opens. |
+| R2-2 | **Sixteen Tier 2 classes, two from each Tier 1 class:** a **Keeper**, who keeps her parent's identity, and an **Expander**, who widens it. They replace round 1's class branches (focus, reverse set): each round-1 call they replace is marked Superseded (by R2-2), and what still fits (the class line, line C, tips, equipped slots, MP, the crown, masteries) is re-homed on the sixteen. |
+| R2-3 | **The expanders, by family:** the **Brawler** and the **Sorcerer** expand into the other channel on their own stat (the owner's Wild Magic Brawler: her Tomes deal damage on ATK; the Blade Sorcerer: her Arms on M.ATK), still pure damage. The **Spellblades and Summoners** expand into support: a little of the healers' kit (wider buffs and debuffs, a ward or a small mend), less damage. The **Paladin and the Cleric** expand into damage: a battle healer, more damage, less healing, still the party's one healer. |
+| R2-4 | **The keepers:** the Brawler's and the Sorcerer's add a **self-buff mechanic** (their own stacking power, never a party buff); the hybrids' and the healers' sharpen what Tier 1 gave them. Names are the classes doc's, checked against master data; the owner's are working titles ("True Brawler", "Wild Magic Brawler", "Blade wielding Sorcerer"). |
+| R2-5 | **Tier 2 promotion is the Ascend.** On her Ascend into Tier 2 she picks her Tier 2 class: one of the two children of a Tier 1 class she brought to Class Rank 50 (Class V already asks three). She can switch later among the Tier 2 classes open to her, each on its own Class Rank, as Tier 1's held classes work, so the owner can "swap back and forth". |
+| R2-6 | **Weapon types are picked at the same promotion:** her new class's three slots and each weapon's Tier 2 type (round 1's Pure or Dual and its partner, or what gear makes of it) are set on the Ascend sheet, then swap freely or cheaply ("weapons it's easier to swap around"). Round 1's "a weapon's G5 picks its branch" is Superseded (by R2-6). |
+| R2-7 | **Accessories get an upgrading tree** in Tier 2: per slot, a family's tree of forms that unlock as the slot's grade rises (dual ATK + M.ATK, several damage kinds, by shape, and so on), each form held to D266's viability rule (no form best in over half the cases, every form someone's best). Round 1's two forms a family grow into the tree. |
+| R2-8 | **Extra Stats split unlocking from slotting.** Jewels (crafted) still open the Sun (the Planet) and the moons' nodes; from Tier 2 **every open node takes a stat she picks** from its body's branch list and swaps freely: core stats, AoE and multi-hit damage (in different proportions), a damage kind or channel, a little MP back, a little life steal. Round 1's weapon moon becomes one of those choices or a body of its own, as the doc decides. |
+| R2-9 | **Professions: two materials a line from Tier 2,** each gathered, processed and crafted, each its own profession with its own EXP and Craft Level; the second material feeds the dual paths in the other systems (Dual weapons, dual accessory forms, Extra Stats branches). **Three professions an Uma:** her line's two plus one sub-profession from another line (replacing round 1's secondary). No new building art unless the doc shows the fifteen places can't hold it. |
+| R2-10 | **The windows (stained glass) grow with Tier 2:** the board's tracks read the new systems (Tier 2 classes, weapon types, the accessory tree, Extra Stats branches, three professions), its step count and pacing kept close to Tier 1's 36. |
+| R2-11 | **The balance guardrail (the owner's fear):** every class, keeper or expander, is worth the same to a party within a band, measured as **party value**: her own damage plus the damage her buffs and debuffs add to others plus the damage her mends and wards save, on the harness. Expanders trade damage for support (or back) at one exchange rate, so no variant is "useless overall". Tier 1-like comps, swapped-pure comps and swapped-support comps all fight within the same band. |
+| R2-12 | **Party comps:** the classes doc shows at least six comps (Tier 1-like, both pures swapped, healer to damage with a Spellblade to support, a Summoner support comp, a double-expander comp, a Tier 3 comp), each with its weapons covered, damage share, support share and healing; balance measures them. |
+
+### 9.2 Round 2's owners
+
+Ids continue in each doc (T2C31…, T2G21…, T2E21…, T2P27…, T2B20…, T2U21…, T2W16…); a round-1 call a requirement
+replaces is marked **Superseded (R2-n)** in its doc's Decisions table, and the doc is rewritten to read as one design.
+
+| Doc | Round 2 |
+|---|---|
+| classes.md | R2-2–R2-5, R2-12: the sixteen classes, their kits, slots and channels, promotion and switching, the comps |
+| gear.md | R2-6, R2-7: weapon types at promotion, the accessory tree |
+| extra-stats.md | R2-8: unlocking and slotting, the branch lists |
+| professions.md | R2-9: two materials a line, three professions an Uma |
+| balance.md | R2-11, R2-12: party value, the guardrail bands, the comps measured |
+| progression.md | R2-5's promotion flow on the Ascend sheet, R2-10's windows, and templates.md's touch-ups for the new classes |
