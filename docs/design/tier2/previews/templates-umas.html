@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Templates Uma by Uma</title>
+<!-- Tier 2 set, templates.md §2.1, §2.3, §4.10 and §5: two front runners Tier 1 to 3, one Uma per calling, the catalog of 75
+     with today's counts, and the signature families by calling. Every Uma here is made up; roster figures are aggregate
+     counts from the master-data census (270 outfits), never names. Style: the Tier rework's _template.html tokens, desktop. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --f-pendant: #2a78d6; --f-orb: #eb6834; --f-charm: #1baf7a; --f-insignia: #6250d6;
+    --heat: 211 120 30;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --f-pendant: #3987e5; --f-orb: #d95926; --f-charm: #199e70; --f-insignia: #9085e9;
+      --heat: 230 160 60;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1280px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font: 700 28px/1.15 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 20px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 4px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 0 0 8px; }
+  p { margin: 0; }
+  a { color: inherit; }
+  .lead { color: var(--ink-soft); max-width: 940px; }
+  .sub { color: var(--ink-soft); margin: 0 0 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  .star { color: var(--accent); font-weight: 800; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken);
+    color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .tier { display: inline-block; padding: 2px 9px; border-radius: 6px; font-weight: 800; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note b { color: var(--ink); }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 0; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* Uma cards */
+  .uma { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .uma > header { padding: 14px 18px 10px; border-bottom: 1px solid var(--hairline); }
+  .uma .who { font-size: 12px; color: var(--ink-soft); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+  .uma .name { font: 700 20px/1.2 ui-rounded, system-ui, sans-serif; margin-top: 2px; }
+  .uma .reads { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 18px; }
+  .uma .read { background: var(--raised); border-radius: 10px; padding: 8px 10px; }
+  .uma .read span { display: block; font-size: 11px; color: var(--ink-faint); }
+  .uma .read b { display: block; font-size: 14px; }
+  .uma .read small { display: block; font-size: 11.5px; color: var(--ink-soft); }
+  .uma table { font-size: 12.5px; }
+  .uma table td:first-child { color: var(--ink-soft); white-space: nowrap; }
+  .uma .diff { background: var(--accent-wash); }
+  .five { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .mini { background: var(--panel); border-radius: 12px; box-shadow: 0 1px 0 var(--hairline-strong); padding: 12px 14px; }
+  .mini .tag { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+  .mini .name { font-weight: 800; font-size: 15px; margin: 2px 0 4px; }
+  .mini .prof { font-size: 12px; color: var(--ink-soft); }
+  .mini dl { margin: 10px 0 0; display: grid; grid-template-columns: 70px 1fr; gap: 4px 8px; font-size: 12.5px; }
+  .mini dt { color: var(--ink-faint); } .mini dd { margin: 0; }
+  .mini dd .t { display: inline-block; min-width: 0; }
+  .heat td.cell { text-align: center; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .heat td.zero { color: var(--ink-faint); font-weight: 400; }
+  .heat th.calling { font-weight: 800; color: var(--ink); }
+  .bars .bar { display: grid; grid-template-columns: 130px 1fr 48px; gap: 10px; align-items: center; margin: 8px 0; }
+  .bars .track { display: flex; height: 26px; border-radius: 7px; overflow: hidden; background: var(--sunken); }
+  .bars .seg { display: grid; place-items: center; font-size: 11.5px; font-weight: 800; color: #fff; min-width: 0; }
+  .bars .seg.off { background-image: repeating-linear-gradient(45deg, rgb(255 255 255 / .35) 0 4px, transparent 4px 9px); }
+  @media (max-width: 1100px) { .five { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Templates, Uma by Uma</h1>
+  <p class="lead">What her template gives a real-shaped Uma at each tier: two front runners side by side, one Uma per calling,
+    the catalog of 75 with today's counts, and the signature families by calling. Every Uma here is made up; counts are the
+    master-data census (270 outfits), never names. From <a href="../templates.md">templates.md</a> §2 and §4.10.</p>
+  <nav class="top">
+    <a href="#pair">Two front runners</a><a href="#five">One per calling</a><a href="#catalog">The catalog</a><a href="#families">Families by calling</a><a href="#ascend">At Ascend</a>
+    <a class="out" href="templates-tiers.html">← By tier</a><a class="out" href="templates-tip.html">← The signature tip</a>
+  </nav>
+
+  <section id="pair">
+    <h2>Two front runners, long distance</h2>
+    <p class="sub">The same calling and stride give the same Flourish and the same <span class="star">★</span> tip; the knack splits them:
+      her moon's node I and her signature family. Shaded: where they differ.</p>
+    <div class="grid2" id="pairs"></div>
+    <div class="callout"><b>Today's front-running stayers: 15 Ironhides, four templates</b>Fleet 5, Tireless 5, Gritty 3, Clever 2 (census).
+      Of their 105 pairs, 81 differ in template; the other 24 share one and still differ in base stats and growth, as every Uma does.
+      A balanced party of five fight types holds five callings, so never two of one template.</div>
+  </section>
+
+  <section id="five">
+    <h2>One Uma per calling, Tier 1 → 2 → 3</h2>
+    <p class="sub">Five made-up Umas, one per calling, each in her suggested class. Numbers at each tier's Lv 50; the Flourish is
+      the most she can take back a fight. In Tier 1 she also starts as her Tier 0, where her Flourish works too.</p>
+    <div class="five" id="fiveumas"></div>
+  </section>
+
+  <section id="catalog">
+    <h2>The catalog: 15 types × 5 knacks</h2>
+    <p class="sub">Calling and stride give her type; her knack its word: "{knack word} {type}". On the census, <b>60 of 75 in use</b>,
+      the largest 13 Umas (a Mighty Spellwright), the median 4, 8 alone. Darker is more Umas.</p>
+    <div class="panel"><table class="heat" id="heat"></table></div>
+  </section>
+
+  <section id="families">
+    <h2>Her signature family, by calling</h2>
+    <p class="sub">Her knack names it: Fleet the Charm, Mighty the Orb, Tireless the Pendant, Gritty and Clever the Insignia. Her
+      preset wears it first only when her weapons can use it (D266): hatched, the Umas whose family their pure class can't use
+      (T2U7). Kept in every tier; their <span class="star">★</span> works in their family's hybrid classes.</p>
+    <div class="panel bars" id="fambars"></div>
+    <div class="legend"><span><i class="sw" style="background:var(--f-charm)"></i>Charm</span><span><i class="sw" style="background:var(--f-insignia)"></i>Insignia</span><span><i class="sw" style="background:var(--f-orb)"></i>Orb</span><span><i class="sw" style="background:var(--f-pendant)"></i>Pendant</span><span>Hatched: off in her pure class</span></div>
+    <div class="note"><b>The measured cost elsewhere (templates.md §4.8):</b> a Charm first on a Paladin (the Fleet Healers, 8 Umas) costs her −0.9 to
+      −2.8% damage at every level; every other family first costs or pays inside the noise, an Orb or her own stat nothing. The
+      seam, if the owner wants it: a mirror rule (a Charm's <span class="star">★</span> counts on a Pendant and back).</div>
+  </section>
+
+  <section id="ascend">
+    <h2>At Ascend, and in a later world</h2>
+    <div class="panel">
+      <table>
+        <tr><th>Piece</th><th>At Ascend (as built)</th><th>In Tiers 2 and 3</th></tr>
+        <tr><td>Her calling, stride, knack, type</td><td>Hers: read from her racing profile, never stored</td><td>The same template; the calling a family name</td></tr>
+        <tr><td>Her class</td><td>Kept; a Tier 0 arrives as her suggested promotion, Class Rank 1</td><td>Every Tier 1 class open from Rank 1; her family two or three of them</td></tr>
+        <tr><td><span class="star">★</span> Flourish</td><td>On from her first fight, as a class of her family</td><td>4% of her max HP a fight</td></tr>
+        <tr><td><span class="star">★</span> Signature</td><td>Her slots keep their families (at G0, off until G1)</td><td>× 1.8 and × 2.6</td></tr>
+        <tr><td><span class="star">★</span> Her moon</td><td>Her map empties; it reopens with her shared moons' II and IV</td><td>× 1.8 and × 2.6</td></tr>
+        <tr><td><span class="star">★</span> Tip</td><td>—</td><td>With Class Rank 40 (about Lv 27 from Rank 1)</td></tr>
+        <tr><td>Her trade</td><td>Hers (Craft Lv 1 again)</td><td>Her calling's line</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+<script>
+  const pm = (v) => (v > 0 ? `+${v}` : `${v}`)
+  // Two front runners (templates.md §4.10).
+  const PAIR = [
+    { who: 'Uma A', name: 'Tireless Ironhide', reads: [['Calling', 'Warrior', 'Front A'], ['Stride', 'Stayer', 'Medium A, Long A → Long'], ['Knack', 'Tireless', 'Stamina +20%']],
+      rows: [['Class', 'Warrior → Brawler', 'Brawler', 'Brawler'], ['★ Flourish', 'Late reserve · 58 HP', 'Late reserve · 101', 'Late reserve · 144'],
+        ['★ Signature', 'Pendant · +5, free in her preset', 'Pendant · +9', 'Pendant · +13'], ['★ Moon I', 'HP +20', 'HP +35', 'HP +50'],
+        ['★ Moon II', 'DEF +8', 'DEF +14', 'DEF +21'], ['★ Tip', '—', 'Long guard · Greatsword', 'Long guard · both lines'], ['Trade', 'Metal', 'Metal', 'Metal']], diff: [2, 3] },
+    { who: 'Uma G', name: 'Fleet Ironhide', reads: [['Calling', 'Warrior', 'Front A, Pace A → Front'], ['Stride', 'Stayer', 'Long A'], ['Knack', 'Fleet', 'Speed, Power, Wit +10% → Speed']],
+      rows: [['Class', 'Warrior → Arms Spellblade', 'Arms Spellblade', 'Arms Spellblade'], ['★ Flourish', 'Late reserve · 53 HP', 'Late reserve · 92', 'Late reserve · 131'],
+        ['★ Signature', 'Charm · +5 (off as a Brawler)', 'Charm · +9', 'Charm · +13'], ['★ Moon I', '2.4% evasion', '2.4%', '2.4%'],
+        ['★ Moon II', 'DEF +8', 'DEF +14', 'DEF +21'], ['★ Tip', '—', 'Long guard · Katana', 'Long guard · both lines'], ['Trade', 'Metal', 'Metal', 'Metal']], diff: [2, 3] },
+  ]
+  document.getElementById('pairs').innerHTML = PAIR.map((u) => `
+    <div class="uma"><header><div class="who">${u.who} · made up</div><div class="name"><span class="star">★</span> ${u.name}</div></header>
+      <div class="reads">${u.reads.map(([k, v, s]) => `<div class="read"><span>${k}</span><b>${v}</b><small>${s}</small></div>`).join('')}</div>
+      <div style="padding:0 18px 14px"><table><tr><th></th><th><span class="tier t1">Tier 1</span></th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th></tr>
+      ${u.rows.map((r, i) => `<tr class="${u.diff.includes(i) ? 'diff' : ''}"><td>${r[0].replace('★', '<span class="star">★</span>')}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table></div>
+    </div>`).join('')
+
+  // One Uma per calling.
+  const FIVE = [
+    { tag: 'Warrior', name: 'Tireless Ironhide', prof: 'Front A · Long A · Stamina growth', cls: 'Brawler', fl: 'Late reserve · 58 · 101 · 144', sig: 'Pendant · +5 · +9 · +13', m1: 'HP +20 · +35 · +50', m2: 'DEF +8 · +14 · +21', tip: 'Long guard · Greatsword', trade: 'Metal' },
+    { tag: 'Spellblade', name: 'Fleet Flashblade', prof: 'Pace A alone · Mile A · Speed growth', cls: 'Arms Spellblade', fl: 'Clean break · 53 · 92 · 131', sig: 'Charm · +5 · +9 · +13', m1: '2.4% evasion, every tier', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Quickstep · Katana', trade: 'Wood' },
+    { tag: 'Mage', name: 'Clever Spellwright', prof: 'Pace A + Late A · Medium A · Wit growth', cls: 'Sorcerer', fl: 'Even pace · 49 · 86 · 122', sig: 'Insignia · +5 · +9 · +13', m1: 'MP +4 · +7 · +10', m2: 'M.DEF +8 · +14 · +21', tip: 'Spillover · Fire Tome', trade: 'Stone' },
+    { tag: 'Summoner', name: 'Gritty Shepherd', prof: 'End A · Long A · Guts growth', cls: 'Tome Summoner', fl: 'Late reserve · 53 · 92 · 131', sig: 'Insignia · +5 · +9 · +13', m1: 'A Limit start of 1, every tier', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Long guard · Dark Tome', trade: 'Fish' },
+    { tag: 'Healer', name: 'Mighty Mender', prof: 'Late A alone · Medium A · Power growth', cls: 'Paladin', fl: 'Even pace · 53 · 92 · 131', sig: 'Orb · +5 · +9 · +13', m1: 'DEF and M.DEF +4 · +7 · +10', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Spillover · Lance', trade: 'Vegetables' },
+  ]
+  document.getElementById('fiveumas').innerHTML = FIVE.map((u, i) => `
+    <div class="mini"><div class="tag">Uma ${'ABCDE'[i]} · ${u.tag}</div><div class="name"><span class="star">★</span> ${u.name}</div><div class="prof">${u.prof}</div>
+      <dl><dt>Her class</dt><dd>${u.cls}</dd><dt><span class="star">★</span> Flourish</dt><dd>${u.fl}</dd><dt><span class="star">★</span> Signature</dt><dd>${u.sig}</dd>
+      <dt><span class="star">★</span> Moon I</dt><dd>${u.m1}</dd><dt><span class="star">★</span> Moon II</dt><dd>${u.m2}</dd><dt><span class="star">★</span> Tip</dt><dd>Tier 2 on: ${u.tip}</dd><dt>Trade</dt><dd>${u.trade}</dd></dl>
+    </div>`).join('')
+
+  // The census grid: calling × stride × knack (fleet, mighty, tireless, gritty, clever).
+  const TYPES = [
+    ['Warrior', 'Charger', [7, 2, 0, 1, 2]], ['Warrior', 'Bruiser', [11, 0, 1, 5, 3]], ['Warrior', 'Ironhide', [5, 0, 5, 3, 2]],
+    ['Spellblade', 'Flashblade', [4, 9, 0, 4, 0]], ['Spellblade', 'Spellfencer', [7, 6, 3, 8, 7]], ['Spellblade', 'Longblade', [3, 2, 11, 3, 5]],
+    ['Mage', 'Flarecaster', [0, 2, 0, 2, 4]], ['Mage', 'Spellwright', [11, 13, 2, 6, 6]], ['Mage', 'Starkeeper', [6, 5, 10, 3, 2]],
+    ['Summoner', 'Beckoner', [1, 2, 0, 0, 0]], ['Summoner', 'Binder', [1, 9, 0, 0, 0]], ['Summoner', 'Shepherd', [5, 5, 7, 1, 2]],
+    ['Healer', 'Lamplighter', [2, 5, 0, 1, 0]], ['Healer', 'Mender', [5, 7, 1, 4, 2]], ['Healer', 'Pilgrim', [1, 2, 8, 2, 6]],
+  ]
+  const STRIDE = ['Dash', 'Middle', 'Stayer']
+  const KN = ['Fleet', 'Mighty', 'Tireless', 'Gritty', 'Clever']
+  const cols = KN.map((_, k) => TYPES.reduce((n, t) => n + t[2][k], 0))
+  let h = `<tr><th>Calling</th><th>Stride</th><th>Type</th>${KN.map((k) => `<th class="num">${k}</th>`).join('')}<th class="num">Umas</th><th class="num">In use</th></tr>`
+  TYPES.forEach(([c, t, v], i) => {
+    const sum = v.reduce((a, b) => a + b, 0), used = v.filter((x) => x > 0).length
+    h += `<tr>${i % 3 === 0 ? `<th class="calling" rowspan="3">${c}</th>` : ''}<td class="muted">${STRIDE[i % 3]}</td><td><b>${t}</b></td>`
+    h += v.map((x) => `<td class="cell ${x ? '' : 'zero'}" style="background:rgb(var(--heat) / ${x ? (0.1 + 0.75 * x / 13).toFixed(2) : 0})">${x || '·'}</td>`).join('')
+    h += `<td class="num"><b>${sum}</b></td><td class="num">${used} of 5</td></tr>`
+  })
+  h += `<tr><td></td><td></td><td class="muted">All 270</td>${cols.map((n) => `<td class="num"><b>${n}</b></td>`).join('')}<td class="num"><b>270</b></td><td class="num"><b>60 of 75</b></td></tr>`
+  document.getElementById('heat').innerHTML = h
+
+  // Families by calling (census).
+  const FAM = [
+    ['Warrior', 47, [['charm', 23, true], ['insignia', 16], ['orb', 2], ['pendant', 6]], 'Charm off as a Brawler'],
+    ['Spellblade', 72, [['charm', 14], ['insignia', 27], ['orb', 17], ['pendant', 14]], ''],
+    ['Mage', 72, [['charm', 17], ['insignia', 23], ['orb', 20], ['pendant', 12, true]], 'Pendant off as a Sorcerer'],
+    ['Summoner', 33, [['charm', 7], ['insignia', 3], ['orb', 16], ['pendant', 7]], ''],
+    ['Healer', 46, [['charm', 8], ['insignia', 15], ['orb', 14], ['pendant', 9]], ''],
+  ]
+  const NAME = { charm: 'Charm', insignia: 'Insignia', orb: 'Orb', pendant: 'Pendant' }
+  document.getElementById('fambars').innerHTML = FAM.map(([c, n, segs, why]) => `
+    <div class="bar"><div><b>${c}</b><div class="muted" style="font-size:11.5px">${why || '&nbsp;'}</div></div>
+      <div class="track">${segs.map(([f, v, off]) => `<div class="seg ${off ? 'off' : ''}" style="width:${(100 * v / n).toFixed(1)}%;background-color:var(--f-${f})" title="${NAME[f]} ${v}">${v >= 4 ? v : ''}</div>`).join('')}</div>
+      <div class="muted" style="text-align:right">${n}</div></div>`).join('') +
+    `<div class="bar"><div><b>All 270</b></div><div class="track">${[['charm', 69], ['insignia', 84], ['orb', 69], ['pendant', 48]].map(([f, v]) => `<div class="seg" style="width:${(100 * v / 270).toFixed(1)}%;background-color:var(--f-${f})">${NAME[f]} ${v}</div>`).join('')}</div><div class="muted" style="text-align:right">270</div></div>`
+</script>
+</body>
+</html>

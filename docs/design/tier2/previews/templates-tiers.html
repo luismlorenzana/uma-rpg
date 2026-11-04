@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Her Template by Tier</title>
+<!-- Tier 2 set, templates.md (T2U): her five template pieces Tier 1 → 2 → 3, her calling with no Tier 0, the signature and
+     her moon by tier, the budget measured on engine v21, and every old call's status. Every Uma here is made up; roster
+     figures are aggregate counts from master data, never names. Style: the Tier rework's _template.html tokens (uma-kit's
+     theme: light uma-racer's, dark uma-rpg's), at desktop width. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --axis: #c3cbd6;
+    --f-pendant: #2a78d6; --f-orb: #eb6834; --f-charm: #1baf7a; --f-insignia: #6250d6;
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --axis: #34445a;
+      --f-pendant: #3987e5; --f-orb: #d95926; --f-charm: #199e70; --f-insignia: #9085e9;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1280px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font: 700 28px/1.15 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 20px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 4px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 0 0 8px; }
+  p { margin: 0; }
+  a { color: inherit; }
+  .lead { color: var(--ink-soft); max-width: 940px; }
+  .sub { color: var(--ink-soft); margin: 0 0 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); }
+  .kpi .value { font-size: 21px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .delta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .star { color: var(--accent); font-weight: 800; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .grid5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken);
+    color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.ghost { background: transparent; border: 1px dashed var(--hairline-strong); color: var(--ink-faint); }
+  .chip.new { background: var(--accent); color: var(--accent-ink); }
+  .tier { display: inline-block; padding: 2px 9px; border-radius: 6px; font-weight: 800; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note b { color: var(--ink); }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  details { margin-top: 12px; }
+  summary { cursor: pointer; color: var(--ink-soft); font-size: 12.5px; font-weight: 600; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* Tier columns */
+  .tiercol { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tiercol > header { padding: 12px 16px; border-top: 5px solid var(--tc); display: flex; align-items: baseline; gap: 10px; }
+  .tiercol > header b { font-size: 16px; } .tiercol > header span { color: var(--ink-soft); font-size: 12.5px; }
+  .piece { padding: 10px 16px; border-top: 1px solid var(--hairline); display: grid; grid-template-columns: 120px 1fr; gap: 10px; }
+  .piece .k { font-weight: 700; font-size: 13px; }
+  .piece .v { font-size: 13px; }
+  .piece .v b { font-variant-numeric: tabular-nums; }
+  .piece .v .d { display: block; color: var(--ink-faint); font-size: 12px; }
+  .piece.isnew { background: var(--accent-wash); }
+  .piece.none .v { color: var(--ink-faint); }
+
+  /* Family board */
+  .fam { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .fam .name { font-weight: 800; font-size: 15px; }
+  .fam .root { font-size: 11.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; }
+  .fam .row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .fam .lbl { font-size: 11.5px; color: var(--ink-soft); margin-top: 10px; font-weight: 600; }
+  .fam .t0 { text-decoration: line-through; }
+
+  /* Status board */
+  .calls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .call { background: var(--panel); border-radius: 12px; padding: 10px 12px; box-shadow: 0 1px 0 var(--hairline-strong); border-left: 5px solid var(--sc); }
+  .call .id { font-weight: 800; font-size: 13px; }
+  .call .st { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--sc); }
+  .call p { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 12px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* Charts */
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .ax { fill: var(--ink-faint); font-size: 11px; }
+  .vl { fill: var(--ink); font-size: 11.5px; font-weight: 700; }
+  .vs { fill: var(--ink-soft); font-size: 11px; }
+  .gl { stroke: var(--grid); stroke-width: 1; }
+  .svgwrap svg { display: block; width: 100%; height: auto; }
+
+  /* Moon dots */
+  .moonrow { display: flex; align-items: center; gap: 10px; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 2px solid var(--accent); background: var(--accent-wash); }
+  .dot.big { width: 18px; height: 18px; }
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .grid3, .grid5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .calls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Her template, Tier 1 → 2 → 3</h1>
+  <p class="lead">Her five template pieces carried from the approved Uma Templates pass (UT1–UT20) onto Tier 1 as it is built
+    (engine v21, save v36), then into Tiers 2 and 3. Tier 2 adds one piece, the <span class="star">★</span> signature tip;
+    everything else is Tier 1's, by the tier. From <a href="../templates.md">templates.md</a> (T2U1–T2U20). Every Uma here is
+    made up.</p>
+  <nav class="top">
+    <a href="#tiers">Tier by tier</a><a href="#calling">Calling, no Tier 0</a><a href="#signature">The signature</a><a href="#moon">Her moon</a><a href="#budget">The budget</a><a href="#calls">Old calls</a><a href="#pages">Old pages</a>
+    <a class="out" href="templates-tip.html">The signature tip →</a><a class="out" href="templates-umas.html">The Umas →</a>
+  </nav>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">Pieces</div><div class="value">5</div><div class="delta">One new in Tier 2: the ★ tip</div></div>
+    <div class="kpi"><div class="label"><span class="star">★</span> Flourish, a Brawler at Lv 50</div><div class="value">58 · 101 · 144</div><div class="delta">4% of her max HP a fight, every tier</div></div>
+    <div class="kpi"><div class="label"><span class="star">★</span> Signature at Lv 50</div><div class="value">+5 · +9 · +13</div><div class="delta">ATK and M.ATK, 0.1 a level × tier</div></div>
+    <div class="kpi"><div class="label"><span class="star">★</span> Her moon, node II</div><div class="value">+8 · +14 · +21</div><div class="delta">3.8–4.0% of her defense</div></div>
+    <div class="kpi"><div class="label"><span class="star">★</span> Signature tip</div><div class="value">Tier 2</div><div class="delta">Class Rank 40, about Lv 27</div></div>
+    <div class="kpi"><div class="label">Damage edge, measured</div><div class="value">≈ +2%</div><div class="delta">The ★ alone at Lv 50, every tier</div></div>
+  </div>
+
+  <section id="tiers">
+    <h2>Every piece, tier by tier</h2>
+    <p class="sub">Four pieces already play in a Tier 2 or 3 world today, by the tier; the tip waits for Tier 2's trees. The
+      shaded row is new in that tier.</p>
+    <div class="grid3">
+      <div class="tiercol" style="--tc: var(--t1)">
+        <header><span class="tier t1">Tier 1</span><b>As built</b><span>engine v21 · save v36</span></header>
+        <div class="piece"><div class="k">Calling</div><div class="v"><b>Her Tier 0</b> (a class, Rank 1–10)<span class="d">Names her type, trade, moon root, family</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Flourish</div><div class="v"><b>4%</b> of her max HP a fight<span class="d">As her family · Brawler 58 · Sorcerer 49 · others 53 HP at Lv 50</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Signature</div><div class="v"><b>+5</b> ATK and M.ATK at Lv 50<span class="d">Any class · her knack's family at G1+ in a slot</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Moon I</div><div class="v"><b>+4 points</b> on her knack's stat<span class="d">HP +20 · MP +4 · DEF and M.DEF +4 · 2.4% evasion · Limit start 1</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Moon II</div><div class="v"><b>+8</b> on her root's defense<span class="d">Warrior DEF · Mage M.DEF · All-Rounders +4 and +4</span></div></div>
+        <div class="piece none"><div class="k"><span class="star">★</span> Tip</div><div class="v">—<span class="d">Tier 1's trees have no tip fork</span></div></div>
+      </div>
+      <div class="tiercol" style="--tc: var(--t2)">
+        <header><span class="tier t2">Tier 2</span><b>× 1.8</b><span>no Tier 0 in the world</span></header>
+        <div class="piece"><div class="k">Calling</div><div class="v"><b>A family</b>, the same word<span class="d">She arrives as her class, or her suggested promotion</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Flourish</div><div class="v"><b>4%</b> (a share)<span class="d">Brawler 101 · Sorcerer 86 · others 92 HP at Lv 50</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Signature</div><div class="v"><b>+9</b> at Lv 50<span class="d">0.18 a level; any form of her family</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Moon I</div><div class="v"><b>+7 points</b><span class="d">HP +35 · MP +7 · DEF and M.DEF +7 · shares flat</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Moon II</div><div class="v"><b>+14</b><span class="d">All-Rounders +7 and +7</span></div></div>
+        <div class="piece isnew"><div class="k"><span class="star">★</span> Tip <span class="chip new">New</span></div><div class="v"><b>A third option</b> at her lead tree's tip fork<span class="d">Quickstep · Spillover · Long guard, by stride; Class Rank 40</span></div></div>
+      </div>
+      <div class="tiercol" style="--tc: var(--t3)">
+        <header><span class="tier t3">Tier 3</span><b>× 2.6</b><span>two lines held a tree</span></header>
+        <div class="piece"><div class="k">Calling</div><div class="v"><b>A family</b><span class="d">As Tier 2</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Flourish</div><div class="v"><b>4%</b><span class="d">Brawler 144 · Sorcerer 122 · others 131 HP at Lv 50</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Signature</div><div class="v"><b>+13</b> at Lv 50<span class="d">0.26 a level</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Moon I</div><div class="v"><b>+10 points</b><span class="d">HP +50 · MP +10 · DEF and M.DEF +10 · shares flat</span></div></div>
+        <div class="piece"><div class="k"><span class="star">★</span> Moon II</div><div class="v"><b>+21</b><span class="d">All-Rounders DEF +10 · M.DEF +11</span></div></div>
+        <div class="piece isnew"><div class="k"><span class="star">★</span> Tip</div><div class="v"><b>At both tip forks</b> of her lead tree<span class="d">A capstone on a ★ tip keeps it</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="calling">
+    <h2>Her calling with no Tier 0</h2>
+    <p class="sub">A Tier 2 or 3 world has no Tier 0 (CV10). Her calling is her racing profile's, so it doesn't move: it stops
+      being a class and stays her family's name (T2U3). Her family is her Tier 0's own Tier 1 children; kin stays outside
+      (T2U4). Struck through: the Tier 0 she can't fight as there.</p>
+    <div class="grid5" id="fams"></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="panel">
+        <h3>What her calling names, in every world</h3>
+        <table>
+          <tr><th></th><th>Tier 1's world</th><th>Tier 2's and 3's</th></tr>
+          <tr><td>Her calling is</td><td>Her Tier 0, a class</td><td>Her family, the same word</td></tr>
+          <tr><td>A new Uma starts as</td><td>Her Tier 0, Rank 1</td><td>Her suggested promotion, Rank 1</td></tr>
+          <tr><td>Her type, trade, moon root</td><td>From it</td><td>From it, unchanged</td></tr>
+          <tr><td>Her Flourish and ★ tip work as</td><td>Her Tier 0 and its children</td><td>Its children</td></tr>
+          <tr><td>Template tab</td><td>"Calling · Warrior · fixed"</td><td>The same; no Tier 0 chip (D270)</td></tr>
+        </table>
+      </div>
+      <div class="callout" style="margin-top:0"><b>What uniqueness means without a Tier 0</b>The same template, read the same way,
+        giving the same pieces. The Tier 0 was where she started, never what made her unique. The halls already carry the
+        family words (the Warrior Dojo, the Mage Tower), so "Calling · Warrior" still reads in a world with no Warrior class.
+        A class branch (T2C) is not a class: her Flourish and tip work in either branch.</div>
+    </div>
+  </section>
+
+  <section id="signature">
+    <h2>The signature by level and tier</h2>
+    <p class="sub">0.1 a level × the tier, at least 1, while one slot wears her family at G1+ (D266). The slots scale by the
+      same tier, so her ★ stays <b>half a slot of her stat</b> in every tier: the trade-off of choosing her family over a
+      second stat holds unchanged.</p>
+    <div class="grid2">
+      <div class="panel"><h3>★ ATK and M.ATK by her level</h3><div class="svgwrap" id="sigchart"></div>
+        <div class="legend" style="margin-top:6px"><span><i class="sw" style="background:var(--t1)"></i>Tier 1</span><span><i class="sw" style="background:var(--t2)"></i>Tier 2</span><span><i class="sw" style="background:var(--t3)"></i>Tier 3</span><span class="muted">Dashed: half an on-curve slot of her stat</span></div>
+      </div>
+      <div class="panel"><h3>Her ★ against a slot, at Lv 50</h3>
+        <table>
+          <tr><th>Tier</th><th class="num">G10 Pendant or Charm</th><th class="num">Her ★</th><th>Half a slot</th></tr>
+          <tr><td><span class="tier t1">1</span></td><td class="num">+10</td><td class="num"><b>+5</b></td><td>Yes</td></tr>
+          <tr><td><span class="tier t2">2</span></td><td class="num">+18</td><td class="num"><b>+9</b></td><td>Yes</td></tr>
+          <tr><td><span class="tier t3">3</span></td><td class="num">+26</td><td class="num"><b>+13</b></td><td>Yes</td></tr>
+        </table>
+        <div class="note"><b>Her preset (T2U7):</b> her family goes first only when her weapons can use it (D266): a Pendant needs an Arm, a
+          Charm a Tome. So 23 Fleet Warriors as a Brawler and 12 Tireless Mages as a Sorcerer keep their ★ off by default; it
+          works in their family's hybrid classes. Kept in every tier: the template is optional (D274).</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="moon">
+    <h2>Her moon by tier</h2>
+    <p class="sub">Two nodes beside her Extra Stats map, no jewel: node I opens with the third shared moon's node II (Lv 16 at the
+      earliest), node II with its node IV (Lv 36). Never with Tier 2's weapon moon (T2E). × 1.8 and × 2.6; Fleet's evasion and
+      Gritty's Limit start are shares and stay flat (T2U8).</p>
+    <div class="panel">
+      <table>
+        <tr><th>Node</th><th>Reads</th><th class="num"><span class="tier t1">Tier 1</span></th><th class="num"><span class="tier t2">Tier 2</span></th><th class="num"><span class="tier t3">Tier 3</span></th></tr>
+        <tr><td rowspan="5"><span class="moonrow"><i class="dot"></i><b>I</b></span></td><td>Tireless · HP</td><td class="num">+20</td><td class="num">+35</td><td class="num">+50</td></tr>
+        <tr><td>Clever · MP</td><td class="num">+4</td><td class="num">+7</td><td class="num">+10</td></tr>
+        <tr><td>Mighty · DEF and M.DEF each</td><td class="num">+4</td><td class="num">+7</td><td class="num">+10</td></tr>
+        <tr><td>Fleet · evasion</td><td class="num">2.4%</td><td class="num">2.4%</td><td class="num">2.4%</td></tr>
+        <tr><td>Gritty · Limit start</td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+        <tr><td rowspan="3"><span class="moonrow"><i class="dot big"></i><b>II</b></span></td><td>Warrior · DEF</td><td class="num">+8</td><td class="num">+14</td><td class="num">+21</td></tr>
+        <tr><td>Mage · M.DEF</td><td class="num">+8</td><td class="num">+14</td><td class="num">+21</td></tr>
+        <tr><td>Spellblade, Summoner, Healer · DEF · M.DEF</td><td class="num">+4 · +4</td><td class="num">+7 · +7</td><td class="num">+10 · +11</td></tr>
+        <tr><td></td><td class="muted">Node II as a share of a Brawler's DEF at Lv 50 (204 · 368 · 532)</td><td class="num muted">3.9%</td><td class="num muted">3.8%</td><td class="num muted">3.9%</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section id="budget">
+    <h2>The budget, measured on engine v21</h2>
+    <p class="sub">A scratch run of the balance harness: both of the owner's parties (D263), on curve, every region stage at the
+      level, 6 seeds, Auto. A gain is damage a turn over the same party without templates (regular fights twice, sub-bosses
+      and bosses once). <b>★ alone</b> adds her ★ to her class's own preset; <b>matched</b> rebuilds the preset with her family
+      first, with her moon and an Even pace Flourish. Noise about ±0.5 points.</p>
+    <div class="grid2">
+      <div class="panel"><h3>Damage a turn: the ★ alone (bar, range) and matched (dot)</h3><div class="svgwrap" id="budgetchart"></div>
+        <div class="legend" style="margin-top:6px"><span><i class="sw" style="background:var(--accent)"></i>★ alone, mean of ten class cells</span><span>│ its range</span><span><i class="sw" style="background:var(--ink);border-radius:50%"></i>Matched, every family, mean</span></div>
+      </div>
+      <div class="panel"><h3>Matched, by her family (mean of ten class cells)</h3><div class="svgwrap" id="famchart"></div>
+        <div class="legend" style="margin-top:6px"><span><i class="sw" style="background:var(--f-pendant)"></i>Pendant</span><span><i class="sw" style="background:var(--f-charm)"></i>Charm</span><span><i class="sw" style="background:var(--f-orb)"></i>Orb</span><span><i class="sw" style="background:var(--f-insignia)"></i>Insignia</span></div>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:16px">
+      <div class="panel"><h3>Damage</h3><p>About <b>+2%</b> a turn at Lv 50 in every tier from the ★ alone (+1.0 to +3.6 · +0.5 to +3.3 · +1.3
+        to +3.4%). Matched, +1.2 · +1.3 · +1.5% on average: an Orb or her own stat makes the ★ free, an Insignia takes a stat
+        slot and pays on sub-bosses and bosses, and the Fleet Paladin's Charm costs −0.9 to −2.8.</p></div>
+      <div class="panel"><h3>Defense</h3><p>A matched party takes <b>4–6% less</b> from Lv 30, once her moon opens (0 at Lv 10). The
+        Flourish mends 0.1–0.9% of her max HP a fight on the world's stages: its 4% is the hard fight's cap. Node II is
+        3.8–4.0% of her defense.</p></div>
+      <div class="panel"><h3>Pace and wins</h3><p><b>0.</b> Every fight won with and without templates; rounds 1–2% fewer. No piece
+        touches MP. The drafts' "about +5%" stays the ceiling, not a target (T2U14); the dial stays the signature's rate
+        (T2U15: 0.2 a level would be about +4%).</p></div>
+    </div>
+    <details class="panel"><summary>Show the numbers</summary>
+      <table id="budgettable"></table>
+      <p class="foot">Matched, every family, ranges: Tier 1 −2.2 to +3.4 · −2.4 to +4.6 · −1.9 to +3.6; Tier 2 −1.9 to +2.3 · −2.5 to +2.2 ·
+        −1.6 to +3.3; Tier 3 −1.1 to +2.1 · −2.8 to +2.4 · −1.3 to +3.5 (Lv 10 · 30 · 50).</p>
+    </details>
+  </section>
+
+  <section id="calls">
+    <h2>The approved calls, UT1–UT20</h2>
+    <p class="sub">Each old call's status on today's Tier 1, and where it goes. Counts: Kept 2 · Kept, changed 14 · Superseded 2 ·
+      Broken 2.</p>
+    <div class="legend"><span><i class="sw" style="background:var(--success)"></i>Kept</span><span><i class="sw" style="background:var(--warning)"></i>Kept, changed</span><span><i class="sw" style="background:var(--locked)"></i>Superseded</span><span><i class="sw" style="background:var(--danger)"></i>Broken</span></div>
+    <div class="calls" id="callboard"></div>
+  </section>
+
+  <section id="pages">
+    <h2>The old pages, carried or retired</h2>
+    <div class="panel">
+      <table>
+        <tr><th>Old page (tier-rework/previews/)</th><th>Now</th></tr>
+        <tr><td>uma-templates.html</td><td><b>Carried</b> into <a href="templates-umas.html">templates-umas.html</a> (75 templates, the styles-only rule); its calling-pick section retired (CV19)</td></tr>
+        <tr><td>uma-gives.html</td><td><b>Carried</b> into this page (re-measured) and <a href="templates-tip.html">templates-tip.html</a>; its MP re-check of the Flourish retired (settled by UT6, live)</td></tr>
+        <tr><td>uma-profile.html</td><td><b>Retired:</b> the live Template tab replaced it (D270); its Tier 2 and 3 marks carried into templates-tip.html's mocks</td></tr>
+        <tr><td>uma-compare.html</td><td><b>Carried</b> into templates-umas.html</td></tr>
+        <tr><td>class-templates.html</td><td>Its #affinity section <b>retired</b> (UT11); the rest is class design, classes.md's (T2C)</td></tr>
+        <tr><td>classes-template-sheets.html</td><td>Class template sheets, not Uma templates: classes.md's (T2C)</td></tr>
+        <tr><td>variance-templates.html, variance-two-umas.html, variance-profile.html</td><td><b>Retired:</b> the first round (U1–U16), superseded on 2026-10-25; history</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+<script>
+  // Families (manual's Tier 0 table; rpgClassFamily). Kin are outside her family.
+  const FAMS = [
+    { name: 'Warrior', root: 'Warrior root', t0: 'Warrior', fam: ['Brawler', 'Arms Spellblade', 'Arms Summoner'], kin: [], type: 'phys', moon: 'DEF +8 · +14 · +21', trade: 'Metal' },
+    { name: 'Spellblade', root: 'All-Rounder', t0: 'Spellblade', fam: ['Arms Spellblade', 'Tome Spellblade'], kin: ['Arms Summoner', 'Paladin'], type: '', moon: 'DEF/M.DEF +4 · +7 · +10/11', trade: 'Wood' },
+    { name: 'Healer', root: 'All-Rounder', t0: 'Healer', fam: ['Paladin', 'Cleric'], kin: ['Arms Spellblade', 'Tome Summoner'], type: 'heal', moon: 'DEF/M.DEF +4 · +7 · +10/11', trade: 'Vegetables' },
+    { name: 'Summoner', root: 'All-Rounder', t0: 'Summoner', fam: ['Arms Summoner', 'Tome Summoner'], kin: ['Tome Spellblade', 'Cleric'], type: '', moon: 'DEF/M.DEF +4 · +7 · +10/11', trade: 'Fish' },
+    { name: 'Mage', root: 'Mage root', t0: 'Mage', fam: ['Sorcerer', 'Tome Spellblade', 'Tome Summoner'], kin: [], type: 'magic', moon: 'M.DEF +8 · +14 · +21', trade: 'Stone' },
+  ]
+  document.getElementById('fams').innerHTML = FAMS.map((f) => `
+    <div class="fam"><div class="root">${f.root}</div><div class="name">${f.name}</div>
+      <div class="lbl">Tier 1's world</div>
+      <div class="row"><span class="chip ${f.type}">${f.t0} · Tier 0</span>${f.fam.map((c) => `<span class="chip ${f.type}">${c}</span>`).join('')}</div>
+      <div class="lbl">Tiers 2 and 3</div>
+      <div class="row"><span class="chip ghost t0">${f.t0}</span>${f.fam.map((c) => `<span class="chip ${f.type}">${c}</span>`).join('')}</div>
+      <div class="lbl">Kin (no Flourish, no ★ tip)</div>
+      <div class="row">${f.kin.length ? f.kin.map((c) => `<span class="chip ghost">${c}</span>`).join('') : '<span class="muted" style="font-size:12px">None</span>'}</div>
+      <div class="lbl">Trade · moon II</div><div style="font-size:12.5px">${f.trade} · ${f.moon}</div>
+    </div>`).join('')
+
+  // The signature by level (signatureBonus: max(1, round(level × tenths ÷ 100))) and half an on-curve slot (G ⌊(l+4)/5⌋, +1 a grade × tier ÷ 2).
+  const TENTHS = { 1: 10, 2: 18, 3: 26 }
+  const sig = (l, t) => Math.max(1, Math.round((l * TENTHS[t]) / 100))
+  const half = (l, t) => (Math.round(Math.min(10, Math.floor((l + 4) / 5)) * TENTHS[t] / 10)) / 2
+  ;(function sigChart() {
+    const W = 560, H = 260, L = 40, R = 16, T = 12, B = 30
+    const x = (l) => L + ((l - 1) / 49) * (W - L - R), y = (v) => T + (1 - v / 14) * (H - T - B)
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Signature bonus by level for each tier">`
+    for (let v = 0; v <= 14; v += 2) s += `<line class="gl" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`
+    for (const l of [1, 10, 20, 30, 40, 50]) s += `<text class="ax" x="${x(l)}" y="${H - 10}" text-anchor="middle">Lv ${l}</text>`
+    for (const t of [1, 2, 3]) {
+      const c = `var(--t${t})`
+      let p = '', h = ''
+      for (let l = 1; l <= 50; l++) { p += `${l === 1 ? 'M' : 'L'}${x(l).toFixed(1)},${y(sig(l, t)).toFixed(1)}`; h += `${l === 1 ? 'M' : 'L'}${x(l).toFixed(1)},${y(half(l, t)).toFixed(1)}` }
+      s += `<path d="${h}" fill="none" stroke="${c}" stroke-width="1.5" stroke-dasharray="4 4" opacity=".7"/>`
+      s += `<path d="${p}" fill="none" stroke="${c}" stroke-width="2.5"/>`
+      s += `<text class="vl" x="${x(50) - 4}" y="${y(sig(50, t)) - 6}" text-anchor="end">+${sig(50, t)}</text>`
+    }
+    document.getElementById('sigchart').innerHTML = s + '</svg>'
+  })()
+
+  // The budget (scratch run, templates.md §4.8).
+  const B = [
+    { t: 1, l: 10, sig: 1, lo: 1.0, hi: 3.1, mean: 2.0, fam: [1.3, 1.0, 2.0, -1.0], all: 0.8, taken: -1.7 },
+    { t: 1, l: 30, sig: 3, lo: 0.6, hi: 4.6, mean: 2.2, fam: [1.1, 1.6, 2.2, -0.3], all: 1.2, taken: -4.1 },
+    { t: 1, l: 50, sig: 5, lo: 1.0, hi: 3.6, mean: 2.1, fam: [1.1, 1.0, 2.1, 0.6], all: 1.2, taken: -4.4 },
+    { t: 2, l: 10, sig: 2, lo: 0.7, hi: 2.1, mean: 1.4, fam: [0.9, 0.7, 1.4, -0.6], all: 0.6, taken: -0.6 },
+    { t: 2, l: 30, sig: 5, lo: 1.1, hi: 1.8, mean: 1.5, fam: [1.0, 0.8, 1.5, -0.4], all: 0.7, taken: -5.5 },
+    { t: 2, l: 50, sig: 9, lo: 0.5, hi: 3.3, mean: 2.1, fam: [1.3, 1.1, 2.1, 0.7], all: 1.3, taken: -4.5 },
+    { t: 3, l: 10, sig: 3, lo: 0.4, hi: 2.0, mean: 1.3, fam: [0.9, 0.8, 1.3, 0.1], all: 0.8, taken: 0.2 },
+    { t: 3, l: 30, sig: 8, lo: 1.4, hi: 2.4, mean: 1.6, fam: [1.1, 0.8, 1.6, 0.1], all: 0.9, taken: -4.3 },
+    { t: 3, l: 50, sig: 13, lo: 1.3, hi: 3.4, mean: 2.4, fam: [1.3, 1.3, 2.4, 1.1], all: 1.5, taken: -5.7 },
+  ]
+  ;(function budgetChart() {
+    const W = 560, H = 270, L = 40, R = 10, T = 14, B2 = 44, lo = -1, hi = 5
+    const y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H - T - B2)
+    const slot = (W - L - R) / B.length
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Template damage gain by tier and level">`
+    for (let v = lo; v <= hi; v++) s += `<line class="gl" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v > 0 ? '+' : ''}${v}%</text>`
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)" stroke-width="1.5"/>`
+    B.forEach((r, i) => {
+      const cx = L + slot * i + slot / 2, bw = slot * 0.46
+      s += `<rect x="${cx - bw / 2}" y="${y(r.mean)}" width="${bw}" height="${y(0) - y(r.mean)}" rx="3" fill="var(--accent)" opacity=".85"><title>Tier ${r.t} Lv ${r.l}: ★ alone ${r.lo} to ${r.hi}%, mean ${r.mean}%</title></rect>`
+      s += `<line x1="${cx}" x2="${cx}" y1="${y(r.hi)}" y2="${y(r.lo)}" stroke="var(--ink-soft)" stroke-width="1.5"/>`
+      s += `<circle cx="${cx}" cy="${y(r.all)}" r="4.5" fill="var(--ink)" stroke="var(--panel)" stroke-width="1.5"><title>Matched, every family: mean ${r.all}%</title></circle>`
+      s += `<text class="vl" x="${cx}" y="${y(r.hi) - 5}" text-anchor="middle">${r.mean}</text>`
+      s += `<text class="ax" x="${cx}" y="${H - 26}" text-anchor="middle">Lv ${r.l}</text>`
+      if (r.l === 30) s += `<text class="vs" x="${cx}" y="${H - 8}" text-anchor="middle" style="font-weight:700;fill:var(--t${r.t})">Tier ${r.t}</text>`
+    })
+    document.getElementById('budgetchart').innerHTML = s + '</svg>'
+  })()
+  ;(function famChart() {
+    const W = 560, H = 270, L = 40, R = 10, T = 14, B2 = 44, lo = -1.5, hi = 3
+    const y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H - T - B2)
+    const COL = ['var(--f-pendant)', 'var(--f-charm)', 'var(--f-orb)', 'var(--f-insignia)'], NAME = ['Pendant', 'Charm', 'Orb', 'Insignia']
+    const slot = (W - L - R) / B.length
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Matched damage gain by family">`
+    for (let v = -1; v <= 3; v++) s += `<line class="gl" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v > 0 ? '+' : ''}${v}%</text>`
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)" stroke-width="1.5"/>`
+    B.forEach((r, i) => {
+      const x0 = L + slot * i + slot * 0.12, bw = (slot * 0.76) / 4
+      r.fam.forEach((v, k) => {
+        const top = Math.min(y(v), y(0)), h = Math.abs(y(v) - y(0))
+        s += `<rect x="${x0 + bw * k}" y="${top}" width="${bw - 1.5}" height="${Math.max(1, h)}" rx="1.5" fill="${COL[k]}"><title>Tier ${r.t} Lv ${r.l}, ${NAME[k]}: ${v > 0 ? '+' : ''}${v}%</title></rect>`
+      })
+      s += `<text class="ax" x="${L + slot * i + slot / 2}" y="${H - 26}" text-anchor="middle">Lv ${r.l}</text>`
+      if (r.l === 30) s += `<text class="vs" x="${L + slot * i + slot / 2}" y="${H - 8}" text-anchor="middle" style="font-weight:700;fill:var(--t${r.t})">Tier ${r.t}</text>`
+    })
+    document.getElementById('famchart').innerHTML = s + '</svg>'
+  })()
+  document.getElementById('budgettable').innerHTML = '<tr><th>Tier · Lv</th><th class="num">Her ★</th><th class="num">★ alone, range</th><th class="num">mean</th><th class="num">Pendant</th><th class="num">Charm</th><th class="num">Orb</th><th class="num">Insignia</th><th class="num">Matched, mean</th><th class="num">Party damage taken</th></tr>' +
+    B.map((r) => `<tr><td>${r.t} · ${r.l}</td><td class="num">+${r.sig}</td><td class="num">${r.lo} to ${r.hi}%</td><td class="num"><b>${r.mean}%</b></td>${r.fam.map((v) => `<td class="num">${v > 0 ? '+' : ''}${v}</td>`).join('')}<td class="num">${r.all}%</td><td class="num">${r.taken > 0 ? '+' : ''}${r.taken}%</td></tr>`).join('')
+
+  // The status board.
+  const K = 'var(--success)', C = 'var(--warning)', S = 'var(--locked)', X = 'var(--danger)'
+  const CALLS = [
+    ['UT1', 'This doc', C, 'Kept, changed', 'D238: the manual owns Tier 1, this doc Tiers 2 and 3 (T2U1)'],
+    ['UT2', 'What a template is', C, 'Kept, changed', 'D240: the calling is her Tier 0, no pick; five pieces stand (T2U2)'],
+    ['UT3', 'The rule', C, 'Kept, changed', 'CV19: five rows by best styles alone; stride and knack as written'],
+    ['UT4', 'The calling pick', S, 'Superseded', 'CV19: the promotion is the pick; save v32 drops it (D247)'],
+    ['UT5', 'The catalog', C, 'Kept, changed', 'CV21: 5 × 3 × 5 = 75, 60 in use'],
+    ['UT6', 'The Flourish', C, 'Kept, changed', 'CV21: as her family. The same share by tier (T2U5)'],
+    ['UT7', 'The signature\'s family', C, 'Kept, changed', 'D264: Fleet the Charm; D266: 0.1 a level (T2U6)'],
+    ['UT8', 'Presets', C, 'Kept, changed', 'D264, D266: three slots, ★ first only when usable (T2U7)'],
+    ['UT9', 'The signature tip', X, 'Broken', 'Six classes\' lead table, the Bow\'s old splash, "as her calling": T2U9–T2U13'],
+    ['UT10', 'Her moon', C, 'Kept, changed', 'D264: no jewel; CV21: node II by root (T2U8)'],
+    ['UT11', 'The affinity', K, 'Kept', 'Retired, never built'],
+    ['UT12', 'What her class gates', C, 'Kept, changed', 'CV21: her family, not one class (T2U4)'],
+    ['UT13', 'The budget', X, 'Broken', 'One slot at +0.2 a level: re-measured on v21 (T2U14)'],
+    ['UT14', 'How it shows', S, 'Superseded', 'D239, D265, D270, D274: the Template tab; one more row (T2U16)'],
+    ['UT15', 'The Stable', C, 'Kept, changed', 'D257: five callings; a Trade group beside it'],
+    ['UT16', 'Names', K, 'Kept', 'Re-checked against today\'s release: no match (T2U19)'],
+    ['UT17', 'Save', C, 'Kept, changed', 'D247: nothing about the template stored; the tip pick (T2U17)'],
+    ['UT18', 'Engine', C, 'Kept, changed', 'Tier 1\'s pieces shipped; the tips with Tier 2\'s classes (T2U18)'],
+    ['UT19', 'Professions, the party', C, 'Kept, changed', 'CV20: one trade a Tier 0 (T2U20)'],
+    ['UT20', 'Enough for now', C, 'Kept, changed', 'D266 turned the dial down; five pieces, one dial (T2U15)'],
+  ]
+  document.getElementById('callboard').innerHTML = CALLS.map(([id, name, col, st, why]) =>
+    `<div class="call" style="--sc:${col}"><div class="id">${id} · ${name}</div><div class="st">${st}</div><p>${why}</p></div>`).join('')
+</script>
+</body>
+</html>

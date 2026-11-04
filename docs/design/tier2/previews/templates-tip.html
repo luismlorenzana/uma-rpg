@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Signature Tip</title>
+<!-- Tier 2 set, templates.md §4.6–§4.9 and §5 (T2U9–T2U13, T2U16): where the ★ signature tip sits on a Tier 2 tree, her lead
+     weapon by class, the three tips on today's shapes against Power and Break, Tier 3's two held lines, and how it shows on
+     the Class and Template tabs. Every Uma here is made up. Style: the Tier rework's _template.html tokens, desktop width. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --s-dash: #d9961c; --s-middle: #1592a0; --s-stayer: #3f5bb5;
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --s-dash: #e0a73a; --s-middle: #2bb3bf; --s-stayer: #7d93e8;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1280px; margin: 0 auto; padding: 32px 40px 80px; }
+  h1 { font: 700 28px/1.15 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 20px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 4px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 0 0 8px; }
+  p { margin: 0; }
+  a { color: inherit; }
+  .lead { color: var(--ink-soft); max-width: 940px; }
+  .sub { color: var(--ink-soft); margin: 0 0 16px; max-width: 980px; }
+  .muted { color: var(--ink-faint); }
+  section { margin-top: 44px; scroll-margin-top: 64px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); min-width: 0; }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 20px -40px 0; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.out { background: transparent; box-shadow: none; color: var(--ink-soft); }
+  .star { color: var(--accent); font-weight: 800; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken);
+    color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.lead { background: var(--accent); color: var(--accent-ink); }
+  .chip.arm { background: color-mix(in srgb, var(--phys) 16%, transparent); color: var(--phys); }
+  .chip.tome { background: color-mix(in srgb, var(--magic) 16%, transparent); color: var(--magic); }
+  .tier { display: inline-block; padding: 2px 9px; border-radius: 6px; font-weight: 800; font-size: 12px; color: #1b1406; }
+  .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .note { font-size: 12.5px; color: var(--ink-soft); background: var(--raised); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+  .note b { color: var(--ink); }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 12px 16px; border-radius: 10px; color: var(--ink); margin-top: 16px; }
+  .callout b { display: block; margin-bottom: 4px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .svgwrap svg { display: block; width: 100%; height: auto; }
+  .n { fill: var(--raised); stroke: var(--hairline-strong); stroke-width: 1.5; }
+  .n.lead { stroke: var(--accent); }
+  .n.held { fill: var(--accent-wash); stroke: var(--accent); }
+  .n.ghost { fill: transparent; stroke-dasharray: 4 3; }
+  .n.star { fill: var(--accent); stroke: var(--accent-strong); }
+  .n.starghost { fill: transparent; stroke: var(--accent); stroke-dasharray: 4 3; }
+  .e { stroke: var(--hairline-strong); stroke-width: 2; fill: none; }
+  .e.held { stroke: var(--accent); }
+  .lbl { fill: var(--ink); font-size: 11.5px; font-weight: 700; }
+  .lbls { fill: var(--ink-soft); font-size: 11px; }
+  .lbla { fill: var(--accent-ink); font-size: 11px; font-weight: 800; }
+  .lblf { fill: var(--ink-faint); font-size: 10.5px; }
+
+  /* Class cards */
+  .cls { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .cls .name { font-weight: 800; font-size: 15px; }
+  .cls .row { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+  .cls dl { margin: 0; display: grid; grid-template-columns: 64px 1fr; gap: 3px 8px; font-size: 12.5px; }
+  .cls dt { color: var(--ink-faint); } .cls dd { margin: 0; }
+
+  /* Tip cards */
+  .tip { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 var(--hairline-strong); overflow: hidden; }
+  .tip > header { padding: 12px 16px; border-top: 5px solid var(--sc); }
+  .tip > header .s { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; font-weight: 800; color: var(--sc); }
+  .tip > header b { display: block; font-size: 17px; margin-top: 2px; }
+  .tip > header p { color: var(--ink-soft); font-size: 13px; margin-top: 4px; }
+  .tip .body { padding: 6px 16px 14px; }
+  .tip dl { margin: 8px 0 0; display: grid; grid-template-columns: 90px 1fr; gap: 3px 8px; font-size: 12.5px; }
+  .tip dt { color: var(--ink-faint); } .tip dd { margin: 0; }
+
+  /* Phone mocks */
+  .phones { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+  .phone { width: 390px; background: var(--page); border-radius: 34px; padding: 14px 12px 18px; box-shadow: 0 0 0 10px var(--ink), 0 10px 30px rgb(0 0 0 / .18); }
+  .phone .bar { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; padding: 2px 14px 10px; }
+  .phone .card { background: var(--panel); border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .phone .title { font: 700 20px/1.2 ui-rounded, system-ui, sans-serif; }
+  .phone .tabs { display: flex; gap: 6px; margin: 8px 0 10px; }
+  .phone .tabs span { flex: 1; text-align: center; padding: 6px 0; border-radius: 999px; background: var(--sunken); font-size: 12px; font-weight: 700; }
+  .phone .tabs span.on { background: var(--ink); color: var(--panel); }
+  .phone .reads { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .phone .read { background: var(--raised); border-radius: 10px; padding: 8px; }
+  .phone .read b { display: block; font-size: 14px; } .phone .read span { font-size: 11px; color: var(--ink-soft); }
+  .srow { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 9px 2px; border-top: 1px solid var(--hairline); min-height: 44px; }
+  .srow .k { font-weight: 700; font-size: 13px; } .srow .k small { display: block; font-weight: 500; color: var(--ink-soft); font-size: 11.5px; }
+  .state { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--sunken); white-space: nowrap; }
+  .state.on { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .state.off { color: var(--ink-faint); background: transparent; border: 1px solid var(--hairline-strong); }
+  .opt { border: 1.5px solid var(--hairline-strong); border-radius: 12px; padding: 10px 12px; margin-top: 8px; min-height: 44px; }
+  .opt b { font-size: 14px; } .opt p { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .opt.held { border-color: var(--ink); }
+  .opt.sig { border-color: var(--accent); border-style: dashed; background: var(--accent-wash); }
+  .btn { display: block; text-align: center; padding: 12px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-weight: 800; margin-top: 12px; min-height: 44px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 0; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 12px; height: 12px; border-radius: 4px; display: inline-block; border: 1.5px solid var(--hairline-strong); }
+  @media (max-width: 1100px) { .grid3, .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The <span class="star">★</span> signature tip</h1>
+  <p class="lead">The one piece Tiers 2 and 3 add to her template: a third option at the tip fork of her lead weapon's tree,
+    beside Power and Break, by her stride. Where it sits, which tree it lands on for each class, what the three tips do on
+    today's shapes, Tier 3's two held lines, and how it shows. From <a href="../templates.md">templates.md</a> §4.6–§4.9 and §5
+    (T2U9–T2U13, T2U16).</p>
+  <nav class="top">
+    <a href="#where">Where it sits</a><a href="#lead">Her lead tree</a><a href="#tips">The three tips</a><a href="#tier3">Tier 3</a><a href="#shows">How it shows</a><a href="#rules">The rules</a>
+    <a class="out" href="templates-tiers.html">← By tier</a><a class="out" href="templates-umas.html">The Umas →</a>
+  </nav>
+
+  <section id="where">
+    <h2>Where it sits: her lead tree's tip fork</h2>
+    <p class="sub">A Tier 2 class: her class tree (branch, focus, three class skills; T2C) and her three weapon trees. Tier 2's
+      trees give every fork a third line, C, and every line's depth-5 tip a pick, Power or Break (CP19, carried by T2C). On
+      her <b>first slot's</b> tree, as a class of her family, the fork offers her stride's <span class="star">★</span> tip too.
+      She holds one line a tree; the <span class="star">★</span> rides the tip of the one she holds.</p>
+    <div class="panel svgwrap" id="tree2"></div>
+    <div class="legend"><span><i class="sw" style="background:var(--accent-wash);border-color:var(--accent)"></i>The line she holds</span><span><i class="sw" style="background:var(--accent);border-color:var(--accent-strong)"></i>★ her tip, offered</span><span><i class="sw" style="border-style:dashed;border-color:var(--accent)"></i>★ on a line she doesn't hold</span><span><i class="sw" style="border-style:dashed"></i>A line she doesn't hold</span></div>
+  </section>
+
+  <section id="lead">
+    <h2>Her lead tree, by class</h2>
+    <p class="sub">Her first slot is always her lead channel, so her lead tree is a weapon of her lead half. On her class preset
+      (D263) it is the one marked; she may put another weapon of that channel first, and the tip follows (T2U10, T2U12). In a
+      class branch she takes the branch's set, and its first slot leads (T2C). The tip's shape today, line A and line B, is
+      what the <span class="star">★</span> modifies.</p>
+    <div class="grid4" id="classes"></div>
+  </section>
+
+  <section id="tips">
+    <h2>The three tips, against Power and Break</h2>
+    <p class="sub">Sidegrades (CP15: reach, hits or support, never power alone), each an engine rule that exists today. Drawn
+      on a one-foe, three-hit tip (a Brawler's Greatsword line A) against three weak foes with shields of 6 (filled pips are shield left; each weak hit removes one); a volley tip below
+      Spillover. Priced against Power in Tier 2's simulation (T2B): within 3 points.</p>
+    <div class="grid3">
+      <div class="tip" style="--sc: var(--s-dash)"><header><div class="s">Dash · Sprint or Mile</div><b>★ Quickstep</b><p>Two more hits on her target, the same total power. Each weak hit chips a shield: up to two more chips a cast on one foe.</p></header>
+        <div class="body"><div class="svgwrap" id="tip-quick"></div><dl><dt>MP</dt><dd>The tip's</dd><dt>Reuses</dt><dd>A Spellblade's extra hit: power spread over more hits</dd><dt>Strong on</dt><dd>Shields and locks; one foe</dd><dt>Knob</dt><dd>One more hit instead of two</dd></dl></div></div>
+      <div class="tip" style="--sc: var(--s-middle)"><header><div class="s">Middle · Medium</div><b>★ Spillover</b><p>The volley's splash: one more hit at 0.35 of the depth's power on every foe but her target. On a volley tip, a second splash.</p></header>
+        <div class="body"><div class="svgwrap" id="tip-spill"></div><dl><dt>MP</dt><dd>+2, as the volley</dd><dt>Reuses</dt><dd>The volley (CV12)</dd><dt>Strong on</dt><dd>Formations: two foes or more</dd><dt>Knob</dt><dd>0.35 → 0.2 on a tip that already strikes every foe</dd></dl></div></div>
+      <div class="tip" style="--sc: var(--s-stayer)"><header><div class="s">Stayer · Long</div><b>★ Long guard</b><p>A Barrier on herself, 10% of her max HP, until the round's end, after the tip's hits. Under the 60% cap; no healing scale.</p></header>
+        <div class="body"><div class="svgwrap" id="tip-guard"></div><dl><dt>MP</dt><dd>+2</dd><dt>Reuses</dt><dd>The Barrier, with herself as the target (the one new step)</dd><dt>Strong on</dt><dd>The hard fight; long fights</dd><dt>Knob</dt><dd>10% → 8%</dd></dl></div></div>
+    </div>
+    <div class="grid3" style="margin-top:14px">
+      <div class="note"><b>On a pair class's half.</b> A Spellblade's lead half keeps her familiar's extra hit; Quickstep's two come on
+        top. A Summoner's lead summon lingers as before; its farewell reads the tip's power, which Spillover's splash doesn't change.</div>
+      <div class="note"><b>On a healer.</b> The tip's strike takes it; her mend or Barrier is the tip's own. Long guard adds her own
+        Barrier beside the Paladin's depth-5 Barrier on every ally.</div>
+      <div class="note"><b>With her branch's focus (T2C).</b> If her lead weapon is in her focus group, its +15% rides the <span class="star">★</span>
+        tip as it rides Power. The <span class="star">★</span> never sits on her class tree.</div>
+    </div>
+  </section>
+
+  <section id="tier3">
+    <h2>Tier 3: both held lines, and their capstones</h2>
+    <p class="sub">Tier 3's trees let her hold two of a tree's three lines, each with its own tip pick and a depth-6 capstone at
+      Class Rank 50 (CP20, carried by T2C). The <span class="star">★</span> is offered at both tips of her lead tree; a capstone
+      built on a <span class="star">★</span> tip keeps its effect, as a capstone keeps its tip's pick. The master slot (CP22) may
+      hold it like any capstone. Her other two trees: Power and Break only (T2U13).</p>
+    <div class="panel svgwrap" id="tree3"></div>
+  </section>
+
+  <section id="shows">
+    <h2>How it shows: the Class tab's fork and the Template tab</h2>
+    <p class="sub">D270's grammar: a number, a state and the sheet where it changes. No dot (D274): the tip is her choice. Drawn
+      for a made-up Tireless Ironhide, a Brawler at Tier 2's Lv 30 (Class Rank 41).</p>
+    <div class="phones">
+      <div class="phone">
+        <div class="bar"><span>9:41</span><span>Class · Greatsword</span></div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--ink-soft);font-weight:700">Greatsword · line A · depth 5 · R40</div>
+          <div class="title" style="margin-top:2px">The tip</div>
+          <p style="font-size:12px;color:var(--ink-soft);margin-top:4px">One foe · 3 hits · Skill Rank 1</p>
+          <div class="opt held"><b>Power</b> <span class="state on" style="float:right">Picked</span><p>The tip as Tier 1 plays it</p></div>
+          <div class="opt"><b>Break</b><p>Its first weak hit on a foe removes one more shield point</p></div>
+          <div class="opt sig"><b><span class="star">★</span> Long guard</b> <span class="state" style="float:right">Signature</span><p>And a Barrier on herself, 10% of her max HP, until the round's end · +2 MP</p></div>
+          <div class="btn">Pick ★ Long guard</div>
+          <p style="font-size:11.5px;color:var(--ink-faint);margin-top:8px">★ Her signature tip: her first slot's tree, as a Warrior family class</p>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="bar"><span>9:41</span><span>Stable · Uma A</span></div>
+        <div class="tabs"><span>Class</span><span>Gear</span><span>Stars</span><span class="on">Template</span></div>
+        <div class="card">
+          <div class="title"><span class="star">★</span> Tireless Ironhide</div>
+          <div class="reads" style="margin-top:8px">
+            <div class="read"><span>Calling</span><b>Warrior</b><span>from Front A</span></div>
+            <div class="read"><span>Stride</span><b>Stayer</b><span>from Long A</span></div>
+            <div class="read"><span>Knack</span><b>Tireless</b><span>Stamina +20% · Pendant</span></div>
+          </div>
+          <div class="srow"><div class="k">Calling · Warrior · fixed<small>Mine · Weapon Forge</small></div><span></span></div>
+          <div class="srow"><div class="k"><span class="star">★</span> Flourish<small>Late reserve · 2%/round from round 3 · max 4%</small></div><span class="state on">On</span></div>
+          <div class="srow"><div class="k"><span class="star">★</span> Signature<small>ATK/M.ATK +5</small></div><span class="state on">Worn</span></div>
+          <div class="srow"><div class="k"><span class="star">★</span> Moon I<small>HP +35</small></div><span class="state on">Open</span></div>
+          <div class="srow"><div class="k"><span class="star">★</span> Moon II<small>DEF +14</small></div><span class="state">Lv 36</span></div>
+          <div class="srow" style="background:var(--accent-wash);border-radius:8px;padding-left:8px;padding-right:8px"><div class="k"><span class="star">★</span> Tip <span style="font-size:10.5px;color:var(--accent-strong)">TIER 2</span><small>Long guard · Greatsword tree</small></div><span class="state">Not picked</span></div>
+        </div>
+      </div>
+      <div class="panel" style="flex:1;min-width:320px">
+        <h3>The ★ Tip row's states</h3>
+        <table>
+          <tr><th>State</th><th>When</th><th>Taps to</th></tr>
+          <tr><td><span class="state on">Picked</span></td><td>Her lead tree's held line has the ★ picked</td><td>The Class tab's tip node</td></tr>
+          <tr><td><span class="state">Not picked</span></td><td>Depth 5 open, Power or Break picked</td><td>The same</td></tr>
+          <tr><td><span class="state">R40 first</span></td><td>Her class below Class Rank 40</td><td>The same (its gate)</td></tr>
+          <tr><td><span class="state off">Off · as Sorcerer</span></td><td>A class outside her family; a stored ★ plays as Power</td><td>Her family's classes as chips</td></tr>
+          <tr><td>—</td><td>Tier 1's world: no tip fork, no row</td><td></td></tr>
+        </table>
+        <div class="note"><b>No dot, no facet.</b> The Template tab never carries a dot (D274); the tip follows her stride, which the
+          Stable's Stride facet already filters. The Battle tab shows the tip's hits as any skill's, and Long guard's Barrier as
+          "★ Barrier 253" (a Brawler at Tier 2's Lv 50).</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <h2>The rules, in one table</h2>
+    <div class="panel">
+      <table>
+        <tr><th>Question</th><th>Answer</th><th>Call</th></tr>
+        <tr><td>Which tree</td><td>Her first slot's, always a weapon of her lead channel; she chooses which of that channel's weapons sits first</td><td>T2U9, T2U10</td></tr>
+        <tr><td>Which depth</td><td>Depth 5, the tip, from Class Rank 40 (about Uma Lv 27 in a Tier 2 world, from Rank 1)</td><td>T2U9</td></tr>
+        <tr><td>Which line</td><td>The one she holds (A, B or C); in Tier 3 both held lines</td><td>T2U9, T2U13</td></tr>
+        <tr><td>The class branches</td><td>Never move it; a branch's set changes her first slot only if she takes the set</td><td>T2U9</td></tr>
+        <tr><td>Gate</td><td>A class of her family (her Tier 0's own children; kin outside)</td><td>T2U4</td></tr>
+        <tr><td>If she reorders, or fights outside her family</td><td>The ★ follows her first slot; a stored ★ elsewhere plays as Power and waits</td><td>T2U12</td></tr>
+        <tr><td>Save</td><td>A third value of T2C's tip pick (<code>power</code> · <code>break</code> · <code>signature</code>), default Power</td><td>T2U17</td></tr>
+        <tr><td>Engine</td><td>Data on rules that exist; a Barrier's self-target the one new step</td><td>T2U18</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+<script>
+  // Tier 2's tree for a class: her class tree, her lead tree (A held, ★ offered) and two other trees.
+  function weaponTree(x0, y0, name, lead, held, opts) {
+    const dx = 46, lines = ['A', 'B', 'C']
+    let s = `<text class="lbl" x="${x0}" y="${y0 - 52}">${name}</text>`
+    s += `<text class="lbls" x="${x0}" y="${y0 - 38}">${lead ? 'Slot 1 · her lead tree' : opts.sub}</text>`
+    // trunk
+    s += `<line class="e held" x1="${x0 + 14}" y1="${y0 + 60}" x2="${x0 + 14 + dx}" y2="${y0 + 60}"/>`
+    for (const [k, d] of [[0, 1], [1, 2]]) s += `<circle class="n held" cx="${x0 + 14 + dx * k}" cy="${y0 + 60}" r="12"/><text class="lbl" x="${x0 + 14 + dx * k}" y="${y0 + 64}" text-anchor="middle">${d}</text>`
+    lines.forEach((ln, i) => {
+      const y = y0 + i * 60, isHeld = ln === held
+      const cls = isHeld ? 'held' : 'ghost'
+      s += `<path class="e ${isHeld ? 'held' : ''}" d="M${x0 + 14 + dx + 12},${y0 + 60} C${x0 + 14 + dx + 40},${y0 + 60} ${x0 + 14 + dx + 20},${y + 0} ${x0 + 14 + 2 * dx - 12},${y}"/>`
+      for (let d = 3; d <= 5; d++) {
+        const x = x0 + 14 + dx * (d - 1)
+        if (d < 5) s += `<line class="e ${isHeld ? 'held' : ''}" x1="${x + 12}" y1="${y}" x2="${x + dx - 12}" y2="${y}"/>`
+        s += `<circle class="n ${cls}" cx="${x}" cy="${y}" r="12"/><text class="${isHeld ? 'lbl' : 'lblf'}" x="${x}" y="${y + 4}" text-anchor="middle">${d}</text>`
+      }
+      s += `<text class="${isHeld ? 'lbl' : 'lblf'}" x="${x0 + 14 + 2 * dx - 12}" y="${y - 16}" text-anchor="middle">${ln}${isHeld ? ' · held' : ''}</text>`
+      // the tip fork
+      const fx = x0 + 14 + dx * 4 + 22
+      const opt = (k, label, kind) => {
+        const oy = y - 16 + k * 16
+        const c = kind === 'star' ? (isHeld ? 'star' : 'starghost') : (isHeld ? 'held' : 'ghost')
+        return `<line class="e ${isHeld ? 'held' : ''}" x1="${fx - 10}" y1="${y}" x2="${fx}" y2="${oy}"/><rect class="n ${c}" x="${fx}" y="${oy - 7}" width="${kind === 'star' ? 92 : 50}" height="14" rx="7"/><text class="${kind === 'star' && isHeld ? 'lbla' : isHeld ? 'lbl' : 'lblf'}" x="${fx + 6}" y="${oy + 4}" style="font-size:10px">${label}</text>`
+      }
+      s += opt(0, 'Power') + opt(1, 'Break')
+      if (lead) s += opt(2, '★ Long guard', 'star')
+    })
+    return s
+  }
+  ;(function () {
+    const W = 1200, H = 290
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="A Tier 2 class: her class tree and three weapon trees, the signature tip on her lead tree">`
+    // class tree
+    s += `<rect x="10" y="44" width="200" height="220" rx="14" fill="var(--raised)" stroke="var(--hairline-strong)"/>`
+    s += `<text class="lbl" x="24" y="70">Her class tree (T2C)</text><text class="lbls" x="24" y="88">Brawler · her class branch</text>`
+    ;['Focus · +15% on its group', 'Class skill · Class Rank 20', 'Class skill · Class Rank 30', 'Class skill · Class Rank 40'].forEach((t, i) => {
+      s += `<rect class="n" x="24" y="${104 + i * 36}" width="172" height="26" rx="8"/><text class="lbls" x="34" y="${121 + i * 36}">${t}</text>`
+    })
+    s += `<text class="lblf" x="24" y="258">No ★ here</text>`
+    s += weaponTree(240, 100, 'Greatsword', true, 'A', {})
+    s += weaponTree(565, 100, 'Axe', false, 'A', { sub: 'Slot 2' })
+    s += weaponTree(890, 100, 'Lance', false, 'B', { sub: 'Slot 3' })
+    document.getElementById('tree2').innerHTML = s + '</svg>'
+  })()
+
+  // Tier 3: lines A and B held on her lead tree, each with the ★ tip and a capstone.
+  ;(function () {
+    const W = 1200, H = 250, x0 = 40, y0 = 60, dx = 92
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tier 3: two held lines on her lead tree, each with the signature tip and a capstone">`
+    s += `<text class="lbl" x="${x0}" y="28">Greatsword · slot 1 · her lead tree, Tier 3</text>`
+    s += `<line class="e held" x1="${x0 + 14}" y1="${y0 + 70}" x2="${x0 + 14 + dx}" y2="${y0 + 70}"/>`
+    for (const [k, d] of [[0, 1], [1, 2]]) s += `<circle class="n held" cx="${x0 + 14 + dx * k}" cy="${y0 + 70}" r="13"/><text class="lbl" x="${x0 + 14 + dx * k}" y="${y0 + 74}" text-anchor="middle">${d}</text>`
+    ;[['A', 0, true], ['B', 1, true], ['C', 2, false]].forEach(([ln, i, held]) => {
+      const y = y0 + i * 70
+      s += `<path class="e ${held ? 'held' : ''}" d="M${x0 + 14 + dx + 13},${y0 + 70} C${x0 + 14 + dx + 50},${y0 + 70} ${x0 + 14 + dx + 30},${y} ${x0 + 14 + 2 * dx - 13},${y}"/>`
+      for (let d = 3; d <= 5; d++) {
+        const x = x0 + 14 + dx * (d - 1)
+        if (d < 5) s += `<line class="e ${held ? 'held' : ''}" x1="${x + 13}" y1="${y}" x2="${x + dx - 13}" y2="${y}"/>`
+        s += `<circle class="n ${held ? 'held' : 'ghost'}" cx="${x}" cy="${y}" r="13"/><text class="${held ? 'lbl' : 'lblf'}" x="${x}" y="${y + 4}" text-anchor="middle">${d}</text>`
+      }
+      s += `<text class="${held ? 'lbl' : 'lblf'}" x="${x0 + 14 + 2 * dx - 13}" y="${y - 18}" text-anchor="middle">${ln}${held ? ' · held' : ' · not held'}</text>`
+      if (!held) return
+      const fx = x0 + 14 + dx * 4 + 26
+      s += `<line class="e held" x1="${fx - 13}" y1="${y}" x2="${fx}" y2="${y}"/>`
+      s += `<rect class="n held" x="${fx}" y="${y - 11}" width="60" height="22" rx="11"/><text class="lbl" x="${fx + 30}" y="${y + 4}" text-anchor="middle" style="font-size:10.5px">Power</text>`
+      s += `<rect class="n held" x="${fx + 66}" y="${y - 11}" width="60" height="22" rx="11"/><text class="lbl" x="${fx + 96}" y="${y + 4}" text-anchor="middle" style="font-size:10.5px">Break</text>`
+      s += `<rect class="n star" x="${fx + 132}" y="${y - 11}" width="108" height="22" rx="11"/><text class="lbla" x="${fx + 186}" y="${y + 4}" text-anchor="middle">★ Long guard</text>`
+      s += `<line class="e held" x1="${fx + 240}" y1="${y}" x2="${fx + 290}" y2="${y}"/>`
+      s += `<circle class="n star" cx="${fx + 306}" cy="${y}" r="15"/><text class="lbla" x="${fx + 306}" y="${y + 4}" text-anchor="middle">6</text>`
+      s += `<text class="lbls" x="${fx + 330}" y="${y - 2}">Capstone · Class Rank 50</text><text class="lblf" x="${fx + 330}" y="${y + 12}">keeps its tip's pick: here ★ Long guard</text>`
+    })
+    s += `<text class="lblf" x="${x0}" y="${H - 10}">Her other two trees: Power · Break at both held tips, no ★. The master slot may hold either ★ capstone.</text>`
+    document.getElementById('tree3').innerHTML = s + '</svg>'
+  })()
+
+  // Lead trees by class (RPG_WEAPON_PRESETS; skill-trees manual, line A and B at depth 5).
+  const CLASSES = [
+    ['Brawler', [['Greatsword', 'arm'], ['Axe', 'arm'], ['Lance', 'arm']], 'One foe, 3 hits', 'Combo: 4 hits', 'Warrior'],
+    ['Sorcerer', [['Fire Tome', 'tome'], ['Blizzard Tome', 'tome'], ['Thunder Tome', 'tome']], 'One foe, 1 hit', 'Wave: every foe, 1 hit', 'Mage'],
+    ['Arms Spellblade', [['Katana', 'arm'], ['Axe', 'arm'], ['Thunder Tome', 'tome']], 'One foe, 2 hits + 1 familiar, Armor Break', 'Pierce: 1 hit + 1, through the shield', 'Warrior, Spellblade'],
+    ['Tome Spellblade', [['Thunder Tome', 'tome'], ['Blizzard Tome', 'tome'], ['Katana', 'arm']], 'One foe, 3 hits + 1 familiar', 'Pierce: 1 hit + 1', 'Spellblade, Mage'],
+    ['Arms Summoner', [['Bow', 'arm'], ['Axe', 'arm'], ['Dark Tome', 'tome']], 'A volley: 3 hits, a splash on every other, lingers', 'Oath: lingers at 0.4', 'Warrior, Summoner'],
+    ['Tome Summoner', [['Dark Tome', 'tome'], ['Blizzard Tome', 'tome'], ['Bow', 'arm']], 'A volley: 3 hits, a splash on every other, lingers', 'Oath: lingers at 0.4', 'Summoner, Mage'],
+    ['Paladin', [['Lance', 'arm'], ['Greatsword', 'arm'], ['Light Tome', 'tome']], 'One foe, 1 hit; Mind Break; Barrier 44% on every ally', 'Surge: one more stack', 'Healer'],
+    ['Cleric', [['Light Tome', 'tome'], ['Fire Tome', 'tome'], ['Lance', 'arm']], 'One foe, 1 hit; Brave and Faith; heals every ally 44%', 'Surge: a mend 15% larger', 'Healer'],
+  ]
+  document.getElementById('classes').innerHTML = CLASSES.map(([name, ws, a, b, fam]) => `
+    <div class="cls"><div class="name">${name}</div>
+      <div class="row">${ws.map(([w, k], i) => `<span class="chip ${i === 0 ? 'lead' : k}">${i === 0 ? '★ ' : ''}${w}</span>`).join('')}</div>
+      <dl><dt>Line A tip</dt><dd>${a}</dd><dt>Line B tip</dt><dd>${b}</dd><dt>Family of</dt><dd>${fam} callings</dd></dl>
+    </div>`).join('')
+
+  // Mini formations: three foes, the target in the middle. Hits are ticks; a weak hit removes a shield pip.
+  function scene(rows) {
+    const W = 360, rowH = 64, H = rows.length * rowH + 8
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Hits on three foes for each option">`
+    rows.forEach((r, i) => {
+      const y = 8 + i * rowH
+      s += `<text class="${r.star ? 'lbla' : 'lbl'}" x="0" y="${y + 30}" style="${r.star ? 'fill:var(--accent-strong)' : ''}">${r.label}</text>`
+      s += `<text class="lblf" x="0" y="${y + 44}">${r.mp}</text>`
+      ;[0, 1, 2].forEach((f) => {
+        const cx = 140 + f * 74, cy = y + 28, hits = r.hits[f], chips = Math.min(6, hits + (r.extra?.[f] ?? 0))
+        s += `<circle cx="${cx}" cy="${cy}" r="16" fill="var(--raised)" stroke="${f === 1 ? 'var(--ink)' : 'var(--hairline-strong)'}" stroke-width="${f === 1 ? 2 : 1.5}"/>`
+        s += `<text class="lblf" x="${cx}" y="${cy + 4}" text-anchor="middle">${f === 1 ? 'target' : ''}</text>`
+        for (let p = 0; p < 6; p++) s += `<rect x="${cx - 22 + p * 7.5}" y="${cy - 28}" width="5.5" height="6" rx="1.5" fill="${p < chips ? 'transparent' : 'var(--ink-soft)'}" stroke="var(--ink-soft)" stroke-width="1"/>`
+        for (let h = 0; h < hits; h++) s += `<line x1="${cx - 20 + h * 7}" y1="${cy + 22}" x2="${cx - 16 + h * 7}" y2="${cy + 30}" stroke="${r.star && (r.starHits?.[f] ?? 0) > h ? 'var(--accent)' : 'var(--ink)'}" stroke-width="2.5" stroke-linecap="round"/>`
+      })
+      if (r.guard) s += `<g transform="translate(${W - 26},${y + 10})"><path d="M10 0 L20 4 L20 12 C20 20 14 24 10 26 C6 24 0 20 0 12 L0 4 Z" fill="var(--accent)" stroke="var(--accent-strong)"/></g><text class="lblf" x="${W - 16}" y="${y + 52}" text-anchor="middle">her</text>`
+    })
+    return s + '</svg>'
+  }
+  // Base: one foe, 3 hits. Shields 6 pips each (a formation's largest); each weak hit removes one (filled = shield left).
+  const POWER = { label: 'Power', mp: 'the tip', hits: [0, 3, 0] }
+  const BREAK = { label: 'Break', mp: 'the tip', hits: [0, 3, 0], extra: [0, 1, 0] }
+  document.getElementById('tip-quick').innerHTML = scene([POWER, BREAK, { label: '★ Quickstep', mp: 'the tip', hits: [0, 5, 0], star: true, starHits: [0, 0, 0] }])
+  document.getElementById('tip-spill').innerHTML = scene([POWER, BREAK, { label: '★ Spillover', mp: '+2 MP', hits: [1, 3, 1], star: true, starHits: [1, 0, 1] },
+    { label: 'Volley tip', mp: 'Bow, Dark', hits: [1, 3, 1] }, { label: '★ on a volley', mp: '+2 MP', hits: [2, 3, 2], star: true, starHits: [2, 0, 2] }])
+  document.getElementById('tip-guard').innerHTML = scene([POWER, BREAK, { label: '★ Long guard', mp: '+2 MP', hits: [0, 3, 0], star: true, guard: true }])
+</script>
+</body>
+</html>
