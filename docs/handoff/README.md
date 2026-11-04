@@ -29,12 +29,8 @@ packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma
 pins it.
 
 **Profile polish** ([proposal](../design/profile-polish/proposal.md), pages: [Details](../design/profile-polish/previews/details.html) and
-[star chart](../design/profile-polish/previews/star-chart.html)) is built and live, with vector crests and stat marks.
-H141's pixel art is published in uma-art 2.19.0 (Done below); H144 pins it and finishes the polish:
-
-| Id | What | Who | Size | Needs | State |
-|---|---|---|---|---|---|
-| [H144](tasks/H144-pin-star-art.md) | Pin uma-art 2.19.0 and swap the vector marks | Claude or ChatGPT | S | H141 | Ready |
+[star chart](../design/profile-polish/previews/star-chart.html)) is finished and live. H144 pins H141's uma-art 2.19.0:
+five native pixel crests and eight stat marks on the chart, totals and Details (D297).
 
 **The combat pass** (H145–H149, D282) is built and live: foes no longer guard, one symbol per kind, the healers' one kit and
 rescue, buffs and debuffs on their paths, pure Brawlers and Sorcerers, a Spellblade's bound familiar.
@@ -94,7 +90,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v21, save v36; uma-kit 0.17.0, uma-art 2.18.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v21, save v36; uma-kit 0.17.0, uma-art 2.19.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 - **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
   "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.
@@ -106,7 +102,8 @@ Packets finished since the last archive go here, newest first; the archive keeps
 | Id | Task | Commit |
 |---|---|---|
 | H167 | Skill names, one grammar for every Tier 1 tree (D298, [skill-names.md](../design/skill-names/skill-names.md)): a word a tree, Greater · Grand · Supreme, a capstone, line B as A's name with its word; 528 of the 560 live names, the Summoners' Bonded line now Oath and the healers' Heavy Surge; names only, no engine or save change | `9d88510` |
-| H141 | Five native 24px star crests and eight native 16px stat marks (platform P80); the 120×220 UI atlas preserves every earlier frame, and native/2×/4× white, dark and night-sky previews passed review. Uma-art 2.19.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41880067892); H144 owns the pin and is Ready, as is H156's next art release. | Art `b612403` ([platform #64](https://github.com/luismlorenzana/uma-platform/pull/64)) |
+| H144 | Profile polish finished: uma-art 2.19.0 pinned, five native 24px star crests and eight native 16px stat marks replace the vector stand-ins (D297). Full checks and both phone widths/themes passed; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/41906774018), health at the merge commit and deployed atlas bytes verified. | `5017f41` ([#88](https://github.com/luismlorenzana/uma-rpg/pull/88)) |
+| H141 | Five native 24px star crests and eight native 16px stat marks (platform P80); the 120×220 UI atlas preserves every earlier frame, and native/2×/4× white, dark and night-sky previews passed review. Uma-art 2.19.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41880067892) and adopted by H144 above; H156's next art release is Ready. | Art `b612403` ([platform #64](https://github.com/luismlorenzana/uma-platform/pull/64)) |
 | H159 | Capital runs' foes: a fourth Finals route for all fourteen scenarios, the run's ids and its sixteen fights, the map's capitals byte for byte as before (D296) | `2938491` |
 | H157 | Collections live, save v35: the switch, the run-wide Ascend and the Observatory removed, the manual and the phone check (D288) | `ceab990` |
 | H155 | Windows on screen, dark: her window beside her bust, the Window sheet, the Gallery, Ascend one Uma at a time, latching and the "Window +1" note (D287) | `3bc65cc` |
