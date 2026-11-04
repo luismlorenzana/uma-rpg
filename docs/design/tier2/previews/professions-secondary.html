@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secondary Line</title>
+<!-- professions.md (T2P) §4.4: the secondary line, from Tier 2. The rule, the screens (phone mocks at 390 pt drawn at
+     desktop scale), and a Tier 2 run of twenty set up. Umas are shown by role ("Uma A"); labels were checked against the
+     master-data release (no exact match). From the Tier 2 set's _template.html (kit colours, light and dark). -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --info: #2f6fe0; --locked: #8a94a3;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --neutral: #a9b4c2;
+    --l1: #2a78d6; --l2: #eb6834; --l3: #1baf7a; --l4: #eda100; --l5: #e87ba4;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --neutral: #4a586b;
+      --l1: #3987e5; --l2: #d95926; --l3: #199e70; --l4: #c98500; --l5: #d55181;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 32px 72px; }
+  h1 { font: 700 26px/1.15 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 19px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 4px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 0 0 6px; }
+  p { margin: 0; color: var(--ink-soft); }
+  .lead { max-width: 920px; } .sub { margin-bottom: 14px; max-width: 960px; }
+  section { margin-top: 36px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 18px -32px 0; padding: 10px 32px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.on { background: var(--accent); color: var(--accent-ink); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: middle; }
+  th { color: var(--ink-soft); font-weight: 600; } td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--ink-faint); } .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 0 0 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* rule grid */
+  .rule { display: grid; grid-template-columns: 240px repeat(10, 1fr); gap: 3px; font-size: 12px; }
+  .rule .h { text-align: center; color: var(--ink-soft); font-weight: 700; padding: 4px 0; }
+  .rule .r { padding: 7px 9px; background: var(--raised); border-radius: 6px; font-weight: 600; display: flex; gap: 6px; align-items: center; }
+  .rule .c { border-radius: 6px; display: grid; place-items: center; font-weight: 700; padding: 7px 0; }
+  .c.yes { background: color-mix(in srgb, var(--success) 22%, transparent); color: var(--success); }
+  .c.main { background: color-mix(in srgb, var(--accent) 24%, transparent); color: var(--accent-strong); }
+  .c.no { background: var(--sunken); color: var(--ink-faint); }
+
+  /* phones */
+  .phones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: start; }
+  .phone { background: var(--page); border-radius: 28px; padding: 10px; box-shadow: 0 0 0 1px var(--hairline-strong), 0 10px 26px rgb(0 0 0 / .10); }
+  .screen { background: var(--page); border-radius: 20px; overflow: hidden; min-height: 520px; display: flex; flex-direction: column; border-top: 4px solid var(--t2); }
+  .bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; font-size: 12px; color: var(--ink-soft); background: var(--panel); border-bottom: 1px solid var(--hairline); }
+  .bar b { color: var(--ink); font-size: 13px; }
+  .body { padding: 10px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .face { width: 30px; height: 30px; border-radius: 50%; background: var(--sunken); border: 1px solid var(--hairline-strong); display: grid; place-items: center; font: 700 11px system-ui; color: var(--ink-soft); flex: none; position: relative; }
+  .face small { position: absolute; left: -4px; bottom: -4px; background: var(--ink); color: var(--panel); border-radius: 6px; font: 700 9px system-ui; padding: 0 3px; }
+  .ptabs { display: flex; gap: 4px; } .ptabs span { flex: 1; text-align: center; padding: 6px 0; border-radius: 8px; background: var(--panel); font-size: 11.5px; font-weight: 600; color: var(--ink-soft); }
+  .ptabs span.on { background: var(--ink); color: var(--panel); }
+  .tile3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .tl { background: var(--panel); border-radius: 10px; padding: 7px 8px; font-size: 11px; color: var(--ink-soft); }
+  .tl b { display: block; font-size: 13px; color: var(--ink); }
+  .rowp { background: var(--panel); border-radius: 10px; padding: 9px 10px; font-size: 12.5px; display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; }
+  .rowp .k { color: var(--ink-soft); } .rowp .v { font-weight: 600; text-align: right; }
+  .rowp.new { box-shadow: 0 0 0 2px var(--accent); }
+  .rowp.sel { box-shadow: 0 0 0 2px var(--ink); }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 700; background: var(--accent); color: var(--accent-ink); margin-left: 4px; }
+  .sheet { background: var(--panel); border-radius: 16px 16px 0 0; margin-top: auto; padding: 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 -6px 18px rgb(0 0 0 / .10); }
+  .sheet .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--hairline-strong); margin: 0 auto 4px; }
+  .sheet .ttl { font-weight: 700; font-size: 15px; } .sheet .st { font-size: 11.5px; color: var(--ink-soft); }
+  .opt { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 10px; background: var(--raised); min-height: 44px; font-size: 12.5px; }
+  .opt .sw { width: 12px; height: 12px; } .opt .nm { font-weight: 700; } .opt .cnt { margin-left: auto; color: var(--ink-soft); font-size: 11.5px; text-align: right; }
+  .grp { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); font-weight: 700; margin-top: 4px; }
+  .who { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; background: var(--raised); min-height: 44px; font-size: 12.5px; }
+  .who .st { margin-left: auto; font-size: 11px; color: var(--ink-soft); text-align: right; }
+  .who.off { opacity: .5; } .who.on { box-shadow: 0 0 0 2px var(--ink); }
+  .gchips { display: flex; gap: 4px; flex-wrap: wrap; } .gchips span { padding: 3px 7px; border-radius: 8px; background: var(--raised); font-size: 11px; font-weight: 700; }
+  .gchips span.on { background: var(--ink); color: var(--panel); } .gchips span.lock { color: var(--ink-faint); }
+  .cap { font-size: 12px; color: var(--ink-soft); margin-top: 8px; text-align: center; }
+
+  /* worked example */
+  .ex { display: grid; grid-template-columns: 150px 1fr 180px; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--hairline); }
+  .exbar { position: relative; height: 26px; }
+  .exbar .cap2 { position: absolute; top: 0; height: 26px; border: 2px dashed var(--ink-soft); border-radius: 5px; }
+  .exbar .fill { position: absolute; top: 4px; height: 18px; display: flex; gap: 2px; }
+  .exbar .fill i { height: 18px; border-radius: 4px; display: grid; place-items: center; font: 600 10.5px system-ui; font-style: normal; color: #fff; }
+  .hatch { background: repeating-linear-gradient(135deg, var(--neutral) 0 4px, transparent 4px 8px); color: var(--ink) !important; border: 1px solid var(--neutral); }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .card { background: var(--panel); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .card b { display: block; margin-bottom: 4px; }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 7px 10px; border-radius: 8px; font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; }
+  @media (max-width: 1100px) { .phones { grid-template-columns: repeat(2, 1fr); } .cards { grid-template-columns: 1fr; } .ex { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The secondary line</h1>
+  <p class="lead">professions.md (T2P12–T2P17). From Tier 2 an Uma may hold one <b>secondary</b>: another line's three
+    places, gather, process and make, at <b>G1–G8</b>. G9 and G10 stay that line's own trade's. One Craft Level for both;
+    free to change; cleared on Ascend.</p>
+  <nav class="top">
+    <a href="professions-tiers.html">The farm by tier</a>
+    <a href="professions-times.html">Times</a>
+    <a href="professions-demand.html">Demand and supply</a>
+    <a class="on" href="professions-secondary.html">The secondary</a>
+  </nav>
+
+  <section>
+    <h2>The rule, for one Uma</h2>
+    <p class="sub">Uma B: her calling is the Spellblade, so her trade is Wood; her secondary is Vegetables. Grades still open
+      at Craft Lv 5g − 4 (G8 at Lv 36). Tier 1 has no secondary.</p>
+    <div class="panel">
+      <div class="rule" id="rule"></div>
+      <p class="foot">✓ she may gather, process and make it · ★ "Main trade only": the Healers' G9 and G10 · — "Another
+        trade" · A line with no Uma of its trade is an open shop: every grade, everyone (T2P17).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>On her phone</h2>
+    <p class="sub">A Tier 2 world (the dusk accent). Four screens: where the secondary shows, the sheet that sets it, and a
+      making place's Who step at G6 and at G9. A tap on a line sets it at once (the profile's free grammar); "None" clears it.</p>
+    <div class="phones">
+      <div>
+        <div class="phone"><div class="screen">
+          <div class="bar"><span>‹ Stable</span><b>Uma B</b><span>Lv 24</span></div>
+          <div class="body">
+            <div class="ptabs"><span>Class</span><span>Gear</span><span>Stars</span><span class="on">Template</span></div>
+            <div class="tile3"><div class="tl">Calling<b>Spellblade</b>from Pace A</div><div class="tl">Stride<b>Middle</b>from Medium A</div><div class="tl">Knack<b>Fleet</b>names her ★</div></div>
+            <div class="rowp"><span class="k">Calling · Spellblade · fixed</span><span class="v">Forest · Armorer</span></div>
+            <div class="rowp new" data-tip="New from Tier 2: opens her secondary sheet"><span class="k">Secondary</span><span class="v">Vegetables ›</span></div>
+            <div class="rowp"><span class="k">★ Flourish</span><span class="v">On</span></div>
+            <div class="rowp"><span class="k">★ Signature</span><span class="v">Worn</span></div>
+            <div class="rowp"><span class="k">★ Moon I · II</span><span class="v">Open · Lv 36</span></div>
+          </div>
+        </div></div>
+        <p class="cap">Her Template tab: under the calling-and-trade row, "Secondary" ("Pick" while she has none).</p>
+      </div>
+      <div>
+        <div class="phone"><div class="screen">
+          <div class="bar"><span>‹ Uma B</span><b>Template</b><span></span></div>
+          <div class="body" style="opacity:.35"><div class="rowp"><span class="k">Calling · Spellblade · fixed</span><span class="v">Forest · Armorer</span></div><div class="rowp"><span class="k">Secondary</span><span class="v">Pick ›</span></div></div>
+          <div class="sheet">
+            <div class="grab"></div>
+            <div class="ttl">Her secondary</div><div class="st">G1–G8 of one other line · free to change</div>
+            <div class="opt" data-tip="6 hands for 250 refined a full window"><i class="sw" style="background:var(--l1)"></i><span><span class="nm">Metal</span><br><span class="muted" style="font-size:11px">Mine · Weapon Forge</span></span><span class="cnt">4 Umas<br>2 secondaries</span></div>
+            <div class="opt" style="box-shadow:0 0 0 2px var(--accent)" data-tip="5 hands for 250: the fewest for its work"><i class="sw" style="background:var(--l2)"></i><span><span class="nm">Vegetables</span><span class="badge">Suggested</span><br><span class="muted" style="font-size:11px">Fields · Tome Forge</span></span><span class="cnt">3 Umas<br>2 secondaries</span></div>
+            <div class="opt" data-tip="4 hands for 150"><i class="sw" style="background:var(--l4)"></i><span><span class="nm">Fish</span><br><span class="muted" style="font-size:11px">Fishery · Charm Forge</span></span><span class="cnt">3 Umas<br>1 secondary</span></div>
+            <div class="opt" data-tip="5 hands for 150"><i class="sw" style="background:var(--l5)"></i><span><span class="nm">Stone</span><br><span class="muted" style="font-size:11px">Monster Den · Lapidary</span></span><span class="cnt">5 Umas<br>0 secondaries</span></div>
+            <div class="opt" style="box-shadow:0 0 0 2px var(--ink)"><span class="nm">None</span><span class="cnt">✓</span></div>
+          </div>
+        </div></div>
+        <p class="cap">Four lines (never her own), each with this world's hands; Suggested weighs hands against a full window's work.</p>
+      </div>
+      <div>
+        <div class="phone"><div class="screen">
+          <div class="bar"><span>‹ Wilds</span><b>Tome Forge</b><span>4 slots · ×1.25</span></div>
+          <div class="body">
+            <div class="gchips"><span>G1</span><span>G2</span><span>G3</span><span>G4</span><span>G5</span><span class="on">G6</span><span>G7</span><span>G8</span><span>G9</span><span class="lock">G10</span></div>
+            <div class="rowp"><span class="k">Tome Ink G6 · ×3</span><span class="v">Sliced Bell Pepper ×30 (42)</span></div>
+            <div class="grp">Her trade</div>
+            <div class="who on"><span class="face">C<small>C42</small></span>Uma C<span class="st">Free</span></div>
+            <div class="who off"><span class="face">D<small>C41</small></span>Uma D<span class="st">At Fields · 2h 10m</span></div>
+            <div class="who"><span class="face">E<small>C40</small></span>Uma E<span class="st">Free</span></div>
+            <div class="grp">Secondary</div>
+            <div class="who"><span class="face">B<small>C43</small></span>Uma B<span class="st">Free</span></div>
+            <div class="who"><span class="face">F<small>C41</small></span>Uma F<span class="st">Free</span></div>
+            <div class="grp">Another trade</div>
+            <div class="who off"><span class="face">G<small>C44</small></span>Uma G<span class="st">Another trade</span></div>
+          </div>
+        </div></div>
+        <p class="cap">Who at G6: her trade first, then this line's secondaries, then the rest greyed.</p>
+      </div>
+      <div>
+        <div class="phone"><div class="screen">
+          <div class="bar"><span>‹ Wilds</span><b>Tome Forge</b><span>4 slots · ×1.25</span></div>
+          <div class="body">
+            <div class="gchips"><span>G1</span><span>G2</span><span>G3</span><span>G4</span><span>G5</span><span>G6</span><span>G7</span><span>G8</span><span class="on">G9</span><span class="lock">G10</span></div>
+            <div class="rowp"><span class="k">Tome Ink G9 · ×3</span><span class="v">Golden Carrot Purée ×30 (31)</span></div>
+            <div class="grp">Her trade</div>
+            <div class="who on"><span class="face">C<small>C42</small></span>Uma C<span class="st">Free</span></div>
+            <div class="who off"><span class="face">D<small>C41</small></span>Uma D<span class="st">At Fields · 2h 10m</span></div>
+            <div class="who off"><span class="face">E<small>C40</small></span>Uma E<span class="st">From Craft Lv 41</span></div>
+            <div class="grp">Secondary</div>
+            <div class="who off" data-tip="G9 and G10 stay the line's own trade's (T2P13)"><span class="face">B<small>C43</small></span>Uma B<span class="st">Main trade only</span></div>
+            <div class="who off"><span class="face">F<small>C41</small></span>Uma F<span class="st">Main trade only</span></div>
+            <div class="grp">Another trade</div>
+            <div class="who off"><span class="face">G<small>C44</small></span>Uma G<span class="st">Another trade</span></div>
+          </div>
+        </div></div>
+        <p class="cap">Who at G9: secondaries greyed "Main trade only". G10 opens at Craft Lv 46.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>A Tier 2 run of twenty, set up</h2>
+    <p class="sub">Twenty at today's callings (Metal 4 · Vegetables 3 · Wood 5 · Fish 3 · Stone 5), each working toward her
+      full window. The dashed box is what the line needs a day at 0.63 full windows a day; the bars are who gives it, in
+      job-hours.</p>
+    <div class="panel">
+      <div class="legend"><span><i class="sw" style="background:var(--l1)"></i>Its own trade (line colour)</span><span><i class="sw hatch" style="width:14px"></i>Secondaries from Wood and Stone</span></div>
+      <div id="ex"></div>
+      <p class="foot">Without secondaries the Healers' three bind: 0.36 full windows a day, 55.8 days for the twenty. With them:
+        0.63 a day, <b>31.8 days</b>. Six of the ten Wood and Stone Umas hold secondaries; two work theirs all day, four split
+        their days. Each line's G9–G10 (a fifth: 32 job-hours a day on Vegetables) stays inside its own trade's hours.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why this shape</h2>
+    <div class="cards">
+      <div class="card"><b>A line, not a place</b><p>A thin trade needs all three of its places. One pick covers a trio; a
+        one-place secondary would need three Umas for one line and twelve choices instead of four.</p></div>
+      <div class="card"><b>G9 and G10 stay the trade's</b><p>The top two grades are a fifth of every line's work, the share the
+        old draft kept for "the main one's higher tiers" (PP15), and they open last, so the trade keeps its mastery.</p></div>
+      <div class="card"><b>Free to change</b><p>Umas ascend one at a time, so a world's head counts move every few days. A fee
+        (the old 1,000 Laurels × tier) would only tax keeping the lines balanced.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Words</h2>
+    <div class="panel"><table>
+      <tr><th>Where</th><th>Text</th></tr>
+      <tr><td>Template tab row</td><td>"Secondary" · "Vegetables ›", or "Pick ›" while she has none</td></tr>
+      <tr><td>The sheet</td><td>"Her secondary" · "G1–G8 of one other line · free to change" · each line's "3 Umas · 2 secondaries" · "Suggested" · "None"</td></tr>
+      <tr><td>Refused</td><td>"At work · recall first" (she works at one of its places)</td></tr>
+      <tr><td>A place's Who step</td><td>"Her trade" · "Secondary" · greyed "Another trade" · on G9–G10 greyed "Main trade only"</td></tr>
+      <tr><td>The Stable's Trade filter</td><td>A "Secondary" facet with each line's count</td></tr>
+      <tr><td>Tier 1</td><td>Nothing: the row and the sheet don't exist there</td></tr>
+    </table></div>
+  </section>
+</main>
+<div id="tip"></div>
+<script>
+const $ = (id) => document.getElementById(id)
+let r = '<div></div>' + Array.from({ length: 10 }, (_, i) => `<div class="h">G${i + 1}</div>`).join('')
+const row = (label, c, f) => { r += `<div class="r"><i class="sw" style="background:var(${c})"></i>${label}</div>`; for (let g = 1; g <= 10; g++) { const [k, t] = f(g); r += `<div class="c ${k}" data-tip="${label}, G${g}: ${t}">${k === 'yes' ? '✓' : k === 'main' ? '★' : '—'}</div>` } }
+row('Wood · her trade', '--l3', () => ['yes', 'gather, process and make'])
+row('Vegetables · her secondary', '--l2', (g) => g <= 8 ? ['yes', 'open to her secondary'] : ['main', 'Main trade only'])
+row('Metal · another trade', '--l1', () => ['no', 'Another trade'])
+row('Fish · another trade', '--l4', () => ['no', 'Another trade'])
+row('Stone · another trade', '--l5', () => ['no', 'Another trade'])
+$('rule').innerHTML = r
+
+const EX = [
+  ['Metal', '--l1', 4, 158, 120, 38, 'two secondaries'],
+  ['Vegetables', '--l2', 3, 158, 90, 68, 'three secondaries'],
+  ['Wood', '--l3', 5, 95, 150, -55, 'gives 55 spare'],
+  ['Fish', '--l4', 3, 95, 90, 5, 'one secondary'],
+  ['Stone', '--l5', 5, 95, 150, -55, 'gives 55 spare'],
+]
+const sc = (v) => (v / 170) * 100
+$('ex').innerHTML = EX.map(([n, c, k, need, own, short, note]) => {
+  const ownUsed = Math.min(own, need)
+  const fill = `<i style="background:var(${c});width:${sc(ownUsed)}%" data-tip="${n}: its ${k} Umas give ${ownUsed} job-hours a day to it">${ownUsed}</i>` +
+    (short > 0 ? `<i class="hatch" style="width:${sc(short)}%" data-tip="${n}: ${short} job-hours a day from secondaries">${short}</i>` : '') +
+    (short < 0 ? `<i class="hatch" style="width:${sc(-short)}%;opacity:.7" data-tip="${n}: ${-short} job-hours a day its Umas give to other lines">→${-short}</i>` : '')
+  return `<div class="ex"><div><b>${n}</b><br><span class="muted" style="font-size:12px">${k} Umas · ${k * 30} job-h a day</span></div>` +
+    `<div class="exbar"><div class="cap2" style="left:0;width:${sc(need)}%" data-tip="${n} needs ${need} job-hours a day"></div><div class="fill" style="left:2px;width:100%">${fill}</div></div>` +
+    `<div class="muted" style="font-size:12px;text-align:right">needs ${need} · ${note}</div></div>`
+}).join('')
+
+const tip = $('tip')
+document.addEventListener('mousemove', (e) => {
+  const t = e.target.closest('[data-tip]')
+  if (!t) { tip.style.opacity = 0; return }
+  tip.textContent = t.dataset.tip; tip.style.opacity = 1
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - 330) + 'px'; tip.style.top = e.clientY + 14 + 'px'
+})
+</script>
+</body>
+</html>

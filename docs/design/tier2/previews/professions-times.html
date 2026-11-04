@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Farm Times</title>
+<!-- professions.md (T2P) §2.2–§2.4, §4.3, §7: every step, item, size and rank, timed, in every tier. Times are computed
+     here with the live code's rules (economy/pacing.ts: stepMinutes 24 → 16 by Craft Level, the places' ×1.25,
+     jobSizes up to 30 steps; professionExpToNext 1,425 + 15L, 2 EXP a job-minute). From the Tier 2 set's _template.html. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --info: #2f6fe0;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --axis: #c3cbd6; --series: #2a78d6;
+    --st-g: #2a78d6; --st-p: #eb6834; --st-m: #1baf7a;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --axis: #34445a; --series: #3987e5;
+      --st-g: #3987e5; --st-p: #d95926; --st-m: #199e70;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 32px 72px; }
+  h1 { font: 700 26px/1.15 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 19px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 4px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 0 0 6px; }
+  p { margin: 0; color: var(--ink-soft); }
+  .lead { max-width: 920px; } .sub { margin-bottom: 14px; max-width: 960px; }
+  section { margin-top: 36px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 18px -32px 0; padding: 10px 32px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); align-items: center; }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.on { background: var(--accent); color: var(--accent-ink); }
+  nav.top .lv { margin-left: auto; display: flex; gap: 4px; align-items: center; font-size: 13px; color: var(--ink-soft); }
+  .seg button { border: 0; padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); font: 600 13px system-ui; cursor: pointer; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .seg button.on { background: var(--ink); color: var(--panel); }
+  .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 18px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); } .kpi .value { font-size: 20px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi .delta { font-size: 12px; color: var(--ink-faint); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: middle; }
+  th { color: var(--ink-soft); font-weight: 600; } td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--ink-faint); } .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 0 0 10px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; } .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  svg text { font-family: system-ui, -apple-system, sans-serif; }
+  .axis-text { fill: var(--ink-faint); font-size: 11px; } .val-text { fill: var(--ink); font-size: 12px; font-weight: 600; } .soft-text { fill: var(--ink-soft); font-size: 11px; }
+  /* chains */
+  .chain { display: grid; grid-template-columns: 200px 1fr 170px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--hairline); }
+  .chain .bar { display: flex; gap: 2px; height: 26px; }
+  .chain .bar i { border-radius: 4px; display: grid; place-items: center; color: #fff; font: 600 11px system-ui; font-style: normal; min-width: 22px; }
+  .chain .t { text-align: right; font-variant-numeric: tabular-nums; } .chain .t b { font-size: 15px; }
+  /* sizes */
+  .sizes { display: grid; grid-template-columns: 200px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--hairline); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sz { display: inline-flex; flex-direction: column; align-items: center; padding: 4px 10px; border-radius: 10px; background: var(--raised); border: 1px solid var(--hairline-strong); font-size: 12px; min-width: 64px; }
+  .sz b { font-size: 13px; } .sz.long { background: var(--accent-wash); border-color: var(--accent); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 7px 10px; border-radius: 8px; font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; }
+  @media (max-width: 1000px) { .kpis { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } .chain, .sizes { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Every step, item and rank, timed</h1>
+  <p class="lead">professions.md (T2P2, T2P8–T2P10). The same in Tiers 1, 2 and 3: one step, then each item and each job
+    size, all in <b>slot time</b>, what a job takes in a slot at the places' ×1.25 (the job sheet's time). Pick her Craft Level
+    to read every table at it.</p>
+  <nav class="top">
+    <a href="professions-tiers.html">The farm by tier</a>
+    <a class="on" href="professions-times.html">Times</a>
+    <a href="professions-demand.html">Demand and supply</a>
+    <a href="professions-secondary.html">The secondary</a>
+    <span class="lv">Craft Lv <span class="seg" id="lvseg"></span></span>
+  </nav>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section>
+    <h2>One step, by Craft Level</h2>
+    <p class="sub">A gather, a process, or one refined item in a make: 24 minutes at Craft Lv 1 falling evenly to 16 at Lv 50,
+      before the ×1.25 (FL28, D264). Dots mark the levels where a grade opens (5g − 4). Craft Level restarts at Lv 1 on
+      Ascend, so every tier walks this line again (T2P9).</p>
+    <div class="panel"><svg id="stepchart" viewBox="0 0 1100 280" width="100%" role="img" aria-label="Step time by Craft Level"></svg>
+      <details><summary class="muted" style="cursor:pointer;font-size:12px">Table view</summary><table id="steptable"></table></details></div>
+  </section>
+
+  <section>
+    <h2>Each item, gather → process → make</h2>
+    <p class="sub">A made item of r refined items is r gathers, r processes and r make steps: a third at each place of its
+      line. One recipe an item, the same in every tier (T2P4).</p>
+    <div class="panel">
+      <div class="legend"><span><i class="sw" style="background:var(--st-g)"></i>Gather (gathering place)</span><span><i class="sw" style="background:var(--st-p)"></i>Process (workbench)</span><span><i class="sw" style="background:var(--st-m)"></i>Make (making place)</span></div>
+      <div id="chains"></div>
+      <p class="foot">Per item beside it: a refined item is three steps; an Arms Gem is ten refined items.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Job sizes: every forge's longest job is 30 steps</h2>
+    <p class="sub">Gather and process ×1 … ×30; a make offers the sizes up to 30 steps, so every forge's longest job is the
+      same (D273). Each chip shows its slot time at the picked Craft Level; the highlighted chip is the longest. Up to three
+      more jobs queue behind it.</p>
+    <div class="panel" id="sizes"></div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>A rank, at the Craft Level that opens it</h2>
+      <p class="sub">Two Umas (3 Arms + 3 Tomes), one grade of everything: 30 steps at every one of the fifteen places
+        (D264). The same in every tier.</p>
+      <div class="panel"><svg id="rankchart" viewBox="0 0 540 280" width="100%" role="img" aria-label="A rank's slot time a place by grade"></svg></div>
+    </div>
+    <div>
+      <h2>Craft Level, day by day</h2>
+      <p class="sub">Working nonstop at ×1.25: 88,200 EXP to Lv 50, 2 EXP a job-minute. Her window's Craft I–V at Lv 10 · 20 ·
+        30 · 40 · 50 (D283). Every tier alike.</p>
+      <div class="panel"><table id="days"></table></div>
+    </div>
+  </section>
+</main>
+<div id="tip"></div>
+<script>
+const $ = (id) => document.getElementById(id)
+const SPEED = 1.25
+const step = (l) => 24 - (8 * (Math.min(50, Math.max(1, l)) - 1)) / 49           // job minutes (economy/pacing.ts)
+const slot = (l, steps) => (steps * step(l)) / SPEED                                 // slot minutes
+const hm = (m) => { m = Math.round(m); const h = Math.floor(m / 60), r = m % 60; return h ? `${h}h ${String(r).padStart(2, '0')}m` : `${r}m` }
+const ms = (m) => { const s = Math.round(m * 60); return `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s` }
+const sizesFor = (steps) => { const most = Math.max(1, Math.round(30 / steps)); return [...[1, 2, 3, 5, 10, 15, 20, 30].filter((n) => n < most), most] }
+const expTo = (l) => 1425 + 15 * l
+const craftDay = (lv) => { let e = 0; for (let l = 1; l < lv; l++) e += expTo(l); return e / (2 * 60 * 24 * SPEED) }
+let LV = 25
+
+const ITEMS = [
+  ['Arms Gem', 'Metal · 10 Ingots', 10], ['Tome Ink', 'Vegetables · 10 cuts', 10], ['Armor Fittings', 'Wood · 3 Planks', 3],
+  ['Accessory Setting', 'Fish · 5 Fillets', 5], ['Planet Jewel', 'Stone · 5 cut stones', 5], ['Moon Jewel', 'Stone · 5 cut stones', 5],
+  ['A refined item', 'any line · 1 raw', 1],
+]
+
+function kpis() {
+  $('kpis').innerHTML = [
+    ['One step', ms(slot(LV, 1)), `Craft Lv ${LV}`],
+    ['A refined item', hm(slot(LV, 3)), 'three steps, three places'],
+    ['An Arms Gem or Tome Ink', hm(slot(LV, 30)), 'the chain, 30 steps'],
+    ['Every forge’s longest job', hm(slot(LV, 30)), '30 steps at every forge'],
+    ['A rank, every place', hm(slot(LV, 30)), '30 refined a line'],
+  ].map(([l, v, d]) => `<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div><div class="delta">${d}</div></div>`).join('')
+}
+
+function stepChart() {
+  const W = 1100, H = 280, L = 60, R = 20, T = 20, B = 40
+  const x = (l) => L + ((l - 1) / 49) * (W - L - R), y = (m) => T + ((20 - m) / 8) * (H - T - B)
+  let s = ''
+  for (const m of [12, 14, 16, 18, 20]) s += `<line x1="${L}" x2="${W - R}" y1="${y(m)}" y2="${y(m)}" stroke="var(--grid)"/><text class="axis-text" x="${L - 8}" y="${y(m) + 4}" text-anchor="end">${m}m</text>`
+  for (const l of [1, 10, 20, 30, 40, 50]) s += `<text class="axis-text" x="${x(l)}" y="${H - B + 18}" text-anchor="middle">Lv ${l}</text>`
+  s += `<path d="${Array.from({ length: 50 }, (_, i) => `${i ? 'L' : 'M'}${x(i + 1).toFixed(1)},${y(slot(i + 1, 1)).toFixed(1)}`).join('')}" fill="none" stroke="var(--series)" stroke-width="2"/>`
+  for (let g = 1; g <= 10; g++) { const l = 5 * g - 4; s += `<circle cx="${x(l)}" cy="${y(slot(l, 1))}" r="5" fill="var(--series)" stroke="var(--panel)" stroke-width="2"/><text class="soft-text" x="${x(l)}" y="${y(slot(l, 1)) - 12}" text-anchor="middle">G${g}</text>` }
+  s += `<line id="xh" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--axis)" opacity="0"/><circle id="xd" r="5" fill="var(--series)" opacity="0"/>`
+  s += `<rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent" id="hit"/>`
+  $('stepchart').innerHTML = s
+  const svg = $('stepchart')
+  svg.addEventListener('mousemove', (e) => {
+    const r = svg.getBoundingClientRect(), px = ((e.clientX - r.left) / r.width) * W
+    const l = Math.round(1 + ((px - L) / (W - L - R)) * 49); if (l < 1 || l > 50) return
+    $('xh').setAttribute('x1', x(l)); $('xh').setAttribute('x2', x(l)); $('xh').setAttribute('opacity', 1)
+    $('xd').setAttribute('cx', x(l)); $('xd').setAttribute('cy', y(slot(l, 1))); $('xd').setAttribute('opacity', 1)
+    showTip(e, `Craft Lv ${l}: one step ${ms(slot(l, 1))} (job ${step(l).toFixed(2)} min)`)
+  })
+  svg.addEventListener('mouseleave', () => { $('xh').setAttribute('opacity', 0); $('xd').setAttribute('opacity', 0); hideTip() })
+  $('steptable').innerHTML = '<tr><th>Craft Lv</th><th class="num">Job minutes</th><th class="num">Slot time</th><th>Opens</th></tr>' +
+    [1, 6, 11, 16, 21, 25, 26, 31, 36, 41, 46, 50].map((l) => `<tr><td>${l}</td><td class="num">${step(l).toFixed(2)}</td><td class="num">${ms(slot(l, 1))}</td><td>${(l + 4) % 5 === 0 ? 'G' + (l + 4) / 5 : ''}</td></tr>`).join('')
+}
+
+function chains() {
+  const max = 30
+  $('chains').innerHTML = ITEMS.map(([n, rec, r]) => {
+    const seg = (c, label) => `<i style="background:var(${c});width:${(r / max) * 100 / 3 * 2.9}%" data-tip="${label}: ${r} step${r > 1 ? 's' : ''}, ${hm(slot(LV, r))} at Craft Lv ${LV}">${r}</i>`
+    return `<div class="chain"><div><b>${n}</b><br><span class="muted" style="font-size:12px">${rec}</span></div><div class="bar">${seg('--st-g', 'Gather')}${seg('--st-p', 'Process')}${seg('--st-m', r === 1 ? 'Into a make' : 'Make')}</div>` +
+      `<div class="t"><b>${hm(slot(LV, 3 * r))}</b><br><span class="muted" style="font-size:12px">${hm(slot(LV, r))} a place · ${3 * r} steps</span></div></div>`
+  }).join('')
+}
+
+function sizes() {
+  const rows = [['Gather or process', 'one step an item', 1], ['Armor Fittings', 'three steps an item', 3], ['A Setting or a jewel', 'five steps an item', 5], ['Arms Gem or Tome Ink', 'ten steps an item', 10]]
+  $('sizes').innerHTML = rows.map(([n, d, st]) => {
+    const z = sizesFor(st)
+    return `<div class="sizes"><div><b>${n}</b><br><span class="muted" style="font-size:12px">${d}</span></div><div class="chips">${z.map((k, i) => `<span class="sz ${i === z.length - 1 ? 'long' : ''}" data-tip="×${k}: ${k * st} steps, ${hm(slot(LV, k * st))} at Craft Lv ${LV}"><b>×${k}</b>${hm(slot(LV, k * st))}</span>`).join('')}</div></div>`
+  }).join('') + `<p class="foot">The longest job is 30 steps at every forge: ${hm(slot(1, 30))} at Craft Lv 1, ${hm(slot(25, 30))} at Lv 25, ${hm(slot(50, 30))} at Lv 50.</p>`
+}
+
+function rankChart() {
+  const W = 540, H = 280, L = 44, R = 10, T = 26, B = 40, bw = 36
+  const y = (m) => T + (1 - m / 600) * (H - T - B)
+  let s = ''
+  for (const h of [0, 120, 240, 360, 480, 600]) s += `<line x1="${L}" x2="${W - R}" y1="${y(h)}" y2="${y(h)}" stroke="var(--grid)"/><text class="axis-text" x="${L - 6}" y="${y(h) + 4}" text-anchor="end">${h / 60}h</text>`
+  for (let g = 1; g <= 10; g++) {
+    const l = 5 * g - 4, m = slot(l, 30), cx = L + 8 + (g - 1) * ((W - L - R - 8) / 10)
+    s += `<path d="M${cx},${y(0)} V${y(m) + 4} q0,-4 4,-4 h${bw - 8} q4,0 4,4 V${y(0)} Z" fill="var(--series)" data-tip="G${g} at Craft Lv ${l}: ${hm(m)} a place, every place"/>`
+    s += `<text class="val-text" x="${cx + bw / 2}" y="${y(m) - 6}" text-anchor="middle" style="font-size:10.5px">${hm(m)}</text><text class="axis-text" x="${cx + bw / 2}" y="${H - B + 16}" text-anchor="middle">G${g}</text><text class="axis-text" x="${cx + bw / 2}" y="${H - B + 30}" text-anchor="middle">Lv ${l}</text>`
+  }
+  $('rankchart').innerHTML = s
+}
+
+function days() {
+  const rows = [[1, 'G1'], [6, 'G2'], [10, 'Craft I'], [11, 'G3'], [16, 'G4'], [20, 'Craft II'], [21, 'G5'], [26, 'G6'], [30, 'Craft III'], [31, 'G7'], [36, 'G8'], [40, 'Craft IV'], [41, 'G9'], [46, 'G10'], [50, 'Craft V']]
+  $('days').innerHTML = '<tr><th>Craft Lv</th><th>Opens or lights</th><th class="num">Day, nonstop</th><th class="num">One step there</th></tr>' +
+    rows.map(([l, n]) => `<tr><td>${l}</td><td>${n.startsWith('Craft') ? '<b>' + n + '</b> (her window)' : n}</td><td class="num">${craftDay(l).toFixed(1)}</td><td class="num">${ms(slot(l, 1))}</td></tr>`).join('')
+}
+
+function render() { kpis(); chains(); sizes(); document.querySelectorAll('#lvseg button').forEach((b) => b.classList.toggle('on', +b.dataset.lv === LV)) }
+$('lvseg').innerHTML = [1, 25, 50].map((l) => `<button data-lv="${l}">${l}</button>`).join(' ')
+$('lvseg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { LV = +b.dataset.lv; render() } })
+stepChart(); rankChart(); days(); render()
+
+const tip = $('tip')
+function showTip(e, t) { tip.textContent = t; tip.style.opacity = 1; tip.style.left = Math.min(e.clientX + 14, innerWidth - 330) + 'px'; tip.style.top = e.clientY + 14 + 'px' }
+function hideTip() { tip.style.opacity = 0 }
+document.addEventListener('mousemove', (e) => { const t = e.target.closest('[data-tip]'); if (t) showTip(e, t.dataset.tip); else if (!e.target.closest('#stepchart')) hideTip() })
+</script>
+</body>
+</html>
