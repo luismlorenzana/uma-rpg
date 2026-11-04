@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ascend Sheet Promotion</title>
+<!-- progression.md's round-2 page (T2W16–T2W23, T2W31): promotion into Tier 2 on the Gallery's Ascend sheet, screen by
+     screen at 390 × 844, a party of five played through. Style: the Tier rework's _template.html block (uma-kit's
+     tokens, light and dark), then this page's own. Every Uma here is made up and shown by role; every window is
+     placeholder panes, never original art. The sixteen classes are shown by role ("Brawler · Keeper"): their names are
+     classes.md's. Weapon types are round 1's Pure and Dual, assumed until gear.md's round 2. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a; --support: #8a5bd0;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --glass-off: #1c2430; --lead: #0b0f14;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c; --support: #b38cff;
+      --glass-off: #121820; --lead: #05080b;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1280px; margin: 0 auto; padding: 28px 36px 80px; }
+  h1 { font: 700 26px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 8px; }
+  h2 { font: 700 19px/1.25 ui-rounded, system-ui, sans-serif; margin: 34px 0 6px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  p { margin: 0 0 8px; max-width: 1000px; }
+  a { color: inherit; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 14px 16px; margin-bottom: var(--gap); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.doc { background: var(--accent-wash); color: var(--accent-strong); font-size: 11px; padding: 1px 7px; }
+  .chip.new { background: transparent; border: 1.5px dashed var(--accent); color: var(--accent-strong); font-size: 11px; padding: 0 7px; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.support { background: color-mix(in srgb, var(--support) 18%, transparent); color: var(--support); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  nav.tabs { display: flex; gap: 6px; margin: 10px 0 18px; flex-wrap: wrap; }
+  nav.tabs a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.tabs a.on { background: var(--accent); color: var(--accent-ink); }
+  .lead { font-size: 15px; color: var(--ink-soft); max-width: 1000px; }
+  .toggle { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 2px; flex-wrap: wrap; }
+  .toggle button { border: 0; background: transparent; color: var(--ink); padding: 4px 12px; border-radius: 999px; font: 600 12px system-ui, sans-serif; cursor: pointer; }
+  .toggle button.on { background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); }
+  /* The flow strip */
+  .flow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  .step { background: var(--raised); border-radius: 10px; padding: 10px 12px; border: 1px solid var(--hairline-strong); position: relative; }
+  .step .n { position: absolute; top: -9px; left: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 11px; border-radius: 999px; padding: 1px 7px; }
+  .step b { display: block; color: var(--ink); font-size: 13px; margin: 4px 0 2px; }
+  .step span { font-size: 12px; color: var(--ink-soft); }
+  .step .taps { display: block; margin-top: 6px; font-size: 11px; color: var(--ink-faint); }
+  /* The play area */
+  .play { display: grid; grid-template-columns: 410px minmax(0, 1fr); gap: 22px; align-items: start; }
+  .phone { width: 390px; height: 844px; border-radius: 34px; background: var(--page); box-shadow: 0 0 0 10px #10161f, 0 12px 40px rgb(0 0 0 / .25); overflow: hidden; position: relative; margin: 10px; }
+  .phone .status { height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 26px; font-size: 13px; font-weight: 700; color: var(--ink); }
+  .phone .behind { padding: 0 16px; opacity: .45; }
+  .phone .behind h4 { margin: 4px 0 8px; font: 700 20px ui-rounded, system-ui, sans-serif; }
+  .gal { display: grid; grid-template-columns: repeat(4, 76px); gap: 10px; }
+  .gal .t { text-align: center; font-size: 10px; color: var(--ink-soft); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 110px; background: var(--panel); border-radius: 20px 20px 0 0; box-shadow: 0 -8px 30px rgb(0 0 0 / .18); display: flex; flex-direction: column; }
+  .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--hairline-strong); margin: 8px auto 4px; }
+  .sheet .head { display: flex; align-items: center; gap: 8px; padding: 4px 16px 8px; border-bottom: 1px solid var(--hairline); }
+  .sheet .head b { font: 700 17px ui-rounded, system-ui, sans-serif; flex: 1; }
+  .sheet .head button { border: 0; background: var(--sunken); color: var(--ink); border-radius: 999px; padding: 4px 10px; font: 600 12px system-ui, sans-serif; cursor: pointer; }
+  .sheet .body { flex: 1; overflow-y: auto; padding: 10px 16px; }
+  .sheet .foot { padding: 10px 16px 26px; border-top: 1px solid var(--hairline); }
+  .go { width: 100%; min-height: 48px; border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-ink); font: 700 16px ui-rounded, system-ui, sans-serif; cursor: pointer; }
+  .go:disabled { opacity: .4; }
+  .grp { font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; margin: 8px 0 4px; display: flex; justify-content: space-between; }
+  .urow { display: grid; grid-template-columns: 22px 34px minmax(0, 1fr) 14px; gap: 8px; align-items: center; background: var(--raised); border-radius: 8px; padding: 7px 8px; margin-bottom: 4px; min-height: 52px; cursor: pointer; }
+  .urow.off { opacity: .55; }
+  .urow input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .urow .nm { font-size: 13.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .urow .sub { font-size: 11px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .urow .why { font-size: 11px; color: var(--ink-soft); }
+  .urow .chev { color: var(--ink-faint); font-size: 16px; }
+  .check { font-size: 11.5px; padding: 6px 8px; border-radius: 8px; background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); margin: 2px 0 8px; }
+  .check.warn { background: color-mix(in srgb, var(--warning) 16%, transparent); color: var(--warning); }
+  .lines { list-style: none; padding: 0; margin: 10px 0 0; }
+  .lines li { background: var(--raised); border-radius: 8px; padding: 7px 10px; margin-bottom: 4px; font-size: 13px; color: var(--ink); }
+  .reset { border: 1px solid var(--hairline-strong); background: transparent; color: var(--ink); border-radius: 999px; padding: 3px 10px; font: 600 11px system-ui, sans-serif; cursor: pointer; }
+  .pair { margin-bottom: 10px; }
+  .pair .pl { font-size: 11px; color: var(--ink-soft); font-weight: 700; margin: 6px 0 4px; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .cc { border: 1.5px solid var(--hairline-strong); border-radius: 10px; padding: 7px 8px; cursor: pointer; background: var(--raised); min-height: 76px; }
+  .cc.on { border-color: var(--accent); background: var(--accent-wash); }
+  .cc .cn { font-size: 12.5px; font-weight: 700; color: var(--ink); }
+  .cc .cr { font-size: 10.5px; color: var(--ink-soft); margin: 2px 0 4px; }
+  .cc .sl { display: flex; gap: 3px; }
+  .cc .sl i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+  .cc .badge { font-size: 9.5px; font-weight: 700; color: var(--accent-strong); text-transform: uppercase; }
+  .locked { font-size: 11px; color: var(--ink-faint); margin: 4px 0 10px; }
+  .wslot { background: var(--raised); border-radius: 8px; padding: 6px 8px; margin-bottom: 5px; }
+  .wslot .wk { font-size: 12.5px; font-weight: 700; color: var(--ink); display: flex; justify-content: space-between; }
+  .wslot .types { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+  .wslot .types button { border: 1px solid var(--hairline-strong); background: transparent; color: var(--ink); border-radius: 999px; padding: 2px 9px; font: 600 11px system-ui, sans-serif; cursor: pointer; }
+  .wslot .types button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .wslot .types button:disabled { opacity: .35; cursor: default; }
+  .subs { display: flex; gap: 5px; flex-wrap: wrap; }
+  .subs button { border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); border-radius: 999px; padding: 4px 10px; font: 600 11.5px system-ui, sans-serif; cursor: pointer; }
+  .subs button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .subs button.fixed { background: var(--sunken); cursor: default; }
+  .sec { font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; margin: 12px 0 6px; }
+  .side h3:first-child { margin-top: 0; }
+  .comp { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 8px 0 4px; }
+  .comp .m { background: var(--raised); border-radius: 10px; padding: 8px; font-size: 12px; }
+  .comp .m b { display: block; color: var(--ink); font-size: 12.5px; }
+  .bar { display: flex; height: 18px; border-radius: 5px; overflow: hidden; margin: 6px 0; }
+  .bar span { display: grid; place-items: center; color: #fff; font-size: 10.5px; font-weight: 700; }
+  .note { font-size: 12.5px; background: var(--raised); border-left: 3px solid var(--accent); border-radius: 6px; padding: 8px 10px; margin: 8px 0; color: var(--ink-soft); }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .callrow td:first-child { white-space: nowrap; font-weight: 700; color: var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 2 · 2026-11-04 · nothing built</span></div>
+  <h1>Promotion on the Ascend sheet</h1>
+  <p class="lead">From Tier 2, the Ascend is her promotion (R2-5, R2-6): on the Gallery's Ascend sheet each ready Uma picks
+    her Tier 2 class, one of the two children of a Tier 1 class she brought to Class Rank 50, and her three weapons'
+    Tier 2 types. Every pick is pre-filled, so a party of five still goes in one tap. Every Uma here is made up; the
+    sixteen classes are shown by role (their names are classes.md's); the weapon types are round 1's Pure and Dual,
+    assumed until gear.md's round 2.</p>
+  <nav class="tabs">
+    <a href="progression-tiers.html">The tiers</a>
+    <a class="on" href="progression-ascend.html">The Ascend sheet</a>
+    <a href="progression-windows.html">The windows</a>
+    <a href="progression-world.html">The worlds</a>
+    <a href="progression-run.html">The run</a>
+    <a href="../progression.md">progression.md</a>
+  </nav>
+
+  <h2>The flow, screen by screen (T2W16)</h2>
+  <p>One sheet, two pages. Nothing opens over the sheet (G4): her page replaces the list inside it, with Back, as the Logs
+    sheet picks an Uma and then an amount.</p>
+  <div class="flow">
+    <div class="step"><span class="n">0</span><b>The Gallery · Ready</b><span>Her full window, its ring, the green dot; "Ready to ascend · Opens 6" on her tile; <b style="display:inline">Ascend 5</b> in the head</span><span class="taps">1 tap</span></div>
+    <div class="step"><span class="n">1</span><b>Who goes</b><span>The ready Umas by party, ticked; per Uma her Suggested class, weapons and types in one line, "Opens 6 of 16"; a check line per whole party; the lines and the purse</span><span class="taps">0 taps with the defaults</span></div>
+    <div class="step"><span class="n">2</span><b>Her Tier 2 · class</b><span>Two cards per Tier 1 class at R50, grouped by it: slots, role, Healer chip; Suggested the keeper of the class she fights as; locked ones greyed</span><span class="taps">1 tap to change</span></div>
+    <div class="step"><span class="n">3</span><b>Her Tier 2 · weapons</b><span>Her class's three slots, a kind and a Tier 2 type each, Suggested pre-set; the kinds she covers</span><span class="taps">0–3 taps</span></div>
+    <div class="step"><span class="n">4</span><b>Her Tier 2 · sub-profession</b><span>Her line's two professions fixed; the four other lines, Suggested marked</span><span class="taps">0–1 tap</span></div>
+    <div class="step"><span class="n">5</span><b>Ascend 5</b><span>The tier veil, then Tier 2's Town Hall, as live; a whole party keeps its name</span><span class="taps">1 tap</span></div>
+  </div>
+
+  <h2>Play it: a party of five, and two more</h2>
+  <p>Party 1 is the owner's first comp from D263 (Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Paladin), all five
+    ready. Uma F is ready in another party but at work; Uma G is ready alone. Tap a row to open her page; pick a class,
+    a type, a line; Back returns. The comps on the right set Party 1 in one go, as the owner's "swap back and forth"
+    would.</p>
+  <div class="card play">
+    <div class="phone" id="phone"></div>
+    <div class="side">
+      <h3>Direction</h3>
+      <div class="row" style="margin-bottom:10px"><span class="toggle" id="dir"><button class="on" data-v="2">Tier 1 → 2</button><button data-v="3">Tier 2 → 3 (pre-filled)</button></span></div>
+      <h3>Party 1's comp (R2-12)</h3>
+      <div class="row" style="margin-bottom:6px"><span class="toggle" id="comp">
+        <button class="on" data-v="keep">Tier 1's look (Suggested)</button>
+        <button data-v="pures">Both pures swapped</button>
+        <button data-v="battle">Healer to battle, a Spellblade supports</button>
+        <button data-v="sumsup">A Summoner supports</button>
+        <button data-v="all">Every expander</button>
+        <button data-v="two">Two healers (a warning)</button>
+      </span></div>
+      <div class="comp" id="compView"></div>
+      <div class="bar" id="roleBar"></div>
+      <p class="muted" style="font-size:12px">Roles by T2B's party value (R2-11): damage, support, heal. Kinds count her three slots and a
+        Dual's partner (one Dual a loadout, T2G3). The check line on the sheet says the same in six words or fewer.</p>
+      <div class="note" id="why"></div>
+      <h3>What the sheet writes, per Uma (T2W17, T2W21)</h3>
+      <table id="writes"></table>
+    </div>
+  </div>
+
+  <h2>What she keeps, picks and restarts (T2W21)</h2>
+  <p>Picks are settings, set or confirmed on the sheet; progress restarts. It reconciles the cross-reference's XR5: going
+    up from Tier 1 there is nothing of Tier 2's to carry, so the sheet sets it; going up from Tier 2, what she had
+    pre-fills the same pages.</p>
+  <div class="card"><table id="kpr"></table></div>
+
+  <h2>The classes open to her (T2W17, T2W18)</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Both children of every Tier 1 class at Class Rank 50</h3>
+      <p>Class V guarantees three Tier 1 classes at R50, so <b>at least 6</b> open; all eight give all sixteen. The sheet reads
+        her Tier 1 ranks before she leaves (she arrives at Class Rank 1) and writes her open set into Tier 2, fixed for the
+        tier: no Tier 1 class fights there, so there's no parent left to rank. She switches freely among them on her Class
+        tab, each on its own Class Rank; Ranks 1–10 rise together (XR1).</p>
+      <table id="opens"></table>
+    </div>
+    <div class="card">
+      <h3>Suggested: the keeper of the class she fights as</h3>
+      <p>When that class is at R50; else the keeper of her highest-ranked R50 class (ties: her family's, then the tree's order).
+        So a promotion with the defaults changes nothing the owner didn't pick: Tier 1's comps arrive as Tier 1's comps,
+        and the expander is one tap away.</p>
+      <table>
+        <tr><th>Her Tier 1 class at R50</th><th>Keeper (R2-4)</th><th>Expander (R2-3)</th></tr>
+        <tr><td>Brawler</td><td>Pure physical, a self-buff</td><td>Arms and Tomes, the Tomes on ATK</td></tr>
+        <tr><td>Sorcerer</td><td>Pure magical, a self-buff</td><td>Tomes and Arms, the Arms on M.ATK</td></tr>
+        <tr><td>Arms · Tome Spellblade</td><td>Damage, sharpened</td><td>Damage and a little support</td></tr>
+        <tr><td>Arms · Tome Summoner</td><td>Damage, sharpened</td><td>Support: wider buffs and debuffs, a ward or a small mend</td></tr>
+        <tr><td>Paladin · Cleric</td><td>The healer, sharpened</td><td>A battle healer: more damage, less healing</td></tr>
+      </table>
+      <div class="note"><b>Ranking one more Tier 1 class before she goes buys two Tier 2 classes.</b> "Opens 6 of 16" on her Gallery tile and
+        her sheet row says it; no Tier 1 rule changes (R2-1).</div>
+    </div>
+  </div>
+
+  <h2>Edge cases</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>The sheet's words</h3>
+      <table>
+        <tr><th>When</th><th>The sheet says (six words at most)</th></tr>
+        <tr><td>She's at work</td><td>"At work · recall first" (live), unticked, can't go</td></tr>
+        <tr><td>Two healer picks in a party</td><td>"One healer a party" in the warning colour; a warning, never a block (the fight checks it, as live)</td></tr>
+        <tr><td>The new world would hold fewer than five</td><td>"3 of 5 to fight in Tier 2" (T2W9)</td></tr>
+        <tr><td>Her open set</td><td>"Opens 6 of 16"; a locked pair "Rank to 50 in Tier 1"</td></tr>
+        <tr><td>Any pick changed in a group</td><td>"Suggested for all" resets the group</td></tr>
+        <tr><td>A weapon's type</td><td>"Swap any time on Gear"</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Umas already in a Tier 2 world at its switch (T2W23)</h3>
+      <p>Before round 2 is built an ascended Uma plays her Tier 1 class × tier. When Tier 2's toolbox switches on, each opens both
+        children of the class she fights as and of every Tier 1 class she has at R50 there, and <b>becomes her class's keeper at
+        that class's Class Rank</b>: nothing lost, no sheet forced. Other open classes stand at Rank 1 (or the shared
+        ladder's); her weapons keep their kinds with Suggested types; her sub-profession is Suggested. Her Gallery tile and
+        Window sheet say "New: Tier 2 classes" until her Class tab is opened. Her lit steps stay (CO2).</p>
+    </div>
+  </div>
+
+  <h2>Every call on this page</h2>
+  <div class="card"><table id="calls"></table></div>
+</main>
+<script>
+const $ = (s) => document.querySelector(s)
+const K = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', katana: 'Katana', bow: 'Bow', fire: 'Fire Tome', ice: 'Blizzard Tome', lightning: 'Thunder Tome', light: 'Light Tome', dark: 'Dark Tome' }
+const TOME = new Set(['fire', 'ice', 'lightning', 'light', 'dark'])
+// The Tier 2 partners (gear.md T2G1, round 1): a Dual adds its partner's kind; one Dual a loadout (T2G3).
+const PARTNER = { greatsword: 'bow', axe: 'bow', lance: 'katana', fire: 'dark', ice: 'light', lightning: 'light', bow: 'greatsword', katana: 'axe', light: 'ice', dark: 'fire' }
+// Tier 1 parents: their D263 presets and round 1's Suggested Dual slot (T2G6).
+const P = {
+  brawler: { name: 'Brawler', preset: ['greatsword', 'axe', 'lance'], dual: 0, heal: false, kind: 'phys' },
+  sorcerer: { name: 'Sorcerer', preset: ['fire', 'ice', 'lightning'], dual: 0, heal: false, kind: 'magic' },
+  armsSB: { name: 'Arms Spellblade', preset: ['katana', 'axe', 'lightning'], dual: 2, heal: false, kind: 'phys' },
+  tomeSB: { name: 'Tome Spellblade', preset: ['lightning', 'ice', 'katana'], dual: 0, heal: false, kind: 'magic' },
+  armsSum: { name: 'Arms Summoner', preset: ['bow', 'axe', 'dark'], dual: 0, heal: false, kind: 'phys' },
+  tomeSum: { name: 'Tome Summoner', preset: ['dark', 'ice', 'bow'], dual: 0, heal: false, kind: 'magic' },
+  paladin: { name: 'Paladin', preset: ['lance', 'greatsword', 'light'], dual: 0, heal: true, kind: 'heal' },
+  cleric: { name: 'Cleric', preset: ['light', 'fire', 'lance'], dual: 2, heal: true, kind: 'heal' },
+}
+const ORDER = ['brawler', 'sorcerer', 'armsSB', 'tomeSB', 'armsSum', 'tomeSum', 'paladin', 'cleric']
+// The sixteen, by role (R2-3, R2-4); an expander's preset assumed its parent's, but the pures' cross a slot.
+function cls(id) {
+  const [p, kx] = id.split(':'), par = P[p], keep = kx === 'k'
+  let preset = [...par.preset], role = 'damage', blurb
+  if (p === 'brawler') { blurb = keep ? 'Pure physical · a self-buff' : 'Arms and Tomes, Tomes on ATK'; if (!keep) preset = ['greatsword', 'axe', 'lightning'] }
+  else if (p === 'sorcerer') { blurb = keep ? 'Pure magical · a self-buff' : 'Tomes and Arms, Arms on M.ATK'; if (!keep) preset = ['fire', 'ice', 'katana'] }
+  else if (p === 'armsSB' || p === 'tomeSB') { blurb = keep ? 'Damage, sharpened' : 'Damage and a little support'; role = keep ? 'damage' : 'support' }
+  else if (p === 'armsSum' || p === 'tomeSum') { blurb = keep ? 'Damage, sharpened' : 'Support: wider buffs, a ward'; role = keep ? 'damage' : 'support' }
+  else { blurb = keep ? 'The healer, sharpened' : 'Battle healer: more damage'; role = 'heal' }
+  const cross = !keep && (p === 'brawler' || p === 'sorcerer') ? 2 : -1
+  return { id, parent: p, keep, name: `${par.name} · ${keep ? 'Keeper' : 'Expander'}`, preset, dual: par.dual, role, blurb, heal: par.heal, cross }
+}
+const UMAS = [
+  { id: 'A', role: 'a Front Uma', calling: 'Warrior', line: 'Metal', r50: ['brawler', 'armsSB', 'armsSum'], as: 'brawler', party: 1, marks: 2000, sub: 'Vegetables' },
+  { id: 'B', role: 'a Pace Uma', calling: 'Mage', line: 'Stone', r50: ['sorcerer', 'tomeSB', 'tomeSum'], as: 'sorcerer', party: 1, marks: 1400, sub: 'Wood' },
+  { id: 'C', role: 'a Pace Uma', calling: 'Spellblade', line: 'Wood', r50: ['armsSB', 'tomeSB', 'paladin'], as: 'armsSB', party: 1, marks: 2000, sub: 'Fish' },
+  { id: 'D', role: 'an End Uma', calling: 'Summoner', line: 'Fish', r50: ['tomeSum', 'armsSum', 'cleric'], as: 'tomeSum', party: 1, marks: 600, sub: 'Metal' },
+  { id: 'E', role: 'a Late Uma', calling: 'Healer', line: 'Vegetables', r50: ['paladin', 'cleric', 'armsSB', 'tomeSum'], as: 'paladin', party: 1, marks: 1200, sub: 'Metal' },
+  { id: 'F', role: 'a Pace Uma', calling: 'Mage', line: 'Stone', r50: ['sorcerer', 'tomeSB', 'tomeSum'], as: 'tomeSB', party: 3, marks: 0, sub: 'Fish', busy: true },
+  { id: 'G', role: 'a Front Uma', calling: 'Warrior', line: 'Metal', r50: ['brawler', 'armsSB', 'armsSum', 'paladin'], as: 'armsSum', party: 4, marks: 800, sub: 'Fish' },
+]
+const LINES = ['Metal', 'Vegetables', 'Wood', 'Fish', 'Stone']
+const FAMILY_ORDER = { Warrior: ['brawler', 'armsSB', 'armsSum'], Mage: ['sorcerer', 'tomeSB', 'tomeSum'], Spellblade: ['armsSB', 'tomeSB'], Summoner: ['armsSum', 'tomeSum'], Healer: ['paladin', 'cleric'] }
+const suggestedClass = (u) => `${u.r50.includes(u.as) ? u.as : u.r50[0]}:k`
+function defaultWeapons(c) { return c.preset.map((k, i) => ({ kind: k, type: i === c.dual && !c.preset.includes(PARTNER[k]) ? 'dual' : 'pure' })) }
+let TO = 2, page = 'list', ticked = new Set(['A', 'B', 'C', 'D', 'E', 'G']), picks = {}
+function resetPick(u) { const c = cls(suggestedClass(u)); picks[u.id] = { cls: c.id, weapons: defaultWeapons(c), sub: u.sub } }
+UMAS.forEach(resetPick)
+const isSuggested = (u) => { const p = picks[u.id], c = cls(p.cls), d = defaultWeapons(c); return p.cls === suggestedClass(u) && p.sub === u.sub && p.weapons.every((w, i) => w.kind === d[i].kind && w.type === d[i].type) }
+const kindsOf = (p) => p.weapons.flatMap((w) => (w.type === 'dual' ? [w.kind, PARTNER[w.kind]] : [w.kind]))
+const wline = (p) => p.weapons.map((w) => `${K[w.kind].replace(' Tome', '')}${w.type === 'dual' ? ' Dual' : ''}`).join(' · ')
+const slotColor = (c, i, k) => (i === c.cross ? 'var(--accent)' : TOME.has(k) ? 'var(--magic)' : 'var(--phys)')
+
+function partyCheck(ids) {
+  const ps = ids.map((id) => picks[id]), cs = ps.map((p) => cls(p.cls))
+  const healers = cs.filter((c) => c.heal).length
+  const kinds = new Set(ps.flatMap(kindsOf))
+  const r = { damage: 0, support: 0, heal: 0 }
+  cs.forEach((c) => r[c.role]++)
+  return { healers, kinds: kinds.size, r, text: healers > 1 ? 'One healer a party' : `One healer · ${kinds.size} of 10 kinds · damage ${r.damage} · support ${r.support} · heal ${r.heal}` }
+}
+
+function glass(lit, size = 30) {
+  // A placeholder window: an arch of panes, lit by count (never original art).
+  let s = `<svg viewBox="0 0 30 36" width="${size}" height="${size * 1.2}"><path d="M2 35V12Q2 1 15 1Q28 1 28 12V35Z" fill="var(--lead)"/>`
+  let k = 0
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) { k++; s += `<rect x="${4 + c * 8}" y="${8 + r * 7}" width="6.5" height="5.5" rx="1" fill="${k <= lit ? ['#e8c25a', '#5aa0d8', '#c76a8a', '#7cc08a'][(r + c) % 4] : 'var(--glass-off)'}"/>` }
+  return s + `<path d="M2 35V12Q2 1 15 1Q28 1 28 12V35Z" fill="none" stroke="${lit >= 12 ? `var(--t${TO - 1})` : 'var(--hairline-strong)'}" stroke-width="1.6"/></svg>`
+}
+
+function listPage() {
+  const ready = UMAS
+  const party1 = ready.filter((u) => u.party === 1)
+  const others = ready.filter((u) => u.party !== 1)
+  const row = (u) => {
+    const p = picks[u.id], c = cls(p.cls), on = ticked.has(u.id) && !u.busy
+    const opens = 2 * u.r50.length
+    return `<div class="urow ${u.busy ? 'off' : ''}" data-open="${u.id}">
+      <input type="checkbox" ${on ? 'checked' : ''} ${u.busy ? 'disabled' : ''} data-tick="${u.id}" onclick="event.stopPropagation()">
+      ${glass(12, 28)}
+      <div style="min-width:0"><div class="nm">Uma ${u.id} <span class="muted" style="font-weight:500">· ${u.calling}</span></div>
+        ${u.busy ? `<div class="why">At work · recall first</div>` : `<div class="sub"><b style="color:var(--ink)">${c.name}</b>${isSuggested(u) ? ' · Suggested' : ''}</div><div class="sub">${wline(p)} · Opens ${opens} of 16</div>`}</div>
+      <span class="chev">›</span></div>`
+  }
+  const g1 = party1.filter((u) => ticked.has(u.id)).map((u) => u.id)
+  const chk = g1.length === 5 ? partyCheck(g1) : null
+  const n = ready.filter((u) => ticked.has(u.id) && !u.busy).length
+  const marks = ready.filter((u) => ticked.has(u.id) && !u.busy).reduce((a, u) => a + u.marks, 0)
+  const purse = TO === 2 ? 2000 : 3000
+  const lines = [`Lv 1 in Tier ${TO}`, 'Ranks, grades, stars and Crafts restart', `Gear returns to Tier ${TO - 1}’s stock`,
+    `+${(purse * n).toLocaleString('en-US')} Laurels · +${5 * n} Speed Tickets`, ...(marks ? [`+${marks.toLocaleString('en-US')} Class Marks`] : []),
+    ...(n < 5 ? [`${n} of 5 to fight in Tier ${TO}`] : [])]
+  return { title: `Ascend to Tier ${TO}`, back: false, body: `
+    <div class="grp"><span>Party 1 · all five ready</span><button class="reset" data-reset="1">Suggested for all</button></div>
+    ${party1.map(row).join('')}
+    ${chk ? `<div class="check ${chk.healers > 1 ? 'warn' : ''}">${chk.text}</div>` : ''}
+    <div class="grp"><span>Ready in other parties</span></div>
+    ${others.map(row).join('')}
+    <ul class="lines">${lines.map((l) => `<li>${l}</li>`).join('')}</ul>`, foot: `<button class="go" ${n ? '' : 'disabled'}>Ascend ${n}</button>` }
+}
+
+function umaPage(id) {
+  const u = UMAS.find((x) => x.id === id), p = picks[id], c = cls(p.cls)
+  const sugg = suggestedClass(u)
+  const pairs = u.r50.map((par) => `<div class="pair"><div class="pl">${P[par].name} · R50 ${TO === 3 ? '· carried' : ''}</div><div class="cards">${['k', 'x'].map((kx) => {
+    const cc = cls(`${par}:${kx}`)
+    return `<div class="cc ${p.cls === cc.id ? 'on' : ''}" data-cls="${cc.id}">
+      ${cc.id === sugg ? '<div class="badge">Suggested</div>' : '<div class="badge" style="visibility:hidden">·</div>'}
+      <div class="cn">${kx === 'k' ? 'Keeper' : 'Expander'}</div><div class="cr">${cc.blurb}</div>
+      <div class="sl">${cc.preset.map((k, i) => `<i style="background:${slotColor(cc, i, k)}" title="${K[k]}${i === cc.cross ? (par === 'brawler' ? ' on ATK' : ' on M.ATK') : ''}"></i>`).join('')}
+        ${cc.heal ? '<span class="chip heal" style="font-size:9.5px;padding:0 5px;margin-left:4px">Healer</span>' : cc.role === 'support' ? '<span class="chip support" style="font-size:9.5px;padding:0 5px;margin-left:4px">Support</span>' : ''}</div></div>`
+  }).join('')}</div></div>`).join('')
+  const locked = ORDER.filter((x) => !u.r50.includes(x)).map((x) => P[x].name)
+  const slots = p.weapons.map((w, i) => {
+    const partner = PARTNER[w.kind], blocked = p.weapons.some((o) => o.kind === partner)
+    const crossNote = i === c.cross ? (c.parent === 'brawler' ? ' · on ATK' : ' · on M.ATK') : ''
+    return `<div class="wslot"><div class="wk"><span>Slot ${i + 1} · ${K[w.kind]}<span class="muted" style="font-weight:500">${crossNote}</span></span><span class="muted" style="font-weight:500">${TOME.has(w.kind) ? 'Tome' : 'Arm'}</span></div>
+      <div class="types"><button data-type="${i}:pure" class="${w.type === 'pure' ? 'on' : ''}">Pure</button><button data-type="${i}:dual" class="${w.type === 'dual' ? 'on' : ''}" ${blocked && w.type !== 'dual' ? 'disabled' : ''}>Dual + ${K[partner].replace(' Tome', '')}</button></div></div>`
+  }).join('')
+  const kinds = [...new Set(kindsOf(p))].map((k) => K[k].replace(' Tome', '')).join(', ')
+  const subs = LINES.map((l) => l === u.line ? `<button class="fixed">${l} ×2 · her line</button>` : `<button data-sub="${l}" class="${p.sub === l ? 'on' : ''}">${l}${l === u.sub ? ' · Suggested' : ''}</button>`).join('')
+  return { title: `Uma ${u.id} · her Tier ${TO}`, back: true, body: `
+    <div class="sec">Her Tier ${TO} class · opens ${2 * u.r50.length} of 16</div>
+    ${TO === 3 ? '<p class="muted" style="font-size:11px;margin:0 0 6px">Assumed: her Tier 2 open set carries; the class she fights as is Suggested.</p>' : ''}
+    ${pairs}
+    ${locked.length ? `<div class="locked">Locked: ${locked.join(', ')} · Rank to 50 in Tier 1</div>` : ''}
+    <div class="sec">Her weapons · ${kinds.split(', ').length} kinds</div>
+    ${slots}
+    <div class="muted" style="font-size:11px">${kinds} · Swap any time on Gear</div>
+    <div class="sec">Her professions</div>
+    <div class="subs">${subs}</div>
+    <div class="muted" style="font-size:11px;margin-top:6px">Craft Lv 1 in all three</div>
+    ${TO === 3 ? '<div class="sec">Kept as settings</div><div class="muted" style="font-size:11.5px">Her accessory forms and stat picks, waiting for their grades and jewels</div>' : ''}`, foot: `<button class="go" data-back="1">Done</button>` }
+}
+
+function draw() {
+  const pg = page === 'list' ? listPage() : umaPage(page.slice(4))
+  const n = UMAS.filter((u) => ticked.has(u.id) && !u.busy).length
+  $('#phone').innerHTML = `<div class="status"><span>9:41</span><span>●●●</span></div>
+    <div class="behind"><h4>Gallery</h4><div class="muted" style="font-size:12px;margin-bottom:8px">6 full · 7 ready · Collection 41%</div>
+      <div class="gal">${UMAS.slice(0, 4).map((u) => `<div class="t">${glass(12, 60)}<div>Uma ${u.id} · Ready</div></div>`).join('')}</div></div>
+    <div class="sheet"><div class="grab"></div><div class="head">${pg.back ? '<button data-back="1">‹ Ascend</button>' : ''}<b>${pg.title}</b></div>
+      <div class="body">${pg.body}</div><div class="foot">${pg.foot}</div></div>`
+  // The side panel: Party 1's comp
+  const ids = UMAS.filter((u) => u.party === 1).map((u) => u.id)
+  const chk = partyCheck(ids)
+  $('#compView').innerHTML = ids.map((id) => {
+    const c = cls(picks[id].cls)
+    return `<div class="m"><b>Uma ${id}</b>${c.name}<div class="muted" style="font-size:11px">${c.blurb}</div><div style="margin-top:4px"><span class="chip ${c.role === 'heal' ? 'heal' : c.role === 'support' ? 'support' : P[c.parent].kind}">${c.role}</span></div><div class="muted" style="font-size:11px;margin-top:4px">${wline(picks[id])}</div></div>`
+  }).join('')
+  const tot = 5, seg = (v, col, lab) => (v ? `<span style="width:${(v / tot) * 100}%;background:${col}">${lab} ${v}</span>` : '')
+  $('#roleBar').innerHTML = seg(chk.r.damage, 'var(--phys)', 'damage') + seg(chk.r.support, 'var(--support)', 'support') + seg(chk.r.heal, 'var(--heal)', 'heal')
+  $('#why').innerHTML = chk.healers > 1
+    ? '<b>Two healers.</b> Uma C picked the Paladin\'s keeper beside Uma E\'s Paladin child. The sheet warns with the live words, "One healer a party", and lets them go: the game checks one healer where a party fights (live <code>healerBlock</code>), and she may mean to split the party in Tier 2.'
+    : `<b>Party 1 in Tier ${TO}:</b> ${chk.text}. ${chk.kinds === 10 ? 'Every kind is held.' : `${10 - chk.kinds} kind${10 - chk.kinds === 1 ? '' : 's'} not held: a Dual elsewhere, or a swap later on Gear, covers it.`} The comp moves whole and keeps its name.`
+  $('#writes').innerHTML = '<tr><th>Uma</th><th>Open set (parents)</th><th>Class</th><th>Weapons and types</th><th>Sub</th></tr>' + UMAS.filter((u) => ticked.has(u.id) && !u.busy).map((u) =>
+    `<tr><td>${u.id}</td><td>${u.r50.map((x) => P[x].name).join(', ')}</td><td>${cls(picks[u.id].cls).name}</td><td>${wline(picks[u.id])}</td><td>${picks[u.id].sub}</td></tr>`).join('')
+}
+
+const COMPS = {
+  keep: {}, pures: { A: 'brawler:x', B: 'sorcerer:x' }, battle: { E: 'paladin:x', C: 'armsSB:x' }, sumsup: { D: 'tomeSum:x' },
+  all: { A: 'brawler:x', B: 'sorcerer:x', C: 'armsSB:x', D: 'tomeSum:x', E: 'paladin:x' }, two: { C: 'paladin:k' },
+}
+function setComp(v) {
+  UMAS.filter((u) => u.party === 1).forEach((u) => {
+    resetPick(u)
+    if (COMPS[v][u.id]) { const c = cls(COMPS[v][u.id]); picks[u.id] = { cls: c.id, weapons: defaultWeapons(c), sub: u.sub } }
+  })
+}
+$('#phone').addEventListener('click', (e) => {
+  const t = e.target
+  if (t.matches('[data-tick]')) { const id = t.dataset.tick; if (!ticked.delete(id)) ticked.add(id); draw(); return }
+  if (t.closest('[data-back]')) { page = 'list'; draw(); return }
+  if (t.closest('[data-reset]')) { UMAS.filter((u) => u.party === 1).forEach(resetPick); draw(); return }
+  const cc = t.closest('[data-cls]')
+  if (cc) { const id = page.slice(4), c = cls(cc.dataset.cls); picks[id] = { ...picks[id], cls: c.id, weapons: defaultWeapons(c) }; draw(); return }
+  const ty = t.closest('[data-type]')
+  if (ty && !ty.disabled) { const id = page.slice(4), [i, v] = ty.dataset.type.split(':'); const ws = picks[id].weapons.map((w, k) => ({ ...w, type: k === +i ? v : v === 'dual' ? 'pure' : w.type })); picks[id] = { ...picks[id], weapons: ws }; draw(); return }
+  const sb = t.closest('[data-sub]')
+  if (sb) { const id = page.slice(4); picks[id] = { ...picks[id], sub: sb.dataset.sub }; draw(); return }
+  const row = t.closest('[data-open]')
+  if (row && !UMAS.find((u) => u.id === row.dataset.open).busy) { page = 'uma:' + row.dataset.open; draw() }
+})
+document.querySelectorAll('.toggle').forEach((tg) => tg.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  tg.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b))
+  if (tg.id === 'dir') { TO = +b.dataset.v; page = 'list' } else { setComp(b.dataset.v) }
+  draw()
+}))
+draw()
+
+// Keeps, picks, restarts (T2W21)
+const KPR = [
+  ['Her calling, her line, her template', 'Kept', 'Kept', 'Her racing profile\'s (live)'],
+  ['Her lower tiers\' full windows, her history', 'Kept', 'Kept', 'The account\'s (CO1)'],
+  ['<b>Her class</b>', '<b>Picked:</b> a Tier 2 class, Suggested the keeper of the class she fights as', '<b>Picked:</b> her class in Tier 3, Suggested the one she fights as (T2W31)', 'R2-5'],
+  ['<b>The classes open to her</b>', 'Both children of every Tier 1 class at R50: 6–16, written to the new world', 'Her open set carries (assumed)', 'T2W17'],
+  ['<b>Her weapons\' kinds and types</b>', '<b>Picked:</b> her class\'s preset, gear\'s Suggested types', '<b>Picked</b>, pre-filled with hers', 'R2-6'],
+  ['Her accessory slots\' families and kinds', 'Kept (live)', 'Kept', 'Live'],
+  ['Her accessory forms (the tree)', 'None yet', '<b>Kept as settings</b>, each waiting for its slot\'s grade', 'A setting; grades are progress'],
+  ['Her stat picks (Extra Stats)', 'None yet', '<b>Kept as settings</b>, each waiting for its node\'s jewel', 'A setting'],
+  ['<b>Her sub-profession</b>', '<b>Picked</b>, Suggested (fewest hands)', 'Kept, changeable on the sheet', 'R2-9'],
+  ['Class Rank', '1 in every open class; Ranks 1–10 one shared ladder (XR1)', 'The same', 'Progress'],
+  ['Level, grades, nodes, all three Craft Levels, Bonds, Hall seats', 'Restart: Lv 1, G0, an empty map, Craft Lv 1 in each, none', 'The same', 'Live rule'],
+  ['Tree picks (lines, tips, her ★ tip), equipped skills', 'Defaults', 'Defaults', 'They follow Class Rank'],
+  ['Her grades\' made items · her set jewels', 'Back to the old Warehouse · gone', 'The same', 'Live rule'],
+  ['The purse', '2,000 Laurels, 5 Speed Tickets, up to 2,000 Class Marks', '3,000 Laurels, 5, up to 2,000', 'T2W10, T3'],
+]
+$('#kpr').innerHTML = '<tr><th>Piece</th><th><span class="tier t1">1</span> → <span class="tier t2">2</span></th><th><span class="tier t2">2</span> → <span class="tier t3">3</span></th><th>Why</th></tr>' + KPR.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="muted">${r[3]}</td></tr>`).join('')
+
+$('#opens').innerHTML = '<tr><th>Tier 1 classes at R50</th><th>Tier 2 classes open</th><th>Who</th></tr>' +
+  [[3, 6, 'Class V\'s minimum: most Umas'], [4, 8, 'One more ranked before she goes'], [5, 10, ''], [8, 16, 'Every Tier 1 class at R50: about 190,000 Class EXP (CO12\'s "too much" as a step, a choice as a goal)']]
+    .map(([a, b, c]) => `<tr><td>${a}</td><td><b>${b}</b> of 16</td><td class="muted">${c}</td></tr>`).join('')
+
+const CALLS = [
+  ['T2W16', 'Where promotion happens', 'On the Gallery\'s Ascend sheet, two pages, every pick pre-filled; one tap ascends with the defaults; nothing opens over the sheet'],
+  ['T2W17', 'The classes open to her', 'Both children of every Tier 1 class at R50 when she ascends, 6 to 16, written to the new world, fixed for the tier; switch freely; "Opens 6 of 16"'],
+  ['T2W18', 'Her Suggested class', 'The keeper of the class she fights as (at R50), else of her highest R50 class'],
+  ['T2W19', 'Her weapons at promotion', 'Her class\'s preset, each weapon\'s type gear\'s Suggested, set on the sheet; swaps later; no G5 gate'],
+  ['T2W20', 'Her sub-profession at promotion', 'On her page, pre-picked with professions\' Suggested; her line\'s two fixed'],
+  ['T2W21', 'What she keeps, picks and restarts', 'Picks are settings, set or confirmed on the sheet; progress restarts (replaces T2W8, reconciles XR5)'],
+  ['T2W22', 'A party together', 'Grouped by party, moves with its name; a check line; two healers a warning, never a block; Suggested for all'],
+  ['T2W23', 'Umas already in a Tier 2 world', 'Each becomes her class\'s keeper at its rank and opens the children of her class and her R50 classes there; no forced sheet'],
+  ['T2W31', 'Ascend into Tier 3', 'The same sheet, pre-filled with her Tier 2 picks; 3,000 Laurels'],
+]
+$('#calls').innerHTML = '<tr><th>Id</th><th>Call</th><th>Recommended</th></tr>' + CALLS.map((r) => `<tr class="callrow"><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')
+</script>
+</body>
+</html>
