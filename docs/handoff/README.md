@@ -29,12 +29,12 @@ packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma
 pins it.
 
 **Profile polish** ([proposal](../design/profile-polish/proposal.md), pages: [Details](../design/profile-polish/previews/details.html) and
-[star chart](../design/profile-polish/previews/star-chart.html)) is built and live, with vector crests and stat marks. Two packets finish it:
+[star chart](../design/profile-polish/previews/star-chart.html)) is built and live, with vector crests and stat marks.
+H141's pixel art is published in uma-art 2.19.0 (Done below); H144 pins it and finishes the polish:
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H141](tasks/H141-star-crests-art.md) | Art: five star crests and eight stat marks, uma-art 2.19.0 | ChatGPT draws and publishes | S | — | Ready: the owner dispatches it |
-| [H144](tasks/H144-pin-star-art.md) | Pin uma-art 2.19.0 and swap the vector marks | Claude or ChatGPT | S | H141 | Waits on H141 |
+| [H144](tasks/H144-pin-star-art.md) | Pin uma-art 2.19.0 and swap the vector marks | Claude or ChatGPT | S | H141 | Ready |
 
 The audit's bugs and the Hall issues have no packet yet.
 
@@ -51,7 +51,7 @@ three buildings' art (H156) and its pin (H158) are open.
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H156](tasks/H156-collections-buildings-art.md) | Art: the Gallery, Trials and Drills buildings, uma-art 2.20.0 | ChatGPT draws and publishes | S | H141's 2.19.0 | Ready after H141: the owner dispatches it |
+| [H156](tasks/H156-collections-buildings-art.md) | Art: the Gallery, Trials and Drills buildings, uma-art 2.20.0 | ChatGPT draws and publishes | S | H141's 2.19.0 | Ready: the owner dispatches it |
 | [H158](tasks/H158-pin-collections-art.md) | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | S | H156 | Waits on H156 |
 
 **Done:** H150–H155 and H157 (2026-11-02, below). **Order now:** H156 (the owner dispatches it to ChatGPT), then H158;
@@ -111,6 +111,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H141 | Five native 24px star crests and eight native 16px stat marks (platform P80); the 120×220 UI atlas preserves every earlier frame, and native/2×/4× white, dark and night-sky previews passed review. Uma-art 2.19.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41880067892); H144 owns the pin and is Ready, as is H156's next art release. | Art `b612403` ([platform #64](https://github.com/luismlorenzana/uma-platform/pull/64)) |
 | H159 | Capital runs' foes: a fourth Finals route for all fourteen scenarios, the run's ids and its sixteen fights, the map's capitals byte for byte as before (D296) | `2938491` |
 | H157 | Collections live, save v35: the switch, the run-wide Ascend and the Observatory removed, the manual and the phone check (D288) | `ceab990` |
 | H155 | Windows on screen, dark: her window beside her bust, the Window sheet, the Gallery, Ascend one Uma at a time, latching and the "Window +1" note (D287) | `3bc65cc` |
