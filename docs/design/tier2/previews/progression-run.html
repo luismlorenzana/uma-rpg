@@ -78,14 +78,17 @@
 </head>
 <body>
 <main>
-  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Drafting 2026-11-04 · nothing built</span></div>
+  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 2 · 2026-11-04 · nothing built</span></div>
   <h1>A Tier 2 run, end to end</h1>
-  <p class="lead">A first cohort of twenty arrives in an empty Tier 2 world. The fighting party is at Lv 50 in days; its
-    windows take about five weeks, because every Uma's Craft Level restarts at 1. This is the model of progression.md
-    §4.8: the Wilds' days come from the live code; the fights' days and the Rift's length are assumptions, said where
-    they're used.</p>
+  <p class="lead">A first cohort of twenty ascends into an empty Tier 2 world, each Uma's Tier 2 class, weapon types and
+    sub-profession set on the Ascend sheet (all keepers by default). The fighting party is at Lv 50 in days; its windows
+    take about five weeks, because every Uma's three Craft Levels restart at 1. This is the model of progression.md §4.8
+    with round 2's systems: the Wilds' days come from the live code; the fights' days, the Rift's length and the other
+    docs' round-2 shapes are assumptions, said where they're used.</p>
   <nav class="tabs">
     <a href="progression-tiers.html">The tiers</a>
+    <a href="progression-ascend.html">The Ascend sheet</a>
+    <a href="progression-windows.html">The windows</a>
     <a href="progression-world.html">The worlds</a>
     <a class="on" href="progression-run.html">The run</a>
     <a href="../progression.md">progression.md</a>
@@ -94,6 +97,7 @@
   <div class="card row" style="position:sticky;top:8px;z-index:5">
     <span class="ctl">The Wilds <span class="toggle" id="up"><button class="on" data-v="1">Nonstop</button><button data-v="1.25">80% busy</button></span></span>
     <span class="ctl">The Rift's run <span class="toggle" id="rift"><button data-v="14">2 weeks</button><button class="on" data-v="17">2½</button><button data-v="21">3</button></span></span>
+    <span class="ctl">Her three Crafts (T2W26) <span class="toggle" id="cm"><button data-v="even">Even</button><button class="on" data-v="line">Her line's two</button><button data-v="spec">A specialist</button></span></span>
     <span class="ctl muted" id="readyLine"></span>
   </div>
 
@@ -124,12 +128,13 @@
     <div class="row">
       <span class="ctl">Cohort <span class="toggle" id="n"><button data-v="5">5</button><button class="on" data-v="20">20</button><button data-v="60">60</button><button data-v="120">120 (24 parties)</button></span></span>
       <span class="ctl">Demand <span class="toggle" id="dem"><button data-v="gear">Eleven slots and the map</button><button class="on" data-v="window">The full window (Weapons V)</button></span></span>
-      <span class="ctl">The secondary (T2P) <span class="toggle" id="sec"><button data-v="0">Off (today)</button><button class="on" data-v="1">On</button></span></span>
+      <span class="ctl">Sub-professions (T2P) <span class="toggle" id="sec"><button data-v="0">Off (today)</button><button class="on" data-v="1">On</button></span></span>
     </div>
     <div class="kpis" id="kpis"></div>
     <div class="lines" id="lines"></div>
-    <p class="muted" style="margin-top:10px">Grey mark: her own Craft V, the floor no tool moves except Speed Tickets on her jobs. With the secondary on, the
-      lines pool (a fifth of the work, the tier's own pair, stays the trade's and doesn't bind here).</p>
+    <p class="muted" style="margin-top:10px">Grey mark: her own Craft V (her three Crafts to 60), the floor no tool moves except Speed Tickets on her jobs.
+      With sub-professions on, the lines pool. Round 2's second material a line is professions.md's to price; this holds if a
+      rank's work stays equal across the lines (T2P1).</p>
   </div>
 
   <h2>Twenty-four parties at tier scale</h2>
@@ -156,32 +161,34 @@ document.addEventListener('mousemove', (e) => {
   tip.innerHTML = t.dataset.tip; tip.style.display = 'block'
   tip.style.left = Math.min(e.clientX + 14, innerWidth - 340) + 'px'; tip.style.top = (e.clientY + 14) + 'px'
 })
-let F = 1, R = 17, N = 20, DEM = 'window', SEC = 1
+let F = 1, R = 17, N = 20, DEM = 'window', SEC = 1, CM = 'line'
 function bind(id, fn) {
   $(id).addEventListener('click', (e) => {
     const b = e.target.closest('button'); if (!b) return
     $(id).querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); fn(b.dataset.v); drawAll()
   })
 }
-bind('#up', (v) => (F = +v)); bind('#rift', (v) => (R = +v)); bind('#n', (v) => (N = +v)); bind('#dem', (v) => (DEM = v)); bind('#sec', (v) => (SEC = +v))
+bind('#up', (v) => (F = +v)); bind('#rift', (v) => (R = +v)); bind('#cm', (v) => (CM = v)); bind('#n', (v) => (N = +v)); bind('#dem', (v) => (DEM = v)); bind('#sec', (v) => (SEC = +v))
 
 // Live numbers (economy/pacing.ts): grade g opens at Craft 5g − 4, nonstop days; Craft I–V days.
 const GD = [0, 0, 2.0, 4.2, 6.4, 8.8, 11.3, 13.8, 16.5, 19.3, 22.1]
 const G = (g) => GD[g] * F
-const CRAFT = [3.8, 8.3, 13.3, 18.7, 24.5]
+// Craft I–V under T2W26 (her three Craft Levels add up to 12 · 24 · 36 · 48 · 60), days of her own work nonstop.
+const CRAFTS = { even: [3.64, 8.66, 13.89, 19.31, 24.94], line: [3.67, 8.82, 14.27, 20.02, 26.07], spec: [3.75, 9.28, 15.4, 22.13, 27.82] }
+const craft = () => CRAFTS[CM]
 const RN = ['I', 'II', 'III', 'IV', 'V']
 // The last Uma's grade: every grade's cohort work (31.8 days ÷ 10) waits for its gate.
 function lastGrade(g) { let c = 0; for (let k = 1; k <= g; k++) c = Math.max(c, G(k)) + 3.18 * F; return c }
 function events(last) {
   const L4 = Math.max(3, G(4)), L5 = Math.max(4, G(5))
-  const e = [['Level I', 0], ['Class I', 0], ['World I', 0], ['Level II', 1], ['Class II', 1], ['World II', 1], ['Level III', 2], ['World III', 2],
-    ['Class III', 3], ['Level IV', L4], ['World IV', L4], ['Level V', L5], ['Class IV', L5], ['World V', L5], ['Class V', L5 + 2]]
+  const e = [['Level I', 0], ['Class I', 0], ['World I', 0], ['Level II', 1], ['Class II', 1.2], ['World II', 1], ['Level III', 2], ['World III', 2],
+    ['Class III', 5], ['Level IV', L4], ['World IV', L4], ['Level V', L5], ['Class IV', L5], ['World V', L5], ['Class V', L5 + 2]]
   for (let n = 1; n <= 5; n++) {
     const g = 2 * n
     if (last) { const d = lastGrade(g); e.push([`Stars ${RN[n - 1]}`, d], [`Gear ${RN[n - 1]}`, d], [`Weapons ${RN[n - 1]}`, d]) }
     else e.push([`Stars ${RN[n - 1]}`, G(g) + 0.5], [`Gear ${RN[n - 1]}`, G(g) + 1], [`Weapons ${RN[n - 1]}`, n === 5 ? G(10) + 2.9 : G(g) + 1.3])
   }
-  CRAFT.forEach((d, i) => e.push([`Craft ${RN[i]}`, d * F]))
+  craft().forEach((d, i) => e.push([`Craft ${RN[i]}`, d * F]))
   e.push(['Rift', G(8) + R])
   return e.sort((a, b) => a[1] - b[1])
 }
@@ -189,7 +196,7 @@ function events(last) {
 function gantt() {
   const W = 1200, x0 = 170, x1 = W - 20, D = 45
   const X = (d) => x0 + Math.min(d, D) / D * (x1 - x0)
-  const lanes = ['Fights', 'Capital runs', 'Trials · Rift', 'Craft Level', 'Grades open', 'T2C classes', 'T2G gear', 'T2E extra stats', 'T2P professions', 'T2B balance', 'T2U templates']
+  const lanes = ['Fights', 'Capital runs', 'Trials · Rift', 'Her three Crafts', 'Grades open', 'T2C classes', 'T2G gear', 'T2E extra stats', 'T2P professions', 'T2B balance', 'T2U templates']
   const Y = (i) => 30 + i * 38
   let g = ''
   for (let d = 0; d <= D; d += 5) g += `<line x1="${X(d)}" x2="${X(d)}" y1="18" y2="${Y(lanes.length) - 10}" stroke="var(--grid)"/><text x="${X(d)}" y="12" text-anchor="middle">day ${d}</text>`
@@ -204,21 +211,22 @@ function gantt() {
   ;[0, 1, 2, L4, L5].forEach((d, i) => { g += dot(1, d + 0.3, 'var(--accent)', `w${6 + i}`, `Capital run, continent ${6 + i}: 16 fights for four parties; World ${RN[i]} lights for all twenty`) })
   g += seg(2, L5, L5 + 2, 'var(--c1)', 'Trials', `Five Lv 50 Umas open the Rift and Trials on day ${L5.toFixed(1)}; 20 Trial wins raise a third class to R50`)
   g += seg(2, G(8), G(8) + R, 'var(--c7)', 'The Rift run', `Fronts from G8 (day ${G(8).toFixed(1)}), about 58 fights over ${R} days; won day ${(G(8) + R).toFixed(1)}`)
-  CRAFT.forEach((d, i) => { g += dot(3, d * F, 'var(--c3)', `Craft ${RN[i]}`, `Craft Lv ${10 * (i + 1)}: day ${(d * F).toFixed(1)} (her own work, 588 hours to Lv 50)`) })
+  craft().forEach((d, i) => { g += dot(3, d * F, 'var(--c3)', `Craft ${RN[i]}`, `Her three Craft Levels add up to ${12 * (i + 1)}: day ${(d * F).toFixed(1)} (her own work; Tier 1's Craft Lv ${10 * (i + 1)} ${[3.75, 8.31, 13.29, 18.69, 24.5][i]})`) })
   for (let k = 1; k <= 10; k++) g += dot(4, G(k), 'var(--c1)', k % 2 === 0 ? `G${k}` : '', `G${k} opens at Craft Lv ${5 * k - 4}: day ${G(k).toFixed(1)}`)
   const T = [
-    [5, 0, 'branch, class skills, tips', 'Class branch: a focus (+15% on its group), default or reverse set; Tier 2, any Class Rank'],
-    [5, 1, '', 'Three class skills at Class Rank 20 · 30 · 40 (about Uma Lv 13 · 20 · 27); branch C at depth 3'],
-    [5, 2.2, '', 'The Power or Break tip fork at depth 5 (Class Rank 40)'],
-    [6, G(5), 'Pure · Dual', 'Weapon branches and accessory branches at a G5 (Craft 21, Uma Lv 21; a Branch Gem)'],
-    [7, G(2), 'moon I', 'Weapon moon I: a Moon Jewel I (made at Craft 6), Uma Lv 6'],
-    [7, G(6), 'III', 'Weapon moon III: Moon Jewel III, Uma Lv 26'],
-    [7, G(10), 'V', 'Weapon moon V: Moon Jewel V (Craft 46), Uma Lv 46'],
-    [8, 0, 'secondary', 'The secondary: any other line\'s base work, from arrival (PP14)'],
-    [8, G(5), 'pair', 'Tier 2\'s material pair: its G5 pieces'],
-    [8, G(10), 'pair G10', 'Tier 2\'s pair: its G10 pieces'],
-    [9, 0, '', 'Three weaknesses at every rank: live in Tiers 2 and 3 (D235)'],
-    [10, 2.2, '★ tip', 'The ★ signature tip on her lead weapon\'s tree, at its tip fork (Class Rank 40)'],
+    [5, 0, 'her class, picked', 'Her Tier 2 class, picked on the Ascend sheet from the children of her Tier 1 classes at R50 (T2W16–T2W18); her open set, switching free'],
+    [5, 1.6, '', 'Class Rank 20 (depth 3) at Lv 16 (XR1); Ranks 1–10 rose on every open class together'],
+    [5, 1.9, '', 'Class Rank 40 (depth 5) at Lv 29: the tip fork, Power or Break'],
+    [5, 5, 'R50', 'Class Rank 50 on her first class at Lv 36; then her sibling (Class IV)'],
+    [6, 0, 'types', 'Her weapons\' Tier 2 types, set on the Ascend sheet (T2W19); swapped on her Gear tab later'],
+    [6, G(2), 'forms', 'The accessory tree\'s first form, as a slot\'s grade rises (assumed)'],
+    [6, G(10), 'tree done', 'Every accessory tree open at G10 (assumed)'],
+    [7, G(2) + 0.5, 'picks', 'A stat pick on each node as its jewel opens it (R2-8)'],
+    [7, G(10) + 0.5, 'map', 'The whole map open: every node with its pick'],
+    [8, 0, 'three', 'Her line\'s two professions and her sub-profession, from arrival (T2W20)'],
+    [8, G(5), '', 'The second material\'s G5 work (professions.md)'],
+    [9, 0, '', 'Party value bands; three weaknesses at every rank (live, D235)'],
+    [10, 1.9, '★ tip', 'The ★ signature tip on her lead weapon\'s tree, at its tip fork (Class Rank 40)'],
   ]
   g += seg(9, 0.6, L5, 'color-mix(in srgb, var(--c5) 70%, var(--panel))', 'term →', 'The toolbox term rises with her tier level, Lv 1 → 50 (SB3, not built)')
   T.forEach(([lane, d, l, t]) => { g += dot(lane, d, 'var(--accent-strong)', l, t) })
@@ -252,19 +260,19 @@ function steps() {
 
 function tools() {
   const rows = [
-    ['Class branch: a focus (+15%), default or reverse set', 'T2C', 'Tier 2, any Class Rank', 0, 'Lv 1'],
-    ['Three weaknesses at every rank (live); the toolbox term to Lv 50', 'T2B', 'Tier 2\'s foes', 0, 'Lv 1'],
-    ['Skill MP ×1.7', 'T2C · T2B', 'Every Tier 2 skill', 0, 'Lv 1'],
-    ['The secondary profession', 'T2P', 'Tier 2', 0, '—'],
-    ['Three class skills', 'T2C', 'Class Rank 20 · 30 · 40', '1 · 1 · 2', 'Lv ~13 · 20 · 27'],
-    ['Branch C; the Power or Break tip fork', 'T2C', 'Depth 3 (CR 20) · depth 5 (CR 40)', '1 · 2', 'Lv ~13 · 27'],
-    ['★ Signature tip on her lead weapon\'s tree', 'T2U', 'Its tip fork (CR 40)', 2, 'Lv ~27'],
-    ['Weapon moon I → V', 'T2E', 'Moon Jewels I → V (Craft 6 → 46), Uma Lv 6 → 46', `${G(2).toFixed(1)} → ${G(10).toFixed(1)}`, 'Lv 6 → 46'],
-    ['Weapon branch, Pure or Dual', 'T2G', 'A weapon\'s G5 (Craft 21, Uma Lv 21), a Branch Gem', G(5).toFixed(1), 'Lv 21'],
-    ['Accessory branches', 'T2G', 'A slot\'s G5', G(5).toFixed(1), 'Lv 21'],
-    ['Tier 2\'s material pair', 'T2P', 'Its G5 and G10 pieces', `${G(5).toFixed(1)} · ${G(10).toFixed(1)}`, '—'],
+    ['Her Tier 2 class, her open set (6–16), switching', 'T2C', 'The Ascend sheet (T2W16–T2W18)', 0, 'Lv 1'],
+    ['Her weapons\' Tier 2 types', 'T2G', 'The Ascend sheet (T2W19); her Gear tab later', 0, 'Lv 1'],
+    ['Her line\'s two professions and her sub-profession', 'T2P', 'The Ascend sheet (T2W20); Craft Lv 1 in each', 0, '—'],
+    ['Three weaknesses at every rank (live); the toolbox term; party value', 'T2B', 'Tier 2\'s foes', 0, 'Lv 1'],
+    ['Skill MP ×1.7; the healing scale ÷ 540', 'T2C · T2B', 'Every Tier 2 skill', 0, 'Lv 1'],
+    ['Ranks 1–10, one shared ladder', 'T2C', 'Class EXP 3,600 (XR1)', '0–1', 'Lv ~10'],
+    ['Her class\'s own kit by depth', 'T2C', 'Class Rank 1 · 10 · 20 · 30 · 40', '0 → 1.9', 'Lv 1 → 29'],
+    ['★ Signature tip on her lead weapon\'s tree', 'T2U', 'Its tip fork (CR 40)', 1.9, 'Lv 29'],
+    ['Accessory forms', 'T2G', 'A slot\'s grade (assumed: the tree complete by G10)', `${G(2).toFixed(1)} → ${G(10).toFixed(1)}`, 'Lv 6 → 46'],
+    ['A stat pick on each node', 'T2E', 'Each node as its jewel opens it', `${(G(2) + 0.5).toFixed(1)} → ${(G(10) + 0.5).toFixed(1)}`, 'Lv 6 → 46'],
+    ['Her second class at R50 (Class IV\'s sibling)', 'T2C', 'Class EXP past her first R50', G(5).toFixed(1), 'Lv 50'],
     ['LB+ at Bond 10', 'T2C', 'Bond 10 in a hall', 'With Bonds', '—'],
-    ['Ten equipped skills', 'T2C', 'Uma Level (+1 a five levels)', 'about 5', 'Lv 35'],
+    ['Ten equipped skills', 'T2C', 'Uma Level (one more a five levels from 10, T2C16)', G(4).toFixed(1), 'Lv 40'],
   ]
   $('#tools').innerHTML = '<tr><th>Addition</th><th>Doc</th><th>Gate</th><th class="num">First cohort, day</th><th>Her level then</th></tr>' +
     rows.map((r) => `<tr><td>${r[0]}</td><td><span class="chip doc">${r[1]}</span></td><td>${r[2]}</td><td class="num">${r[3]}</td><td>${r[4]}</td></tr>`).join('')
@@ -282,14 +290,14 @@ function calc() {
   const byLine = Object.keys(d).map((k) => [k, wallHours(N * d[k]) / Math.min(12, counts[k]) / 24 * F])
   const total = Object.values(d).reduce((a, b) => a + b, 0)
   const pooled = wallHours(N * total) / Math.min(60, N) / 24 * F
-  const floor = 588 / 24 * Math.max(1, N / 60) * F
+  const floor = craft()[4] * Math.max(1, N / 60) * F
   const bound = byLine.reduce((a, b) => (b[1] > a[1] ? b : a))
   const result = SEC ? Math.max(pooled, floor) : Math.max(bound[1], floor)
   const gapH = SEC ? 0 : (bound[1] - Math.max(pooled, floor)) * 24 * Math.min(12, counts[bound[0]])
   const tickets = Math.max(0, Math.ceil(gapH * 2))
   $('#kpis').innerHTML = [
-    ['Every full window, days', result.toFixed(1), SEC ? 'pooled by the secondary' : `bound by ${bound[0]}`],
-    ['Her own Craft V, days', floor.toFixed(1), N > 60 ? `${N} Umas share 60 slots` : '588 hours of her slot'],
+    ['Every full window, days', result.toFixed(1), SEC ? 'pooled by sub-professions' : `bound by ${bound[0]}`],
+    ['Her own Craft V, days', floor.toFixed(1), N > 60 ? `${N} Umas share 60 slots` : 'her three Crafts to 60 (T2W26)'],
     ['Refined items an Uma', total, DEM === 'window' ? 'Metal and Vegetables 250 (two extra weapons)' : 'every line 150'],
     ['Speed Tickets to close the gap', tickets ? tickets.toLocaleString() : '—', tickets ? `${(tickets * 20).toLocaleString()} Laurels at Tier 2's 20 (T2W10)` : 'no gap past the pooled time'],
   ].map(([k, v, x]) => `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="x">${x}</div></div>`).join('')
@@ -297,7 +305,7 @@ function calc() {
   $('#lines').innerHTML = byLine.map(([k, v]) => `<div>${k} <span class="muted">· ${counts[k]} Uma${counts[k] === 1 ? '' : 's'}${counts[k] > 12 ? ', 12 slots' : ''}</span></div>
     <div class="track" data-tip="${k}: ${v.toFixed(1)} days alone (${N} × ${d[k]} refined on ${Math.min(12, counts[k])} slot${Math.min(12, counts[k]) === 1 ? '' : 's'})"><div class="fill" style="width:${v / top * 100}%;background:${COLOR[k]};opacity:${SEC ? 0.45 : 1}"></div><div class="ref" style="left:${floor / top * 100}%"></div></div>
     <div class="num" style="text-align:right;font-variant-numeric:tabular-nums">${v.toFixed(1)} d</div>`).join('') +
-    `<div><b>Pooled</b> <span class="muted">· the secondary</span></div><div class="track" data-tip="All lines pooled on ${Math.min(60, N)} slots: ${pooled.toFixed(1)} days"><div class="fill" style="width:${pooled / top * 100}%;background:var(--t2);opacity:${SEC ? 1 : 0.45}"></div><div class="ref" style="left:${floor / top * 100}%"></div></div><div style="text-align:right"><b>${pooled.toFixed(1)} d</b></div>`
+    `<div><b>Pooled</b> <span class="muted">· sub-professions</span></div><div class="track" data-tip="All lines pooled on ${Math.min(60, N)} slots: ${pooled.toFixed(1)} days"><div class="fill" style="width:${pooled / top * 100}%;background:var(--t2);opacity:${SEC ? 1 : 0.45}"></div><div class="ref" style="left:${floor / top * 100}%"></div></div><div style="text-align:right"><b>${pooled.toFixed(1)} d</b></div>`
 }
 
 function scale() {
@@ -309,8 +317,9 @@ function scale() {
     ['Rift runs (every Uma on a won run)', '6, about 350 fights'],
     ['Trials (Class V for all)', '20 a party, 480 wins or sweeps'],
     ['The Wilds, every full window, pooled', `${(63.6 * F).toFixed(1)} days`],
-    ['The Wilds, today\'s rules (no secondary)', `${(83.7 * F).toFixed(1)} days (Metal and Vegetables bind)`],
-    ['Each Uma\'s own Craft V', `${(49 * F).toFixed(1)} days (120 Umas share 60 slots)`],
+    ['The Wilds, today\'s rules (no sub-profession)', `${(83.7 * F).toFixed(1)} days (Metal and Vegetables bind)`],
+    ['Each Uma\'s own Crafts 60', `${(2 * craft()[4] * F).toFixed(1)} days (120 Umas share 60 slots)`],
+    ['Promotions (the Ascend sheet)', '120 Umas: 24 taps with the defaults, a party at a time'],
   ]
   $('#scale').innerHTML = '<tr><th>Twenty-four parties, one tier</th><th>Value</th></tr>' + rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')
   const items = [['Fights, ledger seconds', 45, 'var(--t2)'], ['Fights, 2 min each', 110, 'var(--t2)'], ['The Wilds, pooled', 63.6 * F * 24, 'var(--c3)'], ['The Wilds, today', 83.7 * F * 24, 'var(--c3)']]
@@ -323,7 +332,7 @@ function ready() {
   const a = Object.fromEntries(events(false)), b = Object.fromEntries(events(true))
   const rows = [
     ['Gear V, Stars V', `${a['Gear V'].toFixed(1)} · ${b['Gear V'].toFixed(1)}`, 'The makers\' Craft 46 opens G10; then the slots'],
-    ['Craft V', `${a['Craft V'].toFixed(1)} · ${b['Craft V'].toFixed(1)}`, 'Her own work only; Speed Tickets fast-forward her jobs (CO15)'],
+    ['Craft V (her three to 60)', `${a['Craft V'].toFixed(1)} · ${b['Craft V'].toFixed(1)}`, 'Her own work only, any split (T2W26); Speed Tickets fast-forward her jobs (CO15)'],
     ['Weapons V', `${a['Weapons V'].toFixed(1)} · ${b['Weapons V'].toFixed(1)}`, 'Metal and Vegetables: two extra weapons an Uma (D289)'],
     ['The Rift', `${a.Rift.toFixed(1)}`, 'The owner\'s play: a run of twenty, about 58 fights'],
   ]

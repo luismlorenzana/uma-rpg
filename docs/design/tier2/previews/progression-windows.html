@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Windows by Tier</title>
+<!-- progression.md's round-2 page (T2W24–T2W29): the stained-glass windows in Tiers 2 and 3. The boards by tier, how a
+     window is drawn (a placeholder window and its pane map, lit by the live P84 rule), latching against a free pick,
+     what each new system lights, the Craft sum, pacing by track and the record. Style: the Tier rework's _template.html
+     block (uma-kit's tokens, light and dark), then this page's own. The window is made-up geometry, never original art. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4;
+    --glass-off: #1c2430; --lead: #0b0f14; --grid: rgb(16 26 36 / 0.08);
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181;
+      --glass-off: #121820; --lead: #05080b; --grid: rgb(255 255 255 / 0.08);
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1280px; margin: 0 auto; padding: 28px 36px 80px; }
+  h1 { font: 700 26px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 8px; }
+  h2 { font: 700 19px/1.25 ui-rounded, system-ui, sans-serif; margin: 34px 0 6px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  p { margin: 0 0 8px; max-width: 1000px; }
+  a { color: inherit; }
+  code { font-size: 12px; background: var(--sunken); padding: 1px 5px; border-radius: 4px; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 14px 16px; margin-bottom: var(--gap); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.doc { background: var(--accent-wash); color: var(--accent-strong); font-size: 11px; padding: 1px 7px; }
+  .chip.new { background: transparent; border: 1.5px dashed var(--accent); color: var(--accent-strong); font-size: 11px; padding: 0 7px; }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  nav.tabs { display: flex; gap: 6px; margin: 10px 0 18px; flex-wrap: wrap; }
+  nav.tabs a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.tabs a.on { background: var(--accent); color: var(--accent-ink); }
+  .lead { font-size: 15px; color: var(--ink-soft); max-width: 1000px; }
+  .toggle { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 2px; flex-wrap: wrap; }
+  .toggle button { border: 0; background: transparent; color: var(--ink); padding: 4px 12px; border-radius: 999px; font: 600 12px system-ui, sans-serif; cursor: pointer; }
+  .toggle button.on { background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-soft); }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  /* The board, as the Window sheet draws it */
+  .board { display: grid; grid-template-columns: 54px repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .board .lab { font-size: 10.5px; color: var(--ink-faint); align-self: center; line-height: 1.15; }
+  .board .lab b { display: block; color: var(--ink); }
+  .tile { min-height: 42px; border-radius: 7px; background: var(--sunken); color: var(--ink); font-size: 10.5px; font-weight: 700; display: grid; place-items: center; text-align: center; line-height: 1.15; padding: 2px; cursor: default; }
+  .tile.changed { outline: 1.5px dashed var(--accent); outline-offset: -2px; background: var(--accent-wash); }
+  .tile.rift { grid-column: span 5; }
+  .tile small { display: block; font-weight: 500; color: var(--ink-soft); font-size: 9.5px; }
+  .bhead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .bhead b { font-size: 14px; }
+  .rule { font-size: 12px; background: var(--raised); border-radius: 8px; padding: 8px 10px; margin-top: 8px; min-height: 36px; color: var(--ink-soft); }
+  /* The reveal */
+  .reveal { display: grid; grid-template-columns: 260px 260px minmax(0, 1fr); gap: 18px; align-items: start; }
+  .reveal svg { display: block; width: 260px; height: 340px; }
+  .reveal .cap { font-size: 12px; color: var(--ink-soft); text-align: center; margin-top: 4px; }
+  .slider input[type=range] { width: 100%; }
+  .kv { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 4px 10px; font-size: 13px; }
+  .kv dt { color: var(--ink-faint); } .kv dd { margin: 0; color: var(--ink); }
+  /* Latch demo */
+  .latch { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
+  .lt { border-radius: 8px; padding: 8px; background: var(--sunken); font-size: 11.5px; text-align: center; min-height: 54px; }
+  .lt.on { background: var(--accent-wash); outline: 1.5px solid var(--accent); }
+  .lt.bad { outline: 1.5px dashed var(--danger); }
+  .lt.bad.on { background: color-mix(in srgb, var(--danger) 12%, transparent); }
+  .btns button { border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); border-radius: 999px; padding: 5px 12px; font: 600 12px system-ui, sans-serif; cursor: pointer; margin: 0 6px 6px 0; }
+  .log { font-size: 12px; color: var(--ink-soft); background: var(--raised); border-radius: 8px; padding: 8px 10px; min-height: 52px; }
+  /* Systems map */
+  .sys { display: grid; grid-template-columns: 220px 120px minmax(0, 1fr); gap: 6px 12px; align-items: center; font-size: 13px; }
+  .sys .s { background: var(--raised); border-radius: 8px; padding: 7px 10px; color: var(--ink); font-weight: 600; }
+  .sys .s small { display: block; font-weight: 500; color: var(--ink-soft); font-size: 11.5px; }
+  .sys .a { text-align: center; color: var(--ink-faint); font-size: 12px; }
+  .sys .t { display: flex; gap: 5px; flex-wrap: wrap; }
+  /* Craft */
+  .craft { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 18px; }
+  .sl { display: grid; grid-template-columns: 120px minmax(0, 1fr) 36px; gap: 6px 10px; align-items: center; font-size: 13px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 10px 0; }
+  .kpi { background: var(--raised); border-radius: 10px; padding: 10px 12px; }
+  .kpi .k { font-size: 12px; color: var(--ink-soft); }
+  .kpi .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .kpi .x { font-size: 11.5px; color: var(--ink-faint); }
+  .steps5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  /* Record */
+  .rec { display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 3px; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .rec div { background: var(--sunken); border-radius: 4px; padding: 4px 2px; text-align: center; }
+  .rec div.on { background: var(--accent-wash); }
+  .rec div small { display: block; font: 9px system-ui, sans-serif; color: var(--ink-faint); }
+  svg text { fill: var(--ink-soft); font: 11px system-ui, sans-serif; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 6px 0 10px; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; margin-right: 5px; vertical-align: -1px; }
+  .note { font-size: 12.5px; background: var(--raised); border-left: 3px solid var(--accent); border-radius: 6px; padding: 8px 10px; margin: 8px 0; color: var(--ink-soft); }
+  #tip { position: fixed; pointer-events: none; z-index: 20; background: var(--panel); color: var(--ink); border-radius: 8px; padding: 7px 10px; font-size: 12px; box-shadow: 0 4px 18px rgb(0 0 0 / .18); max-width: 320px; display: none; }
+  @media (max-width: 1150px) {
+    .grid3, .grid2, .craft { grid-template-columns: minmax(0, 1fr); }
+    .reveal { grid-template-columns: 260px 260px; } .reveal > div:last-child { grid-column: span 2; }
+    .latch { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .rec { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 2 · 2026-11-04 · nothing built</span></div>
+  <h1>The windows in Tiers 2 and 3</h1>
+  <p class="lead">One board of 36 steps in every tier, the same seven tracks and the Rift, the same record. Round 2's
+    systems land where their progress already lives: Class reads the sixteen and asks for a class and its sibling, Craft
+    reads her three professions together, Stars reads the tier's map, Gear and Weapons read grades whatever form or type
+    she wears. A step reads progress, never a choice; the art needs nothing (T2W24–T2W29).</p>
+  <nav class="tabs">
+    <a href="progression-tiers.html">The tiers</a>
+    <a href="progression-ascend.html">The Ascend sheet</a>
+    <a class="on" href="progression-windows.html">The windows</a>
+    <a href="progression-world.html">The worlds</a>
+    <a href="progression-run.html">The run</a>
+    <a href="../progression.md">progression.md</a>
+  </nav>
+
+  <h2>Three boards, as the Window sheet draws them</h2>
+  <p>Each tile is the board's short label; dashed tiles read something new in that tier. Hover a tile for its rule.
+    Tier 1 is live (engine v21, save v36); Tiers 2 and 3 are round 2's, with capitals v2's World step (CA12).</p>
+  <div class="grid3" id="boards"></div>
+
+  <h2>How a window is drawn (live, P84)</h2>
+  <p>A made-up window of placeholder panes, lit by the game's own rule: a pane is drawn when its map value is the lead (0)
+    or at most 250 × lit ÷ (steps − 1); the face (255) only when every step is lit; any other pane is dark glass,
+    (0.3 c + 0.7 y) × 0.16 + (9, 11, 18). The map ranks panes outside in: the frame farthest from her head first, the
+    sunburst from its rim inward, her figure bottom up. Change the step count: the same map lights any board.</p>
+  <div class="card reveal">
+    <div><svg id="win" viewBox="0 0 240 320" role="img" aria-label="A placeholder stained-glass window"></svg><div class="cap" id="winCap"></div></div>
+    <div><svg id="map" viewBox="0 0 240 320" role="img" aria-label="Its pane map"></svg><div class="cap">The pane map (<code>outfit-glass-order</code>): darker first, white the face</div></div>
+    <div>
+      <div class="row"><span class="ctl">Board <span class="toggle" id="nsteps"><button data-v="31">31 (v35)</button><button class="on" data-v="36">36 (live, every tier)</button><button data-v="41">41 (a track more)</button></span></span></div>
+      <div class="slider" style="margin:12px 0"><label class="ctl"><b id="litv">18</b> of <b id="totv">36</b> steps lit</label><input id="lit" type="range" min="0" max="36" value="18"></div>
+      <dl class="kv" id="winKv"></dl>
+      <div class="note"><b>What the art knows: only the count.</b> It never knows which step lit, so a step that read a
+        choice would gain nothing on the glass, and a board can change what its steps ask in any tier with no rebake.
+        <b>The face waits for the last step,</b> so every step must be reachable on a normal run.</div>
+    </div>
+  </div>
+
+  <h2>Why a step reads progress, never a choice (T2W27)</h2>
+  <p>Steps latch for good (CO2): the first time her state meets one, it's hers, dated that day. Play a made-up Uma: real
+    steps light as she progresses and never go dark; the red, dashed tile is a step the board does <b>not</b> have, one
+    that would read a free pick, to show what latching does to it.</p>
+  <div class="card">
+    <div class="btns" id="latchBtns">
+      <button data-a="rank">Win a campaign's worth (+Class EXP)</button>
+      <button data-a="sib">Switch to the sibling and rank it</button>
+      <button data-a="dual">Set her Greatsword to Dual</button>
+      <button data-a="pure">Set it back to Pure</button>
+      <button data-a="grade">Raise five weapons a grade</button>
+      <button data-a="reset">Classes v3's kind of reset</button>
+      <button data-a="restart">Start over</button>
+    </div>
+    <div class="latch" id="latch"></div>
+    <div class="log" id="latchLog"></div>
+  </div>
+
+  <h2>Each new system, and where the board reads it (T2W24)</h2>
+  <div class="card">
+    <div class="sys" id="sys"></div>
+    <p class="muted" style="margin-top:10px">A choice counts only as breadth any option meets equally: "a class and its sibling", "three classes", "five
+      weapons", "her three Crafts to 60". No step names a class, a type, a form, a stat or a profession. A choice celebrated
+      without gating is CO30's medal phase.</p>
+  </div>
+
+  <h2>Craft: her three professions together (T2W26)</h2>
+  <p>Craft I–V ask her three Craft Levels to add up to 12 · 24 · 36 · 48 · 60. Craft EXP a level is nearly flat
+    (1,425 + 15 × level), so spreading costs no more than Tier 1's single Craft; a specialist pays at most 14%, because her
+    last ten levels must come from a second profession. Days are her own slot time, nonstop (2 EXP a base minute, the
+    places' ×1.25).</p>
+  <div class="card craft">
+    <div>
+      <div class="sl">
+        <span>Her line, first</span><input type="range" id="c1" min="1" max="50" value="30"><b id="c1v"></b>
+        <span>Her line, second</span><input type="range" id="c2" min="1" max="50" value="29"><b id="c2v"></b>
+        <span>Sub-profession</span><input type="range" id="c3" min="1" max="50" value="1"><b id="c3v"></b>
+      </div>
+      <div class="row" style="margin-top:10px"><span class="toggle" id="cpre">
+        <button data-v="20,20,20">Even</button><button class="on" data-v="30,29,1">Her line's two</button><button data-v="40,19,1">Main first</button><button data-v="50,9,1">A specialist</button>
+      </span></div>
+    </div>
+    <div>
+      <div class="kpis" id="ckpi"></div>
+      <div class="steps5" id="csteps"></div>
+    </div>
+  </div>
+
+  <h2>Pacing by track: Tier 2 against Tier 1</h2>
+  <p>A first cohort's fighting-party Uma (progression.md §4.6.6, §4.8's model). Grey: Tier 1. Amber: Tier 2. Craft shows
+    its range (an even split to a specialist). Only Craft moves.</p>
+  <div class="card">
+    <div class="row"><span class="ctl">The Wilds <span class="toggle" id="up"><button class="on" data-v="1">Nonstop</button><button data-v="1.25">80% busy</button></span></span></div>
+    <svg id="pace" viewBox="0 0 1200 330" width="100%" height="330" role="img" aria-label="Each step's day by track, Tier 1 and Tier 2"></svg>
+  </div>
+
+  <h2>The record (T2W28)</h2>
+  <p><code>account.windows[outfit][tier].steps</code>: 36 three-character day codes, base 36, days since 2026-01-01,
+    <code>---</code> while dark, in the record's fixed order (save v35's six tracks and the Rift, then v36's Weapons,
+    appended). Positional: never reorder, only append. Round 2 adds no position: Tier 2's and Tier 3's steps keep the
+    same ids, and each id's rule is the tier's. A made-up Tier 2 Uma on day 20 of her tier:</p>
+  <div class="card">
+    <div class="rec" id="rec"></div>
+    <p class="muted" style="margin-top:8px" id="recLine"></p>
+  </div>
+
+  <h2>Every call on this page</h2>
+  <div class="card"><table id="calls"></table></div>
+</main>
+<div id="tip"></div>
+<script>
+const $ = (s) => document.querySelector(s)
+const tip = $('#tip')
+document.addEventListener('mousemove', (e) => {
+  const t = e.target.closest('[data-tip]')
+  if (!t) { tip.style.display = 'none'; return }
+  tip.innerHTML = t.dataset.tip; tip.style.display = 'block'
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - 340) + 'px'; tip.style.top = (e.clientY + 14) + 'px'
+})
+const RN = ['I', 'II', 'III', 'IV', 'V']
+
+// --- The boards ---------------------------------------------------------------------------------------------------
+function board(t) {
+  const first = 5 * (t - 1) + 1
+  const rows = [
+    ['Level', [10, 20, 30, 40, 50].map((l) => [`Lv ${l}`, `Uma Lv ${l}${t > 1 ? ` (T${t} Lv ${l})` : ''}`, false])],
+    ['Class', t === 1
+      ? [['R10', 'A Tier 0 class at Class Rank 10'], ['R30', 'A Tier 1 class at Class Rank 30'], ['R50', 'A Tier 1 class at Class Rank 50'], ['2 at R50', 'Two Tier 1 classes at Class Rank 50'], ['3 at R50', 'Three Tier 1 classes at Class Rank 50']].map((x) => [...x, false])
+      : [['R10', `A Tier ${t === 2 ? 2 : '2'} class at Class Rank 10`, true], ['R30', 'Its Class Rank 30', true], ['R50', t === 3 ? 'Class Rank 50: also her crown and mastery (if classes keeps them there)' : 'Class Rank 50', true],
+        ['Pair at R50', 'A Tier 2 class and its sibling at Class Rank 50: both children of one Tier 1 class (T2W25)', true], ['3 at R50', 'Three Tier 2 classes at Class Rank 50, any', true]]],
+    ['Craft', t === 1 ? [10, 20, 30, 40, 50].map((l) => [`Craft ${l}`, `Craft Lv ${l}`, false]) : [12, 24, 36, 48, 60].map((l) => [`Crafts ${l}`, `Her three Craft Levels add up to ${l} (T2W26)`, true])],
+    ['Gear', [2, 4, 6, 8, 10].map((g) => [`G${g}`, `All eleven worn slots at G${g}${t > 1 ? (g === 10 ? ': every accessory tree open (assumed)' : '; the accessory tree\'s forms open with the grade') : ''}`, t > 1 && g === 10])],
+    ['Weapons', [2, 4, 6, 8, 10].map((g) => [`5 at G${g}`, `Five weapons at G${g}, any of her classes'${t > 1 ? ', any type' : ''}`, false])],
+    ['Stars', [1, 2, 3, 4, 5].map((n) => [`Stars ${RN[n - 1]}`, n === 5 ? `The whole map: ${t === 1 ? '22' : '22 (27 with a weapon-moon body)'} nodes${t > 1 ? '; stat picks not read' : ''}` : `Every node to ${RN[n - 1]}: ${[4, 9, 13, 18][n - 1]} nodes`, false])],
+    ['World', [0, 1, 2, 3, 4].map((i) => [`Cont. ${first + i}`, `Continent ${first + i}: a won capital run (CA12)`, false])],
+  ]
+  return rows
+}
+$('#boards').innerHTML = [1, 2, 3].map((t) => {
+  const rows = board(t)
+  const changed = rows.flatMap((r) => r[1]).filter((x) => x[2]).length
+  return `<div class="card"><div class="bhead"><b><span class="tier t${t}">Tier ${t}</span> ${['', 'as built', 'round 2', 'round 2'][t]}</b><span class="muted" style="font-size:12px">36 steps${t === 3 ? ' (live 35: T2W4)' : ''} · ${changed} re-read</span></div>
+    <div class="board">${rows.map(([name, steps]) => `<span class="lab">${name}</span>${steps.map(([lab, rule, ch]) => `<div class="tile ${ch ? 'changed' : ''}" data-tip="<b>${name} ${RN[steps.indexOf(steps.find((s) => s[0] === lab))]}</b> · ${rule}">${lab}</div>`).join('')}`).join('')}
+      <span class="lab">Rift</span><div class="tile rift ${t === 3 ? 'changed' : ''}" data-tip="On a won Tier ${t} Rift run${t === 3 ? ' (T2W4: Tier 3 gets a Rift)' : ''}">Rift</div></div></div>`
+}).join('')
+
+// --- The reveal: a placeholder window ------------------------------------------------------------------------------
+const HEAD = { x: 120, y: 150 }
+const PAL = ['#e8c25a', '#d98b3a', '#5aa0d8', '#7cc08a', '#c76a8a', '#9a7ad8', '#e0a24e']
+function arc(cx, cy, r0, r1, a0, a1) {
+  const p = (r, a) => `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`
+  return `M${p(r1, a0)} A${r1},${r1} 0 0 1 ${p(r1, a1)} L${p(r0, a1)} A${r0},${r0} 0 0 0 ${p(r0, a0)} Z`
+}
+const PANES = (() => {
+  const out = []
+  const add = (d, group, cx, cy, color, face = false) => out.push({ d, group, cx, cy, color, face })
+  // The frame: the arch's band in ten segments, the sides in six, the sill in six.
+  for (let i = 0; i < 10; i++) { const a0 = Math.PI + (i * Math.PI) / 10, a1 = a0 + Math.PI / 10, am = (a0 + a1) / 2; add(arc(120, 120, 96, 110, a0, a1), 0, 120 + 103 * Math.cos(am), 120 + 103 * Math.sin(am), i % 2 ? '#e8c25a' : '#c76a8a') }
+  for (const x of [10, 216]) for (let i = 0; i < 6; i++) { const y = 120 + i * 30; add(`M${x},${y}h14v30h-14Z`, 0, x + 7, y + 15, i % 2 ? '#5aa0d8' : '#e8c25a') }
+  for (let i = 0; i < 6; i++) { const x = 24 + i * 32; add(`M${x},296h32v14h-32Z`, 0, x + 16, 303, i % 2 ? '#c76a8a' : '#5aa0d8') }
+  // The sunburst: three rings of sixteen rays round her head.
+  const rings = [[44, 80], [80, 120], [120, 200]]
+  rings.forEach(([r0, r1], k) => { for (let i = 0; i < 16; i++) { const a0 = (i * Math.PI * 2) / 16, a1 = a0 + (Math.PI * 2) / 16, am = (a0 + a1) / 2, rm = (r0 + r1) / 2; add(arc(HEAD.x, HEAD.y, r0, r1, a0, a1), 1, HEAD.x + rm * Math.cos(am), HEAD.y + rm * Math.sin(am), k === 2 ? (i % 2 ? '#7cc08a' : '#5aa0d8') : k === 1 ? (i % 2 ? '#e0a24e' : '#e8c25a') : (i % 2 ? '#f0d890' : '#e8c25a')) } })
+  // Her figure: shoulders in eight, a collar, her hair in six, her face one sheet.
+  const sh = [[50, 296], [76, 236], [164, 236], [190, 296]]
+  for (let c = 0; c < 4; c++) for (let r = 0; r < 2; r++) {
+    const t0 = c / 4, t1 = (c + 1) / 4, y0 = 236 + r * 30, y1 = y0 + 30
+    const xl = (y, t) => { const lx = 76 - (26 * (y - 236)) / 60, rx = 164 + (26 * (y - 236)) / 60; return lx + (rx - lx) * t }
+    add(`M${xl(y0, t0).toFixed(1)},${y0} L${xl(y0, t1).toFixed(1)},${y0} L${xl(y1, t1).toFixed(1)},${y1} L${xl(y1, t0).toFixed(1)},${y1} Z`, 2, (xl(y0, t0) + xl(y1, t1)) / 2, (y0 + y1) / 2, ['#9a7ad8', '#5aa0d8', '#9a7ad8', '#5aa0d8'][c] )
+  }
+  add('M104,206h32v30h-32Z', 2, 120, 221, '#e8c25a')
+  for (let i = 0; i < 6; i++) { const a0 = Math.PI * 0.85 + (i * Math.PI * 1.3) / 6, a1 = a0 + (Math.PI * 1.3) / 6, am = (a0 + a1) / 2; add(arc(HEAD.x, HEAD.y + 6, 30, 44, a0, a1), 2, HEAD.x + 37 * Math.cos(am), HEAD.y + 6 + 37 * Math.sin(am), '#d98b3a') }
+  add('M96,156 a24,28 0 1,0 48,0 a24,28 0 1,0 -48,0 Z', 3, 120, 156, '#f4dcc8', true)
+  // P84's order: frame first (farthest from her head first), the sunburst from its rim inward, her figure bottom up; face 255.
+  const ranked = out.filter((p) => !p.face).map((p) => ({ p, key: [p.group, p.group === 2 ? -p.cy : -Math.hypot(p.cx - HEAD.x, p.cy - HEAD.y)] }))
+  ranked.sort((a, b) => a.key[0] - b.key[0] || a.key[1] - b.key[1])
+  ranked.forEach(({ p }, i) => { p.v = Math.ceil((250 * (i + 1)) / ranked.length) })
+  out.filter((p) => p.face).forEach((p) => { p.v = 255 })
+  return out
+})()
+const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+const dark = (h) => { const [r, g, b] = hex(h), y = 0.299 * r + 0.587 * g + 0.114 * b; return `rgb(${Math.round((0.3 * r + 0.7 * y) * 0.16 + 9)},${Math.round((0.3 * g + 0.7 * y) * 0.16 + 11)},${Math.round((0.3 * b + 0.7 * y) * 0.16 + 18)})` }
+let N = 36
+function drawWin() {
+  const lit = +$('#lit').value
+  $('#litv').textContent = lit; $('#totv').textContent = N
+  const limit = lit >= N ? 255 : (250 * lit) / (N - 1)
+  const clip = '<defs><clipPath id="arch"><path d="M10 310V120A110 110 0 0 1 230 120V310Z"/></clipPath></defs>'
+  const ring = lit >= N ? 'var(--t2)' : 'var(--lead)'
+  // Drawn back to front: the sunburst under the frame's band, her figure and face on top (the order map is separate).
+  const BACK = { 1: 0, 0: 1, 2: 2, 3: 3 }
+  const draw = (fill) => `${clip}<path d="M10 310V120A110 110 0 0 1 230 120V310Z" fill="var(--lead)"/><g clip-path="url(#arch)">${[...PANES].sort((a, b) => BACK[a.group] - BACK[b.group]).map((p) => `<path d="${p.d}" fill="${fill(p)}" stroke="var(--lead)" stroke-width="2.2" data-tip="Pane value ${p.v}${p.face ? ' · her face, lit with the last step' : ''} · ${['frame', 'sunburst', 'her figure', 'her face'][p.group]}"/>`).join('')}</g>`
+  $('#win').innerHTML = draw((p) => (p.v <= limit ? p.color : dark(p.color))) + `<path d="M10 310V120A110 110 0 0 1 230 120V310Z" fill="none" stroke="${ring}" stroke-width="${lit >= N ? 6 : 3}"/>`
+  $('#map').innerHTML = draw((p) => `rgb(${p.v},${p.v},${p.v})`)
+  const litPanes = PANES.filter((p) => p.v <= limit).length
+  $('#winCap').textContent = `${lit}/${N} · ${Math.round((100 * lit) / N)}%${lit >= N ? ' · full: her tier\'s ring' : ''}`
+  $('#winKv').innerHTML = [
+    ['A step lights', `${(250 / (N - 1)).toFixed(2)} of the map's 250 values (${(100 / (N - 1)).toFixed(2)}% of the panes before her face)`],
+    ['Limit now', lit >= N ? 'every value, the face too' : `values ≤ ${limit.toFixed(1)}`],
+    ['Panes lit', `${litPanes} of ${PANES.length} (this window); a real bake has a few hundred`],
+    ['Her face', lit >= N ? 'lit' : `dark until step ${N}`],
+  ].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')
+}
+$('#lit').addEventListener('input', drawWin)
+$('#nsteps').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  $('#nsteps').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b))
+  const was = +$('#lit').value / N; N = +b.dataset.v; $('#lit').max = N; $('#lit').value = Math.round(was * N); drawWin()
+})
+drawWin()
+
+// --- Latching -----------------------------------------------------------------------------------------------------
+let L
+function restart() { L = { exp: 0, sib: 0, grade: 2, dual: false, lit: new Set(), log: 'A made-up Tier 2 Uma, the Brawler\'s keeper, Class Rank 10 on her open classes, five weapons at G2.' } }
+restart()
+const LT = [
+  ['class-3', 'Class III · R50', () => L.exp >= 23680], ['class-4', 'Class IV · Pair at R50', () => L.exp >= 23680 && L.sib >= 23680],
+  ['weapons-2', 'Weapons II · 5 at G4', () => L.grade >= 4], ['weapons-3', 'Weapons III · 5 at G6', () => L.grade >= 6],
+  ['gear-1', 'Gear I · G2', () => L.grade >= 2], ['choice', 'Not a step: "wear a Dual"', () => L.dual, true],
+]
+function latch() { LT.forEach(([id, , met]) => { if (met()) L.lit.add(id) }) }
+function drawLatch() {
+  latch()
+  $('#latch').innerHTML = LT.map(([id, lab, met, bad]) => `<div class="lt ${L.lit.has(id) ? 'on' : ''} ${bad ? 'bad' : ''}"><b>${lab}</b><br><span class="muted">${L.lit.has(id) ? (met() ? 'lit' : 'lit, latched') : 'dark'}</span></div>`).join('')
+  $('#latchLog').innerHTML = L.log
+}
+$('#latchBtns').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  const a = b.dataset.a
+  if (a === 'rank') { L.exp = Math.min(23680, L.exp + 23680); L.log = 'Her class to R50: Class III lights and stays lit, whatever she switches to.' }
+  if (a === 'sib') { if (L.exp < 23680) L.log = 'Her first class isn\'t at R50 yet; the sibling ranks, but the pair needs both.'; L.sib = 23680; if (L.exp >= 23680) L.log = 'The sibling at R50 too: Class IV, "Pair at R50", lights: the owner\'s swap, read as progress.' }
+  if (a === 'dual') { L.dual = true; L.log = 'One tap on her Gear tab, and a step that read "wear a Dual" would light for good. That\'s why the board has none (T2W27).' }
+  if (a === 'pure') { L.dual = false; L.log = 'She swaps back. The red tile stays lit: latching keeps a step, so a free pick would be a tutorial, not an achievement.' }
+  if (a === 'grade') { L.grade = Math.min(10, L.grade + 2); L.log = `Five weapons at G${L.grade}: Weapons lights by grade, whatever their types.` }
+  if (a === 'reset') { L.exp = 0; L.sib = 0; L.log = 'A reset of her ranks (Classes v3\'s kind): her ranks fall, her lit steps stay (CO2).' }
+  if (a === 'restart') restart()
+  drawLatch()
+})
+drawLatch()
+
+// --- Systems map ----------------------------------------------------------------------------------------------------
+const SYS = [
+  ['Sixteen classes', 'R2-2–R2-5 · T2C', 'Class Rank on each class she holds', ['Class I–V', 'IV: a class and its sibling'], 'Which she fights as; keeper or expander'],
+  ['Weapon types', 'R2-6 · T2G', 'Each weapon kind\'s grade', ['Weapons I–V', 'Gear I–V'], 'Pure or Dual, the partner'],
+  ['The accessory tree', 'R2-7 · T2G', 'Each slot\'s grade; forms open as it rises', ['Gear I–V', 'V: every tree open'], 'Which form she wears'],
+  ['Stat picks', 'R2-8 · T2E', 'Nodes opened by jewels', ['Stars I–V'], 'The stat each node takes'],
+  ['Three professions', 'R2-9 · T2P', 'Three Craft Levels', ['Craft I–V', 'their sum'], 'Her sub-profession; where she works'],
+  ['Capital runs', 'D293', 'A won run a continent', ['World I–V'], 'Which lane'],
+  ['The Rift', 'D283', 'A won run', ['Rift'], '—'],
+]
+$('#sys').innerHTML = '<b class="muted" style="font-size:12px">System</b><b class="muted" style="font-size:12px;text-align:center">reads</b><b class="muted" style="font-size:12px">On the board · not read</b>' +
+  SYS.map(([n, src, prog, tr, choice]) => `<div class="s">${n}<small>${src} · progress: ${prog}</small></div><div class="a">progress →</div>
+    <div class="t">${tr.map((x) => `<span class="chip">${x}</span>`).join('')}<span class="chip" style="background:transparent;border:1px dashed var(--hairline-strong);color:var(--ink-faint)">not read: ${choice}</span></div>`).join('')
+
+// --- Craft ------------------------------------------------------------------------------------------------------------
+const expTo = (L) => { let s = 0; for (let l = 1; l < L; l++) s += 1425 + 15 * l; return s }
+const days = (exp) => exp / 2 / 60 / 1.25 / 24
+const T1D = [3.75, 8.31, 13.29, 18.69, 24.5]
+function drawCraft() {
+  const v = ['#c1', '#c2', '#c3'].map((id) => +$(id).value)
+  ;['#c1v', '#c2v', '#c3v'].forEach((id, i) => { $(id).textContent = v[i] })
+  const sum = v.reduce((a, b) => a + b, 0), exp = v.reduce((a, l) => a + expTo(l), 0)
+  const n = [12, 24, 36, 48, 60].filter((x) => sum >= x).length
+  $('#ckpi').innerHTML = [
+    ['Her three add up to', sum, `${n} of 5 Craft steps lit`],
+    ['Her own work, nonstop', `${days(exp).toFixed(1)} d`, `${(days(exp) * 1.25).toFixed(1)} at 80%`],
+    ['Tier 1\'s Craft V', '24.5 d', 'Craft Lv 50, one profession'],
+    ['Against Tier 1', sum >= 60 ? `×${(exp / expTo(50)).toFixed(2)}` : '—', sum >= 60 ? 'for Craft V' : 'Craft V not yet'],
+  ].map(([k, val, x]) => `<div class="kpi"><div class="k">${k}</div><div class="v">${val}</div><div class="x">${x}</div></div>`).join('')
+  $('#csteps').innerHTML = [12, 24, 36, 48, 60].map((x, i) => `<div class="tile ${sum >= x ? 'changed' : ''}" style="min-height:54px">Crafts ${x}<small>${sum >= x ? 'lit' : `${sum}/${x}`} · Tier 1 ${T1D[i]} d</small></div>`).join('')
+}
+;['#c1', '#c2', '#c3'].forEach((id) => $(id).addEventListener('input', () => { $('#cpre').querySelectorAll('button').forEach((x) => x.classList.remove('on')); drawCraft() }))
+$('#cpre').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  $('#cpre').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b))
+  b.dataset.v.split(',').forEach((x, i) => { $(['#c1', '#c2', '#c3'][i]).value = x })
+  drawCraft()
+})
+drawCraft()
+
+// --- Pacing by track ------------------------------------------------------------------------------------------------
+let F = 1
+const GD = [0, 0, 2.0, 4.2, 6.4, 8.8, 11.3, 13.8, 16.5, 19.3, 22.1]
+function track(f) {
+  const G = (g) => GD[g] * f
+  return {
+    Level: [[0.5, 0.5], [1, 1], [2, 2], [G(4), G(4)], [G(5), G(5)]],
+    Class: [[0.5, 0.5], [1.2, 1.2], [5.0, 5.0], [G(5), G(5)], [G(5) + 2, G(5) + 2]],
+    Craft: [[3.75 * f, [3.64 * f, 3.75 * f]], [8.31 * f, [8.66 * f, 9.28 * f]], [13.29 * f, [13.89 * f, 15.4 * f]], [18.69 * f, [19.31 * f, 22.13 * f]], [24.5 * f, [24.94 * f, 27.82 * f]]],
+    Gear: [2, 4, 6, 8, 10].map((g) => [G(g) + 1, G(g) + 1]),
+    Weapons: [2, 4, 6, 8, 10].map((g) => [g === 10 ? G(10) + 2.9 : G(g) + 1.3, g === 10 ? G(10) + 2.9 : G(g) + 1.3]),
+    Stars: [2, 4, 6, 8, 10].map((g) => [G(g) + 0.5, G(g) + 0.5]),
+    World: [[0.5, 0.5], [1, 1], [2, 2], [G(4), G(4)], [G(5), G(5)]],
+    Rift: [[G(8) + 17, G(8) + 17]],
+  }
+}
+function drawPace() {
+  const W = 1200, x0 = 90, x1 = W - 30, D = 40, X = (d) => x0 + (Math.min(d, D) / D) * (x1 - x0)
+  const T = track(F), names = Object.keys(T), Y = (i) => 30 + i * 36
+  let g = ''
+  for (let d = 0; d <= D; d += 5) g += `<line x1="${X(d)}" x2="${X(d)}" y1="16" y2="${Y(names.length) - 14}" stroke="var(--grid)"/><text x="${X(d)}" y="12" text-anchor="middle">day ${d}</text>`
+  names.forEach((n, i) => {
+    g += `<text x="10" y="${Y(i) + 4}" style="fill:var(--ink);font-weight:600">${n}</text>`
+    T[n].forEach(([t1, t2], k) => {
+      g += `<circle cx="${X(t1)}" cy="${Y(i) - 6}" r="5" fill="var(--locked)" data-tip="Tier 1 ${n} ${RN[k] ?? ''}: day ${t1.toFixed(1)}"/>`
+      if (Array.isArray(t2)) g += `<g data-tip="Tier 2 Craft ${RN[k]}: day ${t2[0].toFixed(1)} (even) to ${t2[1].toFixed(1)} (a specialist)"><rect x="${X(t2[0])}" y="${Y(i)}" width="${Math.max(4, X(t2[1]) - X(t2[0]))}" height="10" rx="5" fill="var(--t2)"/></g>`
+      else g += `<circle cx="${X(t2)}" cy="${Y(i) + 5}" r="5" fill="var(--t2)" data-tip="Tier 2 ${n} ${RN[k] ?? ''}: day ${t2.toFixed(1)}"/>`
+    })
+  })
+  const ready = Math.max(...names.flatMap((n) => T[n].map(([, t2]) => (Array.isArray(t2) ? t2[1] : t2))))
+  g += `<line x1="${X(ready)}" x2="${X(ready)}" y1="20" y2="${Y(names.length) - 14}" stroke="var(--t2)" stroke-dasharray="4 4"/><text x="${X(ready) + 6}" y="${Y(names.length) - 18}" style="fill:var(--ink)">ready, day ${ready.toFixed(1)}</text>`
+  $('#pace').innerHTML = g
+}
+$('#up').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; $('#up').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); F = +b.dataset.v; drawPace() })
+drawPace()
+
+// --- The record ------------------------------------------------------------------------------------------------------
+const IDS = [...['level', 'class', 'craft', 'gear', 'stars', 'world'].flatMap((t) => [1, 2, 3, 4, 5].map((n) => `${t}-${n}`)), 'rift', ...[1, 2, 3, 4, 5].map((n) => `weapons-${n}`)]
+// Her arrival on 2026-11-10 (day 313 since 2026-01-01), the steps by §4.8's model to her tier's day 20.
+const arrive = 313
+const AT = { 'level-1': 0, 'level-2': 1, 'level-3': 2, 'level-4': 6, 'level-5': 9, 'class-1': 0, 'class-2': 1, 'class-3': 5, 'class-4': 9, 'class-5': 11, 'craft-1': 4, 'craft-2': 9, 'craft-3': 14, 'gear-1': 3, 'gear-2': 7, 'gear-3': 12, 'gear-4': 18, 'stars-1': 3, 'stars-2': 7, 'stars-3': 12, 'stars-4': 17, 'world-1': 0, 'world-2': 1, 'world-3': 2, 'world-4': 6, 'world-5': 9, 'weapons-1': 3, 'weapons-2': 8, 'weapons-3': 13, 'weapons-4': 18 }
+$('#rec').innerHTML = IDS.map((id, i) => {
+  const d = AT[id], code = d === undefined ? '---' : (arrive + d).toString(36).padStart(3, '0')
+  return `<div class="${d === undefined ? '' : 'on'}" data-tip="Position ${i} · ${id} · ${d === undefined ? 'dark' : `lit on her day ${d}`}">${code}<small>${id.replace('weapons', 'wpn')}</small></div>`
+}).join('')
+$('#recLine').textContent = `${Object.keys(AT).length} of 36 lit; ${IDS.length * 3} characters of steps, about 150 bytes a record with its keys. The ids and positions are the same in every tier; only what each id asks changes with the tier.`
+
+// --- Calls --------------------------------------------------------------------------------------------------------
+const CALLS = [
+  ['T2W24', 'The Tier 2 board', 'One board, 36 steps, the same seven tracks and the Rift and the same record positions; Class, Craft and Stars re-read the new systems; Gear and Weapons read grades whatever form or type'],
+  ['T2W25', 'The Class track', 'R10 · R30 · R50 on her best Tier 2 class; IV a Tier 2 class and its sibling at R50; V three Tier 2 classes at R50, any'],
+  ['T2W26', 'The Craft track', 'Her three Craft Levels add up to 12 · 24 · 36 · 48 · 60; Craft V 24.9 (even) to 27.8 days (a specialist), Tier 1 24.5'],
+  ['T2W27', 'Progress, never a choice', 'A step reads progress; a choice only as breadth any option meets equally; no step names a class, type, form, stat or profession'],
+  ['T2W28', 'The record and the art', 'No new position, no rebake; each id\'s rule is the tier\'s; new labels "Pair at R50", "Crafts 36"'],
+  ['T2W29', 'The Tier 3 board', 'Tier 2\'s board at Tier 3\'s numbers, 36 with its Rift'],
+]
+$('#calls').innerHTML = '<tr><th>Id</th><th>Call</th><th>Recommended</th></tr>' + CALLS.map((r) => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')
+</script>
+</body>
+</html>
