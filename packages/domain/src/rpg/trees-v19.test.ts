@@ -37,16 +37,16 @@ describe('the two new hybrids\' trees (CV17)', () => {
       expect(rpgBranchNode(c, w, 4, 'B')).toBe(`${tree}.4${letter}`)
     }
     expect(RPG_BRANCH_B_NAME.tomeblade['tome-light']).toBe('Pierce')
-    expect([RPG_BRANCH_B_NAME.armsummoner.axe, RPG_BRANCH_B_NAME.armsummoner['tome-dark']]).toEqual(['Bonded', 'Pack'])
+    expect([RPG_BRANCH_B_NAME.armsummoner.axe, RPG_BRANCH_B_NAME.armsummoner['tome-dark']]).toEqual(['Oath', 'Pack'])
   })
 
-  it('names the Tome Spellblade\'s skills her own way: a blade word a depth, a spell word on her Tomes, the blade nouns on her Arms', () => {
+  it('names the Tome Spellblade\'s skills with the Spellblade family\'s words (D298): a word a tree, the ladder, an Edge capstone', () => {
     expect(RPG_TOMEBLADE_DEPTHS).toEqual(['Edged', 'Honed', 'Whetted', 'Gleaming', 'Sovereign'])
     expect(RPG_TOMEBLADE_SPELLS).toEqual({ fire: 'Pyre', ice: 'Frost', lightning: 'Volt', light: 'Lumen', dark: 'Umbra' })
-    expect(rpgTreeNodes('tomeblade-tome-lightning').map((n) => n.name)).toEqual(['Edged Volt', 'Honed Volt', 'Whetted Volt', 'Gleaming Volt',
-      'Sovereign Volt', 'Piercing Whetted Volt', 'Piercing Gleaming Volt', 'Piercing Sovereign Volt'])
-    expect(rpgTreeNodes('tomeblade-katana').map((n) => n.name).slice(0, 2)).toEqual(['Edged Draw', 'Honed Draw'])
-    expect(rpgNode('tomeblade-tome-dark.5')!.name).toBe('Sovereign Umbra')
+    expect(rpgTreeNodes('tomeblade-tome-lightning').map((n) => n.name)).toEqual(['Volt', 'Greater Volt', 'Grand Volt', 'Supreme Volt',
+      'Storm Edge', 'Grand Volt Pierce', 'Supreme Volt Pierce', 'Storm Edge Pierce'])
+    expect(rpgTreeNodes('tomeblade-katana').map((n) => n.name).slice(0, 2)).toEqual(['Iai', 'Greater Iai'])
+    expect(rpgNode('tomeblade-tome-dark.5')!.name).toBe('Dusk Edge')
   })
 
   it('plays the Spell Blade\'s rule on her trees, and Pierce on line B', () => {
@@ -64,9 +64,9 @@ describe('the two new hybrids\' trees (CV17)', () => {
     }
   })
 
-  it('casts the Summoner\'s summons on the Arms Summoner\'s trees, Bonded on her Arms and Pack on her Tomes', () => {
-    expect(rpgNode('armsummoner-axe.3b')!.name).toBe('Bonded Axe Ogre')
-    expect(rpgNode('armsummoner-tome-dark.3a')!.name).toBe('Vampire Knight Pack')
+  it('casts the Summoner\'s summons on the Arms Summoner\'s trees, Oath (the Bonded line) on her Arms and Pack on her Tomes', () => {
+    expect(rpgNode('armsummoner-axe.3b')!.name).toBe('Grand Minotaur Oath')
+    expect(rpgNode('armsummoner-tome-dark.3a')!.name).toBe('Grand Vampire Pack')
     // Her summons are the Tome Summoner's as v19 plays them (H128: the Bow's and Dark's volleys, Light's doubles).
     for (const w of RPG_WEAPONS) for (let d = 1; d <= 5; d++) {
       expect(rpgNode(`armsummoner-${w}.${d}`)!.skill, `${w}.${d}`).toEqual(rpgNodeSkill(rpgNode(`summoner-${w}.${d}`)!, V19))

@@ -169,7 +169,7 @@ describe('the Paladin as an identity (D179)', () => {
     expect(rpgNode('paladin-greatsword.1a')?.classId).toBe('paladin')
   })
 
-  it('builds her trees with the Cleric’s kit and names: her Axe on every foe from depth 4, Valkyrie’s Oath, no v14 support', () => {
+  it('builds her trees with the Cleric’s kit and names: her Axe on every foe from depth 4, the healers’ names (D298), no v14 support', () => {
     for (const n of RPG_ALL_NODES.filter((x) => x.classId === 'paladin')) {
       const twin = rpgNode(n.id.replace('paladin-', 'cleric-'))!
       // Both have v15's support (H56, `rpg/battle/healers-v15.test.ts`); only the Cleric has v14's.
@@ -179,12 +179,11 @@ describe('the Paladin as an identity (D179)', () => {
       expect([n.skill.support, support15 && 'v15'], n.id).toEqual([undefined, 'v15'])
       const to = n.weapon === 'axe' && n.depth === 4 ? 'foes' : kit.status!.to
       expect(own, n.id).toEqual({ ...kit, status: { ...kit.status!, to } })
-      // Names are the live generation's: since H72 Valkyrie's Oath is her Light 3B (CP37; v15's was her Lance 4B, with
-      // her Light 3B Heavy Devotion), and her Lance 4B is Heavy Transfix, as the Cleric's.
-      const name = n.id === 'paladin-tome-light.3b' ? "Valkyrie's Oath" : twin.name
-      expect(n.name, n.id).toBe(name)
+      // Names are the live generation's: since the skill names (D298, SN5) the two healers share one set of words, her
+      // Light 3B revive included.
+      expect(n.name, n.id).toBe(twin.name)
     }
-    expect(rpgNode('cleric-tome-light.3b')?.name).toBe('Rebirth')
+    expect(rpgNode('cleric-tome-light.3b')?.name).toBe('Grand Grace Surge')
     expect(rpgNode('paladin-axe.4')?.skill.status?.to).toBe('foes')
     expect(rpgNode('cleric-axe.4')?.skill.status?.to).toBe('foe')
     expect(rpgNode('paladin-greatsword.4')?.skill.status?.to).toBe('foe')

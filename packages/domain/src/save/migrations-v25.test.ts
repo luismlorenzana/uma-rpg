@@ -37,13 +37,13 @@ describe('save v25’s migration (H58, chained in H61)', () => {
     const after = umaOf(migrate(world()), '103')
     expect(after.classes.cleric).toEqual({ weapons: ['tome-fire', 'tome-light', 'tome-dark', 'greatsword', 'axe'], tree: CLERIC_TREE, loadout: CLERIC_LOADOUT })
     expect(after.classes.paladin!.weapons).toEqual(['greatsword', 'axe', 'bow', 'tome-fire', 'tome-ice'])
-    // Her tree renamed, Rebirth and Heavy Transfix included; her Class Rank copied, the others' untouched.
+    // Her tree renamed, her Light 3B revive and her Lance 4B included; her Class Rank copied, the others' untouched.
     expect(after.classes.paladin!.tree).toEqual(['paladin-greatsword.1a', 'paladin-axe.2a', 'paladin-tome-light.3b', 'paladin-lance.4b'])
-    // The live names (v16's since H72: Valkyrie's Oath moved to her Light 3B, CP37; to v15 it was her Lance 4B).
-    expect(rpgNode('cleric-tome-light.3b')!.name).toBe('Rebirth')
-    expect(rpgNode('paladin-tome-light.3b')!.name).toBe("Valkyrie's Oath")
-    expect(rpgNode('cleric-lance.4b')!.name).toBe('Heavy Transfix')
-    expect(rpgNode('paladin-lance.4b')!.name).toBe('Heavy Transfix')
+    // The live names, the healers' one set since the skill names (D298): her Light 3B revive is the Cleric's.
+    expect(rpgNode('cleric-tome-light.3b')!.name).toBe('Grand Grace Surge')
+    expect(rpgNode('paladin-tome-light.3b')!.name).toBe('Grand Grace Surge')
+    expect(rpgNode('cleric-lance.4b')!.name).toBe('Supreme Daze Surge')
+    expect(rpgNode('paladin-lance.4b')!.name).toBe('Supreme Daze Surge')
     expect(after.ranks.classes).toEqual({ cleric: { rank: 40, exp: 0 }, mage: { rank: 5, exp: 0 }, paladin: { rank: 40, exp: 0 } })
     expect(after.classes.mage).toEqual(umaOf(world(), '103').classes.mage)
     expect(after.classId).toBe('cleric')

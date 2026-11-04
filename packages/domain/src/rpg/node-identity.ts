@@ -63,11 +63,17 @@ const RPG_BRANCH_B_NAME_V16: BranchNames = {
   tomeblade: Object.fromEntries(RPG_WEAPONS.map((w) => [w, 'Pierce'])),
 }
 /** Classes v3's (CV14; engine v19, H128): the Brawler's Bow B is Barrage, the Sorcerer's Light B Pierce and her Dark B
- * Barrage, so the twins' B lines mirror. The side letters stay (`RPG_BRANCH_B`). */
+ * Barrage, so the twins' B lines mirror. The side letters stay (`RPG_BRANCH_B`). The skill names (D298, SN6) rename two
+ * lines, as names are presentation: the Summoners' Bonded is Oath (a Bond is the Halls' Bond level) and the healers' Heavy
+ * Surge (Heavy is the Greatsword's and Fire's shape). */
 const RPG_BRANCH_B_NAME_V19: BranchNames = {
   ...RPG_BRANCH_B_NAME_V16,
   brawler: { ...RPG_BRANCH_B_NAME_V16.brawler, bow: 'Barrage' },
   mage: { ...RPG_BRANCH_B_NAME_V16.mage, 'tome-light': 'Pierce', 'tome-dark': 'Barrage' },
+  summoner: Object.fromEntries(RPG_WEAPONS.map((w) => [w, isRpgTome(w) ? 'Oath' : 'Pack'])),
+  armsummoner: Object.fromEntries(RPG_WEAPONS.map((w) => [w, isRpgTome(w) ? 'Pack' : 'Oath'])),
+  paladin: Object.fromEntries(RPG_WEAPONS.map((w) => [w, 'Surge'])),
+  cleric: Object.fromEntries(RPG_WEAPONS.map((w) => [w, 'Surge'])),
 }
 /** Branch B's name on a class's tree in an engine's generation; none for a tree her class lacks or a Tier 0's. */
 export const rpgBranchBName = (classId: RpgClass, weapon: RpgWeapon, engine: number = BATTLE_ENGINE_VERSION): string | undefined =>

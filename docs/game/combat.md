@@ -117,7 +117,7 @@ resolves first whatever order the halves were picked in:
 - **The Summoners:** every act is a pair too, an Arms summon and a Tome summon (an Attack can be either half). Her **lead
   summon lingers**: the Arms Summoner's Arms one, the Tome Summoner's Tome one. When her next pair comes, before either
   half, it strikes **every living foe** once in farewell, one hit of its kind at its linger share (0.3, or 0.4 on her
-  lead trees' line B, Bonded) × its hits' power × `BATTLE_FAREWELL_FACTOR` (0.1), then leaves. The farewell can't be
+  lead trees' line B, Oath) × its hits' power × `BATTLE_FAREWELL_FACTOR` (0.1), then leaves. The farewell can't be
   intercepted, and a weak one chips a shield. Her other half's summon or an Attack leaves nothing. Limit Breaks, Guards
   and new waves keep the lingering summon; if she falls, it leaves with her. Her skills carry no support, and no buff or
   debuff but line A of the secondary weapons ([classes](classes.md#buffs-and-debuffs)).
@@ -332,7 +332,7 @@ support comes after the skill's hits.
 | **Rescue** | Every mend | A mend lifts the most hurt Uma to at least 60% of her max HP, whatever its share would have healed |
 | **Barrier** | Arms skills (the Uma the shown moves threaten most; every Uma at depth 5), and Blizzard spells (every Uma, at half the share) | Absorbs any damage first, the same shares, until the end of the round. Where it reaches every Uma the most threatened takes it whole and the rest ×0.4. Cap 60% of max HP |
 | **Cleanse** | Tome skills | Removes one foe-made status (Burn, Mark, Weaken) from each Uma |
-| **Revive** | Light line B, depth 3: the Cleric's Rebirth and the Paladin's Valkyrie's Oath | Raises the first fallen Uma at 25% of her max HP, once per Uma a fight |
+| **Revive** | Light line B, depth 3: the healers' Grand Grace Surge | Raises the first fallen Uma at 25% of her max HP, once per Uma a fight |
 | **Regen** | Light spells | Her spell's mend again at ×0.2, at the end of its round and of the next ("Regen" on screen). Her next Light spell replaces it; it ends if she falls |
 | **Drain** | Dark spells | 30% of the damage its hits deal heals the most hurt Uma |
 

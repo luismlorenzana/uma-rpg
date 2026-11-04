@@ -59,12 +59,12 @@ describe('a tree’s line over the save (H69)', () => {
     expect(classOf(umaOf(save, '101'), 'mage')).toEqual({ weapons: rpgDefaultWeapons('mage', 16), lines: {}, loadout: null })
   })
 
-  it('takes line B with her equipped skills following, Rend becoming Rending Combo, and back', () => {
+  it('takes line B with her equipped skills following, Supreme Cleave becoming Supreme Cleave Combo, and back', () => {
     const save = equipSkills(party(), BRAWLER, 'brawler', ['brawler-greatsword.4', 'brawler-axe.4', 'brawler-greatsword.2'], T(1))
     const b = pickBranch(save, BRAWLER, 'brawler', 'greatsword', 'B', T(2))
     expect(classOf(umaOf(b, '101'), 'brawler')).toEqual({ weapons: ['greatsword', 'axe', 'lance'], lines: { greatsword: 'B' },
       loadout: ['brawler-greatsword.4b', 'brawler-axe.4', 'brawler-greatsword.2'] })
-    expect([name('brawler-greatsword.4'), name('brawler-greatsword.4b')]).toEqual(['Rend', 'Rending Combo'])
+    expect([name('brawler-greatsword.4'), name('brawler-greatsword.4b')]).toEqual(['Supreme Cleave', 'Supreme Cleave Combo'])
     roundTrip(b)
     const a = pickBranch(b, BRAWLER, 'brawler', 'greatsword', 'A', T(3))
     expect(classOf(umaOf(a, '101'), 'brawler')).toEqual(classOf(umaOf(save, '101'), 'brawler'))

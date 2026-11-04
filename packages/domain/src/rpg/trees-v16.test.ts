@@ -10,9 +10,10 @@ import { heroLimitFor, heroLimitIds, heroLimitKinds } from './heroes'
 import {
   RPG_ACTIVE_SLOT_GATES, RPG_V2_CLASSES, RPG_BRANCH_B, RPG_BRANCH_B_NAME, RPG_MAX_ACTIVE_SLOTS, RPG_SKILL_RANK_FACTOR, rpgActiveSlots,
   rpgAutoLoadout, rpgBranchBName, rpgBranchNode, rpgClassWeapons, rpgDefaultWeapons, rpgHeldSkills, rpgLearnedSkills, rpgNodeLine, rpgSkillRank,
-  rpgSkillRankFactor, rpgSkillRankNextAt, rpgSwapBranchLoadout, rpgUsableLoadout, type RpgClass, type RpgV2Class, type RpgLines, type RpgProfile,
+  rpgSkillRankFactor, rpgSkillRankNextAt, rpgSwapBranchLoadout, rpgUsableLoadout, type RpgClass, type RpgLines, type RpgProfile, type RpgTier1Class,
   type RpgWeapon,
 } from './rules'
+import { rpgSkillName } from './skill-names'
 import { rpgSkillRankUps, rpgTreeView } from './tree-view'
 
 /** An invented Uma of a class on v16: her default weapons unless named, her Class Rank her level unless named. */
@@ -24,27 +25,7 @@ function uma(classId: RpgClass, level: number, o: { classRank?: number; lines?: 
 const ids = (refs: readonly { id: string }[]) => refs.map((r) => r.id)
 const name = (id: string) => rpgNode(id)!.name
 
-/** Branch B at depth 3 on all 50 trees, by §6.5's tables. */
-const B_AT_3: Readonly<Record<RpgV2Class, Readonly<Partial<Record<RpgWeapon, string>>>>> = {
-  brawler: { greatsword: 'Triple Sunder', axe: 'Headsman\'s Cyclone', lance: 'Skewer', bow: 'Rain of Arrows', katana: 'Flash Draw' },
-  mage: { 'tome-fire': 'Firaga Wave', 'tome-ice': 'Blizzaga Spike', 'tome-lightning': 'Thundaga Bolt', 'tome-light': 'Luxaga Cascade', 'tome-dark': 'Noxaga Pierce' },
-  spellblade: { greatsword: 'Piercing Mystic Cleave', axe: 'Piercing Mystic Hew', lance: 'Piercing Mystic Thrust', bow: 'Piercing Mystic Shot',
-    katana: 'Piercing Mystic Draw', 'tome-fire': 'Piercing Mystic Brand', 'tome-ice': 'Piercing Mystic Rime', 'tome-lightning': 'Piercing Mystic Bolt',
-    'tome-light': 'Piercing Mystic Ray', 'tome-dark': 'Piercing Mystic Shade' },
-  summoner: { greatsword: 'Knight Captain Pack', axe: 'Axe Ogre Pack', lance: 'Lance Knight Pack', bow: 'Ranger Pack', katana: 'Kensei Pack',
-    'tome-fire': 'Bonded Fire Drake', 'tome-ice': 'Bonded Ice Golem', 'tome-lightning': 'Bonded Storm Roc', 'tome-light': 'Bonded Seraph Choir',
-    'tome-dark': 'Bonded Vampire Knight' },
-  paladin: { greatsword: 'Heavy Rupture', axe: 'Heavy Maim', lance: 'Heavy Impale', bow: 'Heavy Fracture', katana: 'Heavy Hex',
-    'tome-fire': 'Heavy Bravery', 'tome-ice': 'Heavy Bulwark', 'tome-lightning': 'Heavy Surge', 'tome-light': 'Valkyrie\'s Oath', 'tome-dark': 'Heavy Clarity' },
-  cleric: { greatsword: 'Heavy Rupture', axe: 'Heavy Maim', lance: 'Heavy Impale', bow: 'Heavy Fracture', katana: 'Heavy Hex',
-    'tome-fire': 'Heavy Bravery', 'tome-ice': 'Heavy Bulwark', 'tome-lightning': 'Heavy Surge', 'tome-light': 'Rebirth', 'tome-dark': 'Heavy Clarity' },
-}
 const TREES = RPG_V2_CLASSES.flatMap((c) => rpgClassWeapons(c).map((w) => [c, w] as const))
-/** The B lines Classes v3 renamed (CV14; `trees-v19-shapes.test.ts`): names are presentation, so the live catalog names them
- * as v19 plays them since H134. */
-const RENAMED_V19: Readonly<Record<string, string>> = {
-  'brawler-bow.3b': 'Quiver Barrage', 'mage-tome-light.3b': 'Luxaga Pierce', 'mage-tome-dark.3a': 'Noxaga Barrage', 'mage-tome-light.5b': 'Holy Pierce',
-}
 
 describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
   it('runs with the Tier rework’s fight live (on 20 since D261): seven equipped slots at most', () => {
@@ -60,18 +41,20 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
     for (const [c, w] of TREES) {
       const id = rpgBranchNode(c, w, 3, 'B')
       expect(id, `${c} ${w}`).toBe(`${rpgTreeOf(c, w)}.3${RPG_BRANCH_B[c][w]}`)
-      expect(name(id), id).toBe(RENAMED_V19[id] ?? B_AT_3[c][w])
+      // Names are presentation: the live catalog's, by the skill names' grammar (D298), on every generation's ids.
+      expect(name(id), id).toBe(rpgSkillName(c as RpgTier1Class, w, 3, 'B'))
       expect(rpgBranchNode(c, w, 3, 'A'), id).toBe(`${rpgTreeOf(c, w)}.3`)
     }
-    expect(name(rpgBranchNode('brawler', 'greatsword', 5, 'B'))).toBe('Meteor Combo')
-    expect(name(rpgBranchNode('brawler', 'lance', 5, 'B'))).toBe('Gungnir')
-    expect(name(rpgBranchNode('mage', 'tome-light', 5, 'B'))).toBe(RENAMED_V19['mage-tome-light.5b'])
-    expect(name(rpgBranchNode('summoner', 'tome-fire', 5, 'B'))).toBe('Bonded Phoenix')
-    expect(name(rpgBranchNode('summoner', 'bow', 5, 'B'))).toBe('Sagittarius Pack')
-    // The lines' names for the branch sheet (v16–v18's; the Mage's Dark B is a Barrage from v19, CV14).
+    expect(name(rpgBranchNode('brawler', 'greatsword', 5, 'B'))).toBe('Meteor Strike Combo')
+    expect(name(rpgBranchNode('brawler', 'lance', 5, 'B'))).toBe('Heaven\'s Rain Impale')
+    expect(name(rpgBranchNode('mage', 'tome-light', 5, 'B'))).toBe('Sunburst Pierce')
+    expect(name(rpgBranchNode('summoner', 'tome-fire', 5, 'B'))).toBe('Phoenix Oath')
+    expect(name(rpgBranchNode('summoner', 'bow', 5, 'B'))).toBe('Sylph Lord Pack')
+    // The lines' names for the branch sheet, the live generation's: the Mage's Dark B is a Barrage from v19 (CV14), the
+    // Summoners' Bonded Oath and the healers' Heavy Surge (D298).
     expect([RPG_BRANCH_B_NAME.brawler.greatsword, RPG_BRANCH_B_NAME.brawler.lance, rpgBranchBName('mage', 'tome-dark', 18),
       RPG_BRANCH_B_NAME.spellblade.bow, RPG_BRANCH_B_NAME.summoner['tome-ice'], RPG_BRANCH_B_NAME.summoner.axe, RPG_BRANCH_B_NAME.cleric.katana])
-      .toEqual(['Combo', 'Impale', 'Pierce', 'Pierce', 'Bonded', 'Pack', 'Heavy'])
+      .toEqual(['Combo', 'Impale', 'Pierce', 'Pierce', 'Oath', 'Pack', 'Surge'])
     // The trunk is the same on either line; a tree her class lacks has no node.
     expect([rpgBranchNode('mage', 'tome-ice', 2, 'B'), rpgBranchNode('mage', 'tome-ice', 1, 'A')]).toEqual(['mage-tome-ice.2', 'mage-tome-ice.1'])
     expect(() => rpgBranchNode('brawler', 'tome-fire', 3, 'B')).toThrow(RangeError)
@@ -139,12 +122,12 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
     expect(RPG_LINE_B_POWER_V16).toEqual({ brawler: { lance: 0.95, katana: 0.9 }, mage: { 'tome-dark': 0.9, 'tome-ice': 1.1 } })
   })
 
-  it('names v16’s nodes: Pierce, Valkyrie’s Oath on the Light tree, Heavy Transfix, the Marauder and the Jotun King (CP21, CP37)', () => {
-    expect(name('spellblade-greatsword.3b')).toBe('Piercing Mystic Cleave')
-    expect(name('spellblade-tome-dark.5b')).toBe('Piercing Celestial Shade')
+  it('names v16’s nodes by the live grammar (D298): Pierce, the revive on the Light tree, the Minotaur and the Mountain King (CP21, CP37)', () => {
+    expect(name('spellblade-greatsword.3b')).toBe('Grand Sever Pierce')
+    expect(name('spellblade-tome-dark.5b')).toBe('Dusk Edge Pierce')
     expect(rpgNode('spellblade-greatsword.3b')!.summary).toBe('one foe · 1 hit · 3.335')
-    expect(name('paladin-tome-light.3b')).toBe('Valkyrie\'s Oath')
-    expect(name('paladin-lance.4b')).toBe('Heavy Transfix')
+    expect(name('paladin-tome-light.3b')).toBe('Grand Grace Surge')
+    expect(name('paladin-lance.4b')).toBe('Supreme Daze Surge')
     expect(rpgNode('paladin-tome-light.3b')!.summary).toContain('revives the fallen')
     expect(rpgNode('paladin-lance.4b')!.summary).not.toContain('revives')
     expect([rpgValkyrieOathNode(), rpgValkyrieOathNode(15)]).toEqual(['paladin-tome-light.3b', 'paladin-lance.4b'])
@@ -153,7 +136,7 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
     expect(rpgNodeSkill(rpgNode('paladin-lance.4b')!, 16).support15?.revive).toBeUndefined()
     expect(rpgNodeSkill(rpgNode('paladin-lance.4b')!, 15).support15?.revive).toBe(true)
     expect(['summoner-axe.2', 'summoner-axe.5', 'summoner-axe.2a', 'summoner-axe.5b'].map(name))
-      .toEqual(['Marauder', 'Jotun King', 'Marauder Pack', 'Bonded Jotun King'])
+      .toEqual(['Greater Minotaur', 'Mountain King', 'Marauder Pack', 'Bonded Jotun King'])
   })
 
   it('changes the halls’ two kinds v16–v18: Rampart Charge with an Axe, Choir of Angels Light then Lightning (CP35)', () => {
@@ -218,11 +201,11 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
       .toEqual(['brawler-greatsword.3', 'brawler-axe.1', 'brawler-axe.4', 'brawler-lance.4', 'brawler-lance.3', 'brawler-lance.2'])
   })
 
-  it('swaps a tree’s line with her equipped skills following, in place: Rend becomes Rending Combo (CP23)', () => {
+  it('swaps a tree’s line with her equipped skills following, in place: Supreme Cleave becomes Supreme Cleave Combo (CP23)', () => {
     const loadout = ['brawler-greatsword.4', 'brawler-axe.5', 'brawler-greatsword.2', 'brawler-greatsword.5']
     const b = rpgSwapBranchLoadout(loadout, 'brawler', 'greatsword', 'B')
     expect(b).toEqual(['brawler-greatsword.4b', 'brawler-axe.5', 'brawler-greatsword.2', 'brawler-greatsword.5b'])
-    expect([name(loadout[0]!), name(b[0]!)]).toEqual(['Rend', 'Rending Combo'])
+    expect([name(loadout[0]!), name(b[0]!)]).toEqual(['Supreme Cleave', 'Supreme Cleave Combo'])
     expect(rpgSwapBranchLoadout(b, 'brawler', 'greatsword', 'A')).toEqual(loadout)
     expect(rpgSwapBranchLoadout(loadout, 'brawler', 'greatsword', 'A')).toEqual(loadout)
     // The Lance's B is the catalog's side A; another tree's nodes stay; one id never twice.
@@ -240,14 +223,14 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
     const lance = view.trees[2]!
     expect(lance.tree).toBe('brawler-lance')
     expect(lance.nodes.map((n) => [n.id, n.name, n.line, n.held, n.open, n.gate, n.rank, n.nextRankAt, n.equipped])).toEqual([
-      ['brawler-lance.1', 'Thrust Flurry', 'trunk', true, true, 1, 5, null, false],
-      ['brawler-lance.2', 'Lance Barrage', 'trunk', true, true, 10, 5, null, false],
-      ['brawler-lance.3', 'Spiral Barrage', 'A', false, true, 20, 2, 24, false],
-      ['brawler-lance.4', 'Dragon Dive', 'A', false, false, 30, 0, 30, false],
+      ['brawler-lance.1', 'Flurry', 'trunk', true, true, 1, 5, null, false],
+      ['brawler-lance.2', 'Greater Flurry', 'trunk', true, true, 10, 5, null, false],
+      ['brawler-lance.3', 'Grand Flurry', 'A', false, true, 20, 2, 24, false],
+      ['brawler-lance.4', 'Supreme Flurry', 'A', false, false, 30, 0, 30, false],
       ['brawler-lance.5', 'Heaven\'s Rain', 'A', false, false, 40, 0, 40, false],
-      ['brawler-lance.3a', 'Skewer', 'B', true, true, 20, 2, 24, true],
-      ['brawler-lance.4a', 'Dragon Fang', 'B', false, false, 30, 0, 30, false],
-      ['brawler-lance.5a', 'Gungnir', 'B', false, false, 40, 0, 40, false],
+      ['brawler-lance.3a', 'Grand Flurry Impale', 'B', true, true, 20, 2, 24, true],
+      ['brawler-lance.4a', 'Supreme Flurry Impale', 'B', false, false, 30, 0, 30, false],
+      ['brawler-lance.5a', 'Heaven\'s Rain Impale', 'B', false, false, 40, 0, 40, false],
     ])
     expect(view.trees[0]!.nodes.filter((n) => n.held).map((n) => n.id)).toEqual(['brawler-greatsword.1', 'brawler-greatsword.2', 'brawler-greatsword.3'])
     expect(rpgTreeView(p, loadout, 15)).toBeNull()
@@ -256,9 +239,9 @@ describe('Tier 1’s trees on engine v16, the switch at 16 (H65)', () => {
   it('names the skills a Class Rank up ranks up, and the depth it opens', () => {
     const p = uma('brawler', 30, { lines: { lance: 'B' } })
     expect(rpgSkillRankUps(p, 21, 22)).toEqual([
-      { id: 'brawler-greatsword.3', name: 'Sunder', depth: 3, rank: 2, opened: false },
-      { id: 'brawler-axe.3', name: 'Cyclone', depth: 3, rank: 2, opened: false },
-      { id: 'brawler-lance.3a', name: 'Skewer', depth: 3, rank: 2, opened: false },
+      { id: 'brawler-greatsword.3', name: 'Grand Cleave', depth: 3, rank: 2, opened: false },
+      { id: 'brawler-axe.3', name: 'Grand Whirl', depth: 3, rank: 2, opened: false },
+      { id: 'brawler-lance.3a', name: 'Grand Flurry Impale', depth: 3, rank: 2, opened: false },
     ])
     expect(rpgSkillRankUps(p, 19, 20).map((u) => [u.id, u.rank, u.opened])).toEqual([
       ['brawler-greatsword.3', 1, true], ['brawler-axe.3', 1, true], ['brawler-lance.3a', 1, true],

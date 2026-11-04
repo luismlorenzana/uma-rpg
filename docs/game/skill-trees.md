@@ -70,12 +70,12 @@ are Pierce, the Bow's and Dark's Barrage (CV14). MP below is after her hand.
 | Sorcerer | Dark | Barrage | One foe, 4 · 4 · 6 hits at the depth's power, instead of the volley; −2 MP; keeps the depth-5 ×1.3 on a wounded foe |
 | Arms Spellblade | Every tree | Pierce | One Pierce hit at ×1.15 (two on an Arms tree, with her extra hit); +1 MP; no depth-5 capstone |
 | Tome Spellblade | Every tree | Pierce | One Pierce hit at ×1.15 (two on a Tome tree, with her extra hit); +1 MP; no depth-5 capstone |
-| Arms Summoner | Every Arm | Bonded | Lingers at 0.4, so its farewell strikes harder; +1 MP |
+| Arms Summoner | Every Arm | Oath | Lingers at 0.4, so its farewell strikes harder; +1 MP |
 | Arms Summoner | Every Tome | Pack | One more hit at ×0.95; same MP |
 | Tome Summoner | Every Arm | Pack | One more hit at ×0.95; same MP |
-| Tome Summoner | Every Tome | Bonded | Lingers at 0.4, so its farewell strikes harder; +1 MP |
-| Paladin, Cleric | Greatsword, Lance, Fire | Heavy | One more stack of its status; +2 or +3 MP |
-| Paladin, Cleric | Every other tree | Heavy | A mend or Barrier 15% larger, and no status; +2 or +3 MP. The Light tree's depth 3 B also revives: the Cleric's Rebirth, the Paladin's Valkyrie's Oath |
+| Tome Summoner | Every Tome | Oath | Lingers at 0.4, so its farewell strikes harder; +1 MP |
+| Paladin, Cleric | Greatsword, Lance, Fire | Surge | One more stack of its status; +2 or +3 MP |
+| Paladin, Cleric | Every other tree | Surge | A mend or Barrier 15% larger, and no status; +2 or +3 MP. The Light tree's depth 3 B, Grand Grace Surge, also revives |
 
 ## Pierce
 
@@ -103,66 +103,66 @@ unslotting a weapon takes its tree's skills out of the loadout. A Tier 0 holds t
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `brawler-greatsword.1` | Trunk | Heavy Slash | 10 | one foe · 1 hit · 1.6 |
-| 2 | `brawler-greatsword.2` | Trunk | Cleave | 14 | one foe · 1 hit · 2.2 |
-| 3 | `brawler-greatsword.3` | A | Sunder | 18 | one foe · 2 hits · 2.9 |
-| 4 | `brawler-greatsword.4` | A | Rend | 22 | one foe · 2 hits · 3.7 |
+| 1 | `brawler-greatsword.1` | Trunk | Cleave | 10 | one foe · 1 hit · 1.6 |
+| 2 | `brawler-greatsword.2` | Trunk | Greater Cleave | 14 | one foe · 1 hit · 2.2 |
+| 3 | `brawler-greatsword.3` | A | Grand Cleave | 18 | one foe · 2 hits · 2.9 |
+| 4 | `brawler-greatsword.4` | A | Supreme Cleave | 22 | one foe · 2 hits · 3.7 |
 | 5 | `brawler-greatsword.5` | A | Meteor Strike | 26 | one foe · 3 hits · 5.059 |
-| 3 | `brawler-greatsword.3b` | B · Combo | Triple Sunder | 18 | one foe · 3 hits · 2.667 |
-| 4 | `brawler-greatsword.4b` | B · Combo | Rending Combo | 22 | one foe · 3 hits · 3.405 |
-| 5 | `brawler-greatsword.5b` | B · Combo | Meteor Combo | 26 | one foe · 4 hits · 4.232 |
+| 3 | `brawler-greatsword.3b` | B · Combo | Grand Cleave Combo | 18 | one foe · 3 hits · 2.667 |
+| 4 | `brawler-greatsword.4b` | B · Combo | Supreme Cleave Combo | 22 | one foe · 3 hits · 3.405 |
+| 5 | `brawler-greatsword.5b` | B · Combo | Meteor Strike Combo | 26 | one foe · 4 hits · 4.232 |
 
 #### Brawler · Axe (`brawler-axe`), B · Reap
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `brawler-axe.1` | Trunk | Sweep | 14 | every foe · 1 hit · 0.88 |
-| 2 | `brawler-axe.2` | Trunk | Whirl | 18 | every foe · 1 hit · 1.21 |
-| 3 | `brawler-axe.3` | A | Cyclone | 22 | every foe · 2 hits · 1.596 |
-| 4 | `brawler-axe.4` | A | Quake | 26 | every foe · 2 hits · 2.036 |
+| 1 | `brawler-axe.1` | Trunk | Whirl | 14 | every foe · 1 hit · 0.88 |
+| 2 | `brawler-axe.2` | Trunk | Greater Whirl | 18 | every foe · 1 hit · 1.21 |
+| 3 | `brawler-axe.3` | A | Grand Whirl | 22 | every foe · 2 hits · 1.596 |
+| 4 | `brawler-axe.4` | A | Supreme Whirl | 26 | every foe · 2 hits · 2.036 |
 | 5 | `brawler-axe.5` | A | Maelstrom | 30 | every foe · 3 hits · 2.782 |
-| 3 | `brawler-axe.3b` | B · Reap | Headsman's Cyclone | 24 | every foe · 2 hits · 1.306 |
-| 4 | `brawler-axe.4b` | B · Reap | Guillotine Quake | 28 | every foe · 2 hits · 1.666 |
-| 5 | `brawler-axe.5b` | B · Reap | Executioner's Storm | 32 | every foe · 3 hits · 2.07 |
+| 3 | `brawler-axe.3b` | B · Reap | Grand Whirl Reap | 24 | every foe · 2 hits · 1.306 |
+| 4 | `brawler-axe.4b` | B · Reap | Supreme Whirl Reap | 28 | every foe · 2 hits · 1.666 |
+| 5 | `brawler-axe.5b` | B · Reap | Maelstrom Reap | 32 | every foe · 3 hits · 2.07 |
 
 #### Brawler · Lance (`brawler-lance`), B · Impale
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `brawler-lance.1` | Trunk | Thrust Flurry | 10 | random foes · 2 hits · 1.68 |
-| 2 | `brawler-lance.2` | Trunk | Lance Barrage | 14 | random foes · 2 hits · 2.31 |
-| 3 | `brawler-lance.3` | A | Spiral Barrage | 18 | random foes · 4 hits · 3.044 |
-| 4 | `brawler-lance.4` | A | Dragon Dive | 22 | random foes · 4 hits · 3.884 |
+| 1 | `brawler-lance.1` | Trunk | Flurry | 10 | random foes · 2 hits · 1.68 |
+| 2 | `brawler-lance.2` | Trunk | Greater Flurry | 14 | random foes · 2 hits · 2.31 |
+| 3 | `brawler-lance.3` | A | Grand Flurry | 18 | random foes · 4 hits · 3.044 |
+| 4 | `brawler-lance.4` | A | Supreme Flurry | 22 | random foes · 4 hits · 3.884 |
 | 5 | `brawler-lance.5` | A | Heaven's Rain | 26 | random foes · 6 hits · 5.313 |
-| 3 | `brawler-lance.3a` | B · Impale | Skewer | 20 | one foe · 2 hits · 3.167 |
-| 4 | `brawler-lance.4a` | B · Impale | Dragon Fang | 24 | one foe · 2 hits · 4.043 |
-| 5 | `brawler-lance.5a` | B · Impale | Gungnir | 28 | one foe · 3 hits · 5.025 |
+| 3 | `brawler-lance.3a` | B · Impale | Grand Flurry Impale | 20 | one foe · 2 hits · 3.167 |
+| 4 | `brawler-lance.4a` | B · Impale | Supreme Flurry Impale | 24 | one foe · 2 hits · 4.043 |
+| 5 | `brawler-lance.5a` | B · Impale | Heaven's Rain Impale | 28 | one foe · 3 hits · 5.025 |
 
 #### Brawler · Bow (`brawler-bow`), B · Barrage
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `brawler-bow.1` | Trunk | Twin Arrows | 12 | one foe · 1 hit · 1.28 · 0.56 on every other foe |
-| 2 | `brawler-bow.2` | Trunk | Triple Shot | 16 | one foe · 1 hit · 1.76 · 0.77 on every other foe |
-| 3 | `brawler-bow.3` | A | Quiver Volley | 20 | one foe · 2 hits · 2.32 · 1.015 on every other foe |
-| 4 | `brawler-bow.4` | A | Arrow Storm | 24 | one foe · 2 hits · 2.96 · 1.295 on every other foe |
-| 5 | `brawler-bow.5` | A | Starfall Volley | 28 | one foe · 3 hits · 4.049 · 1.771 on every other foe |
-| 3 | `brawler-bow.3b` | B · Barrage | Quiver Barrage | 18 | one foe · 4 hits · 2.9 |
-| 4 | `brawler-bow.4b` | B · Barrage | Storm Barrage | 22 | one foe · 4 hits · 3.7 |
+| 1 | `brawler-bow.1` | Trunk | Salvo | 12 | one foe · 1 hit · 1.28 · 0.56 on every other foe |
+| 2 | `brawler-bow.2` | Trunk | Greater Salvo | 16 | one foe · 1 hit · 1.76 · 0.77 on every other foe |
+| 3 | `brawler-bow.3` | A | Grand Salvo | 20 | one foe · 2 hits · 2.32 · 1.015 on every other foe |
+| 4 | `brawler-bow.4` | A | Supreme Salvo | 24 | one foe · 2 hits · 2.96 · 1.295 on every other foe |
+| 5 | `brawler-bow.5` | A | Starfall | 28 | one foe · 3 hits · 4.049 · 1.771 on every other foe |
+| 3 | `brawler-bow.3b` | B · Barrage | Grand Salvo Barrage | 18 | one foe · 4 hits · 2.9 |
+| 4 | `brawler-bow.4b` | B · Barrage | Supreme Salvo Barrage | 22 | one foe · 4 hits · 3.7 |
 | 5 | `brawler-bow.5b` | B · Barrage | Starfall Barrage | 26 | one foe · 6 hits · 5.062 |
 
 #### Brawler · Katana (`brawler-katana`), B · Draw
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `brawler-katana.1` | Trunk | Double Slash | 10 | one foe · 2 hits · 1.6 |
-| 2 | `brawler-katana.2` | Trunk | Crossing Cut | 14 | one foe · 2 hits · 2.2 |
-| 3 | `brawler-katana.3` | A | Twin Moon | 18 | one foe · 2 hits · 2.9 |
-| 4 | `brawler-katana.4` | A | Iai Storm | 22 | one foe · 2 hits · 3.7 |
+| 1 | `brawler-katana.1` | Trunk | Crescent | 10 | one foe · 2 hits · 1.6 |
+| 2 | `brawler-katana.2` | Trunk | Greater Crescent | 14 | one foe · 2 hits · 2.2 |
+| 3 | `brawler-katana.3` | A | Grand Crescent | 18 | one foe · 2 hits · 2.9 |
+| 4 | `brawler-katana.4` | A | Supreme Crescent | 22 | one foe · 2 hits · 3.7 |
 | 5 | `brawler-katana.5` | A | Moonfall | 26 | one foe · 2 hits · 4.6 |
-| 3 | `brawler-katana.3a` | B · Draw | Flash Draw | 20 | one foe · 1 hit · 3.002 |
-| 4 | `brawler-katana.4a` | B · Draw | Moonlit Draw | 24 | one foe · 1 hit · 3.83 |
-| 5 | `brawler-katana.5a` | B · Draw | Final Draw | 28 | one foe · 1 hit · 4.761 |
+| 3 | `brawler-katana.3a` | B · Draw | Grand Crescent Draw | 20 | one foe · 1 hit · 3.002 |
+| 4 | `brawler-katana.4a` | B · Draw | Supreme Crescent Draw | 24 | one foe · 1 hit · 3.83 |
+| 5 | `brawler-katana.5a` | B · Draw | Moonfall Draw | 28 | one foe · 1 hit · 4.761 |
 
 ### Arms Spellblade
 
@@ -172,533 +172,533 @@ unslotting a weapon takes its tree's skills out of the loadout. A Tier 0 holds t
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-greatsword.1` | Trunk | Rune Cleave | 5 | one foe · 1 hit · 1.6 |
-| 2 | `spellblade-greatsword.2` | Trunk | Arcane Cleave | 7 | one foe · 1 hit · 2.2 |
-| 3 | `spellblade-greatsword.3` | A | Mystic Cleave | 9 | one foe · 1 hit · 2.9 |
-| 4 | `spellblade-greatsword.4` | A | Astral Cleave | 11 | one foe · 2 hits · 3.7 |
-| 5 | `spellblade-greatsword.5` | A | Celestial Cleave | 13 | one foe · 2 hits · 5.796 |
-| 3 | `spellblade-greatsword.3b` | B · Pierce | Piercing Mystic Cleave | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-greatsword.4b` | B · Pierce | Piercing Astral Cleave | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-greatsword.5b` | B · Pierce | Piercing Celestial Cleave | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-greatsword.1` | Trunk | Sever | 5 | one foe · 1 hit · 1.6 |
+| 2 | `spellblade-greatsword.2` | Trunk | Greater Sever | 7 | one foe · 1 hit · 2.2 |
+| 3 | `spellblade-greatsword.3` | A | Grand Sever | 9 | one foe · 1 hit · 2.9 |
+| 4 | `spellblade-greatsword.4` | A | Supreme Sever | 11 | one foe · 2 hits · 3.7 |
+| 5 | `spellblade-greatsword.5` | A | Titan Edge | 13 | one foe · 2 hits · 5.796 |
+| 3 | `spellblade-greatsword.3b` | B · Pierce | Grand Sever Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-greatsword.4b` | B · Pierce | Supreme Sever Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-greatsword.5b` | B · Pierce | Titan Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Axe (`spellblade-axe`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-axe.1` | Trunk | Rune Hew | 5 | one foe · 1 hit · 1.6 |
-| 2 | `spellblade-axe.2` | Trunk | Arcane Hew | 7 | one foe · 1 hit · 2.2 |
-| 3 | `spellblade-axe.3` | A | Mystic Hew | 9 | one foe · 2 hits · 2.9 |
-| 4 | `spellblade-axe.4` | A | Astral Hew | 11 | one foe · 2 hits · 3.7 |
-| 5 | `spellblade-axe.5` | A | Celestial Hew | 13 | one foe · 2 hits · 5.796 |
-| 3 | `spellblade-axe.3b` | B · Pierce | Piercing Mystic Hew | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-axe.4b` | B · Pierce | Piercing Astral Hew | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-axe.5b` | B · Pierce | Piercing Celestial Hew | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-axe.1` | Trunk | Hew | 5 | one foe · 1 hit · 1.6 |
+| 2 | `spellblade-axe.2` | Trunk | Greater Hew | 7 | one foe · 1 hit · 2.2 |
+| 3 | `spellblade-axe.3` | A | Grand Hew | 9 | one foe · 2 hits · 2.9 |
+| 4 | `spellblade-axe.4` | A | Supreme Hew | 11 | one foe · 2 hits · 3.7 |
+| 5 | `spellblade-axe.5` | A | Gale Edge | 13 | one foe · 2 hits · 5.796 |
+| 3 | `spellblade-axe.3b` | B · Pierce | Grand Hew Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-axe.4b` | B · Pierce | Supreme Hew Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-axe.5b` | B · Pierce | Gale Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Lance (`spellblade-lance`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-lance.1` | Trunk | Rune Thrust | 5 | one foe · 2 hits · 1.6 |
-| 2 | `spellblade-lance.2` | Trunk | Arcane Thrust | 7 | one foe · 2 hits · 2.2 |
-| 3 | `spellblade-lance.3` | A | Mystic Thrust | 9 | one foe · 2 hits · 2.9 |
-| 4 | `spellblade-lance.4` | A | Astral Thrust | 11 | one foe · 3 hits · 3.699 |
-| 5 | `spellblade-lance.5` | A | Celestial Thrust | 13 | one foe · 3 hits · 5.795 |
-| 3 | `spellblade-lance.3b` | B · Pierce | Piercing Mystic Thrust | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-lance.4b` | B · Pierce | Piercing Astral Thrust | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-lance.5b` | B · Pierce | Piercing Celestial Thrust | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-lance.1` | Trunk | Lunge | 5 | one foe · 2 hits · 1.6 |
+| 2 | `spellblade-lance.2` | Trunk | Greater Lunge | 7 | one foe · 2 hits · 2.2 |
+| 3 | `spellblade-lance.3` | A | Grand Lunge | 9 | one foe · 2 hits · 2.9 |
+| 4 | `spellblade-lance.4` | A | Supreme Lunge | 11 | one foe · 3 hits · 3.699 |
+| 5 | `spellblade-lance.5` | A | Comet Edge | 13 | one foe · 3 hits · 5.795 |
+| 3 | `spellblade-lance.3b` | B · Pierce | Grand Lunge Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-lance.4b` | B · Pierce | Supreme Lunge Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-lance.5b` | B · Pierce | Comet Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Bow (`spellblade-bow`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-bow.1` | Trunk | Rune Shot | 5 | one foe · 2 hits · 1.6 |
-| 2 | `spellblade-bow.2` | Trunk | Arcane Shot | 7 | one foe · 2 hits · 2.2 |
-| 3 | `spellblade-bow.3` | A | Mystic Shot | 9 | one foe · 3 hits · 2.901 · Enfeeble 1 on the foe |
-| 4 | `spellblade-bow.4` | A | Astral Shot | 11 | one foe · 3 hits · 3.699 · Enfeeble 1 on the foe |
-| 5 | `spellblade-bow.5` | A | Celestial Shot | 13 | one foe · 4 hits · 4.6 · Enfeeble 2 on the foe |
-| 3 | `spellblade-bow.3b` | B · Pierce | Piercing Mystic Shot | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-bow.4b` | B · Pierce | Piercing Astral Shot | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-bow.5b` | B · Pierce | Piercing Celestial Shot | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-bow.1` | Trunk | Arc | 5 | one foe · 2 hits · 1.6 |
+| 2 | `spellblade-bow.2` | Trunk | Greater Arc | 7 | one foe · 2 hits · 2.2 |
+| 3 | `spellblade-bow.3` | A | Grand Arc | 9 | one foe · 3 hits · 2.901 · Enfeeble 1 on the foe |
+| 4 | `spellblade-bow.4` | A | Supreme Arc | 11 | one foe · 3 hits · 3.699 · Enfeeble 1 on the foe |
+| 5 | `spellblade-bow.5` | A | Falcon Edge | 13 | one foe · 4 hits · 4.6 · Enfeeble 2 on the foe |
+| 3 | `spellblade-bow.3b` | B · Pierce | Grand Arc Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-bow.4b` | B · Pierce | Supreme Arc Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-bow.5b` | B · Pierce | Falcon Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Katana (`spellblade-katana`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-katana.1` | Trunk | Rune Draw | 5 | one foe · 2 hits · 1.6 |
-| 2 | `spellblade-katana.2` | Trunk | Arcane Draw | 7 | one foe · 2 hits · 2.2 |
-| 3 | `spellblade-katana.3` | A | Mystic Draw | 9 | one foe · 2 hits · 2.9 · Armor Break 1 on the foe |
-| 4 | `spellblade-katana.4` | A | Astral Draw | 11 | one foe · 2 hits · 3.7 · Armor Break 1 on the foe |
-| 5 | `spellblade-katana.5` | A | Celestial Draw | 13 | one foe · 2 hits · 4.6 · Armor Break 2 on the foe |
-| 3 | `spellblade-katana.3b` | B · Pierce | Piercing Mystic Draw | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-katana.4b` | B · Pierce | Piercing Astral Draw | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-katana.5b` | B · Pierce | Piercing Celestial Draw | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-katana.1` | Trunk | Iai | 5 | one foe · 2 hits · 1.6 |
+| 2 | `spellblade-katana.2` | Trunk | Greater Iai | 7 | one foe · 2 hits · 2.2 |
+| 3 | `spellblade-katana.3` | A | Grand Iai | 9 | one foe · 2 hits · 2.9 · Armor Break 1 on the foe |
+| 4 | `spellblade-katana.4` | A | Supreme Iai | 11 | one foe · 2 hits · 3.7 · Armor Break 1 on the foe |
+| 5 | `spellblade-katana.5` | A | Moon Edge | 13 | one foe · 2 hits · 4.6 · Armor Break 2 on the foe |
+| 3 | `spellblade-katana.3b` | B · Pierce | Grand Iai Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-katana.4b` | B · Pierce | Supreme Iai Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-katana.5b` | B · Pierce | Moon Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Fire Tome (`spellblade-tome-fire`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-tome-fire.1` | Trunk | Rune Brand | 5 | one foe · 1 hit · 1.6 |
-| 2 | `spellblade-tome-fire.2` | Trunk | Arcane Brand | 7 | one foe · 1 hit · 2.2 |
-| 3 | `spellblade-tome-fire.3` | A | Mystic Brand | 9 | one foe · 1 hit · 2.9 |
-| 4 | `spellblade-tome-fire.4` | A | Astral Brand | 11 | one foe · 2 hits · 3.7 |
-| 5 | `spellblade-tome-fire.5` | A | Celestial Brand | 13 | one foe · 2 hits · 5.796 |
-| 3 | `spellblade-tome-fire.3b` | B · Pierce | Piercing Mystic Brand | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-tome-fire.4b` | B · Pierce | Piercing Astral Brand | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-tome-fire.5b` | B · Pierce | Piercing Celestial Brand | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-tome-fire.1` | Trunk | Scorch | 5 | one foe · 1 hit · 1.6 |
+| 2 | `spellblade-tome-fire.2` | Trunk | Greater Scorch | 7 | one foe · 1 hit · 2.2 |
+| 3 | `spellblade-tome-fire.3` | A | Grand Scorch | 9 | one foe · 1 hit · 2.9 |
+| 4 | `spellblade-tome-fire.4` | A | Supreme Scorch | 11 | one foe · 2 hits · 3.7 |
+| 5 | `spellblade-tome-fire.5` | A | Inferno Edge | 13 | one foe · 2 hits · 5.796 |
+| 3 | `spellblade-tome-fire.3b` | B · Pierce | Grand Scorch Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-tome-fire.4b` | B · Pierce | Supreme Scorch Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-tome-fire.5b` | B · Pierce | Inferno Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Blizzard Tome (`spellblade-tome-ice`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-tome-ice.1` | Trunk | Rune Rime | 5 | one foe · 1 hit · 1.6 |
-| 2 | `spellblade-tome-ice.2` | Trunk | Arcane Rime | 7 | one foe · 1 hit · 2.2 |
-| 3 | `spellblade-tome-ice.3` | A | Mystic Rime | 9 | one foe · 2 hits · 2.9 |
-| 4 | `spellblade-tome-ice.4` | A | Astral Rime | 11 | one foe · 2 hits · 3.7 |
-| 5 | `spellblade-tome-ice.5` | A | Celestial Rime | 13 | one foe · 2 hits · 5.796 |
-| 3 | `spellblade-tome-ice.3b` | B · Pierce | Piercing Mystic Rime | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-tome-ice.4b` | B · Pierce | Piercing Astral Rime | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-tome-ice.5b` | B · Pierce | Piercing Celestial Rime | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-tome-ice.1` | Trunk | Rime | 5 | one foe · 1 hit · 1.6 |
+| 2 | `spellblade-tome-ice.2` | Trunk | Greater Rime | 7 | one foe · 1 hit · 2.2 |
+| 3 | `spellblade-tome-ice.3` | A | Grand Rime | 9 | one foe · 2 hits · 2.9 |
+| 4 | `spellblade-tome-ice.4` | A | Supreme Rime | 11 | one foe · 2 hits · 3.7 |
+| 5 | `spellblade-tome-ice.5` | A | Glacier Edge | 13 | one foe · 2 hits · 5.796 |
+| 3 | `spellblade-tome-ice.3b` | B · Pierce | Grand Rime Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-tome-ice.4b` | B · Pierce | Supreme Rime Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-tome-ice.5b` | B · Pierce | Glacier Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Thunder Tome (`spellblade-tome-lightning`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-tome-lightning.1` | Trunk | Rune Bolt | 5 | one foe · 2 hits · 1.6 |
-| 2 | `spellblade-tome-lightning.2` | Trunk | Arcane Bolt | 7 | one foe · 2 hits · 2.2 |
-| 3 | `spellblade-tome-lightning.3` | A | Mystic Bolt | 9 | one foe · 2 hits · 2.9 |
-| 4 | `spellblade-tome-lightning.4` | A | Astral Bolt | 11 | one foe · 3 hits · 3.699 |
-| 5 | `spellblade-tome-lightning.5` | A | Celestial Bolt | 13 | one foe · 3 hits · 5.795 |
-| 3 | `spellblade-tome-lightning.3b` | B · Pierce | Piercing Mystic Bolt | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-tome-lightning.4b` | B · Pierce | Piercing Astral Bolt | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-tome-lightning.5b` | B · Pierce | Piercing Celestial Bolt | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-tome-lightning.1` | Trunk | Volt | 5 | one foe · 2 hits · 1.6 |
+| 2 | `spellblade-tome-lightning.2` | Trunk | Greater Volt | 7 | one foe · 2 hits · 2.2 |
+| 3 | `spellblade-tome-lightning.3` | A | Grand Volt | 9 | one foe · 2 hits · 2.9 |
+| 4 | `spellblade-tome-lightning.4` | A | Supreme Volt | 11 | one foe · 3 hits · 3.699 |
+| 5 | `spellblade-tome-lightning.5` | A | Storm Edge | 13 | one foe · 3 hits · 5.795 |
+| 3 | `spellblade-tome-lightning.3b` | B · Pierce | Grand Volt Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-tome-lightning.4b` | B · Pierce | Supreme Volt Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-tome-lightning.5b` | B · Pierce | Storm Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Light Tome (`spellblade-tome-light`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-tome-light.1` | Trunk | Rune Ray | 5 | one foe · 2 hits · 1.6 |
-| 2 | `spellblade-tome-light.2` | Trunk | Arcane Ray | 7 | one foe · 2 hits · 2.2 |
-| 3 | `spellblade-tome-light.3` | A | Mystic Ray | 9 | one foe · 2 hits · 2.9 · Brave and Faith 1 on every ally |
-| 4 | `spellblade-tome-light.4` | A | Astral Ray | 11 | one foe · 2 hits · 3.7 · Brave and Faith 1 on every ally |
-| 5 | `spellblade-tome-light.5` | A | Celestial Ray | 13 | one foe · 2 hits · 4.6 · Brave and Faith 2 on every ally |
-| 3 | `spellblade-tome-light.3b` | B · Pierce | Piercing Mystic Ray | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-tome-light.4b` | B · Pierce | Piercing Astral Ray | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-tome-light.5b` | B · Pierce | Piercing Celestial Ray | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-tome-light.1` | Trunk | Lumen | 5 | one foe · 2 hits · 1.6 |
+| 2 | `spellblade-tome-light.2` | Trunk | Greater Lumen | 7 | one foe · 2 hits · 2.2 |
+| 3 | `spellblade-tome-light.3` | A | Grand Lumen | 9 | one foe · 2 hits · 2.9 · Brave and Faith 1 on every ally |
+| 4 | `spellblade-tome-light.4` | A | Supreme Lumen | 11 | one foe · 2 hits · 3.7 · Brave and Faith 1 on every ally |
+| 5 | `spellblade-tome-light.5` | A | Dawn Edge | 13 | one foe · 2 hits · 4.6 · Brave and Faith 2 on every ally |
+| 3 | `spellblade-tome-light.3b` | B · Pierce | Grand Lumen Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-tome-light.4b` | B · Pierce | Supreme Lumen Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-tome-light.5b` | B · Pierce | Dawn Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Arms Spellblade · Dark Tome (`spellblade-tome-dark`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `spellblade-tome-dark.1` | Trunk | Rune Shade | 5 | one foe · 2 hits · 1.6 |
-| 2 | `spellblade-tome-dark.2` | Trunk | Arcane Shade | 7 | one foe · 2 hits · 2.2 |
-| 3 | `spellblade-tome-dark.3` | A | Mystic Shade | 9 | one foe · 3 hits · 2.901 · Mind Break 1 on the foe |
-| 4 | `spellblade-tome-dark.4` | A | Astral Shade | 11 | one foe · 3 hits · 3.699 · Mind Break 1 on the foe |
-| 5 | `spellblade-tome-dark.5` | A | Celestial Shade | 13 | one foe · 4 hits · 4.6 · Mind Break 2 on the foe |
-| 3 | `spellblade-tome-dark.3b` | B · Pierce | Piercing Mystic Shade | 10 | one foe · 1 hit · 3.335 |
-| 4 | `spellblade-tome-dark.4b` | B · Pierce | Piercing Astral Shade | 12 | one foe · 1 hit · 4.255 |
-| 5 | `spellblade-tome-dark.5b` | B · Pierce | Piercing Celestial Shade | 14 | one foe · 1 hit · 5.29 |
+| 1 | `spellblade-tome-dark.1` | Trunk | Umbra | 5 | one foe · 2 hits · 1.6 |
+| 2 | `spellblade-tome-dark.2` | Trunk | Greater Umbra | 7 | one foe · 2 hits · 2.2 |
+| 3 | `spellblade-tome-dark.3` | A | Grand Umbra | 9 | one foe · 3 hits · 2.901 · Mind Break 1 on the foe |
+| 4 | `spellblade-tome-dark.4` | A | Supreme Umbra | 11 | one foe · 3 hits · 3.699 · Mind Break 1 on the foe |
+| 5 | `spellblade-tome-dark.5` | A | Dusk Edge | 13 | one foe · 4 hits · 4.6 · Mind Break 2 on the foe |
+| 3 | `spellblade-tome-dark.3b` | B · Pierce | Grand Umbra Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `spellblade-tome-dark.4b` | B · Pierce | Supreme Umbra Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `spellblade-tome-dark.5b` | B · Pierce | Dusk Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 ### Arms Summoner
 
 10 trees; her three weapons choose three. Powers below are at Rank 3, before her hand (×0.57 on Arms, ×0.46 on Tomes) and her Skill Rank; MP is hers (×0.5).
 
-#### Arms Summoner · Greatsword (`armsummoner-greatsword`), B · Bonded
+#### Arms Summoner · Greatsword (`armsummoner-greatsword`), B · Oath
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `armsummoner-greatsword.1` | Trunk | Squire | 5 | one foe · 1 hit · 1.6 · lingers at 0.3 |
-| 2 | `armsummoner-greatsword.2` | Trunk | Shield Knight | 7 | one foe · 1 hit · 2.2 · lingers at 0.3 |
-| 3 | `armsummoner-greatsword.3` | A | Knight Captain | 9 | one foe · 2 hits · 2.9 · lingers at 0.3 |
-| 4 | `armsummoner-greatsword.4` | A | Aegis Champion | 11 | one foe · 2 hits · 3.7 · lingers at 0.3 |
+| 1 | `armsummoner-greatsword.1` | Trunk | Knight | 5 | one foe · 1 hit · 1.6 · lingers at 0.3 |
+| 2 | `armsummoner-greatsword.2` | Trunk | Greater Knight | 7 | one foe · 1 hit · 2.2 · lingers at 0.3 |
+| 3 | `armsummoner-greatsword.3` | A | Grand Knight | 9 | one foe · 2 hits · 2.9 · lingers at 0.3 |
+| 4 | `armsummoner-greatsword.4` | A | Supreme Knight | 11 | one foe · 2 hits · 3.7 · lingers at 0.3 |
 | 5 | `armsummoner-greatsword.5` | A | Sword Saint | 13 | one foe · 3 hits · 4.967 · lingers at 0.3 |
-| 3 | `armsummoner-greatsword.3b` | B · Bonded | Bonded Knight Captain | 10 | one foe · 2 hits · 2.9 · lingers at 0.4 |
-| 4 | `armsummoner-greatsword.4b` | B · Bonded | Bonded Aegis Champion | 12 | one foe · 2 hits · 3.7 · lingers at 0.4 |
-| 5 | `armsummoner-greatsword.5b` | B · Bonded | Bonded Sword Saint | 14 | one foe · 3 hits · 4.967 · lingers at 0.4 |
+| 3 | `armsummoner-greatsword.3b` | B · Oath | Grand Knight Oath | 10 | one foe · 2 hits · 2.9 · lingers at 0.4 |
+| 4 | `armsummoner-greatsword.4b` | B · Oath | Supreme Knight Oath | 12 | one foe · 2 hits · 3.7 · lingers at 0.4 |
+| 5 | `armsummoner-greatsword.5b` | B · Oath | Sword Saint Oath | 14 | one foe · 3 hits · 4.967 · lingers at 0.4 |
 
-#### Arms Summoner · Axe (`armsummoner-axe`), B · Bonded
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `armsummoner-axe.1` | Trunk | Brigand | 7 | every foe · 1 hit · 0.88 · lingers at 0.3 |
-| 2 | `armsummoner-axe.2` | Trunk | Marauder | 9 | every foe · 1 hit · 1.21 · lingers at 0.3 |
-| 3 | `armsummoner-axe.3` | A | Axe Ogre | 11 | every foe · 2 hits · 1.596 · lingers at 0.3 |
-| 4 | `armsummoner-axe.4` | A | Minotaur Chief | 13 | every foe · 2 hits · 2.036 · lingers at 0.3 |
-| 5 | `armsummoner-axe.5` | A | Jotun King | 15 | every foe · 3 hits · 2.731 · lingers at 0.3 |
-| 3 | `armsummoner-axe.3b` | B · Bonded | Bonded Axe Ogre | 12 | every foe · 2 hits · 1.596 · lingers at 0.4 |
-| 4 | `armsummoner-axe.4b` | B · Bonded | Bonded Minotaur Chief | 14 | every foe · 2 hits · 2.036 · lingers at 0.4 |
-| 5 | `armsummoner-axe.5b` | B · Bonded | Bonded Jotun King | 16 | every foe · 3 hits · 2.731 · lingers at 0.4 |
-
-#### Arms Summoner · Lance (`armsummoner-lance`), B · Bonded
+#### Arms Summoner · Axe (`armsummoner-axe`), B · Oath
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `armsummoner-lance.1` | Trunk | Pikeman | 5 | random foes · 2 hits · 1.68 · lingers at 0.3 |
-| 2 | `armsummoner-lance.2` | Trunk | Dragoon | 7 | random foes · 2 hits · 2.31 · lingers at 0.3 |
-| 3 | `armsummoner-lance.3` | A | Lance Knight | 9 | random foes · 3 hits · 3.045 · lingers at 0.3 |
-| 4 | `armsummoner-lance.4` | A | Valkyrie | 11 | random foes · 3 hits · 3.885 · lingers at 0.3 |
-| 5 | `armsummoner-lance.5` | A | Valkyrie Queen | 13 | random foes · 4 hits · 5.219 · lingers at 0.3 |
-| 3 | `armsummoner-lance.3b` | B · Bonded | Bonded Lance Knight | 10 | random foes · 3 hits · 3.045 · lingers at 0.4 |
-| 4 | `armsummoner-lance.4b` | B · Bonded | Bonded Valkyrie | 12 | random foes · 3 hits · 3.885 · lingers at 0.4 |
-| 5 | `armsummoner-lance.5b` | B · Bonded | Bonded Valkyrie Queen | 14 | random foes · 4 hits · 5.219 · lingers at 0.4 |
+| 1 | `armsummoner-axe.1` | Trunk | Minotaur | 7 | every foe · 1 hit · 0.88 · lingers at 0.3 |
+| 2 | `armsummoner-axe.2` | Trunk | Greater Minotaur | 9 | every foe · 1 hit · 1.21 · lingers at 0.3 |
+| 3 | `armsummoner-axe.3` | A | Grand Minotaur | 11 | every foe · 2 hits · 1.596 · lingers at 0.3 |
+| 4 | `armsummoner-axe.4` | A | Supreme Minotaur | 13 | every foe · 2 hits · 2.036 · lingers at 0.3 |
+| 5 | `armsummoner-axe.5` | A | Mountain King | 15 | every foe · 3 hits · 2.731 · lingers at 0.3 |
+| 3 | `armsummoner-axe.3b` | B · Oath | Grand Minotaur Oath | 12 | every foe · 2 hits · 1.596 · lingers at 0.4 |
+| 4 | `armsummoner-axe.4b` | B · Oath | Supreme Minotaur Oath | 14 | every foe · 2 hits · 2.036 · lingers at 0.4 |
+| 5 | `armsummoner-axe.5b` | B · Oath | Mountain King Oath | 16 | every foe · 3 hits · 2.731 · lingers at 0.4 |
 
-#### Arms Summoner · Bow (`armsummoner-bow`), B · Bonded
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `armsummoner-bow.1` | Trunk | Slinger | 6 | one foe · 1 hit · 1.28 · 0.56 on every other foe · lingers at 0.3 |
-| 2 | `armsummoner-bow.2` | Trunk | Archer | 8 | one foe · 1 hit · 1.76 · 0.77 on every other foe · lingers at 0.3 |
-| 3 | `armsummoner-bow.3` | A | Ranger | 10 | one foe · 2 hits · 2.32 · 1.015 on every other foe · Enfeeble 1 on the foe · lingers at 0.3 |
-| 4 | `armsummoner-bow.4` | A | Sylph Archer | 12 | one foe · 2 hits · 2.96 · 1.295 on every other foe · Enfeeble 1 on the foe · lingers at 0.3 |
-| 5 | `armsummoner-bow.5` | A | Sagittarius | 14 | one foe · 3 hits · 3.681 · 1.61 on every other foe · Enfeeble 2 on the foe · lingers at 0.3 |
-| 3 | `armsummoner-bow.3b` | B · Bonded | Bonded Ranger | 11 | one foe · 2 hits · 2.32 · 1.015 on every other foe · lingers at 0.4 |
-| 4 | `armsummoner-bow.4b` | B · Bonded | Bonded Sylph Archer | 13 | one foe · 2 hits · 2.96 · 1.295 on every other foe · lingers at 0.4 |
-| 5 | `armsummoner-bow.5b` | B · Bonded | Bonded Sagittarius | 15 | one foe · 3 hits · 3.975 · 1.739 on every other foe · lingers at 0.4 |
-
-#### Arms Summoner · Katana (`armsummoner-katana`), B · Bonded
+#### Arms Summoner · Lance (`armsummoner-lance`), B · Oath
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `armsummoner-katana.1` | Trunk | Ronin | 5 | one foe · 2 hits · 1.6 · lingers at 0.3 |
-| 2 | `armsummoner-katana.2` | Trunk | Samurai | 7 | one foe · 2 hits · 2.2 · lingers at 0.3 |
-| 3 | `armsummoner-katana.3` | A | Kensei | 9 | one foe · 2 hits · 2.9 · Armor Break 1 on the foe · lingers at 0.3 |
-| 4 | `armsummoner-katana.4` | A | Blade Shogun | 11 | one foe · 2 hits · 3.7 · Armor Break 1 on the foe · lingers at 0.3 |
-| 5 | `armsummoner-katana.5` | A | Sword Spirit | 13 | one foe · 2 hits · 4.6 · Armor Break 2 on the foe · lingers at 0.3 |
-| 3 | `armsummoner-katana.3b` | B · Bonded | Bonded Kensei | 10 | one foe · 2 hits · 2.9 · lingers at 0.4 |
-| 4 | `armsummoner-katana.4b` | B · Bonded | Bonded Blade Shogun | 12 | one foe · 2 hits · 3.7 · lingers at 0.4 |
-| 5 | `armsummoner-katana.5b` | B · Bonded | Bonded Sword Spirit | 14 | one foe · 2 hits · 4.6 · lingers at 0.4 |
+| 1 | `armsummoner-lance.1` | Trunk | Dragoon | 5 | random foes · 2 hits · 1.68 · lingers at 0.3 |
+| 2 | `armsummoner-lance.2` | Trunk | Greater Dragoon | 7 | random foes · 2 hits · 2.31 · lingers at 0.3 |
+| 3 | `armsummoner-lance.3` | A | Grand Dragoon | 9 | random foes · 3 hits · 3.045 · lingers at 0.3 |
+| 4 | `armsummoner-lance.4` | A | Supreme Dragoon | 11 | random foes · 3 hits · 3.885 · lingers at 0.3 |
+| 5 | `armsummoner-lance.5` | A | Valkyrie | 13 | random foes · 4 hits · 5.219 · lingers at 0.3 |
+| 3 | `armsummoner-lance.3b` | B · Oath | Grand Dragoon Oath | 10 | random foes · 3 hits · 3.045 · lingers at 0.4 |
+| 4 | `armsummoner-lance.4b` | B · Oath | Supreme Dragoon Oath | 12 | random foes · 3 hits · 3.885 · lingers at 0.4 |
+| 5 | `armsummoner-lance.5b` | B · Oath | Valkyrie Oath | 14 | random foes · 4 hits · 5.219 · lingers at 0.4 |
+
+#### Arms Summoner · Bow (`armsummoner-bow`), B · Oath
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `armsummoner-bow.1` | Trunk | Archer | 6 | one foe · 1 hit · 1.28 · 0.56 on every other foe · lingers at 0.3 |
+| 2 | `armsummoner-bow.2` | Trunk | Greater Archer | 8 | one foe · 1 hit · 1.76 · 0.77 on every other foe · lingers at 0.3 |
+| 3 | `armsummoner-bow.3` | A | Grand Archer | 10 | one foe · 2 hits · 2.32 · 1.015 on every other foe · Enfeeble 1 on the foe · lingers at 0.3 |
+| 4 | `armsummoner-bow.4` | A | Supreme Archer | 12 | one foe · 2 hits · 2.96 · 1.295 on every other foe · Enfeeble 1 on the foe · lingers at 0.3 |
+| 5 | `armsummoner-bow.5` | A | Sylph Lord | 14 | one foe · 3 hits · 3.681 · 1.61 on every other foe · Enfeeble 2 on the foe · lingers at 0.3 |
+| 3 | `armsummoner-bow.3b` | B · Oath | Grand Archer Oath | 11 | one foe · 2 hits · 2.32 · 1.015 on every other foe · lingers at 0.4 |
+| 4 | `armsummoner-bow.4b` | B · Oath | Supreme Archer Oath | 13 | one foe · 2 hits · 2.96 · 1.295 on every other foe · lingers at 0.4 |
+| 5 | `armsummoner-bow.5b` | B · Oath | Sylph Lord Oath | 15 | one foe · 3 hits · 3.975 · 1.739 on every other foe · lingers at 0.4 |
+
+#### Arms Summoner · Katana (`armsummoner-katana`), B · Oath
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `armsummoner-katana.1` | Trunk | Samurai | 5 | one foe · 2 hits · 1.6 · lingers at 0.3 |
+| 2 | `armsummoner-katana.2` | Trunk | Greater Samurai | 7 | one foe · 2 hits · 2.2 · lingers at 0.3 |
+| 3 | `armsummoner-katana.3` | A | Grand Samurai | 9 | one foe · 2 hits · 2.9 · Armor Break 1 on the foe · lingers at 0.3 |
+| 4 | `armsummoner-katana.4` | A | Supreme Samurai | 11 | one foe · 2 hits · 3.7 · Armor Break 1 on the foe · lingers at 0.3 |
+| 5 | `armsummoner-katana.5` | A | Shogun | 13 | one foe · 2 hits · 4.6 · Armor Break 2 on the foe · lingers at 0.3 |
+| 3 | `armsummoner-katana.3b` | B · Oath | Grand Samurai Oath | 10 | one foe · 2 hits · 2.9 · lingers at 0.4 |
+| 4 | `armsummoner-katana.4b` | B · Oath | Supreme Samurai Oath | 12 | one foe · 2 hits · 3.7 · lingers at 0.4 |
+| 5 | `armsummoner-katana.5b` | B · Oath | Shogun Oath | 14 | one foe · 2 hits · 4.6 · lingers at 0.4 |
 
 #### Arms Summoner · Fire Tome (`armsummoner-tome-fire`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `armsummoner-tome-fire.1` | Trunk | Ember Sprites | 5 | one foe · 1 hit · 1.6 · lingers at 0.3 |
-| 2 | `armsummoner-tome-fire.2` | Trunk | Salamander | 7 | one foe · 1 hit · 2.2 · lingers at 0.3 |
-| 3 | `armsummoner-tome-fire.3` | A | Fire Drake | 9 | one foe · 2 hits · 2.9 · lingers at 0.3 |
-| 4 | `armsummoner-tome-fire.4` | A | Infernal Wyrm | 11 | one foe · 2 hits · 3.7 · lingers at 0.3 |
+| 1 | `armsummoner-tome-fire.1` | Trunk | Drake | 5 | one foe · 1 hit · 1.6 · lingers at 0.3 |
+| 2 | `armsummoner-tome-fire.2` | Trunk | Greater Drake | 7 | one foe · 1 hit · 2.2 · lingers at 0.3 |
+| 3 | `armsummoner-tome-fire.3` | A | Grand Drake | 9 | one foe · 2 hits · 2.9 · lingers at 0.3 |
+| 4 | `armsummoner-tome-fire.4` | A | Supreme Drake | 11 | one foe · 2 hits · 3.7 · lingers at 0.3 |
 | 5 | `armsummoner-tome-fire.5` | A | Phoenix | 13 | one foe · 3 hits · 4.967 · lingers at 0.3 |
-| 3 | `armsummoner-tome-fire.3a` | B · Pack | Fire Drake Pack | 9 | one foe · 3 hits · 2.754 · lingers at 0.3 |
-| 4 | `armsummoner-tome-fire.4a` | B · Pack | Infernal Wyrm Pack | 11 | one foe · 3 hits · 3.516 · lingers at 0.3 |
+| 3 | `armsummoner-tome-fire.3a` | B · Pack | Grand Drake Pack | 9 | one foe · 3 hits · 2.754 · lingers at 0.3 |
+| 4 | `armsummoner-tome-fire.4a` | B · Pack | Supreme Drake Pack | 11 | one foe · 3 hits · 3.516 · lingers at 0.3 |
 | 5 | `armsummoner-tome-fire.5a` | B · Pack | Phoenix Pack | 13 | one foe · 4 hits · 4.717 · lingers at 0.3 |
 
 #### Arms Summoner · Blizzard Tome (`armsummoner-tome-ice`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `armsummoner-tome-ice.1` | Trunk | Frost Sprites | 7 | every foe · 1 hit · 0.88 · lingers at 0.3 |
-| 2 | `armsummoner-tome-ice.2` | Trunk | Snow Sentinel | 9 | every foe · 2 hits · 1.21 · lingers at 0.3 |
-| 3 | `armsummoner-tome-ice.3` | A | Ice Golem | 11 | every foe · 2 hits · 1.596 · lingers at 0.3 |
-| 4 | `armsummoner-tome-ice.4` | A | Frost Titan | 13 | every foe · 3 hits · 2.034 · lingers at 0.3 |
+| 1 | `armsummoner-tome-ice.1` | Trunk | Golem | 7 | every foe · 1 hit · 0.88 · lingers at 0.3 |
+| 2 | `armsummoner-tome-ice.2` | Trunk | Greater Golem | 9 | every foe · 2 hits · 1.21 · lingers at 0.3 |
+| 3 | `armsummoner-tome-ice.3` | A | Grand Golem | 11 | every foe · 2 hits · 1.596 · lingers at 0.3 |
+| 4 | `armsummoner-tome-ice.4` | A | Supreme Golem | 13 | every foe · 3 hits · 2.034 · lingers at 0.3 |
 | 5 | `armsummoner-tome-ice.5` | A | Winter Queen | 15 | every foe · 3 hits · 2.731 · lingers at 0.3 |
-| 3 | `armsummoner-tome-ice.3a` | B · Pack | Ice Golem Pack | 11 | every foe · 3 hits · 1.515 · lingers at 0.3 |
-| 4 | `armsummoner-tome-ice.4a` | B · Pack | Frost Titan Pack | 13 | every foe · 4 hits · 1.932 · lingers at 0.3 |
+| 3 | `armsummoner-tome-ice.3a` | B · Pack | Grand Golem Pack | 11 | every foe · 3 hits · 1.515 · lingers at 0.3 |
+| 4 | `armsummoner-tome-ice.4a` | B · Pack | Supreme Golem Pack | 13 | every foe · 4 hits · 1.932 · lingers at 0.3 |
 | 5 | `armsummoner-tome-ice.5a` | B · Pack | Winter Queen Pack | 15 | every foe · 4 hits · 2.596 · lingers at 0.3 |
 
 #### Arms Summoner · Thunder Tome (`armsummoner-tome-lightning`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `armsummoner-tome-lightning.1` | Trunk | Spark Sprites | 5 | random foes · 2 hits · 1.68 · lingers at 0.3 |
-| 2 | `armsummoner-tome-lightning.2` | Trunk | Thunderbird | 7 | random foes · 2 hits · 2.31 · lingers at 0.3 |
-| 3 | `armsummoner-tome-lightning.3` | A | Storm Roc | 9 | random foes · 3 hits · 3.045 · lingers at 0.3 |
-| 4 | `armsummoner-tome-lightning.4` | A | Thunder Kirin | 11 | random foes · 3 hits · 3.885 · lingers at 0.3 |
-| 5 | `armsummoner-tome-lightning.5` | A | Raijin | 13 | random foes · 4 hits · 5.219 · lingers at 0.3 |
-| 3 | `armsummoner-tome-lightning.3a` | B · Pack | Storm Roc Pack | 9 | random foes · 4 hits · 2.892 · lingers at 0.3 |
-| 4 | `armsummoner-tome-lightning.4a` | B · Pack | Thunder Kirin Pack | 11 | random foes · 4 hits · 3.692 · lingers at 0.3 |
-| 5 | `armsummoner-tome-lightning.5a` | B · Pack | Raijin Pack | 13 | random foes · 5 hits · 4.957 · lingers at 0.3 |
+| 1 | `armsummoner-tome-lightning.1` | Trunk | Roc | 5 | random foes · 2 hits · 1.68 · lingers at 0.3 |
+| 2 | `armsummoner-tome-lightning.2` | Trunk | Greater Roc | 7 | random foes · 2 hits · 2.31 · lingers at 0.3 |
+| 3 | `armsummoner-tome-lightning.3` | A | Grand Roc | 9 | random foes · 3 hits · 3.045 · lingers at 0.3 |
+| 4 | `armsummoner-tome-lightning.4` | A | Supreme Roc | 11 | random foes · 3 hits · 3.885 · lingers at 0.3 |
+| 5 | `armsummoner-tome-lightning.5` | A | Kirin | 13 | random foes · 4 hits · 5.219 · lingers at 0.3 |
+| 3 | `armsummoner-tome-lightning.3a` | B · Pack | Grand Roc Pack | 9 | random foes · 4 hits · 2.892 · lingers at 0.3 |
+| 4 | `armsummoner-tome-lightning.4a` | B · Pack | Supreme Roc Pack | 11 | random foes · 4 hits · 3.692 · lingers at 0.3 |
+| 5 | `armsummoner-tome-lightning.5a` | B · Pack | Kirin Pack | 13 | random foes · 5 hits · 4.957 · lingers at 0.3 |
 
 #### Arms Summoner · Light Tome (`armsummoner-tome-light`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `armsummoner-tome-light.1` | Trunk | Cherub | 5 | one foe · 2 hits · 1.6 · lingers at 0.3 |
-| 2 | `armsummoner-tome-light.2` | Trunk | Mending Angel | 7 | one foe · 2 hits · 2.2 · lingers at 0.3 |
-| 3 | `armsummoner-tome-light.3` | A | Seraph Choir | 9 | one foe · 2 hits · 2.9 · Brave and Faith 1 on every ally · lingers at 0.3 |
-| 4 | `armsummoner-tome-light.4` | A | Dominion Host | 11 | one foe · 2 hits · 3.7 · Brave and Faith 1 on every ally · lingers at 0.3 |
-| 5 | `armsummoner-tome-light.5` | A | Heaven's Legion | 13 | one foe · 2 hits · 4.6 · Brave and Faith 2 on every ally · lingers at 0.3 |
-| 3 | `armsummoner-tome-light.3a` | B · Pack | Seraph Choir Pack | 9 | one foe · 3 hits · 2.754 · lingers at 0.3 |
-| 4 | `armsummoner-tome-light.4a` | B · Pack | Dominion Host Pack | 11 | one foe · 3 hits · 3.516 · lingers at 0.3 |
-| 5 | `armsummoner-tome-light.5a` | B · Pack | Heaven's Legion Pack | 13 | one foe · 3 hits · 4.371 · lingers at 0.3 |
+| 1 | `armsummoner-tome-light.1` | Trunk | Angel | 5 | one foe · 2 hits · 1.6 · lingers at 0.3 |
+| 2 | `armsummoner-tome-light.2` | Trunk | Greater Angel | 7 | one foe · 2 hits · 2.2 · lingers at 0.3 |
+| 3 | `armsummoner-tome-light.3` | A | Grand Angel | 9 | one foe · 2 hits · 2.9 · Brave and Faith 1 on every ally · lingers at 0.3 |
+| 4 | `armsummoner-tome-light.4` | A | Supreme Angel | 11 | one foe · 2 hits · 3.7 · Brave and Faith 1 on every ally · lingers at 0.3 |
+| 5 | `armsummoner-tome-light.5` | A | Archon | 13 | one foe · 2 hits · 4.6 · Brave and Faith 2 on every ally · lingers at 0.3 |
+| 3 | `armsummoner-tome-light.3a` | B · Pack | Grand Angel Pack | 9 | one foe · 3 hits · 2.754 · lingers at 0.3 |
+| 4 | `armsummoner-tome-light.4a` | B · Pack | Supreme Angel Pack | 11 | one foe · 3 hits · 3.516 · lingers at 0.3 |
+| 5 | `armsummoner-tome-light.5a` | B · Pack | Archon Pack | 13 | one foe · 3 hits · 4.371 · lingers at 0.3 |
 
 #### Arms Summoner · Dark Tome (`armsummoner-tome-dark`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `armsummoner-tome-dark.1` | Trunk | Leech Imp | 6 | one foe · 1 hit · 1.28 · 0.56 on every other foe · lingers at 0.3 |
-| 2 | `armsummoner-tome-dark.2` | Trunk | Night Bat | 8 | one foe · 1 hit · 1.76 · 0.77 on every other foe · lingers at 0.3 |
-| 3 | `armsummoner-tome-dark.3` | A | Vampire Knight | 10 | one foe · 2 hits · 2.32 · 1.015 on every other foe · Mind Break 1 on the foe · lingers at 0.3 |
-| 4 | `armsummoner-tome-dark.4` | A | Blood Countess | 12 | one foe · 2 hits · 2.96 · 1.295 on every other foe · Mind Break 1 on the foe · lingers at 0.3 |
-| 5 | `armsummoner-tome-dark.5` | A | Abyssal Overlord | 14 | one foe · 3 hits · 3.681 · 1.61 on every other foe · Mind Break 2 on the foe · lingers at 0.3 |
-| 3 | `armsummoner-tome-dark.3a` | B · Pack | Vampire Knight Pack | 10 | one foe · 3 hits · 2.205 · 0.964 on every other foe · lingers at 0.3 |
-| 4 | `armsummoner-tome-dark.4a` | B · Pack | Blood Countess Pack | 12 | one foe · 3 hits · 2.811 · 1.23 on every other foe · lingers at 0.3 |
-| 5 | `armsummoner-tome-dark.5a` | B · Pack | Abyssal Overlord Pack | 14 | one foe · 4 hits · 3.776 · 1.651 on every other foe · lingers at 0.3 |
+| 1 | `armsummoner-tome-dark.1` | Trunk | Vampire | 6 | one foe · 1 hit · 1.28 · 0.56 on every other foe · lingers at 0.3 |
+| 2 | `armsummoner-tome-dark.2` | Trunk | Greater Vampire | 8 | one foe · 1 hit · 1.76 · 0.77 on every other foe · lingers at 0.3 |
+| 3 | `armsummoner-tome-dark.3` | A | Grand Vampire | 10 | one foe · 2 hits · 2.32 · 1.015 on every other foe · Mind Break 1 on the foe · lingers at 0.3 |
+| 4 | `armsummoner-tome-dark.4` | A | Supreme Vampire | 12 | one foe · 2 hits · 2.96 · 1.295 on every other foe · Mind Break 1 on the foe · lingers at 0.3 |
+| 5 | `armsummoner-tome-dark.5` | A | Blood Countess | 14 | one foe · 3 hits · 3.681 · 1.61 on every other foe · Mind Break 2 on the foe · lingers at 0.3 |
+| 3 | `armsummoner-tome-dark.3a` | B · Pack | Grand Vampire Pack | 10 | one foe · 3 hits · 2.205 · 0.964 on every other foe · lingers at 0.3 |
+| 4 | `armsummoner-tome-dark.4a` | B · Pack | Supreme Vampire Pack | 12 | one foe · 3 hits · 2.811 · 1.23 on every other foe · lingers at 0.3 |
+| 5 | `armsummoner-tome-dark.5a` | B · Pack | Blood Countess Pack | 14 | one foe · 4 hits · 3.776 · 1.651 on every other foe · lingers at 0.3 |
 
 ### Paladin
 
 10 trees; her three weapons choose three. Powers below are at Rank 3, before her hand (×0.5) and her Skill Rank; MP is hers (×0.6).
 
-#### Paladin · Greatsword (`paladin-greatsword`), B · Heavy
+#### Paladin · Greatsword (`paladin-greatsword`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `paladin-greatsword.1` | Trunk | Breach | 6 | one foe · 1 hit · 1.6 · Armor Break 1 on the foe · Barrier 28% on the most threatened |
-| 2 | `paladin-greatsword.2` | Trunk | Sunder Armor | 8 | one foe · 1 hit · 2.2 · Armor Break 1 on the foe · Barrier 32% on the most threatened |
-| 3 | `paladin-greatsword.3` | A | Rupture | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 36% on the most threatened |
-| 4 | `paladin-greatsword.4` | A | Ravage | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 40% on the most threatened |
+| 2 | `paladin-greatsword.2` | Trunk | Greater Breach | 8 | one foe · 1 hit · 2.2 · Armor Break 1 on the foe · Barrier 32% on the most threatened |
+| 3 | `paladin-greatsword.3` | A | Grand Breach | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 36% on the most threatened |
+| 4 | `paladin-greatsword.4` | A | Supreme Breach | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 40% on the most threatened |
 | 5 | `paladin-greatsword.5` | A | Ruin | 16 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
-| 3 | `paladin-greatsword.3b` | B · Heavy | Heavy Rupture | 13 | one foe · 1 hit · 2.9 · Armor Break 3 on the foe · Barrier 36% on the most threatened |
-| 4 | `paladin-greatsword.4b` | B · Heavy | Heavy Ravage | 16 | one foe · 1 hit · 3.7 · Armor Break 3 on the foe · Barrier 40% on the most threatened |
-| 5 | `paladin-greatsword.5b` | B · Heavy | Heavy Ruin | 18 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
+| 3 | `paladin-greatsword.3b` | B · Surge | Grand Breach Surge | 13 | one foe · 1 hit · 2.9 · Armor Break 3 on the foe · Barrier 36% on the most threatened |
+| 4 | `paladin-greatsword.4b` | B · Surge | Supreme Breach Surge | 16 | one foe · 1 hit · 3.7 · Armor Break 3 on the foe · Barrier 40% on the most threatened |
+| 5 | `paladin-greatsword.5b` | B · Surge | Ruin Surge | 18 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
 
-#### Paladin · Axe (`paladin-axe`), B · Heavy
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `paladin-axe.1` | Trunk | Hack | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
-| 2 | `paladin-axe.2` | Trunk | Hamstring | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
-| 3 | `paladin-axe.3` | A | Maim | 11 | one foe · 1 hit · 2.9 · Barrier 36% on the most threatened |
-| 4 | `paladin-axe.4` | A | Cripple | 13 | one foe · 1 hit · 3.7 · Barrier 40% on the most threatened |
-| 5 | `paladin-axe.5` | A | Unmake | 16 | one foe · 1 hit · 4.6 · Barrier 44% on every ally |
-| 3 | `paladin-axe.3b` | B · Heavy | Heavy Maim | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
-| 4 | `paladin-axe.4b` | B · Heavy | Heavy Cripple | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
-| 5 | `paladin-axe.5b` | B · Heavy | Heavy Unmake | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
-
-#### Paladin · Lance (`paladin-lance`), B · Heavy
+#### Paladin · Axe (`paladin-axe`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `paladin-lance.1` | Trunk | Pierce Mind | 6 | one foe · 1 hit · 1.6 · Mind Break 1 on the foe · Barrier 28% on the most threatened |
-| 2 | `paladin-lance.2` | Trunk | Puncture | 8 | one foe · 1 hit · 2.2 · Mind Break 1 on the foe · Barrier 32% on the most threatened |
-| 3 | `paladin-lance.3` | A | Impale | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · Barrier 36% on the most threatened |
-| 4 | `paladin-lance.4` | A | Transfix | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · Barrier 40% on the most threatened |
-| 5 | `paladin-lance.5` | A | Mindspike | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 44% on every ally |
-| 3 | `paladin-lance.3b` | B · Heavy | Heavy Impale | 13 | one foe · 1 hit · 2.9 · Mind Break 3 on the foe · Barrier 36% on the most threatened |
-| 4 | `paladin-lance.4b` | B · Heavy | Heavy Transfix | 16 | one foe · 1 hit · 3.7 · Mind Break 3 on the foe · Barrier 40% on the most threatened |
-| 5 | `paladin-lance.5b` | B · Heavy | Heavy Mindspike | 18 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 44% on every ally |
+| 1 | `paladin-axe.1` | Trunk | Rampart | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
+| 2 | `paladin-axe.2` | Trunk | Greater Rampart | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
+| 3 | `paladin-axe.3` | A | Grand Rampart | 11 | one foe · 1 hit · 2.9 · Barrier 36% on the most threatened |
+| 4 | `paladin-axe.4` | A | Supreme Rampart | 13 | one foe · 1 hit · 3.7 · Barrier 40% on the most threatened |
+| 5 | `paladin-axe.5` | A | Citadel | 16 | one foe · 1 hit · 4.6 · Barrier 44% on every ally |
+| 3 | `paladin-axe.3b` | B · Surge | Grand Rampart Surge | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
+| 4 | `paladin-axe.4b` | B · Surge | Supreme Rampart Surge | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
+| 5 | `paladin-axe.5b` | B · Surge | Citadel Surge | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
 
-#### Paladin · Bow (`paladin-bow`), B · Heavy
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `paladin-bow.1` | Trunk | Chip | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
-| 2 | `paladin-bow.2` | Trunk | Crack | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
-| 3 | `paladin-bow.3` | A | Fracture | 11 | one foe · 1 hit · 2.9 · Enfeeble 2 on the foe · Barrier 36% on the most threatened |
-| 4 | `paladin-bow.4` | A | Splinter | 13 | one foe · 1 hit · 3.7 · Enfeeble 2 on the foe · Barrier 40% on the most threatened |
-| 5 | `paladin-bow.5` | A | Shatterstorm | 16 | one foe · 1 hit · 4.6 · Enfeeble 3 on every foe · Barrier 44% on every ally |
-| 3 | `paladin-bow.3b` | B · Heavy | Heavy Fracture | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
-| 4 | `paladin-bow.4b` | B · Heavy | Heavy Splinter | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
-| 5 | `paladin-bow.5b` | B · Heavy | Heavy Shatterstorm | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
-
-#### Paladin · Katana (`paladin-katana`), B · Heavy
+#### Paladin · Lance (`paladin-lance`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `paladin-katana.1` | Trunk | Mark | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
-| 2 | `paladin-katana.2` | Trunk | Curse | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
-| 3 | `paladin-katana.3` | A | Hex | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 36% on the most threatened |
-| 4 | `paladin-katana.4` | A | Doom | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 40% on the most threatened |
-| 5 | `paladin-katana.5` | A | Anathema | 16 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
-| 3 | `paladin-katana.3b` | B · Heavy | Heavy Hex | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
-| 4 | `paladin-katana.4b` | B · Heavy | Heavy Doom | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
-| 5 | `paladin-katana.5b` | B · Heavy | Heavy Anathema | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
+| 1 | `paladin-lance.1` | Trunk | Daze | 6 | one foe · 1 hit · 1.6 · Mind Break 1 on the foe · Barrier 28% on the most threatened |
+| 2 | `paladin-lance.2` | Trunk | Greater Daze | 8 | one foe · 1 hit · 2.2 · Mind Break 1 on the foe · Barrier 32% on the most threatened |
+| 3 | `paladin-lance.3` | A | Grand Daze | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · Barrier 36% on the most threatened |
+| 4 | `paladin-lance.4` | A | Supreme Daze | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · Barrier 40% on the most threatened |
+| 5 | `paladin-lance.5` | A | Oblivion | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 44% on every ally |
+| 3 | `paladin-lance.3b` | B · Surge | Grand Daze Surge | 13 | one foe · 1 hit · 2.9 · Mind Break 3 on the foe · Barrier 36% on the most threatened |
+| 4 | `paladin-lance.4b` | B · Surge | Supreme Daze Surge | 16 | one foe · 1 hit · 3.7 · Mind Break 3 on the foe · Barrier 40% on the most threatened |
+| 5 | `paladin-lance.5b` | B · Surge | Oblivion Surge | 18 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 44% on every ally |
 
-#### Paladin · Fire Tome (`paladin-tome-fire`), B · Heavy
+#### Paladin · Bow (`paladin-bow`), B · Surge
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `paladin-bow.1` | Trunk | Wither | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
+| 2 | `paladin-bow.2` | Trunk | Greater Wither | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
+| 3 | `paladin-bow.3` | A | Grand Wither | 11 | one foe · 1 hit · 2.9 · Enfeeble 2 on the foe · Barrier 36% on the most threatened |
+| 4 | `paladin-bow.4` | A | Supreme Wither | 13 | one foe · 1 hit · 3.7 · Enfeeble 2 on the foe · Barrier 40% on the most threatened |
+| 5 | `paladin-bow.5` | A | Blight | 16 | one foe · 1 hit · 4.6 · Enfeeble 3 on every foe · Barrier 44% on every ally |
+| 3 | `paladin-bow.3b` | B · Surge | Grand Wither Surge | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
+| 4 | `paladin-bow.4b` | B · Surge | Supreme Wither Surge | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
+| 5 | `paladin-bow.5b` | B · Surge | Blight Surge | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
+
+#### Paladin · Katana (`paladin-katana`), B · Surge
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `paladin-katana.1` | Trunk | Rend | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
+| 2 | `paladin-katana.2` | Trunk | Greater Rend | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
+| 3 | `paladin-katana.3` | A | Grand Rend | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 36% on the most threatened |
+| 4 | `paladin-katana.4` | A | Supreme Rend | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 40% on the most threatened |
+| 5 | `paladin-katana.5` | A | Doom | 16 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
+| 3 | `paladin-katana.3b` | B · Surge | Grand Rend Surge | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
+| 4 | `paladin-katana.4b` | B · Surge | Supreme Rend Surge | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
+| 5 | `paladin-katana.5b` | B · Surge | Doom Surge | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
+
+#### Paladin · Fire Tome (`paladin-tome-fire`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `paladin-tome-fire.1` | Trunk | Valor | 6 | one foe · 1 hit · 1.6 · Brave and Faith 1 on every ally · heals the most hurt 28% · cleanses |
-| 2 | `paladin-tome-fire.2` | Trunk | Courage | 8 | one foe · 1 hit · 2.2 · Brave and Faith 1 on every ally · heals the most hurt 32% · cleanses |
-| 3 | `paladin-tome-fire.3` | A | Bravery | 11 | one foe · 1 hit · 2.9 · Brave and Faith 2 on every ally · heals the most hurt 36% · cleanses |
-| 4 | `paladin-tome-fire.4` | A | Heroism | 13 | one foe · 1 hit · 3.7 · Brave and Faith 2 on every ally · heals the most hurt 40% · cleanses |
+| 2 | `paladin-tome-fire.2` | Trunk | Greater Valor | 8 | one foe · 1 hit · 2.2 · Brave and Faith 1 on every ally · heals the most hurt 32% · cleanses |
+| 3 | `paladin-tome-fire.3` | A | Grand Valor | 11 | one foe · 1 hit · 2.9 · Brave and Faith 2 on every ally · heals the most hurt 36% · cleanses |
+| 4 | `paladin-tome-fire.4` | A | Supreme Valor | 13 | one foe · 1 hit · 3.7 · Brave and Faith 2 on every ally · heals the most hurt 40% · cleanses |
 | 5 | `paladin-tome-fire.5` | A | Exaltation | 16 | one foe · 1 hit · 4.6 · Brave and Faith 3 on every ally · heals every ally 44% · cleanses |
-| 3 | `paladin-tome-fire.3b` | B · Heavy | Heavy Bravery | 13 | one foe · 1 hit · 2.9 · Brave and Faith 3 on every ally · heals the most hurt 36% · cleanses |
-| 4 | `paladin-tome-fire.4b` | B · Heavy | Heavy Heroism | 16 | one foe · 1 hit · 3.7 · Brave and Faith 3 on every ally · heals the most hurt 40% · cleanses |
-| 5 | `paladin-tome-fire.5b` | B · Heavy | Heavy Exaltation | 18 | one foe · 1 hit · 4.6 · Brave and Faith 3 on every ally · heals every ally 44% · cleanses |
+| 3 | `paladin-tome-fire.3b` | B · Surge | Grand Valor Surge | 13 | one foe · 1 hit · 2.9 · Brave and Faith 3 on every ally · heals the most hurt 36% · cleanses |
+| 4 | `paladin-tome-fire.4b` | B · Surge | Supreme Valor Surge | 16 | one foe · 1 hit · 3.7 · Brave and Faith 3 on every ally · heals the most hurt 40% · cleanses |
+| 5 | `paladin-tome-fire.5b` | B · Surge | Exaltation Surge | 18 | one foe · 1 hit · 4.6 · Brave and Faith 3 on every ally · heals every ally 44% · cleanses |
 
-#### Paladin · Blizzard Tome (`paladin-tome-ice`), B · Heavy
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `paladin-tome-ice.1` | Trunk | Ward | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · Barrier 14% on every ally · cleanses |
-| 2 | `paladin-tome-ice.2` | Trunk | Guard | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · Barrier 16% on every ally · cleanses |
-| 3 | `paladin-tome-ice.3` | A | Bulwark | 11 | one foe · 1 hit · 2.9 · heals the most hurt 36% · Barrier 18% on every ally · cleanses |
-| 4 | `paladin-tome-ice.4` | A | Fortress | 13 | one foe · 1 hit · 3.7 · heals the most hurt 40% · Barrier 20% on every ally · cleanses |
-| 5 | `paladin-tome-ice.5` | A | Sanctum | 16 | one foe · 1 hit · 4.6 · heals every ally 44% · Barrier 22% on every ally · cleanses |
-| 3 | `paladin-tome-ice.3b` | B · Heavy | Heavy Bulwark | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · Barrier 21% on every ally · cleanses |
-| 4 | `paladin-tome-ice.4b` | B · Heavy | Heavy Fortress | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · Barrier 23% on every ally · cleanses |
-| 5 | `paladin-tome-ice.5b` | B · Heavy | Heavy Sanctum | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · Barrier 25% on every ally · cleanses |
-
-#### Paladin · Thunder Tome (`paladin-tome-lightning`), B · Heavy
+#### Paladin · Blizzard Tome (`paladin-tome-ice`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `paladin-tome-lightning.1` | Trunk | Spark | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · cleanses |
-| 2 | `paladin-tome-lightning.2` | Trunk | Charge | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · cleanses |
-| 3 | `paladin-tome-lightning.3` | A | Surge | 11 | one foe · 1 hit · 2.9 · heals the most hurt 36% · cleanses |
-| 4 | `paladin-tome-lightning.4` | A | Overcharge | 13 | one foe · 1 hit · 3.7 · heals the most hurt 40% · cleanses |
-| 5 | `paladin-tome-lightning.5` | A | Breakstorm | 16 | one foe · 1 hit · 4.6 · heals every ally 44% · cleanses |
-| 3 | `paladin-tome-lightning.3b` | B · Heavy | Heavy Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · cleanses |
-| 4 | `paladin-tome-lightning.4b` | B · Heavy | Heavy Overcharge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · cleanses |
-| 5 | `paladin-tome-lightning.5b` | B · Heavy | Heavy Breakstorm | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · cleanses |
+| 1 | `paladin-tome-ice.1` | Trunk | Haven | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · Barrier 14% on every ally · cleanses |
+| 2 | `paladin-tome-ice.2` | Trunk | Greater Haven | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · Barrier 16% on every ally · cleanses |
+| 3 | `paladin-tome-ice.3` | A | Grand Haven | 11 | one foe · 1 hit · 2.9 · heals the most hurt 36% · Barrier 18% on every ally · cleanses |
+| 4 | `paladin-tome-ice.4` | A | Supreme Haven | 13 | one foe · 1 hit · 3.7 · heals the most hurt 40% · Barrier 20% on every ally · cleanses |
+| 5 | `paladin-tome-ice.5` | A | Sanctuary | 16 | one foe · 1 hit · 4.6 · heals every ally 44% · Barrier 22% on every ally · cleanses |
+| 3 | `paladin-tome-ice.3b` | B · Surge | Grand Haven Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · Barrier 21% on every ally · cleanses |
+| 4 | `paladin-tome-ice.4b` | B · Surge | Supreme Haven Surge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · Barrier 23% on every ally · cleanses |
+| 5 | `paladin-tome-ice.5b` | B · Surge | Sanctuary Surge | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · Barrier 25% on every ally · cleanses |
 
-#### Paladin · Light Tome (`paladin-tome-light`), B · Heavy
+#### Paladin · Thunder Tome (`paladin-tome-lightning`), B · Surge
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `paladin-tome-lightning.1` | Trunk | Pulse | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · cleanses |
+| 2 | `paladin-tome-lightning.2` | Trunk | Greater Pulse | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · cleanses |
+| 3 | `paladin-tome-lightning.3` | A | Grand Pulse | 11 | one foe · 1 hit · 2.9 · heals the most hurt 36% · cleanses |
+| 4 | `paladin-tome-lightning.4` | A | Supreme Pulse | 13 | one foe · 1 hit · 3.7 · heals the most hurt 40% · cleanses |
+| 5 | `paladin-tome-lightning.5` | A | Stormheart | 16 | one foe · 1 hit · 4.6 · heals every ally 44% · cleanses |
+| 3 | `paladin-tome-lightning.3b` | B · Surge | Grand Pulse Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · cleanses |
+| 4 | `paladin-tome-lightning.4b` | B · Surge | Supreme Pulse Surge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · cleanses |
+| 5 | `paladin-tome-lightning.5b` | B · Surge | Stormheart Surge | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · cleanses |
+
+#### Paladin · Light Tome (`paladin-tome-light`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `paladin-tome-light.1` | Trunk | Grace | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · Regen 2 rounds · cleanses |
-| 2 | `paladin-tome-light.2` | Trunk | Faith | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · Regen 2 rounds · cleanses |
-| 3 | `paladin-tome-light.3` | A | Devotion | 11 | one foe · 1 hit · 2.9 · Brave and Faith 2 on every ally · heals the most hurt 36% · Regen 2 rounds · cleanses |
-| 4 | `paladin-tome-light.4` | A | Piety | 13 | one foe · 1 hit · 3.7 · Brave and Faith 2 on every ally · heals the most hurt 40% · Regen 2 rounds · cleanses |
+| 2 | `paladin-tome-light.2` | Trunk | Greater Grace | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · Regen 2 rounds · cleanses |
+| 3 | `paladin-tome-light.3` | A | Grand Grace | 11 | one foe · 1 hit · 2.9 · Brave and Faith 2 on every ally · heals the most hurt 36% · Regen 2 rounds · cleanses |
+| 4 | `paladin-tome-light.4` | A | Supreme Grace | 13 | one foe · 1 hit · 3.7 · Brave and Faith 2 on every ally · heals the most hurt 40% · Regen 2 rounds · cleanses |
 | 5 | `paladin-tome-light.5` | A | Benediction | 16 | one foe · 1 hit · 4.6 · Brave and Faith 3 on every ally · heals every ally 44% · Regen 2 rounds · cleanses |
-| 3 | `paladin-tome-light.3b` | B · Heavy | Valkyrie's Oath | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · Regen 2 rounds · cleanses · revives the fallen |
-| 4 | `paladin-tome-light.4b` | B · Heavy | Heavy Piety | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · Regen 2 rounds · cleanses |
-| 5 | `paladin-tome-light.5b` | B · Heavy | Heavy Benediction | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · Regen 2 rounds · cleanses |
+| 3 | `paladin-tome-light.3b` | B · Surge | Grand Grace Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · Regen 2 rounds · cleanses · revives the fallen |
+| 4 | `paladin-tome-light.4b` | B · Surge | Supreme Grace Surge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · Regen 2 rounds · cleanses |
+| 5 | `paladin-tome-light.5b` | B · Surge | Benediction Surge | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · Regen 2 rounds · cleanses |
 
-#### Paladin · Dark Tome (`paladin-tome-dark`), B · Heavy
+#### Paladin · Dark Tome (`paladin-tome-dark`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `paladin-tome-dark.1` | Trunk | Calm | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · cleanses · heals 30% of its damage |
-| 2 | `paladin-tome-dark.2` | Trunk | Focus | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · cleanses · heals 30% of its damage |
-| 3 | `paladin-tome-dark.3` | A | Clarity | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · heals the most hurt 36% · cleanses · heals 30% of its damage |
-| 4 | `paladin-tome-dark.4` | A | Insight | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · heals the most hurt 40% · cleanses · heals 30% of its damage |
-| 5 | `paladin-tome-dark.5` | A | Enlightenment | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · heals every ally 44% · cleanses · heals 30% of its damage |
-| 3 | `paladin-tome-dark.3b` | B · Heavy | Heavy Clarity | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · cleanses · heals 30% of its damage |
-| 4 | `paladin-tome-dark.4b` | B · Heavy | Heavy Insight | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · cleanses · heals 30% of its damage |
-| 5 | `paladin-tome-dark.5b` | B · Heavy | Heavy Enlightenment | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · cleanses · heals 30% of its damage |
+| 1 | `paladin-tome-dark.1` | Trunk | Siphon | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · cleanses · heals 30% of its damage |
+| 2 | `paladin-tome-dark.2` | Trunk | Greater Siphon | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · cleanses · heals 30% of its damage |
+| 3 | `paladin-tome-dark.3` | A | Grand Siphon | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · heals the most hurt 36% · cleanses · heals 30% of its damage |
+| 4 | `paladin-tome-dark.4` | A | Supreme Siphon | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · heals the most hurt 40% · cleanses · heals 30% of its damage |
+| 5 | `paladin-tome-dark.5` | A | Eventide | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · heals every ally 44% · cleanses · heals 30% of its damage |
+| 3 | `paladin-tome-dark.3b` | B · Surge | Grand Siphon Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · cleanses · heals 30% of its damage |
+| 4 | `paladin-tome-dark.4b` | B · Surge | Supreme Siphon Surge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · cleanses · heals 30% of its damage |
+| 5 | `paladin-tome-dark.5b` | B · Surge | Eventide Surge | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · cleanses · heals 30% of its damage |
 
 ### Cleric
 
 10 trees; her three weapons choose three. Powers below are at Rank 3, before her hand (×0.5) and her Skill Rank; MP is hers (×0.6).
 
-#### Cleric · Greatsword (`cleric-greatsword`), B · Heavy
+#### Cleric · Greatsword (`cleric-greatsword`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `cleric-greatsword.1` | Trunk | Breach | 6 | one foe · 1 hit · 1.6 · Armor Break 1 on the foe · Barrier 28% on the most threatened |
-| 2 | `cleric-greatsword.2` | Trunk | Sunder Armor | 8 | one foe · 1 hit · 2.2 · Armor Break 1 on the foe · Barrier 32% on the most threatened |
-| 3 | `cleric-greatsword.3` | A | Rupture | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 36% on the most threatened |
-| 4 | `cleric-greatsword.4` | A | Ravage | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 40% on the most threatened |
+| 2 | `cleric-greatsword.2` | Trunk | Greater Breach | 8 | one foe · 1 hit · 2.2 · Armor Break 1 on the foe · Barrier 32% on the most threatened |
+| 3 | `cleric-greatsword.3` | A | Grand Breach | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 36% on the most threatened |
+| 4 | `cleric-greatsword.4` | A | Supreme Breach | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 40% on the most threatened |
 | 5 | `cleric-greatsword.5` | A | Ruin | 16 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
-| 3 | `cleric-greatsword.3b` | B · Heavy | Heavy Rupture | 13 | one foe · 1 hit · 2.9 · Armor Break 3 on the foe · Barrier 36% on the most threatened |
-| 4 | `cleric-greatsword.4b` | B · Heavy | Heavy Ravage | 16 | one foe · 1 hit · 3.7 · Armor Break 3 on the foe · Barrier 40% on the most threatened |
-| 5 | `cleric-greatsword.5b` | B · Heavy | Heavy Ruin | 18 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
+| 3 | `cleric-greatsword.3b` | B · Surge | Grand Breach Surge | 13 | one foe · 1 hit · 2.9 · Armor Break 3 on the foe · Barrier 36% on the most threatened |
+| 4 | `cleric-greatsword.4b` | B · Surge | Supreme Breach Surge | 16 | one foe · 1 hit · 3.7 · Armor Break 3 on the foe · Barrier 40% on the most threatened |
+| 5 | `cleric-greatsword.5b` | B · Surge | Ruin Surge | 18 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
 
-#### Cleric · Axe (`cleric-axe`), B · Heavy
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `cleric-axe.1` | Trunk | Hack | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
-| 2 | `cleric-axe.2` | Trunk | Hamstring | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
-| 3 | `cleric-axe.3` | A | Maim | 11 | one foe · 1 hit · 2.9 · Barrier 36% on the most threatened |
-| 4 | `cleric-axe.4` | A | Cripple | 13 | one foe · 1 hit · 3.7 · Barrier 40% on the most threatened |
-| 5 | `cleric-axe.5` | A | Unmake | 16 | one foe · 1 hit · 4.6 · Barrier 44% on every ally |
-| 3 | `cleric-axe.3b` | B · Heavy | Heavy Maim | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
-| 4 | `cleric-axe.4b` | B · Heavy | Heavy Cripple | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
-| 5 | `cleric-axe.5b` | B · Heavy | Heavy Unmake | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
-
-#### Cleric · Lance (`cleric-lance`), B · Heavy
+#### Cleric · Axe (`cleric-axe`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `cleric-lance.1` | Trunk | Pierce Mind | 6 | one foe · 1 hit · 1.6 · Mind Break 1 on the foe · Barrier 28% on the most threatened |
-| 2 | `cleric-lance.2` | Trunk | Puncture | 8 | one foe · 1 hit · 2.2 · Mind Break 1 on the foe · Barrier 32% on the most threatened |
-| 3 | `cleric-lance.3` | A | Impale | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · Barrier 36% on the most threatened |
-| 4 | `cleric-lance.4` | A | Transfix | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · Barrier 40% on the most threatened |
-| 5 | `cleric-lance.5` | A | Mindspike | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 44% on every ally |
-| 3 | `cleric-lance.3b` | B · Heavy | Heavy Impale | 13 | one foe · 1 hit · 2.9 · Mind Break 3 on the foe · Barrier 36% on the most threatened |
-| 4 | `cleric-lance.4b` | B · Heavy | Heavy Transfix | 16 | one foe · 1 hit · 3.7 · Mind Break 3 on the foe · Barrier 40% on the most threatened |
-| 5 | `cleric-lance.5b` | B · Heavy | Heavy Mindspike | 18 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 44% on every ally |
+| 1 | `cleric-axe.1` | Trunk | Rampart | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
+| 2 | `cleric-axe.2` | Trunk | Greater Rampart | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
+| 3 | `cleric-axe.3` | A | Grand Rampart | 11 | one foe · 1 hit · 2.9 · Barrier 36% on the most threatened |
+| 4 | `cleric-axe.4` | A | Supreme Rampart | 13 | one foe · 1 hit · 3.7 · Barrier 40% on the most threatened |
+| 5 | `cleric-axe.5` | A | Citadel | 16 | one foe · 1 hit · 4.6 · Barrier 44% on every ally |
+| 3 | `cleric-axe.3b` | B · Surge | Grand Rampart Surge | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
+| 4 | `cleric-axe.4b` | B · Surge | Supreme Rampart Surge | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
+| 5 | `cleric-axe.5b` | B · Surge | Citadel Surge | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
 
-#### Cleric · Bow (`cleric-bow`), B · Heavy
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `cleric-bow.1` | Trunk | Chip | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
-| 2 | `cleric-bow.2` | Trunk | Crack | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
-| 3 | `cleric-bow.3` | A | Fracture | 11 | one foe · 1 hit · 2.9 · Enfeeble 2 on the foe · Barrier 36% on the most threatened |
-| 4 | `cleric-bow.4` | A | Splinter | 13 | one foe · 1 hit · 3.7 · Enfeeble 2 on the foe · Barrier 40% on the most threatened |
-| 5 | `cleric-bow.5` | A | Shatterstorm | 16 | one foe · 1 hit · 4.6 · Enfeeble 3 on every foe · Barrier 44% on every ally |
-| 3 | `cleric-bow.3b` | B · Heavy | Heavy Fracture | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
-| 4 | `cleric-bow.4b` | B · Heavy | Heavy Splinter | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
-| 5 | `cleric-bow.5b` | B · Heavy | Heavy Shatterstorm | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
-
-#### Cleric · Katana (`cleric-katana`), B · Heavy
+#### Cleric · Lance (`cleric-lance`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `cleric-katana.1` | Trunk | Mark | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
-| 2 | `cleric-katana.2` | Trunk | Curse | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
-| 3 | `cleric-katana.3` | A | Hex | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 36% on the most threatened |
-| 4 | `cleric-katana.4` | A | Doom | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 40% on the most threatened |
-| 5 | `cleric-katana.5` | A | Anathema | 16 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
-| 3 | `cleric-katana.3b` | B · Heavy | Heavy Hex | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
-| 4 | `cleric-katana.4b` | B · Heavy | Heavy Doom | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
-| 5 | `cleric-katana.5b` | B · Heavy | Heavy Anathema | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
+| 1 | `cleric-lance.1` | Trunk | Daze | 6 | one foe · 1 hit · 1.6 · Mind Break 1 on the foe · Barrier 28% on the most threatened |
+| 2 | `cleric-lance.2` | Trunk | Greater Daze | 8 | one foe · 1 hit · 2.2 · Mind Break 1 on the foe · Barrier 32% on the most threatened |
+| 3 | `cleric-lance.3` | A | Grand Daze | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · Barrier 36% on the most threatened |
+| 4 | `cleric-lance.4` | A | Supreme Daze | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · Barrier 40% on the most threatened |
+| 5 | `cleric-lance.5` | A | Oblivion | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 44% on every ally |
+| 3 | `cleric-lance.3b` | B · Surge | Grand Daze Surge | 13 | one foe · 1 hit · 2.9 · Mind Break 3 on the foe · Barrier 36% on the most threatened |
+| 4 | `cleric-lance.4b` | B · Surge | Supreme Daze Surge | 16 | one foe · 1 hit · 3.7 · Mind Break 3 on the foe · Barrier 40% on the most threatened |
+| 5 | `cleric-lance.5b` | B · Surge | Oblivion Surge | 18 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · Barrier 44% on every ally |
 
-#### Cleric · Fire Tome (`cleric-tome-fire`), B · Heavy
+#### Cleric · Bow (`cleric-bow`), B · Surge
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `cleric-bow.1` | Trunk | Wither | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
+| 2 | `cleric-bow.2` | Trunk | Greater Wither | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
+| 3 | `cleric-bow.3` | A | Grand Wither | 11 | one foe · 1 hit · 2.9 · Enfeeble 2 on the foe · Barrier 36% on the most threatened |
+| 4 | `cleric-bow.4` | A | Supreme Wither | 13 | one foe · 1 hit · 3.7 · Enfeeble 2 on the foe · Barrier 40% on the most threatened |
+| 5 | `cleric-bow.5` | A | Blight | 16 | one foe · 1 hit · 4.6 · Enfeeble 3 on every foe · Barrier 44% on every ally |
+| 3 | `cleric-bow.3b` | B · Surge | Grand Wither Surge | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
+| 4 | `cleric-bow.4b` | B · Surge | Supreme Wither Surge | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
+| 5 | `cleric-bow.5b` | B · Surge | Blight Surge | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
+
+#### Cleric · Katana (`cleric-katana`), B · Surge
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `cleric-katana.1` | Trunk | Rend | 6 | one foe · 1 hit · 1.6 · Barrier 28% on the most threatened |
+| 2 | `cleric-katana.2` | Trunk | Greater Rend | 8 | one foe · 1 hit · 2.2 · Barrier 32% on the most threatened |
+| 3 | `cleric-katana.3` | A | Grand Rend | 11 | one foe · 1 hit · 2.9 · Armor Break 2 on the foe · Barrier 36% on the most threatened |
+| 4 | `cleric-katana.4` | A | Supreme Rend | 13 | one foe · 1 hit · 3.7 · Armor Break 2 on the foe · Barrier 40% on the most threatened |
+| 5 | `cleric-katana.5` | A | Doom | 16 | one foe · 1 hit · 4.6 · Armor Break 3 on every foe · Barrier 44% on every ally |
+| 3 | `cleric-katana.3b` | B · Surge | Grand Rend Surge | 13 | one foe · 1 hit · 2.9 · Barrier 41% on the most threatened |
+| 4 | `cleric-katana.4b` | B · Surge | Supreme Rend Surge | 16 | one foe · 1 hit · 3.7 · Barrier 46% on the most threatened |
+| 5 | `cleric-katana.5b` | B · Surge | Doom Surge | 18 | one foe · 1 hit · 4.6 · Barrier 51% on every ally |
+
+#### Cleric · Fire Tome (`cleric-tome-fire`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `cleric-tome-fire.1` | Trunk | Valor | 6 | one foe · 1 hit · 1.6 · Brave and Faith 1 on every ally · heals the most hurt 28% · cleanses |
-| 2 | `cleric-tome-fire.2` | Trunk | Courage | 8 | one foe · 1 hit · 2.2 · Brave and Faith 1 on every ally · heals the most hurt 32% · cleanses |
-| 3 | `cleric-tome-fire.3` | A | Bravery | 11 | one foe · 1 hit · 2.9 · Brave and Faith 2 on every ally · heals the most hurt 36% · cleanses |
-| 4 | `cleric-tome-fire.4` | A | Heroism | 13 | one foe · 1 hit · 3.7 · Brave and Faith 2 on every ally · heals the most hurt 40% · cleanses |
+| 2 | `cleric-tome-fire.2` | Trunk | Greater Valor | 8 | one foe · 1 hit · 2.2 · Brave and Faith 1 on every ally · heals the most hurt 32% · cleanses |
+| 3 | `cleric-tome-fire.3` | A | Grand Valor | 11 | one foe · 1 hit · 2.9 · Brave and Faith 2 on every ally · heals the most hurt 36% · cleanses |
+| 4 | `cleric-tome-fire.4` | A | Supreme Valor | 13 | one foe · 1 hit · 3.7 · Brave and Faith 2 on every ally · heals the most hurt 40% · cleanses |
 | 5 | `cleric-tome-fire.5` | A | Exaltation | 16 | one foe · 1 hit · 4.6 · Brave and Faith 3 on every ally · heals every ally 44% · cleanses |
-| 3 | `cleric-tome-fire.3b` | B · Heavy | Heavy Bravery | 13 | one foe · 1 hit · 2.9 · Brave and Faith 3 on every ally · heals the most hurt 36% · cleanses |
-| 4 | `cleric-tome-fire.4b` | B · Heavy | Heavy Heroism | 16 | one foe · 1 hit · 3.7 · Brave and Faith 3 on every ally · heals the most hurt 40% · cleanses |
-| 5 | `cleric-tome-fire.5b` | B · Heavy | Heavy Exaltation | 18 | one foe · 1 hit · 4.6 · Brave and Faith 3 on every ally · heals every ally 44% · cleanses |
+| 3 | `cleric-tome-fire.3b` | B · Surge | Grand Valor Surge | 13 | one foe · 1 hit · 2.9 · Brave and Faith 3 on every ally · heals the most hurt 36% · cleanses |
+| 4 | `cleric-tome-fire.4b` | B · Surge | Supreme Valor Surge | 16 | one foe · 1 hit · 3.7 · Brave and Faith 3 on every ally · heals the most hurt 40% · cleanses |
+| 5 | `cleric-tome-fire.5b` | B · Surge | Exaltation Surge | 18 | one foe · 1 hit · 4.6 · Brave and Faith 3 on every ally · heals every ally 44% · cleanses |
 
-#### Cleric · Blizzard Tome (`cleric-tome-ice`), B · Heavy
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `cleric-tome-ice.1` | Trunk | Ward | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · Barrier 14% on every ally · cleanses |
-| 2 | `cleric-tome-ice.2` | Trunk | Guard | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · Barrier 16% on every ally · cleanses |
-| 3 | `cleric-tome-ice.3` | A | Bulwark | 11 | one foe · 1 hit · 2.9 · heals the most hurt 36% · Barrier 18% on every ally · cleanses |
-| 4 | `cleric-tome-ice.4` | A | Fortress | 13 | one foe · 1 hit · 3.7 · heals the most hurt 40% · Barrier 20% on every ally · cleanses |
-| 5 | `cleric-tome-ice.5` | A | Sanctum | 16 | one foe · 1 hit · 4.6 · heals every ally 44% · Barrier 22% on every ally · cleanses |
-| 3 | `cleric-tome-ice.3b` | B · Heavy | Heavy Bulwark | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · Barrier 21% on every ally · cleanses |
-| 4 | `cleric-tome-ice.4b` | B · Heavy | Heavy Fortress | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · Barrier 23% on every ally · cleanses |
-| 5 | `cleric-tome-ice.5b` | B · Heavy | Heavy Sanctum | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · Barrier 25% on every ally · cleanses |
-
-#### Cleric · Thunder Tome (`cleric-tome-lightning`), B · Heavy
+#### Cleric · Blizzard Tome (`cleric-tome-ice`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `cleric-tome-lightning.1` | Trunk | Spark | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · cleanses |
-| 2 | `cleric-tome-lightning.2` | Trunk | Charge | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · cleanses |
-| 3 | `cleric-tome-lightning.3` | A | Surge | 11 | one foe · 1 hit · 2.9 · heals the most hurt 36% · cleanses |
-| 4 | `cleric-tome-lightning.4` | A | Overcharge | 13 | one foe · 1 hit · 3.7 · heals the most hurt 40% · cleanses |
-| 5 | `cleric-tome-lightning.5` | A | Breakstorm | 16 | one foe · 1 hit · 4.6 · heals every ally 44% · cleanses |
-| 3 | `cleric-tome-lightning.3b` | B · Heavy | Heavy Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · cleanses |
-| 4 | `cleric-tome-lightning.4b` | B · Heavy | Heavy Overcharge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · cleanses |
-| 5 | `cleric-tome-lightning.5b` | B · Heavy | Heavy Breakstorm | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · cleanses |
+| 1 | `cleric-tome-ice.1` | Trunk | Haven | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · Barrier 14% on every ally · cleanses |
+| 2 | `cleric-tome-ice.2` | Trunk | Greater Haven | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · Barrier 16% on every ally · cleanses |
+| 3 | `cleric-tome-ice.3` | A | Grand Haven | 11 | one foe · 1 hit · 2.9 · heals the most hurt 36% · Barrier 18% on every ally · cleanses |
+| 4 | `cleric-tome-ice.4` | A | Supreme Haven | 13 | one foe · 1 hit · 3.7 · heals the most hurt 40% · Barrier 20% on every ally · cleanses |
+| 5 | `cleric-tome-ice.5` | A | Sanctuary | 16 | one foe · 1 hit · 4.6 · heals every ally 44% · Barrier 22% on every ally · cleanses |
+| 3 | `cleric-tome-ice.3b` | B · Surge | Grand Haven Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · Barrier 21% on every ally · cleanses |
+| 4 | `cleric-tome-ice.4b` | B · Surge | Supreme Haven Surge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · Barrier 23% on every ally · cleanses |
+| 5 | `cleric-tome-ice.5b` | B · Surge | Sanctuary Surge | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · Barrier 25% on every ally · cleanses |
 
-#### Cleric · Light Tome (`cleric-tome-light`), B · Heavy
+#### Cleric · Thunder Tome (`cleric-tome-lightning`), B · Surge
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `cleric-tome-lightning.1` | Trunk | Pulse | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · cleanses |
+| 2 | `cleric-tome-lightning.2` | Trunk | Greater Pulse | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · cleanses |
+| 3 | `cleric-tome-lightning.3` | A | Grand Pulse | 11 | one foe · 1 hit · 2.9 · heals the most hurt 36% · cleanses |
+| 4 | `cleric-tome-lightning.4` | A | Supreme Pulse | 13 | one foe · 1 hit · 3.7 · heals the most hurt 40% · cleanses |
+| 5 | `cleric-tome-lightning.5` | A | Stormheart | 16 | one foe · 1 hit · 4.6 · heals every ally 44% · cleanses |
+| 3 | `cleric-tome-lightning.3b` | B · Surge | Grand Pulse Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · cleanses |
+| 4 | `cleric-tome-lightning.4b` | B · Surge | Supreme Pulse Surge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · cleanses |
+| 5 | `cleric-tome-lightning.5b` | B · Surge | Stormheart Surge | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · cleanses |
+
+#### Cleric · Light Tome (`cleric-tome-light`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `cleric-tome-light.1` | Trunk | Grace | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · Regen 2 rounds · cleanses |
-| 2 | `cleric-tome-light.2` | Trunk | Faith | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · Regen 2 rounds · cleanses |
-| 3 | `cleric-tome-light.3` | A | Devotion | 11 | one foe · 1 hit · 2.9 · Brave and Faith 2 on every ally · heals the most hurt 36% · Regen 2 rounds · cleanses |
-| 4 | `cleric-tome-light.4` | A | Piety | 13 | one foe · 1 hit · 3.7 · Brave and Faith 2 on every ally · heals the most hurt 40% · Regen 2 rounds · cleanses |
+| 2 | `cleric-tome-light.2` | Trunk | Greater Grace | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · Regen 2 rounds · cleanses |
+| 3 | `cleric-tome-light.3` | A | Grand Grace | 11 | one foe · 1 hit · 2.9 · Brave and Faith 2 on every ally · heals the most hurt 36% · Regen 2 rounds · cleanses |
+| 4 | `cleric-tome-light.4` | A | Supreme Grace | 13 | one foe · 1 hit · 3.7 · Brave and Faith 2 on every ally · heals the most hurt 40% · Regen 2 rounds · cleanses |
 | 5 | `cleric-tome-light.5` | A | Benediction | 16 | one foe · 1 hit · 4.6 · Brave and Faith 3 on every ally · heals every ally 44% · Regen 2 rounds · cleanses |
-| 3 | `cleric-tome-light.3b` | B · Heavy | Rebirth | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · Regen 2 rounds · cleanses · revives the fallen |
-| 4 | `cleric-tome-light.4b` | B · Heavy | Heavy Piety | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · Regen 2 rounds · cleanses |
-| 5 | `cleric-tome-light.5b` | B · Heavy | Heavy Benediction | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · Regen 2 rounds · cleanses |
+| 3 | `cleric-tome-light.3b` | B · Surge | Grand Grace Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · Regen 2 rounds · cleanses · revives the fallen |
+| 4 | `cleric-tome-light.4b` | B · Surge | Supreme Grace Surge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · Regen 2 rounds · cleanses |
+| 5 | `cleric-tome-light.5b` | B · Surge | Benediction Surge | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · Regen 2 rounds · cleanses |
 
-#### Cleric · Dark Tome (`cleric-tome-dark`), B · Heavy
+#### Cleric · Dark Tome (`cleric-tome-dark`), B · Surge
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `cleric-tome-dark.1` | Trunk | Calm | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · cleanses · heals 30% of its damage |
-| 2 | `cleric-tome-dark.2` | Trunk | Focus | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · cleanses · heals 30% of its damage |
-| 3 | `cleric-tome-dark.3` | A | Clarity | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · heals the most hurt 36% · cleanses · heals 30% of its damage |
-| 4 | `cleric-tome-dark.4` | A | Insight | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · heals the most hurt 40% · cleanses · heals 30% of its damage |
-| 5 | `cleric-tome-dark.5` | A | Enlightenment | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · heals every ally 44% · cleanses · heals 30% of its damage |
-| 3 | `cleric-tome-dark.3b` | B · Heavy | Heavy Clarity | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · cleanses · heals 30% of its damage |
-| 4 | `cleric-tome-dark.4b` | B · Heavy | Heavy Insight | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · cleanses · heals 30% of its damage |
-| 5 | `cleric-tome-dark.5b` | B · Heavy | Heavy Enlightenment | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · cleanses · heals 30% of its damage |
+| 1 | `cleric-tome-dark.1` | Trunk | Siphon | 6 | one foe · 1 hit · 1.6 · heals the most hurt 28% · cleanses · heals 30% of its damage |
+| 2 | `cleric-tome-dark.2` | Trunk | Greater Siphon | 8 | one foe · 1 hit · 2.2 · heals the most hurt 32% · cleanses · heals 30% of its damage |
+| 3 | `cleric-tome-dark.3` | A | Grand Siphon | 11 | one foe · 1 hit · 2.9 · Mind Break 2 on the foe · heals the most hurt 36% · cleanses · heals 30% of its damage |
+| 4 | `cleric-tome-dark.4` | A | Supreme Siphon | 13 | one foe · 1 hit · 3.7 · Mind Break 2 on the foe · heals the most hurt 40% · cleanses · heals 30% of its damage |
+| 5 | `cleric-tome-dark.5` | A | Eventide | 16 | one foe · 1 hit · 4.6 · Mind Break 3 on every foe · heals every ally 44% · cleanses · heals 30% of its damage |
+| 3 | `cleric-tome-dark.3b` | B · Surge | Grand Siphon Surge | 13 | one foe · 1 hit · 2.9 · heals the most hurt 41% · cleanses · heals 30% of its damage |
+| 4 | `cleric-tome-dark.4b` | B · Surge | Supreme Siphon Surge | 16 | one foe · 1 hit · 3.7 · heals the most hurt 46% · cleanses · heals 30% of its damage |
+| 5 | `cleric-tome-dark.5b` | B · Surge | Eventide Surge | 18 | one foe · 1 hit · 4.6 · heals every ally 51% · cleanses · heals 30% of its damage |
 
 ### Tome Summoner
 
@@ -708,131 +708,131 @@ unslotting a weapon takes its tree's skills out of the loadout. A Tier 0 holds t
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-greatsword.1` | Trunk | Squire | 5 | one foe · 1 hit · 1.6 · lingers at 0.3 |
-| 2 | `summoner-greatsword.2` | Trunk | Shield Knight | 7 | one foe · 1 hit · 2.2 · lingers at 0.3 |
-| 3 | `summoner-greatsword.3` | A | Knight Captain | 9 | one foe · 2 hits · 2.9 · lingers at 0.3 |
-| 4 | `summoner-greatsword.4` | A | Aegis Champion | 11 | one foe · 2 hits · 3.7 · lingers at 0.3 |
+| 1 | `summoner-greatsword.1` | Trunk | Knight | 5 | one foe · 1 hit · 1.6 · lingers at 0.3 |
+| 2 | `summoner-greatsword.2` | Trunk | Greater Knight | 7 | one foe · 1 hit · 2.2 · lingers at 0.3 |
+| 3 | `summoner-greatsword.3` | A | Grand Knight | 9 | one foe · 2 hits · 2.9 · lingers at 0.3 |
+| 4 | `summoner-greatsword.4` | A | Supreme Knight | 11 | one foe · 2 hits · 3.7 · lingers at 0.3 |
 | 5 | `summoner-greatsword.5` | A | Sword Saint | 13 | one foe · 3 hits · 5.335 · lingers at 0.3 |
-| 3 | `summoner-greatsword.3a` | B · Pack | Knight Captain Pack | 9 | one foe · 3 hits · 2.754 · lingers at 0.3 |
-| 4 | `summoner-greatsword.4a` | B · Pack | Aegis Champion Pack | 11 | one foe · 3 hits · 3.516 · lingers at 0.3 |
+| 3 | `summoner-greatsword.3a` | B · Pack | Grand Knight Pack | 9 | one foe · 3 hits · 2.754 · lingers at 0.3 |
+| 4 | `summoner-greatsword.4a` | B · Pack | Supreme Knight Pack | 11 | one foe · 3 hits · 3.516 · lingers at 0.3 |
 | 5 | `summoner-greatsword.5a` | B · Pack | Sword Saint Pack | 13 | one foe · 4 hits · 5.067 · lingers at 0.3 |
 
 #### Tome Summoner · Axe (`summoner-axe`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-axe.1` | Trunk | Brigand | 7 | every foe · 1 hit · 0.88 · lingers at 0.3 |
-| 2 | `summoner-axe.2` | Trunk | Marauder | 9 | every foe · 1 hit · 1.21 · lingers at 0.3 |
-| 3 | `summoner-axe.3` | A | Axe Ogre | 11 | every foe · 2 hits · 1.596 · lingers at 0.3 |
-| 4 | `summoner-axe.4` | A | Minotaur Chief | 13 | every foe · 2 hits · 2.036 · lingers at 0.3 |
-| 5 | `summoner-axe.5` | A | Jotun King | 15 | every foe · 3 hits · 2.934 · lingers at 0.3 |
-| 3 | `summoner-axe.3a` | B · Pack | Axe Ogre Pack | 11 | every foe · 3 hits · 1.515 · lingers at 0.3 |
-| 4 | `summoner-axe.4a` | B · Pack | Minotaur Chief Pack | 13 | every foe · 3 hits · 1.932 · lingers at 0.3 |
-| 5 | `summoner-axe.5a` | B · Pack | Jotun King Pack | 15 | every foe · 4 hits · 2.789 · lingers at 0.3 |
+| 1 | `summoner-axe.1` | Trunk | Minotaur | 7 | every foe · 1 hit · 0.88 · lingers at 0.3 |
+| 2 | `summoner-axe.2` | Trunk | Greater Minotaur | 9 | every foe · 1 hit · 1.21 · lingers at 0.3 |
+| 3 | `summoner-axe.3` | A | Grand Minotaur | 11 | every foe · 2 hits · 1.596 · lingers at 0.3 |
+| 4 | `summoner-axe.4` | A | Supreme Minotaur | 13 | every foe · 2 hits · 2.036 · lingers at 0.3 |
+| 5 | `summoner-axe.5` | A | Mountain King | 15 | every foe · 3 hits · 2.934 · lingers at 0.3 |
+| 3 | `summoner-axe.3a` | B · Pack | Grand Minotaur Pack | 11 | every foe · 3 hits · 1.515 · lingers at 0.3 |
+| 4 | `summoner-axe.4a` | B · Pack | Supreme Minotaur Pack | 13 | every foe · 3 hits · 1.932 · lingers at 0.3 |
+| 5 | `summoner-axe.5a` | B · Pack | Mountain King Pack | 15 | every foe · 4 hits · 2.789 · lingers at 0.3 |
 
 #### Tome Summoner · Lance (`summoner-lance`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-lance.1` | Trunk | Pikeman | 5 | random foes · 2 hits · 1.68 · lingers at 0.3 |
-| 2 | `summoner-lance.2` | Trunk | Dragoon | 7 | random foes · 2 hits · 2.31 · lingers at 0.3 |
-| 3 | `summoner-lance.3` | A | Lance Knight | 9 | random foes · 3 hits · 3.045 · lingers at 0.3 |
-| 4 | `summoner-lance.4` | A | Valkyrie | 11 | random foes · 3 hits · 3.885 · lingers at 0.3 |
-| 5 | `summoner-lance.5` | A | Valkyrie Queen | 13 | random foes · 4 hits · 5.605 · lingers at 0.3 |
-| 3 | `summoner-lance.3a` | B · Pack | Lance Knight Pack | 9 | random foes · 4 hits · 2.892 · lingers at 0.3 |
-| 4 | `summoner-lance.4a` | B · Pack | Valkyrie Pack | 11 | random foes · 4 hits · 3.692 · lingers at 0.3 |
-| 5 | `summoner-lance.5a` | B · Pack | Valkyrie Queen Pack | 13 | random foes · 5 hits · 5.324 · lingers at 0.3 |
+| 1 | `summoner-lance.1` | Trunk | Dragoon | 5 | random foes · 2 hits · 1.68 · lingers at 0.3 |
+| 2 | `summoner-lance.2` | Trunk | Greater Dragoon | 7 | random foes · 2 hits · 2.31 · lingers at 0.3 |
+| 3 | `summoner-lance.3` | A | Grand Dragoon | 9 | random foes · 3 hits · 3.045 · lingers at 0.3 |
+| 4 | `summoner-lance.4` | A | Supreme Dragoon | 11 | random foes · 3 hits · 3.885 · lingers at 0.3 |
+| 5 | `summoner-lance.5` | A | Valkyrie | 13 | random foes · 4 hits · 5.605 · lingers at 0.3 |
+| 3 | `summoner-lance.3a` | B · Pack | Grand Dragoon Pack | 9 | random foes · 4 hits · 2.892 · lingers at 0.3 |
+| 4 | `summoner-lance.4a` | B · Pack | Supreme Dragoon Pack | 11 | random foes · 4 hits · 3.692 · lingers at 0.3 |
+| 5 | `summoner-lance.5a` | B · Pack | Valkyrie Pack | 13 | random foes · 5 hits · 5.324 · lingers at 0.3 |
 
 #### Tome Summoner · Bow (`summoner-bow`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-bow.1` | Trunk | Slinger | 6 | one foe · 1 hit · 1.28 · 0.56 on every other foe · lingers at 0.3 |
-| 2 | `summoner-bow.2` | Trunk | Archer | 8 | one foe · 1 hit · 1.76 · 0.77 on every other foe · lingers at 0.3 |
-| 3 | `summoner-bow.3` | A | Ranger | 10 | one foe · 2 hits · 2.32 · 1.015 on every other foe · Enfeeble 1 on the foe · lingers at 0.3 |
-| 4 | `summoner-bow.4` | A | Sylph Archer | 12 | one foe · 2 hits · 2.96 · 1.295 on every other foe · Enfeeble 1 on the foe · lingers at 0.3 |
-| 5 | `summoner-bow.5` | A | Sagittarius | 14 | one foe · 3 hits · 3.681 · 1.61 on every other foe · Enfeeble 2 on the foe · lingers at 0.3 |
-| 3 | `summoner-bow.3a` | B · Pack | Ranger Pack | 10 | one foe · 3 hits · 2.205 · 0.964 on every other foe · lingers at 0.3 |
-| 4 | `summoner-bow.4a` | B · Pack | Sylph Archer Pack | 12 | one foe · 3 hits · 2.811 · 1.23 on every other foe · lingers at 0.3 |
-| 5 | `summoner-bow.5a` | B · Pack | Sagittarius Pack | 14 | one foe · 4 hits · 4.055 · 1.774 on every other foe · lingers at 0.3 |
+| 1 | `summoner-bow.1` | Trunk | Archer | 6 | one foe · 1 hit · 1.28 · 0.56 on every other foe · lingers at 0.3 |
+| 2 | `summoner-bow.2` | Trunk | Greater Archer | 8 | one foe · 1 hit · 1.76 · 0.77 on every other foe · lingers at 0.3 |
+| 3 | `summoner-bow.3` | A | Grand Archer | 10 | one foe · 2 hits · 2.32 · 1.015 on every other foe · Enfeeble 1 on the foe · lingers at 0.3 |
+| 4 | `summoner-bow.4` | A | Supreme Archer | 12 | one foe · 2 hits · 2.96 · 1.295 on every other foe · Enfeeble 1 on the foe · lingers at 0.3 |
+| 5 | `summoner-bow.5` | A | Sylph Lord | 14 | one foe · 3 hits · 3.681 · 1.61 on every other foe · Enfeeble 2 on the foe · lingers at 0.3 |
+| 3 | `summoner-bow.3a` | B · Pack | Grand Archer Pack | 10 | one foe · 3 hits · 2.205 · 0.964 on every other foe · lingers at 0.3 |
+| 4 | `summoner-bow.4a` | B · Pack | Supreme Archer Pack | 12 | one foe · 3 hits · 2.811 · 1.23 on every other foe · lingers at 0.3 |
+| 5 | `summoner-bow.5a` | B · Pack | Sylph Lord Pack | 14 | one foe · 4 hits · 4.055 · 1.774 on every other foe · lingers at 0.3 |
 
 #### Tome Summoner · Katana (`summoner-katana`), B · Pack
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-katana.1` | Trunk | Ronin | 5 | one foe · 2 hits · 1.6 · lingers at 0.3 |
-| 2 | `summoner-katana.2` | Trunk | Samurai | 7 | one foe · 2 hits · 2.2 · lingers at 0.3 |
-| 3 | `summoner-katana.3` | A | Kensei | 9 | one foe · 2 hits · 2.9 · Armor Break 1 on the foe · lingers at 0.3 |
-| 4 | `summoner-katana.4` | A | Blade Shogun | 11 | one foe · 2 hits · 3.7 · Armor Break 1 on the foe · lingers at 0.3 |
-| 5 | `summoner-katana.5` | A | Sword Spirit | 13 | one foe · 2 hits · 4.6 · Armor Break 2 on the foe · lingers at 0.3 |
-| 3 | `summoner-katana.3a` | B · Pack | Kensei Pack | 9 | one foe · 3 hits · 2.754 · lingers at 0.3 |
-| 4 | `summoner-katana.4a` | B · Pack | Blade Shogun Pack | 11 | one foe · 3 hits · 3.516 · lingers at 0.3 |
-| 5 | `summoner-katana.5a` | B · Pack | Sword Spirit Pack | 13 | one foe · 3 hits · 4.371 · lingers at 0.3 |
+| 1 | `summoner-katana.1` | Trunk | Samurai | 5 | one foe · 2 hits · 1.6 · lingers at 0.3 |
+| 2 | `summoner-katana.2` | Trunk | Greater Samurai | 7 | one foe · 2 hits · 2.2 · lingers at 0.3 |
+| 3 | `summoner-katana.3` | A | Grand Samurai | 9 | one foe · 2 hits · 2.9 · Armor Break 1 on the foe · lingers at 0.3 |
+| 4 | `summoner-katana.4` | A | Supreme Samurai | 11 | one foe · 2 hits · 3.7 · Armor Break 1 on the foe · lingers at 0.3 |
+| 5 | `summoner-katana.5` | A | Shogun | 13 | one foe · 2 hits · 4.6 · Armor Break 2 on the foe · lingers at 0.3 |
+| 3 | `summoner-katana.3a` | B · Pack | Grand Samurai Pack | 9 | one foe · 3 hits · 2.754 · lingers at 0.3 |
+| 4 | `summoner-katana.4a` | B · Pack | Supreme Samurai Pack | 11 | one foe · 3 hits · 3.516 · lingers at 0.3 |
+| 5 | `summoner-katana.5a` | B · Pack | Shogun Pack | 13 | one foe · 3 hits · 4.371 · lingers at 0.3 |
 
-#### Tome Summoner · Fire Tome (`summoner-tome-fire`), B · Bonded
+#### Tome Summoner · Fire Tome (`summoner-tome-fire`), B · Oath
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-tome-fire.1` | Trunk | Ember Sprites | 5 | one foe · 1 hit · 1.6 · lingers at 0.3 |
-| 2 | `summoner-tome-fire.2` | Trunk | Salamander | 7 | one foe · 1 hit · 2.2 · lingers at 0.3 |
-| 3 | `summoner-tome-fire.3` | A | Fire Drake | 9 | one foe · 2 hits · 2.9 · lingers at 0.3 |
-| 4 | `summoner-tome-fire.4` | A | Infernal Wyrm | 11 | one foe · 2 hits · 3.7 · lingers at 0.3 |
+| 1 | `summoner-tome-fire.1` | Trunk | Drake | 5 | one foe · 1 hit · 1.6 · lingers at 0.3 |
+| 2 | `summoner-tome-fire.2` | Trunk | Greater Drake | 7 | one foe · 1 hit · 2.2 · lingers at 0.3 |
+| 3 | `summoner-tome-fire.3` | A | Grand Drake | 9 | one foe · 2 hits · 2.9 · lingers at 0.3 |
+| 4 | `summoner-tome-fire.4` | A | Supreme Drake | 11 | one foe · 2 hits · 3.7 · lingers at 0.3 |
 | 5 | `summoner-tome-fire.5` | A | Phoenix | 13 | one foe · 3 hits · 5.335 · lingers at 0.3 |
-| 3 | `summoner-tome-fire.3b` | B · Bonded | Bonded Fire Drake | 10 | one foe · 2 hits · 2.9 · lingers at 0.4 |
-| 4 | `summoner-tome-fire.4b` | B · Bonded | Bonded Infernal Wyrm | 12 | one foe · 2 hits · 3.7 · lingers at 0.4 |
-| 5 | `summoner-tome-fire.5b` | B · Bonded | Bonded Phoenix | 14 | one foe · 3 hits · 5.335 · lingers at 0.4 |
+| 3 | `summoner-tome-fire.3b` | B · Oath | Grand Drake Oath | 10 | one foe · 2 hits · 2.9 · lingers at 0.4 |
+| 4 | `summoner-tome-fire.4b` | B · Oath | Supreme Drake Oath | 12 | one foe · 2 hits · 3.7 · lingers at 0.4 |
+| 5 | `summoner-tome-fire.5b` | B · Oath | Phoenix Oath | 14 | one foe · 3 hits · 5.335 · lingers at 0.4 |
 
-#### Tome Summoner · Blizzard Tome (`summoner-tome-ice`), B · Bonded
+#### Tome Summoner · Blizzard Tome (`summoner-tome-ice`), B · Oath
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-tome-ice.1` | Trunk | Frost Sprites | 7 | every foe · 1 hit · 0.88 · lingers at 0.3 |
-| 2 | `summoner-tome-ice.2` | Trunk | Snow Sentinel | 9 | every foe · 2 hits · 1.21 · lingers at 0.3 |
-| 3 | `summoner-tome-ice.3` | A | Ice Golem | 11 | every foe · 2 hits · 1.596 · lingers at 0.3 |
-| 4 | `summoner-tome-ice.4` | A | Frost Titan | 13 | every foe · 3 hits · 2.034 · lingers at 0.3 |
+| 1 | `summoner-tome-ice.1` | Trunk | Golem | 7 | every foe · 1 hit · 0.88 · lingers at 0.3 |
+| 2 | `summoner-tome-ice.2` | Trunk | Greater Golem | 9 | every foe · 2 hits · 1.21 · lingers at 0.3 |
+| 3 | `summoner-tome-ice.3` | A | Grand Golem | 11 | every foe · 2 hits · 1.596 · lingers at 0.3 |
+| 4 | `summoner-tome-ice.4` | A | Supreme Golem | 13 | every foe · 3 hits · 2.034 · lingers at 0.3 |
 | 5 | `summoner-tome-ice.5` | A | Winter Queen | 15 | every foe · 3 hits · 2.934 · lingers at 0.3 |
-| 3 | `summoner-tome-ice.3b` | B · Bonded | Bonded Ice Golem | 12 | every foe · 2 hits · 1.596 · lingers at 0.4 |
-| 4 | `summoner-tome-ice.4b` | B · Bonded | Bonded Frost Titan | 14 | every foe · 3 hits · 2.034 · lingers at 0.4 |
-| 5 | `summoner-tome-ice.5b` | B · Bonded | Bonded Winter Queen | 16 | every foe · 3 hits · 2.934 · lingers at 0.4 |
+| 3 | `summoner-tome-ice.3b` | B · Oath | Grand Golem Oath | 12 | every foe · 2 hits · 1.596 · lingers at 0.4 |
+| 4 | `summoner-tome-ice.4b` | B · Oath | Supreme Golem Oath | 14 | every foe · 3 hits · 2.034 · lingers at 0.4 |
+| 5 | `summoner-tome-ice.5b` | B · Oath | Winter Queen Oath | 16 | every foe · 3 hits · 2.934 · lingers at 0.4 |
 
-#### Tome Summoner · Thunder Tome (`summoner-tome-lightning`), B · Bonded
-
-| Depth | Node | Line | Name | MP | What it does |
-|---|---|---|---|---|---|
-| 1 | `summoner-tome-lightning.1` | Trunk | Spark Sprites | 5 | random foes · 2 hits · 1.68 · lingers at 0.3 |
-| 2 | `summoner-tome-lightning.2` | Trunk | Thunderbird | 7 | random foes · 2 hits · 2.31 · lingers at 0.3 |
-| 3 | `summoner-tome-lightning.3` | A | Storm Roc | 9 | random foes · 3 hits · 3.045 · lingers at 0.3 |
-| 4 | `summoner-tome-lightning.4` | A | Thunder Kirin | 11 | random foes · 3 hits · 3.885 · lingers at 0.3 |
-| 5 | `summoner-tome-lightning.5` | A | Raijin | 13 | random foes · 4 hits · 5.605 · lingers at 0.3 |
-| 3 | `summoner-tome-lightning.3b` | B · Bonded | Bonded Storm Roc | 10 | random foes · 3 hits · 3.045 · lingers at 0.4 |
-| 4 | `summoner-tome-lightning.4b` | B · Bonded | Bonded Thunder Kirin | 12 | random foes · 3 hits · 3.885 · lingers at 0.4 |
-| 5 | `summoner-tome-lightning.5b` | B · Bonded | Bonded Raijin | 14 | random foes · 4 hits · 5.605 · lingers at 0.4 |
-
-#### Tome Summoner · Light Tome (`summoner-tome-light`), B · Bonded
+#### Tome Summoner · Thunder Tome (`summoner-tome-lightning`), B · Oath
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-tome-light.1` | Trunk | Cherub | 5 | one foe · 2 hits · 1.6 · lingers at 0.3 |
-| 2 | `summoner-tome-light.2` | Trunk | Mending Angel | 7 | one foe · 2 hits · 2.2 · lingers at 0.3 |
-| 3 | `summoner-tome-light.3` | A | Seraph Choir | 9 | one foe · 2 hits · 2.9 · Brave and Faith 1 on every ally · lingers at 0.3 |
-| 4 | `summoner-tome-light.4` | A | Dominion Host | 11 | one foe · 2 hits · 3.7 · Brave and Faith 1 on every ally · lingers at 0.3 |
-| 5 | `summoner-tome-light.5` | A | Heaven's Legion | 13 | one foe · 2 hits · 4.6 · Brave and Faith 2 on every ally · lingers at 0.3 |
-| 3 | `summoner-tome-light.3b` | B · Bonded | Bonded Seraph Choir | 10 | one foe · 2 hits · 2.9 · lingers at 0.4 |
-| 4 | `summoner-tome-light.4b` | B · Bonded | Bonded Dominion Host | 12 | one foe · 2 hits · 3.7 · lingers at 0.4 |
-| 5 | `summoner-tome-light.5b` | B · Bonded | Bonded Heaven's Legion | 14 | one foe · 2 hits · 4.6 · lingers at 0.4 |
+| 1 | `summoner-tome-lightning.1` | Trunk | Roc | 5 | random foes · 2 hits · 1.68 · lingers at 0.3 |
+| 2 | `summoner-tome-lightning.2` | Trunk | Greater Roc | 7 | random foes · 2 hits · 2.31 · lingers at 0.3 |
+| 3 | `summoner-tome-lightning.3` | A | Grand Roc | 9 | random foes · 3 hits · 3.045 · lingers at 0.3 |
+| 4 | `summoner-tome-lightning.4` | A | Supreme Roc | 11 | random foes · 3 hits · 3.885 · lingers at 0.3 |
+| 5 | `summoner-tome-lightning.5` | A | Kirin | 13 | random foes · 4 hits · 5.605 · lingers at 0.3 |
+| 3 | `summoner-tome-lightning.3b` | B · Oath | Grand Roc Oath | 10 | random foes · 3 hits · 3.045 · lingers at 0.4 |
+| 4 | `summoner-tome-lightning.4b` | B · Oath | Supreme Roc Oath | 12 | random foes · 3 hits · 3.885 · lingers at 0.4 |
+| 5 | `summoner-tome-lightning.5b` | B · Oath | Kirin Oath | 14 | random foes · 4 hits · 5.605 · lingers at 0.4 |
 
-#### Tome Summoner · Dark Tome (`summoner-tome-dark`), B · Bonded
+#### Tome Summoner · Light Tome (`summoner-tome-light`), B · Oath
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `summoner-tome-dark.1` | Trunk | Leech Imp | 6 | one foe · 1 hit · 1.28 · 0.56 on every other foe · lingers at 0.3 |
-| 2 | `summoner-tome-dark.2` | Trunk | Night Bat | 8 | one foe · 1 hit · 1.76 · 0.77 on every other foe · lingers at 0.3 |
-| 3 | `summoner-tome-dark.3` | A | Vampire Knight | 10 | one foe · 2 hits · 2.32 · 1.015 on every other foe · Mind Break 1 on the foe · lingers at 0.3 |
-| 4 | `summoner-tome-dark.4` | A | Blood Countess | 12 | one foe · 2 hits · 2.96 · 1.295 on every other foe · Mind Break 1 on the foe · lingers at 0.3 |
-| 5 | `summoner-tome-dark.5` | A | Abyssal Overlord | 14 | one foe · 3 hits · 3.681 · 1.61 on every other foe · Mind Break 2 on the foe · lingers at 0.3 |
-| 3 | `summoner-tome-dark.3b` | B · Bonded | Bonded Vampire Knight | 11 | one foe · 2 hits · 2.32 · 1.015 on every other foe · lingers at 0.4 |
-| 4 | `summoner-tome-dark.4b` | B · Bonded | Bonded Blood Countess | 13 | one foe · 2 hits · 2.96 · 1.295 on every other foe · lingers at 0.4 |
-| 5 | `summoner-tome-dark.5b` | B · Bonded | Bonded Abyssal Overlord | 15 | one foe · 3 hits · 4.27 · 1.868 on every other foe · lingers at 0.4 |
+| 1 | `summoner-tome-light.1` | Trunk | Angel | 5 | one foe · 2 hits · 1.6 · lingers at 0.3 |
+| 2 | `summoner-tome-light.2` | Trunk | Greater Angel | 7 | one foe · 2 hits · 2.2 · lingers at 0.3 |
+| 3 | `summoner-tome-light.3` | A | Grand Angel | 9 | one foe · 2 hits · 2.9 · Brave and Faith 1 on every ally · lingers at 0.3 |
+| 4 | `summoner-tome-light.4` | A | Supreme Angel | 11 | one foe · 2 hits · 3.7 · Brave and Faith 1 on every ally · lingers at 0.3 |
+| 5 | `summoner-tome-light.5` | A | Archon | 13 | one foe · 2 hits · 4.6 · Brave and Faith 2 on every ally · lingers at 0.3 |
+| 3 | `summoner-tome-light.3b` | B · Oath | Grand Angel Oath | 10 | one foe · 2 hits · 2.9 · lingers at 0.4 |
+| 4 | `summoner-tome-light.4b` | B · Oath | Supreme Angel Oath | 12 | one foe · 2 hits · 3.7 · lingers at 0.4 |
+| 5 | `summoner-tome-light.5b` | B · Oath | Archon Oath | 14 | one foe · 2 hits · 4.6 · lingers at 0.4 |
+
+#### Tome Summoner · Dark Tome (`summoner-tome-dark`), B · Oath
+
+| Depth | Node | Line | Name | MP | What it does |
+|---|---|---|---|---|---|
+| 1 | `summoner-tome-dark.1` | Trunk | Vampire | 6 | one foe · 1 hit · 1.28 · 0.56 on every other foe · lingers at 0.3 |
+| 2 | `summoner-tome-dark.2` | Trunk | Greater Vampire | 8 | one foe · 1 hit · 1.76 · 0.77 on every other foe · lingers at 0.3 |
+| 3 | `summoner-tome-dark.3` | A | Grand Vampire | 10 | one foe · 2 hits · 2.32 · 1.015 on every other foe · Mind Break 1 on the foe · lingers at 0.3 |
+| 4 | `summoner-tome-dark.4` | A | Supreme Vampire | 12 | one foe · 2 hits · 2.96 · 1.295 on every other foe · Mind Break 1 on the foe · lingers at 0.3 |
+| 5 | `summoner-tome-dark.5` | A | Blood Countess | 14 | one foe · 3 hits · 3.681 · 1.61 on every other foe · Mind Break 2 on the foe · lingers at 0.3 |
+| 3 | `summoner-tome-dark.3b` | B · Oath | Grand Vampire Oath | 11 | one foe · 2 hits · 2.32 · 1.015 on every other foe · lingers at 0.4 |
+| 4 | `summoner-tome-dark.4b` | B · Oath | Supreme Vampire Oath | 13 | one foe · 2 hits · 2.96 · 1.295 on every other foe · lingers at 0.4 |
+| 5 | `summoner-tome-dark.5b` | B · Oath | Blood Countess Oath | 15 | one foe · 3 hits · 4.27 · 1.868 on every other foe · lingers at 0.4 |
 
 ### Tome Spellblade
 
@@ -842,131 +842,131 @@ unslotting a weapon takes its tree's skills out of the loadout. A Tier 0 holds t
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-greatsword.1` | Trunk | Edged Cleave | 5 | one foe · 1 hit · 1.6 |
-| 2 | `tomeblade-greatsword.2` | Trunk | Honed Cleave | 7 | one foe · 1 hit · 2.2 |
-| 3 | `tomeblade-greatsword.3` | A | Whetted Cleave | 9 | one foe · 1 hit · 2.9 |
-| 4 | `tomeblade-greatsword.4` | A | Gleaming Cleave | 11 | one foe · 2 hits · 3.7 |
-| 5 | `tomeblade-greatsword.5` | A | Sovereign Cleave | 13 | one foe · 2 hits · 5.29 |
-| 3 | `tomeblade-greatsword.3b` | B · Pierce | Piercing Whetted Cleave | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-greatsword.4b` | B · Pierce | Piercing Gleaming Cleave | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-greatsword.5b` | B · Pierce | Piercing Sovereign Cleave | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-greatsword.1` | Trunk | Sever | 5 | one foe · 1 hit · 1.6 |
+| 2 | `tomeblade-greatsword.2` | Trunk | Greater Sever | 7 | one foe · 1 hit · 2.2 |
+| 3 | `tomeblade-greatsword.3` | A | Grand Sever | 9 | one foe · 1 hit · 2.9 |
+| 4 | `tomeblade-greatsword.4` | A | Supreme Sever | 11 | one foe · 2 hits · 3.7 |
+| 5 | `tomeblade-greatsword.5` | A | Titan Edge | 13 | one foe · 2 hits · 5.29 |
+| 3 | `tomeblade-greatsword.3b` | B · Pierce | Grand Sever Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-greatsword.4b` | B · Pierce | Supreme Sever Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-greatsword.5b` | B · Pierce | Titan Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Axe (`tomeblade-axe`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-axe.1` | Trunk | Edged Hew | 5 | one foe · 1 hit · 1.6 |
-| 2 | `tomeblade-axe.2` | Trunk | Honed Hew | 7 | one foe · 1 hit · 2.2 |
-| 3 | `tomeblade-axe.3` | A | Whetted Hew | 9 | one foe · 2 hits · 2.9 |
-| 4 | `tomeblade-axe.4` | A | Gleaming Hew | 11 | one foe · 2 hits · 3.7 |
-| 5 | `tomeblade-axe.5` | A | Sovereign Hew | 13 | one foe · 2 hits · 5.29 |
-| 3 | `tomeblade-axe.3b` | B · Pierce | Piercing Whetted Hew | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-axe.4b` | B · Pierce | Piercing Gleaming Hew | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-axe.5b` | B · Pierce | Piercing Sovereign Hew | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-axe.1` | Trunk | Hew | 5 | one foe · 1 hit · 1.6 |
+| 2 | `tomeblade-axe.2` | Trunk | Greater Hew | 7 | one foe · 1 hit · 2.2 |
+| 3 | `tomeblade-axe.3` | A | Grand Hew | 9 | one foe · 2 hits · 2.9 |
+| 4 | `tomeblade-axe.4` | A | Supreme Hew | 11 | one foe · 2 hits · 3.7 |
+| 5 | `tomeblade-axe.5` | A | Gale Edge | 13 | one foe · 2 hits · 5.29 |
+| 3 | `tomeblade-axe.3b` | B · Pierce | Grand Hew Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-axe.4b` | B · Pierce | Supreme Hew Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-axe.5b` | B · Pierce | Gale Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Lance (`tomeblade-lance`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-lance.1` | Trunk | Edged Thrust | 5 | one foe · 2 hits · 1.6 |
-| 2 | `tomeblade-lance.2` | Trunk | Honed Thrust | 7 | one foe · 2 hits · 2.2 |
-| 3 | `tomeblade-lance.3` | A | Whetted Thrust | 9 | one foe · 2 hits · 2.9 |
-| 4 | `tomeblade-lance.4` | A | Gleaming Thrust | 11 | one foe · 3 hits · 3.699 |
-| 5 | `tomeblade-lance.5` | A | Sovereign Thrust | 13 | one foe · 3 hits · 5.289 |
-| 3 | `tomeblade-lance.3b` | B · Pierce | Piercing Whetted Thrust | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-lance.4b` | B · Pierce | Piercing Gleaming Thrust | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-lance.5b` | B · Pierce | Piercing Sovereign Thrust | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-lance.1` | Trunk | Lunge | 5 | one foe · 2 hits · 1.6 |
+| 2 | `tomeblade-lance.2` | Trunk | Greater Lunge | 7 | one foe · 2 hits · 2.2 |
+| 3 | `tomeblade-lance.3` | A | Grand Lunge | 9 | one foe · 2 hits · 2.9 |
+| 4 | `tomeblade-lance.4` | A | Supreme Lunge | 11 | one foe · 3 hits · 3.699 |
+| 5 | `tomeblade-lance.5` | A | Comet Edge | 13 | one foe · 3 hits · 5.289 |
+| 3 | `tomeblade-lance.3b` | B · Pierce | Grand Lunge Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-lance.4b` | B · Pierce | Supreme Lunge Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-lance.5b` | B · Pierce | Comet Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Bow (`tomeblade-bow`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-bow.1` | Trunk | Edged Shot | 5 | one foe · 2 hits · 1.6 |
-| 2 | `tomeblade-bow.2` | Trunk | Honed Shot | 7 | one foe · 2 hits · 2.2 |
-| 3 | `tomeblade-bow.3` | A | Whetted Shot | 9 | one foe · 3 hits · 2.901 · Enfeeble 1 on the foe |
-| 4 | `tomeblade-bow.4` | A | Gleaming Shot | 11 | one foe · 3 hits · 3.699 · Enfeeble 1 on the foe |
-| 5 | `tomeblade-bow.5` | A | Sovereign Shot | 13 | one foe · 4 hits · 4.6 · Enfeeble 2 on the foe |
-| 3 | `tomeblade-bow.3b` | B · Pierce | Piercing Whetted Shot | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-bow.4b` | B · Pierce | Piercing Gleaming Shot | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-bow.5b` | B · Pierce | Piercing Sovereign Shot | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-bow.1` | Trunk | Arc | 5 | one foe · 2 hits · 1.6 |
+| 2 | `tomeblade-bow.2` | Trunk | Greater Arc | 7 | one foe · 2 hits · 2.2 |
+| 3 | `tomeblade-bow.3` | A | Grand Arc | 9 | one foe · 3 hits · 2.901 · Enfeeble 1 on the foe |
+| 4 | `tomeblade-bow.4` | A | Supreme Arc | 11 | one foe · 3 hits · 3.699 · Enfeeble 1 on the foe |
+| 5 | `tomeblade-bow.5` | A | Falcon Edge | 13 | one foe · 4 hits · 4.6 · Enfeeble 2 on the foe |
+| 3 | `tomeblade-bow.3b` | B · Pierce | Grand Arc Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-bow.4b` | B · Pierce | Supreme Arc Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-bow.5b` | B · Pierce | Falcon Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Katana (`tomeblade-katana`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-katana.1` | Trunk | Edged Draw | 5 | one foe · 2 hits · 1.6 |
-| 2 | `tomeblade-katana.2` | Trunk | Honed Draw | 7 | one foe · 2 hits · 2.2 |
-| 3 | `tomeblade-katana.3` | A | Whetted Draw | 9 | one foe · 2 hits · 2.9 · Armor Break 1 on the foe |
-| 4 | `tomeblade-katana.4` | A | Gleaming Draw | 11 | one foe · 2 hits · 3.7 · Armor Break 1 on the foe |
-| 5 | `tomeblade-katana.5` | A | Sovereign Draw | 13 | one foe · 2 hits · 4.6 · Armor Break 2 on the foe |
-| 3 | `tomeblade-katana.3b` | B · Pierce | Piercing Whetted Draw | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-katana.4b` | B · Pierce | Piercing Gleaming Draw | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-katana.5b` | B · Pierce | Piercing Sovereign Draw | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-katana.1` | Trunk | Iai | 5 | one foe · 2 hits · 1.6 |
+| 2 | `tomeblade-katana.2` | Trunk | Greater Iai | 7 | one foe · 2 hits · 2.2 |
+| 3 | `tomeblade-katana.3` | A | Grand Iai | 9 | one foe · 2 hits · 2.9 · Armor Break 1 on the foe |
+| 4 | `tomeblade-katana.4` | A | Supreme Iai | 11 | one foe · 2 hits · 3.7 · Armor Break 1 on the foe |
+| 5 | `tomeblade-katana.5` | A | Moon Edge | 13 | one foe · 2 hits · 4.6 · Armor Break 2 on the foe |
+| 3 | `tomeblade-katana.3b` | B · Pierce | Grand Iai Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-katana.4b` | B · Pierce | Supreme Iai Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-katana.5b` | B · Pierce | Moon Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Fire Tome (`tomeblade-tome-fire`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-tome-fire.1` | Trunk | Edged Pyre | 5 | one foe · 1 hit · 1.6 |
-| 2 | `tomeblade-tome-fire.2` | Trunk | Honed Pyre | 7 | one foe · 1 hit · 2.2 |
-| 3 | `tomeblade-tome-fire.3` | A | Whetted Pyre | 9 | one foe · 1 hit · 2.9 |
-| 4 | `tomeblade-tome-fire.4` | A | Gleaming Pyre | 11 | one foe · 2 hits · 3.7 |
-| 5 | `tomeblade-tome-fire.5` | A | Sovereign Pyre | 13 | one foe · 2 hits · 5.29 |
-| 3 | `tomeblade-tome-fire.3b` | B · Pierce | Piercing Whetted Pyre | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-tome-fire.4b` | B · Pierce | Piercing Gleaming Pyre | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-tome-fire.5b` | B · Pierce | Piercing Sovereign Pyre | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-tome-fire.1` | Trunk | Scorch | 5 | one foe · 1 hit · 1.6 |
+| 2 | `tomeblade-tome-fire.2` | Trunk | Greater Scorch | 7 | one foe · 1 hit · 2.2 |
+| 3 | `tomeblade-tome-fire.3` | A | Grand Scorch | 9 | one foe · 1 hit · 2.9 |
+| 4 | `tomeblade-tome-fire.4` | A | Supreme Scorch | 11 | one foe · 2 hits · 3.7 |
+| 5 | `tomeblade-tome-fire.5` | A | Inferno Edge | 13 | one foe · 2 hits · 5.29 |
+| 3 | `tomeblade-tome-fire.3b` | B · Pierce | Grand Scorch Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-tome-fire.4b` | B · Pierce | Supreme Scorch Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-tome-fire.5b` | B · Pierce | Inferno Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Blizzard Tome (`tomeblade-tome-ice`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-tome-ice.1` | Trunk | Edged Frost | 5 | one foe · 1 hit · 1.6 |
-| 2 | `tomeblade-tome-ice.2` | Trunk | Honed Frost | 7 | one foe · 1 hit · 2.2 |
-| 3 | `tomeblade-tome-ice.3` | A | Whetted Frost | 9 | one foe · 2 hits · 2.9 |
-| 4 | `tomeblade-tome-ice.4` | A | Gleaming Frost | 11 | one foe · 2 hits · 3.7 |
-| 5 | `tomeblade-tome-ice.5` | A | Sovereign Frost | 13 | one foe · 2 hits · 5.29 |
-| 3 | `tomeblade-tome-ice.3b` | B · Pierce | Piercing Whetted Frost | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-tome-ice.4b` | B · Pierce | Piercing Gleaming Frost | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-tome-ice.5b` | B · Pierce | Piercing Sovereign Frost | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-tome-ice.1` | Trunk | Rime | 5 | one foe · 1 hit · 1.6 |
+| 2 | `tomeblade-tome-ice.2` | Trunk | Greater Rime | 7 | one foe · 1 hit · 2.2 |
+| 3 | `tomeblade-tome-ice.3` | A | Grand Rime | 9 | one foe · 2 hits · 2.9 |
+| 4 | `tomeblade-tome-ice.4` | A | Supreme Rime | 11 | one foe · 2 hits · 3.7 |
+| 5 | `tomeblade-tome-ice.5` | A | Glacier Edge | 13 | one foe · 2 hits · 5.29 |
+| 3 | `tomeblade-tome-ice.3b` | B · Pierce | Grand Rime Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-tome-ice.4b` | B · Pierce | Supreme Rime Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-tome-ice.5b` | B · Pierce | Glacier Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Thunder Tome (`tomeblade-tome-lightning`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-tome-lightning.1` | Trunk | Edged Volt | 5 | one foe · 2 hits · 1.6 |
-| 2 | `tomeblade-tome-lightning.2` | Trunk | Honed Volt | 7 | one foe · 2 hits · 2.2 |
-| 3 | `tomeblade-tome-lightning.3` | A | Whetted Volt | 9 | one foe · 2 hits · 2.9 |
-| 4 | `tomeblade-tome-lightning.4` | A | Gleaming Volt | 11 | one foe · 3 hits · 3.699 |
-| 5 | `tomeblade-tome-lightning.5` | A | Sovereign Volt | 13 | one foe · 3 hits · 5.289 |
-| 3 | `tomeblade-tome-lightning.3b` | B · Pierce | Piercing Whetted Volt | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-tome-lightning.4b` | B · Pierce | Piercing Gleaming Volt | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-tome-lightning.5b` | B · Pierce | Piercing Sovereign Volt | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-tome-lightning.1` | Trunk | Volt | 5 | one foe · 2 hits · 1.6 |
+| 2 | `tomeblade-tome-lightning.2` | Trunk | Greater Volt | 7 | one foe · 2 hits · 2.2 |
+| 3 | `tomeblade-tome-lightning.3` | A | Grand Volt | 9 | one foe · 2 hits · 2.9 |
+| 4 | `tomeblade-tome-lightning.4` | A | Supreme Volt | 11 | one foe · 3 hits · 3.699 |
+| 5 | `tomeblade-tome-lightning.5` | A | Storm Edge | 13 | one foe · 3 hits · 5.289 |
+| 3 | `tomeblade-tome-lightning.3b` | B · Pierce | Grand Volt Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-tome-lightning.4b` | B · Pierce | Supreme Volt Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-tome-lightning.5b` | B · Pierce | Storm Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Light Tome (`tomeblade-tome-light`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-tome-light.1` | Trunk | Edged Lumen | 5 | one foe · 2 hits · 1.6 |
-| 2 | `tomeblade-tome-light.2` | Trunk | Honed Lumen | 7 | one foe · 2 hits · 2.2 |
-| 3 | `tomeblade-tome-light.3` | A | Whetted Lumen | 9 | one foe · 2 hits · 2.9 · Brave and Faith 1 on every ally |
-| 4 | `tomeblade-tome-light.4` | A | Gleaming Lumen | 11 | one foe · 2 hits · 3.7 · Brave and Faith 1 on every ally |
-| 5 | `tomeblade-tome-light.5` | A | Sovereign Lumen | 13 | one foe · 2 hits · 4.6 · Brave and Faith 2 on every ally |
-| 3 | `tomeblade-tome-light.3b` | B · Pierce | Piercing Whetted Lumen | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-tome-light.4b` | B · Pierce | Piercing Gleaming Lumen | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-tome-light.5b` | B · Pierce | Piercing Sovereign Lumen | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-tome-light.1` | Trunk | Lumen | 5 | one foe · 2 hits · 1.6 |
+| 2 | `tomeblade-tome-light.2` | Trunk | Greater Lumen | 7 | one foe · 2 hits · 2.2 |
+| 3 | `tomeblade-tome-light.3` | A | Grand Lumen | 9 | one foe · 2 hits · 2.9 · Brave and Faith 1 on every ally |
+| 4 | `tomeblade-tome-light.4` | A | Supreme Lumen | 11 | one foe · 2 hits · 3.7 · Brave and Faith 1 on every ally |
+| 5 | `tomeblade-tome-light.5` | A | Dawn Edge | 13 | one foe · 2 hits · 4.6 · Brave and Faith 2 on every ally |
+| 3 | `tomeblade-tome-light.3b` | B · Pierce | Grand Lumen Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-tome-light.4b` | B · Pierce | Supreme Lumen Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-tome-light.5b` | B · Pierce | Dawn Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 #### Tome Spellblade · Dark Tome (`tomeblade-tome-dark`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `tomeblade-tome-dark.1` | Trunk | Edged Umbra | 5 | one foe · 2 hits · 1.6 |
-| 2 | `tomeblade-tome-dark.2` | Trunk | Honed Umbra | 7 | one foe · 2 hits · 2.2 |
-| 3 | `tomeblade-tome-dark.3` | A | Whetted Umbra | 9 | one foe · 3 hits · 2.901 · Mind Break 1 on the foe |
-| 4 | `tomeblade-tome-dark.4` | A | Gleaming Umbra | 11 | one foe · 3 hits · 3.699 · Mind Break 1 on the foe |
-| 5 | `tomeblade-tome-dark.5` | A | Sovereign Umbra | 13 | one foe · 4 hits · 4.6 · Mind Break 2 on the foe |
-| 3 | `tomeblade-tome-dark.3b` | B · Pierce | Piercing Whetted Umbra | 10 | one foe · 1 hit · 3.335 |
-| 4 | `tomeblade-tome-dark.4b` | B · Pierce | Piercing Gleaming Umbra | 12 | one foe · 1 hit · 4.255 |
-| 5 | `tomeblade-tome-dark.5b` | B · Pierce | Piercing Sovereign Umbra | 14 | one foe · 1 hit · 5.29 |
+| 1 | `tomeblade-tome-dark.1` | Trunk | Umbra | 5 | one foe · 2 hits · 1.6 |
+| 2 | `tomeblade-tome-dark.2` | Trunk | Greater Umbra | 7 | one foe · 2 hits · 2.2 |
+| 3 | `tomeblade-tome-dark.3` | A | Grand Umbra | 9 | one foe · 3 hits · 2.901 · Mind Break 1 on the foe |
+| 4 | `tomeblade-tome-dark.4` | A | Supreme Umbra | 11 | one foe · 3 hits · 3.699 · Mind Break 1 on the foe |
+| 5 | `tomeblade-tome-dark.5` | A | Dusk Edge | 13 | one foe · 4 hits · 4.6 · Mind Break 2 on the foe |
+| 3 | `tomeblade-tome-dark.3b` | B · Pierce | Grand Umbra Pierce | 10 | one foe · 1 hit · 3.335 |
+| 4 | `tomeblade-tome-dark.4b` | B · Pierce | Supreme Umbra Pierce | 12 | one foe · 1 hit · 4.255 |
+| 5 | `tomeblade-tome-dark.5b` | B · Pierce | Dusk Edge Pierce | 14 | one foe · 1 hit · 5.29 |
 
 ### Sorcerer
 
@@ -976,64 +976,64 @@ unslotting a weapon takes its tree's skills out of the loadout. A Tier 0 holds t
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `mage-tome-fire.1` | Trunk | Fire | 10 | one foe · 1 hit · 1.6 |
-| 2 | `mage-tome-fire.2` | Trunk | Fira | 14 | one foe · 1 hit · 2.2 |
-| 3 | `mage-tome-fire.3` | A | Firaga | 18 | one foe · 1 hit · 2.9 |
-| 4 | `mage-tome-fire.4` | A | Firaja | 22 | one foe · 1 hit · 3.7 |
+| 1 | `mage-tome-fire.1` | Trunk | Flame | 10 | one foe · 1 hit · 1.6 |
+| 2 | `mage-tome-fire.2` | Trunk | Greater Flame | 14 | one foe · 1 hit · 2.2 |
+| 3 | `mage-tome-fire.3` | A | Grand Flame | 18 | one foe · 1 hit · 2.9 |
+| 4 | `mage-tome-fire.4` | A | Supreme Flame | 22 | one foe · 1 hit · 3.7 |
 | 5 | `mage-tome-fire.5` | A | Flare Star | 26 | one foe · 1 hit · 4.6 |
-| 3 | `mage-tome-fire.3a` | B · Wave | Firaga Wave | 22 | every foe · 1 hit · 1.595 |
-| 4 | `mage-tome-fire.4a` | B · Wave | Firaja Wave | 26 | every foe · 1 hit · 2.035 |
-| 5 | `mage-tome-fire.5a` | B · Wave | Flare Wave | 30 | every foe · 1 hit · 2.53 |
+| 3 | `mage-tome-fire.3a` | B · Wave | Grand Flame Wave | 22 | every foe · 1 hit · 1.595 |
+| 4 | `mage-tome-fire.4a` | B · Wave | Supreme Flame Wave | 26 | every foe · 1 hit · 2.035 |
+| 5 | `mage-tome-fire.5a` | B · Wave | Flare Star Wave | 30 | every foe · 1 hit · 2.53 |
 
 #### Sorcerer · Blizzard Tome (`mage-tome-ice`), B · Spike
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
-| 1 | `mage-tome-ice.1` | Trunk | Blizzard | 14 | every foe · 1 hit · 0.88 |
-| 2 | `mage-tome-ice.2` | Trunk | Blizzara | 18 | every foe · 1 hit · 1.21 |
-| 3 | `mage-tome-ice.3` | A | Blizzaga | 22 | every foe · 1 hit · 1.595 |
-| 4 | `mage-tome-ice.4` | A | Blizzaja | 26 | every foe · 1 hit · 2.035 |
+| 1 | `mage-tome-ice.1` | Trunk | Frost | 14 | every foe · 1 hit · 0.88 |
+| 2 | `mage-tome-ice.2` | Trunk | Greater Frost | 18 | every foe · 1 hit · 1.21 |
+| 3 | `mage-tome-ice.3` | A | Grand Frost | 22 | every foe · 1 hit · 1.595 |
+| 4 | `mage-tome-ice.4` | A | Supreme Frost | 26 | every foe · 1 hit · 2.035 |
 | 5 | `mage-tome-ice.5` | A | Absolute Zero | 30 | every foe · 2 hits · 2.53 |
-| 3 | `mage-tome-ice.3a` | B · Spike | Blizzaga Spike | 18 | one foe · 1 hit · 3.19 |
-| 4 | `mage-tome-ice.4a` | B · Spike | Blizzaja Spike | 22 | one foe · 1 hit · 4.07 |
-| 5 | `mage-tome-ice.5a` | B · Spike | Zero Spike | 26 | one foe · 1 hit · 5.06 |
+| 3 | `mage-tome-ice.3a` | B · Spike | Grand Frost Spike | 18 | one foe · 1 hit · 3.19 |
+| 4 | `mage-tome-ice.4a` | B · Spike | Supreme Frost Spike | 22 | one foe · 1 hit · 4.07 |
+| 5 | `mage-tome-ice.5a` | B · Spike | Absolute Zero Spike | 26 | one foe · 1 hit · 5.06 |
 
 #### Sorcerer · Thunder Tome (`mage-tome-lightning`), B · Bolt
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `mage-tome-lightning.1` | Trunk | Thunder | 10 | random foes · 2 hits · 1.68 |
-| 2 | `mage-tome-lightning.2` | Trunk | Thundara | 14 | random foes · 2 hits · 2.31 |
-| 3 | `mage-tome-lightning.3` | A | Thundaga | 18 | random foes · 3 hits · 3.045 |
-| 4 | `mage-tome-lightning.4` | A | Thundaja | 22 | random foes · 3 hits · 3.885 |
-| 5 | `mage-tome-lightning.5` | A | Judgment Storm | 26 | random foes · 4 hits · 4.832 |
-| 3 | `mage-tome-lightning.3a` | B · Bolt | Thundaga Bolt | 18 | one foe · 1 hit · 2.9 |
-| 4 | `mage-tome-lightning.4a` | B · Bolt | Thundaja Bolt | 22 | one foe · 1 hit · 3.7 |
-| 5 | `mage-tome-lightning.5a` | B · Bolt | Judgment Bolt | 26 | one foe · 1 hit · 4.6 |
+| 2 | `mage-tome-lightning.2` | Trunk | Greater Thunder | 14 | random foes · 2 hits · 2.31 |
+| 3 | `mage-tome-lightning.3` | A | Grand Thunder | 18 | random foes · 3 hits · 3.045 |
+| 4 | `mage-tome-lightning.4` | A | Supreme Thunder | 22 | random foes · 3 hits · 3.885 |
+| 5 | `mage-tome-lightning.5` | A | Ion Storm | 26 | random foes · 4 hits · 4.832 |
+| 3 | `mage-tome-lightning.3a` | B · Bolt | Grand Thunder Bolt | 18 | one foe · 1 hit · 2.9 |
+| 4 | `mage-tome-lightning.4a` | B · Bolt | Supreme Thunder Bolt | 22 | one foe · 1 hit · 3.7 |
+| 5 | `mage-tome-lightning.5a` | B · Bolt | Ion Storm Bolt | 26 | one foe · 1 hit · 4.6 |
 
 #### Sorcerer · Light Tome (`mage-tome-light`), B · Pierce
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `mage-tome-light.1` | Trunk | Lux | 10 | one foe · 2 hits · 1.6 |
-| 2 | `mage-tome-light.2` | Trunk | Luxra | 14 | one foe · 2 hits · 2.2 |
-| 3 | `mage-tome-light.3` | A | Luxaga | 18 | one foe · 2 hits · 2.9 |
-| 4 | `mage-tome-light.4` | A | Luxaja | 22 | one foe · 2 hits · 3.7 |
-| 5 | `mage-tome-light.5` | A | Holy | 26 | one foe · 2 hits · 4.6 |
-| 3 | `mage-tome-light.3b` | B · Pierce | Luxaga Pierce | 20 | one foe · 1 hit · 2.835 |
-| 4 | `mage-tome-light.4b` | B · Pierce | Luxaja Pierce | 24 | one foe · 1 hit · 3.617 |
-| 5 | `mage-tome-light.5b` | B · Pierce | Holy Pierce | 28 | one foe · 1 hit · 4.497 |
+| 2 | `mage-tome-light.2` | Trunk | Greater Lux | 14 | one foe · 2 hits · 2.2 |
+| 3 | `mage-tome-light.3` | A | Grand Lux | 18 | one foe · 2 hits · 2.9 |
+| 4 | `mage-tome-light.4` | A | Supreme Lux | 22 | one foe · 2 hits · 3.7 |
+| 5 | `mage-tome-light.5` | A | Sunburst | 26 | one foe · 2 hits · 4.6 |
+| 3 | `mage-tome-light.3b` | B · Pierce | Grand Lux Pierce | 20 | one foe · 1 hit · 2.835 |
+| 4 | `mage-tome-light.4b` | B · Pierce | Supreme Lux Pierce | 24 | one foe · 1 hit · 3.617 |
+| 5 | `mage-tome-light.5b` | B · Pierce | Sunburst Pierce | 28 | one foe · 1 hit · 4.497 |
 
 #### Sorcerer · Dark Tome (`mage-tome-dark`), B · Barrage
 
 | Depth | Node | Line | Name | MP | What it does |
 |---|---|---|---|---|---|
 | 1 | `mage-tome-dark.1` | Trunk | Nox | 12 | one foe · 1 hit · 1.28 · 0.56 on every other foe |
-| 2 | `mage-tome-dark.2` | Trunk | Noxra | 16 | one foe · 1 hit · 1.76 · 0.77 on every other foe |
-| 3 | `mage-tome-dark.3` | A | Noxaga | 20 | one foe · 2 hits · 2.32 · 1.015 on every other foe |
-| 4 | `mage-tome-dark.4` | A | Noxaja | 24 | one foe · 2 hits · 2.96 · 1.295 on every other foe |
+| 2 | `mage-tome-dark.2` | Trunk | Greater Nox | 16 | one foe · 1 hit · 1.76 · 0.77 on every other foe |
+| 3 | `mage-tome-dark.3` | A | Grand Nox | 20 | one foe · 2 hits · 2.32 · 1.015 on every other foe |
+| 4 | `mage-tome-dark.4` | A | Supreme Nox | 24 | one foe · 2 hits · 2.96 · 1.295 on every other foe |
 | 5 | `mage-tome-dark.5` | A | Black Hole | 28 | one foe · 3 hits · 3.681 · 1.61 on every other foe |
-| 3 | `mage-tome-dark.3a` | B · Barrage | Noxaga Barrage | 18 | one foe · 4 hits · 2.9 |
-| 4 | `mage-tome-dark.4a` | B · Barrage | Noxaja Barrage | 22 | one foe · 4 hits · 3.7 |
-| 5 | `mage-tome-dark.5a` | B · Barrage | Void Barrage | 26 | one foe · 6 hits · 4.602 |
+| 3 | `mage-tome-dark.3a` | B · Barrage | Grand Nox Barrage | 18 | one foe · 4 hits · 2.9 |
+| 4 | `mage-tome-dark.4a` | B · Barrage | Supreme Nox Barrage | 22 | one foe · 4 hits · 3.7 |
+| 5 | `mage-tome-dark.5a` | B · Barrage | Black Hole Barrage | 26 | one foe · 6 hits · 4.602 |
 <!-- /live -->

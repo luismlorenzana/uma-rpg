@@ -94,7 +94,7 @@ describe('the Class tab as a tree (H70, H120)', () => {
     expect(document.querySelector('[data-tree-status]')).toBeNull()
   })
 
-  it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Sunder\'s detail on tap', async () => {
+  it('draws class plus three tree icons, her Lance on B filled, gates on closed nodes, and Grand Cleave\'s detail on tap', async () => {
     show(await brawler())
     const tabs = within(screen.getByRole('tablist', { name: 'Trees' })).getAllByRole('tab')
     expect(tabs.map((t) => t.getAttribute('aria-label'))).toEqual(['Greatsword, line A', 'Axe, line A', 'Lance, line B'])
@@ -102,10 +102,10 @@ describe('the Class tab as a tree (H70, H120)', () => {
     expect(screen.getByRole('button', { name: 'Change Greatsword' })).toBeDefined()
 
     // The Greatsword tree: the trunk and A held to depth 3; the node is compact and its tap sheet owns the words.
-    expect(rpgNode('brawler-greatsword.3')!.name).toBe('Sunder')
+    expect(rpgNode('brawler-greatsword.3')!.name).toBe('Grand Cleave')
     expect(node('brawler-greatsword.3').dataset.held).toBe('true')
-    expect(node('brawler-greatsword.3').getAttribute('aria-label')).toBe('Sunder, Rank 2 · next R24, equipped')
-    expect(node('brawler-greatsword.1').getAttribute('aria-label')).toBe('Heavy Slash, Rank 5')
+    expect(node('brawler-greatsword.3').getAttribute('aria-label')).toBe('Grand Cleave, Rank 2 · next R24, equipped')
+    expect(node('brawler-greatsword.1').getAttribute('aria-label')).toBe('Cleave, Rank 5')
     expect(node('brawler-greatsword.3b').dataset.held).toBeUndefined()
     fireEvent.click(node('brawler-greatsword.3'))
     expect(await screen.findByRole('img', { name: 'Rank 2 of 5' })).toBeDefined()

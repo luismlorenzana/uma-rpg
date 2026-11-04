@@ -197,10 +197,12 @@ describe('the B lines at v19 (CV14)', () => {
     expect([rpgBranchBName('brawler', 'bow', V18), rpgBranchBName('mage', 'tome-light', V18), rpgBranchBName('mage', 'tome-dark', V18)])
       .toEqual(['Rain', 'Cascade', 'Pierce'])
     expect([RPG_BRANCH_B_NAME.brawler.bow, RPG_BRANCH_B_NAME.mage['tome-light'], RPG_BRANCH_B_NAME.mage['tome-dark']]).toEqual(['Barrage', 'Pierce', 'Barrage'])
-    // Every other line keeps its name, and the side letters never move.
+    // Every other line keeps its name but the two the skill names rename (D298, SN6), and the side letters never move.
+    const renamed: Readonly<Record<string, string>> = { Bonded: 'Oath', Heavy: 'Surge' }
     for (const c of rpgClasses(V19)) for (const w of rpgClassWeapons(c)) {
       const moved = (c === 'brawler' && w === 'bow') || (c === 'mage' && (w === 'tome-light' || w === 'tome-dark'))
-      if (!moved) expect(rpgBranchBName(c, w, V19), `${c} ${w}`).toBe(rpgBranchBName(c, w, V18))
+      const old = rpgBranchBName(c, w, V18)!
+      if (!moved) expect(rpgBranchBName(c, w, V19), `${c} ${w}`).toBe(renamed[old] ?? old)
     }
     expect([RPG_BRANCH_B.brawler.bow, RPG_BRANCH_B.mage['tome-light'], RPG_BRANCH_B.mage['tome-dark']]).toEqual(['b', 'b', 'a'])
     expect(rpgBranchBName('brawler', 'tome-fire', V19)).toBeUndefined()
@@ -258,15 +260,15 @@ describe('three generations on one id', () => {
     }
   })
 
-  it('names the live catalog v19\'s since H134 (names are presentation): Starfall Volley, the Barrages and the Pierces', () => {
+  it('names the live catalog by the skill names since D298 (names are presentation): the Salvo, the Barrages and the Pierces', () => {
     const name = (id: string) => rpgNode(id)!.name
-    expect(['brawler-bow.1', 'brawler-bow.4', 'brawler-bow.5'].map(name)).toEqual(['Twin Arrows', 'Arrow Storm', 'Starfall Volley'])
-    expect([3, 4, 5].map((d) => name(`brawler-bow.${d}b`))).toEqual(['Quiver Barrage', 'Storm Barrage', 'Starfall Barrage'])
-    expect([3, 4, 5].map((d) => name(`mage-tome-light.${d}b`))).toEqual(['Luxaga Pierce', 'Luxaja Pierce', 'Holy Pierce'])
-    expect([3, 4, 5].map((d) => name(`mage-tome-dark.${d}a`))).toEqual(['Noxaga Barrage', 'Noxaja Barrage', 'Void Barrage'])
-    // Every other name stays, the cores of Light and Dark among them.
+    expect(['brawler-bow.1', 'brawler-bow.4', 'brawler-bow.5'].map(name)).toEqual(['Salvo', 'Supreme Salvo', 'Starfall'])
+    expect([3, 4, 5].map((d) => name(`brawler-bow.${d}b`))).toEqual(['Grand Salvo Barrage', 'Supreme Salvo Barrage', 'Starfall Barrage'])
+    expect([3, 4, 5].map((d) => name(`mage-tome-light.${d}b`))).toEqual(['Grand Lux Pierce', 'Supreme Lux Pierce', 'Sunburst Pierce'])
+    expect([3, 4, 5].map((d) => name(`mage-tome-dark.${d}a`))).toEqual(['Grand Nox Barrage', 'Supreme Nox Barrage', 'Black Hole Barrage'])
+    // The capstones, Light's and Dark's among them.
     expect(['mage-tome-light.5', 'mage-tome-dark.5', 'summoner-bow.5', 'spellblade-tome-dark.5', 'brawler-katana.5a'].map(name))
-      .toEqual(['Holy', 'Black Hole', 'Sagittarius', 'Celestial Shade', 'Final Draw'])
+      .toEqual(['Sunburst', 'Black Hole', 'Sylph Lord', 'Dusk Edge', 'Moonfall Draw'])
     // The summaries are v19's, a volley's splash in them.
     expect(rpgNode('mage-tome-dark.1')!.summary).toBe('one foe · 1 hit · 1.28 · 0.56 on every other foe')
     expect(rpgNode('mage-tome-light.3')!.summary).toBe('one foe · 2 hits · 2.9')

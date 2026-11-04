@@ -197,7 +197,7 @@ describe('engine v15: the Summoner, the Spell Blade’s mirror (classes-v2 §3.2
     // A foe guarding another: the farewell is never intercepted.
     unitOf(first, 'f2').guardingFor = 'f1'
     const step = ok(first, pair('summoner-tome-lightning.1', 'summoner-greatsword.1', 'f3'))
-    expect(step.cues[0]).toEqual({ kind: 'summon', actorId: 'a5', targetId: 'f3', label: 'Ember Sprites' })
+    expect(step.cues[0]).toEqual({ kind: 'summon', actorId: 'a5', targetId: 'f3', label: rpgNode('summoner-tome-fire.1')!.name })
     const hits = hitsOf(step.cues, 'a5')
     const farewell = hits.slice(0, 3)
     expect(farewell.map((c) => [c.targetId, c.element, c.label])).toEqual([['f1', 'fire', undefined], ['f2', 'fire', undefined], ['f3', 'fire', undefined]])
@@ -226,7 +226,7 @@ describe('engine v15: the Summoner, the Spell Blade’s mirror (classes-v2 §3.2
   it('leaves nothing lingering after a Tome Attack, and an Arms summon never lingers', () => {
     const first = round(s0(), pair('summoner-tome-fire.1', 'summoner-greatsword.1')).next
     const step = ok(first, pair('tome-fire', 'summoner-greatsword.1'))
-    expect(step.cues[0]).toMatchObject({ kind: 'summon', label: 'Ember Sprites' })
+    expect(step.cues[0]).toMatchObject({ kind: 'summon', label: rpgNode('summoner-tome-fire.1')!.name })
     expect(hitsOf(step.cues, 'a5').slice(3).map((c) => c.element)).toEqual(['fire', 'greatsword'])
     expect(step.state.summons).toEqual([])
     // With nothing lingering, the next pair has no farewell.
@@ -244,7 +244,7 @@ describe('engine v15: the Summoner, the Spell Blade’s mirror (classes-v2 §3.2
     expect(limit.next.summons).toEqual(first.summons)
     const guard = round(limit.next, { kind: 'guard', actorId: 'a5', targetId: 'a1' }).next
     expect(guard.summons).toEqual(first.summons)
-    expect(ok(guard, pair('tome-fire', 'bow')).cues[0]).toMatchObject({ kind: 'summon', label: 'Ember Sprites' })
+    expect(ok(guard, pair('tome-fire', 'bow')).cues[0]).toMatchObject({ kind: 'summon', label: rpgNode('summoner-tome-fire.1')!.name })
   })
 
   it('says farewell to the next wave’s foes', () => {
@@ -255,7 +255,7 @@ describe('engine v15: the Summoner, the Spell Blade’s mirror (classes-v2 §3.2
     expect(first.state.wave).toBe(1)
     expect(first.state.summons).toHaveLength(1)
     const step = ok(first.state, pair('tome-fire', 'bow', 'w2'))
-    expect(step.cues[0]).toMatchObject({ kind: 'summon', label: 'Ember Sprites' })
+    expect(step.cues[0]).toMatchObject({ kind: 'summon', label: rpgNode('summoner-tome-fire.1')!.name })
     expect(hitsOf(step.cues, 'a5').slice(0, 2).map((c) => [c.targetId, c.element])).toEqual([['w1', 'fire'], ['w2', 'fire']])
   })
 
@@ -269,10 +269,10 @@ describe('engine v15: the Summoner, the Spell Blade’s mirror (classes-v2 §3.2
     expect(ok(down, pair('tome-fire', 'bow')).cues.some((c) => c.kind === 'summon')).toBe(false)
   })
 
-  it('names the Greatsword line’s depth-3 summon the Knight Captain, "Paladin" being a class since the switch', () => {
+  it('names the Greatsword tree’s summons by the skill names (D298): the Knight a depth, its line B off the live side unnamed', () => {
     expect(['summoner-greatsword.3', 'summoner-greatsword.3a', 'summoner-greatsword.3b'].map((id) => rpgNode(id)!.name))
-      .toEqual(['Knight Captain', 'Knight Captain Pack', 'Bonded Knight Captain'])
-    expect(rpgNode('summoner-greatsword.4')!.name).toBe('Aegis Champion')
+      .toEqual(['Grand Knight', 'Grand Knight Pack', 'Bonded Knight Captain'])
+    expect(rpgNode('summoner-greatsword.4')!.name).toBe('Supreme Knight')
   })
 
   // H56 moved every support to `support15`, which no Summoner node has (D181); H55 landed second and turns this on.

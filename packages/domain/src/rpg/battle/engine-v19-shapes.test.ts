@@ -129,7 +129,7 @@ describe('engine v19: the double (CV12)', () => {
 })
 
 describe('engine v19: a lingering volley summon', () => {
-  it('bids an Arms Summoner\'s Slinger farewell with one hit on every foe as her next pair comes', () => {
+  it('bids an Arms Summoner\'s Bow summon farewell with one hit on every foe as her next pair comes', () => {
     const as = member('a3', 'armsummoner', { loadout: ['armsummoner-bow.1', 'armsummoner-axe.1', 'armsummoner-tome-dark.1'] })
     expect(as.weapons).toEqual(['bow', 'axe', 'tome-dark'])
     const s = start(input(as))
@@ -140,7 +140,7 @@ describe('engine v19: a lingering volley summon', () => {
       ['dark', 'f1'], ['dark', 'f2'], ['dark', 'f3']])
     expect(step.state.summons).toEqual([{ allyId: 'a3', ref: ref('armsummoner-bow.1'), scale: 0.3 }])
     const again = ok(next, { ...pair, targetId: 'f2' })
-    expect(again.cues[0]).toMatchObject({ kind: 'summon', actorId: 'a3', label: 'Slinger' })
+    expect(again.cues[0]).toMatchObject({ kind: 'summon', actorId: 'a3', label: rpgNode('armsummoner-bow.1')!.name })
     const farewell = again.cues.slice(1, 4)
     expect(farewell.map((c) => [c.kind, (c as Hit).element, (c as Hit).targetId])).toEqual([['hit', 'bow', 'f1'], ['hit', 'bow', 'f2'], ['hit', 'bow', 'f3']])
     expect(again.cues[4]).toMatchObject({ kind: 'hit', element: 'bow', targetId: 'f2' })

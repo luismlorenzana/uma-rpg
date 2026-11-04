@@ -20,10 +20,11 @@
 // by one rule (`passSkill`), so no older def moves.
 import {
   isRpgTome, RPG_CLASSES, RPG_TIER0_CLASSES, RPG_TOMES, RPG_WEAPON_KINDS, RPG_WEAPONS, rpgWeaponKind,
-  type RpgClass, type RpgDamageKind, type RpgElement, type RpgStatusKind, type RpgTier0Class, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
+  type RpgClass, type RpgDamageKind, type RpgElement, type RpgStatusKind, type RpgTier0Class, type RpgTier1Class, type RpgTreeId, type RpgWeapon, type RpgWeaponKind,
 } from './kinds'
 import { RPG_TIER0_MP, RPG_TIER0_SKILL } from './class-tree'
-import { RPG_BRANCH_B, RPG_SKILL_MP, RPG_SKILL_POWER, rpgTreeOf } from './node-identity'
+import { RPG_BRANCH_B, RPG_SKILL_MP, RPG_SKILL_POWER, rpgClassWeapons, rpgTreeOf } from './node-identity'
+import { rpgSkillName } from './skill-names'
 import { BATTLE_ENGINE_VERSION, BATTLE_REGEN_ROUNDS, RPG_REWORK_ENGINE, rpgRework, rpgV2 } from './battle/caps'
 export { rpgTreeOf, rpgSideNodeLevel } from './node-identity'
 // The depth tables live with the node identities (H62): the world's foes read them without building this catalog.
@@ -738,6 +739,15 @@ for (const node of NODES) {
   if (sameDef(skill, played)) continue
   node.skill21 = skill
   if (LIVE21) node.summary = describe(skill)
+}
+// The skill names (D298): every live tree's trunk and lines read one grammar. A node has one name, the live one, so an
+// older fight replayed shows today's names; its defs never move.
+if (LIVE19) {
+  for (const node of NODES) {
+    if (RPG_TIER0_CLASSES.includes(node.classId as RpgTier0Class) || !rpgClassWeapons(node.classId).includes(node.weapon)) continue
+    const line = node.variant === null ? 'A' : node.depth >= 3 && RPG_BRANCH_B[node.classId][node.weapon] === node.variant ? 'B' : null
+    if (line) node.name = rpgSkillName(node.classId as RpgTier1Class, node.weapon, node.depth, line)
+  }
 }
 
 /** Every node of every generation (960: 750 to v18, D179; Classes v3's 210 from v19, H126): `rpgNode` finds any of them. */

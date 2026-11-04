@@ -36,8 +36,6 @@ H141's pixel art is published in uma-art 2.19.0 (Done below); H144 pins it and f
 |---|---|---|---|---|---|
 | [H144](tasks/H144-pin-star-art.md) | Pin uma-art 2.19.0 and swap the vector marks | Claude or ChatGPT | S | H141 | Ready |
 
-The audit's bugs and the Hall issues have no packet yet.
-
 **The combat pass** (H145–H149, D282) is built and live: foes no longer guard, one symbol per kind, the healers' one kit and
 rescue, buffs and debuffs on their paths, pure Brawlers and Sorcerers, a Spellblade's bound familiar.
 
@@ -87,10 +85,6 @@ Every packet can go to ChatGPT; no art packet.
 
 **Order:** H163 can start now, beside H160. Then H164 after H160, H165 after H161, and H166 after H162.
 
-**For the owner's review:** [skill names](../design/skill-names/skill-names.md) ([review page](../design/skill-names/previews/skill-names.html)):
-one grammar for all 70 trees (a word a tree, Greater · Grand · Supreme, a capstone; line B is A's name with the line's
-word), 524 of the 560 names changed, two B lines renamed (SN1–SN15). A proposal; not packeted until approved.
-
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
 
@@ -111,6 +105,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H167 | Skill names, one grammar for every Tier 1 tree (D298, [skill-names.md](../design/skill-names/skill-names.md)): a word a tree, Greater · Grand · Supreme, a capstone, line B as A's name with its word; 528 of the 560 live names, the Summoners' Bonded line now Oath and the healers' Heavy Surge; names only, no engine or save change | (this commit) |
 | H141 | Five native 24px star crests and eight native 16px stat marks (platform P80); the 120×220 UI atlas preserves every earlier frame, and native/2×/4× white, dark and night-sky previews passed review. Uma-art 2.19.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41880067892); H144 owns the pin and is Ready, as is H156's next art release. | Art `b612403` ([platform #64](https://github.com/luismlorenzana/uma-platform/pull/64)) |
 | H159 | Capital runs' foes: a fourth Finals route for all fourteen scenarios, the run's ids and its sixteen fights, the map's capitals byte for byte as before (D296) | `2938491` |
 | H157 | Collections live, save v35: the switch, the run-wide Ascend and the Observatory removed, the manual and the phone check (D288) | `ceab990` |

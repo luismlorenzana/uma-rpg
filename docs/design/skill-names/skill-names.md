@@ -1,6 +1,9 @@
 # Skill names: one grammar for every tree
 
-**Status:** a proposal for the owner's review, 2026-11-04. Nothing is built. The review page is
+**Status:** approved 2026-11-04 (D298) and built (H167). Three words changed after approval: the healers' Katana tree
+is **Rend**, not Mark, and their Blizzard tree **Haven**, not Ward, since Mark and Ward are foes' statuses in a fight
+("cut + mark", "Ward: guard up", SN7); and the Spellblades' Fire tree is **Scorch**, not Blaze, which is a string in the
+master-data release (the original-content guard, `template-release.test.ts`). The review page is
 [previews/skill-names.html](previews/skill-names.html): all 70 trees and their 560 skills, today's name beside the proposed
 one, with what each does. Its numbers come from the live catalog (engine v21).
 
@@ -82,7 +85,7 @@ Each family's word and capstone, weapon by weapon (the full 560 are on the revie
 | Lance | Lunge | Greater Lunge | Grand Lunge | Supreme Lunge | Comet Edge |
 | Bow | Arc | Greater Arc | Grand Arc | Supreme Arc | Falcon Edge |
 | Katana | Iai | Greater Iai | Grand Iai | Supreme Iai | Moon Edge |
-| Fire Tome | Blaze | Greater Blaze | Grand Blaze | Supreme Blaze | Inferno Edge |
+| Fire Tome | Scorch | Greater Scorch | Grand Scorch | Supreme Scorch | Inferno Edge |
 | Blizzard Tome | Rime | Greater Rime | Grand Rime | Supreme Rime | Glacier Edge |
 | Thunder Tome | Volt | Greater Volt | Grand Volt | Supreme Volt | Storm Edge |
 | Light Tome | Lumen | Greater Lumen | Grand Lumen | Supreme Lumen | Dawn Edge |
@@ -113,16 +116,16 @@ on the other's: the Arms Summoner's Arms, the Tome Summoner's Tomes.
 | Axe | Rampart | Greater Rampart | Grand Rampart | Supreme Rampart | Citadel |
 | Lance | Daze | Greater Daze | Grand Daze | Supreme Daze | Oblivion |
 | Bow | Wither | Greater Wither | Grand Wither | Supreme Wither | Blight |
-| Katana | Mark | Greater Mark | Grand Mark | Supreme Mark | Doom |
+| Katana | Rend | Greater Rend | Grand Rend | Supreme Rend | Doom |
 | Fire Tome | Valor | Greater Valor | Grand Valor | Supreme Valor | Exaltation |
-| Blizzard Tome | Ward | Greater Ward | Grand Ward | Supreme Ward | Sanctuary |
+| Blizzard Tome | Haven | Greater Haven | Grand Haven | Supreme Haven | Sanctuary |
 | Thunder Tome | Pulse | Greater Pulse | Grand Pulse | Supreme Pulse | Stormheart |
 | Light Tome | Grace | Greater Grace | Grand Grace | Supreme Grace | Benediction |
 | Dark Tome | Siphon | Greater Siphon | Grand Siphon | Supreme Siphon | Eventide |
 
 ## 3. What changes and what doesn't
 
-- **524 of the 560 skills change name** (the rest already fit: Meteor Strike, Maelstrom, Moonfall, Flare Star, Black
+- **528 of the 560 skills change name** (the rest already fit: Meteor Strike, Maelstrom, Moonfall, Flare Star, Black
   Hole, Sword Saint, Phoenix, Ruin, Exaltation, Benediction…). There are 350 distinct names.
 - **Two B lines are renamed** on the Class tab and in the manual: the Summoners' **Bonded → Oath** (a Bond is the Halls'
   Bond level) and the healers' **Heavy → Surge** (Heavy is the Greatsword's and Fire's shape). The others keep their
@@ -133,7 +136,7 @@ on the other's: the Arms Summoner's Arms, the Tome Summoner's Tomes.
   lines, the tests that pin names, and `pnpm docs:update` for [skill trees](../../game/skill-trees.md). Its packet confirms
   the replay pins don't read names.
 
-## 4. Decisions to take
+## 4. Decisions (approved, D298)
 
 | Id | Call | Recommended |
 |---|---|---|

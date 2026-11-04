@@ -488,7 +488,7 @@ A Tier 0's trees are one node each ([above](#tier-0-and-promotion)). A Tier 1 cl
   its gate (D102, CP16), and every node there on her path is hers at once.
 - **Line A is the default; line B is a sidegrade with its own name** (Combo, Impale, Pierce, Barrage, Heavy…; every
   tree's is in [skill trees](skill-trees.md#the-lines-at-a-glance)). She takes B, or A again, free at any time; her
-  equipped skills follow in place (with Rend equipped, taking Combo puts Rending Combo in its slot). A line sits on any
+  equipped skills follow in place (with Supreme Cleave equipped, taking Combo puts Supreme Cleave Combo in its slot). A line sits on any
   kind of her class's trees, slotted or not.
 - **Skill Ranks** (CP32): every skill she holds is Rank 1 when its depth opens and gains a rank every 2 Class Ranks, up
   to Rank 5, on its own. A rank scales its power, and a healer's mend and Barrier shares, ×0.95 to ×1.05; MP, hits,
@@ -500,7 +500,7 @@ A Tier 0's trees are one node each ([above](#tier-0-and-promotion)). A Tier 1 cl
 - **The two new hybrids' trees** (CV17): the Tome Spellblade's follow the Arms Spellblade's rule (one foe, hits by kind,
   the same depth-5 riders) under her own names, Edged, Honed, Whetted, Gleaming and Sovereign, then Pyre, Frost, Volt,
   Lumen and Umbra on her Tomes and the blade's Cleave, Hew, Thrust, Shot and Draw on her Arms; the Arms Summoner's are the
-  Summoner's summons in their kind's shape, with Bonded on her Arms trees and Pack on her Tomes, the Tome Summoner's
+  Summoner's summons in their kind's shape, with Oath on her Arms trees and Pack on her Tomes, the Tome Summoner's
   mirrored.
 
 <!-- live:depths -->

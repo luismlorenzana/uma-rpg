@@ -7,7 +7,7 @@ import { BATTLE_UNBROKEN_FACTOR, BATTLE_WARD_FACTOR, BATTLE_WEAK, battleWeakness
 import { battleDamage } from './engine'
 import { battleHasLimit, battleLimitPlan } from './limit'
 import { autoAction } from './auto'
-import { RPG_AOE_SHARE, RPG_RANDOM_BONUS } from '../catalog'
+import { RPG_AOE_SHARE, RPG_RANDOM_BONUS, rpgNode } from '../catalog'
 import { ALL_HERO_LIMIT_IDS, HERO_LIMIT_POWER, heroLimitFor, heroLimitIds, heroLimitSkills, isHeroLimitId } from '../heroes'
 import type { BattleAlly, BattleCue, BattleEnemy, BattleInput, BattleState, BattleStep } from './types'
 import { balanceParty, balanceStage } from '../../world/balance-party'
@@ -111,7 +111,7 @@ describe('battle engine v6: one act a turn, ten kinds, Orbs (D86)', () => {
     expect(first.state.summons).toEqual([{ allyId: 'a5', ref: skill('summoner-tome-fire.1'), scale: 0.3 }])
     const round2 = one(s, { kind: 'skill', actorId: 'a5', targetId: 'f1', skill: skill('summoner-tome-fire.1') }).state
     const second = applyBattleAction(round2, { kind: 'skill', actorId: 'a5', targetId: 'f1', skill: skill('summoner-greatsword.1') })
-    expect(second.cues.find((c) => c.kind === 'summon')).toMatchObject({ label: 'Ember Sprites' })
+    expect(second.cues.find((c) => c.kind === 'summon')).toMatchObject({ label: rpgNode('summoner-tome-fire.1')!.name })
     expect(hits(second, 'f1').map((c) => c.kind === 'hit' && c.element)).toEqual(['fire', 'greatsword'])
     const [linger, summoned] = hits(second, 'f1').map((c) => (c.kind === 'hit' ? c.amount : 0))
     expect(linger! / summoned!).toBeCloseTo(0.3 / 0.6, 1)

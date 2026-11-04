@@ -43,7 +43,7 @@ describe('the Limit Break menu (D106, D112)', () => {
     expect(limitOptions(fight(10, {}), 'a1').options).toEqual([])
     expect(limitReady(fight(10, { hero: 'cleric-1' }), 'a1')).toBe(true)
     expect(limitReady(fight(9, {}), 'a1')).toBe(true)
-    expect(limitOptions(fight(9, {}), 'a1').options[0]).toMatchObject({ name: 'Heavy Slash' })
+    expect(limitOptions(fight(9, {}), 'a1').options[0]).toMatchObject({ name: 'Cleave' })
   })
 })
 
