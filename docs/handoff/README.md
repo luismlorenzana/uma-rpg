@@ -87,6 +87,10 @@ Every packet can go to ChatGPT; no art packet.
 
 **Order:** H163 can start now, beside H160. Then H164 after H160, H165 after H161, and H166 after H162.
 
+**For the owner's review:** [skill names](../design/skill-names/skill-names.md) ([review page](../design/skill-names/previews/skill-names.html)):
+one grammar for all 70 trees (a word a tree, Greater · Grand · Supreme, a capstone; line B is A's name with the line's
+word), 524 of the 560 names changed, two B lines renamed (SN1–SN15). A proposal; not packeted until approved.
+
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
 
