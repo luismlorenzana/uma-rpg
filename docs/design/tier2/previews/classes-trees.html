@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trees by Tier</title>
+<!-- docs/design/tier2/classes.md (T2C11, T2C14–T2C22, T2C27). The Tier rework's preview template: uma-kit's theme tokens. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --ring: #c2643a; --ld: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c; --ring: #e08a5e; --ld: #a98bff;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 24px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.ring { background: color-mix(in srgb, var(--ring) 18%, transparent); color: var(--ring); }
+  .chip.ld { background: color-mix(in srgb, var(--ld) 18%, transparent); color: var(--ld); }
+  .chip.new { background: var(--accent-wash); color: var(--accent-strong); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  select { font: 600 13px system-ui; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 2px; gap: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+  .seg button.on { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .treegrid { display: grid; grid-template-columns: 110px repeat(3, minmax(0, 1fr)); gap: 8px 12px; align-items: stretch; margin-top: 10px; }
+  .dh { font-size: 12px; color: var(--ink-faint); padding-top: 8px; }
+  .dh b { color: var(--ink-soft); }
+  .node { padding: 8px 10px; border-radius: 10px; background: var(--raised); border: 1.5px solid var(--hairline-strong); font-size: 12px; cursor: pointer; }
+  .node .nm { font-weight: 700; font-size: 13px; color: var(--ink); }
+  .node .sub { color: var(--ink-faint); font-size: 11px; margin-top: 2px; }
+  .node.trunk { border-color: var(--accent); background: var(--accent-wash); grid-column: span 3; text-align: center; }
+  .node.held { border-color: var(--accent); }
+  .node.unheld { opacity: .45; }
+  .node.new { border-style: dashed; }
+  .node.crown { box-shadow: inset 0 0 0 2px var(--t3); }
+  .node.empty { visibility: hidden; }
+  .lh { text-align: center; font-weight: 700; font-size: 12px; color: var(--ink-soft); }
+  .tips { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .tip { font-size: 10px; padding: 1px 6px; border-radius: 999px; background: var(--sunken); color: var(--ink-soft); font-weight: 700; }
+  .tip.on { background: var(--accent); color: var(--accent-ink); }
+  .detail { margin-top: 10px; font-size: 13px; }
+  .note { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+  @media (max-width: 760px) { .treegrid { grid-template-columns: 70px repeat(3, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Trees by tier</h1>
+  <p>Any Tier 1 class's tree on any kind she can slot, as Tier 1 plays it and as Tiers 2 and 3 would grow it
+    (<a href="../classes.md">classes.md</a> §4.6–§5.3). Every name comes from D298's grammar: the tree's word, Greater ·
+    Grand · Supreme, its capstone, a line's word after line A's name. Dashed nodes are new; a purple ring is a crown.</p>
+  <div class="card">
+    <div class="row">
+      <label>Class <select id="cls"></select></label>
+      <label>Weapon <select id="wpn"></select></label>
+      <span class="seg" id="tier"><button data-t="1" class="on">Tier 1</button><button data-t="2">Tier 2</button><button data-t="3">Tier 3</button></span>
+      <span class="seg" id="line"></span>
+    </div>
+    <div class="treegrid" id="tree"></div>
+    <div class="detail" id="detail"></div>
+    <p class="note" id="tier-note"></p>
+  </div>
+
+  <h2>Her class line (Tier 2 on)</h2>
+  <div class="card">
+    <div class="row"><span class="seg" id="branch"></span><span class="muted" id="branch-note"></span></div>
+    <div class="treegrid" id="classline" style="grid-template-columns: 110px minmax(0, 1fr)"></div>
+  </div>
+
+  <h2>Line C's words, by family</h2>
+  <div class="card scroll"><table id="cwords"></table>
+  <p class="note">252 new names checked against every master-data string (all ten release files, case-insensitive, exact): no match; none over three words or 21 characters.</p></div>
+</main>
+<script>
+const W = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire Tome', ice: 'Blizzard Tome', lightning: 'Thunder Tome', light: 'Light Tome', dark: 'Dark Tome' }
+const ARMS = ['greatsword', 'axe', 'lance', 'bow', 'katana'], TOMES = ['fire', 'ice', 'lightning', 'light', 'dark']
+const RING = new Set(['greatsword', 'axe', 'lance', 'fire', 'ice', 'lightning'])
+const SECONDARY = { katana: 'Armor Break', bow: 'Enfeeble', dark: 'Mind Break', light: 'Brave and Faith' }
+const EVERY = { greatsword: 'Armor Break', lance: 'Mind Break', fire: 'Brave and Faith' }
+const SHAPE = { greatsword: 'One foe, 1 · 1 · 2 · 2 · 3 hits', fire: 'One foe, one hit', axe: 'Every foe at ×0.55', ice: 'Every foe at ×0.55',
+  lance: 'Random foes, ×1.05', lightning: 'Random foes, ×1.05', katana: 'One foe, two hits', light: 'One foe, two hits',
+  bow: 'The tapped foe 0.8, a 0.35 splash on every other', dark: 'The tapped foe 0.8, a 0.35 splash on every other' }
+const WORDS = {
+  brawler: { greatsword: ['Cleave', 'Meteor Strike'], axe: ['Whirl', 'Maelstrom'], lance: ['Flurry', "Heaven's Rain"], bow: ['Salvo', 'Starfall'], katana: ['Crescent', 'Moonfall'] },
+  sorcerer: { fire: ['Flame', 'Flare Star'], ice: ['Frost', 'Absolute Zero'], lightning: ['Thunder', 'Ion Storm'], light: ['Lux', 'Sunburst'], dark: ['Nox', 'Black Hole'] },
+  spellblade: { greatsword: ['Sever', 'Titan Edge'], axe: ['Hew', 'Gale Edge'], lance: ['Lunge', 'Comet Edge'], bow: ['Arc', 'Falcon Edge'], katana: ['Iai', 'Moon Edge'],
+    fire: ['Scorch', 'Inferno Edge'], ice: ['Rime', 'Glacier Edge'], lightning: ['Volt', 'Storm Edge'], light: ['Lumen', 'Dawn Edge'], dark: ['Umbra', 'Dusk Edge'] },
+  summoner: { greatsword: ['Knight', 'Sword Saint'], axe: ['Minotaur', 'Mountain King'], lance: ['Dragoon', 'Valkyrie'], bow: ['Archer', 'Sylph Lord'], katana: ['Samurai', 'Shogun'],
+    fire: ['Drake', 'Phoenix'], ice: ['Golem', 'Winter Queen'], lightning: ['Roc', 'Kirin'], light: ['Angel', 'Archon'], dark: ['Vampire', 'Blood Countess'] },
+  healer: { greatsword: ['Breach', 'Ruin'], axe: ['Rampart', 'Citadel'], lance: ['Daze', 'Oblivion'], bow: ['Wither', 'Blight'], katana: ['Rend', 'Doom'],
+    fire: ['Valor', 'Exaltation'], ice: ['Haven', 'Sanctuary'], lightning: ['Pulse', 'Stormheart'], light: ['Grace', 'Benediction'], dark: ['Siphon', 'Eventide'] },
+}
+const B_BRAWLER = { greatsword: ['Combo', 'One more hit, ×0.92'], axe: ['Reap', 'Every foe ×0.45, then one hit on the tapped foe; +2 MP'], lance: ['Impale', 'One foe, 2–3 hits at ×1.09; +2 MP'], bow: ['Barrage', 'One foe, 4 · 4 · 6 hits; −2 MP'], katana: ['Draw', 'One Pierce hit at ×1.035; +2 MP'] }
+const B_SORC = { fire: ['Wave', 'Every foe, one hit; +4 MP'], ice: ['Spike', 'One foe, one hit at ×1.1; −4 MP'], lightning: ['Bolt', 'One foe, one hit'], light: ['Pierce', 'One Pierce hit at ×0.98; +2 MP'], dark: ['Barrage', 'One foe, 4 · 4 · 6 hits; −2 MP'] }
+const C_BRAWLER = { greatsword: ['Rout', 'Random foes, A\'s hits ×1.05'], axe: ['Havoc', 'Random foes, one hit more ×1.05; −4 MP'], lance: ['Tremor', 'Every foe at the area share; +4 MP'], bow: ['Hail', 'Every foe evenly at the area share; +2 MP'], katana: ['Fork', 'Her foe and one other, two hits each, the other at 0.6; +2 MP'] }
+const C_SORC = { fire: ['Kindle', 'Random foes, 2 · 3 · 3 hits ×1.05'], ice: ['Sleet', 'Random foes, 2 · 2 · 3 hits ×1.05; −4 MP'], lightning: ['Peal', 'Every foe at the area share; +4 MP'], light: ['Beam', 'Her foe and one other, two hits each, the other at 0.6; +2 MP'], dark: ['Gloom', 'Every foe evenly at the area share; +2 MP'] }
+const CLASSES = {
+  brawler: { name: 'Brawler', fam: 'brawler', weapons: ARMS, lead: null, branches: [['Berserker', 'ring', ['Rampage', 'Skybreaker'], 'The tapped foe the full power, every other 0.3'], ['Warlord', 'ld', ['Conquest', 'Sundown'], 'One foe; on a Broken foe every other also takes 0.55']] },
+  mage: { name: 'Sorcerer', fam: 'sorcerer', weapons: TOMES, lead: null, branches: [['Sage', 'ring', ['Nebula', 'Starburst'], 'Every foe at the area share; a weak foe the full power'], ['Augur', 'ld', ['Quasar', 'Event Horizon'], 'One foe, one hit at ×1.25, MP ×1.5']] },
+  spellblade: { name: 'Arms Spellblade', fam: 'spellblade', weapons: [...ARMS, ...TOMES], lead: 'arms', branches: [['Rune Knight', 'ring', ['Sigil', 'Rune Edge'], 'Lead half on one foe, other half on every foe at 0.55'], ['Blademaster', 'ld', ['Bane', 'Penumbra Edge'], 'Her pair on one foe; a Light/Dark weapon\'s path status, 1 · 1 · 2']] },
+  tomeblade: { name: 'Tome Spellblade', fam: 'spellblade', weapons: [...TOMES, ...ARMS], lead: 'tome', branches: [['Rune Knight', 'ring', ['Sigil', 'Rune Edge'], 'Lead half on one foe, other half on every foe at 0.55'], ['Blademaster', 'ld', ['Bane', 'Penumbra Edge'], 'Her pair on one foe; a Light/Dark weapon\'s path status, 1 · 1 · 2']] },
+  armsummoner: { name: 'Arms Summoner', fam: 'summoner', weapons: [...ARMS, ...TOMES], lead: 'arms', branches: [['Warlock', 'ld', ['Wraith', 'Banshee'], 'Her lead summon on every foe at 0.55; a Light/Dark weapon\'s path status'], ['Invoker', 'ring', ['Griffin', 'Kraken'], 'Her lead summon lingers at 0.5: a harder farewell']] },
+  summoner: { name: 'Tome Summoner', fam: 'summoner', weapons: [...TOMES, ...ARMS], lead: 'tome', branches: [['Warlock', 'ld', ['Wraith', 'Banshee'], 'Her lead summon on every foe at 0.55; a Light/Dark weapon\'s path status'], ['Invoker', 'ring', ['Griffin', 'Kraken'], 'Her lead summon lingers at 0.5: a harder farewell']] },
+  paladin: { name: 'Paladin', fam: 'healer', weapons: [...ARMS, ...TOMES], lead: null, branches: [['Guardian', 'ring', ['Edict', 'Covenant'], 'Its status reaches every foe or Uma from depth 3, or its Barrier or mend every Uma'], ['Templar', 'ld', ['Solace', 'Absolution'], 'A mend on the most hurt and a Barrier on the most threatened, both whole']] },
+  cleric: { name: 'Cleric', fam: 'healer', weapons: [...TOMES, ...ARMS], lead: null, branches: [['Guardian', 'ring', ['Edict', 'Covenant'], 'Its status reaches every foe or Uma from depth 3, or its Barrier or mend every Uma'], ['Templar', 'ld', ['Solace', 'Absolution'], 'A mend on the most hurt and a Barrier on the most threatened, both whole']] },
+}
+const isLead = (c, w) => c.lead === (TOMES.includes(w) ? 'tome' : 'arms')
+function lines(cid, w) {
+  const c = CLASSES[cid]
+  if (c.fam === 'brawler') return { B: B_BRAWLER[w], C: C_BRAWLER[w] }
+  if (c.fam === 'sorcerer') return { B: B_SORC[w], C: C_SORC[w] }
+  if (c.fam === 'spellblade') return { B: ['Pierce', `One Pierce hit at ×1.15${isLead(c, w) ? ' (two, with her familiar\'s)' : ''}; +1 MP`],
+    C: isLead(c, w) ? ['Swath', 'Her lead half on every foe at the area share, her familiar\'s hit given up; +2 MP a half'] : ['Strafe', 'Her other half at random foes, ×1.05'] }
+  if (c.fam === 'summoner') return { B: isLead(c, w) ? ['Oath', 'Lingers at 0.4, a harder farewell; +1 MP'] : ['Pack', 'One more hit, ×0.95'],
+    C: isLead(c, w) ? ['Hunt', 'Its farewell strikes its own target three times instead of every foe once; +1 MP'] : ['Maul', 'One hit fewer, ×1.1'] }
+  return { B: ['Surge', EVERY[w] ? 'One more stack of its status; +2 MP' : `A mend or Barrier ×1.15${w === 'light' ? '; depth 3 also revives' : ''}; +2 MP`],
+    C: ['Psalm', 'Her mend or Barrier reaches every Uma from depth 3 (×0.4 the rest); +2 MP'] }
+}
+function aWhat(cid, w, d) {
+  const c = CLASSES[cid]
+  const path = d >= 3 && SECONDARY[w] && (c.fam === 'spellblade' || c.fam === 'summoner' || c.fam === 'healer')
+  let base = c.fam === 'healer' ? `${ARMS.includes(w) ? 'A blow: a Barrier on the most threatened' : 'A spell: a mend on the most hurt'}${EVERY[w] ? `; ${EVERY[w]} (every skill)` : ''}`
+    : c.fam === 'summoner' ? `A summon in its shape: ${SHAPE[w].toLowerCase()}` : c.fam === 'spellblade' ? 'Her half on one foe, her kind\'s hits' : SHAPE[w]
+  if (path) base += ` · path: ${SECONDARY[w]}, ${c.fam === 'healer' ? '2 · 2 · 3' : '1 · 1 · 2'}`
+  return base
+}
+const POWER = [1.6, 2.2, 2.9, 3.7, 4.6], MP = [10, 14, 18, 22, 26]
+let cid = 'brawler', w = 'greatsword', tier = 1, line = 'A', held = ['A', 'B'], branch = 0
+const sel = document.getElementById('cls'), wsel = document.getElementById('wpn')
+sel.innerHTML = Object.entries(CLASSES).map(([k, c]) => `<option value="${k}">${c.name}</option>`).join('')
+function fillWeapons() { wsel.innerHTML = CLASSES[cid].weapons.map((k) => `<option value="${k}">${W[k]}</option>`).join(''); if (!CLASSES[cid].weapons.includes(w)) w = CLASSES[cid].weapons[0]; wsel.value = w }
+function lineSeg() {
+  const avail = tier >= 2 ? ['A', 'B', 'C'] : ['A', 'B']
+  if (!avail.includes(line)) line = 'A'
+  const el = document.getElementById('line')
+  el.innerHTML = tier === 3 ? avail.map((l) => `<button data-l="${l}" class="${held.includes(l) ? 'on' : ''}">Hold ${l}</button>`).join('')
+    : avail.map((l) => `<button data-l="${l}" class="${line === l ? 'on' : ''}">Line ${l}</button>`).join('')
+}
+function nodeName(word, cap, d, suffix) { const base = d === 1 ? word : d === 2 ? `Greater ${word}` : d === 3 ? `Grand ${word}` : d === 4 ? `Supreme ${word}` : cap; return suffix ? `${base} ${suffix}` : base }
+function draw() {
+  const c = CLASSES[cid], [word, cap] = WORDS[c.fam][w], L = lines(cid, w)
+  const cols = tier >= 2 ? ['A', 'B', 'C'] : ['A', 'B']
+  const isHeld = (l) => (tier === 3 ? held.includes(l) : line === l)
+  let h = `<div></div>` + ['A', 'B', 'C'].map((l) => `<div class="lh">${cols.includes(l) ? `Line ${l}${l === 'B' ? ` · ${L.B[0]}` : l === 'C' ? ` · ${L.C[0]}` : ''}` : ''}</div>`).join('')
+  for (let d = 1; d <= 5; d++) {
+    h += `<div class="dh"><b>Depth ${d}</b><br>Class Rank ${[1, 10, 20, 30, 40][d - 1]}<br>${POWER[d - 1]} · ${MP[d - 1]} MP</div>`
+    if (d <= 2) { h += `<div class="node trunk held" data-n="${d}"><div class="nm">${nodeName(word, cap, d)}</div><div class="sub">${d === 1 ? 'Trunk' : 'Trunk'} · ${aWhat(cid, w, d)}</div></div>`; continue }
+    for (const l of ['A', 'B', 'C']) {
+      if (!cols.includes(l)) { h += `<div class="node empty"></div>`; continue }
+      const suf = l === 'A' ? '' : L[l][0]
+      const crowned = tier === 3 && d === 5 && isHeld(l)
+      const tips = tier >= 2 && d === 5 ? `<div class="tips"><span class="tip on">Power</span><span class="tip">Break</span>${c.weapons[0] === w ? '<span class="tip">★ signature (T2U)</span>' : ''}</div>` : ''
+      h += `<div class="node ${isHeld(l) ? 'held' : 'unheld'} ${l === 'C' ? 'new' : ''} ${crowned ? 'crown' : ''}" data-n="${d}${l}"><div class="nm">${nodeName(word, cap, d, suf)}${crowned ? ' ♛' : ''}</div>`
+        + `<div class="sub">${l === 'A' ? aWhat(cid, w, d) : L[l][1]}${crowned ? ' · crowned at Class Rank 50: 5.6 whole, +4 MP' : ''}</div>${tips}</div>`
+    }
+  }
+  document.getElementById('tree').innerHTML = h
+  const group = RING.has(w) ? '<span class="chip ring">Ring</span>' : '<span class="chip ld">Light/Dark</span>'
+  document.getElementById('detail').innerHTML = `<div class="row"><b>${c.name} · ${W[w]}</b> ${group}${c.lead ? (isLead(c, w) ? ' <span class="chip">her lead half</span>' : ' <span class="chip">her other half</span>') : ''}
+    <span class="muted">The trunk is always hers; ${tier === 3 ? 'two lines held, Auto between them' : 'one line at a time, free to swap'}.</span></div>`
+  document.getElementById('tier-note').textContent = tier === 1 ? 'Tier 1, as live: 8 nodes, line A or B.'
+    : tier === 2 ? 'Tier 2: line C joins the fork (dashed); every capstone forks Power or Break; her lead weapon\'s tree gains the ★ signature tip (T2U). 14 nodes.'
+    : 'Tier 3: two of the three lines held (tap to choose); at Class Rank 50 each held capstone is crowned (♛): 5.6 whole, +4 MP, one more stack to the cap. No new names.'
+  // The class line.
+  const bs = document.getElementById('branch')
+  bs.innerHTML = c.branches.map((b, i) => `<button data-b="${i}" class="${branch === i ? 'on' : ''}">${b[0]} · ${b[1] === 'ring' ? 'Ring' : 'Light/Dark'}${i === 0 ? ' (branch 1)' : ''}</button>`).join('')
+  const [bn, bg, [bw, bc], bwhat] = c.branches[branch]
+  document.getElementById('branch-note').textContent = tier === 1 ? 'No class line in Tier 1: switch to Tier 2 or 3.' : `Cast through one of her ${bg === 'ring' ? 'Ring' : 'Light/Dark'} weapons, +15%.`
+  let ch = ''
+  for (const d of [3, 4, 5]) {
+    const crowned = tier === 3 && d === 5
+    ch += `<div class="dh"><b>Class Rank ${[20, 30, 40][d - 3]}</b><br>${POWER[d - 1]} · ${MP[d - 1]} MP +</div><div class="node ${tier === 1 ? 'unheld' : 'held'} new ${crowned ? 'crown' : ''}"><div class="nm">${d === 3 ? `Grand ${bw}` : d === 4 ? `Supreme ${bw}` : bc}${crowned ? ' ♛' : ''}</div><div class="sub">${bwhat}${crowned ? ' · crowned at Class Rank 50, with her family\'s mastery' : ''}</div></div>`
+  }
+  document.getElementById('classline').innerHTML = ch
+}
+sel.addEventListener('change', () => { cid = sel.value; branch = 0; fillWeapons(); draw() })
+wsel.addEventListener('change', () => { w = wsel.value; draw() })
+document.getElementById('tier').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return
+  for (const x of e.currentTarget.children) x.classList.toggle('on', x === b); tier = Number(b.dataset.t); lineSeg(); draw() })
+document.getElementById('line').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const l = b.dataset.l
+  if (tier === 3) { if (held.includes(l)) return; held = [held[1], l] } else line = l
+  lineSeg(); draw() })
+document.getElementById('branch').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; branch = Number(b.dataset.b); draw() })
+fillWeapons(); lineSeg(); draw()
+
+const CW = [['Brawler', 'Greatsword Rout · Axe Havoc · Lance Tremor · Bow Hail · Katana Fork', 'By tree, as her B lines are'],
+  ['Sorcerer', 'Fire Kindle · Blizzard Sleet · Thunder Peal · Light Beam · Dark Gloom', 'By tree'],
+  ['Spellblades', 'Swath on her lead half\'s trees · Strafe on her other half\'s', 'An Arms Spellblade\'s Lance is Grand Lunge Swath, a Tome Spellblade\'s Grand Lunge Strafe'],
+  ['Summoners', 'Hunt on her lead half\'s trees · Maul on her other half\'s', 'Beside Oath and Pack'],
+  ['Healers', 'Psalm on every tree', 'Beside Surge']]
+document.getElementById('cwords').innerHTML = '<tr><th>Family</th><th>Line C</th><th>Note</th></tr>' + CW.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td class="muted">${c}</td></tr>`).join('')
+</script>
+</body>
+</html>

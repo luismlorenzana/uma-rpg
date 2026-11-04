@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classes by Tier</title>
+<!-- docs/design/tier2/classes.md (T2C). Built from the Tier rework's preview template: uma-kit's theme tokens, light and dark. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --ring: #c2643a; --ld: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c; --ring: #e08a5e; --ld: #a98bff;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 24px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: var(--gap); }
+  .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .g5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 860px) { .g3, .g5, .g2 { grid-template-columns: 1fr; } }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.ring { background: color-mix(in srgb, var(--ring) 18%, transparent); color: var(--ring); }
+  .chip.ld { background: color-mix(in srgb, var(--ld) 18%, transparent); color: var(--ld); }
+  .chip.new { background: var(--accent-wash); color: var(--accent-strong); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+  ul.adds { margin: 6px 0 0; padding-left: 18px; }
+  ul.adds li { margin: 3px 0; }
+  .fam h3 { margin-top: 0; }
+  .cls { padding: 6px 0; border-top: 1px solid var(--hairline); }
+  .cls:first-of-type { border-top: 0; }
+  .cls b { color: var(--ink); }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 2px; gap: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+  .seg button.on { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .bar { height: 10px; border-radius: 5px; background: var(--accent); display: inline-block; vertical-align: middle; }
+  .bar.today { background: var(--ink-faint); }
+  .bar.phys { background: var(--phys); } .bar.magic { background: var(--magic); } .bar.heal { background: var(--heal); }
+  .barcell { min-width: 200px; }
+  svg text { fill: var(--ink-soft); font: 11px system-ui; }
+  svg .axis { stroke: var(--hairline-strong); }
+  svg .grid { stroke: var(--hairline); }
+  svg .t1 { stroke: var(--t1); } svg .t2 { stroke: var(--t2); }
+  .note { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Classes by tier</h1>
+  <p>The eight Tier 1 classes from Tier 1 (live, engine v21) through Tiers 2 and 3, as
+    <a href="../classes.md">classes.md</a> (T2C1–T2C30) proposes. Tier 1's numbers are the live code's; Lv 50 sheets come from
+    the balance harness's on-curve Uma. Nothing in Tiers 2 and 3 is built.</p>
+  <nav class="tabs">
+    <a href="#glance">At a glance</a><a href="#families">The eight, by family</a><a href="#pace">Class Rank</a>
+    <a href="#sheets">Lv 50 sheets</a><a href="#mp">MP and healing</a><a href="#status">Buffs and debuffs</a>
+    <a href="#halls">Halls</a><a href="#counts">Counts</a>
+  </nav>
+
+  <h2 id="glance">At a glance</h2>
+  <div class="grid g3">
+    <div class="card">
+      <div class="row"><span class="tier t1">Tier 1</span><span class="muted">live</span></div>
+      <ul class="adds">
+        <li>5 Tier 0s promote at Class Rank 10 into 8 Tier 1 classes (kin included)</li>
+        <li>70 trees: trunk, then <b>line A or B</b> (8 nodes)</li>
+        <li>15 skills held, 3 → 7 equipped</li>
+        <li>Statuses at three levels: none · a path · widely (D282)</li>
+        <li>16 Hall seats, ×0.95 damage classes, ×0.8 healers</li>
+        <li>Presets: the owner's two party comps (D263)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="row"><span class="tier t2">Tier 2</span><span class="chip new">proposed</span></div>
+      <ul class="adds">
+        <li>The eight open from Class Rank 1; no Tier 0</li>
+        <li>A <b>class branch</b>: <span class="chip ring">Ring +15%</span> or <span class="chip ld">Light/Dark +15%</span>, her preset or her reverse set</li>
+        <li>A <b>class line</b> at Class Rank 20 · 30 · 40 (Grand · Supreme · its capstone)</li>
+        <li><b>Line C</b> on every tree; each capstone <b>Power or Break</b>; ★ signature tip (T2U)</li>
+        <li>18 held, 3 → 10 equipped</li>
+        <li>LB+: +20% at Bond 10 · skill MP ×1.7 · healing ÷ 540</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="row"><span class="tier t3">Tier 3</span><span class="chip new">proposed</span></div>
+      <ul class="adds">
+        <li><b>Two lines held</b> on every tree, Auto between them</li>
+        <li>At Class Rank 50 every capstone she holds is <b>crowned</b>: 5.6 whole, +4 MP, one more stack</li>
+        <li>Her family's <b>mastery</b> and a <b>master slot</b></li>
+        <li>27 held, 10 + master equipped</li>
+        <li>Skill MP ×2.4 · healing ÷ 780 · MP back a round's sixth step</li>
+        <li>Her Limit Break reads the crown's 5.6</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="families">The eight, by family</h2>
+  <p>A family's two classes share its two branches. Branch 1 (preselected at Ascend) is her standard preset's group.</p>
+  <div class="grid g5" id="families-grid"></div>
+
+  <h2 id="pace">Class Rank by Uma Level</h2>
+  <div class="card">
+    <svg id="pace-chart" viewBox="0 0 1040 300" width="100%" role="img" aria-label="Class Rank against Uma Level, Tier 1 and later tiers"></svg>
+    <div class="row legend"><span class="chip" style="color:var(--t1)">— Tier 1: Tier 0 to Rank 10 at Lv 10, then her Tier 1 class from Rank 10</span>
+      <span class="chip" style="color:var(--t2)">— Tiers 2 and 3: every class from Rank 1</span></div>
+    <div class="scroll"><table id="pace-table"></table></div>
+    <p class="note">2E Class EXP a win, Uma Level's curve (120 + 16 × rank). A campaign is 50,960 Class EXP: two classes from Rank 1 to 50 in a later tier.</p>
+  </div>
+
+  <h2 id="sheets">Lv 50 sheets, by tier (SB1)</h2>
+  <div class="card">
+    <div class="row"><span class="seg" id="tier-seg"><button data-t="1" class="on">Tier 1</button><button data-t="2">Tier 2</button><button data-t="3">Tier 3</button></span>
+      <span class="legend">On curve: her preset, G10 × tier, every Extra Stats node × tier, no template. Mirrors share a row.</span></div>
+    <div class="scroll"><table id="sheet-table"></table></div>
+    <p class="note">Offense holds SB1 exactly (×1.80, ×2.61). HP grows ×1.73 and ×2.47, MP ×1.72 and ×2.45: their base has a flat part.</p>
+  </div>
+
+  <h2 id="mp">MP and healing by tier</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h3>A depth-5 act's casts on a full bar, Lv 50</h3>
+      <div class="scroll"><table id="mp-table"></table></div>
+      <p class="note">Today later tiers cost skill MP × the tier (×2, ×3). T2C17: ×1.7 and ×2.4, the bar's own growth.</p>
+    </div>
+    <div class="card">
+      <h3>A healer's healing scale, on-curve Lv 50</h3>
+      <div class="scroll"><table id="heal-table"></table></div>
+      <p class="note">×(1 + offense ÷ divisor). Today ÷ 300 in every tier; T2C18 divides by 300 × the tier's multiplier.</p>
+    </div>
+  </div>
+
+  <h2 id="status">Buffs and debuffs by tier (D282's three levels)</h2>
+  <div class="card scroll"><table>
+    <tr><th>Class</th><th><span class="tier t1">Tier 1</span></th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th><th>Never</th></tr>
+    <tr><td><b>Brawler, Sorcerer</b></td><td>None: pure damage</td><td>None: both branches pure damage</td><td>None</td><td>A status in any tier</td></tr>
+    <tr><td><b>Spellblades, Summoners</b></td><td>A path: line A of a secondary weapon (Katana, Bow, Light, Dark) from depth 3, 1 · 1 · 2</td><td>+ the Light/Dark branch's line rides the path (Blademaster, Warlock)</td><td>+ a crowned capstone one stack more (2 → 3)</td><td>A status through a Ring weapon</td></tr>
+    <tr><td><b>Paladin, Cleric</b></td><td>Every skill of the Greatsword, Lance and Fire (1 · 1 · 2 · 2 · 3), and the path (2 · 2 · 3)</td><td>+ the Guardian's line spreads them from depth 3; the Templar's set holds three path weapons</td><td>+ a crowned capstone one stack more (to 3)</td><td>—</td></tr>
+  </table>
+  <p class="note">Five statuses (Armor Break, Mind Break, Enfeeble, Brave, Faith), ±10% a stack, cap 3, two rounds, in every tier. Aegis, Breaker, Clarity, Hex and Shatter stay retired.</p></div>
+
+  <h2 id="halls">The Halls by tier</h2>
+  <div class="card scroll"><table>
+    <tr><th></th><th><span class="tier t1">Tier 1</span></th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th></tr>
+    <tr><td>Seats</td><td>16: Dojo 2, Tower 2, Salle 4, Circle 4, Sanctum 4</td><td>The same 16, no new seat</td><td>The same</td></tr>
+    <tr><td>On arrival</td><td>—</td><td>No seat, no Bond: the new world's halls start empty</td><td>The same</td></tr>
+    <tr><td>Power at 100%</td><td>Own (×1.9–×2.9) × class scale × open depth</td><td>The same; <b>LB+ +20% at Bond 10</b> (100% → 120%)</td><td>The same; open depth <b>5.6</b> at Class Rank 50</td></tr>
+    <tr><td>Class scale</td><td>×1 Tier 0 · ×0.95 · ×0.8</td><td>×0.95 · ×0.8</td><td>×0.95 · ×0.8</td></tr>
+    <tr><td>Hits on one foe</td><td>At most 10</td><td>At most 10</td><td>At most 10</td></tr>
+    <tr><td>Coverage</td><td>Every class closes her default gaps with two Heroes (28–45 of 120 pairs)</td><td colspan="2">For all sixteen sets (preset and reverse): 13–16 of the 16 seats add a kind she lacks; her best two Heroes add 4–6 kinds</td></tr>
+  </table></div>
+
+  <h2 id="counts">Counts</h2>
+  <div class="card scroll"><table>
+    <tr><th></th><th><span class="tier t1">Tier 1</span></th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th></tr>
+    <tr><td>Trees she uses</td><td>3</td><td>3 + her class line</td><td>3 + her class line</td></tr>
+    <tr><td>Nodes a weapon tree</td><td>8</td><td>14 (+ ★ tip on her lead tree)</td><td>14; crowns are a state</td></tr>
+    <tr><td>Lines held a tree</td><td>1</td><td>1</td><td>2</td></tr>
+    <tr><td>Skills held</td><td>15</td><td>18</td><td>27</td></tr>
+    <tr><td>Equipped</td><td>3 → 7 (Lv 10, 20, 30, 40)</td><td>3 → 10 (Lv 10, 15, 20, 25, 30, 35, 40)</td><td>10 + the master slot</td></tr>
+    <tr><td>Picks a class</td><td>3</td><td>7</td><td>10</td></tr>
+    <tr><td>Nodes in the catalog</td><td>560</td><td>1,028 (+ 210 line C, 210 Break tips, 48 class-line nodes)</td><td>1,028</td></tr>
+  </table></div>
+</main>
+<script>
+const FAMILIES = [
+  { name: 'Warrior', hall: 'Dojo', classes: [['Brawler', '3 Arms · ×1', 'phys']], ring: 'Berserker', ld: 'Warlord', one: 'ring', mastery: 'Juggernaut' },
+  { name: 'Mage', hall: 'Tower', classes: [['Sorcerer', '3 Tomes · ×1', 'magic']], ring: 'Sage', ld: 'Augur', one: 'ring', mastery: 'Resonance' },
+  { name: 'Spellblade', hall: 'Salle', classes: [['Arms Spellblade', '2 Arms + Tome · 0.72 + 0.44', 'phys'], ['Tome Spellblade', '2 Tomes + Arm · 0.72 + 0.48', 'magic']], ring: 'Rune Knight', ld: 'Blademaster', one: 'ring', mastery: 'Spellbind' },
+  { name: 'Summoner', hall: 'Circle', classes: [['Arms Summoner', '2 Arms + Tome · 0.57 + 0.46', 'phys'], ['Tome Summoner', '2 Tomes + Arm · 0.57 + 0.5', 'magic']], ring: 'Invoker', ld: 'Warlock', one: 'ld', mastery: 'Menagerie' },
+  { name: 'Healer', hall: 'Sanctum', classes: [['Paladin', '2 Arms + Tome · ×0.5, from ATK', 'heal'], ['Cleric', '2 Tomes + Arm · ×0.5, from M.ATK', 'heal']], ring: 'Guardian', ld: 'Templar', one: 'ring', mastery: 'Overflow' },
+]
+const fg = document.getElementById('families-grid')
+for (const f of FAMILIES) {
+  const d = document.createElement('div'); d.className = 'card fam'
+  d.innerHTML = `<h3>${f.name} · ${f.hall}</h3>` + f.classes.map(([n, s, c]) => `<div class="cls"><b>${n}</b> <span class="chip ${c}">${c === 'heal' ? 'Healer' : c === 'phys' ? 'Physical' : 'Magical'}</span><div class="muted">${s}</div></div>`).join('')
+    + `<div class="cls"><div class="row"><span class="chip ring">Ring</span> ${f.ring}${f.one === 'ring' ? ' <span class="chip new">branch 1</span>' : ''}</div>`
+    + `<div class="row" style="margin-top:4px"><span class="chip ld">Light/Dark</span> ${f.ld}${f.one === 'ld' ? ' <span class="chip new">branch 1</span>' : ''}</div></div>`
+    + `<div class="cls muted">Tier 3 mastery: <b>${f.mastery}</b></div>`
+  fg.appendChild(d)
+}
+
+// Class Rank pace: Tier 1 reaches rank R at the level whose 2E fits (Tier 0 3,600 first), later tiers from Rank 1.
+const umaTo = (L) => { let s = 0; for (let l = 1; l < L; l++) s += 120 + 16 * l; return s }
+const clsTo = (R) => { let s = 0; for (let r = 1; r < R; r++) s += 120 + 16 * r; return s }
+const rankAt = (L, t1) => { const b = 2 * umaTo(L); if (!t1) { let r = 1; while (r < 50 && clsTo(r + 1) <= b) r++; return r }
+  if (L < 10) return L; const budget = Math.max(clsTo(10), b - clsTo(10)); let r = 1; while (r < 50 && clsTo(r + 1) <= budget) r++; return Math.max(10, r) }
+const svg = document.getElementById('pace-chart'); const W = 1040, H = 300, X0 = 44, Y0 = 268, XW = 970, YH = 240
+const x = (L) => X0 + (L - 1) / 49 * XW, y = (R) => Y0 - (R - 1) / 49 * YH
+let s = ''
+for (const R of [10, 20, 30, 40, 50]) s += `<line class="grid" x1="${X0}" x2="${X0 + XW}" y1="${y(R)}" y2="${y(R)}"/><text x="${X0 - 8}" y="${y(R) + 4}" text-anchor="end">${R}</text>`
+for (const L of [1, 10, 20, 30, 40, 50]) s += `<text x="${x(L)}" y="${Y0 + 18}" text-anchor="middle">Lv ${L}</text>`
+s += `<line class="axis" x1="${X0}" x2="${X0 + XW}" y1="${Y0}" y2="${Y0}"/><line class="axis" x1="${X0}" x2="${X0}" y1="${Y0}" y2="${Y0 - YH}"/>`
+for (const [t1, cls] of [[true, 't1'], [false, 't2']]) {
+  let p = ''; for (let L = 1; L <= 50; L++) p += `${L === 1 ? 'M' : 'L'}${x(L).toFixed(1)},${y(rankAt(L, t1)).toFixed(1)}`
+  s += `<path class="${cls}" d="${p}" fill="none" stroke-width="3"/>`
+}
+s += `<text x="${X0 + 6}" y="${Y0 - YH - 6}">Class Rank</text>`
+svg.innerHTML = s
+const firstAt = (R, t1) => { for (let L = 1; L <= 50; L++) if (rankAt(L, t1) >= R) return L; return '—' }
+const pt = document.getElementById('pace-table')
+pt.innerHTML = '<tr><th>Class Rank</th><th>Opens</th><th class="n">Tier 1, Uma Lv</th><th class="n">Tiers 2 and 3, Uma Lv</th></tr>' +
+  [[1, 'Depth 1'], [10, 'Depth 2'], [20, 'Depth 3 (the fork) · the class line'], [30, 'Depth 4 · its second skill'], [40, 'Depth 5 (the capstones) · its capstone'], [50, 'Tier 3: the crowns, the mastery, the master slot']]
+    .map(([R, o]) => `<tr><td>${R}</td><td>${o}</td><td class="n">${R === 10 ? 10 : firstAt(R, true)}</td><td class="n">${firstAt(R, false)}</td></tr>`).join('')
+
+// Lv 50 sheets from the live code (balanceMember, gear and stars on curve).
+const SHEETS = [
+  ['Brawler (Greatsword)', 'phys', [[1460, 212, 209, 114, 204, 181, 297], [2531, 367, 377, 205, 368, 324, 535], [3610, 522, 545, 296, 532, 468, 774]]],
+  ['Sorcerer (Fire)', 'magic', [[1230, 294, 114, 214, 184, 200, 302], [2139, 505, 205, 386, 331, 360, 544], [3055, 717, 296, 558, 478, 520, 787]]],
+  ['Arms Spellblade (Katana) · Arms Summoner (Bow)', 'phys', [[1322, 245, 200, 128, 194, 191, 288], [2296, 423, 362, 229, 349, 342, 520], [3277, 600, 522, 333, 505, 494, 751]]],
+  ['Tome Spellblade (Thunder) · Tome Summoner (Dark)', 'magic', [[1322, 245, 128, 200, 194, 191, 288], [2296, 423, 229, 362, 349, 342, 520], [3277, 600, 333, 522, 505, 494, 751]]],
+  ['Paladin (Lance)', 'heal', [[1322, 294, 193, 109, 209, 191, 281], [2296, 505, 347, 197, 377, 342, 505], [3277, 717, 503, 284, 545, 494, 732]]],
+  ['Cleric (Light)', 'heal', [[1322, 294, 109, 193, 194, 205, 281], [2296, 505, 197, 347, 349, 369, 505], [3277, 717, 284, 503, 505, 533, 732]]],
+]
+const fmt = (n) => n.toLocaleString('en-US')
+function drawSheet(t) {
+  const max = 800
+  document.getElementById('sheet-table').innerHTML = '<tr><th>Class</th><th class="n">HP</th><th class="n">MP</th><th class="n">ATK</th><th class="n">M.ATK</th><th class="n">DEF</th><th class="n">M.DEF</th><th class="n">Lead offense</th><th class="barcell">× Tier 1</th></tr>' +
+    SHEETS.map(([n, c, rows]) => { const r = rows[t - 1], base = rows[0][6]
+      return `<tr><td>${n}</td>${r.slice(0, 6).map((v) => `<td class="n">${fmt(v)}</td>`).join('')}<td class="n"><b>${r[6]}</b></td><td class="barcell"><span class="bar ${c}" style="width:${(r[6] / max * 180).toFixed(0)}px"></span> <span class="muted">×${(r[6] / base).toFixed(2)}</span></td></tr>` }).join('')
+}
+drawSheet(1)
+document.getElementById('tier-seg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return
+  for (const x of e.currentTarget.children) x.classList.toggle('on', x === b); drawSheet(Number(b.dataset.t)) })
+
+const MP = [
+  ['Brawler', 212, 367, 522, 26, [52, 44], [78, 62]], ['Sorcerer', 294, 505, 717, 26, [52, 44], [78, 62]],
+  ['Spellblade · Summoner', 245, 423, 600, 26, [52, 44], [78, 62]], ['Paladin · Cleric', 294, 505, 717, 16, [32, 27], [48, 37]],
+]
+document.getElementById('mp-table').innerHTML = '<tr><th>Class</th><th class="n">T1</th><th class="n">T2 today</th><th class="n">T2 ×1.7</th><th class="n">T3 today</th><th class="n">T3 ×2.4</th></tr>' +
+  MP.map(([n, b1, b2, b3, c1, c2, c3]) => `<tr><td>${n}</td><td class="n">${(b1 / c1).toFixed(1)}</td><td class="n muted">${(b2 / c2[0]).toFixed(1)}</td><td class="n"><b>${(b2 / c2[1]).toFixed(1)}</b></td><td class="n muted">${(b3 / c3[0]).toFixed(1)}</td><td class="n"><b>${(b3 / c3[1]).toFixed(1)}</b></td></tr>`).join('')
+const HEAL = [[1, 193, 300, 300], [2, 347, 300, 540], [3, 503, 300, 780]]
+document.getElementById('heal-table').innerHTML = '<tr><th>Tier</th><th class="n">Her offense</th><th class="barcell">Today (÷ 300)</th><th class="barcell">T2C18 (÷ 300 × tier)</th></tr>' +
+  HEAL.map(([t, o, a, b]) => { const s1 = 1 + o / a, s2 = 1 + o / b
+    return `<tr><td><span class="tier t${t}">Tier ${t}</span></td><td class="n">${o}</td><td class="barcell"><span class="bar today" style="width:${(s1 * 50).toFixed(0)}px"></span> ×${s1.toFixed(2)}</td><td class="barcell"><span class="bar heal" style="width:${(s2 * 50).toFixed(0)}px"></span> ×${s2.toFixed(2)} <span class="muted">÷ ${b}</span></td></tr>` }).join('')
+</script>
+</body>
+</html>
