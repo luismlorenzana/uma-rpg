@@ -107,7 +107,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
-| H159 | Capital runs' foes: a fourth Finals route for all fourteen scenarios, the run's ids and its sixteen fights, the map's capitals byte for byte as before (D296) | this commit |
+| H159 | Capital runs' foes: a fourth Finals route for all fourteen scenarios, the run's ids and its sixteen fights, the map's capitals byte for byte as before (D296) | `2938491` |
 | H157 | Collections live, save v35: the switch, the run-wide Ascend and the Observatory removed, the manual and the phone check (D288) | `ceab990` |
 | H155 | Windows on screen, dark: her window beside her bust, the Window sheet, the Gallery, Ascend one Uma at a time, latching and the "Window +1" note (D287) | `3bc65cc` |
 | H154 | Drills and Training Logs, dark: five Drills a tier, ten runs a day banked to thirty, Logs a third of her next level (D286) | `11d2d05` |
