@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Tier 2 Run</title>
+<!-- progression.md's run page (T2W): a Tier 2 run day by day for a first cohort (the model of §4.8), her window lighting,
+     the toolbox arriving, the Wilds calculator (§8, the live step, Craft and slot rules) and 24 parties at tier scale.
+     Style: the Tier rework's _template.html block, then this page's own. Every Uma here is made up. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300; --c7: #6250d6;
+    --grid: #e3e8ef; --axis: #c3cbd6;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9;
+      --grid: #243041; --axis: #34445a;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1280px; margin: 0 auto; padding: 28px 36px 80px; }
+  h1 { font: 700 26px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 8px; }
+  h2 { font: 700 19px/1.25 ui-rounded, system-ui, sans-serif; margin: 34px 0 6px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  p { margin: 0 0 8px; max-width: 1000px; }
+  a { color: inherit; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 14px 16px; margin-bottom: var(--gap); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.doc { background: var(--accent-wash); color: var(--accent-strong); font-size: 11px; padding: 1px 7px; }
+  .chip.new { background: transparent; border: 1.5px dashed var(--accent); color: var(--accent-strong); font-size: 11px; padding: 0 7px; }
+  .muted { color: var(--ink-faint); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  nav.tabs { display: flex; gap: 6px; margin: 10px 0 18px; flex-wrap: wrap; }
+  nav.tabs a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.tabs a.on { background: var(--accent); color: var(--accent-ink); }
+  .lead { font-size: 15px; color: var(--ink-soft); max-width: 1000px; }
+  .toggle { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 2px; }
+  .toggle button { border: 0; background: transparent; color: var(--ink); padding: 4px 12px; border-radius: 999px; font: 600 12px system-ui, sans-serif; cursor: pointer; }
+  .toggle button.on { background: var(--panel); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-soft); }
+  svg text { fill: var(--ink-soft); font: 11px system-ui, sans-serif; }
+  svg text.lane { fill: var(--ink); font-weight: 600; font-size: 12px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 6px 0 10px; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; margin-right: 5px; vertical-align: -1px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 10px 0; }
+  .kpi { background: var(--raised); border-radius: 10px; padding: 10px 12px; }
+  .kpi .k { font-size: 12px; color: var(--ink-soft); }
+  .kpi .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .kpi .x { font-size: 11.5px; color: var(--ink-faint); }
+  .lines { display: grid; grid-template-columns: 150px minmax(0, 1fr) 110px; gap: 6px 12px; align-items: center; font-size: 12.5px; }
+  .lines .track { position: relative; height: 16px; background: transparent; }
+  .lines .fill { position: absolute; left: 0; top: 2px; height: 12px; border-radius: 0 4px 4px 0; }
+  .lines .ref { position: absolute; top: -3px; width: 2px; height: 22px; background: var(--ink-faint); }
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  details summary { cursor: pointer; color: var(--ink-soft); font-size: 12.5px; font-weight: 600; margin-top: 8px; }
+  #tip { position: fixed; pointer-events: none; z-index: 20; background: var(--panel); color: var(--ink); border-radius: 8px; padding: 7px 10px; font-size: 12px; box-shadow: 0 4px 18px rgb(0 0 0 / .18); max-width: 320px; display: none; }
+</style>
+</head>
+<body>
+<main>
+  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Drafting 2026-11-04 · nothing built</span></div>
+  <h1>A Tier 2 run, end to end</h1>
+  <p class="lead">A first cohort of twenty arrives in an empty Tier 2 world. The fighting party is at Lv 50 in days; its
+    windows take about five weeks, because every Uma's Craft Level restarts at 1. This is the model of progression.md
+    §4.8: the Wilds' days come from the live code; the fights' days and the Rift's length are assumptions, said where
+    they're used.</p>
+  <nav class="tabs">
+    <a href="progression-tiers.html">The tiers</a>
+    <a href="progression-world.html">The worlds</a>
+    <a class="on" href="progression-run.html">The run</a>
+    <a href="../progression.md">progression.md</a>
+  </nav>
+
+  <div class="card row" style="position:sticky;top:8px;z-index:5">
+    <span class="ctl">The Wilds <span class="toggle" id="up"><button class="on" data-v="1">Nonstop</button><button data-v="1.25">80% busy</button></span></span>
+    <span class="ctl">The Rift's run <span class="toggle" id="rift"><button data-v="14">2 weeks</button><button class="on" data-v="17">2½</button><button data-v="21">3</button></span></span>
+    <span class="ctl muted" id="readyLine"></span>
+  </div>
+
+  <h2>The run, day by day</h2>
+  <p>Each lane is one kind of progress. Hover any mark. The fights climb two bands a day while gear allows; Lv 31–40
+    waits for G4 and Lv 41–50 for G5 (tier2-world §11 measured, engine v13; T2B re-measures). The Rift's fronts start
+    when G8 opens.</p>
+  <div class="card"><svg id="gantt" viewBox="0 0 1200 470" width="100%" height="470" role="img" aria-label="A Tier 2 run by day"></svg></div>
+
+  <h2>Her window lighting</h2>
+  <p>Steps lit by day: the fighting party's Uma (served first) and the twenty's last Uma (served last: the whole cohort's
+    work for each grade, about 3.2 days of every slot, waits for its Craft gate).</p>
+  <div class="card">
+    <div class="legend"><span><i class="sw" style="background:var(--t2)"></i>The fighting party's Uma</span><span><i class="sw" style="background:var(--c7)"></i>The twenty's last Uma</span></div>
+    <svg id="steps" viewBox="0 0 1200 300" width="100%" height="300" role="img" aria-label="Window steps lit by day"></svg>
+    <details><summary>Show the numbers</summary><table id="stepsT"></table></details>
+  </div>
+
+  <h2>The toolbox arrives (T2W11: no new gates)</h2>
+  <p>Each Tier 2 addition opens on its own system's gate. Shapes are the drafts' (progression.md §6 assumes them).</p>
+  <div class="card"><table id="tools"></table></div>
+
+  <h2>The Wilds' clock: a calculator</h2>
+  <p>Days of the Wilds' work until every Uma of a cohort has her full window's gear, from the live rules: a step 20.1
+    minutes at Craft Lv 25, the places' ×1.25, four slots a place, twelve a trade, sixty a world. The release's trades:
+    Metal 48, Wood 72, Stone 72, Fish 34, Vegetables 46 of 272 outfits; a party of five is one of each.</p>
+  <div class="card">
+    <div class="row">
+      <span class="ctl">Cohort <span class="toggle" id="n"><button data-v="5">5</button><button class="on" data-v="20">20</button><button data-v="60">60</button><button data-v="120">120 (24 parties)</button></span></span>
+      <span class="ctl">Demand <span class="toggle" id="dem"><button data-v="gear">Eleven slots and the map</button><button class="on" data-v="window">The full window (Weapons V)</button></span></span>
+      <span class="ctl">The secondary (T2P) <span class="toggle" id="sec"><button data-v="0">Off (today)</button><button class="on" data-v="1">On</button></span></span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="lines" id="lines"></div>
+    <p class="muted" style="margin-top:10px">Grey mark: her own Craft V, the floor no tool moves except Speed Tickets on her jobs. With the secondary on, the
+      lines pool (a fifth of the work, the tier's own pair, stays the trade's and doesn't bind here).</p>
+  </div>
+
+  <h2>Twenty-four parties at tier scale</h2>
+  <div class="two">
+    <div class="card"><table id="scale"></table></div>
+    <div class="card">
+      <h3>Fights against the Wilds</h3>
+      <svg id="vs" viewBox="0 0 560 200" width="100%" height="200" role="img" aria-label="Fight hours against Wilds hours"></svg>
+      <p class="muted">One party fights at a time, an hour or two a day; sixty slots work around the clock. The fights are a few
+        percent of a tier's time: the clock is Craft, in every tier (T2W12).</p>
+    </div>
+  </div>
+
+  <h2>Ready to ascend</h2>
+  <div class="card"><table id="ready"></table></div>
+</main>
+<div id="tip"></div>
+<script>
+const $ = (s) => document.querySelector(s)
+const tip = $('#tip')
+document.addEventListener('mousemove', (e) => {
+  const t = e.target.closest('[data-tip]')
+  if (!t) { tip.style.display = 'none'; return }
+  tip.innerHTML = t.dataset.tip; tip.style.display = 'block'
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - 340) + 'px'; tip.style.top = (e.clientY + 14) + 'px'
+})
+let F = 1, R = 17, N = 20, DEM = 'window', SEC = 1
+function bind(id, fn) {
+  $(id).addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return
+    $(id).querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); fn(b.dataset.v); drawAll()
+  })
+}
+bind('#up', (v) => (F = +v)); bind('#rift', (v) => (R = +v)); bind('#n', (v) => (N = +v)); bind('#dem', (v) => (DEM = v)); bind('#sec', (v) => (SEC = +v))
+
+// Live numbers (economy/pacing.ts): grade g opens at Craft 5g − 4, nonstop days; Craft I–V days.
+const GD = [0, 0, 2.0, 4.2, 6.4, 8.8, 11.3, 13.8, 16.5, 19.3, 22.1]
+const G = (g) => GD[g] * F
+const CRAFT = [3.8, 8.3, 13.3, 18.7, 24.5]
+const RN = ['I', 'II', 'III', 'IV', 'V']
+// The last Uma's grade: every grade's cohort work (31.8 days ÷ 10) waits for its gate.
+function lastGrade(g) { let c = 0; for (let k = 1; k <= g; k++) c = Math.max(c, G(k)) + 3.18 * F; return c }
+function events(last) {
+  const L4 = Math.max(3, G(4)), L5 = Math.max(4, G(5))
+  const e = [['Level I', 0], ['Class I', 0], ['World I', 0], ['Level II', 1], ['Class II', 1], ['World II', 1], ['Level III', 2], ['World III', 2],
+    ['Class III', 3], ['Level IV', L4], ['World IV', L4], ['Level V', L5], ['Class IV', L5], ['World V', L5], ['Class V', L5 + 2]]
+  for (let n = 1; n <= 5; n++) {
+    const g = 2 * n
+    if (last) { const d = lastGrade(g); e.push([`Stars ${RN[n - 1]}`, d], [`Gear ${RN[n - 1]}`, d], [`Weapons ${RN[n - 1]}`, d]) }
+    else e.push([`Stars ${RN[n - 1]}`, G(g) + 0.5], [`Gear ${RN[n - 1]}`, G(g) + 1], [`Weapons ${RN[n - 1]}`, n === 5 ? G(10) + 2.9 : G(g) + 1.3])
+  }
+  CRAFT.forEach((d, i) => e.push([`Craft ${RN[i]}`, d * F]))
+  e.push(['Rift', G(8) + R])
+  return e.sort((a, b) => a[1] - b[1])
+}
+
+function gantt() {
+  const W = 1200, x0 = 170, x1 = W - 20, D = 45
+  const X = (d) => x0 + Math.min(d, D) / D * (x1 - x0)
+  const lanes = ['Fights', 'Capital runs', 'Trials · Rift', 'Craft Level', 'Grades open', 'T2C classes', 'T2G gear', 'T2E extra stats', 'T2P professions', 'T2B balance', 'T2U templates']
+  const Y = (i) => 30 + i * 38
+  let g = ''
+  for (let d = 0; d <= D; d += 5) g += `<line x1="${X(d)}" x2="${X(d)}" y1="18" y2="${Y(lanes.length) - 10}" stroke="var(--grid)"/><text x="${X(d)}" y="12" text-anchor="middle">day ${d}</text>`
+  lanes.forEach((l, i) => { g += `<text class="lane" x="10" y="${Y(i) + 4}">${l}</text>` })
+  const seg = (lane, a, b, color, label, tipText) => `<g data-tip="${tipText}"><rect x="${X(a)}" y="${Y(lane) - 9}" width="${Math.max(3, X(b) - X(a) - 2)}" height="18" rx="4" fill="${color}"/>
+    ${X(b) - X(a) > 46 ? `<text x="${X(a) + 6}" y="${Y(lane) + 4}" style="fill:#fff;font-weight:600">${label}</text>` : ''}</g>`
+  const dot = (lane, d, color, label, tipText) => `<g data-tip="${tipText}"><circle cx="${X(d)}" cy="${Y(lane)}" r="6" fill="${color}" stroke="var(--panel)" stroke-width="2"/>
+    ${label ? `<text x="${X(d) + 9}" y="${Y(lane) - 9}">${label}</text>` : ''}</g>`
+  const L4 = Math.max(3, G(4)), L5 = Math.max(4, G(5))
+  const bands = [[0, 1, 'Lv 1–10'], [1, 2, '11–20'], [2, 3, '21–30'], [3, L4, '31–40'], [L4, L5, '41–50']]
+  bands.forEach(([a, b, l], i) => { g += seg(0, a, b, `color-mix(in srgb, var(--t2) ${50 + i * 10}%, var(--panel))`, l, `${l === 'Lv 1–10' ? l : 'Lv ' + l}: day ${a.toFixed(1)} to ${b.toFixed(1)}${i >= 3 ? ' (waits for G' + (i + 1) + ')' : ''}`) })
+  ;[0, 1, 2, L4, L5].forEach((d, i) => { g += dot(1, d + 0.3, 'var(--accent)', `w${6 + i}`, `Capital run, continent ${6 + i}: 16 fights for four parties; World ${RN[i]} lights for all twenty`) })
+  g += seg(2, L5, L5 + 2, 'var(--c1)', 'Trials', `Five Lv 50 Umas open the Rift and Trials on day ${L5.toFixed(1)}; 20 Trial wins raise a third class to R50`)
+  g += seg(2, G(8), G(8) + R, 'var(--c7)', 'The Rift run', `Fronts from G8 (day ${G(8).toFixed(1)}), about 58 fights over ${R} days; won day ${(G(8) + R).toFixed(1)}`)
+  CRAFT.forEach((d, i) => { g += dot(3, d * F, 'var(--c3)', `Craft ${RN[i]}`, `Craft Lv ${10 * (i + 1)}: day ${(d * F).toFixed(1)} (her own work, 588 hours to Lv 50)`) })
+  for (let k = 1; k <= 10; k++) g += dot(4, G(k), 'var(--c1)', k % 2 === 0 ? `G${k}` : '', `G${k} opens at Craft Lv ${5 * k - 4}: day ${G(k).toFixed(1)}`)
+  const T = [
+    [5, 0, 'branch, class skills, tips', 'Class branch: a focus (+15% on its group), default or reverse set; Tier 2, any Class Rank'],
+    [5, 1, '', 'Three class skills at Class Rank 20 · 30 · 40 (about Uma Lv 13 · 20 · 27); branch C at depth 3'],
+    [5, 2.2, '', 'The Power or Break tip fork at depth 5 (Class Rank 40)'],
+    [6, G(5), 'Pure · Dual', 'Weapon branches and accessory branches at a G5 (Craft 21, Uma Lv 21; a Branch Gem)'],
+    [7, G(2), 'moon I', 'Weapon moon I: a Moon Jewel I (made at Craft 6), Uma Lv 6'],
+    [7, G(6), 'III', 'Weapon moon III: Moon Jewel III, Uma Lv 26'],
+    [7, G(10), 'V', 'Weapon moon V: Moon Jewel V (Craft 46), Uma Lv 46'],
+    [8, 0, 'secondary', 'The secondary: any other line\'s base work, from arrival (PP14)'],
+    [8, G(5), 'pair', 'Tier 2\'s material pair: its G5 pieces'],
+    [8, G(10), 'pair G10', 'Tier 2\'s pair: its G10 pieces'],
+    [9, 0, '', 'Three weaknesses at every rank: live in Tiers 2 and 3 (D235)'],
+    [10, 2.2, '★ tip', 'The ★ signature tip on her lead weapon\'s tree, at its tip fork (Class Rank 40)'],
+  ]
+  g += seg(9, 0.6, L5, 'color-mix(in srgb, var(--c5) 70%, var(--panel))', 'term →', 'The toolbox term rises with her tier level, Lv 1 → 50 (SB3, not built)')
+  T.forEach(([lane, d, l, t]) => { g += dot(lane, d, 'var(--accent-strong)', l, t) })
+  $('#gantt').innerHTML = g
+}
+
+function steps() {
+  const W = 1200, H = 300, x0 = 50, x1 = W - 20, y0 = 14, y1 = H - 30, D = 45
+  const X = (d) => x0 + Math.min(d, D) / D * (x1 - x0), Y = (n) => y1 - n / 36 * (y1 - y0)
+  let g = ''
+  ;[0, 9, 18, 27, 36].forEach((n) => { g += `<line x1="${x0}" x2="${x1}" y1="${Y(n)}" y2="${Y(n)}" stroke="var(--grid)"/><text x="${x0 - 8}" y="${Y(n) + 4}" text-anchor="end">${n}</text>` })
+  for (let d = 0; d <= D; d += 5) g += `<text x="${X(d)}" y="${y1 + 18}" text-anchor="middle">day ${d}</text>`
+  ;[[false, 'var(--t2)'], [true, 'var(--c7)']].forEach(([last, col]) => {
+    const ev = events(last); let pts = `${X(0)},${Y(0)}`, n = 0
+    ev.forEach(([, d]) => { pts += ` ${X(d)},${Y(n)}`; n++; pts += ` ${X(d)},${Y(n)}` })
+    pts += ` ${X(D)},${Y(n)}`
+    g += `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`
+    const end = ev.at(-1)[1]
+    g += `<g data-tip="${last ? 'The twenty\'s last' : 'The fighting party\'s Uma'}: full on day ${end.toFixed(1)}"><circle cx="${X(end)}" cy="${Y(36)}" r="5" fill="${col}"/>
+      <text x="${X(end) + 8}" y="${Y(36) + (last ? 14 : -6)}" style="fill:var(--ink)">${last ? 'last' : 'party'}: day ${end.toFixed(1)}</text></g>`
+  })
+  $('#steps').innerHTML = g
+  const a = events(false), b = events(true)
+  const byName = (ev) => Object.fromEntries(ev.map(([n, d]) => [n, d]))
+  const A = byName(a), B = byName(b)
+  $('#stepsT').innerHTML = '<tr><th>Step</th><th class="num">The party\'s Uma, day</th><th class="num">The twenty\'s last, day</th></tr>' +
+    a.map(([n]) => `<tr><td>${n}</td><td class="num">${A[n].toFixed(1)}</td><td class="num">${B[n].toFixed(1)}</td></tr>`).join('')
+  const ready = Math.max(...a.map((x) => x[1])), readyLast = Math.max(...b.map((x) => x[1]))
+  $('#readyLine').textContent = `Ready to ascend: the party's Uma day ${ready.toFixed(1)}, the twenty's last day ${readyLast.toFixed(1)}`
+}
+
+function tools() {
+  const rows = [
+    ['Class branch: a focus (+15%), default or reverse set', 'T2C', 'Tier 2, any Class Rank', 0, 'Lv 1'],
+    ['Three weaknesses at every rank (live); the toolbox term to Lv 50', 'T2B', 'Tier 2\'s foes', 0, 'Lv 1'],
+    ['Skill MP ×1.7', 'T2C · T2B', 'Every Tier 2 skill', 0, 'Lv 1'],
+    ['The secondary profession', 'T2P', 'Tier 2', 0, '—'],
+    ['Three class skills', 'T2C', 'Class Rank 20 · 30 · 40', '1 · 1 · 2', 'Lv ~13 · 20 · 27'],
+    ['Branch C; the Power or Break tip fork', 'T2C', 'Depth 3 (CR 20) · depth 5 (CR 40)', '1 · 2', 'Lv ~13 · 27'],
+    ['★ Signature tip on her lead weapon\'s tree', 'T2U', 'Its tip fork (CR 40)', 2, 'Lv ~27'],
+    ['Weapon moon I → V', 'T2E', 'Moon Jewels I → V (Craft 6 → 46), Uma Lv 6 → 46', `${G(2).toFixed(1)} → ${G(10).toFixed(1)}`, 'Lv 6 → 46'],
+    ['Weapon branch, Pure or Dual', 'T2G', 'A weapon\'s G5 (Craft 21, Uma Lv 21), a Branch Gem', G(5).toFixed(1), 'Lv 21'],
+    ['Accessory branches', 'T2G', 'A slot\'s G5', G(5).toFixed(1), 'Lv 21'],
+    ['Tier 2\'s material pair', 'T2P', 'Its G5 and G10 pieces', `${G(5).toFixed(1)} · ${G(10).toFixed(1)}`, '—'],
+    ['LB+ at Bond 10', 'T2C', 'Bond 10 in a hall', 'With Bonds', '—'],
+    ['Ten equipped skills', 'T2C', 'Uma Level (+1 a five levels)', 'about 5', 'Lv 35'],
+  ]
+  $('#tools').innerHTML = '<tr><th>Addition</th><th>Doc</th><th>Gate</th><th class="num">First cohort, day</th><th>Her level then</th></tr>' +
+    rows.map((r) => `<tr><td>${r[0]}</td><td><span class="chip doc">${r[1]}</span></td><td>${r[2]}</td><td class="num">${r[3]}</td><td>${r[4]}</td></tr>`).join('')
+}
+
+// The calculator (progression.md §8): the live step at Craft Lv 25, the places' ×1.25, 12 slots a trade, 60 a world.
+const STEP = 24 - 8 * 24 / 49 // 20.08 minutes
+const SHARE = { Metal: 48 / 272, Vegetables: 46 / 272, Wood: 72 / 272, Fish: 34 / 272, Stone: 72 / 272 }
+const COLOR = { Metal: 'var(--c1)', Vegetables: 'var(--c2)', Wood: 'var(--c3)', Fish: 'var(--c4)', Stone: 'var(--c5)' }
+const DEMAND = { gear: { Metal: 150, Vegetables: 150, Wood: 150, Fish: 150, Stone: 150 }, window: { Metal: 250, Vegetables: 250, Wood: 150, Fish: 150, Stone: 150 } }
+const wallHours = (refined) => refined * 3 * STEP / 60 / 1.25
+function calc() {
+  const d = DEMAND[DEM]
+  const counts = Object.fromEntries(Object.keys(SHARE).map((k) => [k, N === 5 ? 1 : Math.max(1, Math.round(N * SHARE[k]))]))
+  const byLine = Object.keys(d).map((k) => [k, wallHours(N * d[k]) / Math.min(12, counts[k]) / 24 * F])
+  const total = Object.values(d).reduce((a, b) => a + b, 0)
+  const pooled = wallHours(N * total) / Math.min(60, N) / 24 * F
+  const floor = 588 / 24 * Math.max(1, N / 60) * F
+  const bound = byLine.reduce((a, b) => (b[1] > a[1] ? b : a))
+  const result = SEC ? Math.max(pooled, floor) : Math.max(bound[1], floor)
+  const gapH = SEC ? 0 : (bound[1] - Math.max(pooled, floor)) * 24 * Math.min(12, counts[bound[0]])
+  const tickets = Math.max(0, Math.ceil(gapH * 2))
+  $('#kpis').innerHTML = [
+    ['Every full window, days', result.toFixed(1), SEC ? 'pooled by the secondary' : `bound by ${bound[0]}`],
+    ['Her own Craft V, days', floor.toFixed(1), N > 60 ? `${N} Umas share 60 slots` : '588 hours of her slot'],
+    ['Refined items an Uma', total, DEM === 'window' ? 'Metal and Vegetables 250 (two extra weapons)' : 'every line 150'],
+    ['Speed Tickets to close the gap', tickets ? tickets.toLocaleString() : '—', tickets ? `${(tickets * 20).toLocaleString()} Laurels at Tier 2's 20 (T2W10)` : 'no gap past the pooled time'],
+  ].map(([k, v, x]) => `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="x">${x}</div></div>`).join('')
+  const top = Math.max(...byLine.map((x) => x[1]), pooled, floor) * 1.05
+  $('#lines').innerHTML = byLine.map(([k, v]) => `<div>${k} <span class="muted">· ${counts[k]} Uma${counts[k] === 1 ? '' : 's'}${counts[k] > 12 ? ', 12 slots' : ''}</span></div>
+    <div class="track" data-tip="${k}: ${v.toFixed(1)} days alone (${N} × ${d[k]} refined on ${Math.min(12, counts[k])} slot${Math.min(12, counts[k]) === 1 ? '' : 's'})"><div class="fill" style="width:${v / top * 100}%;background:${COLOR[k]};opacity:${SEC ? 0.45 : 1}"></div><div class="ref" style="left:${floor / top * 100}%"></div></div>
+    <div class="num" style="text-align:right;font-variant-numeric:tabular-nums">${v.toFixed(1)} d</div>`).join('') +
+    `<div><b>Pooled</b> <span class="muted">· the secondary</span></div><div class="track" data-tip="All lines pooled on ${Math.min(60, N)} slots: ${pooled.toFixed(1)} days"><div class="fill" style="width:${pooled / top * 100}%;background:var(--t2);opacity:${SEC ? 1 : 0.45}"></div><div class="ref" style="left:${floor / top * 100}%"></div></div><div style="text-align:right"><b>${pooled.toFixed(1)} d</b></div>`
+}
+
+function scale() {
+  const rows = [
+    ['Umas · parties', '120 · 24'], ['Slots in the Wilds', '60 (12 a trade)'],
+    ['Fights to Lv 50, every party', '24 × 132 = 3,168 (each party\'s path 140: 3,360)'],
+    ['Fight time (40 · 70 · 100 s; 2 min a fight)', '≈ 45 h · ≈ 110 h'],
+    ['Capital runs (World I–V for all)', '6 a continent, 30 a tier, 480 fights'],
+    ['Rift runs (every Uma on a won run)', '6, about 350 fights'],
+    ['Trials (Class V for all)', '20 a party, 480 wins or sweeps'],
+    ['The Wilds, every full window, pooled', `${(63.6 * F).toFixed(1)} days`],
+    ['The Wilds, today\'s rules (no secondary)', `${(83.7 * F).toFixed(1)} days (Metal and Vegetables bind)`],
+    ['Each Uma\'s own Craft V', `${(49 * F).toFixed(1)} days (120 Umas share 60 slots)`],
+  ]
+  $('#scale').innerHTML = '<tr><th>Twenty-four parties, one tier</th><th>Value</th></tr>' + rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')
+  const items = [['Fights, ledger seconds', 45, 'var(--t2)'], ['Fights, 2 min each', 110, 'var(--t2)'], ['The Wilds, pooled', 63.6 * F * 24, 'var(--c3)'], ['The Wilds, today', 83.7 * F * 24, 'var(--c3)']]
+  const top = Math.max(...items.map((x) => x[1]))
+  $('#vs').innerHTML = items.map(([l, h, c], i) => `<g data-tip="${l}: ${Math.round(h).toLocaleString()} hours"><text x="0" y="${28 + i * 44}">${l}</text>
+    <rect x="150" y="${16 + i * 44}" width="${Math.max(3, h / top * 330)}" height="18" rx="4" fill="${c}"/><text x="${158 + Math.max(3, h / top * 330)}" y="${29 + i * 44}" style="fill:var(--ink)">${Math.round(h).toLocaleString()} h</text></g>`).join('')
+}
+
+function ready() {
+  const a = Object.fromEntries(events(false)), b = Object.fromEntries(events(true))
+  const rows = [
+    ['Gear V, Stars V', `${a['Gear V'].toFixed(1)} · ${b['Gear V'].toFixed(1)}`, 'The makers\' Craft 46 opens G10; then the slots'],
+    ['Craft V', `${a['Craft V'].toFixed(1)} · ${b['Craft V'].toFixed(1)}`, 'Her own work only; Speed Tickets fast-forward her jobs (CO15)'],
+    ['Weapons V', `${a['Weapons V'].toFixed(1)} · ${b['Weapons V'].toFixed(1)}`, 'Metal and Vegetables: two extra weapons an Uma (D289)'],
+    ['The Rift', `${a.Rift.toFixed(1)}`, 'The owner\'s play: a run of twenty, about 58 fights'],
+  ]
+  $('#ready').innerHTML = '<tr><th>Her last steps</th><th class="num">Day: the party\'s Uma · the twenty\'s last</th><th>What moves it</th></tr>' +
+    rows.map((r) => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${r[2]}</td></tr>`).join('')
+}
+
+function drawAll() { gantt(); steps(); tools(); calc(); scale(); ready() }
+drawAll()
+</script>
+</body>
+</html>
