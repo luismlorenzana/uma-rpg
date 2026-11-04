@@ -1,7 +1,7 @@
 // The Scenario Gate opens the active tier's world map (D66, D97, H35): five continents, one per scenario of the tier, each ten levels of
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
 // `r/<region>`, `capital/<continent>`, `fight`. Canvas maps keep the complete lists one tap away.
-import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
+import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, rpgMapRoutes, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -143,7 +143,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
   const cleared = clearedByRegion(worldRun(world).wins)
   const rows = Array.from({ length: 10 }, (_, row) => row)
   const finals = rpgFinals(continent.order)
-  const wonFinals = finals.routes.flatMap((_, i) => Object.values(capitalStageIds(continent.id, i + 1)))
+  const wonFinals = rpgMapRoutes(finals).flatMap((_, i) => Object.values(capitalStageIds(continent.id, i + 1)))
     .filter((id) => (worldRun(world).wins[id] ?? 0) > 0).length
   return (
     <div>

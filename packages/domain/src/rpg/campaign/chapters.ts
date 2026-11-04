@@ -6,7 +6,7 @@ import { RPG_SKILL_POWER } from '../node-identity'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../battle/caps'
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../battle/types'
 import { RPG_FOE_ROLES, RPG_FOE_TUNING, rpgFoe, rpgFoeShields, type RpgFoeRole } from './enemies'
-import { rpgFinals, type RpgFinalsRoute } from './finals'
+import { rpgFinals, rpgMapRoutes, type RpgEscortRole, type RpgFinalsFoe, type RpgFinalsRoute } from './finals'
 import { rpgStageWeaknesses } from './weaknesses'
 
 /** Ten levels a chapter (D48): Debut 1–3, Classic 4–6, Senior 7–9, Finals 10. Five chapters fill a tier's Lv1–50. */
@@ -107,7 +107,7 @@ function layout(start: number, order: number): Layout[] {
   const finalLevel = start + RPG_CHAPTER_LEVELS - 1
   const last = add({ id: 'final-camp', col: 2, kind: 'camp', level: finalLevel, stage: finals, element: null })
   link(previous, [last]); row += 1
-  const routes = rpgFinals(order).routes.map((spec, index) => ({ index, spec, col: index * 2 }))
+  const routes = rpgMapRoutes(rpgFinals(order)).map((spec, index) => ({ index, spec, col: index * 2 }))
   const guards = routes.map((r) => add({ id: rpgFinalsNodeIds(r.index + 1).vanguard, col: r.col, kind: 'sub-boss', level: finalLevel,
     stage: finals, element: r.spec.vanguard.element, route: r }))
   last.exits.push(...guards.map((n) => n.id)); row += 1
@@ -123,8 +123,8 @@ export function rpgChapterReach(levelStart: number): number {
   return RPG_SKILL_POWER[depth - 1]! / RPG_SKILL_POWER[0]
 }
 
-function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], reach: number, engine: number, tier: number): { enemies: BattleEnemy[]; lead: RpgCastMember | null } {
-  if (node.kind === 'camp') return { enemies: [], lead: null }
+/** A node's foe makers: faces from the cast, one weakness dealer for the whole node, and its regular foes. */
+function foeKit(chapterId: string, node: Pick<Layout, 'id' | 'stage' | 'level'>, cast: readonly RpgCastMember[], engine: number, tier: number) {
   const used = new Set<string>()
   const castFor = (slot: number): RpgCastMember => {
     const offset = hash(`${chapterId}:${node.id}:${slot}:cast`)
@@ -158,6 +158,14 @@ function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], r
     return rpgFoe({ id: `foe${slot + 1}`, castId: member.id, element, rank: 'regular', level: node.level, shield,
       weaknesses: weaknesses(slot, element, 'regular', her), role: her }, engine)
   }
+  return { used, weaknesses, regular }
+}
+type FoeKit = ReturnType<typeof foeKit>
+
+function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], reach: number, engine: number, tier: number,
+  kit?: FoeKit): { enemies: BattleEnemy[]; lead: RpgCastMember | null } {
+  if (node.kind === 'camp') return { enemies: [], lead: null }
+  const { used, weaknesses, regular } = kit ?? foeKit(chapterId, node, cast, engine, tier)
   const others = (avoid: RpgElement, slot: number) => pick(RPG_ELEMENTS.filter((e) => e !== avoid), `${chapterId}:${node.id}:${slot}:el`)
   if (node.kind === 'fight') {
     const count = node.element ? 3 : node.stage === 0 ? 2 : node.stage === 1 ? (node.col === 2 ? 3 : 2) : 3
@@ -184,6 +192,29 @@ function foes(chapterId: string, node: Layout, cast: readonly RpgCastMember[], r
     shield: rpgFoeShields(engine)[node.kind === 'boss' ? 'boss' : 'subBoss'], weaknesses: weaknesses(0, element, rank, node.kind === 'boss' ? 'champion' : 'captain'), reach }, engine),
   ...Array.from({ length: minions }, (_, i) => authored ? regular(i + 1, authored[i]![1], authored[i]![0]) : regular(i + 1, others(element, i + 1)))]
   return { enemies, lead: boss }
+}
+
+/** The legacy generator's cast stand-in: a capital's faces are set by its caller. */
+const NO_CAST: readonly RpgCastMember[] = [{ id: '', name: '' }]
+
+/**
+ * A capital run's fight in the Finals' shape (D293, H159): a sub-boss or boss lead of the foe's element, with its two
+ * authored escorts, built as a route's vanguard or champion is, at `level`. A boss may open on a wave of regulars (each a
+ * role and an element) and then enter with its own two; one weakness dealer serves both waves, and foe ids run on across
+ * them. `key` seeds everything, so a key builds the same fight; the faces are left empty for the caller's.
+ */
+export function rpgFinalsFight(key: string, order: number, fight: { kind: 'sub-boss' | 'boss'; level: number; foe: RpgFinalsFoe;
+  lead?: readonly (readonly [RpgEscortRole, RpgElement])[] }, engine: number = BATTLE_ENGINE_VERSION): { enemies: BattleEnemy[]; waves?: BattleEnemy[][] } {
+  if (!Number.isSafeInteger(order) || order < 1) throw new RangeError(`Bad chapter order ${order}`)
+  const spec: RpgFinalsRoute = { name: '', line: '', vanguard: fight.foe, champion: fight.foe }
+  const node: Layout = { id: key, row: 0, col: 0, kind: fight.kind, level: fight.level, stage: RPG_FIGHT_STAGES,
+    element: fight.foe.element, exits: [], route: { index: 0, spec } }
+  const tier = Math.ceil(order / 5)
+  const kit = foeKit('capital-run', node, NO_CAST, engine, tier)
+  const lead = (fight.lead ?? []).map(([role, element], slot) => kit.regular(slot, element, role))
+  const { enemies } = foes('capital-run', node, NO_CAST, rpgChapterReach(rpgChapterLevelStart(order)), engine, tier, kit)
+  if (!lead.length) return { enemies }
+  return { enemies: lead, waves: [enemies.map((e, i) => ({ ...e, id: `foe${lead.length + i + 1}` }))] }
 }
 
 function nodeName(node: Layout, lead: RpgCastMember | null): string {

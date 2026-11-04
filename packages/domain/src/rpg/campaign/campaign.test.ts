@@ -4,7 +4,7 @@ import { battleWeakness } from '../battle/skills'
 import type { BattleState } from '../battle/types'
 import { grantRpgExp, projectRpgStats, RPG_ELEMENTS, rpgDefaultWeapons, type RpgProfile } from '../rules'
 import { rpgCampaignChapter, rpgChapterReach, rpgNodeParents, rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from './chapters'
-import { RPG_FINALS, rpgFinals } from './finals'
+import { RPG_FINALS, rpgFinals, rpgMapRoutes } from './finals'
 import { rpgBattleBaseExp, rpgBattleExp, rpgBattleLaurels, rpgLevelExpFactor, rpgRewardKind, rpgShardsBetween } from './rewards'
 import {
   createRpgRun, rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCarriedMp, rpgChapterCleared, rpgCloseRunBattle, rpgNodeStatus,
@@ -29,7 +29,7 @@ describe('generated chapters (D48)', () => {
       const finals = rpgFinals(chapter.order)
       const bosses = chapter.nodes.filter((n) => n.kind === 'boss')
       expect(bosses.map((n) => n.id)).toEqual(['route1-boss', 'route2-boss', 'route3-boss'])
-      expect(bosses.map((n) => n.element)).toEqual(finals.routes.map((r) => r.champion.element))
+      expect(bosses.map((n) => n.element)).toEqual(rpgMapRoutes(finals).map((r) => r.champion.element))
       expect(bosses.every((n) => n.level === chapter.levelStart + 9 && n.exits.length === 0)).toBe(true)
       expect(chapter.nodes.filter((n) => n.kind === 'sub-boss').map((n) => n.level - chapter.levelStart)).toEqual([2, 5, 8, 9, 9, 9])
       const fights = chapter.nodes.filter((n) => n.kind === 'fight')
@@ -53,7 +53,7 @@ describe('generated chapters (D48)', () => {
     expect(RPG_FINALS).toHaveLength(14)
     expect(Object.keys(rpgFinals(1))).toEqual(['routes'])
     expect(rpgFinals(15)).toBe(rpgFinals(1))
-    for (const finals of RPG_FINALS) expect(new Set(finals.routes.map((r) => r.champion.element)).size).toBe(3)
+    for (const finals of RPG_FINALS) expect(new Set(rpgMapRoutes(finals).map((r) => r.champion.element)).size).toBe(3)
   })
 
   it('shows more weaknesses on weaker foes and bigger shields on stronger ones, never their own element (v15; v16’s twins: twins-v16)', () => {

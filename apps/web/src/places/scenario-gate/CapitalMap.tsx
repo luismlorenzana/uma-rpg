@@ -1,5 +1,5 @@
 // The capital's authored Finals: three independent vanguard → champion routes (H15).
-import { capitalId, capitalStageIds, rpgFinals, worldRun, type RpgElement, type WorldContinent } from '@rpg/domain'
+import { capitalId, capitalStageIds, rpgFinals, rpgMapRoutes, worldRun, type RpgElement, type WorldContinent } from '@rpg/domain'
 import type { Campaign } from '../../battle/campaign'
 import { ElementGlyph, formatLevel } from '../../battle/labels'
 import { useWorld } from '../../save/game'
@@ -15,7 +15,7 @@ export function CapitalMap({ campaign, continent, place }: { campaign: Campaign;
   return <StageMap campaign={campaign} region={chapter} place={place} title={continent.name}
     levels={formatLevel(chapter.levelStart)} color={campaign.color(chapter.id)} capital renderStages={(choice) => (
       <div className="space-y-3 p-3">
-        {finals.routes.map((route, i) => {
+        {rpgMapRoutes(finals).map((route, i) => {
           const ids = capitalStageIds(continent.id, i + 1)
           const nodes = [ids.vanguard, ids.champion].map((id) => chapter.nodes.find((n) => n.id === id)!)
           const elements = [...new Set<RpgElement>(nodes.flatMap((n) => n.enemies.flatMap((e) => e.element2 ? [e.element, e.element2] : [e.element])))]

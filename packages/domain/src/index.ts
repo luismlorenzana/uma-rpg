@@ -58,5 +58,7 @@ export * from './roster/aptitudes'
 export * from './roster/template'
 export * from './world/biomes'
 export * from './world/capital'
+// Capital runs' ids (D293, H159); the run's fights are `capitalRunChapter` above.
+export * from './world/capital-run-id'
 export * from './world/roster'
 export * from './world/world'

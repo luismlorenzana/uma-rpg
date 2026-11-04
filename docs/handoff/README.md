@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H167; decision numbers from D296). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H167; decision numbers from D297). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it.
@@ -67,8 +67,8 @@ lights on a won run. Built dark behind `capitalRunsLive()` (save v37), switched 
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H159](tasks/H159-capital-run-foes.md) | The fourth Finals route for every scenario, and the run's foes | ChatGPT or Claude | M | — | Ready |
-| [H160](tasks/H160-capital-run-rules.md) | The run rules and save v37, dark: start, lanes, the Final, pay, the World step | ChatGPT or Claude | L | H159 | Waits |
+| H159 | The fourth Finals route for every scenario, and the run's foes | Claude | M | — | Done (D296), below |
+| [H160](tasks/H160-capital-run-rules.md) | The run rules and save v37, dark: start, lanes, the Final, pay, the World step | ChatGPT or Claude | L | H159 | Ready |
 | [H161](tasks/H161-capital-run-screens.md) | The screens, dark: the capital page, New run, a run's page, the result | ChatGPT or Claude | L | H160 | Waits |
 | [H162](tasks/H162-capital-runs-switch.md) | The switch: save v37 live, the old capital removed, the manual, the phone check | ChatGPT or Claude | M | H159–H161 | Waits |
 
@@ -85,7 +85,7 @@ Every packet can go to ChatGPT; no art packet.
 | [H165](tasks/H165-honeycomb-screen.md) | The screen, dark: the SVG honeycomb, its hexes, the quick looks, zoom, 24 parties on screen | ChatGPT or Claude | L | H161, H164 | Waits |
 | [H166](tasks/H166-honeycomb-switch.md) | The switch: save v38 live, the pixel continent map removed, the manual, the phone check | ChatGPT or Claude | M | H162, H165 | Waits |
 
-**Order:** H163 can start now, beside H159. Then H164 after H160, H165 after H161, and H166 after H162.
+**Order:** H163 can start now, beside H160. Then H164 after H160, H165 after H161, and H166 after H162.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
@@ -107,6 +107,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H159 | Capital runs' foes: a fourth Finals route for all fourteen scenarios, the run's ids and its sixteen fights, the map's capitals byte for byte as before (D296) | this commit |
 | H157 | Collections live, save v35: the switch, the run-wide Ascend and the Observatory removed, the manual and the phone check (D288) | `ceab990` |
 | H155 | Windows on screen, dark: her window beside her bust, the Window sheet, the Gallery, Ascend one Uma at a time, latching and the "Window +1" note (D287) | `3bc65cc` |
 | H154 | Drills and Training Logs, dark: five Drills a tier, ten runs a day banked to thirty, Logs a third of her next level (D286) | `11d2d05` |
