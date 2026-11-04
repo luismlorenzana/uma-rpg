@@ -348,8 +348,8 @@ tiles, Gear's budget one screen at 390×844. Weapons are chosen on the Class tab
   and her own moon's two beside a crescent. Each moon draws a figure, clockwise from I: Prowess a spearhead, Vigor a pentagon, Guard a shield.
   Each star carries its numeral, its jewel's numeral, and each body a label with its count ("Guard 3/5", "★ Bruiser 1/2"). **Open** is filled, with
   the line to it lit; **Ready** (a jewel in the Warehouse opens it now) has a green dot and a slow pulse; **Next** is a bright ring; **Later** a dim one.
-  A full body closes its figure. A star opens its sheet; a body opens the sheet on its next node, its last when full. The crests are vector
-  stand-ins until uma-art's own (H141, H144).
+  A full body closes its figure. A star opens its sheet; a body opens the sheet on its next node, its last when full. The five crests draw
+  from uma-art's UI atlas at 24 px; the eight stat marks on the totals and Details draw at 16 px (H141, H144).
 - **The six totals** ("HP +125", "MP +25", "ATK +25", "M.ATK +13", "DEF +19", "M.DEF +19") of the shared map, each with its stat mark, then her
   moon's line in the accent ("★ Evasion +2.4% · DEF +8").
 - **A node's sheet** ("Guard III", "★ Bruiser's moon II"): a strip of every node of its body, each with the first number of its value and

@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client'
 import { describe, expect, it, vi } from 'vitest'
 import { CLASS_LABEL, skillLine, STATUS_LABEL } from './labels'
 import { AchievementBadge, ClassEmblem, FrontCrest, StatusChips, StatusGlyph } from './pixel-icons'
+import { StarCrest, StatMark, type StatMarkId } from '../places/observatory/star-marks'
 
 async function renderIcons(content: React.ReactNode, check: (host: HTMLElement) => void) {
   const host = document.createElement('div'), root = createRoot(host)
@@ -56,6 +57,32 @@ describe('class emblems and status glyphs', () => {
       expect(host.querySelector('[role="group"]')?.getAttribute('aria-label')).toBe('Statuses')
     })
     await renderIcons(<StatusChips statuses={[]} />, (host) => expect(host.children).toHaveLength(0))
+  })
+})
+
+describe('the star chart\'s pixel crests and stat marks (uma-art 2.19.0, H144)', () => {
+  it('draws all thirteen atlas frames at native size, as decoration, without vector stand-ins', async () => {
+    const bodies = ['planet', 'prowess', 'vigor', 'guard', 'template'] as const
+    const stats: readonly StatMarkId[] = ['hp', 'mp', 'atk', 'matk', 'def', 'mdef', 'evasion', 'limit']
+    const expected = [...bodies.map(body => [`star/${body}`, 24] as const), ...stats.map(stat => [`stat/${stat}`, 16] as const)]
+    const frames: Record<string, { x: number; y: number; w: number; h: number }> = atlas.frames
+    for (const [key, size] of expected) expect(frames[key], key).toMatchObject({ w: size, h: size })
+    await renderIcons(<>{bodies.map(body => <StarCrest key={body} body={body} />)}{stats.map(stat => <StatMark key={stat} stat={stat} className="align-middle" />)}</>, host => {
+      expect(host.querySelector('svg')).toBeNull()
+      const icons = [...host.querySelectorAll<HTMLElement>('span[style]')]
+      expect(icons).toHaveLength(13)
+      for (const [index, icon] of icons.entries()) {
+        const [key, size] = expected[index]!, frame = frames[key]!
+        expect(icon.getAttribute('aria-hidden')).toBe('true')
+        expect(icon.style.width).toBe(`${size}px`); expect(icon.style.height).toBe(`${size}px`)
+        expect(icon.style.backgroundImage).toContain('atlas.png')
+        expect(icon.style.backgroundSize).toBe(`${atlas.width}px ${atlas.height}px`)
+        expect(icon.style.backgroundPosition).toBe(`${-frame.x}px ${-frame.y}px`)
+        expect(icon.style.imageRendering).toBe('pixelated')
+      }
+      expect([...host.querySelectorAll('[data-stat-mark]')].map(mark => mark.getAttribute('data-stat-mark'))).toEqual(stats)
+      for (const mark of host.querySelectorAll('[data-stat-mark]')) expect(mark.className).toContain('align-middle')
+    })
   })
 })
 

@@ -1,9 +1,8 @@
 # Profile polish: Details and the star chart
 
-> **From the owner's two screenshots, 2026-10-31; approved and built: H139, H140, H142 and H143 (D275–D278).** Art is ChatGPT's, so the
-> chart shipped with vector crests, and [H141](https://github.com/luismlorenzana/uma-platform/pull/64) published the pixel art in uma-art 2.19.0 that
-> [H144](../../handoff/tasks/H144-pin-star-art.md) pins (PP25, PP30). No rule, save or balance change: the fight, the jewels and every number stay as
-> they are.
+> **Finished: H139–H144.** From the owner's two screenshots, 2026-10-31; Details and the chart are built (D275–D278), and
+> H144 pins [H141's pixel art](https://github.com/luismlorenzana/uma-platform/pull/64) in uma-art 2.19.0 (PP25, PP30).
+> No rule, save or balance change: the fight, the jewels and every number stay as they are.
 
 **Pages:** [Details](previews/details.html) · [Star chart](previews/star-chart.html). Both are live mocks with the light and dark
 themes and both phone sizes; the chart's stars and bodies can be tapped.
@@ -134,12 +133,12 @@ The owner prefers no open questions, so each is decided, with the reason.
 | PP22 | Lines light from star to star; the closing line only when a body is full | The order shows, and finishing a body shows too |
 | PP23 | A color for each body: gold, ember, rose, sky and orchid | A chart should be readable at a glance; no green |
 | PP24 | Each body's label holds its name and count; ★ her moon's label runs from the right edge | Any template name fits |
-| PP25 | Crests sit over the SVG in HTML buttons: vector until H144 pins the pixel art, at whole pixels | The viewBox scale would blur pixel art, and a button is a real 44 pt target |
+| PP25 | Crests sit over the SVG in HTML buttons: H144's pixel art at native size and whole pixels | The viewBox scale would blur pixel art, and a button is a real 44 pt target |
 | PP26 | A tap on a body opens the sheet on its next node, or its last when full | One sheet, no new kind |
 | PP27 | The node sheet gains a strip of its body's nodes, each with the first number of its value | Every value of a body in one place |
 | PP28 | The six totals and the ★ line stay, with stat marks | The owner didn't ask to lose them |
 | PP29 | Details' tiles wear the same marks | One icon set |
-| PP30 | Five 24 px crests and eight 16 px marks, in uma-art's `ui` atlas; ChatGPT draws and publishes; H144 pins, and vector stand-ins carry the game until then | Art is ChatGPT's end to end, and the chart shouldn't wait on it |
+| PP30 | Five 24 px crests and eight 16 px marks, in uma-art 2.19.0's `ui` atlas; H141 drew and published, H144 pins | Art is ChatGPT's end to end, and the chart shouldn't wait on it |
 | PP31 | The top-left corner stays empty | Tier 2 and Tier 3's weapon moons fit there, whenever they're built; nothing is built for them now |
 
 ## 5. The packets
@@ -151,6 +150,6 @@ The owner prefers no open questions, so each is decided, with the reason.
 | [H141](https://github.com/luismlorenzana/uma-platform/pull/64) | Art: five crests and eight stat marks, published in uma-art 2.19.0 | ChatGPT draws and publishes | S | — |
 | H142 | The star chart, with vector crests | Claude | M | — |
 | H143 | A body's sheet, its strip and the stat marks | Claude | S | H140, H142 |
-| [H144](../../handoff/tasks/H144-pin-star-art.md) | Pin uma-art 2.19.0: pixel crests and marks | Claude or ChatGPT | S | H141 |
+| H144 | Pin uma-art 2.19.0: pixel crests and marks, finished | Claude or ChatGPT | S | H141 |
 
-H143 joins Details and the chart. H144 follows the art.
+H143 joins Details and the chart. H144 finishes the profile polish with the published art.

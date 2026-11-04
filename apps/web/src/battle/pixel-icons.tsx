@@ -8,7 +8,7 @@ const frames: Readonly<Record<string, { x: number; y: number; w: number; h: numb
 export type PixelScale = 1 | 2 | 4
 /** A `ui` frame at its native CSS-pixel size (24/16/12) or a whole-number scale: never fractional at phone widths.
  * Decorative unless it's given a label. */
-function PixelIcon({ frame, scale = 1, className = '', label }: { frame: string; scale?: PixelScale; className?: string; label?: string }) {
+export function PixelIcon({ frame, scale = 1, className = '', label }: { frame: string; scale?: PixelScale; className?: string; label?: string }) {
   const f = frames[frame]
   if (!f) return null
   const named = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true }
