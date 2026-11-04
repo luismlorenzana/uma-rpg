@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gear by Tier</title>
+<!-- gear.md: the Tier 1 → 2 → 3 picture of gear. Self-contained; kit tokens from _template.html. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  :root { --k-greatsword: #c8641e; --k-axe: #8a4fc0; --k-lance: #2f8a3e; --k-bow: #c2477a; --k-dark: #6a46c0; }
+  @media (prefers-color-scheme: dark) { :root { --k-greatsword: #e8873f; --k-axe: #b083e6; --k-lance: #5cbf6a; --k-bow: #e57aa5; --k-dark: #9f84ec; } }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .pills button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .tabs3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .gear { background: var(--raised); border-radius: 18px; padding: 12px; border: 1px solid var(--hairline-strong); }
+  .gear .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; }
+  .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); font-weight: 700; margin: 10px 0 6px; }
+  .tiles { display: grid; gap: 6px; }
+  .tiles.w { grid-template-columns: 1fr; }
+  .tiles.a5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .tiles.a3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tile { background: var(--panel); border-radius: 10px; padding: 7px 9px; border: 1.5px solid var(--hairline-strong); font-size: 12px; min-width: 0; }
+  .tile b { display: block; font-size: 12.5px; color: var(--ink); }
+  .tile .v { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .tile.br { border-color: var(--accent); }
+  .tile .bchip { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--accent-strong); margin-right: 4px; }
+  .kc { border-left: 4px solid var(--kc); }
+  .timeline { display: grid; grid-template-columns: 1.2fr 1fr 1.4fr; gap: 10px; }
+  .phase { background: var(--panel); border-radius: var(--radius); padding: 12px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .phase h4 { margin: 0 0 6px; font-size: 14px; }
+  .phase ul { margin: 0; padding-left: 18px; font-size: 13px; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 10px 14px; border-radius: 10px; color: var(--ink); margin-top: 12px; font-size: 13px; }
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Gear by tier: one Uma's Gear tab, Tier 1 → 2 → 3</h1>
+  <p>From <a href="../gear.md">gear.md</a>. The same Uma at each tier's Lv 50, every slot at G10, on her preset (D263, T2G13)
+    and her suggested branches (T2G6). Pick her class; the values are the code's rows × tier (Might, armor, accessories) and
+    the design's branch rows.</p>
+  <nav class="tabs"><a href="#tab">Her Gear tab by tier</a><a href="#g5">What G5 opens</a><a href="#rows">Every row at G10</a><a href="#pages">The other pages</a></nav>
+
+  <section id="tab">
+    <div class="pills" id="cls" role="group" aria-label="Class"><button data-c="brawler" aria-pressed="true">Brawler</button><button data-c="armsummoner">Arms Summoner</button></div>
+    <div class="tabs3" id="tabs3"></div>
+    <div class="callout" id="note"></div>
+  </section>
+
+  <section id="g5">
+    <h2>What a grade's G5 opens, in every tier</h2>
+    <div class="timeline">
+      <div class="phase"><h4>G1–G4 (Uma Lv 1–16)</h4><ul>
+        <li>One made item raises one slot one grade, as Tier 1.</li>
+        <li>A weapon: its Tier 1 line in Tier 2; its Tier 2 branch at Tier 3's Might in Tier 3.</li>
+        <li>An accessory slot: the four bases (Tier 2); the forms she knows at their Tier 2 rate (Tier 3).</li></ul></div>
+      <div class="phase"><h4>G5 (Uma Lv 21)</h4><ul>
+        <li><b>A weapon's G5 item takes its branch:</b> Pure or Dual (Tier 2); Keen, Tempered or Evolved (Tier 3).</li>
+        <li><b>An accessory slot's G5 Setting opens</b> its family's two branches (Tier 2) or their step (Tier 3). No item.</li>
+        <li>Armor: nothing new.</li></ul></div>
+      <div class="phase"><h4>G6–G10 (Uma Lv 26–46)</h4><ul>
+        <li>The line's items as before, × tier.</li>
+        <li>One two-kind weapon in her slots; her ★ family pays on any weapons (a Twofold form).</li>
+        <li>A re-forge is one more G5 item; a form swap is one tap.</li></ul></div>
+    </div>
+  </section>
+
+  <section id="rows">
+    <h2>Every row at G10, by tier</h2>
+    <div class="card scroll"><table>
+      <thead><tr><th>Piece</th><th class="n"><span class="tier t1">Tier 1</span></th><th class="n"><span class="tier t2">Tier 2</span></th><th class="n"><span class="tier t3">Tier 3</span></th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Weapon Might</td><td class="n">68</td><td class="n">122</td><td class="n">177</td><td>`mightAt`</td></tr>
+        <tr><td>A weak hit, at most</td><td class="n">×1.3</td><td class="n">×1.5 (Pure)</td><td class="n">×1.7 (Keen)</td><td>WP6, WP9</td></tr>
+        <tr><td>Armor: HP · DEF · M.DEF · MP</td><td class="n">150 · 40 · 40 · 30</td><td class="n">270 · 72 · 72 · 54</td><td class="n">390 · 104 · 104 · 78</td><td>`armorValues`</td></tr>
+        <tr><td>Armor: evasion · offense</td><td class="n">12% · 25</td><td class="n">12% · 45</td><td class="n">12% · 65</td><td>Speed unscaled</td></tr>
+        <tr><td>Pendant, Charm (base) a slot</td><td class="n">+10</td><td class="n">+18</td><td class="n">+26</td><td>`accessorySlotValue`</td></tr>
+        <tr><td>Great Pendant, Great Charm</td><td class="n">—</td><td class="n">+23</td><td class="n">+36</td><td>T2G10</td></tr>
+        <tr><td>Twofold Pendant, Twofold Charm (each stat)</td><td class="n">—</td><td class="n">+18</td><td class="n">+29</td><td>T2G10</td></tr>
+        <tr><td>Orb (base)</td><td class="n">+20</td><td class="n">+36</td><td class="n">+52</td><td>`accessorySlotValue`</td></tr>
+        <tr><td>Great Orb · Twofold Orb (each kind)</td><td class="n">—</td><td class="n">+47 · +25</td><td class="n">+73 · +42</td><td>T2G10</td></tr>
+        <tr><td>Insignia · Great Insignia · Onset</td><td class="n">+10%</td><td class="n">+10% · +13% · +15%</td><td class="n">+10% · +14% · +16%</td><td>T2G10, percentages flat</td></tr>
+        <tr><td>Orb forms on one kind, at most (the kind cap)</td><td class="n">+68</td><td class="n">+122</td><td class="n">+177</td><td>T2G14</td></tr>
+        <tr><td>★ signature at Lv 50</td><td class="n">+5</td><td class="n">+9</td><td class="n">+13</td><td>`signatureBonus`</td></tr>
+        <tr><td>A rank of everything, refined a line (two Umas)</td><td class="n">30</td><td class="n">30</td><td class="n">30</td><td>D264, T2G16</td></tr>
+      </tbody></table></div>
+  </section>
+
+  <section id="pages">
+    <h2>The other pages</h2>
+    <p><a href="gear-weapons.html">Weapons: the tree, the partner table, legal Duals, coverage</a> ·
+      <a href="gear-accessories.html">Accessories: the branches, rows, what each wins</a> ·
+      <a href="gear-costs.html">Armor by tier and what a rank costs</a></p>
+  </section>
+</main>
+<script>
+const UMA = {
+  brawler: { name: 'A Brawler (Party 1 and 2)', half: 'Physical', stat: 'ATK',
+    w: [
+      [['Greatsword', 'greatsword', 'G10 · Might 68 · weak ×1.3', ''], ['Axe', 'axe', 'G10 · Might 68 · weak ×1.3', ''], ['Lance', 'lance', 'G10 · Might 68 · weak ×1.3', '']],
+      [['Dual Greatsword + Bow', 'greatsword', 'G10 · Might 122 · weak ×1.3 on either', 'Dual'], ['Pure Axe', 'axe', 'G10 · Might 122 · weak ×1.5', 'Pure'], ['Pure Lance', 'lance', 'G10 · Might 122 · weak ×1.5', 'Pure']],
+      [['Tempered Greatsword + Bow', 'greatsword', 'G10 · Might 177 · ×1.5 on both', 'Tempered'], ['Keen Axe', 'axe', 'G10 · Might 177 · weak ×1.7', 'Keen'], ['Keen Lance', 'lance', 'G10 · Might 177 · weak ×1.7', 'Keen']],
+    ],
+    a: [
+      [['Pendant', 'ATK +10'], ['Pendant', 'ATK +10'], ['Orb · Greatsword', '+20']],
+      [['Great Pendant', 'ATK +23'], ['Great Pendant', 'ATK +23'], ['Great Orb · Greatsword', '+47']],
+      [['Great Pendant', 'ATK +36'], ['Great Pendant', 'ATK +36'], ['Great Orb · Greatsword', '+73']],
+    ],
+    note: 'Her Dual fills the Bow, held once in both parties; her other two go Pure, then Keen. A Charm ★ would wear a Twofold Charm in slot 1 from Tier 2 (ATK +18 and her ★).' },
+  armsummoner: { name: 'An Arms Summoner (Party 2)', half: 'Physical', stat: 'ATK',
+    w: [
+      [['Bow', 'bow', 'G10 · Might 68 · weak ×1.3', ''], ['Axe', 'axe', 'G10 · Might 68 · weak ×1.3', ''], ['Dark Tome', 'dark', 'G10 · Might 68 · weak ×1.3', '']],
+      [['Dual Bow + Greatsword', 'bow', 'G10 · Might 122 · weak ×1.3 on either', 'Dual'], ['Pure Axe', 'axe', 'G10 · Might 122 · weak ×1.5', 'Pure'], ['Pure Dark', 'dark', 'G10 · Might 122 · weak ×1.5', 'Pure']],
+      [['Tempered Bow + Greatsword', 'bow', 'G10 · Might 177 · ×1.5 on both', 'Tempered'], ['Keen Axe', 'axe', 'G10 · Might 177 · weak ×1.7', 'Keen'], ['Keen Dark', 'dark', 'G10 · Might 177 · weak ×1.7', 'Keen']],
+    ],
+    a: [
+      [['Pendant', 'ATK +10'], ['Pendant', 'ATK +10'], ['Orb · Bow', '+20']],
+      [['Twofold Pendant', 'ATK +18 · M.ATK +18'], ['Twofold Pendant', 'ATK +18 · M.ATK +18'], ['Great Orb · Bow', '+47']],
+      [['Twofold Pendant', 'ATK +29 · M.ATK +29'], ['Twofold Pendant', 'ATK +29 · M.ATK +29'], ['Great Orb · Bow', '+73']],
+    ],
+    note: 'Her Dual Bow (a Volley: its splash chips every foe weak to either kind) fills the Greatsword, Party 2\'s one holder. A hybrid\'s preset wears Twofold from G5: both her halves gain. Her best set measured is Great Orb ×2 and a Twofold (19.5% at Tier 2 Lv 50; the preset 17.6%).' },
+};
+const ARMOR = [['Head', 'DEF', [40, 72, 104]], ['Body', 'HP', [150, 270, 390]], ['Legs', 'MP', [30, 54, 78]], ['Arms', 'M.DEF', [40, 72, 104]], ['Feet', 'Evasion', ['12%', '12%', '12%']]];
+const OFF = [5, 9, 13];
+function draw(c) {
+  for (const b of document.querySelectorAll('#cls button')) b.setAttribute('aria-pressed', String(b.dataset.c === c));
+  const u = UMA[c];
+  document.getElementById('tabs3').innerHTML = [0, 1, 2].map((t) => `<div class="gear"><div class="head"><span>${u.name}</span><span class="tier t${t + 1}">Tier ${t + 1} · Lv 50</span></div>
+    <div class="lbl">Weapons</div><div class="tiles w">${u.w[t].map(([n, k, v, b]) => `<div class="tile kc${b === 'Dual' || b === 'Tempered' ? ' br' : ''}" style="--kc:var(--k-${k})">${b ? `<span class="bchip">${b}</span>` : ''}<b>${n}</b><span class="v">${v}</span></div>`).join('')}</div>
+    <div class="lbl">Armor · ${u.half}, offense +${OFF[t]} a piece to ${u.stat}</div><div class="tiles a5">${ARMOR.map(([s, st, v]) => `<div class="tile"><b>${s}</b><span class="v">${st} +${v[t]}`.replace('+12%', '12%') + '</span></div>').join('')}</div>
+    <div class="lbl">Accessories</div><div class="tiles a3">${u.a[t].map(([n, v]) => `<div class="tile${t && n !== 'Pendant' ? ' br' : ''}"><b>${n}</b><span class="v">G10 · ${v}</span></div>`).join('')}</div></div>`).join('');
+  document.getElementById('note').textContent = u.note;
+}
+for (const b of document.querySelectorAll('#cls button')) b.onclick = () => draw(b.dataset.c);
+draw('brawler');
+</script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Accessory Branches</title>
+<!-- gear.md (T2G9–T2G15): the four families' branches in Tiers 2 and 3. Self-contained; kit tokens from _template.html. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  :root { --s1: #fbf1dd; --s2: #f3dca6; --s3: #e6bd63; --s4: #c99530; --s5: #9a6c14; }
+  @media (prefers-color-scheme: dark) { :root { --s1: #2b2312; --s2: #4a3a15; --s3: #6f5419; --s4: #9a7322; --s5: #c99a38; } }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 12px 0 4px; }
+  .kpi { background: var(--panel); border-radius: var(--radius); padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .kpi .val { font: 700 20px/1.2 ui-rounded, system-ui, sans-serif; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .sub { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+  .fams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .fam { background: var(--panel); border-radius: var(--radius); padding: 12px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .fam h4 { margin: 0 0 10px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .ftree { display: grid; grid-template-columns: 1fr 1.25fr 0.8fr; gap: 8px; align-items: center; }
+  .node { background: var(--raised); border: 1.5px solid var(--hairline-strong); border-radius: 10px; padding: 7px 9px; font-size: 12px; }
+  .node b { display: block; font-size: 13px; color: var(--ink); }
+  .node.br { border-color: var(--accent); background: var(--accent-wash); }
+  .node .v { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .stack { display: grid; gap: 8px; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .pills button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .heat { border-collapse: separate; border-spacing: 3px; }
+  .heat td, .heat th { border: 0; }
+  .heat td.c { text-align: center; font-variant-numeric: tabular-nums; border-radius: 6px; min-width: 52px; font-weight: 600; color: var(--ink); }
+  .heat td.best { outline: 2px solid var(--ink); outline-offset: -2px; font-weight: 800; }
+  .q1 { background: var(--s1); } .q2 { background: var(--s2); } .q3 { background: var(--s3); } .q4 { background: var(--s4); color: #1b1300 !important; } .q5 { background: var(--s5); color: #fff !important; }
+  @media (prefers-color-scheme: dark) { .q4, .q5 { color: #0f1620 !important; } }
+  .est { font-style: italic; }
+  .phone { width: 360px; background: var(--raised); border-radius: 18px; padding: 12px; border: 1px solid var(--hairline-strong); }
+  .phone .title { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .li { display: flex; justify-content: space-between; align-items: center; background: var(--panel); border-radius: 10px; padding: 9px 11px; margin-bottom: 6px; font-size: 13px; }
+  .li .tag { font-size: 11px; color: var(--ink-soft); }
+  .li.on { outline: 2px solid var(--accent); }
+  .li.new::before { content: 'G5'; font-size: 10px; font-weight: 800; color: var(--accent-strong); margin-right: 6px; }
+  .phones { display: flex; gap: 16px; flex-wrap: wrap; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 10px 14px; border-radius: 10px; color: var(--ink); margin-top: 12px; font-size: 13px; }
+  #tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--panel); font-size: 12px; padding: 6px 9px; border-radius: 8px; max-width: 300px; opacity: 0; z-index: 10; }
+  details summary { cursor: pointer; font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Accessories in Tiers 2 and 3: four families, two branches each</h1>
+  <p>From <a href="../gear.md">gear.md</a> (T2G9–T2G15), on today's three slots and four families (D264, D266). A slot's G5
+    opens its family's two branches in Tier 2 and their step in Tier 3. A form is a setting: nothing is made for it, and
+    one tap wears a row. Values from the code where the code has them (`accessorySlotValue`, `signatureBonus`); the
+    branches' rows are the design's, rounded the same way.</p>
+  <nav class="tabs"><a href="#trees">The trees</a><a href="#rows">Rows by grade</a><a href="#wins">What each wins</a><a href="#picker">The slot's list</a><a href="#star">★ and presets</a></nav>
+
+  <div class="kpis">
+    <div class="kpi"><div class="lbl">Slots</div><div class="val">3 · 3 · 3</div><div class="sub">Every tier, repeats allowed (D264)</div></div>
+    <div class="kpi"><div class="lbl">Forms a slot can wear</div><div class="val">4 · 12 · 12</div><div class="sub">Bases, then two branches a family</div></div>
+    <div class="kpi"><div class="lbl">Her stat, a G10 slot</div><div class="val">+10 · +23 · +36</div><div class="sub">Pendant, then Great Pendant (ATK)</div></div>
+    <div class="kpi"><div class="lbl">Three slots add (Lv 50)</div><div class="val">11–13% · 18–25%</div><div class="sub">Tier 1 (D266) · Tier 2, her best set</div></div>
+  </div>
+
+  <section id="trees">
+    <h2>The trees: a Great form and a reach form, then the step</h2>
+    <p><b>Great</b> keeps the base's reach, ×1.3 (Pure's way). The other changes what it reaches (Dual's way). Tier 3's step
+      is one rule: +0.1 a grade on each, +0.2 on the Orb forms, +0.1% on the Insignias. G10 values shown, Tier 1 · 2 · 3.</p>
+    <div class="fams" id="fams"></div>
+  </section>
+
+  <section id="rows">
+    <h2>Rows by grade, one slot</h2>
+    <div class="pills" id="tierpick" role="group" aria-label="Tier"><button data-t="1">Tier 1</button><button data-t="2" aria-pressed="true">Tier 2</button><button data-t="3">Tier 3</button></div>
+    <div class="card scroll"><table id="rowt"></table>
+      <p class="legend" id="rownote"></p></div>
+  </section>
+
+  <section id="wins">
+    <h2>What each wins (measured at each tier's Lv 50)</h2>
+    <p>Each class in her owner party on curve, her three slots at G10 in one set, the others bare; her damage a turn
+      against the same Uma with no accessory, on every region stage at that level (40 fights, 20 sub-bosses, 20 bosses,
+      4 seeds). The mean weighs fights twice. <span class="est">Onset</span> needs a new rule: its cells are estimates
+      (three Onsets × her measured first-act share), in italics. The outlined cell is each column's best.</p>
+    <div class="pills" id="winpick" role="group" aria-label="Tier"><button data-t="2" aria-pressed="true">Tier 2</button><button data-t="3">Tier 3</button></div>
+    <div class="pills" id="ctxpick" role="group" aria-label="Fight"><button data-c="mean" aria-pressed="true">Mean</button><button data-c="fight">Regular fights</button><button data-c="sub">Sub-bosses</button><button data-c="boss">Bosses</button></div>
+    <div class="card scroll"><table class="heat" id="wint"></table>
+      <p class="legend">Shading is one hue, light to dark by gain; every cell carries its number. Stat = her armor half's (a Pendant for the Brawler, the Arms hybrids and the Paladin; a Charm for the others). Twofold Orb ×3 on the pair of her kinds that wins her mean (the Summoners' Bow and Dark, the Arms Spellblade's Axe and Thunder…); with Twofold, on her first and third weapons. Great Orb on the preset's Orb kind.</p></div>
+    <div class="callout"><b>Best cells</b> (8 classes × 4 columns). <b>Tier 2:</b> the Great stat forms 10, Twofold 10, the Great Orb 8, the Great Insignia 7, Onset 6 (estimated), the Twofold Orb 3. <b>Tier 3</b> (the step): the Great stat forms 10, Onset 8 (estimated), the Great Insignia 7, the Twofold Orb 5, the Great Orb 4, Twofold 3. A cell counts every form in its best set. Every branch someone's best in both tiers; none in more than a third. Great for a pure class, Twofold for a hybrid; the healers keep the Great form (their heals read it).</div>
+  </section>
+
+  <section id="picker">
+    <h2>The slot's list, one tap (D266)</h2>
+    <p>A Brawler's slot 1 in Tier 2. At G4 the four bases; at G5 her family's branches join, each with what it adds at her grade.</p>
+    <div class="phones">
+      <div class="phone"><div class="title"><span>Slot 1 · G4</span><span class="muted">Tier 2</span></div>
+        <div class="li on"><span>Pendant</span><span class="tag">ATK +7</span></div>
+        <div class="li"><span>Charm</span><span class="tag">M.ATK +7</span></div>
+        <div class="li"><span>Orb · Greatsword</span><span class="tag">+14</span></div>
+        <div class="li"><span>Orb · Axe</span><span class="tag">+14</span></div>
+        <div class="li"><span>Orb · Lance</span><span class="tag">+14</span></div>
+        <div class="li"><span>Insignia</span><span class="tag">bosses +4%</span></div>
+        <p class="legend">"G5 opens two more for each family"</p></div>
+      <div class="phone"><div class="title"><span>Slot 1 · G5</span><span class="muted">Tier 2</span></div>
+        <div class="li"><span>Pendant</span><span class="tag">ATK +9</span></div>
+        <div class="li new on"><span>Great Pendant</span><span class="tag">ATK +12</span></div>
+        <div class="li new"><span>Twofold Pendant</span><span class="tag">ATK +9 · M.ATK +9</span></div>
+        <div class="li"><span>Charm · Great Charm · Twofold Charm</span><span class="tag">…</span></div>
+        <div class="li new"><span>Great Orb · Greatsword</span><span class="tag">+23</span></div>
+        <div class="li new"><span>Twofold Orb · Greatsword + Lance</span><span class="tag">+13 each</span></div>
+        <div class="li new"><span>Great Insignia</span><span class="tag">bosses +6.5%</span></div>
+        <div class="li new"><span>Onset Insignia</span><span class="tag">first act +7.5%</span></div></div>
+    </div>
+  </section>
+
+  <section id="star">
+    <h2>★ on any weapons, and the presets (T2G12, T2G13)</h2>
+    <div class="card scroll"><table>
+      <thead><tr><th>Slot's grade</th><th>A pure class and a healer</th><th>A hybrid (both Spellblades, both Summoners)</th><th>Her ★ family</th></tr></thead>
+      <tbody>
+        <tr><td>G1–G4, or Tier 1</td><td>Her stat · her stat · Orb (D266)</td><td>The same</td><td>First, unless her weapons can't use it</td></tr>
+        <tr><td><b>G5 on, Tiers 2 and 3</b></td><td><b>Great stat · Great stat · Great Orb</b></td><td><b>Twofold · Twofold · Great Orb</b></td><td><b>Always first</b>: a Twofold form of her family gives both stats</td></tr>
+      </tbody></table>
+      <p class="legend">The preset adds 15.2–22.2% at Tier 2's Lv 50 (Tier 1's set at that level 11.6–16.9%; each class's best set 18.3–24.5%).</p></div>
+    <div class="card"><h3>Example: a Brawler whose ★ is the Charm, Tier 2 Lv 50, slots G10</h3>
+      <table><thead><tr><th>Set</th><th>Her ATK from the slots</th><th>★</th><th>In all</th></tr></thead>
+        <tbody>
+          <tr><td>Great Pendant · Great Pendant · Great Orb (no ★)</td><td>+46</td><td>—</td><td>+46 ATK, Orb +47 on the Greatsword</td></tr>
+          <tr><td><b>Twofold Charm</b> · Great Pendant · Great Orb</td><td>+18 + 23 = +41</td><td>+9 ATK, +9 M.ATK</td><td><b>+50 ATK</b>, Orb +47</td></tr>
+        </tbody></table>
+      <p class="legend">In Tier 1 the same Brawler leaves the Charm off: a Charm gives her nothing her three Arms use (D266 call 7).</p></div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+const FAMS = [
+  { n: 'Pendant', base: '+1 ATK a grade', v: '+10 · +18 · +26', ch: 'phys',
+    a: ['Great Pendant', '+1.3 ATK a grade → +1.4', '— · +23 · +36'], b: ['Twofold Pendant', '+1 ATK and +1 M.ATK → +1.1 each', '— · +18 · +29 each'] },
+  { n: 'Charm', base: '+1 M.ATK a grade', v: '+10 · +18 · +26', ch: 'magic',
+    a: ['Great Charm', '+1.3 M.ATK a grade → +1.4', '— · +23 · +36'], b: ['Twofold Charm', '+1 ATK and +1 M.ATK → +1.1 each', '— · +18 · +29 each'] },
+  { n: 'Orb', base: '+2 on one of her kinds', v: '+20 · +36 · +52',
+    a: ['Great Orb', '+2.6 on one kind → +2.8', '— · +47 · +73'], b: ['Twofold Orb', '+1.4 on each of two of her kinds → +1.6', '— · +25 · +42 each'] },
+  { n: 'Insignia', base: '+1% a grade on sub-bosses and bosses', v: '+10% every tier',
+    a: ['Great Insignia', '+1.3% a grade → +1.4%', '— · +13% · +14%'], b: ['Onset Insignia', '+1.5% a grade on her first act each wave → +1.6%', '— · +15% · +16%'] },
+];
+document.getElementById('fams').innerHTML = FAMS.map((f) => `<div class="fam"><h4>${f.n}${f.ch ? ` <span class="chip ${f.ch}">${f.ch === 'phys' ? 'ATK' : 'M.ATK'}</span>` : ''}</h4>
+  <div class="ftree"><div class="node"><span class="tier t1">Base</span><b>${f.n}</b><span class="v">${f.base}<br>${f.v}</span></div>
+  <div class="stack"><div class="node br"><span class="tier t2">G5</span><b>${f.a[0]}</b><span class="v">${f.a[1]}</span></div><div class="node br"><span class="tier t2">G5</span><b>${f.b[0]}</b><span class="v">${f.b[1]}</span></div></div>
+  <div class="stack"><div class="node"><span class="tier t3">Step</span><span class="v">${f.a[2]}</span></div><div class="node"><span class="tier t3">Step</span><span class="v">${f.b[2]}</span></div></div></div></div>`).join('');
+// Rows by grade (values from the code's rounding: tierScaled(rate × grade))
+const ROWS = {
+  1: [['Pendant, Charm', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], ['Orb', [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]], ['Insignia', ['1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%']]],
+  2: [['Pendant, Charm (base)', [2, 4, 5, 7, 9, 11, 13, 14, 16, 18]], ['Great Pendant, Great Charm', ['', '', '', '', 12, 14, 16, 19, 21, 23]], ['Twofold Pendant, Twofold Charm (each stat)', ['', '', '', '', 9, 11, 13, 14, 16, 18]],
+      ['Orb (base)', [4, 7, 11, 14, 18, 22, 25, 29, 32, 36]], ['Great Orb', ['', '', '', '', 23, 28, 33, 37, 42, 47]], ['Twofold Orb (each of two kinds)', ['', '', '', '', 13, 15, 18, 20, 23, 25]],
+      ['Insignia (base)', ['1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%']], ['Great Insignia', ['', '', '', '', '6.5%', '7.8%', '9.1%', '10.4%', '11.7%', '13%']], ['Onset Insignia', ['', '', '', '', '7.5%', '9%', '10.5%', '12%', '13.5%', '15%']]],
+  3: [['Pendant, Charm (base)', [3, 5, 8, 10, 13, 16, 18, 21, 23, 26]], ['Great Pendant, Great Charm', [3, 7, 10, 14, 18, 22, 25, 29, 33, 36]], ['Twofold (each stat)', [3, 5, 8, 10, 14, 17, 20, 23, 26, 29]],
+      ['Orb (base)', [5, 10, 16, 21, 26, 31, 36, 42, 47, 52]], ['Great Orb', [7, 14, 20, 27, 36, 44, 51, 58, 66, 73]], ['Twofold Orb (each of two kinds)', [4, 7, 11, 15, 21, 25, 29, 33, 37, 42]],
+      ['Insignia (base)', ['1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%', '10%']], ['Great Insignia', ['1.3%', '2.6%', '3.9%', '5.2%', '7%', '8.4%', '9.8%', '11.2%', '12.6%', '14%']], ['Onset Insignia', ['1.5%', '3%', '4.5%', '6%', '8%', '9.6%', '11.2%', '12.8%', '14.4%', '16%']]],
+};
+const NOTES = { 1: 'Tier 1 as built (D266): linear, every raise counts.', 2: 'Tier 2: × 1.8 on flat rows; a branch opens at the slot\'s G5. Percentages are the same in every tier.', 3: 'Tier 3: × 2.6; a branch she knows works at its Tier 2 rate at G1–G4 and takes its step at G5.' };
+function rows(t) {
+  for (const b of document.querySelectorAll('#tierpick button')) b.setAttribute('aria-pressed', String(b.dataset.t === String(t)));
+  document.getElementById('rowt').innerHTML = `<thead><tr><th>Form</th>${[...Array(10)].map((_, i) => `<th>G${i + 1}</th>`).join('')}</tr></thead><tbody>` + ROWS[t].map(([n, v]) => `<tr><td>${n}</td>${v.map((x) => `<td>${x === '' ? '<span class="muted">—</span>' : x}</td>`).join('')}</tr>`).join('') + '</tbody>';
+  document.getElementById('rownote').textContent = NOTES[t];
+}
+for (const b of document.querySelectorAll('#tierpick button')) b.onclick = () => rows(Number(b.dataset.t));
+rows(2);
+// Wins: [fight, sub, boss, mean] by class and set. E = estimated (Onset).
+const SETS = ['Great stat ×3', 'Great stat ×2, Great Orb', 'Twofold ×3', 'Twofold ×2, Great Orb', 'Great Orb ×2, Great stat', 'Great Orb ×2, Twofold', 'Twofold Orb ×3 (her best pair)', 'Twofold ×2, Twofold Orb (1st + 3rd)', 'Great Insignia ×3', 'Onset ×3 (est.)'];
+const CLS = ['Brawler', 'Sorcerer', 'Arms Spellblade', 'Tome Spellblade', 'Arms Summoner', 'Tome Summoner', 'Paladin', 'Cleric'];
+const W = { 2: {
+  Brawler: [[17.5, 21.0, 19.8, 18.8], [13.3, 18.5, 16.6, 15.2], [13.7, 15.6, 15.8, 14.6], [11.5, 15.8, 13.7, 12.9], [10.6, 16.2, 13.8, 12.5], [9.3, 14.7, 12.5, 11.2], [15.7, 15.2, 15.7, 15.6], [14.5, 17.0, 15.7, 15.3], [0, 24.0, 14.8, 8.6], [15.3, 4.5, 14.4, 12.4]],
+  Sorcerer: [[20.1, 22.0, 19.9, 20.5], [17.4, 19.0, 18.9, 18.1], [16.0, 16.8, 15.5, 16.1], [14.6, 15.0, 15.7, 15.0], [15.1, 17.0, 16.0, 15.8], [13.5, 15.1, 14.8, 14.2], [14.9, 16.4, 15.9, 15.5], [15.6, 16.3, 16.0, 15.9], [0, 25.4, 14.6, 9.5], [16.7, 5.9, 17.6, 14.2]],
+  'Arms Spellblade': [[15.9, 20.4, 14.1, 16.6], [14.1, 19.0, 13.5, 15.1], [19.0, 23.0, 15.6, 19.2], [15.5, 20.2, 14.4, 16.4], [11.0, 16.4, 12.7, 12.7], [12.5, 17.5, 13.0, 13.8], [18.9, 20.6, 13.6, 18.1], [17.7, 21.1, 14.2, 17.7], [0, 24.1, 13.4, 9.0], [18.5, 8.6, 18.5, 16.0]],
+  'Tome Spellblade': [[18.5, 18.1, 15.8, 17.8], [17.4, 15.2, 13.9, 16.0], [19.3, 17.6, 16.7, 18.3], [18.7, 15.0, 14.6, 16.7], [17.4, 12.4, 12.5, 14.9], [16.9, 12.6, 12.9, 14.8], [17.9, 14.7, 14.4, 16.2], [19.7, 15.0, 15.2, 17.4], [0, 23.3, 13.0, 9.5], [18.5, 8.1, 18.5, 15.9]],
+  'Arms Summoner': [[14.5, 13.8, 15.5, 14.6], [17.0, 15.3, 15.6, 16.3], [16.9, 15.4, 14.7, 16.0], [19.0, 16.4, 15.8, 17.6], [20.1, 17.0, 16.9, 18.6], [21.7, 17.2, 17.1, 19.5], [21.0, 16.4, 15.7, 18.7], [18.6, 15.5, 14.6, 16.9], [0, 17.6, 14.3, 7.7], [24.3, 9.5, 20.7, 19.7]],
+  'Tome Summoner': [[16.0, 15.0, 14.9, 15.5], [19.4, 17.9, 18.4, 18.8], [19.9, 16.8, 16.1, 18.2], [22.3, 19.7, 18.9, 20.8], [23.2, 21.9, 21.8, 22.5], [25.2, 22.5, 21.5, 23.6], [24.8, 20.7, 18.9, 22.3], [21.2, 18.0, 16.8, 19.3], [0, 22.4, 13.1, 8.7], [23.0, 9.5, 18.9, 18.6]],
+  Paladin: [[20.1, 19.5, 20.7, 20.1], [22.2, 20.8, 23.8, 22.2], [18.7, 17.6, 17.2, 18.0], [20.4, 19.4, 21.3, 20.4], [24.4, 22.9, 26.5, 24.5], [23.4, 22.1, 25.7, 23.6], [21.1, 16.1, 19.1, 19.2], [17.8, 18.8, 18.8, 18.3], [0, 26.4, 17.4, 11.5], [23.0, 7.2, 17.6, 17.7]],
+  Cleric: [[17.9, 15.4, 22.0, 18.3], [17.1, 17.1, 22.6, 18.5], [18.8, 20.5, 22.5, 20.1], [17.8, 20.0, 23.8, 19.8], [17.7, 16.7, 23.6, 18.9], [18.5, 19.0, 23.8, 20.0], [17.7, 20.7, 20.6, 19.2], [19.3, 20.7, 21.9, 20.3], [0, 20.7, 15.4, 9.0], [19.8, 6.3, 18.0, 16.0]],
+}, 3: {
+  Brawler: [[20.4, 17.8, 19.3, 19.6], [17.3, 16.8, 17.1, 17.1], [16.2, 14.1, 15.6, 15.6], [14.4, 14.2, 14.2, 14.3], [13.1, 13.5, 15.1, 13.6], [11.2, 12.2, 13.7, 12.0], [17.3, 15.0, 17.0, 16.7], [15.8, 14.6, 15.8, 15.5], [0, 21.9, 15.6, 8.3], [17.3, 5.3, 16.3, 14.0]],
+  Sorcerer: [[22.3, 21.7, 21.7, 22.0], [19.1, 20.4, 19.3, 19.5], [18.2, 17.7, 16.7, 17.7], [17.9, 17.4, 16.9, 17.6], [17.2, 19.5, 19.4, 18.3], [15.8, 17.6, 16.5, 16.4], [18.4, 20.2, 20.1, 19.2], [18.9, 18.3, 18.6, 18.7], [0, 25.7, 14.4, 9.7], [18.7, 6.2, 16.3, 15.0]],
+  'Arms Spellblade': [[14.6, 19.0, 15.6, 15.9], [14.3, 17.8, 14.5, 15.2], [18.5, 21.5, 19.3, 19.4], [16.7, 18.9, 16.5, 17.2], [13.4, 15.7, 12.4, 13.7], [14.6, 16.4, 14.5, 15.0], [20.0, 19.7, 19.8, 19.9], [17.7, 20.2, 18.1, 18.4], [0, 22.4, 14.6, 8.6], [20.2, 9.1, 20.6, 17.5]],
+  'Tome Spellblade': [[16.4, 20.8, 17.2, 17.7], [15.3, 18.6, 14.8, 16.0], [19.7, 20.8, 17.5, 19.5], [17.7, 18.4, 15.1, 17.3], [15.3, 14.5, 12.9, 14.5], [16.2, 14.6, 13.2, 15.1], [18.6, 19.7, 17.4, 18.6], [18.4, 18.7, 16.2, 18.0], [0, 26.3, 14.8, 10.2], [20.2, 8.2, 21.6, 17.5]],
+  'Arms Summoner': [[14.8, 18.8, 13.7, 15.6], [18.0, 22.3, 17.1, 18.9], [18.9, 22.3, 17.7, 19.4], [20.7, 24.2, 19.2, 21.3], [21.4, 25.4, 19.8, 22.0], [22.6, 26.4, 20.6, 23.1], [24.5, 26.5, 18.8, 23.6], [21.1, 23.5, 18.2, 21.0], [0, 23.1, 15.2, 9.4], [26.4, 9.6, 22.6, 21.2]],
+  'Tome Summoner': [[14.8, 17.3, 14.5, 15.3], [16.1, 20.4, 17.6, 17.5], [18.4, 19.1, 15.8, 17.9], [20.2, 22.2, 18.1, 20.2], [20.0, 23.2, 21.2, 21.1], [21.4, 24.1, 21.1, 22.0], [23.9, 24.0, 18.8, 22.6], [20.5, 20.9, 16.8, 19.7], [0, 24.5, 14.8, 9.6], [24.5, 11.0, 20.2, 20.0]],
+  Paladin: [[23.7, 22.3, 21.0, 22.7], [24.7, 23.8, 24.3, 24.4], [21.2, 21.6, 19.9, 21.0], [23.2, 23.2, 23.0, 23.2], [26.2, 25.9, 26.1, 26.1], [25.5, 25.9, 25.8, 25.7], [20.5, 27.0, 26.0, 23.5], [20.6, 23.7, 21.1, 21.5], [0, 29.5, 17.8, 11.9], [24.5, 7.7, 19.2, 19.0]],
+  Cleric: [[19.9, 18.7, 20.6, 19.7], [20.1, 19.2, 21.4, 20.2], [22.2, 20.2, 24.2, 22.2], [21.6, 21.8, 24.2, 22.3], [21.5, 20.8, 23.3, 21.8], [21.1, 22.7, 24.0, 22.2], [21.4, 22.0, 23.9, 22.1], [22.2, 21.6, 24.0, 22.5], [0, 24.5, 20.2, 11.2], [22.6, 6.2, 18.2, 17.4]],
+} };
+const CI = { fight: 0, sub: 1, boss: 2, mean: 3 };
+let wt = 2, wc = 'mean';
+function wins() {
+  for (const b of document.querySelectorAll('#winpick button')) b.setAttribute('aria-pressed', String(Number(b.dataset.t) === wt));
+  for (const b of document.querySelectorAll('#ctxpick button')) b.setAttribute('aria-pressed', String(b.dataset.c === wc));
+  const i = CI[wc];
+  const q = (v) => (v <= 0 ? '' : v < 10 ? 'q1' : v < 15 ? 'q2' : v < 19 ? 'q3' : v < 23 ? 'q4' : 'q5');
+  const best = Object.fromEntries(CLS.map((c) => [c, Math.max(...W[wt][c].map((r) => r[i]))]));
+  document.getElementById('wint').innerHTML = `<thead><tr><th>Set</th>${CLS.map((c) => `<th>${c}</th>`).join('')}</tr></thead><tbody>` + SETS.map((s, si) => `<tr><th>${s}</th>${CLS.map((c) => { const v = W[wt][c][si][i]; return `<td class="c ${q(v)}${v === best[c] ? ' best' : ''}${si === 9 ? ' est' : ''}" data-tip="${c}, Tier ${wt}, ${wc === 'sub' ? 'sub-bosses' : wc === 'boss' ? 'bosses' : wc === 'fight' ? 'regular fights' : 'mean'}: ${s} adds ${v.toFixed(1)}%${si === 9 ? ' (estimate)' : ''}">${v ? v.toFixed(1) : '0'}</td>` }).join('')}</tr>`).join('') + '</tbody>';
+}
+for (const b of document.querySelectorAll('#winpick button')) b.onclick = () => { wt = Number(b.dataset.t); wins() };
+for (const b of document.querySelectorAll('#ctxpick button')) b.onclick = () => { wc = b.dataset.c; wins() };
+wins();
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', (e) => { const t = e.target.closest('[data-tip]'); if (!t) { tip.style.opacity = 0; return } tip.textContent = t.dataset.tip; tip.style.left = `${e.clientX + 14}px`; tip.style.top = `${e.clientY + 14}px`; tip.style.opacity = 1 });
+</script>
+</body>
+</html>
