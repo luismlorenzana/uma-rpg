@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Farm Demand Supply</title>
+<!-- professions.md (T2P) §2.4–§2.5, §4.2, §4.5, §4.6: demand against supply by tier. Numbers from the live ledger
+     (economy/professions-v4.sim.ts: 750 refined, 753.1 job-hours, 50.2 a place, 2.39 a day) and its shared math
+     (professions.sim.ts), run through a throwaway table test; rosters at today's callings (reclass §1, 272 outfits).
+     Assumes T2P1: T2G's and T2E's new pieces add no items. Lines take the reference palette's slots 1–5 in row order. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --info: #2f6fe0;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --neutral: #a9b4c2;
+    --l1: #2a78d6; --l2: #eb6834; --l3: #1baf7a; --l4: #eda100; --l5: #e87ba4;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --neutral: #4a586b;
+      --l1: #3987e5; --l2: #d95926; --l3: #199e70; --l4: #c98500; --l5: #d55181;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 32px 72px; }
+  h1 { font: 700 26px/1.15 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 19px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 4px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 0 0 6px; }
+  p { margin: 0; color: var(--ink-soft); }
+  .lead { max-width: 920px; } .sub { margin-bottom: 14px; max-width: 960px; }
+  section { margin-top: 36px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .note { background: var(--accent-wash); border-left: 4px solid var(--accent); border-radius: 10px; padding: 10px 14px; margin-top: 14px; color: var(--ink); font-size: 13px; }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 18px -32px 0; padding: 10px 32px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.on { background: var(--accent); color: var(--accent-ink); }
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 18px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); } .kpi .value { font-size: 20px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi .delta { font-size: 12px; color: var(--ink-faint); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: middle; }
+  th { color: var(--ink-soft); font-weight: 600; } td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--ink-faint); } .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 0 0 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; } .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  /* stacked rows */
+  .srow { display: grid; grid-template-columns: 210px 1fr 150px; gap: 12px; align-items: center; padding: 6px 0; }
+  .stack { display: flex; gap: 2px; height: 26px; }
+  .stack i { border-radius: 4px; display: grid; place-items: center; font: 600 11px system-ui; font-style: normal; color: #fff; }
+  .srow .t { text-align: right; font-variant-numeric: tabular-nums; } .srow .t b { font-size: 15px; }
+  .divider { height: 1px; background: var(--hairline); margin: 6px 0; }
+  /* bars */
+  .brow { display: grid; grid-template-columns: 230px 1fr; gap: 12px; align-items: center; padding: 5px 0; }
+  .btrack { display: flex; flex-direction: column; gap: 3px; }
+  .b { height: 18px; border-radius: 0 4px 4px 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font: 600 11px system-ui; color: var(--ink); position: relative; min-width: 2px; }
+  .b span { position: absolute; left: calc(100% + 6px); white-space: nowrap; color: var(--ink); }
+  .seg button { border: 0; padding: 5px 12px; border-radius: 999px; background: var(--raised); color: var(--ink); font: 600 13px system-ui; cursor: pointer; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .seg button.on { background: var(--ink); color: var(--panel); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 340px; background: var(--ink); color: var(--panel); padding: 7px 10px; border-radius: 8px; font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; }
+  @media (max-width: 1000px) { .kpis { grid-template-columns: repeat(3, 1fr); } .grid2 { grid-template-columns: 1fr; } .srow, .brow { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Demand against supply</h1>
+  <p class="lead">professions.md (T2P1, T2P2, T2P21, T2P22). What one Uma takes, what the fifteen places give, and how long a
+    roster takes, in every tier. Two yardsticks: <b>a maxed Uma</b> (her eleven worn slots and the whole map) and <b>a full
+    window</b> (what Ascend asks: two more weapons at G10, D289).</p>
+  <nav class="top">
+    <a href="professions-tiers.html">The farm by tier</a>
+    <a href="professions-times.html">Times</a>
+    <a class="on" href="professions-demand.html">Demand and supply</a>
+    <a href="professions-secondary.html">The secondary</a>
+  </nav>
+  <div class="note"><b>Assumed (T2P1):</b> the five-line rule holds in Tiers 2 and 3. T2G's weapon and accessory branches and
+    T2E's weapon moons add no items (T2P5–T2P7), so every number here is Tier 1's, in every tier. §4.2 of the doc shows what
+    breaks if a piece lands on one line.</div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">A maxed Uma</div><div class="value">750</div><div class="delta">refined · 602 slot-hours</div></div>
+    <div class="kpi"><div class="label">A full window</div><div class="value">950</div><div class="delta">refined · 763 slot-hours</div></div>
+    <div class="kpi"><div class="label">A place's four slots</div><div class="value">2.39</div><div class="delta">maxed Umas a day, every place</div></div>
+    <div class="kpi"><div class="label">Forty, Tier 1 → Tier 2</div><div class="value">1.00 → 1.59</div><div class="delta">maxed Umas a day</div></div>
+    <div class="kpi"><div class="label">Twenty full windows</div><div class="value">55.8 → 31.8 d</div><div class="delta">without → with secondaries</div></div>
+    <div class="kpi"><div class="label">The party holds G10</div><div class="value">day 22.8</div><div class="delta">Tier 2, with secondaries</div></div>
+  </div>
+
+  <section>
+    <h2>One Uma, by tier and line</h2>
+    <p class="sub">Refined items. A full window's five weapons split 2.5 Arms and 2.5 Tomes on a roster's average, so Metal
+      and Vegetables carry 250 and the rest 150. The same in every tier: only what the items raise scales (T2P2).</p>
+    <div class="panel">
+      <div class="legend" id="lineLegend"></div>
+      <div id="uma"></div>
+      <p class="foot">Per item beside the totals: an Arms Gem or Tome Ink's chain is 8h 02m of slot time at Craft Lv 25,
+        Armor Fittings 2h 25m, a Setting or a jewel 4h 01m.</p>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>A place's work, one Uma</h2>
+      <p class="sub">Job-hours at one place of each line, Craft Lv 25 (the ledger's unit, before ×1.25), and what its four
+        slots make a day.</p>
+      <div class="panel"><table id="places"></table></div>
+    </div>
+    <div>
+      <h2>A rank, by tier</h2>
+      <p class="sub">Two Umas, one grade of everything; slot time a place at Craft Lv 25.</p>
+      <div class="panel"><table id="rank"></table></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How long twenty take</h2>
+    <p class="sub">A Tier 2 or 3 world of twenty, everyone working, by how its callings split (Metal · Vegetables · Wood · Fish
+      · Stone). Without a secondary a line waits on its own trade's Umas (Tier 1's rule); with one, on the roster's hours.</p>
+    <div class="panel">
+      <div class="row" style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px">
+        <div class="legend" style="margin:0"><span><i class="sw" style="background:var(--neutral)"></i>No secondary</span><span><i class="sw" style="background:var(--l1)"></i>With secondaries</span></div>
+        <div class="seg" id="yard"><button data-y="window" class="on">Full windows</button> <button data-y="maxed">Maxed</button></div>
+      </div>
+      <div id="rosters"></div>
+      <p class="foot">Days for twenty. A trade with no Uma is an open shop for everyone. With secondaries every split runs at its
+        hours; G9–G10 stay each trade's and never bind here.</p>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>Forty Umas</h2>
+      <p class="sub">A day's output and what binds it.</p>
+      <div class="panel"><table id="forty"></table></div>
+    </div>
+    <div>
+      <h2>The fighting party's grades</h2>
+      <p class="sub">A Tier 2 run of twenty with secondaries. Craft Level is the wall: the party holds each grade within a day
+        of its opening.</p>
+      <div class="panel"><table id="gradedays"></table></div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>If a tier adds work on one line</h2>
+      <p class="sub">Why T2P1 matters: what a weapon moon farmed at a jewel a node, or the code's Branch Gem placeholder, would do
+        to one Uma.</p>
+      <div class="panel"><table id="sens"></table></div>
+    </div>
+    <div>
+      <h2>The Exchange by tier</h2>
+      <p class="sub">Raw only, × the world's tier, as fights pay (T2P18). Tickets stay flat (T2P19).</p>
+      <div class="panel"><table id="ex"></table></div>
+    </div>
+  </section>
+</main>
+<div id="tip"></div>
+<script>
+const $ = (id) => document.getElementById(id)
+const LINES = [['Metal', '--l1'], ['Vegetables', '--l2'], ['Wood', '--l3'], ['Fish', '--l4'], ['Stone', '--l5']]
+$('lineLegend').innerHTML = LINES.map(([n, c]) => `<span><i class="sw" style="background:var(${c})"></i>${n}</span>`).join('')
+const MAXED = [150, 150, 150, 150, 150], WINDOW = [250, 250, 150, 150, 150]
+const stack = (vals, label, tier, slotH) => {
+  const total = vals.reduce((a, b) => a + b, 0)
+  return `<div class="srow"><div><span class="tier ${tier[1]}">${tier[0]}</span> ${label}</div><div class="stack">${vals.map((v, i) => `<i style="background:var(${LINES[i][1]});width:${(v / 950) * 100}%" data-tip="${tier[0]}, ${label}: ${LINES[i][0]} ${v} refined">${v}</i>`).join('')}</div><div class="t"><b>${total}</b><br><span class="muted" style="font-size:12px">${slotH} slot-hours</span></div></div>`
+}
+let u = ''
+for (const t of [['Tier 1', 't1'], ['Tier 2', 't2'], ['Tier 3', 't3']]) { u += stack(MAXED, 'a maxed Uma', t, 602) + stack(WINDOW, 'a full window', t, 763) + '<div class="divider"></div>' }
+$('uma').innerHTML = u
+
+$('places').innerHTML = '<tr><th>Line</th><th class="num">Maxed</th><th class="num">A day</th><th class="num">Full window</th><th class="num">A day</th></tr>' +
+  LINES.map(([n, c], i) => `<tr><td><i class="sw" style="background:var(${c});margin-right:6px"></i>${n}</td><td class="num">50.2 h</td><td class="num">2.39</td><td class="num">${i < 2 ? '83.7 h' : '50.2 h'}</td><td class="num">${i < 2 ? '1.43' : '2.39'}</td></tr>`).join('') +
+  '<tr><td class="muted">A place’s day</td><td class="num muted" colspan="4">4 slots × 24 h × 1.25 = 120 job-hours</td></tr>'
+$('rank').innerHTML = '<tr><th>Yardstick</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr>' +
+  '<tr><td>Maxed: 3 Arms + 3 Tomes, 30 a line</td><td>8h 02m every place</td><td>8h 02m</td><td>8h 02m</td></tr>' +
+  '<tr><td>Full window: 5 Arms + 5 Tomes</td><td>Metal, Vegetables 13h 23m (50); the rest 8h 02m</td><td>the same</td><td>the same</td></tr>' +
+  '<tr><td class="muted">At G1’s Craft Lv 1 · G10’s Lv 46</td><td class="muted" colspan="3">9h 36m · 6h 40m a place (30 steps)</td></tr>'
+
+const SPLITS = [
+  ['Today’s callings', '4 · 3 · 5 · 3 · 5', { maxed: [33.5, 25.1], window: [55.8, 31.8] }, { maxed: 'Vegetables’ and Fish’s 3', window: 'Vegetables’ 3' }],
+  ['Even', '4 · 4 · 4 · 4 · 4', { maxed: [25.1, 25.1], window: [41.8, 31.8] }, { maxed: 'Metal’s 4', window: 'Metal’s 4' }],
+  ['Thin', '3 · 3 · 6 · 2 · 6', { maxed: [50.2, 25.1], window: [55.8, 31.8] }, { maxed: 'Fish’s 2', window: 'Metal’s 3' }],
+  ['One Summoner', '4 · 4 · 5 · 1 · 6', { maxed: [100.4, 25.1], window: [100.4, 31.8] }, { maxed: 'Fish’s 1', window: 'Fish’s 1' }],
+  ['No Summoner', '4 · 4 · 6 · 0 · 6', { maxed: [25.1, 25.1], window: [41.8, 31.8] }, { maxed: 'Metal’s 4 (Fish an open shop)', window: 'Metal’s 4 (Fish an open shop)' }],
+]
+let Y = 'window'
+function rosters() {
+  const max = 110
+  $('rosters').innerHTML = SPLITS.map(([n, s, d, binds]) => {
+    const [a, b] = d[Y]
+    return `<div class="brow"><div><b>${n}</b><br><span class="muted" style="font-size:12px">${s}</span></div><div class="btrack">` +
+      `<div class="b" style="background:var(--neutral);width:${(a / max) * 85}%" data-tip="${n}, no secondary: ${a} days (binds: ${binds[Y]})"><span>${a} days · ${binds[Y]}</span></div>` +
+      `<div class="b" style="background:var(--l1);width:${(b / max) * 85}%" data-tip="${n}, with secondaries: ${b} days (the roster's hours)"><span>${b} days · its hours</span></div></div></div>`
+  }).join('')
+  document.querySelectorAll('#yard button').forEach((x) => x.classList.toggle('on', x.dataset.y === Y))
+}
+$('yard').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { Y = b.dataset.y; rosters() } })
+rosters()
+
+$('forty').innerHTML = '<tr><th>Forty</th><th class="num">Maxed a day</th><th class="num">Full windows a day</th><th>Binds</th></tr>' +
+  '<tr><td>Tier 1, the ledger’s split (D220: 9 · 9 · 8 · 7 · 7)</td><td class="num">1.39</td><td class="num">1.08</td><td>Fish’s 7 · Metal’s 9</td></tr>' +
+  '<tr><td><b>Tier 1, today’s callings (7 · 7 · 11 · 5 · 10)</b></td><td class="num"><b>1.00</b></td><td class="num"><b>0.84</b></td><td>Fish’s 5 · Metal’s and Vegetables’ 7</td></tr>' +
+  '<tr><td><b>Tier 2 or 3, the same forty, with secondaries</b></td><td class="num"><b>1.59</b></td><td class="num"><b>1.26</b></td><td>its hours</td></tr>' +
+  '<tr><td class="muted">Twenty of them, days</td><td class="num muted">20.1 → 12.6</td><td class="num muted">23.9 → 15.9</td><td class="muted">Tier 1 → Tier 2</td></tr>'
+
+const opens = [0, 2.0, 4.2, 6.4, 8.8, 11.3, 13.8, 16.5, 19.3, 22.1], party = [0.6, 2.7, 4.8, 7.1, 9.4, 11.9, 14.4, 17.1, 19.9, 22.8], run = [3.2, 5.2, 7.4, 9.6, 12.0, 14.4, 17.0, 19.7, 22.4, 25.3]
+$('gradedays').innerHTML = '<tr><th>Grade</th><th class="num">Opens (Craft Lv 5g − 4)</th><th class="num">The party holds it</th><th class="num">The run’s full windows hold it</th></tr>' +
+  opens.map((o, i) => `<tr><td>G${i + 1}</td><td class="num">day ${o.toFixed(1)}</td><td class="num">day ${party[i].toFixed(1)}</td><td class="num">day ${run[i].toFixed(1)}</td></tr>`).join('')
+
+$('sens').innerHTML = '<tr><th>A tier adds, on one line</th><th class="num">That line</th><th class="num">Its places a day</th><th class="num">Its share</th></tr>' +
+  '<tr><td><b>Nothing (T2P1)</b></td><td class="num">150</td><td class="num">2.39</td><td class="num">20%</td></tr>' +
+  '<tr><td>A weapon moon at a Moon Jewel a node (+5)</td><td class="num">Stone 175</td><td class="num">2.05</td><td class="num">22.6%</td></tr>' +
+  '<tr><td>Two weapon moons so (Tier 3, +10)</td><td class="num">Stone 200</td><td class="num">1.79</td><td class="num">25.0%</td></tr>' +
+  '<tr><td>A Branch Gem of 7 Ingots at every weapon’s G5</td><td class="num">Metal 156 · Vegetables 135</td><td class="num">2.30 · 2.66</td><td class="num">21.1% · 18.2%</td></tr>'
+
+$('ex').innerHTML = '<tr><th></th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr>' +
+  [['Raw G1–G5 (after the first win)', 20, 40, 60], ['Raw G6–G10 (after its continent 3)', 53, 106, 159], ['A rank’s raw, one line, G1–G5', 600, 1200, 1800], ['The same, G6–G10', 1590, 3180, 4770],
+   ['Selling raw G1–G5 · G6–G10', '4 · 11', '8 · 22', '12 · 33'], ['Selling a made item of grade g', '6 + 6g', '× 2', '× 3'], ['Speed · Sweep Ticket', '10 · 15', '10 · 15', '10 · 15']]
+    .map((r) => `<tr><td>${r[0]}</td>${r.slice(1).map((v) => `<td class="num">${typeof v === 'number' ? v.toLocaleString('en') : v}</td>`).join('')}</tr>`).join('')
+
+const tip = $('tip')
+document.addEventListener('mousemove', (e) => {
+  const t = e.target.closest('[data-tip]')
+  if (!t) { tip.style.opacity = 0; return }
+  tip.textContent = t.dataset.tip; tip.style.opacity = 1
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - 350) + 'px'; tip.style.top = e.clientY + 14 + 'px'
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Farm by Tier</title>
+<!-- professions.md (T2P) §1, §2, §4.1–§4.4: the five lines and fifteen places, Tier 1 → 2 → 3. From the Tier 2 set's
+     _template.html (kit colours, light and dark). Lines take the reference categorical palette's slots 1–5 in the Wilds'
+     row order (validated: adjacent CVD ΔE 9.1 light, 8.4 dark); every mark is labelled. No original-game names. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --grid: #e3e8ef; --road: #d9c9a6;
+    --l1: #2a78d6; --l2: #eb6834; --l3: #1baf7a; --l4: #eda100; --l5: #e87ba4;
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --grid: #243041; --road: #5a4d33;
+      --l1: #3987e5; --l2: #d95926; --l3: #199e70; --l4: #c98500; --l5: #d55181;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 32px 72px; }
+  h1 { font: 700 26px/1.15 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 19px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 4px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 0 0 6px; }
+  p { margin: 0; color: var(--ink-soft); }
+  .lead { max-width: 920px; }
+  .sub { margin-bottom: 14px; max-width: 960px; }
+  section { margin-top: 36px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 18px -32px 0; padding: 10px 32px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.on { background: var(--accent); color: var(--accent-ink); }
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 18px; }
+  .kpi { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .label { font-size: 12px; color: var(--ink-soft); }
+  .kpi .value { font-size: 20px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi .delta { font-size: 12px; color: var(--ink-faint); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; vertical-align: -1px; margin-right: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.kept { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .chip.changed { background: color-mix(in srgb, var(--info) 16%, transparent); color: var(--info); }
+  .chip.super { background: var(--sunken); color: var(--ink-soft); }
+  .chip.broken { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+  .muted { color: var(--ink-faint); }
+
+  /* The Wilds: five rows of three */
+  .wilds { display: grid; grid-template-columns: 190px 1fr 34px 1fr 34px 1fr; gap: 10px 0; align-items: stretch; }
+  .wilds .head { font-size: 12px; color: var(--ink-soft); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 0 0 2px; }
+  .wilds .line { display: flex; flex-direction: column; justify-content: center; padding: 8px 12px 8px 12px; border-left: 5px solid var(--lc); background: var(--raised); border-radius: 10px 0 0 10px; }
+  .wilds .line b { font-size: 15px; }
+  .wilds .line span { font-size: 12px; color: var(--ink-soft); }
+  .bld { background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 10px; padding: 8px 10px; position: relative; }
+  .bld .n { font-weight: 700; }
+  .bld .p { font-size: 12px; color: var(--ink-soft); }
+  .bld .it { font-size: 12px; margin-top: 4px; }
+  .bld .pips { position: absolute; top: 8px; right: 10px; display: flex; gap: 3px; }
+  .bld .pips i { width: 8px; height: 8px; border-radius: 50%; background: var(--sunken); border: 1px solid var(--hairline-strong); }
+  .arrow { display: grid; place-items: center; color: var(--ink-faint); font-size: 18px; }
+  .road { background: linear-gradient(var(--road), var(--road)) center/4px 100% no-repeat; }
+
+  /* Tint strip */
+  .tints { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .mini { border-radius: 12px; padding: 12px; box-shadow: 0 1px 0 var(--hairline-strong); background: var(--panel); position: relative; overflow: hidden; }
+  .mini::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
+  .mini.t2::after { background: rgb(192 122 58 / .14); } .mini.t3::after { background: rgb(40 50 120 / .22); }
+  .mini .g { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
+  .mini .g i { height: 16px; border-radius: 4px; background: var(--raised); border-left: 4px solid var(--lc); }
+  .mini .cap { font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+
+  /* Tier columns */
+  .tiers { display: grid; grid-template-columns: 180px repeat(3, 1fr); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 0 var(--hairline-strong); background: var(--panel); }
+  .tiers > div { padding: 9px 12px; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+  .tiers .rh { color: var(--ink-soft); font-weight: 600; background: var(--raised); }
+  .tiers .th { font-weight: 700; border-top: 5px solid var(--tc); }
+  .tiers .new { background: var(--accent-wash); font-weight: 600; }
+
+  /* Grade access grid */
+  .access { display: grid; grid-template-columns: 220px repeat(10, 1fr); gap: 3px; font-size: 12px; }
+  .access .h { color: var(--ink-soft); font-weight: 700; text-align: center; padding: 4px 0; }
+  .access .r { color: var(--ink); font-weight: 600; padding: 6px 8px; background: var(--raised); border-radius: 6px; }
+  .access .c { border-radius: 6px; display: grid; place-items: center; padding: 6px 2px; font-weight: 600; }
+  .c.yes { background: color-mix(in srgb, var(--success) 22%, transparent); color: var(--success); }
+  .c.no { background: var(--sunken); color: var(--ink-faint); }
+  .c.main { background: color-mix(in srgb, var(--accent) 24%, transparent); color: var(--accent-strong); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 7px 10px; border-radius: 8px; font-size: 12px; line-height: 1.4; opacity: 0; transition: opacity .08s; }
+  @media (max-width: 1000px) { .kpis { grid-template-columns: repeat(3, 1fr); } .grid2, .tints { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The farm, Tier 1 → 2 → 3</h1>
+  <p class="lead">professions.md (T2P). Tiers 2 and 3 keep Tier 1's five lines and fifteen places whole: the same fifty
+    materials, recipes, steps and sizes, every line equal. They add one thing, a <b>secondary line</b>: one other trio's
+    work at G1–G8, while G9 and G10 stay her trade's.</p>
+  <nav class="top">
+    <a class="on" href="professions-tiers.html">The farm by tier</a>
+    <a href="professions-times.html">Times</a>
+    <a href="professions-demand.html">Demand and supply</a>
+    <a href="professions-secondary.html">The secondary</a>
+  </nav>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">Lines · places · slots</div><div class="value">5 · 15 · 60</div><div class="delta">every tier</div></div>
+    <div class="kpi"><div class="label">A rank, every place</div><div class="value">8h 02m</div><div class="delta">30 refined a line, Craft Lv 25</div></div>
+    <div class="kpi"><div class="label">A maxed Uma</div><div class="value">750</div><div class="delta">refined · 602 slot-hours</div></div>
+    <div class="kpi"><div class="label">A full window</div><div class="value">950</div><div class="delta">refined · 763 slot-hours</div></div>
+    <div class="kpi"><div class="label">Craft Lv 1 → 50</div><div class="value">24.5 d</div><div class="delta">restarts every tier</div></div>
+    <div class="kpi"><div class="label">Twenty full windows, Tier 2</div><div class="value">31.8 d</div><div class="delta">55.8 without the secondary</div></div>
+  </div>
+
+  <section>
+    <h2>The Wilds: one row a line, the same in every tier</h2>
+    <p class="sub">Gather on the left, process on the trunk road, make on the right (D230). Four slots a place at ×1.25, no
+      upgrades. Her calling names her trade; from Tier 2 a secondary adds one other row's three places at G1–G8.</p>
+    <div class="panel">
+      <div class="wilds" id="wilds">
+        <div class="head">Line · her trade</div><div class="head">1 · Gather</div><div></div><div class="head">2 · Process</div><div></div><div class="head">3 · Make</div>
+      </div>
+      <p class="foot">Outfits of 272 by calling (reclass §1). The recipe is the line's refined items of the made item's grade (D264).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>The same map, the tier's look</h2>
+    <p class="sub">A tier changes the tint, never the buildings (T2P11). No new art in any tier.</p>
+    <div class="tints" id="tints"></div>
+  </section>
+
+  <section>
+    <h2>Ten grades a line, the same items in every world</h2>
+    <p class="sub">Grade g opens at Craft Lv 5g − 4 to gather, process and make, and is worn at Uma Lv 5g − 4. A Tier 2 Arms
+      Gem G6 is 10 Gold Ingots, as in Tier 1; its Might is × 1.8 (T2P3).</p>
+    <div class="panel" style="overflow-x:auto">
+      <table id="grades"></table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tier by tier</h2>
+    <p class="sub">Highlighted: what the tier adds to the farm. Everything else is Tier 1's.</p>
+    <div class="tiers" id="tiers"></div>
+  </section>
+
+  <section>
+    <h2>Who may work a grade</h2>
+    <p class="sub">One Uma whose trade is Wood, with Vegetables as her secondary (Tier 2 and 3). The open shop still opens a
+      line with no Uma of its trade to everyone, at every grade (T2P17).</p>
+    <div class="grid2">
+      <div class="panel"><h3><span class="tier t1">Tier 1</span></h3><div class="access" id="acc1"></div></div>
+      <div class="panel"><h3><span class="tier t2">Tier 2</span> <span class="tier t3">Tier 3</span></h3><div class="access" id="acc2"></div></div>
+    </div>
+    <p class="foot">✓ she may gather, process and make it · ★ "Main trade only": the line's own trade keeps G9 and G10 · — "Another trade".</p>
+  </section>
+
+  <section>
+    <h2>The old drafts on today's Tier 1</h2>
+    <p class="sub">The headline calls of profession-progression (PP) and farm-by-line (FL). Every call's row is in the doc's §3:
+      23 kept, 19 kept with a change, 15 superseded, 2 broken.</p>
+    <div class="panel"><table id="old"></table></div>
+  </section>
+</main>
+<div id="tip"></div>
+<script>
+const LINES = [
+  { n: 'Metal', c: '--l1', trade: 'Warrior', out: 48, g: ['Mine', 'Mining', 'ores'], p: ['Mine Workbench', 'Smelting', 'ore → ingot'], m: ['Weapon Forge', 'Arms Crafting', 'Arms Gem · 10 Ingots'],
+    raw: ['Copper', 'Tin', 'Iron', 'Silver', 'Cobalt', 'Gold', 'Platinum', 'Titanium', 'Mythril', 'Orichalcum'], form: 'Ore → Ingot' },
+  { n: 'Vegetables', c: '--l2', trade: 'Healer', out: 46, g: ['Fields', 'Farming', 'vegetables'], p: ['Fields Workbench', 'Prepping', 'vegetable → cut'], m: ['Tome Forge', 'Tome Crafting', 'Tome Ink · 10 cuts'],
+    raw: ['Carrot', 'Potato', 'Cabbage', 'Onion', 'Tomato', 'Bell Pepper', 'Eggplant', 'Asparagus', 'Golden Carrot', 'Emperor Pumpkin'], form: 'chopped, diced, a purée…' },
+  { n: 'Wood', c: '--l3', trade: 'Spellblade', out: 72, g: ['Forest', 'Wood Chopping', 'logs'], p: ['Forest Workbench', 'Sawing', 'log → plank'], m: ['Armorer', 'Armor Crafting', 'Armor Fittings · 3 Planks'],
+    raw: ['Pine', 'Birch', 'Cedar', 'Maple', 'Oak', 'Cherry', 'Mahogany', 'Ebony', 'Elderwood', 'Yggdrasil Branch'], form: 'Log → Plank' },
+  { n: 'Fish', c: '--l4', trade: 'Summoner', out: 34, g: ['Fishery', 'Fishing', 'fish'], p: ['Fishery Workbench', 'Filleting', 'fish → fillet'], m: ['Charm Forge', 'Accessory Crafting', 'Accessory Setting · 5 Fillets'],
+    raw: ['Carp', 'Trout', 'Sardine', 'Mackerel', 'Salmon', 'Sea Bream', 'Eel', 'Tuna', 'Silverfin', 'Rainbow Koi'], form: 'Fish → Fillet' },
+  { n: 'Stone', c: '--l5', trade: 'Mage', out: 72, g: ['Monster Den', 'Hunting', 'stones'], p: ['Den Workbench', 'Stonecutting', 'stone → cut stone'], m: ['Lapidary', 'Jewel Crafting', 'Planet · Moon Jewel · 5 cut'],
+    raw: ['Quartz', 'Amethyst', 'Citrine', 'Garnet', 'Emerald', 'Sapphire', 'Ruby', 'Diamond', 'Starstone', "Philosopher's Stone"], form: 'Stone → Cut' },
+]
+const $ = (id) => document.getElementById(id)
+const pips = '<div class="pips"><i></i><i></i><i></i><i></i></div>'
+const bld = (b, tip) => `<div class="bld" data-tip="${tip}">${pips}<div class="n">${b[0]}</div><div class="p">${b[1]}</div><div class="it">${b[2]}</div></div>`
+let w = ''
+for (const l of LINES) {
+  w += `<div class="line" style="--lc:var(${l.c})"><b><span class="sw" style="background:var(${l.c})"></span>${l.n}</b><span>${l.trade} · ${l.out} of 272</span></div>`
+  w += bld(l.g, `${l.g[0]}: gathers ${l.n} G1–G10. One step a raw item.`) + '<div class="arrow">→</div>'
+  w += `<div class="road" style="padding:0">${bld(l.p, `${l.p[0]}: processes one raw into one refined, one step each.`)}</div><div class="arrow">→</div>`
+  w += bld(l.m, `${l.m[0]}: one step for each refined item in the recipe. Its longest job is 30 steps, 8h 02m at Craft Lv 25.`)
+}
+$('wilds').insertAdjacentHTML('beforeend', w)
+
+const tints = [['t1', 'Tier 1 · Apprentice · day', 'The theme as it is'], ['t2', 'Tier 2 · Adept · dusk', 'An amber accent and a warm wash'], ['t3', 'Tier 3 · Master · night', 'A violet accent and a deep blue wash']]
+$('tints').innerHTML = tints.map(([t, n, c]) => `<div class="mini ${t}"><span class="tier ${t}">${n}</span><div class="g">${LINES.map((l) => '<i style="--lc:var(' + l.c + ')"></i>'.repeat(3)).join('')}</div><div class="cap">${c}; fifteen places, sixty slots.</div></div>`).join('')
+
+let g = '<tr><th>Line</th>' + Array.from({ length: 10 }, (_, i) => `<th>G${i + 1}</th>`).join('') + '</tr>'
+g += '<tr><td class="muted">Opens at Craft Lv</td>' + Array.from({ length: 10 }, (_, i) => `<td class="muted">Lv ${5 * (i + 1) - 4}</td>`).join('') + '</tr>'
+for (const l of LINES) g += `<tr><td><span class="sw" style="background:var(${l.c})"></span><b>${l.n}</b><br><span class="muted" style="font-size:12px">${l.form}</span></td>` + l.raw.map((r) => `<td>${r}</td>`).join('') + '</tr>'
+$('grades').innerHTML = g
+
+const T = [
+  ['', ['Tier 1', '--t1', 't1'], ['Tier 2', '--t2', 't2'], ['Tier 3', '--t3', 't3']],
+  ['Her work', 'Her trade’s three places', ['+ one secondary line, G1–G8', 1], ['The same as Tier 2', 0]],
+  ['G9 and G10', 'Her trade’s', 'Her trade’s alone', 'Her trade’s alone'],
+  ['Materials', '50 pairs, G1–G10', 'The same 50', 'The same 50'],
+  ['Recipes', 'Arms Gem · Tome Ink 10, Fittings 3, Setting 5, jewels 5', 'The same', 'The same'],
+  ['Branches', '—', 'Weapon and accessory branches: no item', 'The same'],
+  ['A step (slot time)', '19m → 16m → 13m (Craft Lv 1 · 25 · 50)', 'The same', 'The same'],
+  ['Longest job', '30 steps at every forge: 8h 02m at Lv 25', 'The same', 'The same'],
+  ['Craft Level', 'Lv 1–50, 24.5 days nonstop', 'Restarts at Lv 1', 'Restarts at Lv 1'],
+  ['A rank, every place', '8h 02m at Craft Lv 25', 'The same', 'The same'],
+  ['A maxed Uma · a full window', '750 · 950 refined', 'The same', 'The same'],
+  ['Exchange raw G1–G5 · G6–G10', '20 · 53 Laurels', '40 · 106', '60 · 159'],
+  ['Values of what items raise', '×1', '×1.8', '×2.6'],
+  ['Twenty full windows', '55.8 days (today’s callings)', ['31.8 days with secondaries', 1], ['31.8 days', 0]],
+]
+let tt = ''
+for (const [i, row] of T.entries()) {
+  if (i === 0) { tt += '<div class="rh"></div>' + row.slice(1).map(([n, c, k]) => `<div class="th" style="--tc:var(${c})"><span class="tier ${k}">${n}</span></div>`).join(''); continue }
+  tt += `<div class="rh">${row[0]}</div>` + row.slice(1).map((v) => Array.isArray(v) ? `<div class="${v[1] ? 'new' : ''}">${v[0]}</div>` : `<div>${v}</div>`).join('')
+}
+$('tiers').innerHTML = tt
+
+const acc = (id, sec) => {
+  let a = '<div></div>' + Array.from({ length: 10 }, (_, i) => `<div class="h">G${i + 1}</div>`).join('')
+  const row = (name, f) => { a += `<div class="r">${name}</div>`; for (let gr = 1; gr <= 10; gr++) { const [k, t] = f(gr); a += `<div class="c ${k}" data-tip="${name}, G${gr}: ${t}">${k === 'yes' ? '✓' : k === 'main' ? '★' : '—'}</div>` } }
+  row('Wood · her trade', () => ['yes', 'gather, process, make'])
+  if (sec) row('Vegetables · her secondary', (gr) => gr <= 8 ? ['yes', 'open to her secondary'] : ['main', 'Main trade only: the Healers’'])
+  else row('Vegetables', () => ['no', 'Another trade'])
+  row('Metal, Fish, Stone', () => ['no', 'Another trade'])
+  $(id).innerHTML = a
+}
+acc('acc1', false); acc('acc2', true)
+
+const OLD = [
+  ['PP1, PP3', 'Ten professions: five gathering, one processing, four making', 'super', 'Superseded', 'Fifteen: five of each kind, a trio a line (D224, D230)'],
+  ['PP7–PP9', 'A material pair a tier (2 · 4 · 6 types) and the ladder', 'super', 'Superseded', 'Ten grades a line, the same fifty in every world (D224; T2P3)'],
+  ['PP10', 'Weapon Gem 4, Fittings 2 · 3, Setting 12 · 6 · 4, Planet 12, Moon 4', 'super', 'Superseded', '10 · 10 · 3 · 5 · 5 · 5 in every tier (D264; T2P4)'],
+  ['PP4–PP6', 'Ten places, forty slots, the same map, reused art', 'changed', 'Kept, changed', 'Fifteen places, sixty slots, five rows (D230; T2P11)'],
+  ['PP11', 'Amounts don’t scale with the tier', 'changed', 'Kept, changed', '750 refined in every tier (D264; T2P2)'],
+  ['PP13', 'Craft Level restarts each tier', 'changed', 'Kept, changed', 'With FL6’s gate for every grade (T2P9)'],
+  ['PP14', 'A secondary: one of eight other professions, its base pair’s work', 'broken', 'Broken', 'One other line, G1–G8 (T2P12–T2P15)'],
+  ['PP15', 'The tier’s own pair stays the main trade’s', 'broken', 'Broken', 'G9 and G10 stay her trade’s, the same fifth (T2P13)'],
+  ['PP16', 'The open shop', 'kept', 'Kept', 'With the secondary (T2P17)'],
+  ['PP17', 'The Exchange × tier', 'changed', 'Kept, changed', 'By grade, 20 · 53 × tier (D224, D264; T2P18)'],
+  ['FL8', 'Every world uses the same fifty types', 'kept', 'Kept', 'T2P3'],
+  ['FL28, FL34', 'Equal steps; sizes in steps', 'changed', 'Kept, changed', '24 → 16 minutes; every forge to 30 steps (D264, D273)'],
+]
+$('old').innerHTML = '<tr><th>Calls</th><th>The draft said</th><th>Status</th><th>Now</th></tr>' + OLD.map(([c, s, k, st, now]) => `<tr><td><b>${c}</b></td><td>${s}</td><td><span class="chip ${k}">${st}</span></td><td>${now}</td></tr>`).join('')
+
+const tip = $('tip')
+document.addEventListener('mousemove', (e) => {
+  const t = e.target.closest('[data-tip]')
+  if (!t) { tip.style.opacity = 0; return }
+  tip.textContent = t.dataset.tip; tip.style.opacity = 1
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - 330) + 'px'; tip.style.top = e.clientY + 14 + 'px'
+})
+</script>
+</body>
+</html>
