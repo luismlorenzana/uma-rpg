@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ten Branches</title>
+<!-- professions.md (T2P), round 2 (R2-9): §4.2, §4.3. The ten material branches, their twenty grades a line, the ten made
+     items and the dual path each second item feeds. Material names are uma-art's own (items atlas families stones,
+     herbs-spices, hides-scales, bones-horns, mushrooms); every name was checked against the master-data release (no
+     exact match). From the Tier 2 set's _template.html (kit colours, light and dark). -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0;
+    --phys: #c2643a; --magic: #5b6ee0;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --l1: #2a78d6; --l2: #eb6834; --l3: #1baf7a; --l4: #eda100; --l5: #e87ba4;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --l1: #3987e5; --l2: #d95926; --l3: #199e70; --l4: #c98500; --l5: #d55181;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 32px 72px; }
+  h1 { font: 700 26px/1.15 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 19px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 4px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 0 0 8px; }
+  p { margin: 0; color: var(--ink-soft); }
+  .lead { max-width: 940px; } .sub { margin-bottom: 14px; max-width: 980px; }
+  section { margin-top: 36px; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 18px 22px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px);
+    margin: 18px -32px 0; padding: 10px 32px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--hairline); }
+  nav.top a { padding: 5px 12px; border-radius: 999px; background: var(--panel); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 1px 0 var(--hairline-strong); }
+  nav.top a.on { background: var(--accent); color: var(--accent-ink); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  .foot { font-size: 12px; color: var(--ink-faint); margin-top: 10px; }
+  .muted { color: var(--ink-faint); }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; vertical-align: -2px; margin-right: 6px; background: var(--lc); }
+  .sw.b2 { background: repeating-linear-gradient(135deg, var(--lc) 0 3px, transparent 3px 6px); border: 1.5px solid var(--lc); }
+
+  .cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .card { background: var(--panel); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); border-top: 5px solid var(--lc); display: flex; flex-direction: column; gap: 6px; }
+  .card.b2 { border-top-style: dashed; }
+  .card .bn { font: 700 16px/1.2 ui-rounded, system-ui, sans-serif; display: flex; align-items: center; justify-content: space-between; }
+  .card .k { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; font-weight: 700; }
+  .card .v { font-size: 13px; }
+  .card .made { background: var(--raised); border-radius: 8px; padding: 6px 8px; font-size: 13px; }
+  .card .feeds { font-size: 12px; color: var(--ink-soft); }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tabs button { font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); cursor: pointer; }
+  .tabs button.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  td.g { font-weight: 700; color: var(--ink-soft); width: 48px; }
+  td .it { display: block; } td .r { color: var(--ink-soft); font-size: 12px; }
+
+  /* the flow */
+  .flow { display: grid; grid-template-columns: 1.1fr 40px 1.2fr 40px 1.6fr; gap: 10px 0; align-items: center; }
+  .flow .h { font-size: 12px; color: var(--ink-soft); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+  .box { background: var(--raised); border-radius: 10px; padding: 9px 12px; border-left: 5px solid var(--lc); font-size: 13px; }
+  .box.b2 { border-left-style: dashed; }
+  .box b { font-size: 14px; }
+  .box.sys { border-left-color: var(--accent); background: var(--panel); border: 1px solid var(--hairline-strong); border-left: 5px solid var(--accent); }
+  .ar { text-align: center; color: var(--ink-faint); font-size: 18px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .piece { display: grid; grid-template-columns: 1fr 22px 1fr 22px 1fr; align-items: center; gap: 6px; margin: 6px 0; font-size: 13px; }
+  .piece .p { background: var(--accent-wash); border-radius: 8px; padding: 6px 8px; font-weight: 700; }
+  .piece .a { background: var(--raised); border-radius: 8px; padding: 6px 8px; border-left: 4px solid var(--lc); }
+  .piece .a.b2 { border-left-style: dashed; }
+  @media (max-width: 1050px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid2 { grid-template-columns: 1fr; } .flow { grid-template-columns: 1fr; } .ar { display: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The ten branches and what they feed</h1>
+  <p class="lead">professions.md (T2P27–T2P30). From Tier 2 every line works two materials, each gathered, processed and
+    made into its own item at the line's three places. The first item raises a piece's <b>base</b>, the second its
+    <b>Tier 2 path</b>: the dual paths of gear and Extra Stats.</p>
+  <nav class="top">
+    <a href="professions-tiers.html">The farm by tier</a>
+    <a class="on" href="professions-branches.html">The ten branches</a>
+    <a href="professions-times.html">Times</a>
+    <a href="professions-demand.html">Demand and supply</a>
+    <a href="professions-secondary.html">Three professions</a>
+  </nav>
+
+  <section>
+    <h2>Ten branches, two a line</h2>
+    <p class="sub">The top row is Tier 1's materials as built; the bottom row is new in Tier 2 (dashed), each from an
+      uma-art family the game doesn't use yet. Each branch is its own profession with its own Craft Level (T2P31).</p>
+    <div class="cards" id="cards1"></div>
+    <div class="cards" id="cards2" style="margin-top:12px"></div>
+  </section>
+
+  <section>
+    <h2>Twenty grades a line</h2>
+    <p class="sub">Every grade opens at Craft Lv 5g − 4 of its own profession and is worn at Uma Lv 5g − 4. A made item
+      takes its branch's refined items of its own grade (FL7); a jewel's and a Stardust's grade is its node's (Planet n is
+      2n − 1, a moon's node n 2n).</p>
+    <div class="panel">
+      <div class="tabs" id="tabs"></div>
+      <table id="grades"></table>
+    </div>
+  </section>
+
+  <section>
+    <h2>What a grade takes from Tier 2</h2>
+    <p class="sub">Every grade of every piece takes its line's two items of that grade, one tap (T2P29). The second item
+      powers the path she has set, whatever it is, so a path swaps freely and every branch carries the same work.</p>
+    <div class="grid2">
+      <div class="panel"><h3>The rule, one piece at a time</h3><div id="pieces"></div>
+        <p class="foot">Her moon's two nodes take neither (they open with the third moon's II and IV, D264).</p></div>
+      <div class="panel"><h3>The dual paths, by line</h3>
+        <div class="flow" id="flow"><div class="h">Second branch</div><div></div><div class="h">Its item</div><div></div><div class="h">The path it raises (owner)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>Why these five families</h2>
+      <p class="sub">Each was picked for its gathering place and for what its making place makes of it.</p>
+      <div class="panel"><table id="why"></table>
+        <p class="foot">Left unused: grains, fruits, sweets, nuts-seeds, fibers (a fair swap for Herbs or Hides, no number
+          moves), and essences, whose refined row is Tome Ink's icon (FL15).</p></div>
+    </div>
+    <div>
+      <h2>If a path is priced otherwise</h2>
+      <p class="sub">A maxed Uma, eight slots a place. Every branch is 150 under the ten-branch rule (T2P39).</p>
+      <div class="panel"><table id="breaks"></table></div>
+    </div>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id)
+const B = [
+  { line: 'Metal', lc: '--l1', trade: 'Warrior', b1: { n: 'Metal', fam: 'ores', jobs: ['Mining', 'Smelting', 'Arms Crafting'], made: 'Arms Gem', rec: 10, unit: 'Ingots',
+      raw: ['Copper Ore', 'Tin Ore', 'Iron Ore', 'Silver Ore', 'Cobalt Ore', 'Gold Ore', 'Platinum Ore', 'Titanium Ore', 'Mythril Ore', 'Orichalcum Ore'],
+      ref: ['Copper Ingot', 'Tin Ingot', 'Iron Ingot', 'Silver Ingot', 'Cobalt Ingot', 'Gold Ingot', 'Platinum Ingot', 'Titanium Ingot', 'Mythril Ingot', 'Orichalcum Ingot'], feeds: 'An Arms weapon\'s grade (Might × tier)' },
+    b2: { n: 'Rock', fam: 'stones', jobs: ['Quarrying', 'Masonry', 'Whetstone Crafting'], made: 'Arms Whetstone', rec: 10, unit: 'Blocks',
+      raw: ['Limestone', 'Sandstone', 'Slate', 'Granite', 'Basalt', 'Marble', 'Obsidian', 'Jade', 'Runestone', 'Meteorite'],
+      ref: ['Limestone Block', 'Sandstone Block', 'Slate Block', 'Granite Block', 'Basalt Block', 'Marble Block', 'Obsidian Block', 'Jade Block', 'Runestone Block', 'Meteorite Block'], feeds: 'An Arms weapon\'s Tier 2 type: Pure, Dual and partner, or cross-channel', owner: 'gear (R2-6)' } },
+  { line: 'Vegetables', lc: '--l2', trade: 'Healer', b1: { n: 'Vegetables', fam: 'vegetables', jobs: ['Farming', 'Prepping', 'Tome Crafting'], made: 'Tome Ink', rec: 10, unit: 'cuts',
+      raw: ['Carrot', 'Potato', 'Cabbage', 'Onion', 'Tomato', 'Bell Pepper', 'Eggplant', 'Asparagus', 'Golden Carrot', 'Emperor Pumpkin'],
+      ref: ['Chopped Carrot', 'Diced Potato', 'Shredded Cabbage', 'Diced Onion', 'Tomato Purée', 'Sliced Bell Pepper', 'Sliced Eggplant', 'Trimmed Asparagus', 'Golden Carrot Purée', 'Pumpkin Purée'], feeds: 'A Tome\'s grade (Might × tier)' },
+    b2: { n: 'Herbs', fam: 'herbs-spices', jobs: ['Herb Picking', 'Drying', 'Reagent Crafting'], made: 'Tome Reagent', rec: 10, unit: 'dried herbs',
+      raw: ['Basil', 'Mint', 'Rosemary', 'Thyme', 'Ginger', 'Peppercorn', 'Cinnamon', 'Saffron', 'Mandrake', 'Phoenix Pepper'],
+      ref: ['Dried Basil', 'Dried Mint', 'Dried Rosemary', 'Dried Thyme', 'Ground Ginger', 'Ground Pepper', 'Ground Cinnamon', 'Saffron Threads', 'Mandrake Powder', 'Phoenix Spice'], feeds: 'A Tome\'s Tier 2 type: Pure, Dual and partner, or cross-channel', owner: 'gear (R2-6)' } },
+  { line: 'Wood', lc: '--l3', trade: 'Spellblade', b1: { n: 'Wood', fam: 'woods', jobs: ['Wood Chopping', 'Sawing', 'Armor Crafting'], made: 'Armor Fittings', rec: 3, unit: 'Planks',
+      raw: ['Pine Log', 'Birch Log', 'Cedar Log', 'Maple Log', 'Oak Log', 'Cherry Log', 'Mahogany Log', 'Ebony Log', 'Elderwood Log', 'Yggdrasil Branch'],
+      ref: ['Pine Plank', 'Birch Plank', 'Cedar Plank', 'Maple Plank', 'Oak Plank', 'Cherry Plank', 'Mahogany Plank', 'Ebony Plank', 'Elderwood Plank', 'Yggdrasil Plank'], feeds: 'An armor slot\'s grade (its stat and offense × tier)' },
+    b2: { n: 'Hides', fam: 'hides-scales', jobs: ['Trapping', 'Tanning', 'Lining Crafting'], made: 'Armor Lining', rec: 3, unit: 'leathers',
+      raw: ['Puffbun Pelt', 'Boarling Hide', 'Wolfkin Pelt', 'Rock Lizard Scale', 'Ironback Hide', 'Basilisk Scale', 'Manticore Hide', 'Behemoth Hide', 'Wyvern Scale', 'Dragon Scale'],
+      ref: ['Puffbun Leather', 'Boarling Leather', 'Wolfkin Leather', 'Lizard Leather', 'Ironback Leather', 'Basilisk Leather', 'Manticore Leather', 'Behemoth Leather', 'Wyvern Leather', 'Dragonhide'], feeds: 'An armor slot\'s Tier 2 part: a lining adding its offense to her other half (assumed; else the tier step)', owner: 'gear' } },
+  { line: 'Fish', lc: '--l4', trade: 'Summoner', b1: { n: 'Fish', fam: 'fish', jobs: ['Fishing', 'Filleting', 'Accessory Crafting'], made: 'Accessory Setting', rec: 5, unit: 'Fillets',
+      raw: ['Carp', 'Trout', 'Sardine', 'Mackerel', 'Salmon', 'Sea Bream', 'Eel', 'Tuna', 'Silverfin', 'Rainbow Koi'],
+      ref: ['Carp Fillet', 'Trout Fillet', 'Sardine Fillet', 'Mackerel Fillet', 'Salmon Fillet', 'Sea Bream Fillet', 'Eel Fillet', 'Tuna Fillet', 'Silverfin Fillet', 'Rainbow Koi Fillet'], feeds: 'An accessory slot\'s grade (its base row × tier)' },
+    b2: { n: 'Fossils', fam: 'bones-horns', jobs: ['Beachcombing', 'Carving', 'Inlay Crafting'], made: 'Accessory Inlay', rec: 5, unit: 'carvings',
+      raw: ['Seashell', 'Ammonite', 'Trilobite', 'Fossil Bone', 'Mammoth Tusk', 'Saber Fang', 'Raptor Claw', 'Tyrant Tooth', 'Titan Bone', 'Unicorn Horn'],
+      ref: ['Shell Carving', 'Ammonite Carving', 'Trilobite Carving', 'Bone Carving', 'Tusk Carving', 'Fang Carving', 'Claw Carving', 'Tooth Carving', 'Titan Carving', 'Unicorn Carving'], feeds: 'An accessory slot\'s tree: the form she wears (dual ATK and M.ATK, several kinds…)', owner: 'gear (R2-7)' } },
+  { line: 'Stone', lc: '--l5', trade: 'Mage', b1: { n: 'Stone', fam: 'crystals', jobs: ['Hunting', 'Stonecutting', 'Jewel Crafting'], made: 'Planet · Moon Jewel', rec: 5, unit: 'cut stones',
+      raw: ['Quartz', 'Amethyst', 'Citrine', 'Garnet', 'Emerald', 'Sapphire', 'Ruby', 'Diamond', 'Starstone', 'Philosopher\'s Stone'],
+      ref: ['Cut Quartz', 'Cut Amethyst', 'Cut Citrine', 'Cut Garnet', 'Cut Emerald', 'Cut Sapphire', 'Cut Ruby', 'Cut Diamond', 'Cut Starstone', 'Cut Philosopher\'s Stone'], feeds: 'Opens an Extra Stats node (its points × tier)' },
+    b2: { n: 'Fungi', fam: 'mushrooms', jobs: ['Foraging', 'Grinding', 'Stardust Crafting'], made: 'Stardust', rec: 5, unit: 'powders',
+      raw: ['Button Mushroom', 'Shiitake', 'Oyster Mushroom', 'Enoki', 'Chanterelle', 'Porcini', 'Morel', 'Truffle', 'Glowcap', 'King Reishi'],
+      ref: ['Dried Button Mushroom', 'Dried Shiitake', 'Dried Oyster Mushroom', 'Dried Enoki', 'Dried Chanterelle', 'Dried Porcini', 'Dried Morel', 'Shaved Truffle', 'Glowcap Powder', 'Reishi Powder'], feeds: 'Slots an open node\'s branch stat, one a jewel (AoE, multi-hit, a kind, MP back, life steal)', owner: 'extra stats (R2-8)' } },
+]
+const card = (L, b, two) => `<div class="card${two ? ' b2' : ''}" style="--lc:var(${L.lc})">
+  <div class="bn"><span><i class="sw${two ? ' b2' : ''}"></i>${b.n}</span><span class="chip">${two ? 'Tier 2' : 'Tier 1'}</span></div>
+  <div><div class="k">${L.line} line · ${L.trade}</div><div class="v">uma-art <b>${b.fam}</b></div></div>
+  <div><div class="k">Gather · process · make</div><div class="v">${b.jobs.join(' · ')}</div></div>
+  <div class="made"><b>${b.made}</b> G1–G10<br><span class="muted">${b.rec} ${b.unit} of its grade</span></div>
+  <div class="feeds">${two ? '<b>Tier 2 path:</b> ' : '<b>Its base:</b> '}${b.feeds}</div></div>`
+$('cards1').innerHTML = B.map((L) => card(L, L.b1, false)).join('')
+$('cards2').innerHTML = B.map((L) => card(L, L.b2, true)).join('')
+
+const madeAt = (b, g) => {
+  if (b.made === 'Planet · Moon Jewel') return g % 2 ? `Planet Jewel ${['I', 'II', 'III', 'IV', 'V'][(g - 1) / 2]}` : `Moon Jewel ${['I', 'II', 'III', 'IV', 'V'][g / 2 - 1]}`
+  if (b.made === 'Stardust') return `Stardust G${g} <span class="r">(${g % 2 ? 'Planet ' + ['I', 'II', 'III', 'IV', 'V'][(g - 1) / 2] : 'a moon\'s ' + ['I', 'II', 'III', 'IV', 'V'][g / 2 - 1]})</span>`
+  return `${b.made} G${g}`
+}
+function showLine(i) {
+  const L = B[i]
+  document.querySelectorAll('#tabs button').forEach((x, j) => x.classList.toggle('on', j === i))
+  let h = `<tr><th>Grade</th><th><i class="sw" style="--lc:var(${L.lc})"></i>${L.b1.n}: raw → refined</th><th>Makes</th><th><i class="sw b2" style="--lc:var(${L.lc})"></i>${L.b2.n}: raw → refined</th><th>Makes</th><th>Opens at</th></tr>`
+  for (let g = 1; g <= 10; g++) {
+    h += `<tr><td class="g">G${g}</td><td><span class="it">${L.b1.raw[g - 1]} → ${L.b1.ref[g - 1]}</span></td><td><span class="it">${madeAt(L.b1, g)}</span><span class="r">${L.b1.rec} × ${L.b1.ref[g - 1]}</span></td>
+      <td><span class="it">${L.b2.raw[g - 1]} → ${L.b2.ref[g - 1]}</span></td><td><span class="it">${madeAt(L.b2, g)}</span><span class="r">${L.b2.rec} × ${L.b2.ref[g - 1]}</span></td><td class="r">Craft Lv ${5 * g - 4} · Uma Lv ${5 * g - 4}</td></tr>`
+  }
+  $('grades').innerHTML = h
+}
+$('tabs').innerHTML = B.map((L, i) => `<button type="button" data-i="${i}">${L.line} · ${L.b1.n === L.line ? '' : L.b1.n + ' · '}${L.b2.n}</button>`).join('')
+document.querySelectorAll('#tabs button').forEach((x) => x.addEventListener('click', () => showLine(+x.dataset.i)))
+showLine(0)
+
+const PIECES = [
+  ['An Arms weapon, G6', '--l1', 'Arms Gem G6 · 10 Gold Ingots', 'Arms Whetstone G6 · 10 Marble Blocks'],
+  ['A Tome, G6', '--l2', 'Tome Ink G6 · 10 Sliced Bell Pepper', 'Tome Reagent G6 · 10 Ground Pepper'],
+  ['An armor slot, G6', '--l3', 'Armor Fittings G6 · 3 Cherry Planks', 'Armor Lining G6 · 3 Basilisk Leathers'],
+  ['An accessory slot, G6', '--l4', 'Accessory Setting G6 · 5 Sea Bream Fillets', 'Accessory Inlay G6 · 5 Fang Carvings'],
+  ['Planet III (grade 5)', '--l5', '3 Planet Jewels III · 15 Cut Emeralds', '3 Stardust G5 · 15 Dried Chanterelles'],
+  ['A moon\'s node III (grade 6)', '--l5', '1 Moon Jewel III · 5 Cut Sapphires', '1 Stardust G6 · 5 Dried Porcini'],
+]
+$('pieces').innerHTML = PIECES.map(([p, lc, a, b]) => `<div class="piece" style="--lc:var(${lc})"><div class="p">${p}</div><div class="ar">=</div><div class="a"><b>Its base</b><br>${a}</div><div class="ar">+</div><div class="a b2"><b>Tier 2 path</b><br>${b}</div></div>`).join('')
+
+const fl = $('flow')
+for (const L of B) {
+  fl.insertAdjacentHTML('beforeend', `<div class="box b2" style="--lc:var(${L.lc})"><b>${L.b2.n}</b><br><span class="muted">${L.line} line · ${L.b2.fam}</span></div><div class="ar">→</div>
+    <div class="box b2" style="--lc:var(${L.lc})"><b>${L.b2.made}</b><br><span class="muted">${L.b2.rec} ${L.b2.unit}</span></div><div class="ar">→</div>
+    <div class="box sys">${L.b2.feeds}<br><span class="muted">${L.b2.owner}</span></div>`)
+}
+
+const WHY = [
+  ['Rock', 'A mine quarries stone', 'A quarry stone makes a whetstone for blades', 'Named apart from the Stone line (gems, not quarry stone)'],
+  ['Herbs', 'A field grows herbs and spices', 'A spell takes reagents', 'Fibers (bookbinding) the alternative'],
+  ['Hides', 'A forest is trapped for pelts', 'Armor is lined with leather', 'The old farm hunted hides at the Monster Den (identity.ts)'],
+  ['Fossils', 'The shore gives shells and fossils', 'A charm is inlaid with carvings', 'Seven of ten grades are bones and horns, so not "Shells"'],
+  ['Fungi', 'A monster den grows cave fungi', 'Ground to a glowing dust for the stars', 'Essences fit too, but their refined row is Tome Ink\'s icon'],
+]
+$('why').innerHTML = '<tr><th>Branch</th><th>Its gathering place</th><th>Its making place</th><th>Note</th></tr>' + WHY.map((r) => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td class="muted">${r[3]}</td></tr>`).join('')
+const BR = [
+  ['Nothing (the ten-branch rule)', '150 every branch', '2.39 every place', '20% every trade'],
+  ['Whetstones and Reagents only on her one two-kind weapon', 'Rock, Herbs 50', 'Metal, Vegetables 3.59', 'Warriors, Healers 15.4%'],
+  ['Armor with no path and no Lining', 'Hides 0', 'Wood 4.78', 'Spellblades 11.1%'],
+  ['A Stardust a node, not a jewel', 'Fungi 100', 'Stone 2.87', 'Mages 17.2%'],
+]
+$('breaks').innerHTML = '<tr><th>If Tier 2 prices a path</th><th>That branch</th><th>Its line\'s places, maxed a day</th><th>Its trade\'s share</th></tr>' + BR.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')
+</script>
+</body>
+</html>
