@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weapon Moons</title>
+<!-- docs/design/tier2/extra-stats.md (§4.3–§4.9, §5.3; T2E3–T2E8, T2E13, T2E17): the weapon moons of Tiers 2 and 3. What they
+     add beside Might and the Orbs (and why no kind cap), Full or Split, the one-tap kinds list, presets for the eight classes,
+     her offense at Lv 50 and the model's gains. Self-contained; uma-kit's tokens, light and dark. Sheets and gains are the
+     live code's (world/balance-party.ts, economy/accessories.ts) under T2E's rules; the model is a draft for balance.md. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --bezel: #0d1117;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #6250d6; --chart: #fcfcfb;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a;
+      --success: #4fb37a; --danger: #e0645c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #9085e9; --chart: #1a1a19;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-strong: #e8b65a;
+    --success: #4fb37a; --danger: #e0645c;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #9085e9; --chart: #1a1a19;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.5 Inter, system-ui, -apple-system, sans-serif; }
+  main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 72px; }
+  h1 { font-size: 30px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -.01em; }
+  h2 { font-size: 21px; margin: 44px 0 6px; }
+  h3 { margin: 0 0 6px; font-size: 15px; }
+  p.lede { color: var(--ink-soft); margin: 0 0 14px; max-width: 82ch; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 18px; }
+  .seg { display: inline-flex; background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 10px; overflow: hidden; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 13px/1 Inter, system-ui, sans-serif; padding: 9px 12px; min-height: 36px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  select, input[type=range] { font: 600 13px Inter, system-ui, sans-serif; }
+  select { min-height: 36px; border-radius: 10px; border: 1px solid var(--hairline-strong); background: var(--panel); color: var(--ink); padding: 0 10px; }
+  .card { background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px; padding: 14px 16px; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  code { font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 0; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+  /* Stacked and grouped bars. */
+  .bars { display: grid; grid-template-columns: 170px 1fr 54px; gap: 6px 10px; align-items: center; font-size: 13px; }
+  .bars .name { color: var(--ink-soft); text-align: right; }
+  .bars .val { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .track { display: flex; gap: 2px; height: 18px; }
+  .track i { display: block; height: 100%; }
+  .track i:first-child { border-radius: 4px 0 0 4px; } .track i:last-child { border-radius: 0 4px 4px 0; }
+  .track i:only-child { border-radius: 4px; }
+  .pair { display: flex; flex-direction: column; gap: 2px; }
+  .pair i { display: block; height: 9px; border-radius: 0 4px 4px 0; }
+  .hov { position: relative; cursor: default; }
+  .tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 14px rgb(0 0 0 / .14); opacity: 0; transition: opacity .12s; z-index: 10; max-width: 280px; }
+  /* Slider readout. */
+  .readout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .readout div { background: var(--raised); border-radius: 10px; padding: 10px 12px; }
+  .readout b { font: 800 24px 'SF Pro Rounded', ui-rounded, system-ui, sans-serif; display: block; }
+  .readout span { font-size: 12.5px; color: var(--ink-soft); }
+  .readout .win { outline: 2px solid var(--accent); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  /* Phone sheets. */
+  .phones { display: flex; flex-wrap: wrap; gap: 24px; }
+  .phone { width: 410px; padding: 10px; background: var(--bezel); border-radius: 38px; flex: none; }
+  .screen { position: relative; width: 390px; height: 560px; background: rgb(8 12 18 / .5); border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+  .sheet { background: var(--panel); border-radius: 18px 18px 0 0; padding: 8px 16px 16px; }
+  .grip { width: 38px; height: 4px; border-radius: 2px; background: var(--hairline-strong); margin: 0 auto 8px; }
+  .sheet header { display: flex; align-items: center; justify-content: space-between; min-height: 40px; font: 700 19px 'SF Pro Rounded', ui-rounded, system-ui, sans-serif; }
+  .sheet header span { color: var(--ink-soft); font-size: 22px; font-weight: 400; }
+  .klist { list-style: none; margin: 0; padding: 0; }
+  .klist li { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 48px; border-bottom: 1px solid var(--hairline); font-weight: 600; font-size: 14px; padding: 0 4px; }
+  .klist li span { font-weight: 500; color: var(--ink-soft); font-size: 12.5px; text-align: right; }
+  .klist li.on { color: var(--accent-strong); }
+  .klist li.on::before { content: '✓'; margin-right: -2px; }
+  .note { font-size: 12.5px; color: var(--ink-soft); text-align: center; margin: 8px 0 0; }
+  .lines { list-style: none; padding: 0; margin: 6px 0 0; font-size: 13.5px; }
+  .lines li { padding: 6px 0; border-bottom: 1px solid var(--hairline); }
+</style>
+</head>
+<body>
+<main>
+  <h1>The weapon moons</h1>
+  <p class="lede">Tier 2's one and Tier 3's two: five nodes of flat offense on her hits of a kind, <b>Full</b> on one or <b>Split</b> at 0.7 on two, on the
+    Planet's ranks and its jewels. What they add beside her Might and her Orbs, how she picks their kinds in one tap, and what the model says they're
+    worth. From <a href="../extra-stats.md">extra-stats.md</a> §4–§5.</p>
+  <div class="bar"><span class="seg" id="theme"><button data-v="">System</button><button data-v="light">Light</button><button data-v="dark">Dark</button></span></div>
+
+  <h2>Beside Might and the Orbs, and why no kind cap</h2>
+  <p class="lede">A Brawler's Greatsword offense at each tier's Lv 50 (the balance party's average outfit, on-curve G10, the whole map, no template). A weapon
+    moon joins her hit's offense in the damage stack's step 1, as an Orb does; it never heals and never adds a kind. The most any one kind can carry is three
+    Orbs and a Full moon: about 30% of her offense on it, so no cap is needed (T2E6).</p>
+  <div class="card"><div class="bars" id="stack"></div><div class="legend" id="stacklegend"></div></div>
+
+  <h2>Full or Split</h2>
+  <p class="lede">A Full moon gives its kind about 1.4 times what a Split gives each of its two. So Split wins while her damage spreads, and Full wins once her
+    Full kind carries enough of it. Slide her lead kind's share of her damage; her other two share the rest evenly. (A simpler spread than §4.9's, which
+    weights her weapons by her hands: for the crossover only. The per-hit gains are the model's, Tier 2's Lv 50.)</p>
+  <div class="grid2">
+    <div class="card">
+      <div class="bar" style="margin:0 0 10px"><select id="fclass" aria-label="Class"></select></div>
+      <label for="share" style="font-size:13px;color:var(--ink-soft)">Her lead kind's share of her damage: <b id="sharev" style="color:var(--ink)"></b></label>
+      <input type="range" id="share" min="33" max="90" value="45">
+      <div class="readout"><div id="rfull"></div><div id="rsplit"></div></div>
+      <p class="note" id="cross" style="text-align:left"></p>
+    </div>
+    <div class="card">
+      <h3>Every node, Full and Split</h3>
+      <div class="scroll"><table id="fsnodes"></table></div>
+      <p class="note" style="text-align:left">Opens at Lv 1, 11, 21, 31, 41 (the Planet's ranks), one Planet Jewel a node in every tier. A Split's two kinds share the
+        five nodes and five jewels.</p>
+    </div>
+  </div>
+
+  <h2>What the model says they add</h2>
+  <p class="lede">The model (a draft for balance.md's simulation): a hit is offense² ÷ (offense + defense) against a regular striker at the tier's Lv 50; her act
+    is her three weapons evenly, each at her hand for its half. Every gain holds within 0.3 points across tiers, since SB1 scales both sides. Hover a bar; the
+    table holds every number.</p>
+  <div class="grid2">
+    <div class="card"><h3><span class="tier t2">Tier 2</span> one weapon moon, on her act</h3><div class="bars" id="g2"></div><div class="legend" id="g2l"></div></div>
+    <div class="card"><h3><span class="tier t3">Tier 3</span> two weapon moons, on her act</h3><div class="bars" id="g3"></div><div class="legend" id="g3l"></div></div>
+  </div>
+  <div class="card scroll" style="margin-top:12px"><table id="gtable"></table></div>
+
+  <h2>Her kinds, in one tap</h2>
+  <p class="lede">The weapon moon's sheet has a <b>Kinds</b> row; it opens six rows from her three weapons. A tap wears the row, no Set, and the sheet returns
+    to the node with its new values (T2E5). A Brawler with three nodes open in Tier 2, and the same Uma in Tier 3, where one list sets both moons.</p>
+  <div class="phones">
+    <div class="phone"><div class="screen"><div class="sheet"><div class="grip"></div><header>Weapon moon · kinds<span>×</span></header><ul class="klist" id="k2"></ul><p class="note">A tap wears the row. Free outside fights.</p></div></div></div>
+    <div class="phone"><div class="screen"><div class="sheet"><div class="grip"></div><header>Weapon moons · kinds<span>×</span></header><ul class="klist" id="k3"></ul><p class="note">Weapon moon 1 is the Full one; every kind different.</p></div></div></div>
+  </div>
+
+  <h2>Presets for the eight classes</h2>
+  <p class="lede">Tier 2: Split on her Orb's kind (<code>presetKind</code>) and her other weapon of the same half. Tier 3: Full on that kind, Split on her other
+    two. The Standard preset sets them with her weapons and accessories; Ascend gives her the new tier's (T2E7).</p>
+  <div class="card scroll"><table id="presets"></table></div>
+
+  <h2>Her offense at Lv 50, with her preset moons</h2>
+  <p class="lede">Each weapon's offense (her ATK or M.ATK with the map, armor and her preset's accessories, her weapon's Might, her Orb on its kind), then
+    what her weapon moons add on it. From <code>balanceMember</code> at each tier's Lv 50.</p>
+  <div class="card scroll"><table id="sheets"></table><div class="legend" id="sheetlegend"></div></div>
+
+  <h2>Set all, with the Planet's jewels shared</h2>
+  <p class="lede">Set all keeps its live rule (T2E13): each jewel to the body furthest behind among those it fits, map order on a tie. On the Planet's side the
+    Planet comes first in map order; when the stock can't cover its count, the weapon moons take the jewel, so nothing that fits is left.</p>
+  <div class="grid2">
+    <div class="card"><h3><span class="tier t2">Tier 2</span> three Planet Jewels III, two Moon Jewels IV</h3><ul class="lines">
+      <li>Planet Jewel III ×2 → Planet III · +7 · all six</li><li>Planet Jewel III → Weapon moon III · Greatsword +13 · Axe +13</li>
+      <li>Moon Jewel IV → Vigor IV · HP +70 · MP +14</li><li>Moon Jewel IV → Guard IV · DEF/M.DEF +14</li></ul>
+      <p class="note" style="text-align:left">With only one Planet Jewel III, the Planet's two can't be met: it goes to the weapon moon.</p></div>
+    <div class="card"><h3><span class="tier t3">Tier 3</span> three Planet Jewels I</h3><ul class="lines">
+      <li>Planet Jewel I → Planet I · +3 · all six</li><li>Planet Jewel I → Weapon moon 1 I · Full · Greatsword +10</li>
+      <li>Planet Jewel I → Weapon moon 2 I · Split · Axe +7 · Lance +7</li></ul>
+      <p class="note" style="text-align:left">Lv 1 in Tier 3: the first rank lights all three bodies of the Planet's side.</p></div>
+  </div>
+</main>
+<div class="tip" id="tip"></div>
+
+<script>
+// --- Numbers from the code (printed by a throwaway test; T2E's rules on the live sheet) ------------------------------------
+const CLASSES = {
+  brawler: { name: 'Brawler', kinds: ['Greatsword', 'Axe', 'Lance'], half: 'Axe' },
+  spellblade: { name: 'Arms Spellblade', kinds: ['Katana', 'Axe', 'Lightning'], half: 'Axe' },
+  armsummoner: { name: 'Arms Summoner', kinds: ['Bow', 'Axe', 'Dark'], half: 'Axe' },
+  paladin: { name: 'Paladin', kinds: ['Lance', 'Greatsword', 'Light'], half: 'Greatsword' },
+  cleric: { name: 'Cleric', kinds: ['Light', 'Fire', 'Lance'], half: 'Fire' },
+  summoner: { name: 'Tome Summoner', kinds: ['Dark', 'Ice', 'Bow'], half: 'Ice' },
+  tomeblade: { name: 'Tome Spellblade', kinds: ['Lightning', 'Ice', 'Katana'], half: 'Ice' },
+  mage: { name: 'Sorcerer', kinds: ['Fire', 'Ice', 'Lightning'], half: 'Ice' },
+}
+// The model at Lv 50 (any tier within 0.3): her act's gain and each kind's hit gain.
+const GAIN = {
+  brawler: { core: 33.5, t2split: 12.0, t2full: 8.7, t3fs: 20.5, t3ff: 17.2, sA: 17.0, sB: 18.5, f: 24.4, share: [25.1, 33.1, 37.8] },
+  spellblade: { core: 27.5, t2split: 15.2, t2full: 11.0, t3fs: 23.1, t3ff: 21.9, sA: 17.6, sB: 19.1, f: 25.2, share: [21.4, 31.9, 36.2] },
+  armsummoner: { core: 27.5, t2split: 14.5, t2full: 10.5, t3fs: 23.3, t3ff: 20.8, sA: 17.6, sB: 19.1, f: 25.2, share: [21.4, 31.5, 36.3] },
+  paladin: { core: 30.1, t2split: 14.6, t2full: 10.6, t3fs: 24.7, t3ff: 21.0, sA: 18.2, sB: 19.9, f: 26.1, share: [23.1, 33.0, 38.4] },
+  cleric: { core: 29.4, t2split: 14.7, t2full: 10.6, t3fs: 24.0, t3ff: 21.0, sA: 17.5, sB: 19.1, f: 25.0, share: [22.7, 32.6, 37.7] },
+  summoner: { core: 26.8, t2split: 14.2, t2full: 10.3, t3fs: 22.7, t3ff: 20.4, sA: 16.9, sB: 18.4, f: 24.2, share: [20.9, 30.9, 35.6] },
+  tomeblade: { core: 26.7, t2split: 14.9, t2full: 10.8, t3fs: 22.4, t3ff: 21.4, sA: 16.9, sB: 18.4, f: 24.2, share: [20.9, 31.3, 35.4] },
+  mage: { core: 31.3, t2split: 11.3, t2full: 8.1, t3fs: 19.3, t3ff: 16.1, sA: 16.0, sB: 17.3, f: 22.9, share: [23.8, 31.5, 36.1] },
+}
+// Offense at Lv 50 (balanceMember, preset, whole map, no template), her three weapons in slot order.
+const SHEET = {
+  2: { brawler: [535, 499, 499], spellblade: [520, 484, 351], armsummoner: [520, 484, 351], paladin: [505, 469, 319], cleric: [505, 469, 319], summoner: [520, 484, 351], tomeblade: [520, 484, 351], mage: [544, 508, 508] },
+  3: { brawler: [774, 722, 722], spellblade: [751, 699, 510], armsummoner: [751, 699, 510], paladin: [732, 680, 461], cleric: [732, 680, 461], summoner: [751, 699, 510], tomeblade: [751, 699, 510], mage: [787, 735, 735] },
+}
+const FULL = { 2: [7, 13, 18, 23, 29], 3: [10, 18, 26, 34, 42] }, SPLIT = { 2: [5, 9, 13, 16, 20], 3: [7, 13, 18, 24, 29] }
+const sum = (a) => a.reduce((x, y) => x + y, 0)
+const P = (v) => v.toFixed(1)
+const tip = document.getElementById('tip')
+const hover = (root) => root.querySelectorAll('[data-tip]').forEach((el) => {
+  el.addEventListener('mousemove', (e) => { tip.innerHTML = el.dataset.tip; tip.style.opacity = 1; tip.style.left = `${e.clientX + 14}px`; tip.style.top = `${e.clientY + 14}px` })
+  el.addEventListener('mouseleave', () => { tip.style.opacity = 0 })
+})
+
+// --- The stack ------------------------------------------------------------------------------------------------------------
+const PARTS = [['ATK (her stat, the map, armor, Pendants)', 'var(--s1)'], ['Might, G10', 'var(--s2)'], ['Orbs', 'var(--s3)'], ['Weapon moon, Full', 'var(--s4)']]
+const STACK = [
+  ['Tier 1 · her preset', [209, 68, 20, 0]], ['Tier 1 · three Orbs', [189, 68, 60, 0]],
+  ['Tier 2 · preset + Full moon', [377, 122, 36, 90]], ['Tier 2 · three Orbs + Full', [341, 122, 108, 90]],
+  ['Tier 3 · preset + Full moon', [545, 177, 52, 130]], ['Tier 3 · three Orbs + Full', [493, 177, 156, 130]],
+]
+const maxStack = 956
+const stack = document.getElementById('stack')
+stack.innerHTML = STACK.map(([name, parts]) => {
+  const total = sum(parts), flat = parts[2] + parts[3]
+  return `<span class="name">${name}</span><div class="track hov" data-tip="<b>${name}</b><br>${parts.map((v, i) => v ? `${PARTS[i][0]}: ${v}` : '').filter(Boolean).join('<br>')}<br>Flat on this kind: ${flat} (${(flat / total * 100).toFixed(0)}%)" style="width:${total / maxStack * 100}%">${parts.map((v, i) => v ? `<i style="flex:${v};background:${PARTS[i][1]}"></i>` : '').join('')}</div><span class="val">${total}</span>`
+}).join('')
+document.getElementById('stacklegend').innerHTML = PARTS.map(([n, c]) => `<span><i style="background:${c}"></i>${n}</span>`).join('')
+hover(stack)
+
+// --- Full or Split --------------------------------------------------------------------------------------------------------
+const fclass = document.getElementById('fclass'), share = document.getElementById('share')
+fclass.innerHTML = Object.entries(CLASSES).map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')
+function fs() {
+  const id = fclass.value, g = GAIN[id], c = CLASSES[id], s = Number(share.value) / 100, q = (1 - s) / 2
+  const full = g.f * s, split = g.sA * s + g.sB * q, cross = (g.sB / 2) / (g.f - g.sA + g.sB / 2)
+  document.getElementById('sharev').textContent = `${Math.round(s * 100)}% · ${c.kinds[0]}`
+  document.getElementById('rfull').innerHTML = `<b>+${full.toFixed(1)}%</b><span>Full · ${c.kinds[0]} (+${P(g.f)}% on its hits)</span>`
+  document.getElementById('rsplit').innerHTML = `<b>+${split.toFixed(1)}%</b><span>Split · ${c.kinds[0]} + ${c.half} (+${P(g.sA)}%, +${P(g.sB)}%)</span>`
+  document.getElementById('rfull').className = full > split ? 'win' : ''
+  document.getElementById('rsplit').className = split >= full ? 'win' : ''
+  document.getElementById('cross').innerHTML = `Full wins once her ${c.kinds[0]} deals over <b>${Math.round(cross * 100)}%</b> of her damage, about <b>${(cross / ((1 - cross) / 2)).toFixed(1)}×</b> her second kind. The preset is Split until balance.md's simulation says Auto leans further.`
+}
+fclass.onchange = fs; share.oninput = fs; fs()
+document.getElementById('fsnodes').innerHTML = `<tr><th>Tier · mode</th>${['I', 'II', 'III', 'IV', 'V'].map((r) => `<th class="num">${r}</th>`).join('')}<th class="num">Lv 50</th></tr>` +
+  [[2, 'Full', FULL[2]], [2, 'Split, each', SPLIT[2]], [3, 'Full', FULL[3]], [3, 'Split, each', SPLIT[3]]].map(([t, m, row]) => `<tr><td><span class="tier t${t}">T${t}</span> ${m}</td>${row.map((v) => `<td class="num">+${v}</td>`).join('')}<td class="num"><b>+${sum(row)}</b></td></tr>`).join('')
+
+// --- Gains ----------------------------------------------------------------------------------------------------------------
+function grouped(host, legendHost, a, b, la, lb) {
+  const el = document.getElementById(host), max = 26
+  el.innerHTML = Object.entries(CLASSES).map(([id, c]) => {
+    const g = GAIN[id]
+    return `<span class="name">${c.name}</span><div class="pair hov" data-tip="<b>${c.name}</b><br>${la}: +${P(g[a])}%<br>${lb}: +${P(g[b])}%">
+      <i style="width:${g[a] / max * 100}%;background:var(--s1)"></i><i style="width:${g[b] / max * 100}%;background:var(--s2)"></i></div><span class="val">+${P(g[a])}%</span>`
+  }).join('')
+  document.getElementById(legendHost).innerHTML = `<span><i style="background:var(--s1)"></i>${la}</span><span><i style="background:var(--s2)"></i>${lb}</span>`
+  hover(el)
+}
+grouped('g2', 'g2l', 't2split', 't2full', 'Split on her lead half (the preset)', 'Full on her Orb\'s kind')
+grouped('g3', 'g3l', 't3fs', 't3ff', 'Full + Split, all three (the preset)', 'Full + Full, two')
+document.getElementById('gtable').innerHTML = `<tr><th>Class</th><th class="num">The core on her act</th><th class="num">T2 Split</th><th>On its kinds' hits</th><th class="num">T2 Full</th><th class="num">On its hits</th><th class="num">T3 Full + Split</th><th class="num">T3 Full + Full</th><th class="num">Extra Stats' share: T1 · T2 · T3</th></tr>` +
+  Object.entries(CLASSES).map(([id, c]) => { const g = GAIN[id]; return `<tr><td><b>${c.name}</b></td><td class="num">+${P(g.core)}%</td><td class="num"><b>+${P(g.t2split)}%</b></td><td>${c.kinds[0]} +${P(g.sA)}%, ${c.half} +${P(g.sB)}%</td><td class="num">+${P(g.t2full)}%</td><td class="num">+${P(g.f)}%</td><td class="num"><b>+${P(g.t3fs)}%</b></td><td class="num">+${P(g.t3ff)}%</td><td class="num">${g.share.map((s) => `${P(s)}%`).join(' · ')}</td></tr>` }).join('')
+
+// --- Kinds lists ----------------------------------------------------------------------------------------------------------
+const k = CLASSES.brawler.kinds
+document.getElementById('k2').innerHTML = [
+  ...k.map((x) => [`Full · ${x}`, `${x} +38 · +90 at V`, false]),
+  [`Split · ${k[0]} + ${k[1]}`, '+27 each · +63 at V', true], [`Split · ${k[0]} + ${k[2]}`, '+27 each · +63 at V', false], [`Split · ${k[1]} + ${k[2]}`, '+27 each · +63 at V', false],
+].map(([a, b, on]) => `<li class="${on ? 'on' : ''}">${a}<span>${b}</span></li>`).join('')
+document.getElementById('k3').innerHTML = [
+  ...k.map((x, i) => [`Full ${x} · Split ${k.filter((y) => y !== x).join(' + ')}`, 'all three · +130, +91 each at V', i === 0]),
+  [`Full ${k[0]} · Full ${k[1]}`, 'two · +130 each at V', false], [`Full ${k[0]} · Full ${k[2]}`, 'two · +130 each at V', false], [`Full ${k[1]} · Full ${k[2]}`, 'two · +130 each at V', false],
+].map(([a, b, on]) => `<li class="${on ? 'on' : ''}">${a}<span>${b}</span></li>`).join('')
+
+// --- Presets and sheets ---------------------------------------------------------------------------------------------------
+document.getElementById('presets').innerHTML = `<tr><th>Class</th><th>Preset weapons (D263)</th><th>Her Orb's kind</th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th></tr>` +
+  Object.values(CLASSES).map((c) => { const rest = c.kinds.slice(1); return `<tr><td><b>${c.name}</b></td><td>${c.kinds.join(', ')}</td><td>${c.kinds[0]}</td><td>Split ${c.kinds[0]} + ${c.half}</td><td>Full ${c.kinds[0]} · Split ${rest.join(' + ')}</td></tr>` }).join('')
+const moonsOn = (t, c) => (t === 2 ? c.kinds.map((x) => (x === c.kinds[0] || x === c.half ? sum(SPLIT[2]) : 0)) : c.kinds.map((x, i) => (i === 0 ? sum(FULL[3]) : sum(SPLIT[3]))))
+document.getElementById('sheets').innerHTML = `<tr><th>Tier</th><th>Class</th><th>Weapon 1</th><th>Weapon 2</th><th>Weapon 3</th></tr>` +
+  [2, 3].flatMap((t) => Object.entries(CLASSES).map(([id, c], i) => {
+    const base = SHEET[t][id], add = moonsOn(t, c)
+    return `<tr>${i === 0 ? `<td rowspan="8"><span class="tier t${t}">Tier ${t}</span></td>` : ''}<td><b>${c.name}</b></td>${c.kinds.map((x, j) => `<td><div style="display:flex;align-items:center;gap:8px"><div class="track" style="width:${(base[j] + add[j]) / 917 * 140}px;height:10px"><i style="flex:${base[j]};background:var(--s1)"></i>${add[j] ? `<i style="flex:${add[j]};background:var(--s4)"></i>` : ''}</div><span>${x} ${base[j]}${add[j] ? ` → <b>${base[j] + add[j]}</b>` : ''}</span></div></td>`).join('')}</tr>`
+  })).join('')
+document.getElementById('sheetlegend').innerHTML = '<span><i style="background:var(--s1)"></i>Her offense on the weapon</span><span><i style="background:var(--s4)"></i>Her weapon moons on it</span>'
+
+// --- Theme ----------------------------------------------------------------------------------------------------------------
+const seg = document.getElementById('theme')
+const paint = (v) => seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)))
+seg.querySelectorAll('button').forEach((b) => b.onclick = () => { paint(b.dataset.v); if (b.dataset.v) document.documentElement.dataset.theme = b.dataset.v; else delete document.documentElement.dataset.theme })
+paint('')
+</script>
+</body>
+</html>
