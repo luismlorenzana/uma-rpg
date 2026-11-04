@@ -32,7 +32,7 @@ export function StarChart({ map, ready, templateType, onNode }: ChartProps) {
         return (
           <button key={b.id} type="button" onClick={() => onNode(bodyNode(map, b))} aria-label={bodyLabel(b.id, templateType, open, b.stars.length)} data-map-body={b.id}
             className="absolute grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full" style={{ left: `${(b.hub[0] / CHART_W) * 100}%`, top: `${(b.hub[1] / CHART_H) * 100}%` }}>
-            <StarCrest body={b.id} color={b.color} />
+            <StarCrest body={b.id} />
           </button>
         )
       })}
