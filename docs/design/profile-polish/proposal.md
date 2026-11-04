@@ -1,7 +1,7 @@
 # Profile polish: Details and the star chart
 
 > **From the owner's two screenshots, 2026-10-31; approved and built: H139, H140, H142 and H143 (D275–D278).** Art is ChatGPT's, so the
-> chart shipped with vector crests, and [H141](../../handoff/tasks/H141-star-crests-art.md) draws the pixel art that
+> chart shipped with vector crests, and [H141](https://github.com/luismlorenzana/uma-platform/pull/64) published the pixel art in uma-art 2.19.0 that
 > [H144](../../handoff/tasks/H144-pin-star-art.md) pins (PP25, PP30). No rule, save or balance change: the fight, the jewels and every number stay as
 > they are.
 
@@ -148,7 +148,7 @@ The owner prefers no open questions, so each is decided, with the reason.
 |---|---|---|---|---|
 | H139 | The damage numbers, proved equal to a fight's | Claude | S | — |
 | H140 | Details: damage first, All stats a tap down | Claude | M | H139 |
-| [H141](../../handoff/tasks/H141-star-crests-art.md) | Art: five crests and eight stat marks | ChatGPT draws and publishes | S | — |
+| [H141](https://github.com/luismlorenzana/uma-platform/pull/64) | Art: five crests and eight stat marks, published in uma-art 2.19.0 | ChatGPT draws and publishes | S | — |
 | H142 | The star chart, with vector crests | Claude | M | — |
 | H143 | A body's sheet, its strip and the stat marks | Claude | S | H140, H142 |
 | [H144](../../handoff/tasks/H144-pin-star-art.md) | Pin uma-art 2.19.0: pixel crests and marks | Claude or ChatGPT | S | H141 |
