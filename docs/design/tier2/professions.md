@@ -286,7 +286,7 @@ New: [the secondary line](previews/professions-secondary.html), for T2P12–T2P1
 | **Places · slots** | Fifteen, four slots each, ×1.25, the same map with Tier 2's dusk tint | T2P11 |
 | **The secondary** | **New:** one other line, all three of its places, G1–G8 | T2P12–T2P17 |
 | **The Exchange** | Raw only, × 2: 40 · 106 Laurels | T2P18 |
-| **Tickets** | Speed 10, Sweep 15, unchanged | T2P19 |
+| **Tickets** | Speed and Sweep × tier: 20 · 30 in Tier 2, 30 · 45 in Tier 3 ([progression](progression.md) T2W10) | T2P19 |
 | **Drills** | No Craft EXP | T2P20 |
 
 **What the world starts with.** A Tier 2 world fills as Umas ascend, one at a time once each window is full (D283),
@@ -476,8 +476,11 @@ Raw only, every line's ten grades, up to 99 at a time; refined and made items on
 | Class Manual | 1,000 Class Marks | the same | the same |
 
 - **× tier** because a tier's fights pay × tier (D170): a raw item costs the same number of fights in every tier.
-- **Tickets stay flat** (T2P19): a Speed Ticket buys 30 minutes, about two steps at Craft Lv 25, in every tier. Fights pay
-  × tier, so a later world's time is cheaper in fights: a gentle catch-up for a world that restarts at Craft Lv 1.
+- **Tickets × tier too** (T2P19, reconciled with [progression](progression.md#43-pay-laurels-tickets-class-marks-and-logs)
+  T2W10): a Speed Ticket still buys 30 minutes, about two steps at Craft Lv 25, and costs 20 Laurels in Tier 2 and 30 in
+  Tier 3 (Sweep 30 and 45), so a Laurel buys the same time in every tier, as it buys the same raw items. Flat tickets
+  would make a later world's time two or three times cheaper in fights; that stays the first knob if Tier 2's Wilds play
+  slow. Class Manuals stay 1,000 Class Marks (EXP is tier-relative).
 
 ### 4.7 Tier 3 in full (T2P23)
 
@@ -579,7 +582,7 @@ Every new call, with the recommended answer. The owner reviews them all.
 | **T2P16** Pickers and words | **Who lists "Her trade", then "Secondary", then the rest greyed "Another trade"; a G9 or G10 job greys secondaries "Main trade only"; targets offer the trade first; the Stable gains a Secondary facet** | One flat list | One place, one job, the reason on the row (PP22) |
 | **T2P17** The open shop with secondaries | **A line with no Uma of its trade opens every grade to everyone; once one arrives, G9 and G10 are hers** | Secondaries only, no open shop | PP16 kept: a world without Summoners still makes Settings |
 | **T2P18** The Exchange by tier | **Raw only; G1–G5 20 × tier after the tier's first win, G6–G10 53 × tier after a win on its continent 3 (continents 8 and 13); selling × tier** | Flat prices; refined or made items for sale | PP17 and D264; a raw item costs the same fights in every tier |
-| **T2P19** Tickets by tier | **Speed Ticket 10, Sweep Ticket 15, Class Manual 1,000 Class Marks in every tier** | × tier | Today's; a later world's time is cheaper in fights, a catch-up for a world at Craft Lv 1 |
+| **T2P19** Tickets by tier | **Speed and Sweep Tickets × tier (20 · 30, 30 · 45), as T2W10; Class Manual 1,000 Class Marks in every tier** (reconciled) | Flat (today's: a later world's time cheaper in fights) | A Laurel buys the same time in every tier, as it buys the same raw items |
 | **T2P20** Drills and the farm | **Drills pay no Craft EXP in any tier** (T2W owns Drills) | Craft Logs | D283's note: Craft V stays at Lv 50 and Speed Tickets are the craft's fast-forward |
 | **T2P21** Two yardsticks | **Report a maxed Uma (750 refined, every line 150) and a full window (950, the weapon lines 250 on a roster's average); the full window is the ascend number** | The maxed Uma alone | Ascend needs a full window, and its Weapons track asks five weapons at G10 (D289) |
 | **T2P22** The full window's weapon work | **In Tiers 2 and 3 the secondary carries it; recipes stay. Tier 1 stays as built** (forty at today's callings: 0.84 full windows a day, Metal and Vegetables binding; a seam, below) | Arms Gem and Tome Ink 6 in every tier (5 × 6 = 3 × 10: the full window equal, the maxed Uma not); a secondary in Tier 1 too | Keeps the tiers' recipes one set; every split of twenty runs at its hours |

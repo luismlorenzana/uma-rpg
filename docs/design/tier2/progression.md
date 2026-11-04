@@ -370,7 +370,7 @@ term, weaknesses, shields).
 | Class Marks, Class Manuals | Half of EXP past a cap; 1,000 for 1,000 | The same | The same | EXP is tier-relative |
 | Training Logs | A third of her next level | The same | The same | Tier-relative |
 
-- **Why × tier:** raw items, sales and the secondary's fee are × tier so a Laurel buys the same work (PP17); the tickets
+- **Why × tier:** raw items and sales are × tier so a Laurel buys the same work (PP17; the secondary has no fee, T2P14); the tickets
   were left flat, so today a Tier 2 fight buys twice the job time a Tier 1 fight does, and Tier 3 three times. Making
   them × tier keeps the owner's "the rate of progression is fine as it is" in every tier. **The alternative** (keep
   them flat) eases the Wilds' clock in later tiers through Laurels; it's the first knob if Tier 2 plays slow.
@@ -387,8 +387,8 @@ toolbox: settings carry, progress restarts.**
 | Her class (live) | Carries | Live rule |
 | **Her class branch** (T2C: focus, default or reverse set) | **Carries**, per class | A free setting, like her accessory families; nothing to re-earn |
 | Class skills, branch C, tips, the ★ signature tip (T2C, T2U) | Back to defaults with her trees | Tree picks restart with Class Rank 1 |
-| Weapon branches, Pure · Dual (T2G) | Gone with their grades (G0) | A branch is a grade's (G5) |
-| Accessory families and kinds (live) · forms past the base (T2G) | Carry · gone with the grade | Live rule; a form is a grade's |
+| Weapon branches, Pure · Dual (T2G) | **Carry** with the weapon kind; its grade resets to G0, and at G1–G4 the branch works at its Tier 2 rate (T2G17) | The owner's WP11 and WP34: branches carry, grades reset |
+| Accessory families and kinds (live) · forms past the base (T2G) | Carry · **carry** (T2G17) | Live rule; a form is a setting of the slot (T2G9) |
 | The weapon moon's setting, Full or Split and its kinds (T2E) | **Carries**; its nodes restart with the map | A setting; nodes are jewels |
 | The secondary profession (T2P) | Cleared, free to pick in the new tier | PP14 |
 | Craft Level, Bonds, Hall seats, grades, nodes (live) | Restart | Live rule |
@@ -455,10 +455,10 @@ cohort's, nonstop, the fighting party served first ([§4.8](#48-a-tier-2-run-end
 | Three class skills | T2C | Class Rank 20 · 30 · 40 | 1 · 1 · 2 | Lv ~13 · 20 · 27 |
 | Branch C; the Power or Break tip fork | T2C | Depth 3 (CR 20) · depth 5 (CR 40) | 1 · 2 | Lv ~13 · 27 |
 | ★ Signature tip on her lead weapon's tree | T2U | Its tip fork, depth 5 (CR 40) | 2 | Lv ~27 |
-| Weapon moon I → V | T2E | Moon Jewels I → V, made at Craft 6 → 46, set at Uma Lv 6 → 46 | 2.0 → 22.1 (2.6 → 27.7) | Lv 6 → 46 |
-| Weapon branch, Pure or Dual | T2G | A weapon's G5: Craft 21, Uma Lv 21, a Branch Gem | 8.8 (11.0) | Lv 21 |
+| Weapon moon I → V | T2E | One Planet Jewel each, on the Planet's ranks (the Planet takes one fewer, T2E2), set at Uma Lv 1 · 11 · 21 · 31 · 41 | No extra Stone (T2P7) | Lv 1 → 41 |
+| Weapon branch, Pure or Dual | T2G | A weapon's G5: Craft 21, Uma Lv 21; its own G5 Arms Gem or Tome Ink sets the branch, no Branch Gem (T2G4, T2P5) | 8.8 (11.0) | Lv 21 |
 | Accessory branches | T2G | A slot's G5 | 8.8 (11.0) | Lv 21 |
-| Tier 2's material pair | T2P | Its G5 and G10 pieces | 8.8 · 22.1 (11.0 · 27.7) | — |
+| The secondary profession | T2P | From Tier 2: one other line's three places, G1–G8 (G9–G10 stay its trade's, T2P12–T2P13); the same fifty material pairs in every tier (T2P3) | From Lv 1 | — |
 | LB+ at Bond 10 | T2C | Bond 10 in a hall | With Bonds, not days | — |
 | Ten equipped skills | T2C | Uma Level (+1 a five levels, tiers.md's draft) | about 5 | Lv 35 |
 
@@ -558,12 +558,12 @@ Tier 3's additions, assumed from the drafts; each opens on its system's own gate
 
 | Addition | Doc | Gate |
 |---|---|---|
-| The branch's capstone at depth 6; the class's mastery | T2C | Class Rank 50 |
+| The crown (every held capstone at 5.6, T2C20) and the family's mastery (T2C22) | T2C | Class Rank 50 |
 | Keen, Tempered or Evolved | T2G | A weapon's G5 in Tier 3 |
 | Accessory branches a step deeper | T2G | A slot's G5 |
-| A second weapon moon (Full + Split serve her three weapons) | T2E | Moon Jewels I–V, Uma Lv 6–46 |
-| The secondary's Tier 2 work; Tier 3's pair | T2P | Tier 3; its G5 and G10 |
-| The ★ tip at both of its forks | T2U | Depth 5 and 6 |
+| A second weapon moon (Full + Split serve her three weapons) | T2E | Planet Jewels on the Planet's ranks, as Tier 2's (T2E2) |
+| The secondary, as Tier 2's (T2P23) | T2P | Nothing new |
+| The ★ tip on both held lines of her lead tree (T2U13) | T2U | Depth 5, Class Rank 40 |
 | Tier 3's term (HP and DEF ×1.08 → ×1.48, offense +10%, bosses ×1.1); bosses' shields 10; skill MP ×2.4 | T2B, T2C | Tier 3's foes and skills |
 
 ### 5.4 Her window
@@ -587,7 +587,7 @@ this doc's Tier 2 shape, and Tier 3's full windows (Rift step lit) are ready to 
 | All six | Ascend: settings carry, progress restarts; the first five | T2W8, T2W9 |
 | All six | Tier 3 has a Rift and Trials; Tier 4 stays closed | T2W4, T2W14 |
 | T2P | **The demand a full window makes:** 950 refined items an Uma (Metal and Vegetables 250 each on average, Wood, Fish and Stone 150), 954 hours at Craft Lv 25; and **the target:** a party's windows in about 32 days nonstop, a first run of twenty in about 32, a 24-party world's in about 64 ([§8](#8-pacing)) | T2W12 |
-| T2P | Tickets × tier, so its fee and the Exchange read one rule | T2W10 |
+| T2P | Tickets × tier, so the Exchange reads one rule (T2P19 follows) | T2W10 |
 | T2E | The Stars track counts every body, the weapon moons included: 27 nodes in Tier 2, 32 in Tier 3 | T2W7 |
 | T2B | The fronts' added tests per tier; Tier 3's Rift to tune; the leans and packs a tier's generator reads | T2W2–T2W5 |
 | T2C | The Rift's guidance names each member's class branch; her class branch carries on Ascend | T2W5, T2W8 |
@@ -598,9 +598,9 @@ this doc's Tier 2 shape, and Tier 3's full windows (Rift step lit) are ready to 
 | From | Assumed | Used in |
 |---|---|---|
 | **T2C** (classes) | Class branches from Tier 2: one of two a class, a focus (+15% on its weapon group's kinds) with a default or reverse set, swapped freely; three class skills at Class Rank 20, 30, 40; branch C and a Power or Break tip fork; ten equipped skills; LB+ at Bond 10; skill MP ×1.7 (Tier 3 ×2.4); Tier 3's capstone at depth 6 (CR 50) and a mastery (CP19, CP20, CP26, CP27) | §4.4, §4.7, §5.3 |
-| **T2G** (gear) | Weapon branches at a weapon's G5 in Tier 2 (Pure or Dual, a fixed partner), Tier 3's step at G5 (Keen, Tempered, Evolved); accessory branches at a slot's G5; three slots every tier; a Branch Gem at G5 (WP6–WP9, WP34, D264) | §4.4, §4.7, §5.3 |
-| **T2E** (extra stats) | A weapon moon in Tier 2, five nodes on Moon Jewels I–V at Uma Lv 6–46, Full or Split, a setting; a second in Tier 3; her moon still opens with the three shared moons' II and IV (EP24–EP26) | §4.6, §4.7, §5.4 |
-| **T2P** (professions) | Craft Level restarts at 1; amounts don't scale (PP11); the secondary from Tier 2, any other line's base work, cleared on Ascend, free the first time (PP14); the tier's own pair at G5 and G10 stays the trade's, a fifth of the work (PP15) | §4.4, §4.7, §8 |
+| **T2G** (gear) | Weapon branches at a weapon's G5 in Tier 2 (Pure or Dual, a fixed partner), Tier 3's step at G5 (Keen, Tempered, Evolved); accessory forms at a slot's G5; three slots every tier; no Branch Gem, the G5 item sets the branch (T2G4); branches and forms carry on Ascend (T2G17) (WP6–WP9, WP34, D264) | §4.4, §4.7, §5.3 |
+| **T2E** (extra stats) | A weapon moon in Tier 2, five nodes on one Planet Jewel each at the Planet's ranks (T2E2), Full or Split, a setting; a second in Tier 3; her moon still opens with the three shared moons' II and IV (EP24–EP26) | §4.6, §4.7, §5.4 |
+| **T2P** (professions) | Craft Level restarts at 1; amounts don't scale (PP11); the secondary from Tier 2, one other line's three places at G1–G8, cleared on Ascend, free to change (T2P12–T2P14); no tier pairs, the same fifty in every tier (T2P3) | §4.4, §4.7, §8 |
 | **T2B** (balance) | Z3's restart kept; the toolbox terms SB3–SB5; three weaknesses at every rank in Tiers 2 and 3 kept as live (WK8, D235); bosses' shields 9 and 10 (SB6); the fronts' numbers per tier | §4.2, §4.5, §5.2 |
 | **T2U** (templates) | The ★ signature tip on her lead weapon's tree from Tier 2 (its tip fork), at both forks in Tier 3 (UT9); the signature and her moon × tier (live) | §4.7, §5.3 |
 
@@ -707,7 +707,7 @@ Every new call, with its recommended answer.
 | **T2W5** | The Rift's fronts in Tiers 2 and 3 | **Z9's one added test a front, re-aimed at today's toolbox** (Iron shields +2 and one or two Arms; Arcane one element a foe, leaders and guards apart; the Duel's boss three acts from stage 9; the Horde five to seven a wave); Tier 3 keeps them; T2B sets each tier's numbers; the guidance names each member's class branch |
 | **T2W6** | Trials and Drills by tier | **Unchanged in every tier:** Trials at the tier's Lv 45, 50, 55, opening with its Rift; Drills at its Lv 10–50, 2–6 Logs, ten runs a day banked to thirty, opening with its first map win; Logs and Marks stay in their world |
 | **T2W7** | Windows by tier | **One board, 36 steps in every tier**; Class I a Tier 1 class at R10 from Tier 2; World n a won capital run; **the Stars steps count the tier's whole map, weapon moons included** (Tier 2: 5 · 11 · 16 · 22 · 27; Tier 3: 6 · 13 · 19 · 26 · 32); no new track |
-| **T2W8** | Ascend with a toolbox | **Settings carry, progress restarts:** her class and its class branch, her accessory families and kinds, her weapon moon's setting carry; weapon branches and accessory forms go with their grades, tree picks with her trees, the secondary is cleared |
+| **T2W8** | Ascend with a toolbox | **Settings carry, progress restarts:** her class and its class branch, her accessory families, kinds and forms, her weapon branches (with T2G17: at G1–G4 a carried branch works at its Tier 2 rate) and her weapon moon's setting carry; grades, nodes and tree picks restart; the secondary is cleared (reconciled with T2G17) |
 | **T2W9** | Ascending into an empty world | **The Ascend sheet says when the new world would hold fewer than five** ("3 of 5 to fight in Tier 2"); no rule change |
 | **T2W10** | Prices by tier | **Speed and Sweep Tickets × tier** (20 · 30 in Tier 2, 30 · 45 in Tier 3) **and the purse's Laurels × the tier she arrives in** (2,000, 3,000), so a Laurel buys the same time in every tier; Marks, Manuals and Logs untiered |
 | **T2W11** | When the toolbox opens | **No new gates:** every Tier 2 and 3 addition opens on its system's gate (Class Rank, a grade's levels, a node's jewel and level) |

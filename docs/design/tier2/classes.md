@@ -243,20 +243,23 @@ forces; **Superseded** a Tier 1 decision replaced it; **Broken** written for a T
   ([§4.3](#43-class-branches-by-family-t2c6t2c8)). A Tier 0 arrives as her suggested promotion (CV11).
 - **Her calling still names her family.** Her Tier 0 is gone, but her calling (her running styles) still says which
   family her ★ Flourish works as (its own Tier 1 classes, never kin, RC6), her trade and her template.
-- **Class Rank 1–50, the same gates** (1, 10, 20, 30, 40) and 2E a win. With no Tier 0 to climb first she opens each
-  depth sooner than in Tier 1:
+- **Class Rank 1–50, the same gates** (1, 10, 20, 30, 40) and 2E a win. **Ranks 1–10 are one shared ladder** (the
+  cross-reference's call with [balance](balance.md#42-a-later-tiers-class-rank-pace-t2b3) T2B3): her first 3,600 Class
+  EXP, the Tier 0 ladder's, raise every Tier 1 class she holds to Rank 10 together, as a Tier 0's Rank 10 opens all her
+  children at Rank 10 in Tier 1; from Rank 10 each class climbs on its own. So she opens each depth at Tier 1's levels:
 
 | Class Rank | Opens | Tier 1, Uma Lv (Tier 0, promoted at 10) | **Tiers 2 and 3, Uma Lv** |
 |---|---|---|---|
 | 1 | Depth 1 | 1 (as her Tier 0) | **1** |
-| 10 | Depth 2 | 10 (the promotion) | **7** |
-| 20 | Depth 3, the fork, **the class line** | 16 | **13** |
-| 30 | Depth 4, the line's second skill | 22 | **20** |
-| 40 | Depth 5, the capstones | 29 | **27** |
-| 50 | Tier 3: **the crowns, the mastery, the master slot** | 36 | **34** |
+| 10 | Depth 2 | 10 (the promotion) | **10** (the shared ladder's end) |
+| 20 | Depth 3, the fork, **the class line** | 16 | **16** |
+| 30 | Depth 4, the line's second skill | 22 | **22** |
+| 40 | Depth 5, the capstones | 29 | **29** |
+| 50 | Tier 3: **the crowns, the mastery, the master slot** | 36 | **36** |
 
-A campaign (Lv 1–50) is 50,960 Class EXP: **exactly two classes from Rank 1 to 50** (25,480 each), as in Tier 1 after its
-Tier 0.
+A campaign (Lv 1–50) is 50,960 Class EXP: the shared 3,600, then **two classes from Rank 10 to 50** (23,680 each),
+exactly as in Tier 1 after its Tier 0. Starting each class from Rank 1 on its own (the code today, 2E a win) would open
+depths at Lv 7 · 13 · 20 · 27 and run Lv 20 fights at 0.83–0.95 of Tier 1's rounds (T2B3's measure).
 
 ### 4.2 The two weapon groups (T2C4, T2C5)
 
@@ -574,7 +577,7 @@ mastery) is an exact master-data skill name, so the Warrior's is **Juggernaut**.
 | **professions.md (T2P)** | Weapon demand by set: Ring-first classes' reverse sets pull Bow, Katana, Light and Dark; the Summoners' pull the Ring kinds; a class's two sets share exactly one kind (the Brawler's Greatsword, the Sorcerer's Fire, the Spellblades' Katana, the Summoners' Axe or Blizzard, the healers' Light Tome) | Trades by calling (CV20) unchanged; Ascend resets grades, so day one of a set costs the same either way |
 | **balance.md (T2B)** | Every number to simulate: the focus +15%, the ten class lines, line C, the Break tip, the crown 5.6, five masteries, LB+ +20%, skill MP ×1.7 · ×2.4, the healing divisor, MP's sixth step | It prices the stack (WP31) and the branch rule (10–20% in context); weaknesses by tier (WK8: every rank 3) and shields by tier; statuses ±10% a stack in every tier; its first fallback for the focus +10% |
 | **templates.md (T2U)** | The ★ signature tip slot: a third tip option on her lead weapon's tree (Tier 2), at both held lines' tips (Tier 3); her Flourish's family in a world with no Tier 0 (her calling's own Tier 1 classes, never kin) | It fills the tip's content and keeps the Flourish 4% of her max HP a fight |
-| **progression.md (T2W)** | Arrival (her class, a Tier 0's suggested promotion, Rank 1, branch 1, every class open); Class Rank pace by tier (§4.1); two classes to Rank 50 a campaign; the halls empty on arrival | Ascend one Uma at a time (D283); windows' Class steps by tier; the Rift's guided builds by tier read the reverse sets; Tier 3 has no Rift yet |
+| **progression.md (T2W)** | Arrival (her class, a Tier 0's suggested promotion, Rank 1, branch 1, every class open); Class Rank pace by tier (§4.1); two classes to Rank 50 a campaign; the halls empty on arrival | Ascend one Uma at a time (D283); windows' Class steps by tier; the Rift's guided builds by tier read the reverse sets; Tier 3 gets a Rift (T2W4) |
 
 ## 7. Save and engine
 
@@ -637,7 +640,7 @@ Every new call, with the recommended answer.
 |---|---|---|---|
 | **T2C1** | The classes in Tiers 2 and 3 | **The eight Tier 1 classes, no new class, lean or hand; every one open from Class Rank 1; no Tier 0** (CV10) | Advanced classes (A1–A2); Tier 0 in every tier |
 | **T2C2** | What a Tier 0 means later | **None exists. A Tier 0 ascends as her suggested promotion; her calling still names her Flourish's family (its own Tier 1 classes, never kin), her trade and her template** | Keep her Tier 0 as a class in Tier 2 |
-| **T2C3** | Class Rank by tier | **1–50 from Rank 1, gates 1 · 10 · 20 · 30 · 40, 50 the crown in Tier 3; 2E a win; Class Rank 20 · 30 · 40 · 50 at Lv 13 · 20 · 27 · 34; two classes to Rank 50 a campaign** | A Tier 0-like opening ladder; later gates |
+| **T2C3** | Class Rank by tier | **1–50, gates 1 · 10 · 20 · 30 · 40, 50 the crown in Tier 3; Ranks 1–10 one shared ladder of 3,600 (the Tier 0's) raising every class she holds, then each class on its own; Class Rank 20 · 30 · 40 · 50 at Lv 16 · 22 · 29 · 36, as Tier 1; two classes to Rank 50 a campaign** (reconciled with T2B3) | Each class from Rank 1 on its own (depths at Lv 7 · 13 · 20 · 27) |
 | **T2C4** | The weapon groups on today's twins | **Ring (Greatsword, Axe, Lance · Fire, Ice, Lightning) and Light/Dark (Katana, Bow · Light, Dark), unchanged by v19: each twin set stays inside its group; Light/Dark is D282's secondary weapons and the doubles and volleys** | Groups by shape; three groups |
 | **T2C5** | The groups' names | **One word a group, both channels: "Ring" and "Light/Dark"**; the owner's Heavy · Lite · Elemental · Arcane retire (Heavy is a shape, D246, D298 SN6; Arcane a Rift front) | The owner's four with Heavy → Main and Arcane → Shade; Main and Secondary |
 | **T2C6** | Branches for eight classes | **By family: ten branches, two a family; mirrored classes share theirs (names, line, crown, mastery), each with her own hand** | Sixteen, two a class (48 class skills); one branch a class |
@@ -659,7 +662,7 @@ Every new call, with the recommended answer.
 | **T2C22** | Masteries | **Five, by family, at Class Rank 50 with the class line's crown: Juggernaut, Resonance, Spellbind, Menagerie, Overflow; Last Stand retires (one healer kit)**; "Unstoppable" is a master-data skill name | Six as CP27; on from Class Rank 1 |
 | **T2C23** | The Halls by tier | **The same sixteen seats in every world, no new seat; seats and Bonds per world; LB+ +20% at Bond 10 from Tier 2; scales ×0.95 and ×0.8** | New seats for the branches; LB+ effects per seat |
 | **T2C24** | Buffs and debuffs by tier | **D282's three levels hold in every tier; five statuses, +10% a stack, cap 3; no retired status returns; a crown adds one stack** | A Tier 2 status for the pure classes |
-| **T2C25** | Presets by tier | **Two a class (branch 1's and branch 2's), each setting her three accessory slots by D266's rule on its weapons; a swap offers, never forces** | One preset; presets that follow the branch automatically |
+| **T2C25** | Presets by tier | **Two a class (branch 1's and branch 2's), each setting her three accessory slots by D266's rule on its weapons, and from a slot's G5 by gear's T2G13 (Great or Twofold forms); a swap offers, never forces** | One preset; presets that follow the branch automatically |
 | **T2C26** | The party screen's hint | **When a mix drops a kind, name the member whose other set holds it ("No Bow: the Paladin's Light/Dark set holds one"); flip the healer with the magic pair** | Require every mix to hold all ten; no hint |
 | **T2C27** | New names | **D298's grammar; every one of the 252 new names checked against every master-data string (all ten release files, case-insensitive, exact): no match; none over three words or 21 characters (the longest, Supreme Crescent Fork, 21); none equals a status, a line, a shape, a place, a Limit Break or a Finals route.** Replaced on the way: Conjurer, Unstoppable, Singularity and Prism (master-data strings); Seal (the Rift's Seals), Supernova and Eclipse (Finals routes), Quake and Worldbreaker (older generations' skill names); Sweep (a shape) and Mighty (a knack word) from CP19 | Names at build time |
 | **T2C28** | The save | **Store her branch per class, line C, the tip, Tier 3's two held lines and the master slot; derive the rest** (§7) | Store the focus and set |

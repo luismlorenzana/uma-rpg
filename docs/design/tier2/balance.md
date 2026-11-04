@@ -122,7 +122,9 @@ which Z3 accepted and no term prices.
 | Tier 3, two two-kind weapons (the Brawler and the Sorcerer one) | 4.59 · 4.56 | 4.67 · 4.56 | 4.65 · 4.65 | 142 · 134 (6%) |
 
 Party 1 · Party 2. WK8's three kinds were sized for the drafts' Tier 2 weapon breadth; without it Tiers 2 and 3 bring
-back the owner's "weak to my least used weapons" on one stage in six.
+back the owner's "weak to my least used weapons" on one stage in six. **The cross-reference keeps one two-kind weapon in
+Tier 3 too** ([gear](gear.md) T2G3): two lift Tier 3's answers to 4.59–4.67, above Tier 1's, so Tier 3 reads as Tier 2's
+one-weapon row (T2G2 measured 4.32 · 4.29 on the suggested branches), inside check 4's 10% idle bound.
 
 ### 2.5 Statuses, MP and Limit Breaks (after the combat pass)
 
@@ -255,9 +257,11 @@ Rank pace (T2B3). An analytic estimate sizes a knob before code, as this doc's t
 
 Measured (Tier 2 and 3 at Lv 20, both parties): from Rank 1 the fights run **0.83–0.95** of Tier 1's rounds
 (sub-bosses 0.83–0.88), against 0.96–1.02 at Tier 1's pace; at Lv 10, 30 and 50 the two paces are within 0.05.
-**Recommended:** a Tier 1 class's Ranks 1–10 in a later world take the Tier 0 ladder's Class EXP (3,600, twice their
-1,800), so depths 2–5 open at Lv 10 · 16 · 22 · 29 in every tier and the foes need nothing new. The foes' reach can't
-fix it (a continent's reach reads its first level: depth 2 at Lv 11 on either pace). Its home is T2C or T2W (assumed).
+**Recommended:** in a later world, Ranks 1–10 are one shared ladder of the Tier 0's Class EXP (3,600), raising every
+Tier 1 class she holds to Rank 10 together, then each class climbs on its own, so depths 2–5 open at Lv 10 · 16 · 22 · 29
+in every tier and the foes need nothing new. The foes' reach can't fix it (a continent's reach reads its first level:
+depth 2 at Lv 11 on either pace). It lives in [classes](classes.md#41-arriving-and-class-rank-t2c1t2c3) T2C3 (the
+cross-reference made the ladder shared, so a campaign still takes two classes to Rank 50).
 
 ### 4.3 The damage stack by tier (T2B14)
 
@@ -369,8 +373,9 @@ itself. Her bar grows ×1.73 and ×2.46; the regen is a share of it:
 Every class within 2 points of Tier 1's, and no deep act refunded by a round (the most a healer's 95%). A skill's MP is
 round(round(its MP × her hand) × the factor), at least 1; a skill carried from an earlier tier pays its own tier's.
 
-- **The regen** (T2B11): 1% of her bar a depth, five at most, every tier. If T2C adds a depth 6 in Tier 3, it still
-  counts five (SB18's clarification, D198).
+- **The regen** (T2B11): 1% of her bar a depth, five at most in Tiers 1 and 2. Tier 3 has no depth 6: its **crown**
+  (Class Rank 50, every held capstone at 5.6 with +4 MP, [classes](classes.md) T2C20) adds a sixth step, 6% a round
+  (T2C21), which pays for the crown's MP (reconciled; the simulation's MP checks confirm it).
 - **Statuses** (T2B12): +10% a stack (foes' 15%), cap 3, two rounds, Burn 4% a round, in every tier. Any status T2C
   adds keeps the step and the cap; D282's three levels carry unless T2C widens them.
 - **Limit Breaks** (T2B13): tier-free; the scales 1 · 0.95 · 0.8 and the 10-hit cap carry. Bonds restart at Ascend
@@ -425,12 +430,12 @@ seeds for a delivery, Tiers 2 and 3 at Lv 10 · 20 · 30 · 40 · 50 against the
 
 | Doc | This doc provides | This doc assumes |
 |---|---|---|
-| **T2C** classes | T2B3 (a later tier's Class Rank pace), T2B10 (skill MP × 1.7 · 2.4), T2B12 (the status step and cap), T2B13 (Limit Breaks tier-free), T2B16–T2B17 (the mirror and healer bands), T2B9 (the rail counts T2C's hits) | The focus +15% on her group (CP39), worth ×1.12 an act; a healer's focus on her mends; Tier 3's depth 6 at Class Rank 50 (CP20) if kept; the hands and the Halls' scales unchanged by tier; T2C or T2W implements T2B3 |
-| **T2G** gear | T2B1 (every new flat value × tier), T2B7–T2B8 (the breadth gate reads T2G's two-kind weapon), T2B14 (the ceilings), T2B19 (the viability rule for branch forms) | One two-kind weapon in Tier 2 at G5 (Dual, WP32's partner, re-checked on v19's twins), two in Tier 3 (the Brawler and the Sorcerer one), her Tier 2 branch carried into Tier 3; Pure ×1.5, Keen ×1.7; three slots in every tier, branch forms worth about ×1.04 (Tier 2) and ×1.08 (Tier 3) at Lv 50 |
+| **T2C** classes | T2B3 (a later tier's Class Rank pace), T2B10 (skill MP × 1.7 · 2.4), T2B12 (the status step and cap), T2B13 (Limit Breaks tier-free), T2B16–T2B17 (the mirror and healer bands), T2B9 (the rail counts T2C's hits) | The focus +15% on her group (CP39), worth ×1.12 an act; a healer's focus on her mends; Tier 3's depth 6 at Class Rank 50 (CP20) if kept; the hands and the Halls' scales unchanged by tier; T2C3 implements T2B3 (a shared Ranks 1–10 ladder); T2C18's healing divisor × tier (300 · 540 · 780) keeps an on-curve Lv 50 healer's scale ×1.64 in every tier, which the simulation's healer checks (T2B17, T2B18) confirm with T2B10's skill MP |
+| **T2G** gear | T2B1 (every new flat value × tier), T2B7–T2B8 (the breadth gate reads T2G's two-kind weapon), T2B14 (the ceilings), T2B19 (the viability rule for branch forms) | One two-kind weapon in Tiers 2 and 3 at G5 (Dual, WP32's partner re-derived on v19's twins, T2G1; one in Tier 3 too, T2G3), her Tier 2 branch carried into Tier 3 (T2G17); Pure ×1.5, Keen ×1.7; three slots in every tier, branch forms worth about ×1.04 (Tier 2) and ×1.08 (Tier 3) at Lv 50 |
 | **T2E** extra stats | T2B1, T2B4–T2B5 (the moons' share priced in the term) | Weapon moons (EP24–EP26) worth ×1.14 and ×1.23 at Lv 50, × tier values; the lead-half rule for a hybrid's Full moon (SB10) |
 | **T2P** professions | No balance change moves an item, a recipe or a count | — |
 | **T2U** templates | The ★ at 1.6–1.8% of her lead offense in every tier; the Flourish's 4% tier-free | The signature 0.1 a level × tier (D266); the Flourish as UT6 |
-| **T2W** progression | T2B3, T2B9 (the Rift by tier, Tier 3's rule), the term and shields in foe generation | Ascend resets Class Rank to 1, grades to G0 and Bonds to 0; foe levels lifetime; whether Tier 3 gets a Rift |
+| **T2W** progression | T2B3, T2B9 (the Rift by tier, Tier 3's rule), the term and shields in foe generation | Ascend resets Class Rank to 1, grades to G0 and Bonds to 0; foe levels lifetime; Tier 3 gets a Rift (T2W4), drawn by T2B9's rule |
 
 ## 6. Save and engine
 
@@ -460,7 +465,7 @@ seeds for a delivery, Tiers 2 and 3 at Lv 10 · 20 · 30 · 40 · 50 against the
 |---|---|---|---|
 | **T2B1** Every source keeps its share | Every flat value (armor, Might, Pendant, Charm, Orb, Extra Stats, ★ and every new Tier 2–3 flat source) is Tier 1's × 1.8 and × 2.6; percentages stay; a new source joins §2.2's table before it ships | Per-stat multipliers for HP and MP's +2 points | Measured on the code: within 2.2 points at every tier's Lv 50 |
 | **T2B2** The yardstick is the engine | Every Tier 2–3 number is measured on the harness (`balance-t2.test.ts`); an analytic estimate only sizes a knob | SB2's analytic model | Every Tier 1 number since R1 came from the engine |
-| **T2B3** A later tier's Class Rank pace | A Tier 1 class's Ranks 1–10 in a later world take the Tier 0 ladder's Class EXP (3,600), so depths open at Lv 10 · 16 · 22 · 29 in every tier | Accept the faster pace (fights 5–17% short at Lv 13–29); the foes' reach reads it (can't reach Lv 20) | One curve for every tier; the foes stay tuned; implemented by T2C or T2W |
+| **T2B3** A later tier's Class Rank pace | Ranks 1–10 in a later world are one shared ladder of the Tier 0's Class EXP (3,600) raising every class she holds, so depths open at Lv 10 · 16 · 22 · 29 in every tier (T2C3, reconciled) | Accept the faster pace (fights 5–17% short at Lv 13–29); the foes' reach reads it (can't reach Lv 20) | One curve for every tier; the foes stay tuned; implemented by T2C or T2W |
 | **T2B4** Tier 2's term | Foes' HP and DEF × (1.08 + 0.20 (ℓ − 1) ÷ 49), offense × (1 + 0.10 (ℓ − 1) ÷ 49); provisional until §4.9 sets it | SB3's 1.00 → 1.27; no term (only if every Tier 2 piece is dropped) | Prices the kept toolbox (K 1.15 → 1.39) with no narrowing to cancel the focus |
 | **T2B5** Tier 3's term | × (1.12 + 0.30 (ℓ − 1) ÷ 49), offense +10% by Lv 50; provisional | SB4's 1.08 → 1.48 | K 1.25 → 1.64; the third slot is Tier 1's now |
 | **T2B6** Bosses | The term × 1.1 on bosses' HP and DEF in Tiers 2–3 | No boss factor | Two-kind weapons lift a boss's answers 14–23% over Tier 1's; a regular's return to Tier 1's |
@@ -468,7 +473,7 @@ seeds for a delivery, Tiers 2 and 3 at Lv 10 · 20 · 30 · 40 · 50 against the
 | **T2B8** Weaknesses in Tiers 2–3 | WK8's three kinds by role **from the breadth gate**, Tier 1's 2 + 2 before it (Tier 2 Lv 1–20); without T2G's two-kind weapon, 2 + 2 in every tier; WK12's checks in every tier plus ≤ 10% idle stages at every level | WK8 from Lv 1 (16–18% idle before G5); four kinds by role (3 + 1) in every tier | The lists narrow when her weapons widen; the floor holds; CP's "breadth grows as weaknesses narrow" |
 | **T2B9** The Rift by tier | Draws by front in every tier; a Tier 2 front takes the world's term and `RIFT_TUNING_V19`'s scales; the Duel's shields are the best act's or Limit Break's chips + 3, at least 13, re-counted on T2C's trees; Tier 3's Rift, if T2W opens it, the same rule | New Tier 2 draws; fixed shields 13–15 | The Rift is where specialized parties come in (WK9); a hit chips one point whatever its kinds |
 | **T2B10** Skill MP by tier | × 1.7 in Tier 2 and × 2.4 in Tier 3 (round(round(MP × hand) × factor), at least 1), at the engine stage; the code's × tier goes | Keep × 2 · × 3 (13–19% fewer deep casts, a healer's refund 94 → 75%); × 1.8 · × 2.6 (SB1's multiplier: 4–6% fewer) | Her bar grows × 1.73 and × 2.46; every class back within 2 points of Tier 1's |
-| **T2B11** The base regen | 1% of her bar a depth, five at most, in every tier | A per-tier share | Tier-free once T2B10 lands |
+| **T2B11** The base regen | 1% of her bar a depth, five at most in Tiers 1 and 2; Tier 3's crown adds a sixth step, 6% (T2C21, reconciled) | A per-tier share | Tier-free once T2B10 lands; the crown's +4 MP is paid for |
 | **T2B12** Statuses | Tier-free: +10% a stack (foes' 15%), cap 3, two rounds, Burn 4%; any new status keeps the step and the cap; D282's three levels carry unless T2C widens them | A step by tier | Percentages hold their share under SB1 |
 | **T2B13** Limit Breaks | Tier-free: power × scale × open depth's power, at most 10 hits on one foe, gauge 12; the Bond restart priced by the harness's ramp | A Limit Break power by tier | The offense it multiplies already carries the tier |
 | **T2B14** The damage stack | WP31's steps; Tier 2–3 multipliers land in steps 3–4; ceilings on one weak hit ×1.69 · ×2.24 · ×2.54 before statuses; no cap | Cap the product; SB7's fallbacks | The terms price the on-curve act, the Rift the tuned one |

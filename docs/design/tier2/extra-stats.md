@@ -152,7 +152,7 @@ polish PP31, D277; not profession-progression's PP).
 | **EP24** Weapon moons | Five nodes on Moon Jewels I–V at Lv 6–46, +4, +7, +10, +13, +16 × tier | **Kept, changed** (D264) | Values kept; the nodes move to the Planet's ranks (Lv 1–41) and take one Planet Jewel each, so every rank stays three jewels (T2E2, T2E3) |
 | **EP25** Full or Split | Full one kind; Split two at 0.7 | **Kept** | Re-measured on today's sheet: Split wins an even act, Full a lead-heavy one, break-even about 2.5× (§4.9) |
 | **EP26** Tier 3's second moon | Full + Split serves three weapons; Full + Full two; no Split + Split | **Kept** | T2E5 |
-| **EP27** Weapon moons and the kind cap | Outside the cap (+68 × tier), bounded by their size | **Broken** | The cap was never built; D264 and D266's linear three slots bound the Orbs. T2E6: no cap, and the bound is measured |
+| **EP27** Weapon moons and the kind cap | Outside the cap (+68 × tier), bounded by their size | **Kept, changed** | The cap was never built in Tier 1; T2G14 brings it back for the Orb forms from Tier 2, and the moons stay outside it with no cap of their own (T2E6, reconciled) |
 | **EP28** Valor and Swiftness | Retired | **Kept** | Never built |
 | **EP29** Weapon-moon presets | Tier 2 Split on her two most-used kinds; Tier 3 Full + Split; a hybrid's on her lead half; both class branches' sets | **Broken** | Written for six classes, their branches and Dual weapons; Classes v3 (D240) has eight classes, presets are the owner's two comps (D263) and the Orb's kind is `presetKind` (D266). T2E7 restates it on today's presets |
 | **PP31** (profile polish) The chart's corner | The top-left corner stays empty: the weapon moons fit there | **Kept, changed** (D277) | The corner stays empty, but under D277's own tests (44 pt, labels inside) it holds one five-star body without room for a Split's label, and no second one. The weapon moons ride an outer orbit below (T2E9); the corner stays free (T2E19) |
@@ -236,9 +236,10 @@ picker are Tier 1's.
 
 ### 4.4 No kind cap (T2E6)
 
-The draft kept a kind cap for accessories and put the moons outside it (EP27). Today there is no cap to sit outside,
-and none is needed: the most flat any one kind can carry is three Orbs and a Full moon, and it stays under a third of
-her offense on that kind.
+The draft kept a kind cap for accessories and put the moons outside it (EP27). Tier 1 has no cap today; from Tier 2,
+[gear](gear.md) T2G14 caps the **Orb forms** on one kind at a G10 weapon's Might × tier (+122 · +177), and the moons stay
+outside it, as EP27 had them. The moons need no cap of their own: the most flat any one kind carries is three Orbs and a
+Full moon, under a third of her offense on that kind (with three Great Orbs at T2G14's cap, about a third).
 
 | A Brawler's Greatsword at Lv 50 | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|
@@ -447,7 +448,7 @@ Her offense at Tier 3's Lv 50, then with her preset moons:
 | Tome Spellblade | Lightning 751 → **881** | Ice 699 → **790** | Katana 510 → **601** |
 | Sorcerer | Fire 787 → **917** | Ice 735 → **826** | Lightning 735 → **826** |
 
-Her moon in Tier 3 is §4.10's last column. Tier 3 has no Rift yet, so her window there is 35 steps; the Stars track
+Her moon in Tier 3 is §4.10's last column. Tier 3 gets a Rift ([progression](progression.md) T2W4), so her window there is 36 steps; the Stars track
 counts 6 · 13 · 19 · 26 · 32.
 
 ## 6. Provides and assumes
