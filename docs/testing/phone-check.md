@@ -66,12 +66,14 @@ button and footer should stay reachable without horizontal page scrolling, in li
    trees are one node each ("Drill Strike · Greatsword", "R7/10") with "Promotion at R10 · 3 to go" under them; **Change ›**
    lists all ten weapons, and a tap holds one with the sheet still open. Tap the class tile: **Classes** shows the tree,
    Warrior · All-Rounder · Mage over the Tier 0 row and the Tier 1 rows, with her **Standard preset** in the footer on her
-   own class. Tap a closed Tier 1 tile: its line and the gate ("Opens with Warrior R10 or Summoner R10"), disabled. Tap another
-   Tier 0: **Start Summoner · R1**; start it, expect it On, then switch back with **Fight as …**. (D253, D267)
+   own class. Tap a closed Tier 1 tile: its line and the gate, disabled: "Opens with Warrior, Summoner or Spellblade R10" on
+   the Arms Summoner, "Opens with Healer R10 or Spellblade R10" on the Paladin. Tap another Tier 0: **Start Summoner · R1**;
+   start it, expect it On, then switch back with **Fight as …**. (D253, D267, D290, D291)
 10. **Promotion and a reclass.** On a Tier 0 at Rank 10 (read her share at the Exchange first, step 24, if none is),
     expect "R10 · Promote" with the green dot on the class tile, a dot on the Class tab and the mark on her roster face.
     Tap the tile: the promotion sheet ("Promote · Warrior R10", Suggested on one child) with "Warrior R10 → Brawler R…" and
-    "Depths 1–2 · 6 skills · +n EXP". **Promote to …**: she fights as the child at Rank 10 or more, on its first tree with its
+    "Depths 1–2 · 6 skills · +n EXP". A Warrior or a Mage shows three children; a Spellblade, a Summoner or a Healer four,
+    her kin included (a Healer: Paladin, Arms Spellblade, Cleric, Tome Summoner), and only an own child is ever Suggested. **Promote to …**: she fights as the child at Rank 10 or more, on its first tree with its
     lines. Reopen **Classes**: her siblings read **Ready**; promote one, then **Fight as** the first again. **Class Manuals ›**
     opens the Exchange's sheet on her, and Back returns to Classes. (D253, D267)
 11. **Class tab: trees.** On a Tier 1 class, tap each of the three weapon tiles: a ring and that tree. Tap a held node: its
@@ -93,9 +95,9 @@ button and footer should stay reachable without horizontal page scrolling, in li
     Uma outside her family: **Fight as …** and the row reads On. Tap a ★ Moon row: Stars' node sheet. An All-Rounder Moon II reads
     `DEF/M.DEF +4`. (D204, D217, D258, D269, D270)
 13. **Standard preset.** On a promoted Uma, in **Classes** on her own class, tap **Standard preset**: expect **Standard preset ·
-    On** and her preset's weapons. On a Healer, expect two rows, **Paladin** and **Cleric**: tap one, expect it to read **· On**;
-    a Warrior or a Mage shows three rows, each listing its accessories. Check the weapon chips' colours in both themes: the
-    Katana jade, the Bow rose. (D223, D263, D266)
+    On** and her preset's weapons. On a Healer, expect four rows, **Paladin**, **Arms Spellblade**, **Cleric** and **Tome
+    Summoner**: tap one, expect it to read **· On**; a Warrior or a Mage shows three rows, each listing its accessories. Check the weapon chips' colours in both themes: the
+    Katana jade, the Bow rose. (D223, D263, D266, D290)
 14. **Gear.** Expect eleven tiles on one screen at 390×844: three weapons, five armor slots, three accessories, each with its grade
     and one stat, and "Physical · n ready" matching the green dots. Tap a ready weapon: "G6 → G8", "Might a → b", each cost with
     what's held and the target chips; tap a lower chip, then **Raise to G…**: the sheet stays open on the new grade and the items

@@ -1,6 +1,7 @@
 # Classes and weapons
 
-Thirteen classes in a tree and ten weapons, as engine v21 and save v34 play them (Classes v3, D240; the combat pass, D282). Every Uma starts as
+Thirteen classes in a tree and ten weapons, as engine v21 and save v36 play them (Classes v3, D240; the combat pass, D282;
+the reclass, D290, D291). Every Uma starts as
 her calling's **Tier 0**, an introductory class, and at Class Rank 10 promotes into one of its **Tier 1** classes. She
 has one **active class** at a time and switches freely among the classes she holds; each keeps its own three weapons,
 her line on each of its trees and her equipped skills. A fight already open keeps the setup it started with. Fights from
@@ -26,20 +27,25 @@ template), `save/class.ts` (her starting and active class, the classes she holds
 
 Three **roots**, left to right, physical to magical: **Warrior**, **All-Rounder** and **Mage**. A root is a label, never
 a class she fights as. Five **Tier 0** classes sit under them and eight **Tier 1** classes below. A Tier 1 class opens by
-promotion from a parent at Class Rank 10; a hybrid has two parents, its All-Rounder Tier 0 and its channel's root class.
+promotion from any of its parents at Class Rank 10. A pure class has one, its root's Tier 0. A hybrid has three: its
+All-Rounder Tier 0, its channel's root class and a kin Tier 0. A healer has two, the Healer and a kin Tier 0.
 
 ```
-             WARRIOR    │                 ALL-ROUNDER                   │     MAGE
-────────────────────────┼───────────────────────────────────────────────┼──────────────
- Tier 0      Warrior    │  Spellblade          Healer       Summoner        │   Mage
-────────────────────────┼───────────────────────────────────────────────┼──────────────
- Tier 1      Brawler    │  Arms Spellblade  Paladin       Arms Summoner │   Sorcerer
-             ◄ Warrior  │  ◄ Warrior        ◄ Healer     ◄ Warrior     │   ◄ Mage
-                        │  ◄ Spellblade                      ◄ Summoner      │
-                        │  Tome Spellblade  Cleric        Tome Summoner │
-                        │  ◄ Spellblade        ◄ Healer     ◄ Summoner      │
-                        │  ◄ Mage                     ◄ Mage    │
+            WARRIOR    │                  ALL-ROUNDER                       │ MAGE
+───────────────────────┼────────────────────────────────────────────────────┼────────────
+ Tier 0     Warrior    │ Spellblade       Healer           Summoner         │ Mage
+───────────────────────┼────────────────────────────────────────────────────┼────────────
+ Tier 1     Brawler    │ Arms Spellblade  Paladin          Arms Summoner    │ Sorcerer
+            ◄ Warrior  │ ◄ Warrior        ◄ Healer         ◄ Warrior        │ ◄ Mage
+                       │ ◄ Spellblade     ◄ Spellblade*    ◄ Summoner       │
+                       │ ◄ Healer*                         ◄ Spellblade*    │
+                       │ Tome Spellblade  Cleric           Tome Summoner    │
+                       │ ◄ Spellblade     ◄ Healer         ◄ Summoner       │
+                       │ ◄ Mage           ◄ Summoner*      ◄ Mage           │
+                       │ ◄ Summoner*                       ◄ Healer*        │
 ```
+
+`*` a kin parent, since the reclass ([below](#reclassing)): never Suggested, and outside her Flourish's family.
 
 | Class | Plays like |
 |---|---|
@@ -199,7 +205,10 @@ The class tree is the reclass map, on the Classes sheet ([sections](sections.md#
 |---|---|---|
 | Brawler | Arms Spellblade or Arms Summoner | Nothing: her Warrior is at Rank 10, so its other children are one tap |
 | Brawler | Tome Spellblade | A Spellblade, a Mage or a Summoner to Rank 10: 3,600 Class EXP, 4 Class Manuals or the first continent's fights |
-| Brawler | Cleric | A Healer to Rank 10: the same 3,600 |
+| Brawler | Tome Summoner | A Summoner, a Mage or a Healer to Rank 10: the same 3,600 |
+| Brawler | Paladin | A Healer or a Spellblade to Rank 10: the same 3,600 |
+| Brawler | Cleric | A Healer or a Summoner to Rank 10: the same 3,600 |
+| Brawler | Sorcerer | A Mage to Rank 10: the same 3,600 |
 | Spellblade, Summoner or Healer | Four classes | Nothing more: each now promotes into four |
 | Any | A class she holds | Nothing |
 | Any | Gear | Only the new class's weapons she hasn't raised: a grade belongs to the weapon and serves every class |
@@ -401,9 +410,10 @@ sets them on the Gear tab: a tile a slot, and a tap on a row of its list wears i
 
 ### Standard presets
 
-**Each Tier 1 class has one, and a Tier 0 picks among its children's (D263, D164, WP25).** The footer of the Classes sheet
-lists them on her own class: a Tier 1 class's "Standard preset", or one row for each class a Tier 0 promotes into, so she starts on the weapons she
-means to keep: three rows for the Warrior and the Mage, two for the Spellblade, the Summoner and the Healer.
+**Each Tier 1 class has one, and a Tier 0 picks among its children's (D263, D164, WP25; kin included since D290).** The
+footer of the Classes sheet lists them on her own class: a Tier 1 class's "Standard preset", or one row for each class a
+Tier 0 promotes into, so she starts on the weapons she means to keep: three rows for the Warrior and the Mage, four for the
+Spellblade, the Summoner and the Healer.
 
 A tap puts her active class on those three weapons and sets all three accessory slots: her armor half's stat twice (a Pendant
 for a physical class, a Charm for a magical one) and an Orb (D266). Her ★ signature family goes first, in the place of one of

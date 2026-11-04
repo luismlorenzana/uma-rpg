@@ -1,6 +1,6 @@
 # Game sections
 
-Every screen and what is on it, as the game runs today (engine v21, save v34). This page says where things show; the
+Every screen and what is on it, as the game runs today (engine v21, save v36). This page says where things show; the
 rules and numbers behind them are on the other pages, linked from each section. The place list comes from
 `packages/domain/src/hub/places.ts`. Each place's screens live in `apps/web/src/places/<place>/`, registered in
 `places/registry.tsx`; the shell and the Hub are `apps/web/src/hub/`.
@@ -270,14 +270,17 @@ and a tap opens one sheet.
     selected healer would make two in her party.
   - The footer acts on the selection: **Fight as Arms Spellblade** or **Start Summoner · R1** (free; the sheet stays open,
     the class On), **Promote to Arms Summoner** (the promotion sheet replaces this one on that child), and on a closed one
-    its gate, "Opens with Spellblade R10 or Mage R10", disabled. On her own class it is her **standard preset** (`presetRows`;
+    its gate, disabled: "Opens with Healer R10 or Spellblade R10" for two parents, "Opens with Spellblade, Mage or Summoner R10"
+    for three. On her own class it is her **standard preset** (`presetRows`;
     D263): one row, "Standard preset" or "Standard preset · On", with her class's emblem, "Lance · Greatsword · Light Tome" and
     "Pendant · Pendant · Orb" under it. A Tier 0 shows a "Standard preset" heading and one row for each class it promotes
     into, each with that class's emblem and name ("Paladin", "Cleric · On"). A tap sets those weapons and all three
     accessory slots, her ★ family first; no grade moves ([classes](classes.md#standard-presets)).
   - **Class Manuals ›** ("Exchange") opens the Exchange's Manual sheet on her at `/town/exchange/manual/:outfitId`; its
     Back returns to the Class tab with Classes open.
-  - **The promotion sheet** ("Promote · Warrior R10", "Free · the others stay open"): one tile a child, **Suggested** on
+  - **The promotion sheet** ("Promote · Warrior R10", "Free · the others stay open"): one tile a child, three for the
+    Warrior and the Mage and four for the Spellblade, the Summoner and the Healer, kin included
+    ([classes](classes.md#reclassing)), in the Tier 0 table's order; **Suggested** on
     the suggested one (opened on it, or on the Ready tile's child), **Held** on one she holds; each with its slots, the
     preset she lands on and role, a row the same on every tile left out. Under them "Warrior R10 → Brawler R11" and "Depths 1–2 · 6
     skills · +400 EXP" (the EXP waiting on her Tier 0 lands at once). **Promote to Brawler** (free, no confirm) closes it

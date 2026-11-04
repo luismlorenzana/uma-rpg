@@ -1,10 +1,17 @@
 # Classes v3: the class tree, Tier 0 and the promotion
 
 > **Built and live (H126–H134, D257).** Approved by the owner on 2026-10-29 (D240) and live from H134 on engine v19 and
-> save v32; the game as it plays is the [manual](../../game/README.md)'s, which wins where this doc differs: the Mage
-> root's Tier 0 reads **Initiate** on screen (its id stays `apprentice`, since "Apprentice" is Tier 1's world name), the
-> class tree and promotion sheet sit on today's Skills tab (H137, D252, D253), and H131's measured numbers (D249) replace
-> the drafts where §12 and §3 say so.
+> save v32; the game as it plays is the [manual](../../game/classes.md)'s, which wins where this doc differs. Changed
+> since:
+> - **The Tier 0 names** (D259): Warrior, Spellblade, Healer, Summoner and Mage, their families' words (ids unchanged;
+>   this doc's Recruit, Duelist, Acolyte, Caller and Apprentice or Initiate).
+> - **The screens:** the class tree and the promotion sheet sit on the profile's Class tab (H120, D267).
+> - **The numbers:** H131's measured ones (D249) replace the drafts where §12 and §3 say so.
+> - **The halls** (D261): sixteen seats, engine v20.
+> - **The presets** (D263): one a Tier 1 class, the owner's two parties.
+> - **The combat pass** (D282, engine v21): the healers' shared kit, and buffs and debuffs at three levels of access.
+> - **The reclass** (D290, D291; [reclass.md](../reclass/reclass.md)): every Tier 0 promotes into three or four, its kin
+>   included, so a hybrid has three parents and a healer two, not §1's two and one.
 >
 > The owner's request of 2026-10-29: after the Paladin and
 > Cleric split, split more classes, as **a class tree** with three roots, **Tier 0** introductory classes that promote
