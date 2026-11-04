@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Armor and Costs</title>
+<!-- gear.md (T2G8, T2G4, T2G16): armor by tier and what a rank costs. Self-contained; kit tokens from _template.html. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+</style>
+<style>
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .grid2 > * { min-width: 0; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .pills button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .suit { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .suit .card { margin: 0; }
+  .suit dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 8px 0 0; font-size: 13px; }
+  .suit dt { color: var(--ink-soft); } .suit dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+  /* Split measure: one series, damage lost, bars grow left from zero */
+  .split { display: grid; grid-template-columns: 170px repeat(4, minmax(0, 1fr)); gap: 6px 10px; align-items: center; font-size: 12px; }
+  .split .h { color: var(--ink-soft); font-weight: 600; }
+  .neg { position: relative; height: 18px; background: var(--raised); border-radius: 4px; }
+  .neg i { position: absolute; right: 0; top: 4px; height: 10px; background: var(--danger); border-radius: 4px 0 0 4px; opacity: .85; }
+  .neg span { position: absolute; left: 6px; top: 0; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+  .step { background: var(--raised); border-radius: 10px; padding: 10px; font-size: 13px; }
+  .step b { display: block; margin-bottom: 4px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 10px 14px; border-radius: 10px; color: var(--ink); margin-top: 12px; font-size: 13px; }
+  #tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--panel); font-size: 12px; padding: 6px 9px; border-radius: 8px; max-width: 300px; opacity: 0; z-index: 10; }
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Armor by tier, and what a rank costs</h1>
+  <p>From <a href="../gear.md">gear.md</a> (T2G4, T2G8, T2G16). Armor is Tier 1's rows × tier on her class's half; a rank
+    costs the same 30 refined items a line in every tier, because a weapon's branch rides its G5 item and an accessory's
+    forms need none. Every number from the code (`armorValues`, `RECIPE_V4`) or the manual's ledger.</p>
+  <nav class="tabs"><a href="#armor">Armor by tier</a><a href="#split">Why her class's half</a><a href="#rank">What a rank costs</a><a href="#maxed">A maxed Uma</a><a href="#retired">What retires</a></nav>
+
+  <section id="armor">
+    <h2>Armor: five slots, Tier 1's rows × tier</h2>
+    <div class="pills" id="tp" role="group" aria-label="Tier"><button data-t="1">Tier 1</button><button data-t="2" aria-pressed="true">Tier 2</button><button data-t="3">Tier 3</button></div>
+    <div class="card scroll"><table id="armt"></table>
+      <p class="legend">Feet Speed doesn't scale: 2 a grade, 0.6% evasion a point, 12% at G10 in every tier. Offense goes to ATK on a physical-led class, M.ATK on a magic-led one.</p></div>
+    <div class="suit">
+      <div class="card"><span class="tier t1">Tier 1 suit, G10</span><dl><dt>HP</dt><dd>+150</dd><dt>DEF · M.DEF</dt><dd>+40 · +40</dd><dt>MP</dt><dd>+30</dd><dt>Evasion</dt><dd>12%</dd><dt>Offense</dt><dd>+25</dd></dl></div>
+      <div class="card"><span class="tier t2">Tier 2 suit, G10</span><dl><dt>HP</dt><dd>+270</dd><dt>DEF · M.DEF</dt><dd>+72 · +72</dd><dt>MP</dt><dd>+54</dd><dt>Evasion</dt><dd>12%</dd><dt>Offense</dt><dd>+45</dd></dl></div>
+      <div class="card"><span class="tier t3">Tier 3 suit, G10</span><dl><dt>HP</dt><dd>+390</dd><dt>DEF · M.DEF</dt><dd>+104 · +104</dd><dt>MP</dt><dd>+78</dd><dt>Evasion</dt><dd>12%</dd><dt>Offense</dt><dd>+65</dd></dl></div>
+    </div>
+  </section>
+
+  <section id="split">
+    <h2>Why her class's half: splitting a hybrid's pieces never pays (T2G8)</h2>
+    <p>WP14 let the classes between pick a half per piece from Tier 2. Measured at Tier 2's Lv 50 (each class in her
+      owner party on curve; each piece's 9 offense moved to her other half), her damage a turn against her class's half:</p>
+    <div class="card">
+      <div class="split" id="splitg"><div class="h">Class (her half)</div><div class="h">1 piece moved</div><div class="h">2 pieces</div><div class="h">3 pieces</div><div class="h">All 5</div></div>
+      <p class="legend">Single series: the damage she loses, in her row's cells. Heals: the Paladin's within noise (−1.6% to +1.3%), the Cleric's −1.6% to −7.0%.</p>
+    </div>
+    <div class="callout"><b>Why:</b> a hit is offense² ÷ (offense + defense), so a point on her stronger channel is worth more
+      than one on her weaker; and since D264 the Pendant and the Charm already let a hybrid add her other half's stat from a
+      slot (from Tier 2's G5, both at once with a Twofold form). The choice retires: five fewer toggles.</div>
+  </section>
+
+  <section id="rank">
+    <h2>What a rank costs: 30 refined a line, in every tier (T2G16)</h2>
+    <p>One rank of everything on two Umas, one on three Arms and one on three Tomes (D264). Tiers 2 and 3 add nothing to make.</p>
+    <div class="card scroll"><table>
+      <thead><tr><th>Line (made item, refined each)</th><th class="n">Uma on 3 Arms</th><th class="n">Uma on 3 Tomes</th><th class="n">Both</th><th>Tier 2 and 3 add</th></tr></thead>
+      <tbody>
+        <tr><td>Metal (3 Arms Gems × 10)</td><td class="n">30</td><td class="n">0</td><td class="n"><b>30</b></td><td>The G5 gem carries the branch (Pure or Dual; Keen, Tempered or Evolved)</td></tr>
+        <tr><td>Vegetables (3 Tome Ink × 10)</td><td class="n">0</td><td class="n">30</td><td class="n"><b>30</b></td><td>The same, for a Tome</td></tr>
+        <tr><td>Wood (5 Armor Fittings × 3)</td><td class="n">15</td><td class="n">15</td><td class="n"><b>30</b></td><td>—</td></tr>
+        <tr><td>Fish (3 Accessory Settings × 5)</td><td class="n">15</td><td class="n">15</td><td class="n"><b>30</b></td><td>The G5 Setting opens the branches; forms need no item</td></tr>
+        <tr><td>Stone (3 jewels × 5)</td><td class="n">15</td><td class="n">15</td><td class="n"><b>30</b></td><td>extra-stats.md's (assumed three jewels a rank)</td></tr>
+      </tbody></table>
+      <p class="legend">8.0 h at each of a line's three places at Craft Lv 25; a 30-step job 9h 36m at Craft Lv 1, 8h 2m at Lv 25 (D273). Crafters restart at Craft Lv 1 on Ascend, so a tier's first ranks run slower (professions.md's hours).</p></div>
+    <div class="card"><h3>The branch's step, in the Wilds</h3>
+      <div class="flow">
+        <div class="step"><b>The Mine</b>10 Cobalt Ore (G5)</div>
+        <div class="step"><b>The Mine Workbench</b>10 Cobalt Ingots</div>
+        <div class="step"><b>The Weapon Forge</b>1 Arms Gem G5</div>
+        <div class="step"><b>Her weapon's sheet</b>G4 → G5: pick Pure or Dual (Tier 2), Keen, Tempered or Evolved (Tier 3)</div>
+      </div>
+      <p class="legend">A Tome's: the Fields, the Fields Workbench (10 Tomato Purée), the Tome Forge (Tome Ink G5). A re-forge is one more G5 item: 10 refined, 2h 40m at each place at Craft Lv 25.</p></div>
+  </section>
+
+  <section id="maxed">
+    <h2>A maxed Uma, refined items a line (the same in every tier)</h2>
+    <div class="card scroll"><table>
+      <thead><tr><th>Her class (her slots)</th><th class="n">Metal</th><th class="n">Vegetables</th><th class="n">Wood</th><th class="n">Fish</th><th class="n">Stone</th><th class="n">In all</th></tr></thead>
+      <tbody>
+        <tr><td>Brawler (3 Arms)</td><td class="n">300</td><td class="n">0</td><td class="n">150</td><td class="n">150</td><td class="n">150</td><td class="n">750</td></tr>
+        <tr><td>Arms Spellblade, Arms Summoner, Paladin (2 Arms, 1 Tome)</td><td class="n">200</td><td class="n">100</td><td class="n">150</td><td class="n">150</td><td class="n">150</td><td class="n">750</td></tr>
+        <tr><td>Tome Spellblade, Tome Summoner, Cleric (1 Arm, 2 Tomes)</td><td class="n">100</td><td class="n">200</td><td class="n">150</td><td class="n">150</td><td class="n">150</td><td class="n">750</td></tr>
+        <tr><td>Sorcerer (3 Tomes)</td><td class="n">0</td><td class="n">300</td><td class="n">150</td><td class="n">150</td><td class="n">150</td><td class="n">750</td></tr>
+      </tbody></table>
+      <p class="legend">The manual's ledger (`economy/professions-v4.sim.ts`): 753 h at Craft Lv 25, each trade 20% over a roster split evenly. Outside it: a re-forge (10 refined), a class switch's unraised weapons.</p></div>
+  </section>
+
+  <section id="retired">
+    <h2>What retires from the old drafts</h2>
+    <div class="card scroll"><table>
+      <thead><tr><th>Old (weapon-progression)</th><th>Now</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>The Branch Gem (one item a tier, 4 refined; the code's placeholder, 7 Metal)</td><td>The weapon's own G5 Arms Gem or Tome Ink takes the branch</td><td>Two weapon lines at 10 refined (FL4, D264): a Branch Gem would make an Arms and a Tome item, and unbalance a line</td></tr>
+        <tr><td>Tier pairs on a ladder (G4, G5, G9, G10 in the tier's new materials); gear 365 refined a tier</td><td>One recipe a grade in every world, the same fifty pairs (FL8, FL9)</td><td>The farm by line; professions.md owns any tier materials</td></tr>
+        <tr><td>Accessory Settings 12 · 6 · 4 refined by slot count</td><td>5 a Setting, three slots in every tier (30 an Uma)</td><td>D264</td></tr>
+        <tr><td>Armor halves per piece for the classes between, from Tier 2</td><td>Her class's half in every tier</td><td>Measured above</td></tr>
+      </tbody></table></div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+const ARM = {
+  1: { def: [4, 8, 12, 16, 20, 24, 28, 32, 36, 40], hp: [15, 30, 45, 60, 75, 90, 105, 120, 135, 150], mp: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30], off: [1, 1, 2, 2, 3, 3, 4, 4, 5, 5] },
+  2: { def: [7, 14, 22, 29, 36, 43, 50, 58, 65, 72], hp: [27, 54, 81, 108, 135, 162, 189, 216, 243, 270], mp: [5, 11, 16, 22, 27, 32, 38, 43, 49, 54], off: [2, 2, 4, 4, 5, 5, 7, 7, 9, 9] },
+  3: { def: [10, 21, 31, 42, 52, 62, 73, 83, 94, 104], hp: [39, 78, 117, 156, 195, 234, 273, 312, 351, 390], mp: [8, 16, 23, 31, 39, 47, 55, 62, 70, 78], off: [3, 3, 5, 5, 8, 8, 10, 10, 13, 13] },
+};
+function armor(t) {
+  for (const b of document.querySelectorAll('#tp button')) b.setAttribute('aria-pressed', String(Number(b.dataset.t) === t));
+  const a = ARM[t], g = [...Array(10)].map((_, i) => i + 1);
+  const r = (n, v) => `<tr><td>${n}</td>${v.map((x) => `<td class="n">${x}</td>`).join('')}</tr>`;
+  document.getElementById('armt').innerHTML = `<thead><tr><th>Slot</th>${g.map((x) => `<th class="n">G${x}</th>`).join('')}</tr></thead><tbody>`
+    + r('Opens at Uma Lv', g.map((x) => 5 * x - 4)) + r('Head: DEF', a.def) + r('Body: HP', a.hp) + r('Legs: MP', a.mp) + r('Arms: M.DEF', a.def)
+    + r('Feet: Speed (evasion)', g.map((x) => `${2 * x} (${(1.2 * x).toFixed(1)}%)`)) + r('Each piece: offense', a.off) + '</tbody>';
+}
+for (const b of document.querySelectorAll('#tp button')) b.onclick = () => armor(Number(b.dataset.t));
+armor(2);
+const SPLIT = [['Arms Spellblade (physical)', [-0.9, -1.5, -2.5, -4.1]], ['Tome Spellblade (magical)', [-1.5, -2.8, -4.2, -6.3]], ['Arms Summoner (physical)', [-0.8, -1.8, -2.6, -4.0]],
+  ['Tome Summoner (magical)', [-0.8, -1.5, -2.6, -3.9]], ['Paladin (physical)', [-2.2, -4.5, -6.5, -10.6]], ['Cleric (magical)', [-1.3, -2.1, -3.2, -5.0]]];
+const sg = document.getElementById('splitg');
+sg.innerHTML += SPLIT.map(([n, v]) => `<div>${n}</div>${v.map((x, i) => `<div class="neg" data-tip="${n}: ${[1, 2, 3, 5][i]} piece${i ? 's' : ''} moved, ${x.toFixed(1)}% damage"><i style="width:${Math.abs(x) * 9}%"></i><span>${x.toFixed(1)}%</span></div>`).join('')}`).join('');
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', (e) => { const t = e.target.closest('[data-tip]'); if (!t) { tip.style.opacity = 0; return } tip.textContent = t.dataset.tip; tip.style.left = `${e.clientX + 14}px`; tip.style.top = `${e.clientY + 14}px`; tip.style.opacity = 1 });
+</script>
+</body>
+</html>
