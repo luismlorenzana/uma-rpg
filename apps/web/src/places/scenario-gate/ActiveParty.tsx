@@ -16,7 +16,7 @@ import { activePartyRows } from '../../album/party-rows'
 import { chooseActiveParty, useActiveTier, useWorld } from '../../save/game'
 import { profileDoor } from '../stable/profile-tabs'
 
-export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
+export function ActivePartyBar({ campaign, compact = false }: { campaign: Campaign; compact?: boolean }) {
   const world = useWorld()
   const tier = useActiveTier()
   const navigate = useNavigate()
@@ -40,7 +40,7 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
         {!isPartyFull(party) ? <span className="text-[11px] text-danger">A fight needs five</span>
           : healers && <span className="text-[11px] font-semibold text-warning">{healers}</span>}
       </div>
-      <div className="flex gap-1">
+      {!compact && <div className="flex gap-1">
         {members.map((id) => {
           const uma = world.umas[id]!
           const outfit = campaign.outfits.get(id)
@@ -67,7 +67,7 @@ export function ActivePartyBar({ campaign }: { campaign: Campaign }) {
             </button>
           )
         })}
-      </div>
+      </div>}
       {picking && <PickerStep title="Who fights?" rows={activePartyRows(campaign.view, world)}
         disabled={row => row.partyIndex === index ? 'Active party' : null}
         describe={row => `${row.members.length}/5 · ${formatLevel(row.level)}`}

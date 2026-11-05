@@ -1,7 +1,7 @@
 // A region (D66, D97): one biome climbing five levels, its twelve stages on a path. Stages open in order and stay open for replays;
 // progress is the world's, whichever party won. Tap a stage for its rivals, then fight with the active party.
 import {
-  biomeById, healerBlock, openFightOf, rpgNodeStatus, SaveRuleError, springReadyAt, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
+  biomeById, healerBlock, honeycombLive, nearestSpring, openFightOf, rpgNodeStatus, SaveRuleError, springReadyAt, sweepBlock, worldRun, type FightResult as Result, type RpgCampaignChapter, type RpgElement,
   type RpgMapNode, type RpgNodeStatus,
 } from '@rpg/domain'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
@@ -48,7 +48,8 @@ export function StageMap({ campaign, region, place, title, levels, color, capita
   const [view, setView] = useMapView()
   const info = campaign.regionInfo(region.id)
   const now = useNow(30_000)
-  const spring = info ? springForRegion(campaign.continents.find((c) => c.id === info.continentId), info) : undefined
+  const continent = campaign.continents.find((c) => c.id === info?.continentId)
+  const spring = info && continent ? honeycombLive() ? continent.springs.find((s) => s.id === nearestSpring(continent, info.id)) : springForRegion(continent, info) : undefined
   const readyAt = world && spring ? springReadyAt(world, spring.id, now) : null, dry = !!readyAt
   const wins = world ? worldRun(world).wins : undefined
   const layout = useMemo(() => info && wins ? regionLayout(info,
