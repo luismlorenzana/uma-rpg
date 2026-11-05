@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The stress check</title>
+<!-- docs/design/tier2/balance.md (T2B23, T2B30, T2B31, T2B39). Self-contained; kit colours. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    /* Chart series: tiers (validated: adjacent and all pairs, light on #fff, dark on #17202b) and sources (reference slots 1–6). */
+    --s1: #c49a1c; --s2: #a8482a; --s3: #7a5ad0;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+    --band: rgb(47 122 79 / 0.10); --grid: rgb(16 26 36 / 0.08);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --s1: #b3902a; --s2: #b5452e; --s3: #8b76e2;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
+      --band: rgb(79 179 122 / 0.12); --grid: rgb(255 255 255 / 0.08);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 24px 64px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 8px; }
+  h2 { font: 700 18px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 6px; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .lead { font-size: 15px; max-width: 900px; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.k { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .chip.kc { background: color-mix(in srgb, var(--info) 16%, transparent); color: var(--info); }
+  .chip.br { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; max-width: 100%; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 9px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.hl td { background: var(--raised); }
+  nav.top { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 18px; position: sticky; top: 0; background: var(--page); padding: 8px 0; z-index: 5; }
+  nav.top a { padding: 4px 11px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; }
+  nav.top a.out { background: transparent; border: 1px solid var(--hairline-strong); }
+  .two { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); gap: 22px; align-items: start; }
+  .say { font-size: 14px; color: var(--ink-soft); }
+  .say b { color: var(--ink); }
+  .calls { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .seg { display: inline-flex; gap: 4px; background: var(--sunken); padding: 3px; border-radius: 999px; margin: 4px 0 8px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12.5px system-ui, sans-serif; padding: 4px 11px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 6px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; flex: none; }
+  .sw.dot { border-radius: 50%; }
+  .sw.ring { border-radius: 50%; background: transparent !important; border: 2px solid; }
+  .sw.line { width: 18px; height: 3px; border-radius: 2px; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: system-ui, -apple-system, sans-serif; }
+  .ax { fill: var(--ink-faint); font-size: 11.5px; }
+  .lab { fill: var(--ink); font-size: 12.5px; font-weight: 600; }
+  .val { fill: var(--ink); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .soft { fill: var(--ink-soft); font-size: 11.5px; }
+  .gridl { stroke: var(--grid); stroke-width: 1; }
+  .hit { fill: transparent; cursor: default; }
+  .hit:focus { outline: none; } .hit:focus-visible { stroke: var(--accent); stroke-width: 2; }
+  details { margin-top: 10px; } summary { cursor: pointer; color: var(--ink-soft); font-size: 13px; font-weight: 650; }
+  .free { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .free div { background: var(--raised); border-radius: 10px; padding: 12px 14px; }
+  .free b { display: block; color: var(--ink); margin-bottom: 2px; }
+  .free span { color: var(--ink-soft); font-size: 13px; }
+  #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
+    font-size: 12.5px; line-height: 1.4; opacity: 0; transition: opacity .08s; left: 0; top: 0; }
+  #tip b { display: block; margin-bottom: 2px; }
+  @media (max-width: 900px) { .two, .free { grid-template-columns: 1fr; } main { padding: 16px 16px 48px; } }
+</style>
+
+<style>
+  .band { fill: var(--band); }
+  .ring { fill: var(--panel); stroke-width: 2; }
+  .k-pure { --kc: var(--c1); } .k-blade { --kc: var(--c2); } .k-call { --kc: var(--c3); } .k-heal { --kc: var(--heal); }
+  .verdict td:first-child { font-weight: 650; color: var(--ink); }
+  .ok { color: var(--success); font-weight: 650; } .bad { color: var(--danger); font-weight: 650; } .edge { color: var(--warning); font-weight: 650; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .mini { background: var(--raised); border-radius: 10px; padding: 12px 14px; }
+  .mini h3 { margin-top: 0; }
+  .num b { color: var(--ink); }
+  code { font-size: 12px; }
+  @media (max-width: 900px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The stress check</h1>
+  <p class="lead">Where healing and sustain are worth something: T2C64's stress check, defined and run. The four healers and the four supports against their siblings and parents, and the owner's question answered: <b>no variant is useless; each is the better pick somewhere</b>.</p>
+  <nav class="top"><a href="#design">The check</a><a href="#healers">The healers</a><a href="#supports">The supports</a><a href="#nohealer">No healer</a><a href="#verdict">The verdict</a>
+    <a class="out" href="../balance.md">The doc →</a><a class="out" href="balance-tiers.html">By tier</a><a class="out" href="balance-sim.html">The guardrail</a><a class="out" href="balance-comps.html">The comps</a><a class="out" href="balance-stress.html">The stress check</a><a class="out" href="balance-calls.html">Every call</a>
+  </nav>
+  <section id="design" class="card">
+    <div class="head"><h2>The attrition check (T2B23)</h2><span class="calls"><span class="chip kc">T2C64</span><span class="chip">T2B23</span></span></div>
+
+    <div class="two"><div>
+      <p class="say"><b>Why:</b> on curve a party loses about 1% of its HP a round, so a mend is insurance the harness can't price. The check makes sustain decide: <b>each region's elite, its boss's first wave and its boss as one fight</b> (three waves, HP and MP carried, the 10% breather), the foes' offense ×2, ×2.6, ×3.2 and ×4, at Tier 2 Lv 30 and 50 and Tier 3 Lv 50, 16 seeds (320 fights a cell).</p>
+      <p class="say"><b>Read:</b> wins, knockouts a fight, HP left, damage taken, and the party's damage a round (a KO deals nothing); each healer and support again with her sustain off.</p>
+    </div><div>
+      <h3>Where sustain starts to matter (Tier 2 Lv 50: wins · KOs a fight · HP left)</h3>
+      <div class="scroll"><table class=""><thead><tr><th>Party</th><th class=num>×2</th><th class=num>×2.6</th><th class=num>×3.2</th><th class=num>×4</th></tr></thead><tbody><tr><td>Party 1, healer on</td><td class=num>100.0% · 0.05 · 97%</td><td class=num>99.1% · 0.40 · 89%</td><td class=num>91.9% · 1.05 · 75%</td><td class=num>67.8% · 2.37 · 49%</td></tr><tr><td>Party 1, her sustain off</td><td class=num>91.2% · 1.23 · 54%</td><td class=num>59.7% · 2.71 · 28%</td><td class=num>—</td><td class=num>—</td></tr><tr><td>Party 2, healer on</td><td class=num>100.0% · 0.07 · 97%</td><td class=num>97.8% · 0.45 · 89%</td><td class=num>85.6% · 1.25 · 72%</td><td class=num>57.2% · 2.64 · 45%</td></tr><tr><td>Party 2, her sustain off</td><td class=num>78.1% · 1.80 · 46%</td><td class=num>47.5% · 3.07 · 26%</td><td class=num>—</td><td class=num>—</td></tr></tbody></table></div>
+    </div></div>
+  </section>
+  <section id="healers" class="card">
+    <div class="head"><h2>Keeper or battle healer: each the better pick somewhere</h2><span class="calls"><span class="chip">T2B30</span><span class="chip">T2B31</span></span></div>
+
+    <p class="say">On curve the battle healer adds damage; under attrition the keeper keeps the party standing. The chart: fights won as the foes' offense climbs (Tier 2 Lv 50), with the healerless parties beside them. The table: wins · KOs a fight · HP left; party damage a round at ×2.6.</p>
+    <div class="legend" id="win-legend"></div>
+    <div id="win-chart"></div>
+    <div class="scroll"><table class=""><thead><tr><th>Healer</th><th class=num>On-curve gain, Lv 10 · 30 · 50</th><th class=num>×2</th><th class=num>×2.6</th><th class=num>×3.2</th><th class=num>×4</th><th class=num>Damage a round, ×2.6</th></tr></thead><tbody><tr><td>Paladin</td><td class=num>—</td><td class=num>100.0% · 0.05 · 97%</td><td class=num>99.1% · 0.40 · 89%</td><td class=num>91.9% · 1.05 · 75%</td><td class=num>67.8% · 2.37 · 49%</td><td class=num>7190</td></tr><tr><td><b>Guardian</b></td><td class=num>+5.5% · +0.0% · +1.1%</td><td class=num>100.0% · 0.06 · 97%</td><td class=num>99.1% · 0.40 · 89%</td><td class=num>91.9% · 1.04 · 75%</td><td class=num>67.5% · 2.36 · 49%</td><td class=num>7236</td></tr><tr><td><b>Templar</b></td><td class=num>+12.2% · +9.7% · +5.6%</td><td class=num>100.0% · 0.07 · 95%</td><td class=num>99.4% · 0.41 · 87%</td><td class=num>89.7% · 1.21 · 69%</td><td class=num>63.4% · 2.53 · 44%</td><td class=num>7331</td></tr><tr><td>Cleric</td><td class=num>—</td><td class=num>100.0% · 0.07 · 97%</td><td class=num>97.8% · 0.45 · 89%</td><td class=num>85.6% · 1.25 · 72%</td><td class=num>57.2% · 2.64 · 45%</td><td class=num>7494</td></tr><tr><td><b>Bishop</b></td><td class=num>+15.5% · +0.0% · +0.1%</td><td class=num>100.0% · 0.07 · 97%</td><td class=num>97.8% · 0.45 · 89%</td><td class=num>85.0% · 1.27 · 72%</td><td class=num>56.9% · 2.65 · 44%</td><td class=num>7511</td></tr><tr><td><b>Exorcist</b></td><td class=num>+15.8% · +6.9% · +7.3%</td><td class=num>100.0% · 0.10 · 96%</td><td class=num>96.6% · 0.54 · 86%</td><td class=num>77.5% · 1.67 · 62%</td><td class=num>51.9% · 2.89 · 39%</td><td class=num>7563</td></tr></tbody></table></div>
+  </section>
+  <section id="supports" class="card">
+    <div class="head"><h2>The supports: safer parties, a little damage</h2><span class="calls"><span class="chip">T2B24</span><span class="chip">T2B25</span></span></div>
+
+    <p class="say">Each support against her parent and her keeper, ×2.6 at Tier 2 Lv 50. The last column switches the <b>healer's</b> sustain off: what the support's own ward, mend and Enfeeble carry alone.</p>
+    <div class="scroll"><table class=""><thead><tr><th>In the seat</th><th class=num>Wins</th><th class=num>KOs a fight</th><th class=num>Taken a fight</th><th class=num>Damage a round</th><th class=num>Healer off: wins · KOs</th></tr></thead><tbody><tr><td>Arms Spellblade</td><td class=num>99.1%</td><td class=num>0.40</td><td class=num>4782</td><td class=num>7190</td><td class=num>59.7% · 2.71</td></tr><tr><td>Blademaster</td><td class=num>99.1%</td><td class=num>0.40</td><td class=num>4751</td><td class=num>7296</td><td class=num>65.9% · 2.49</td></tr><tr><td><b>Sentinel</b></td><td class=num>99.4%</td><td class=num>0.32</td><td class=num>4262</td><td class=num>7360</td><td class=num>82.2% · 1.48</td></tr><tr><td>Tome Spellblade</td><td class=num>97.8%</td><td class=num>0.45</td><td class=num>5184</td><td class=num>7494</td><td class=num>47.5% · 3.07</td></tr><tr><td>Runeblade</td><td class=num>98.4%</td><td class=num>0.38</td><td class=num>4799</td><td class=num>7679</td><td class=num>51.2% · 2.88</td></tr><tr><td><b>Enchanter</b></td><td class=num>99.4%</td><td class=num>0.35</td><td class=num>4645</td><td class=num>7586</td><td class=num>74.7% · 1.77</td></tr><tr><td>Arms Summoner</td><td class=num>97.8%</td><td class=num>0.45</td><td class=num>5184</td><td class=num>7494</td><td class=num>47.5% · 3.07</td></tr><tr><td>Warlord</td><td class=num>97.8%</td><td class=num>0.44</td><td class=num>5039</td><td class=num>7588</td><td class=num>53.4% · 2.80</td></tr><tr><td><b>Druid</b></td><td class=num>99.7%</td><td class=num>0.20</td><td class=num>3760</td><td class=num>7663</td><td class=num>69.7% · 2.18</td></tr><tr><td>Tome Summoner</td><td class=num>99.1%</td><td class=num>0.40</td><td class=num>4782</td><td class=num>7190</td><td class=num>59.7% · 2.71</td></tr><tr><td>Invoker</td><td class=num>99.4%</td><td class=num>0.38</td><td class=num>4779</td><td class=num>7274</td><td class=num>66.2% · 2.42</td></tr><tr><td><b>Shaman</b></td><td class=num>99.7%</td><td class=num>0.27</td><td class=num>3853</td><td class=num>7365</td><td class=num>85.3% · 1.47</td></tr></tbody></table></div>
+  </section>
+  <section id="nohealer" class="card">
+    <div class="head"><h2>A party with no healer (T2B39)</h2><span class="calls"><span class="chip">T2B39</span></span></div>
+
+    <p class="say">One healer a party is a ceiling, not a floor. Two supports carry a healerless party through ×2.6; with the proposed support rule a keeper healer's party stays ahead at ×4. Wins · KOs a fight · HP left.</p>
+    <div class="scroll"><table class=""><thead><tr><th>Party (Tier 2 Lv 50)</th><th class=num>×2</th><th class=num>×2.6</th><th class=num>×3.2</th><th class=num>×4</th></tr></thead><tbody><tr><td><b>N0</b> Berserker, Archmage + no healer, no support (Blademaster, Invoker, Runeblade)</td><td class=num>99.4% · 0.50 · 68%</td><td class=num>88.4% · 1.42 · 49%</td><td class=num>65.6% · 2.42 · 32%</td><td class=num>35.9% · 3.58 · 17%</td></tr><tr><td><b>N1</b> Berserker, Archmage + Sentinel + Shaman</td><td class=num>100.0% · 0.03 · 91%</td><td class=num>99.4% · 0.30 · 80%</td><td class=num>95.3% · 0.82 · 66%</td><td class=num>73.1% · 1.96 · 45%</td></tr><tr><td><b>N2</b> Berserker, Archmage + Sentinel</td><td class=num>100.0% · 0.11 · 79%</td><td class=num>96.2% · 0.66 · 62%</td><td class=num>76.2% · 1.86 · 40%</td><td class=num>45.0% · 3.17 · 22%</td></tr><tr><td><b>N3</b> Berserker, Archmage + Shaman</td><td class=num>100.0% · 0.21 · 84%</td><td class=num>98.8% · 0.66 · 72%</td><td class=num>86.2% · 1.48 · 55%</td><td class=num>56.2% · 2.71 · 33%</td></tr><tr><td><b>N4</b> Berserker, Archmage + Druid</td><td class=num>99.7% · 0.30 · 81%</td><td class=num>93.1% · 1.08 · 63%</td><td class=num>71.2% · 2.13 · 43%</td><td class=num>40.6% · 3.31 · 24%</td></tr><tr><td>C1 (a healer)</td><td class=num>100.0% · 0.04 · 97%</td><td class=num>98.8% · 0.33 · 91%</td><td class=num>94.1% · 0.80 · 80%</td><td class=num>78.1% · 1.78 · 61%</td></tr><tr><td>C6 (a healer)</td><td class=num>100.0% · 0.00 · 99%</td><td class=num>100.0% · 0.12 · 96%</td><td class=num>98.8% · 0.45 · 89%</td><td class=num>85.6% · 1.42 · 68%</td></tr><tr><td>C7 (a healer)</td><td class=num>100.0% · 0.02 · 99%</td><td class=num>100.0% · 0.22 · 94%</td><td class=num>95.6% · 0.67 · 83%</td><td class=num>73.8% · 1.85 · 60%</td></tr></tbody></table></div>
+  </section>
+  <section id="verdict" class="card">
+    <div class="head"><h2>Is any variant useless? No</h2><span class="calls"><span class="chip k">the owner's fear</span></span></div>
+<div class="scroll"><table class="verdict"><thead><tr><th>Siblings</th><th>Where each is the better pick</th></tr></thead><tbody><tr><td>Berserker · Spellfist</td><td>Both within the band at every level; the Spellfist adds an element (the Arcane ward)</td></tr><tr><td>Archmage · Battlemage</td><td>The Battlemage ahead at Lv 10 and 30 (+10.9, +8.3%), the Archmage at Lv 50 (+5.1 against −1.8%); the Battlemage answers an Iron ward</td></tr><tr><td>Blademaster · Sentinel</td><td>The Blademaster ahead on curve at Lv 10 and 50; the Sentinel at Lv 30 and under attrition (her party 82% with the healer off, the Blademaster's 66%)</td></tr><tr><td>Runeblade · Enchanter</td><td>The Enchanter ahead at Lv 50 and under attrition (75% against 51% with the healer off); level at Lv 10 and 30</td></tr><tr><td>Warlord · Druid</td><td>The Warlord ahead on curve at Lv 50 (+6.8 against −1.5%); the Druid under attrition (KOs 0.20 against 0.44); level at Lv 30</td></tr><tr><td>Invoker · Shaman</td><td>The Shaman ahead at Lv 10 and under attrition (85% against 66% with the healer off); the Invoker at Lv 30 and 50</td></tr><tr><td>Guardian · Templar</td><td>The Templar ahead on curve (+12.1 · +9.7 · +5.7% against +5.5 · 0 · +1.1%); the Guardian from ×3.2 (92 against 90% of fights won, 68 against 63% at ×4)</td></tr><tr><td>Bishop · Exorcist</td><td>The Exorcist ahead on curve at Lv 30 and 50 (+6.9 · +7.3% against 0 · +0.1%); the Bishop from ×2.6 (98 against 97%; 85 against 78% at ×3.2, 57 against 52% at ×4)</td></tr></tbody></table></div>
+  </section>
+
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg'
+  const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (parent) parent.appendChild(n); return n }
+  const tip = document.getElementById('tip')
+  const showTip = (ev, h) => { tip.innerHTML = h; tip.style.opacity = 1; const r = tip.getBoundingClientRect(); let x = (ev.clientX ?? ev.target.getBoundingClientRect().right) + 14, y = (ev.clientY ?? ev.target.getBoundingClientRect().top) + 14; if (x + r.width > innerWidth - 8) x = innerWidth - r.width - 8; if (y + r.height > innerHeight - 8) y -= r.height + 28; tip.style.left = x + 'px'; tip.style.top = y + 'px' }
+  const hideTip = () => { tip.style.opacity = 0 }
+  const hover = (node, h) => { node.setAttribute('tabindex', '0'); node.setAttribute('aria-label', h.replace(/<[^>]+>/g, ' ')); node.addEventListener('pointermove', (ev) => showTip(ev, h)); node.addEventListener('pointerleave', hideTip); node.addEventListener('focus', (ev) => showTip(ev, h)); node.addEventListener('blur', hideTip) }
+  window.__t2b = { el, hover };
+})();
+
+(() => {
+  const { el, hover } = window.__t2b
+  const L = [["Guardian", "--c1", "", [100.0, 99.1, 91.9, 67.5]], ["Templar", "--c1", "5 4", [100.0, 99.4, 89.7, 63.4]], ["Bishop", "--c2", "", [100.0, 97.8, 85.0, 56.9]], ["Exorcist", "--c2", "5 4", [100.0, 96.6, 77.5, 51.9]], ["No healer, Sentinel + Shaman (N1)", "--c3", "", [100.0, 99.4, 95.3, 73.1]], ["No healer, no support (N0)", "--ink-faint", "2 3", [99.4, 88.4, 65.6, 35.9]]], MX = ['×2', '×2.6', '×3.2', '×4']
+  document.getElementById('win-legend').innerHTML = L.map(([n, c, d]) => `<span><i class="sw line" style="background:var(${c});${d ? 'opacity:.6' : ''}"></i>${n}</span>`).join('')
+  const host = document.getElementById('win-chart')
+  const W = 1080, H = 300, Lm = 50, R = 230, T = 14, B = 30, pw = W - Lm - R, ph = H - T - B
+  const X = (i) => Lm + pw * i / 3, Y = (v) => T + ph * (1 - (v - 30) / 70)
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Fights won by attrition multiplier, healers and healerless parties' }, host)
+  for (const v of [30, 50, 70, 90, 100]) { el('line', { x1: Lm, x2: Lm + pw, y1: Y(v), y2: Y(v), class: 'gridl' }, svg); el('text', { x: Lm - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = `${v}%` }
+  MX.forEach((m, i) => el('text', { x: X(i), y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = m)
+  L.forEach(([n, c, d, v]) => {
+    el('path', { d: v.map((y, i) => `${i ? 'L' : 'M'}${X(i)},${Y(y)}`).join(' '), style: `stroke:var(${c});stroke-width:2.2;fill:none;${d ? `stroke-dasharray:${d};` : ''}stroke-linejoin:round` }, svg)
+    v.forEach((y, i) => { el('circle', { cx: X(i), cy: Y(y), r: 4, style: `fill:var(${c});stroke:var(--panel);stroke-width:1.5` }, svg); const h = el('circle', { cx: X(i), cy: Y(y), r: 10, class: 'hit' }, svg); hover(h, `<b>${n}</b>${MX[i]}: ${y}% of fights won`) })
+    el('text', { x: X(3) + 10, y: Y(v[3]) + 4, class: 'soft' }, svg).textContent = `${n.split(' (')[0]} ${v[3]}%`
+  })
+})()
+</script>
+</body>
+</html>

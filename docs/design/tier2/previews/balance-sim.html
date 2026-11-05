@@ -3,10 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Balance Simulation by Tier</title>
-<!-- docs/design/tier2/balance.md (T2B): the fight simulation's Tier 1 reference row, today's Tiers 2–3, the Class Rank
-     pace, the mirrors and the healers, and the checklist. Measured on engine v21 (the owner's two parties, on curve,
-     Auto, 8 seeds a stage). Self-contained; kit colours from tier-rework/previews/_template.html. -->
+<title>The guardrail</title>
+<!-- docs/design/tier2/balance.md (T2B20–T2B33): the sixteen measured on a fork of engine v21. Self-contained; kit colours. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -17,8 +15,9 @@
     --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
     --radius: 12px; --gap: 12px;
+    /* Chart series: tiers (validated: adjacent and all pairs, light on #fff, dark on #17202b) and sources (reference slots 1–6). */
     --s1: #c49a1c; --s2: #a8482a; --s3: #7a5ad0;
-    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
     --band: rgb(47 122 79 / 0.10); --grid: rgb(16 26 36 / 0.08);
     color-scheme: light dark;
   }
@@ -31,7 +30,7 @@
       --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
       --s1: #b3902a; --s2: #b5452e; --s3: #8b76e2;
-      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300;
       --band: rgb(79 179 122 / 0.12); --grid: rgb(255 255 255 / 0.08);
     }
   }
@@ -45,8 +44,9 @@
   .lead { font-size: 15px; max-width: 900px; }
   .card { background: var(--panel); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 1px 0 var(--hairline-strong); }
   .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .chip.ok { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
-  .chip.out { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .chip.k { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .chip.kc { background: color-mix(in srgb, var(--info) 16%, transparent); color: var(--info); }
+  .chip.br { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
   .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
   .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
   .muted { color: var(--ink-faint); }
@@ -56,126 +56,102 @@
   th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   tr.hl td { background: var(--raised); }
-  td.bad { color: var(--danger); font-weight: 700; }
   nav.top { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 18px; position: sticky; top: 0; background: var(--page); padding: 8px 0; z-index: 5; }
   nav.top a { padding: 4px 11px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; }
   nav.top a.out { background: transparent; border: 1px solid var(--hairline-strong); }
   .two { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); gap: 22px; align-items: start; }
-  .say { font-size: 14px; color: var(--ink-soft); } .say b { color: var(--ink); }
-  .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .say { font-size: 14px; color: var(--ink-soft); }
+  .say b { color: var(--ink); }
   .calls { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .seg { display: inline-flex; gap: 4px; background: var(--sunken); padding: 3px; border-radius: 999px; margin: 4px 0 8px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12.5px system-ui, sans-serif; padding: 4px 11px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
   .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 6px; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .sw { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; flex: none; }
+  .sw.dot { border-radius: 50%; }
+  .sw.ring { border-radius: 50%; background: transparent !important; border: 2px solid; }
   .sw.line { width: 18px; height: 3px; border-radius: 2px; }
   svg { display: block; width: 100%; height: auto; overflow: visible; }
   svg text { font-family: system-ui, -apple-system, sans-serif; }
   .ax { fill: var(--ink-faint); font-size: 11.5px; }
-  .lab { fill: var(--ink); font-size: 12px; font-weight: 600; }
+  .lab { fill: var(--ink); font-size: 12.5px; font-weight: 600; }
+  .val { fill: var(--ink); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .soft { fill: var(--ink-soft); font-size: 11.5px; }
   .gridl { stroke: var(--grid); stroke-width: 1; }
-  .hit { fill: transparent; } .hit:focus { outline: none; } .hit:focus-visible { stroke: var(--accent); stroke-width: 2; }
+  .hit { fill: transparent; cursor: default; }
+  .hit:focus { outline: none; } .hit:focus-visible { stroke: var(--accent); stroke-width: 2; }
   details { margin-top: 10px; } summary { cursor: pointer; color: var(--ink-soft); font-size: 13px; font-weight: 650; }
+  .free { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .free div { background: var(--raised); border-radius: 10px; padding: 12px 14px; }
+  .free b { display: block; color: var(--ink); margin-bottom: 2px; }
+  .free span { color: var(--ink-soft); font-size: 13px; }
   #tip { position: fixed; z-index: 20; pointer-events: none; max-width: 320px; background: var(--ink); color: var(--panel); padding: 8px 10px; border-radius: 8px;
     font-size: 12.5px; line-height: 1.4; opacity: 0; transition: opacity .08s; left: 0; top: 0; }
   #tip b { display: block; margin-bottom: 2px; }
-  @media (max-width: 900px) { .two { grid-template-columns: 1fr; } main { padding: 16px 16px 48px; } }
+  @media (max-width: 900px) { .two, .free { grid-template-columns: 1fr; } main { padding: 16px 16px 48px; } }
+</style>
+
+<style>
+  .band { fill: var(--band); }
+  .ring { fill: var(--panel); stroke-width: 2; }
+  .k-pure { --kc: var(--c1); } .k-blade { --kc: var(--c2); } .k-call { --kc: var(--c3); } .k-heal { --kc: var(--heal); }
+  .verdict td:first-child { font-weight: 650; color: var(--ink); }
+  .ok { color: var(--success); font-weight: 650; } .bad { color: var(--danger); font-weight: 650; } .edge { color: var(--warning); font-weight: 650; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .mini { background: var(--raised); border-radius: 10px; padding: 12px 14px; }
+  .mini h3 { margin-top: 0; }
+  .num b { color: var(--ink); }
+  code { font-size: 12px; }
+  @media (max-width: 900px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <main>
-  <h1>The fight simulation, Tier 1 → 2 → 3</h1>
-  <p class="lead">Measured on <b>engine v21 today</b>: the owner's two parties (Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Paladin;
-    Brawler, Sorcerer, Tome Spellblade, Arms Summoner, Cleric) at their presets and three accessory slots, on curve, first try on Auto,
-    8 seeds a stage, every region stage at the level. <b>Wins are 100% in every cell.</b> Tiers 2 and 3 are Tier 1's rules × tier, the toolbox unbuilt.</p>
-  <nav class="top">
-    <a href="#ref">The reference row</a><a href="#tiers">Tiers 2–3 today</a><a href="#pace">The Class Rank pace</a><a href="#mirror">Mirrors and healers</a><a href="#check">The checklist</a>
-    <a class="out" href="../balance.md">The doc →</a><a class="out" href="balance-tiers.html">By tier →</a><a class="out" href="balance-calls.html">Every call →</a>
+  <h1>The guardrail</h1>
+  <p class="lead">R2-11's guardrail, measured: every Tier 2 class against her Tier 1 parent in the owner's two parties, at Tier 2 Lv 10, 30 and 50, at classes.md's values and at the proposed knobs. <b>classes.md's values put 14 of 36 cells in the band; the proposed knobs 34.</b></p>
+  <nav class="top"><a href="#measure">How it's measured</a><a href="#band">The sixteen</a><a href="#knobs">The knobs</a><a href="#ds">D and S</a><a href="#t1">Tier 1 anchor</a>
+    <a class="out" href="../balance.md">The doc →</a><a class="out" href="balance-tiers.html">By tier</a><a class="out" href="balance-sim.html">The guardrail</a><a class="out" href="balance-comps.html">The comps</a><a class="out" href="balance-stress.html">The stress check</a><a class="out" href="balance-calls.html">Every call</a>
   </nav>
+  <section id="measure" class="card">
+    <div class="head"><h2>How party value is measured (T2B20, T2B21)</h2><span class="calls"><span class="chip">R2-11</span><span class="chip kc">amends T2C56</span></span></div>
 
-  <section id="ref" class="card">
-    <div class="head"><h2>The Tier 1 reference row</h2><span class="calls"><span class="chip">T2B18</span></span></div>
-    <p class="say">Rounds a fight · rounds to her first Break, every Tier 1 region stage at the level. Lv 40 from the committed <code>balance-v21.test.ts</code> (rounds only).</p>
-    <div class="scroll"><table>
-      <thead><tr><th>Lv</th><th class="num">Party 1 regular</th><th class="num">sub-boss</th><th class="num">boss</th><th class="num">Party 2 regular</th><th class="num">sub-boss</th><th class="num">boss</th></tr></thead>
-      <tbody id="ref-body"></tbody>
-    </table></div>
+    <div class="two"><div>
+      <p class="say"><b>On the harness, not on paper.</b> The sixteen's rules run on a scratch fork of engine v21 with the live Auto; every Uma is built by the live harness (gear, Extra Stats, a Learner's Limit Break, Class Rank on Tier 1's pace) with Tier 2's MP (×1.7) and healing divisor (÷ 540), gear's Suggested types and forms and Extra Stats' Prowess presets. Every stage of the level, 16 seeds: 1,280 fights a party.</p>
+      <p class="say"><b>A class's gain</b> is the party's damage a round with her in her parent's seat, minus with her parent, over her parent's V. Fights weigh 2, sub-bosses and bosses 1. <b>V = D + S</b>: D her own damage a round, in BT (an on-curve Brawler's at the same tier and level); S what the other four lose when her statuses, mends, wards and keeper twist are switched off.</p>
+    </div><div>
+      <h3>Emulated exactly</h3><p class="say">Momentum (a factor beside the statuses, a stack after each turn, lost on a KO); the cross (every hit on her stat, defense, weakness and statuses by the kind's channel, her other channel's trees); both halves' familiar; both summons lingering; the support level's statuses, Barrier and farewell mend; the keepers' extra stack; the battle healers' hand and shares; Area and Multi-hit at step 4b; Pure and Dual weak multipliers by grade; the forms and Kindred.</p>
+      <h3>Left out</h3><p class="say">Class lines, line C, Break tips and Tier 2's extra equipped slots (every class gets them; the build re-measures); two lines held in Tier 3; Vow. Tier 3's rider step uses Tier 2's rates × 2.6.</p>
+    </div></div>
+  </section>
+  <section id="band" class="card">
+    <div class="head"><h2>The sixteen against their parents</h2><span class="calls"><span class="chip">T2B22</span><span class="chip kc">amends T2C64</span></span></div>
+
+    <p class="say">Each class in her parent's seat of the owner's party (Party 1 or 2; the pure classes in both, averaged). <b>Rings</b> are classes.md's values, <b>dots</b> the proposed knobs; the green band is the twelve's mean ± 5 points. The four healers are read on the <a href="balance-stress.html">stress check</a>, so their rows carry no band.</p>
+    <div class="seg" role="group" aria-label="Level" id="lv-pick"><button aria-pressed="false" data-i="0">Tier 2 Lv 10</button><button aria-pressed="false" data-i="1">Lv 30</button><button aria-pressed="true" data-i="2">Lv 50</button></div>
+    <div class="legend"><span><i class="sw ring" style="border-color:var(--ink-soft)"></i>classes.md's values</span><span><i class="sw dot" style="background:var(--accent)"></i>proposed</span><span><i class="sw" style="background:var(--band)"></i>the band (mean ± 5)</span></div>
+    <div id="gain-chart"></div>
+    <div class="scroll"><table class=""><thead><tr><th>Class (parent)</th><th class=num>classes.md Lv 10</th><th class=num>Lv 30</th><th class=num>Lv 50</th><th class=num>Proposed Lv 10</th><th class=num>Lv 30</th><th class=num>Lv 50</th></tr></thead><tbody><tr><td>Berserker <span class='muted'>(Brawler)</span></td><td class=num><span class="ok">+4.5%</span></td><td class=num><span class="edge">+1.8%</span></td><td class=num><span class="ok">+4.5%</span></td><td class=num><span class="ok">+5.6%</span></td><td class=num><span class="ok">+2.0%</span></td><td class=num><span class="ok">+5.1%</span></td></tr><tr><td>Spellfist <span class='muted'>(Brawler)</span></td><td class=num><span class="ok">+10.4%</span></td><td class=num><span class="ok">+6.7%</span></td><td class=num><span class="ok">+3.0%</span></td><td class=num><span class="ok">+6.5%</span></td><td class=num><span class="ok">+4.5%</span></td><td class=num><span class="ok">+4.3%</span></td></tr><tr><td>Archmage <span class='muted'>(Sorcerer)</span></td><td class=num><span class="ok">+4.9%</span></td><td class=num><span class="ok">+2.6%</span></td><td class=num><span class="ok">+4.1%</span></td><td class=num><span class="ok">+5.9%</span></td><td class=num><span class="ok">+3.4%</span></td><td class=num><span class="ok">+5.1%</span></td></tr><tr><td>Battlemage <span class='muted'>(Sorcerer)</span></td><td class=num><span class="bad">-2.5%</span></td><td class=num><span class="bad">-4.7%</span></td><td class=num><span class="bad">-11.5%</span></td><td class=num><span class="ok">+10.9%</span></td><td class=num><span class="ok">+8.3%</span></td><td class=num><span class="ok">-1.8%</span></td></tr><tr><td>Blademaster <span class='muted'>(Arms Spellblade)</span></td><td class=num><span class="bad">+0.5%</span></td><td class=num><span class="bad">+0.0%</span></td><td class=num><span class="bad">-0.1%</span></td><td class=num><span class="ok">+9.1%</span></td><td class=num><span class="ok">+4.6%</span></td><td class=num><span class="ok">+3.6%</span></td></tr><tr><td>Sentinel <span class='muted'>(Arms Spellblade)</span></td><td class=num><span class="bad">+34.0%</span></td><td class=num><span class="bad">+46.0%</span></td><td class=num><span class="bad">+49.8%</span></td><td class=num><span class="bad">-2.4%</span></td><td class=num><span class="bad">+10.9%</span></td><td class=num><span class="ok">+2.9%</span></td></tr><tr><td>Runeblade <span class='muted'>(Tome Spellblade)</span></td><td class=num><span class="bad">-0.7%</span></td><td class=num><span class="bad">+0.5%</span></td><td class=num><span class="bad">-0.7%</span></td><td class=num><span class="ok">+6.7%</span></td><td class=num><span class="ok">+2.3%</span></td><td class=num><span class="ok">+2.9%</span></td></tr><tr><td>Enchanter <span class='muted'>(Tome Spellblade)</span></td><td class=num><span class="bad">+32.6%</span></td><td class=num><span class="bad">+19.4%</span></td><td class=num><span class="bad">+18.5%</span></td><td class=num><span class="ok">+7.0%</span></td><td class=num><span class="ok">+2.5%</span></td><td class=num><span class="ok">+6.7%</span></td></tr><tr><td>Warlord <span class='muted'>(Arms Summoner)</span></td><td class=num><span class="ok">+4.0%</span></td><td class=num><span class="bad">-0.2%</span></td><td class=num><span class="ok">+1.8%</span></td><td class=num><span class="ok">+8.6%</span></td><td class=num><span class="ok">+1.9%</span></td><td class=num><span class="ok">+6.9%</span></td></tr><tr><td>Druid <span class='muted'>(Arms Summoner)</span></td><td class=num><span class="ok">+12.5%</span></td><td class=num><span class="ok">+10.1%</span></td><td class=num><span class="bad">-1.9%</span></td><td class=num><span class="ok">+7.1%</span></td><td class=num><span class="ok">+2.2%</span></td><td class=num><span class="ok">-1.4%</span></td></tr><tr><td>Invoker <span class='muted'>(Tome Summoner)</span></td><td class=num><span class="ok">+4.0%</span></td><td class=num><span class="bad">+1.3%</span></td><td class=num><span class="ok">+1.2%</span></td><td class=num><span class="ok">+8.7%</span></td><td class=num><span class="ok">+3.6%</span></td><td class=num><span class="ok">+2.9%</span></td></tr><tr><td>Shaman <span class='muted'>(Tome Summoner)</span></td><td class=num><span class="bad">-1.5%</span></td><td class=num><span class="bad">+0.2%</span></td><td class=num><span class="bad">-2.3%</span></td><td class=num><span class="ok">+10.5%</span></td><td class=num><span class="ok">+0.9%</span></td><td class=num><span class="ok">+1.2%</span></td></tr><tr><td>Guardian <span class='muted'>(Paladin)</span></td><td class=num><span class="muted">+5.5%</span></td><td class=num><span class="muted">+0.0%</span></td><td class=num><span class="muted">+1.1%</span></td><td class=num><span class="muted">+5.5%</span></td><td class=num><span class="muted">+0.0%</span></td><td class=num><span class="muted">+1.1%</span></td></tr><tr><td>Templar <span class='muted'>(Paladin)</span></td><td class=num><span class="muted">+12.2%</span></td><td class=num><span class="muted">+9.7%</span></td><td class=num><span class="muted">+5.6%</span></td><td class=num><span class="muted">+12.2%</span></td><td class=num><span class="muted">+9.7%</span></td><td class=num><span class="muted">+5.6%</span></td></tr><tr><td>Bishop <span class='muted'>(Cleric)</span></td><td class=num><span class="muted">+15.5%</span></td><td class=num><span class="muted">+0.0%</span></td><td class=num><span class="muted">+0.1%</span></td><td class=num><span class="muted">+15.5%</span></td><td class=num><span class="muted">+0.0%</span></td><td class=num><span class="muted">+0.1%</span></td></tr><tr><td>Exorcist <span class='muted'>(Cleric)</span></td><td class=num><span class="muted">+15.8%</span></td><td class=num><span class="muted">+6.9%</span></td><td class=num><span class="muted">+7.3%</span></td><td class=num><span class="muted">+15.8%</span></td><td class=num><span class="muted">+6.9%</span></td><td class=num><span class="muted">+7.3%</span></td></tr><tr class="hl"><td><b>Mean of the twelve</b> (healers apart)</td><td class=num>+8.6%</td><td class=num>+7.0%</td><td class=num>+5.5%</td><td class=num>+7.0%</td><td class=num>+3.9%</td><td class=num>+3.2%</td></tr><tr class="hl"><td><b>Cells within ±5 of the mean</b></td><td class=num>14 of 36</td><td class=num></td><td class=num></td><td class=num>34 of 36</td><td class=num></td><td class=num></td></tr></tbody></table></div>
+  </section>
+  <section id="knobs" class="card">
+    <div class="head"><h2>The knobs, in order (T2B33)</h2><span class="calls"><span class="chip">T2B24–T2B31</span></span></div>
+<div class="scroll"><table class=""><thead><tr><th>Knob</th><th>classes.md</th><th>Proposed</th><th>Amends</th></tr></thead><tbody><tr><td>Support status (T2B24)</td><td>Healers' ladder 1·1·2·2·3, built up; Brave and Faith on every Uma</td><td>1·1·1·2·2, topped up, never built; Brave and Faith on her ward</td><td>T2C39, T2C45</td></tr><tr><td>Supports' hands (T2B25)</td><td>Sentinel, Enchanter ×0.85; Druid, Shaman ×0.9; the Druid on the Greatsword</td><td>Sentinel ×0.95, Enchanter ×0.8, Druid ×0.95 on the Axe, Shaman ×1</td><td>T2C39, T2C54</td></tr><tr><td>Momentum (T2B26)</td><td>+5% a stack</td><td>+6% a stack</td><td>T2C34</td></tr><tr><td>The cross (T2B27)</td><td>Both ×1.05, the Heavy twins</td><td>Spellfist ×1.05, Battlemage ×1.3, the Scatter twins</td><td>T2C35, T2C54</td></tr><tr><td>Spellblade keepers (T2B28)</td><td>The familiar on both halves</td><td>… and it pierces; hands +0.03 a half</td><td>T2C37</td></tr><tr><td>Summoner keepers (T2B29)</td><td>Both summons linger</td><td>… hands +0.03 a half</td><td>T2C38</td></tr><tr><td>Battle healers (T2B31)</td><td>×0.6, MP ×0.7, shares ×0.7</td><td>Kept</td><td>T2C44</td></tr><tr><td>Healer keepers (T2B30)</td><td>One stack more</td><td>Kept (a round longer tried and refused)</td><td>T2C43</td></tr></tbody></table></div>
+  </section>
+  <section id="ds" class="card">
+    <div class="head"><h2>Her damage and her support (D + S, BT a round)</h2><span class="calls"><span class="chip">proposed</span></span></div>
+
+    <p class="say">D falls where a class trades damage for support (the four supports), S rises; a keeper's D rises. S is what the other four lose without her statuses, wards, mends and twist; Kindred sits in the others' D.</p>
+    <div class="scroll"><table class=""><thead><tr><th>Class</th><th class=num>Parent, Lv 50</th><th class=num>Her, Lv 50</th><th class=num>Parent, Lv 10 · 30</th><th class=num>Her, Lv 10 · 30</th></tr></thead><tbody><tr><td>Berserker</td><td class=num>1.04 + 0.00</td><td class=num>1.14 + 0.00</td><td class=num>0.98 + 0.00 · 1.04 + 0.00</td><td class=num>1.08 + 0.00 · 1.10 + 0.00</td></tr><tr><td>Spellfist</td><td class=num>1.04 + 0.00</td><td class=num>1.12 + 0.00</td><td class=num>0.98 + 0.00 · 1.04 + 0.00</td><td class=num>1.06 + 0.00 · 1.14 + 0.00</td></tr><tr><td>Archmage</td><td class=num>1.12 + 0.00</td><td class=num>1.21 + 0.00</td><td class=num>1.02 + 0.00 · 1.03 + 0.00</td><td class=num>1.11 + 0.00 · 1.08 + 0.00</td></tr><tr><td>Battlemage</td><td class=num>1.12 + 0.00</td><td class=num>1.22 + 0.00</td><td class=num>1.02 + 0.00 · 1.03 + 0.00</td><td class=num>1.15 + 0.00 · 1.19 + 0.00</td></tr><tr><td>Blademaster</td><td class=num>0.85 + 0.02</td><td class=num>0.89 + 0.01</td><td class=num>0.76 + 0.00 · 0.72 + 0.00</td><td class=num>0.83 + 0.00 · 0.77 + 0.00</td></tr><tr><td>Sentinel</td><td class=num>0.85 + 0.02</td><td class=num>0.71 + 0.14</td><td class=num>0.76 + 0.00 · 0.72 + 0.00</td><td class=num>0.71 + 0.07 · 0.62 + 0.09</td></tr><tr><td>Runeblade</td><td class=num>0.86 + 0.09</td><td class=num>0.92 + 0.05</td><td class=num>0.77 + 0.00 · 0.69 + 0.05</td><td class=num>0.83 + 0.00 · 0.77 + 0.02</td></tr><tr><td>Enchanter</td><td class=num>0.86 + 0.09</td><td class=num>0.69 + 0.23</td><td class=num>0.77 + 0.00 · 0.69 + 0.05</td><td class=num>0.64 + 0.13 · 0.56 + 0.11</td></tr><tr><td>Warlord</td><td class=num>0.73 + 0.10</td><td class=num>0.78 + 0.10</td><td class=num>0.72 + 0.00 · 0.56 + 0.06</td><td class=num>0.78 + -0.00 · 0.60 + 0.05</td></tr><tr><td>Druid</td><td class=num>0.73 + 0.10</td><td class=num>0.65 + 0.11</td><td class=num>0.72 + 0.00 · 0.56 + 0.06</td><td class=num>0.67 + 0.11 · 0.51 + 0.07</td></tr><tr><td>Invoker</td><td class=num>0.73 + 0.02</td><td class=num>0.77 + 0.01</td><td class=num>0.75 + 0.00 · 0.55 + 0.01</td><td class=num>0.81 + 0.00 · 0.58 + -0.00</td></tr><tr><td>Shaman</td><td class=num>0.73 + 0.02</td><td class=num>0.70 + 0.03</td><td class=num>0.75 + 0.00 · 0.55 + 0.01</td><td class=num>0.76 + 0.06 · 0.53 + 0.01</td></tr><tr><td>Guardian</td><td class=num>0.37 + 0.24</td><td class=num>0.37 + 0.24</td><td class=num>0.35 + 0.05 · 0.27 + 0.10</td><td class=num>0.35 + 0.08 · 0.27 + 0.10</td></tr><tr><td>Templar</td><td class=num>0.37 + 0.24</td><td class=num>0.42 + 0.23</td><td class=num>0.35 + 0.05 · 0.27 + 0.10</td><td class=num>0.40 + 0.04 · 0.33 + 0.10</td></tr><tr><td>Bishop</td><td class=num>0.35 + 0.36</td><td class=num>0.35 + 0.36</td><td class=num>0.29 + 0.11 · 0.26 + 0.17</td><td class=num>0.29 + 0.17 · 0.26 + 0.17</td></tr><tr><td>Exorcist</td><td class=num>0.35 + 0.36</td><td class=num>0.41 + 0.36</td><td class=num>0.29 + 0.11 · 0.26 + 0.17</td><td class=num>0.33 + 0.11 · 0.31 + 0.17</td></tr></tbody></table></div>
+  </section>
+  <section id="t1" class="card">
+    <div class="head"><h2>Tier 1 as built, on the fork (the anchor)</h2><span class="calls"><span class="chip">T2B2</span></span></div>
+
+    <p class="say">Tier 1 Lv 50, the live rules (the fork changes nothing in Tier 1): D + S a member, BT a round. classes.md's analytic anchors had the Paladin's statuses at 0.37 and the hybrids' paths at 0.03; measured 0.33 and 0.03 · 0.11.</p>
+    <div class="scroll"><table class=""><thead><tr><th>Party</th><th>Brawler</th><th>Sorcerer</th><th>Hybrid</th><th>Summoner</th><th>Healer</th><th class=num>Party (Σ D)</th></tr></thead><tbody><tr><td>Party 1</td><td>Brawler 1.00</td><td>Sorcerer 1.02</td><td>Arms Spellblade 0.81 + 0.03</td><td>Tome Summoner 0.72 + 0.03</td><td>Paladin 0.37 + 0.33</td><td class=num>3.91</td></tr><tr><td>Party 2</td><td>Brawler 1.06</td><td>Sorcerer 1.10</td><td>Tome Spellblade 0.82 + 0.11</td><td>Arms Summoner 0.72 + 0.09</td><td>Cleric 0.35 + 0.42</td><td class=num>4.05</td></tr></tbody></table></div>
   </section>
 
-  <section id="tiers" class="card">
-    <div class="head"><h2>Tiers 2 and 3 today play at Tier 1's pace, until the Class Rank differs</h2><span class="calls"><span class="chip">T2B3</span><span class="chip">T2B4</span></span></div>
-    <div class="two">
-      <div>
-        <p class="say">Rounds a fight ÷ Tier 1's at the same tier level, the mean of regulars, sub-bosses and bosses over both parties. <b>At Tier 1's Class Rank pace</b> (solid dots) every cell is inside ±10%. <b>From Class Rank 1</b> (rings), what a later tier does today, Lv 20's fights run 9–12% short on average, sub-bosses to 17%.</p>
-        <div class="legend" id="r-legend"></div>
-        <div id="r-chart"></div>
-      </div>
-      <div>
-        <h3>What it means</h3>
-        <p class="say"><b>With no Tier 2 tools, no term is needed:</b> a Tier 2 world is Tier 1's × tier and the build budget restarts with her grades. The term (T2B4, T2B5) prices only what the set adds.</p>
-        <p class="say"><b>The pace is the one gap today:</b> with no Tier 0 bank a later tier opens depths two to three levels sooner (§ below). T2B3 puts it on Tier 1's curve.</p>
-        <p class="say"><b>Breaks:</b> rounds to her first Break within ±0.6 of Tier 1's in every cell, so today's shields hold until the two-kind weapons arrive (T2B7).</p>
-      </div>
-    </div>
-    <details><summary>Show the numbers</summary><div class="scroll" id="r-table"></div></details>
-  </section>
-
-  <section id="pace" class="card">
-    <div class="head"><h2>The Class Rank pace</h2><span class="calls"><span class="chip">T2B3</span></span></div>
-    <div class="two">
-      <div>
-        <p class="say">The balance party's Class Rank by Uma Level (2E Class EXP a win). <b>Tier 1</b> fights a Tier 0 to Rank 10 at Lv 10 and opens her class there. <b>A later tier</b> starts her class at Rank 1 with no Tier 0 bank, so she reaches each depth sooner.</p>
-        <div class="legend" id="p-legend"></div>
-        <div id="p-chart"></div>
-      </div>
-      <div>
-        <h3>Depths open at Uma Lv</h3>
-        <div class="scroll"><table>
-          <thead><tr><th>Depth (Class Rank)</th><th class="num">Tier 1</th><th class="num">A later tier today</th></tr></thead>
-          <tbody>
-            <tr><td>2 (10)</td><td class="num">10</td><td class="num">7</td></tr>
-            <tr><td>3 (20)</td><td class="num">16</td><td class="num">13</td></tr>
-            <tr><td>4 (30)</td><td class="num">22</td><td class="num">20</td></tr>
-            <tr><td>5 (40)</td><td class="num">29</td><td class="num">27</td></tr>
-            <tr><td>Rank 50</td><td class="num">36</td><td class="num">34</td></tr>
-          </tbody>
-        </table></div>
-        <p class="say"><b>Recommended (T2B3):</b> a Tier 1 class's Ranks 1–10 in a later world take the Tier 0 ladder's Class EXP (3,600, twice their 1,800). Then the two lines are one, and the foes stay tuned.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="mirror" class="card">
-    <div class="head"><h2>The mirrors and the healers, where they stood</h2><span class="calls"><span class="chip">T2B16</span><span class="chip">T2B17</span></span></div>
-    <p class="say">Damage a turn on regular stages; this doc's run at Lv 10 · 20 · 30 · 50. <span class="chip out">red</span> is outside its band.</p>
-    <div class="scroll"><table>
-      <thead><tr><th>Measure (band)</th><th>D236 · v18</th><th>D249 · v19</th><th>Today, Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr></thead>
-      <tbody id="m-body"></tbody>
-    </table></div>
-    <p class="say"><b>Tier 3's Lv 50 dip</b> is MP's: her pair costs 87 of a 600 bar at ×3; T2B10's ×2.4 gives her 70. <b>No hand moves for Tiers 2–3</b> before the toolbox is measured: a hand moves Tier 1 too.</p>
-  </section>
-
-  <section id="check" class="card">
-    <div class="head"><h2>What the simulation must confirm (T2B18)</h2><span class="calls"><span class="chip">32 seeds for a delivery</span></span></div>
-    <div class="scroll"><table>
-      <thead><tr><th>#</th><th>Check</th><th>Band</th><th>Tier 1 reference</th><th>Today, Tiers 2–3</th><th>Knob, in order</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>Wins on curve</td><td>100%</td><td>100%</td><td>100%</td><td>—</td></tr>
-        <tr class="hl"><td>2</td><td>Rounds a fight</td><td>±10% of Tier 1's</td><td>2.9–4.0 · 3.1–4.9 · 5.0–7.8</td><td>0.93–1.08; 0.83–0.95 at Lv 20 from Rank 1</td><td>The term; bosses × 1.1</td></tr>
-        <tr><td>3</td><td>Rounds to her first Break</td><td>±0.5</td><td>1.2–1.4 · 2.0–3.0 · 2.2–3.1</td><td>within ±0.6</td><td>Shields (T2B7)</td></tr>
-        <tr class="hl"><td>4</td><td>Stages leaving a member nothing</td><td>≤ 10% at every level</td><td>3–5%</td><td>16–18% without a two-kind weapon</td><td>The breadth gate (T2B8)</td></tr>
-        <tr><td>5</td><td>MP over a region</td><td>10–12 of 12; late pace ±10%</td><td>12 of 12 (D236)</td><td>not measured</td><td>T2B10, then the regen's share</td></tr>
-        <tr class="hl"><td>6</td><td>Deep casts a bar; refund</td><td>±10%; none refunded</td><td>7.1–18.4; 37–94%</td><td>13–19% fewer; 29–78%</td><td>T2B10</td></tr>
-        <tr><td>7</td><td>The mirrors (S3–S5)</td><td>±5%; 90–110%; 70/30 ± 5</td><td>92–106%; 99–117%; 72–81%</td><td>89–111%</td><td>The hands, then T2C's class skills</td></tr>
-        <tr><td>8</td><td>The healers</td><td>±10%</td><td>101–106%</td><td>99–106%</td><td>T2C's healer focus</td></tr>
-        <tr><td>9</td><td>Accessories</td><td>No mix best in over half; every family someone's best</td><td>met (D266)</td><td>not measured</td><td>T2G's branch rows</td></tr>
-        <tr><td>10</td><td>Defense</td><td>≈ 21% at Lv 50 with the term</td><td>19.0%</td><td>18.4 · 18.2%</td><td>Armor's HP a grade</td></tr>
-        <tr><td>11</td><td>The Rift's fronts</td><td>Right party 91–100%, champions 60–68%</td><td>D249's</td><td>not measured</td><td><code>riftTuning</code>'s scales</td></tr>
-        <tr><td>12</td><td>The Duel's rail</td><td>No act Breaks a Duel boss</td><td>10 chips, shields 13</td><td>the same</td><td>The Duel's shields (T2B9)</td></tr>
-        <tr><td>13</td><td>SB1</td><td>Shares within 2.2 points</td><td>—</td><td>met</td><td>—</td></tr>
-      </tbody>
-    </table></div>
-  </section>
 </main>
 <div id="tip" role="tooltip"></div>
 <script>
@@ -183,90 +159,41 @@
   const NS = 'http://www.w3.org/2000/svg'
   const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (parent) parent.appendChild(n); return n }
   const tip = document.getElementById('tip')
-  const showTip = (e, html) => { tip.innerHTML = html; tip.style.opacity = 1; const r = tip.getBoundingClientRect(); let x = (e.clientX ?? e.target.getBoundingClientRect().right) + 14, y = (e.clientY ?? e.target.getBoundingClientRect().top) + 14; if (x + r.width > innerWidth - 8) x = innerWidth - r.width - 8; if (y + r.height > innerHeight - 8) y -= r.height + 28; tip.style.left = x + 'px'; tip.style.top = y + 'px' }
+  const showTip = (ev, h) => { tip.innerHTML = h; tip.style.opacity = 1; const r = tip.getBoundingClientRect(); let x = (ev.clientX ?? ev.target.getBoundingClientRect().right) + 14, y = (ev.clientY ?? ev.target.getBoundingClientRect().top) + 14; if (x + r.width > innerWidth - 8) x = innerWidth - r.width - 8; if (y + r.height > innerHeight - 8) y -= r.height + 28; tip.style.left = x + 'px'; tip.style.top = y + 'px' }
   const hideTip = () => { tip.style.opacity = 0 }
-  const hover = (node, html) => { node.setAttribute('tabindex', '0'); node.setAttribute('aria-label', html.replace(/<[^>]+>/g, ' ')); node.addEventListener('pointermove', (e) => showTip(e, html)); node.addEventListener('pointerleave', hideTip); node.addEventListener('focus', (e) => showTip(e, html)); node.addEventListener('blur', hideTip) }
-  const legend = (id, items) => { document.getElementById(id).innerHTML = items.map(([c, t, k = '', ring]) => `<span><i class="sw ${k}" style="${ring ? `background:transparent;border:2px solid var(${c})` : `background:var(${c})`}"></i>${t}</span>`).join('') }
+  const hover = (node, h) => { node.setAttribute('tabindex', '0'); node.setAttribute('aria-label', h.replace(/<[^>]+>/g, ' ')); node.addEventListener('pointermove', (ev) => showTip(ev, h)); node.addEventListener('pointerleave', hideTip); node.addEventListener('focus', (ev) => showTip(ev, h)); node.addEventListener('blur', hideTip) }
+  window.__t2b = { el, hover };
+})();
 
-  // The reference row (rounds · first Break), Tier 1, v21.
-  const REF = [
-    [10, ['4.0 · 1.3', '4.2 · 3.0', '7.4 · 3.1'], ['4.0 · 1.4', '4.2 · 2.9', '7.5 · 2.9']],
-    [20, ['3.4 · 1.3', '3.9 · 2.7', '6.0 · 2.5'], ['3.3 · 1.3', '3.8 · 2.3', '6.0 · 2.5']],
-    [30, ['2.9 · 1.2', '3.1 · 2.0', '5.1 · 2.2'], ['2.9 · 1.2', '3.1 · 2.1', '5.0 · 2.3']],
-    [40, ['3.3', '4.0', '6.0'], ['3.3', '3.8', '5.9']],
-    [50, ['4.0 · 1.3', '4.9 · 2.7', '7.8 · 2.7'], ['3.9 · 1.4', '4.8 · 2.4', '7.3 · 2.6']],
-  ]
-  document.getElementById('ref-body').innerHTML = REF.map(([lv, a, b]) => `<tr><td>Lv ${lv}</td>${[...a, ...b].map((c) => `<td class="num">${c}</td>`).join('')}</tr>`).join('')
-
-  // Rounds ÷ Tier 1: [party][tier][pace][level] = [regular, sub-boss, boss].
-  const LV = [10, 20, 30, 50]
-  const R = {
-    'Party 1': { 2: { tier1: [[1.04, 1.02, 0.97], [1.00, 0.96, 0.98], [1.03, 1.03, 1.00], [1.03, 1.02, 0.98]], rank1: [[1.01, 1.00, 0.94], [0.90, 0.86, 0.89], [1.03, 1.02, 0.97], [1.03, 1.02, 0.98]] },
-                 3: { tier1: [[0.99, 1.00, 0.96], [1.02, 0.99, 0.96], [1.06, 1.03, 1.01], [1.01, 1.03, 0.97]], rank1: [[0.96, 0.98, 0.93], [0.92, 0.88, 0.89], [1.06, 1.02, 1.00], [1.01, 1.03, 0.97]] } },
-    'Party 2': { 2: { tier1: [[1.08, 0.99, 0.99], [1.01, 0.96, 0.98], [1.02, 0.99, 0.98], [1.01, 0.93, 1.01]], rank1: [[1.04, 0.97, 0.95], [0.93, 0.83, 0.88], [1.01, 0.98, 0.96], [1.01, 0.93, 1.01]] },
-                 3: { tier1: [[1.03, 1.01, 0.98], [1.02, 0.98, 0.99], [1.02, 1.02, 1.01], [0.99, 0.94, 1.00]], rank1: [[1.00, 0.99, 0.95], [0.95, 0.88, 0.91], [1.02, 1.01, 1.01], [0.99, 0.94, 1.00]] } },
-  }
-  const mean = (tier, pace, i) => { const xs = ['Party 1', 'Party 2'].flatMap((p) => R[p][tier][pace][i]); return xs.reduce((a, b) => a + b, 0) / xs.length }
-  const SERIES = [[2, 'tier1', '--s2', 'Tier 2, Tier 1’s pace', false], [3, 'tier1', '--s3', 'Tier 3, Tier 1’s pace', false], [2, 'rank1', '--s2', 'Tier 2, from Class Rank 1', true], [3, 'rank1', '--s3', 'Tier 3, from Class Rank 1', true]]
-  legend('r-legend', SERIES.map(([, , c, n, ring]) => [c, n, '', ring]))
-  ;(() => {
-    const host = document.getElementById('r-chart')
-    const W = 640, H = 290, L = 46, Rr = 24, T = 14, B = 30, pw = W - L - Rr, ph = H - T - B
-    const X = (i) => L + pw * (i + 0.5) / LV.length, Y = (v) => T + ph * (1 - (v - 0.8) / 0.35)
-    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Rounds a fight against Tier 1, by tier level, for Tiers 2 and 3 at two Class Rank paces' }, host)
-    el('rect', { x: L, y: Y(1.1), width: pw, height: Y(0.9) - Y(1.1), style: 'fill:var(--band)' }, svg)
-    el('text', { x: L + pw - 4, y: Y(1.1) + 13, 'text-anchor': 'end', class: 'soft' }, svg).textContent = 'the band: ±10%'
-    for (const v of [0.8, 0.9, 1.0, 1.1]) { el('line', { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: 'gridl' }, svg); el('text', { x: L - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = v.toFixed(1) }
-    LV.forEach((l, i) => el('text', { x: X(i), y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `Lv ${l}`)
-    SERIES.forEach(([tier, pace, c, name, ring], si) => {
-      const pts = LV.map((l, i) => [X(i) + (si - 1.5) * 9, Y(mean(tier, pace, i))])
-      el('path', { d: pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x},${y}`).join(' '), style: `stroke:var(${c});stroke-width:2;fill:none;stroke-linejoin:round;opacity:${ring ? 0.5 : 0.9}` }, svg)
-      pts.forEach(([x, y], i) => {
-        el('circle', { cx: x, cy: y, r: ring ? 4.5 : 5, style: ring ? `fill:var(--panel);stroke:var(${c});stroke-width:2` : `fill:var(${c});stroke:var(--panel);stroke-width:2` }, svg)
-        const cells = ['Party 1', 'Party 2'].map((p) => `${p}: ${R[p][tier][pace][i].map((v) => v.toFixed(2)).join(' · ')}`).join('<br>')
-        hover(el('circle', { cx: x, cy: y, r: 11, class: 'hit' }, svg), `<b>${name}, Lv ${LV[i]}</b>Mean ${mean(tier, pace, i).toFixed(2)}<br>${cells}<br><span>regular · sub-boss · boss</span>`)
-      })
+(() => {
+  const { el, hover } = window.__t2b
+  const D = {"berserker": {"fam": "pure", "name": "Berserker", "parent": "Brawler", "cl": [4.5, 1.8, 4.5], "pr": [5.6, 2.0, 5.1], "D": [1.08, 1.1, 1.14], "S": [0.0, 0.0, 0.0], "Dp": [0.98, 1.04, 1.04], "Sp": [0.0, 0.0, 0.0], "heal": false}, "spellfist": {"fam": "pure", "name": "Spellfist", "parent": "Brawler", "cl": [10.4, 6.7, 3.0], "pr": [6.5, 4.5, 4.3], "D": [1.06, 1.14, 1.12], "S": [0.0, 0.0, 0.0], "Dp": [0.98, 1.04, 1.04], "Sp": [0.0, 0.0, 0.0], "heal": false}, "archmage": {"fam": "pure", "name": "Archmage", "parent": "Sorcerer", "cl": [4.9, 2.6, 4.1], "pr": [5.9, 3.4, 5.1], "D": [1.11, 1.08, 1.21], "S": [0.0, 0.0, 0.0], "Dp": [1.02, 1.03, 1.12], "Sp": [0.0, 0.0, 0.0], "heal": false}, "battlemage": {"fam": "pure", "name": "Battlemage", "parent": "Sorcerer", "cl": [-2.5, -4.7, -11.5], "pr": [10.9, 8.3, -1.8], "D": [1.15, 1.19, 1.22], "S": [0.0, 0.0, 0.0], "Dp": [1.02, 1.03, 1.12], "Sp": [0.0, 0.0, 0.0], "heal": false}, "blademaster": {"fam": "blade", "name": "Blademaster", "parent": "Arms Spellblade", "cl": [0.5, 0.0, -0.1], "pr": [9.1, 4.6, 3.6], "D": [0.83, 0.77, 0.89], "S": [0.0, 0.0, 0.01], "Dp": [0.76, 0.72, 0.85], "Sp": [0.0, 0.0, 0.02], "heal": false}, "sentinel": {"fam": "blade", "name": "Sentinel", "parent": "Arms Spellblade", "cl": [34.0, 46.0, 49.8], "pr": [-2.4, 10.9, 2.9], "D": [0.71, 0.62, 0.71], "S": [0.07, 0.09, 0.14], "Dp": [0.76, 0.72, 0.85], "Sp": [0.0, 0.0, 0.02], "heal": false}, "runeblade": {"fam": "blade", "name": "Runeblade", "parent": "Tome Spellblade", "cl": [-0.7, 0.5, -0.7], "pr": [6.7, 2.3, 2.9], "D": [0.83, 0.77, 0.92], "S": [0.0, 0.02, 0.05], "Dp": [0.77, 0.69, 0.86], "Sp": [0.0, 0.05, 0.09], "heal": false}, "enchanter": {"fam": "blade", "name": "Enchanter", "parent": "Tome Spellblade", "cl": [32.6, 19.4, 18.5], "pr": [7.0, 2.5, 6.7], "D": [0.64, 0.56, 0.69], "S": [0.13, 0.11, 0.23], "Dp": [0.77, 0.69, 0.86], "Sp": [0.0, 0.05, 0.09], "heal": false}, "warlord": {"fam": "call", "name": "Warlord", "parent": "Arms Summoner", "cl": [4.0, -0.2, 1.8], "pr": [8.6, 1.9, 6.9], "D": [0.78, 0.6, 0.78], "S": [-0.0, 0.05, 0.1], "Dp": [0.72, 0.56, 0.73], "Sp": [0.0, 0.06, 0.1], "heal": false}, "druid": {"fam": "call", "name": "Druid", "parent": "Arms Summoner", "cl": [12.5, 10.1, -1.9], "pr": [7.1, 2.2, -1.4], "D": [0.67, 0.51, 0.65], "S": [0.11, 0.07, 0.11], "Dp": [0.72, 0.56, 0.73], "Sp": [0.0, 0.06, 0.1], "heal": false}, "invoker": {"fam": "call", "name": "Invoker", "parent": "Tome Summoner", "cl": [4.0, 1.3, 1.2], "pr": [8.7, 3.6, 2.9], "D": [0.81, 0.58, 0.77], "S": [0.0, -0.0, 0.01], "Dp": [0.75, 0.55, 0.73], "Sp": [0.0, 0.01, 0.02], "heal": false}, "shaman": {"fam": "call", "name": "Shaman", "parent": "Tome Summoner", "cl": [-1.5, 0.2, -2.3], "pr": [10.5, 0.9, 1.2], "D": [0.76, 0.53, 0.7], "S": [0.06, 0.01, 0.03], "Dp": [0.75, 0.55, 0.73], "Sp": [0.0, 0.01, 0.02], "heal": false}, "guardian": {"fam": "heal", "name": "Guardian", "parent": "Paladin", "cl": [5.5, 0.0, 1.1], "pr": [5.5, 0.0, 1.1], "D": [0.35, 0.27, 0.37], "S": [0.08, 0.1, 0.24], "Dp": [0.35, 0.27, 0.37], "Sp": [0.05, 0.1, 0.24], "heal": true}, "templar": {"fam": "heal", "name": "Templar", "parent": "Paladin", "cl": [12.2, 9.7, 5.6], "pr": [12.2, 9.7, 5.6], "D": [0.4, 0.33, 0.42], "S": [0.04, 0.1, 0.23], "Dp": [0.35, 0.27, 0.37], "Sp": [0.05, 0.1, 0.24], "heal": true}, "bishop": {"fam": "heal", "name": "Bishop", "parent": "Cleric", "cl": [15.5, 0.0, 0.1], "pr": [15.5, 0.0, 0.1], "D": [0.29, 0.26, 0.35], "S": [0.17, 0.17, 0.36], "Dp": [0.29, 0.26, 0.35], "Sp": [0.11, 0.17, 0.36], "heal": true}, "exorcist": {"fam": "heal", "name": "Exorcist", "parent": "Cleric", "cl": [15.8, 6.9, 7.3], "pr": [15.8, 6.9, 7.3], "D": [0.33, 0.31, 0.41], "S": [0.11, 0.17, 0.36], "Dp": [0.29, 0.26, 0.35], "Sp": [0.11, 0.17, 0.36], "heal": true}}, M = {"cl": [8.6, 7.0, 5.5], "pr": [7.0, 3.9, 3.2]}, ORDER = ["berserker", "spellfist", "archmage", "battlemage", "blademaster", "sentinel", "runeblade", "enchanter", "warlord", "druid", "invoker", "shaman", "guardian", "templar", "bishop", "exorcist"]
+  const C = { pure: '--c1', blade: '--c2', call: '--c3', heal: '--heal' }
+  const draw = (i) => {
+    const host = document.getElementById('gain-chart'); host.innerHTML = ''
+    const W = 1080, L = 220, R = 30, rowH = 26, T = 26, H = T + rowH * ORDER.length + 30, lo = -15, hi = 55, pw = W - L - R
+    const X = (v) => L + pw * (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Each class\'s gain over her parent, classes.md against proposed' }, host)
+    for (let t = lo; t <= hi; t += 5) { el('line', { x1: X(t), x2: X(t), y1: T - 8, y2: H - 26, class: 'gridl' }, svg); el('text', { x: X(t), y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `${t > 0 ? '+' : ''}${t}%` }
+    const m = M.pr[i]
+    el('rect', { x: X(m - 5), y: T - 8, width: X(m + 5) - X(m - 5), height: rowH * 12 + 8, class: 'band' }, svg)
+    el('text', { x: X(m), y: T - 12, 'text-anchor': 'middle', class: 'soft' }, svg).textContent = `mean ${m > 0 ? '+' : ''}${m.toFixed(1)}% ± 5`
+    el('line', { x1: X(0), x2: X(0), y1: T - 8, y2: H - 26, style: 'stroke:var(--ink-faint);stroke-width:1.5' }, svg)
+    ORDER.forEach((c, k) => {
+      const d = D[c], y = T + k * rowH + 10, col = C[d.fam]
+      el('text', { x: L - 10, y: y + 4, 'text-anchor': 'end', class: 'lab' }, svg).textContent = d.name + (d.heal ? ' (stress)' : '')
+      const a = d.cl[i], b = d.pr[i]
+      el('line', { x1: X(a), x2: X(b), y1: y, y2: y, style: `stroke:var(${col});stroke-width:2;opacity:.45` }, svg)
+      el('circle', { cx: X(a), cy: y, r: 5, class: 'ring', style: `stroke:var(${col})` }, svg)
+      el('circle', { cx: X(b), cy: y, r: 6, style: `fill:var(${col});stroke:var(--panel);stroke-width:2` }, svg)
+      if (a > hi) el('text', { x: X(hi) - 4, y: y - 7, 'text-anchor': 'end', class: 'soft' }, svg).textContent = `${a.toFixed(0)}% →`
+      const h = el('rect', { x: L, y: y - 11, width: pw, height: 22, class: 'hit' }, svg)
+      hover(h, `<b>${d.name}</b> in the ${d.parent}'s seat<br>classes.md: ${a > 0 ? '+' : ''}${a}% · proposed: ${b > 0 ? '+' : ''}${b}%<br>D + S: ${d.D[i]} + ${d.S[i]} BT (parent ${d.Dp[i]} + ${d.Sp[i]})`)
     })
-    const rows = []
-    for (const p of ['Party 1', 'Party 2']) for (const t of [2, 3]) for (const pace of ['tier1', 'rank1']) rows.push(`<tr><td>${p}, Tier ${t}, ${pace === 'tier1' ? 'Tier 1’s pace' : 'from Rank 1'}</td>${R[p][t][pace].map((c) => `<td class="num">${c.map((v) => `<span${v < 0.9 || v > 1.1 ? ' style="color:var(--danger);font-weight:700"' : ''}>${v.toFixed(2)}</span>`).join(' · ')}</td>`).join('')}</tr>`)
-    document.getElementById('r-table').innerHTML = `<table><thead><tr><th>Regular · sub-boss · boss</th>${LV.map((l) => `<th class="num">Lv ${l}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`
-  })()
-
-  // The Class Rank pace (balanceClassRank on v21 and on the from-Rank-1 curve).
-  const T1 = [10,10,10,10,10,10,10,10,10,10,11,13,15,17,19,20,22,24,25,27,28,30,31,33,34,36,37,39,40,42,43,45,46,48,49,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50]
-  const LT = [1,2,4,6,7,9,11,12,14,15,17,18,20,21,23,24,25,27,28,30,31,33,34,36,37,38,40,41,43,44,46,47,49,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50]
-  legend('p-legend', [['--s1', 'Tier 1 (a Tier 0 below Lv 10)', 'line'], ['--s2', 'A later tier today', 'line']])
-  ;(() => {
-    const host = document.getElementById('p-chart')
-    const W = 640, H = 280, L = 46, Rr = 60, T = 12, B = 30, pw = W - L - Rr, ph = H - T - B
-    const X = (l) => L + pw * (l - 1) / 49, Y = (r) => T + ph * (1 - r / 50)
-    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Class Rank by Uma Level, Tier 1 against a later tier' }, host)
-    for (const [r, d] of [[0, ''], [10, 'depth 2'], [20, 'depth 3'], [30, 'depth 4'], [40, 'depth 5'], [50, '']]) {
-      el('line', { x1: L, x2: L + pw, y1: Y(r), y2: Y(r), class: 'gridl' }, svg)
-      el('text', { x: L - 8, y: Y(r) + 4, 'text-anchor': 'end', class: 'ax' }, svg).textContent = r
-      if (d) el('text', { x: L + pw + 6, y: Y(r) + 4, class: 'soft' }, svg).textContent = d
-    }
-    for (const l of [1, 10, 20, 30, 40, 50]) el('text', { x: X(l), y: H - 8, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = `Lv ${l}`
-    const path = (xs, from) => xs.map((r, i) => i + 1 < from ? null : `${i + 1 === from ? 'M' : 'L'}${X(i + 1)},${Y(r)}`).filter(Boolean).join(' ')
-    el('path', { d: path(T1, 10), style: 'stroke:var(--s1);stroke-width:2;fill:none;stroke-linejoin:round' }, svg)
-    el('path', { d: path(LT, 1), style: 'stroke:var(--s2);stroke-width:2;fill:none;stroke-linejoin:round' }, svg)
-    for (let l = 1; l <= 50; l++) hover(el('rect', { x: X(l) - pw / 98, y: T, width: pw / 49, height: ph, class: 'hit' }, svg), `<b>Uma Lv ${l}</b>Tier 1: ${l < 10 ? `a Tier 0 at Rank ${l}` : `Class Rank ${T1[l - 1]}`}<br>A later tier: Class Rank ${LT[l - 1]}`)
-  })()
-
-  // Mirrors and healers.
-  const M = [
-    ['S5 Tome Summoner ÷ Arms Spellblade (90–110%)', 'Summoner ÷ Spell Blade 110 · 88 · 90 (Lv 10 · 30 · 50)', '102–104; 114 at Lv 10', [117, 103, 102, 99], [103, 110, 95, 96], [111, 97, 94, 89], [90, 110]],
-    ['S5 Arms Summoner ÷ Tome Spellblade (90–110%)', '—', '98–106', [107, 106, 99, 99], [104, 106, 94, 98], [107, 103, 99, 95], [90, 110]],
-    ['S3 Tome ÷ Arms Spellblade, across the parties (±5%)', '—', '102–103', [101, 103, 106, 101], null, null, [95, 105]],
-    ['S4 Arms ÷ Tome Summoner, across the parties (±5%)', '—', '96–103', [92, 106, 102, 101], null, null, [95, 105]],
-    ['Arms Spellblade, physical (65–75%)', '—', '74–80 (missed)', [77, 75, 74, 77], null, null, [65, 75]],
-    ['Tome Spellblade, magical (65–75%)', '—', '68–74', [77, 74, 78, 81], null, null, [65, 75]],
-    ['Arms Summoner, physical (65–75%)', '—', '68–73', [72, 73, 74, 75], null, null, [65, 75]],
-    ['Tome Summoner, magical (65–75%)', 'Summoner 71 · 66 · 71', '66–72', [72, 70, 71, 74], null, null, [65, 75]],
-    ['Paladin ÷ Cleric, mends and absorbed Barriers (90–110%; Lv 10 · 30 · 50)', 'R1 111, R2 112', '89 · 147 · 121', [101, 104, 106], [99, 106, 104], [102, 101, 106], [90, 110]],
-  ]
-  const cell = (xs, [lo, hi]) => xs ? xs.map((v) => `<span${v < lo || v > hi ? ' style="color:var(--danger);font-weight:700"' : ''}>${v}</span>`).join(' · ') + '%' : '—'
-  document.getElementById('m-body').innerHTML = M.map(([n, a, b, t1, t2, t3, band]) => `<tr><td>${n}</td><td>${a}</td><td>${b}</td><td class="num">${cell(t1, band)}</td><td class="num">${cell(t2, band)}</td><td class="num">${cell(t3, band)}</td></tr>`).join('')
+  }
+  const pick = document.getElementById('lv-pick')
+  pick.querySelectorAll('button').forEach((b) => b.onclick = () => { pick.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); draw(+b.dataset.i) })
+  draw(2)
 })()
 </script>
 </body>
