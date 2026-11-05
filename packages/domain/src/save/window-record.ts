@@ -2,12 +2,13 @@
 // three base-36 characters in the catalog's order, the day it lit as days since 2026-01-01 (UTC), `---` while dark; the
 // capital champions she has beaten are a 15-bit mask. No save import here, so `save.ts` can parse it without a cycle.
 import { WINDOW_ROUTES, WINDOW_STEP_IDS, WINDOW_STEPS_MAX, type WindowStepId } from '../rpg/windows'
+import { capitalRunsLive } from './collections'
 
 export interface WindowRecord {
   /** `WINDOW_STEPS_MAX` × 3 characters. */
   steps: string
-  /** Bit 3 × (n − 1) + (route − 1): continent n of her tier's five, route 1–3. */
-  champions: number
+  /** Bit 3 × (n − 1) + (route − 1): continent n of her tier's five, route 1–3. Absent from save v37 (H160). */
+  champions?: number
 }
 
 /** The account's windows: by outfit id, then by tier key ("1", "2"…). */
@@ -20,7 +21,7 @@ export const WINDOW_CODE = /^(?:---|[0-9a-z]{3})$/
 export const WINDOW_STEPS_LENGTH = WINDOW_STEPS_MAX * 3
 export const WINDOW_CHAMPIONS_MAX = 2 ** (5 * WINDOW_ROUTES) - 1
 
-export const emptyWindow = (): WindowRecord => ({ steps: WINDOW_DARK.repeat(WINDOW_STEPS_MAX), champions: 0 })
+export const emptyWindow = (): WindowRecord => ({ steps: WINDOW_DARK.repeat(WINDOW_STEPS_MAX), ...(capitalRunsLive() ? {} : { champions: 0 }) })
 
 /** The day a time falls on, as the record's code. */
 export function dayCode(now: string): string {

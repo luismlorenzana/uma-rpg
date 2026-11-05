@@ -12,7 +12,7 @@ import { ARMOR_SLOTS } from '../economy/ranks'
 import { withHerMoon } from '../economy/planet'
 import { capitalStageIds } from '../world/capital'
 import { activeClass, classOf, type BattleOutfit } from './class'
-import { collectionsLive } from './collections'
+import { capitalRunsLive, collectionsLive } from './collections'
 import { TIERS } from './rules'
 import { gradesOf, starMapOf, type OwnedUma, type Save, type TierWorld } from './save'
 import { championBit, championsWon, codeDay, emptyWindow, stepCode, withSteps, WINDOW_DARK, type WindowRecord, type WindowRecords } from './window-record'
@@ -54,8 +54,8 @@ function starsMet(uma: OwnedUma, n: WindowNumeral): boolean {
   return (n < 2 || open.has('template:1')) && (n < 4 || open.has('template:2'))
 }
 
-/** The steps her state meets now, in her world's `tier`, with her champions mask for World. The Rift is never read from
- * state: only a won run lights it. */
+/** The steps her state meets now, in her world's `tier`. Before v37 World reads her champions mask; from v37 only a won
+ * capital run lights it. The Rift likewise is never read from state: only its won run lights it. */
 export function windowMet(uma: OwnedUma, outfit: BattleOutfit, tier: number, champions: number): Set<WindowStepId> {
   const met = new Set<WindowStepId>()
   const t1 = tier1Ranks(uma)
@@ -70,7 +70,7 @@ export function windowMet(uma: OwnedUma, outfit: BattleOutfit, tier: number, cha
     if (floor >= WINDOW_GRADES[i]!) met.add(`gear-${n}`)
     if (weaponsAt(uma, WINDOW_GRADES[i]!) >= WINDOW_WEAPONS) met.add(`weapons-${n}`)
     if (starsMet(uma, n)) met.add(`stars-${n}`)
-    if (championsWon(champions, n)) met.add(`world-${n}`)
+    if (!capitalRunsLive() && championsWon(champions, n)) met.add(`world-${n}`)
   }
   return met
 }
@@ -92,7 +92,7 @@ function put(windows: WindowRecords, outfitId: string, tier: string, record: Win
 /** Her record with what her state meets latched, and, once full without a Rift (Tier 3), the Rift's place too, so the
  * window stays full if a Rift arrives (CO33). */
 function latchOne(record: WindowRecord, uma: OwnedUma, outfit: BattleOutfit, tier: number, now: string): WindowRecord {
-  let next = withSteps(record, windowMet(uma, outfit, tier, record.champions), now)
+  let next = withSteps(record, windowMet(uma, outfit, tier, record.champions ?? 0), now)
   if (!tierHasRift(tier) && windowFull(next, tier)) next = withSteps(next, ['rift'], now)
   return next
 }
@@ -107,13 +107,20 @@ function credit(save: Save, outfits: ReadonlyMap<string, BattleOutfit>, now: str
     const won = (n: number) => [1, 2, 3].every((route) => (world.world.run.wins[capitalStageIds(`w${first + n - 1}`, route).champion] ?? 0) > 0)
     for (const [id, uma] of Object.entries(world.umas)) {
       let record = recordOf(windows, id, key)
-      let mask = record.champions
+      let mask = record.champions ?? 0
       for (const n of NUMERALS) {
         if (uma.level >= WINDOW_LEVELS[n - 1]! && won(n)) for (const route of [1, 2, 3]) mask |= championBit(n, route)
       }
       if (mask !== record.champions) record = { ...record, champions: mask }
       for (const run of world.rift.runs) if (run.wonAt !== null && run.roster.includes(id)) record = withSteps(record, ['rift'], run.wonAt)
       const outfit = outfits.get(id)
+      // Only this once-only pre-v35 credit keeps the old World rule at v37. Date the earned steps before the mask
+      // leaves, even if her outfit hasn't loaded yet; a normal latch never reads old capital wins or champion bits.
+      if (capitalRunsLive()) {
+        record = withSteps(record, NUMERALS.filter((n) => championsWon(mask, n)).map((n) => `world-${n}` as const), now)
+        const { champions: _champions, ...steps } = record
+        record = steps
+      }
       if (outfit) record = latchOne(record, uma, outfit, tier, now)
       windows = put(windows, id, key, record)
     }
@@ -122,7 +129,7 @@ function credit(save: Save, outfits: ReadonlyMap<string, BattleOutfit>, now: str
     for (const entry of entries) {
       const from = String(entry.tier - 1)
       const full = withSteps(recordOf(windows, id, from), WINDOW_STEP_IDS, entry.at)
-      windows = put(windows, id, from, { ...full, champions: 2 ** 15 - 1 })
+      windows = put(windows, id, from, capitalRunsLive() ? full : { ...full, champions: 2 ** 15 - 1 })
     }
   }
   return windows
@@ -152,7 +159,7 @@ export function latchWindows(save: Save, outfits: ReadonlyMap<string, BattleOutf
 
 /** A won capital champion stage's bit for the party (D283 decision 5), in the world's tier; any other stage, the save. */
 export function recordChampion(save: Save, tier: string, stageId: string, outfitIds: readonly string[]): Save {
-  if (!collectionsLive() || !save.account.windows) return save
+  if (!collectionsLive() || capitalRunsLive() || !save.account.windows) return save
   const m = /^w(\d+)-capital-r([1-3])-s2$/.exec(stageId)
   if (!m) return save
   const continent = Number(m[1]) - 5 * (Number(tier) - 1)
@@ -161,8 +168,8 @@ export function recordChampion(save: Save, tier: string, stageId: string, outfit
   let windows = save.account.windows
   for (const id of outfitIds) {
     const record = recordOf(windows, id, tier)
-    if (Math.floor(record.champions / bit) % 2 === 1) continue
-    windows = put(windows, id, tier, { ...record, champions: record.champions + bit })
+    if (Math.floor((record.champions ?? 0) / bit) % 2 === 1) continue
+    windows = put(windows, id, tier, { ...record, champions: (record.champions ?? 0) + bit })
   }
   return windows === save.account.windows ? save : { ...save, account: { ...save.account, windows } }
 }
@@ -172,6 +179,16 @@ export function recordRiftWin(save: Save, tier: string, roster: readonly string[
   if (!collectionsLive() || !save.account.windows) return save
   let windows = save.account.windows
   for (const id of roster) windows = put(windows, id, tier, withSteps(recordOf(windows, id, tier), ['rift'], now))
+  return windows === save.account.windows ? save : { ...save, account: { ...save.account, windows } }
+}
+
+/** World n lights for all twenty only when the fourth final falls (D293, H160). */
+export function recordCapitalWin(save: Save, tier: string, continent: string, roster: readonly string[], now: string): Save {
+  if (!capitalRunsLive() || !save.account.windows) return save
+  const n = Number(/^w([1-9]\d*)$/.exec(continent)?.[1]) - 5 * (Number(tier) - 1)
+  if (n < 1 || n > 5 || !Number.isInteger(n)) return save
+  let windows = save.account.windows
+  for (const id of roster) windows = put(windows, id, tier, withSteps(recordOf(windows, id, tier), [`world-${n as WindowNumeral}`], now))
   return windows === save.account.windows ? save : { ...save, account: { ...save.account, windows } }
 }
 
@@ -201,11 +218,11 @@ export function windowOf(save: Save, outfitId: string, tier: number): WindowView
     const on = own.filter((s) => s.day !== null).length
     return { track, lit: on, total: own.length, percent: percentOf(on, own.length) }
   })
-  return { tier, steps, lit, total: steps.length, percent: percentOf(lit, steps.length), tracks, full: lit === steps.length, champions: record.champions }
+  return { tier, steps, lit, total: steps.length, percent: percentOf(lit, steps.length), tracks, full: lit === steps.length, champions: record.champions ?? 0 }
 }
 
 /** A track's next dark step and how far she is toward it, for the board's "what's left" ("Lv 34/40", "8 of 11 at G6"). */
-export interface WindowNext { track: WindowTrack; numeral: WindowNumeral; have: number; need: number; grade?: number }
+export interface WindowNext { track: WindowTrack; numeral: WindowNumeral; have: number; need: number; grade?: number; run?: string }
 
 /** Each track's first dark step and her progress toward it; a track with every step lit has none. */
 export function windowNext(save: Save, uma: OwnedUma, outfit: BattleOutfit, outfitId: string, tier: number): WindowNext[] {
@@ -234,7 +251,14 @@ export function windowNext(save: Save, uma: OwnedUma, outfit: BattleOutfit, outf
         out.push({ track, numeral: n, have: nodes.filter((id) => open.has(id)).length, need: nodes.length })
         break
       }
-      case 'world': out.push({ track, numeral: n, have: [1, 2, 3].filter((route) => Math.floor(record.champions / championBit(n, route)) % 2 === 1).length, need: 3 }); break
+      case 'world': {
+        if (capitalRunsLive()) {
+          const continent = `w${5 * (tier - 1) + n}`
+          const run = save.tierWorlds[String(tier)]?.capitalRuns?.find((r) => r.continent === continent && r.lanes.some((l) => l.umas.includes(outfitId)))
+          out.push({ track, numeral: n, have: run?.lanes.filter((l) => l.finalAt !== null).length ?? 0, need: 4, ...(run ? { run: run.id } : {}) })
+        } else out.push({ track, numeral: n, have: [1, 2, 3].filter((route) => Math.floor((record.champions ?? 0) / championBit(n, route)) % 2 === 1).length, need: 3 })
+        break
+      }
     }
   }
   return out

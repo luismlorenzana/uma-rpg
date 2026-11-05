@@ -296,6 +296,12 @@ At every schema bump the API's GET migrates the stored save without writing it; 
 new version copies the stored document to `saveBackups/{uid}-v{n}` (D69), and an older app's write is refused once
 the newer version is stored (D45).
 
+**Staged, still dark (H160):** `capitalRunsLive()` in `save/collections.ts` stays false while the live save is v36.
+`toV37` and the account's v37 step are written but not applied: worlds will gain open `capitalRuns` and `capitals`
+(started/won counters and six recent wins), and windows will drop only their champion masks, keeping lit steps. The
+run rules load through `@rpg/domain/capital`, outside the initial bundle. Today's three Finals routes, champion credit
+and live save shape stay unchanged. H161 adds screens; H162 owns the switch and the live manual changes.
+
 ### The shape
 
 ```

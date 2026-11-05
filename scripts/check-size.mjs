@@ -19,6 +19,7 @@ export const LAZY_MODULES = [
   'packages/domain/src/rpg/heroes.ts',
   'packages/domain/src/rpg/catalog.ts',
   'packages/domain/src/save/battle.ts',
+  'packages/domain/src/save/capital.ts',
   'packages/domain/src/save/migrations.ts',
   'packages/domain/src/save/classes-v3.ts',
   'packages/domain/src/save/class-tiles.ts',

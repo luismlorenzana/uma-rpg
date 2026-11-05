@@ -44,6 +44,9 @@ import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFlourishActive, umaStride, umaTemplate } from '../roster/template'
 import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit } from './class'
 import { RPG_RESET_TIER0 } from './classes-v3'
+import { capitalRunsLive } from './collections'
+import { isCapitalRunChapter } from '../world/capital-run-id'
+import { settleCapitalFight } from './capital'
 
 // An Uma's class (H62) and one healer a party (H59): in `save/class.ts`, so the main bundle and the party screens read them
 // without this module and the engine. Classes v3's class tree (`umaClassTree`, in `save/class-tiles.ts` since H137, and
@@ -425,6 +428,8 @@ export interface FightResult {
   firstClear?: boolean
   /** A Drill's pay (save v35, D283): Training Logs into the wallet, and nothing else. */
   logs?: number
+  /** Progress in the signed lane; `won` means all four finals have fallen (save v37, H160). */
+  capital?: { runId: string; lane: number; general?: 1 | 2 | 3; final?: number; won: boolean }
 }
 
 /** One bar a member filled: which, how much EXP, and the track before and after. */
@@ -470,6 +475,7 @@ export function stageLaurels(kind: ReturnType<typeof rpgRewardKind>, tier: numbe
  * MP carries. A loss leaves the run as it was before.
  */
 export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun, state: BattleState, now: string, tier = TIER_ONE): { save: Save; result: FightResult } {
+  if (capitalRunsLive() && isCapitalRunChapter(chapter)) return settleCapitalFight(save, chapter, run, state, now, tier)
   if (isDrillChapter(chapter)) return settleDrill(save, chapter, run, state, now, tier)
   const world = worldOf(save, tier)
   const battle = run.battle
@@ -570,14 +576,14 @@ export function fillRanks(uma: OwnedUma, entrant: Pick<Entrant, 'classId' | 'wea
  * From v16 the win confirms each one's calling pick (CP29, H69).
  */
 export function payEntrants(world: TierWorld, entrants: readonly Entrant[], kind: ReturnType<typeof rpgRewardKind>, foeLevel: number, laurels: number,
-  tier = TIER_ONE, share = 1): { world: TierWorld; members: MemberGain[]; shards: number; tickets: number; laurels: number; gearMarks: number; classMarks: number } {
+  tier = TIER_ONE, share: number | ((outfitId: string) => number) = 1): { world: TierWorld; members: MemberGain[]; shards: number; tickets: number; laurels: number; gearMarks: number; classMarks: number } {
   const umas = { ...world.umas }
   const members: MemberGain[] = []
   let shards = 0, gearMarks = 0, classMarks = 0
   for (const e of entrants) {
     const uma = umas[e.outfitId]
     if (!uma) continue // released from the world since: nothing to pay
-    const exp = Math.max(1, Math.round(rpgBattleExp(kind, foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level })) * share))
+    const exp = Math.max(1, Math.round(rpgBattleExp(kind, foeLevel, rpgMemberLevel({ tier: Number(tier), level: uma.level })) * (typeof share === 'number' ? share : share(e.outfitId))))
     const gained = grantRpgExp({ tier: Number(tier), level: uma.level, exp: uma.exp }, exp)
     const got = tier === TIER_ONE ? rpgShardsBetween(uma.level, gained.level) : 0
     const filled = fillRanks(uma, e, exp, 1, BATTLE_ENGINE_VERSION, tier)

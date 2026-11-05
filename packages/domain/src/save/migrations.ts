@@ -2,7 +2,7 @@
 // imports this chain only for a save older than the current version; only the API's sync `parseSave` imports it statically,
 // and the web never calls that, so it stays out of the main bundle (H136, scripts/check-size.mjs).
 import { FACILITY_SLOTS, grantProfessionExp, itemMinutes, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
-import { COLLECTIONS_SAVE, collectionsLive } from './collections'
+import { CAPITAL_RUNS_SAVE, capitalRunsLive, COLLECTIONS_SAVE, collectionsLive } from './collections'
 import { facilitySpec } from '../economy/jobs'
 import { gemIdentity, isStarNode, nodeGem } from '../economy/stars'
 import { ITEM_IDENTITIES as ITEM_FAMILIES, isItemId } from '../items/identity'
@@ -215,7 +215,8 @@ export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v32 = version < 32 && isRecord(v31) ? toV32(v31, tier) : v31
   const v33 = version < 33 && isRecord(v32) ? toV33(v32) : v32
   const v34 = version < 34 && isRecord(v33) ? toV34(v33) : v33
-  return version < COLLECTIONS_SAVE && collectionsLive() && isRecord(v34) ? toV35(v34) : v34
+  const v35 = version < COLLECTIONS_SAVE && collectionsLive() && isRecord(v34) ? toV35(v34) : v34
+  return version < CAPITAL_RUNS_SAVE && capitalRunsLive() && isRecord(v35) ? toV37(v35) : v35
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
@@ -1318,4 +1319,9 @@ export function toV34(world: Record<string, unknown>): Record<string, unknown> {
 export function toV35(world: Record<string, unknown>): Record<string, unknown> {
   const wallet = isRecord(world.wallet) ? { ...world.wallet, trainingLogs: 0 } : world.wallet
   return { ...world, wallet, drills: { day: null, runs: 10, won: {} } }
+}
+
+/** v36 → v37 (D293, H160): no capital run has started. Old map wins and every other field stay as they were. */
+export function toV37(world: Record<string, unknown>): Record<string, unknown> {
+  return { ...world, capitalRuns: [], capitals: {} }
 }

@@ -57,7 +57,8 @@ import {
 } from '../rift/state'
 import { migrateWorld, type TierGrant } from './migrations'
 import { SAVE_SCHEMA_VERSION } from './version'
-import { collectionsLive, WEAPONS_SAVE } from './collections'
+import { CAPITAL_RUNS_SAVE, capitalRunsLive, collectionsLive, WEAPONS_SAVE } from './collections'
+import { capitalRunNodeOf, capitalRunOf } from '../world/capital-run-id'
 import { validSteps, widenSteps, WINDOW_CHAMPIONS_MAX, type WindowRecord, type WindowRecords } from './window-record'
 
 export type { TierGrant } from './migrations'
@@ -204,7 +205,27 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
   classesV3?: ClassesV3Record
   /** Save v35 (D283, H152): the day's Drill runs. Absent before. */
   drills?: DrillsState
+  /** Save v37 (D293, H160): open capital runs; absent before the switch. */
+  capitalRuns?: CapitalRun[]
+  /** The run counters and the last six wins of each capital in this world. */
+  capitals?: Record<string, CapitalRecord>
 }
+
+export type CapitalParty = [string, string, string, string, string]
+export type CapitalLanes = [CapitalLane, CapitalLane, CapitalLane, CapitalLane]
+export interface CapitalLane {
+  /** Party Hall index at sign-up, for display only; `umas` keeps the signed five in slot order. */
+  party: number
+  umas: CapitalParty
+  generals: 0 | 1 | 2 | 3
+  finalAt: string | null
+}
+export interface CapitalRun { id: string; continent: string; startedAt: string; lanes: CapitalLanes }
+/** A won run keeps its faces even after its Umas ascend. */
+export interface CapitalWin { id: string; wonAt: string; lanes: CapitalParty[] }
+export interface CapitalRecord { started: number; won: number; recent: CapitalWin[] }
+export const CAPITAL_RUNS_MAX = 5
+export const CAPITAL_RECENT_MAX = 6
 
 /** A world's Drills (D283, CO23, CO24): the last day turned (`YYYY-MM-DD` on the phone's clock, after 04:00), the runs
  * banked (0–30), and each Drill's first win. */
@@ -381,7 +402,7 @@ export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run
 export function newTierWorld(now: string, unlockTickets: number, engine: number = BATTLE_ENGINE_VERSION): TierWorld {
   if (rpgRework('economy', engine)) {
     return { createdAt: now, wallet: newWallet(unlockTickets, engine), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, targets: [], heroes: {},
-      rift: newRiftState(), grant: null, ...(collectionsLive() ? { drills: newDrills() } : {}) }
+      rift: newRiftState(), grant: null, ...(collectionsLive() ? { drills: newDrills() } : {}), ...(capitalRunsLive() ? { capitalRuns: [], capitals: {} } : {}) }
   }
   return { createdAt: now, wallet: newWallet(unlockTickets, engine), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {},
     rift: newRiftState() }
@@ -474,8 +495,9 @@ function parseWindows(value: unknown, path: string): WindowRecords {
     for (const [key, rec] of Object.entries(object(raw, at, Object.keys((raw as Obj | null) ?? {})))) {
       const rp = `${at}.${key}`
       if (!/^[1-9]\d{0,2}$/.test(key)) throw new SaveParseError(rp, 'tier keys are positive integers')
-      const r = object(rec, rp, ['steps', 'champions'])
+      const r = object(rec, rp, capitalRunsLive() ? ['steps'] : ['steps', 'champions'])
       if (!validSteps(r.steps)) throw new SaveParseError(`${rp}.steps`, `expected ${WINDOW_STEPS_MAX} three-character day codes`)
+      if (capitalRunsLive()) { tiers[key] = { steps: r.steps }; continue }
       const champions = count(r.champions, `${rp}.champions`)
       if (champions > WINDOW_CHAMPIONS_MAX) throw new SaveParseError(`${rp}.champions`, `expected 0–${WINDOW_CHAMPIONS_MAX}`)
       tiers[key] = { steps: r.steps, champions }
@@ -1238,6 +1260,85 @@ function parseClassesV3(value: unknown, path: string): ClassesV3Record {
   return { manuals, marks: manuals * 1000, umas, halls, traded: r.traded, seen: r.seen }
 }
 
+/** The twenty signed Umas of a capital run or a past win: five per lane, distinct across all four lanes. */
+function parseCapitalParty(value: unknown, path: string, seen: Set<string>, umas?: Record<string, OwnedUma>): CapitalParty {
+  const party = ids(value, path, PARTY_SIZE)
+  if (party.length !== PARTY_SIZE) throw new SaveParseError(path, 'expected five Umas')
+  for (const id of party) {
+    if (!OUTFIT_ID.test(id)) throw new SaveParseError(path, 'outfit ids are positive integers')
+    if (seen.has(id)) throw new SaveParseError(path, `outfit ${id} is in two lanes or runs`)
+    if (umas && !umas[id]) throw new SaveParseError(path, `outfit ${id} isn't owned in this world`)
+    seen.add(id)
+  }
+  return [...party] as CapitalParty
+}
+
+/** v37's capital records and open runs. Historical faces needn't still be owned here; open rosters must be. */
+function parseCapitals(w: Obj, path: string, tier: number, umas: Record<string, OwnedUma>, fight: RpgRun): Pick<TierWorld, 'capitalRuns' | 'capitals'> {
+  const continents = Array.from({ length: 5 }, (_, i) => `w${5 * (tier - 1) + i + 1}`)
+  const capitals: Record<string, CapitalRecord> = {}
+  const seenRuns = new Set<string>()
+  const parseId = (value: unknown, at: string, continent: string, started: number): string => {
+    const ref = typeof value === 'string' ? capitalRunOf(value) : null
+    if (!ref || ref.continentId !== continent || ref.n > started) throw new SaveParseError(at, 'expected a started run of this capital')
+    if (seenRuns.has(value as string)) throw new SaveParseError(at, 'duplicate run id')
+    seenRuns.add(value as string)
+    return value as string
+  }
+  for (const [continent, raw] of Object.entries(object(w.capitals, `${path}.capitals`, continents))) {
+    const at = `${path}.capitals.${continent}`
+    const c = object(raw, at, ['started', 'won', 'recent'])
+    const started = count(c.started, `${at}.started`), won = count(c.won, `${at}.won`)
+    if (started > 999_999_999 || won > started) throw new SaveParseError(at, 'expected won ≤ started ≤ 999999999')
+    const recent = list(c.recent, `${at}.recent`, Math.min(won, CAPITAL_RECENT_MAX), Math.min(won, CAPITAL_RECENT_MAX)).map((value, i): CapitalWin => {
+      const rp = `${at}.recent.${i}`, r = object(value, rp, ['id', 'wonAt', 'lanes'])
+      const seen = new Set<string>()
+      const lanes = list(r.lanes, `${rp}.lanes`, 4, 4).map((party, j) => parseCapitalParty(party, `${rp}.lanes.${j}`, seen))
+      return { id: parseId(r.id, `${rp}.id`, continent, started), wonAt: timestamp(r.wonAt, `${rp}.wonAt`), lanes }
+    })
+    if (recent.some((r, i) => i > 0 && Date.parse(r.wonAt) > Date.parse(recent[i - 1]!.wonAt))) throw new SaveParseError(`${at}.recent`, 'expected newest win first')
+    capitals[continent] = { started, won, recent }
+  }
+  const seenUmas = new Set<string>()
+  const capitalRuns = list(w.capitalRuns, `${path}.capitalRuns`, 0, CAPITAL_RUNS_MAX).map((raw, i): CapitalRun => {
+    const at = `${path}.capitalRuns.${i}`, r = object(raw, at, ['id', 'continent', 'startedAt', 'lanes'])
+    if (typeof r.continent !== 'string' || !continents.includes(r.continent)) throw new SaveParseError(`${at}.continent`, 'not a continent of this tier')
+    const record = capitals[r.continent]
+    if (!record) throw new SaveParseError(`${at}.continent`, 'no capital counter')
+    const id = parseId(r.id, `${at}.id`, r.continent, record.started)
+    const startedAt = timestamp(r.startedAt, `${at}.startedAt`), parties = new Set<number>()
+    const lanes = list(r.lanes, `${at}.lanes`, 4, 4).map((raw, j): CapitalLane => {
+      const lp = `${at}.lanes.${j}`, l = object(raw, lp, ['party', 'umas', 'generals', 'finalAt'])
+      const party = count(l.party, `${lp}.party`), generals = count(l.generals, `${lp}.generals`)
+      if (party >= PARTY_COUNT || parties.has(party)) throw new SaveParseError(`${lp}.party`, 'expected four different Party Hall indices')
+      parties.add(party)
+      if (generals > 3) throw new SaveParseError(`${lp}.generals`, 'expected 0–3')
+      const finalAt = l.finalAt === null ? null : timestamp(l.finalAt, `${lp}.finalAt`)
+      if (finalAt !== null && Date.parse(finalAt) < Date.parse(startedAt)) throw new SaveParseError(`${lp}.finalAt`, 'before the run started')
+      return { party, umas: parseCapitalParty(l.umas, `${lp}.umas`, seenUmas, umas), generals: generals as CapitalLane['generals'], finalAt }
+    }) as CapitalLanes
+    if (lanes.some((l) => l.finalAt !== null) && lanes.some((l) => l.generals !== 3)) throw new SaveParseError(`${at}.lanes`, 'every general must fall before a final')
+    if (lanes.every((l) => l.finalAt !== null)) throw new SaveParseError(at, 'a won run belongs in recent')
+    return { id, continent: r.continent, startedAt, lanes }
+  })
+  for (const [continent, c] of Object.entries(capitals)) {
+    if (capitalRuns.filter((r) => r.continent === continent).length + c.won > c.started) throw new SaveParseError(`${path}.capitals.${continent}`, 'more runs than started')
+  }
+  const node = capitalRunNodeOf(fight.battle?.nodeId ?? '')
+  if (node) {
+    const run = capitalRuns.find((r) => r.id === node.runId), lane = run?.lanes[node.lane - 1]
+    const at = `${path}.world.run.battle`
+    if (!run || !lane) throw new SaveParseError(at, 'no open capital run for this fight')
+    if (node.final ? run.lanes.some((l) => l.generals !== 3) || lane.finalAt !== null : node.general !== lane.generals + 1) {
+      throw new SaveParseError(at, 'not the lane’s next fight')
+    }
+    const raw = (fight.battle!.input as { allies?: unknown } | null)?.allies
+    const allies = (Array.isArray(raw) ? raw : []).map((a: unknown) => (a as { id?: unknown } | null)?.id)
+    if (allies.length !== PARTY_SIZE || lane.umas.some((id) => !allies.includes(id)) || fight.party !== lane.party) throw new SaveParseError(at, 'not the signed lane’s five')
+  }
+  return { capitalRuns, capitals }
+}
+
 /** v28's world (H78; R2's build decision 7): v27's without the gear and gem shelves, places with no levels, and the grant.
  * v31 (H114) keeps its shape; its work and stock read by the Wilds' trios. From the classes stage (save v32, H130) its
  * Umas, ranks and seats read v32's, and it may hold the class reset's record. */
@@ -1245,10 +1346,10 @@ function parseTierWorldV28(value: unknown, path: string, tier: number, check: Ch
   const v32 = rpgRework('classes')
   const v35 = collectionsLive()
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'targets', 'heroes', 'rift', 'grant',
-    ...(v32 ? ['classesV3'] : []), ...(v35 ? ['drills'] : [])])
+    ...(v32 ? ['classesV3'] : []), ...(v35 ? ['drills'] : []), ...(capitalRunsLive() ? ['capitalRuns', 'capitals'] : [])])
   const umas = parseUmas(w.umas, `${path}.umas`, { tier })
   object(w.buildings, `${path}.buildings`, [])
-  return {
+  const world: TierWorld = {
     createdAt: timestamp(w.createdAt, `${path}.createdAt`), wallet: parseWallet(w.wallet, `${path}.wallet`, true), umas,
     parties: parseParties(w.parties, `${path}.parties`, umas), world: parseWorldState(w.world, `${path}.world`, check),
     items: parseStock(w.items, `${path}.items`), buildings: {}, work: parseWork(w.work, `${path}.work`, umas, v31Work(tier)),
@@ -1257,6 +1358,8 @@ function parseTierWorldV28(value: unknown, path: string, tier: number, check: Ch
     ...(w.classesV3 === undefined ? {} : { classesV3: parseClassesV3(w.classesV3, `${path}.classesV3`) }),
     ...(v35 ? { drills: parseDrills(w.drills, `${path}.drills`) } : {}),
   }
+  if (capitalRunsLive()) Object.assign(world, parseCapitals(w, path, tier, umas, world.world.run))
+  return world
 }
 
 function parseTierWorld(raw: unknown, path: string, version: number, tier: number, check: CheckBattle, migrate: typeof migrateWorld): TierWorld {
@@ -1624,6 +1727,20 @@ function widenAccount(account: unknown): unknown {
   return { ...(account as Obj), windows: wide }
 }
 
+/** The v37 account step drops only the old champion mask; unknown fields still reach the strict parse. */
+function withoutChampions(account: unknown): unknown {
+  if (typeof account !== 'object' || account === null || Array.isArray(account)) return account
+  const windows = (account as Obj).windows
+  if (typeof windows !== 'object' || windows === null || Array.isArray(windows)) return account
+  return { ...account, windows: Object.fromEntries(Object.entries(windows).map(([id, tiers]: [string, unknown]) => [id,
+    typeof tiers !== 'object' || tiers === null || Array.isArray(tiers) ? tiers : Object.fromEntries(Object.entries(tiers).map(([tier, raw]: [string, unknown]) => {
+      if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return [tier, raw]
+      const { champions: _champions, ...record } = raw as Obj
+      return [tier, record]
+    })),
+  ])) }
+}
+
 function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migrate: typeof migrateWorld): Save {
   const o = object(value, path, ['schemaVersion', 'account', 'tierWorlds'])
   const version = o.schemaVersion
@@ -1641,7 +1758,8 @@ function parseSaveChecked(value: unknown, path: string, check: CheckBattle, migr
     ? { ...rawAccount, windows: {}, windowsStart: null } : rawAccount
   // Save v36 (D289): each record gains the Weapons steps at its end (`widenSteps`).
   const widened = version < WEAPONS_SAVE ? widenAccount(withWindows) : withWindows
-  const a = object(widened, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history', 'defeated',
+  const capitalAccount = capitalRunsLive() && version < CAPITAL_RUNS_SAVE ? withoutChampions(widened) : widened
+  const a = object(capitalAccount, `${path}.account`, ['trainerName', 'createdAt', 'updatedAt', 'achievements', 'history', 'defeated',
     ...(live ? ['windows', 'windowsStart'] : [])])
   const trainerName = typeof a.trainerName === 'string' ? normalizeTrainerName(a.trainerName) : null
   if (!trainerName || trainerName !== a.trainerName) throw new SaveParseError(`${path}.account.trainerName`, `must be 1–${TRAINER_NAME_MAX} trimmed characters`)

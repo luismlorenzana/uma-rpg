@@ -1,7 +1,8 @@
 # Capitals v2: the Finals as a mini Rift
 
 **Status:** approved 2026-11-03 (D293): packets H159–H162. One call changed in packeting: CA14 needs no engine bump. Nothing
-is built yet. The preview page is
+is live yet. H159's four-lane foes and H160's run rules and strict v37 parse are built; H160 stays dark on save v36.
+H161 owns the screens and H162 the switch. The preview page is
 [previews/capitals.html](previews/capitals.html): a run's shape, the three screens and the pacing against today's.
 
 ## The owner's points
@@ -136,8 +137,10 @@ Vanguards (a sub-boss's weight, halved), the final boss as a two-wave boss.
 
 ## 10. Save and code
 
-- **Save v37,** each world: `capitalRuns`, its open runs (id, continent, the four lanes' parties, each lane's generals
-  beaten and final won, start time, seed), and `capitalWins`, runs won by continent. The account's window records lose
+- **Save v37,** each world: `capitalRuns`, up to five open runs (id, continent, start time and four lanes, each its Party
+  Hall index for display, its signed five, generals beaten and final's win time), and `capitals`, by continent:
+  `started` numbers every run, including abandoned ones; `won` counts wins; `recent` keeps six wins, newest first, each
+  its id, win time and four signed fives. A retry's seed comes from the map's fight counter, as a Drill's does. The account's window records lose
   `champions`. A save before v37 had no runs, so it gains them empty; its old capital wins stay in the record harmlessly.
 - **No engine bump** (D293): a fight replays from its frozen input, and the run's foes come from a new generator, not a
   rule change. An open fight on an old capital stage at the switch settles as a regular fight at its foes' level, as a
@@ -180,8 +183,8 @@ Vanguards (a sub-boss's weight, halved), the final boss as a two-wave boss.
 
 ## 13. Packets
 
-1. The fourth Finals route for the fourteen scenarios, and the run's foe generator (engine v22, dark).
-2. The run rules and save v37 (dark), the window's World step and record change.
+1. **H159, built (D296):** the fourth Finals route for the fourteen scenarios and the run's foe generator. No engine bump.
+2. **H160, built dark:** the run rules and save v37, the window's World step and record change. Save v36 stays live.
 3. The capital page, New run and the run page (dark), the continent map's capital line.
 4. The switch: v37 live, the manual (maps, loops, sections), the phone check.
 
