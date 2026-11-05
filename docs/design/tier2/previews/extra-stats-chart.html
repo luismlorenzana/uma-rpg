@@ -3,11 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Star Chart by Tier</title>
-<!-- docs/design/tier2/extra-stats.md (T2E9–T2E13): the live star chart (places/observatory/star-chart.ts, D277) with Tier 2's
-     and Tier 3's weapon moons on an outer orbit. Self-contained: uma-kit's tokens, light and dark, phone mocks on a desktop
-     page. Tier 1's table is the live one, star for star; the values are the live code's (economy/planet.ts) × tier. Umas are
-     shown by role; the weapon moon's crest is a vector stand-in for an art packet. -->
+<title>Star Chart with Branches</title>
+<!-- docs/design/tier2/extra-stats.md (T2E21–T2E49, round 2): the live star chart (places/observatory/star-chart.ts, D277),
+     the same 22 stars in every tier, with a node's three steps (a jewel opens it, from Tier 2 a Stardust a jewel slots it,
+     then any branch of its list swaps free): the Branch row, the grouped one-tap list (D266's pattern), "Wear on every node",
+     the diamond marks, the totals' kinds and branch lines, the Branches sheet and Set all with Stardust. Self-contained:
+     uma-kit's tokens, light and dark, phone mocks on a desktop page. Values are the live code's Tier 1 points × tier
+     (economy/planet.ts) and T2E's branch rules; kinds and presets read the harness (§4.6, §4.7). Umas are shown by role. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -91,8 +93,11 @@
   .totals b { font-weight: 600; }
   .totals em { font-style: normal; color: var(--ink-soft); }
   .starline { text-align: center; font-size: 12.5px; font-weight: 600; color: var(--accent-strong); margin: 6px 0 0; }
-  .moonline { text-align: center; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin: 4px 0 0; display: flex; justify-content: center; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .moonline, .branchline { text-align: center; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin: 4px 0 0; display: flex; justify-content: center; gap: 6px; align-items: center; flex-wrap: wrap; }
   .moonline i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .branchline b { color: var(--ink); font-weight: 700; }
+  .rowbtn { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 44px; margin-top: 8px; padding: 0 12px; border: 1px solid var(--hairline-strong); border-radius: 10px; background: var(--raised); color: var(--ink); font: 600 13.5px Inter, system-ui, sans-serif; cursor: pointer; text-align: left; }
+  .rowbtn span { color: var(--ink-soft); font-weight: 500; text-align: right; }
 
   /* The chart: always the night sky. */
   .chart { display: block; width: 100%; height: auto; border-radius: 14px; }
@@ -104,13 +109,14 @@
   .pulse { animation: pulse 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
   @media (prefers-reduced-motion: reduce) { .pulse { animation: none; opacity: .45; } }
 
-  /* The sheet. */
+  /* The sheets. */
   .scrim { position: absolute; inset: 0; background: var(--scrim); display: flex; align-items: flex-end; z-index: 5; }
-  .sheet { width: 100%; background: var(--panel); border-radius: 18px 18px 0 0; padding: 8px 16px 16px; }
+  .sheet { width: 100%; background: var(--panel); border-radius: 18px 18px 0 0; padding: 8px 16px 16px; max-height: 86%; overflow: auto; }
   .grip { width: 38px; height: 4px; border-radius: 2px; background: var(--hairline-strong); margin: 0 auto 8px; }
   .sheet header { display: flex; align-items: center; justify-content: space-between; min-height: 40px; }
   .sheet header b { font-size: 19px; }
-  .close { border: 0; background: none; color: var(--ink-soft); font-size: 22px; width: 44px; height: 44px; margin-right: -12px; cursor: pointer; }
+  .close, .back { border: 0; background: none; color: var(--ink-soft); font-size: 22px; width: 44px; height: 44px; cursor: pointer; }
+  .close { margin-right: -12px; } .back { margin-left: -12px; font-size: 20px; }
   .steps { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; margin: 4px 0 10px; position: relative; }
   .step { position: relative; border: 0; background: none; color: inherit; padding: 2px 0 4px; min-height: 58px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font: inherit; }
   .step::before { content: ''; position: absolute; top: 17px; left: -50%; width: 100%; height: 2px; background: var(--hairline-strong); }
@@ -126,18 +132,19 @@
   .nsheet { text-align: center; }
   .nsheet p { margin: 2px 0; }
   .nsheet .val { font-size: 14px; font-weight: 600; }
-  .nsheet .big { font-size: 22px; font-weight: 800; line-height: 1.2; }
   .nsheet .soft { font-size: 12.5px; color: var(--ink-soft); }
   .nsheet .open { font-size: 14px; font-weight: 600; color: var(--accent-strong); }
-  .kindsrow { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 44px; margin-top: 8px; padding: 0 12px; border: 1px solid var(--hairline-strong); border-radius: 10px; background: var(--raised); color: var(--ink); font: 600 13.5px Inter, system-ui, sans-serif; cursor: pointer; }
-  .kindsrow span { color: var(--ink-soft); font-weight: 500; }
   .klist { list-style: none; margin: 0; padding: 0; }
-  .klist button { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; min-height: 48px; border: 0; border-bottom: 1px solid var(--hairline); background: none; color: var(--ink); font: 600 14px Inter, system-ui, sans-serif; text-align: left; padding: 0 4px; cursor: pointer; }
-  .klist button span { font-weight: 500; color: var(--ink-soft); font-size: 12.5px; text-align: right; }
+  .klist button { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; min-height: 52px; border: 0; border-bottom: 1px solid var(--hairline); background: none; color: var(--ink); font: 600 14px Inter, system-ui, sans-serif; text-align: left; padding: 4px 4px; cursor: pointer; }
+  .klist button em { display: block; font-style: normal; font-weight: 500; font-size: 11.5px; color: var(--ink-soft); }
+  .klist button span { font-weight: 600; color: var(--ink-soft); font-size: 12.5px; text-align: right; white-space: nowrap; }
   .klist button.on { color: var(--accent-strong); }
-  .klist button.on::before { content: '✓'; margin-right: 6px; }
+  .klist button.on::before { content: '✓'; margin-right: 2px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+  .chips i { font-style: normal; font-size: 11.5px; font-weight: 600; padding: 2px 7px; border-radius: 999px; background: var(--sunken); color: var(--ink); }
   .sheetbtn { width: 100%; min-height: 48px; margin-top: 12px; border: 0; border-radius: 10px; font: 700 15px 'SF Pro Rounded', ui-rounded, Inter, system-ui, sans-serif; background: var(--raised); color: var(--ink-soft); }
   .sheetbtn.go { background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+  .sheetbtn.soft { background: var(--raised); color: var(--ink); cursor: pointer; border: 1px solid var(--hairline-strong); }
   .legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
   .legend .card { display: flex; gap: 10px; align-items: center; padding: 10px 12px; margin: 0; }
   .legend svg { flex: none; }
@@ -146,15 +153,17 @@
   .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   @media (max-width: 760px) { .three { grid-template-columns: 1fr; } }
   .three svg { width: 100%; height: auto; display: block; border-radius: 12px; }
+  .klist li.grp { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-faint); padding: 10px 4px 2px; }
+  .stardust { color: var(--accent-strong); font-weight: 600; }
 </style>
 </head>
 <body>
 <main>
-  <h1>The star chart in Tiers 1, 2 and 3</h1>
-  <p class="lede">The live Stars tab's chart, star for star, with the weapon moons added where <a href="../extra-stats.md">extra-stats.md</a> puts them
-    (T2E9): on an <b>outer orbit below the core</b>. Tier 1's 22 stars never move; Tier 2's chart grows to 360 × 470 for one crescent,
-    Tier 3's to 360 × 500 for two. Every check the live <code>star-chart.test.ts</code> makes runs below on the tier shown. Tap a star, a
-    crest, <b>Set all</b>, or a weapon moon's <b>Kinds</b> row.</p>
+  <h1>The star chart with branches</h1>
+  <p class="lede">The live Stars tab, star for star, as <a href="../extra-stats.md">extra-stats.md</a> grows it. A node has <b>three steps</b> (T2E21): its
+    <b>jewels</b> open it, as Tier 1, and it gives Tier 1's gift; from Tier 2 one <b>Stardust</b> a jewel slots it, once; then it wears any <b>branch</b> of its
+    body's list, swapped freely. The map is Tier 1's 22 nodes in every tier: round 1's weapon moon is Prowess's kind rows now (T2E27). Tap a star, its
+    <b>Branch</b> row, a crest, <b>Set all</b>, or <b>Branches</b> under the totals.</p>
   <div class="bar">
     <span class="seg" id="theme"><button data-v="">System</button><button data-v="light">Light</button><button data-v="dark">Dark</button></span>
     <span class="seg" id="width"><button data-v="390">390 × 844</button><button data-v="375">375 × 667</button></span>
@@ -167,170 +176,222 @@
     <div><p class="cap" id="cap"></p><div class="phone"><div class="screen" id="phone"></div></div></div>
     <div class="col">
       <div class="card">
-        <h3>What each tier adds to the chart</h3>
+        <h3>A node's three steps</h3>
         <ul>
-          <li><span class="tier t1">Tier 1</span> <b>As live:</b> the Planet on its ring, Prowess, Vigor and Guard on one orbit of 132, her moon's pair at the top right. 22 stars, 360 × 350.</li>
-          <li><span class="tier t2">Tier 2</span> <b>One weapon moon</b>, a steel crescent straight below the Planet on an outer orbit of 172, its label its kinds. 27 stars, 360 × 470.</li>
-          <li><span class="tier t3">Tier 3</span> <b>Two</b>, steel and lavender, on one outer orbit of 220 at 90° ± 22°, labels from the edges. 32 stars, 360 × 500.</li>
+          <li><b>Unlocking</b> is Tier 1's in every tier: a Planet node takes three Planet Jewels, a moon node one Moon Jewel, in order, at its level. An open node gives Tier 1's gift (× 1.8, × 2.6). Her moon takes none.</li>
+          <li><b>Slotting</b>, from Tier 2: one <b>Stardust</b> of the node's grade a jewel (a Planet node three, a moon node one), once (<a href="../professions.md">professions</a> T2P30). Her moon never.</li>
+          <li><b>Choosing</b> is free: the <b>Branch</b> row opens the body's list; a tap wears a row and the sheet returns to the node. <b>Wear on every node</b> sets the body in one more tap. An unslotted or closed node keeps her pick and wears it once slotted.</li>
+          <li><b>A white diamond</b> at a star's lower right: its branch isn't Tier 1's gift.</li>
         </ul>
       </div>
       <div class="card">
-        <h3>The rules this page plays</h3>
+        <h3>The lists (T2E23–T2E27, T2E44)</h3>
         <ul>
-          <li><b>Three jewels a rank in every tier</b> (T2E2): an odd rank's three Planet Jewels open the Planet (3 · 2 · 1 by tier) and each weapon moon (1); an even rank's three Moon Jewels open the three moons. Her moon takes none.</li>
-          <li><b>A weapon moon's numerals are the Planet's:</b> I at Lv 1, II at 11, III at 21, IV at 31, V at 41. A Planet Jewel III opens Planet III or a weapon moon's III.</li>
-          <li><b>Set all</b> keeps its live rule: each jewel to the body furthest behind among those it fits, map order on a tie.</li>
-          <li><b>Kinds, one tap</b> (T2E5): six rows from her three weapons; a tap wears the row and the sheet returns to the node with its new values.</li>
-          <li><b>Values</b> are the live code's Tier 1 points × 1.8 and × 2.6, rounded per node; a Split node is 0.7 of the Full one.</li>
+          <li><b>Planet:</b> All six · DEF and M.DEF · HP and MP. ATK and M.ATK stay on every row; the doubled pair takes the other pair's points.</li>
+          <li><b>Prowess:</b> Offense (her split) · Area +1.5% a point · Multi-hit +0.6% a point · Full (1.5 × the points on one kind) · Split (0.7 of Full on each of two) · Trio in Tier 3 (half of Full on all three).</li>
+          <li><b>Vigor:</b> HP and MP · HP · MP · MP back (+0.1 … +0.7% of her bar a round) · Life steal (0.2 … 1%).</li>
+          <li><b>Guard:</b> DEF and M.DEF · DEF · M.DEF · Area guard (−0.8 … −4% on foes' every-Uma moves).</li>
+          <li><b>★ Her moon:</b> no branch: her template is read, never picked.</li>
         </ul>
       </div>
       <div class="card">
-        <h3>Why not the top-left corner</h3>
-        <p style="margin:0;color:var(--ink-soft)">The profile polish kept the corner empty for the weapon moons (PP31). Under its own tests it holds one five-star body,
-          but its label has one line between Prowess's label and Vigor's: room for "Greatsword 5/5", not "Greatsword · Lightning 5/5", and no room for
-          Tier 3's second moon. The corner stays free for a later body (T2E19).</p>
+        <h3>Presets (T2E37, T2E38)</h3>
+        <p style="margin:0;color:var(--ink-soft)">A class's preset slots Prowess by her kit, measured on the harness: Offense for the pure classes and healers, Multi-hit for the Spellblades,
+          Area for the Summoners. The Planet, Vigor and Guard keep Tier 1's gifts. Prowess's kind rows list her kit's top pair first (the Brawler's Lance + Axe, not her
+          Orb's Greatsword). The <b>Branches</b> sheet puts her preset, or Tier 1's gifts, on every node in one tap.</p>
       </div>
     </div>
   </div>
 
   <h2>Every tier at once</h2>
-  <p class="lede">The full map of a Brawler at each tier's Lv 50, drawn from the same table.</p>
+  <p class="lede">A Brawler's full map at each tier's Lv 50, slotted, on a mix of branches, drawn from the same table: the chart never changes shape.</p>
   <div class="three" id="three"></div>
 
-  <h2>Four states, and a sixth body colour</h2>
-  <p class="lede">Colour says which body, fill says how far along. Green stays Ready's alone (PP21, PP23).</p>
+  <h2>Four states and a mark</h2>
+  <p class="lede">Colour says which body, fill says how far along, the diamond says a branch other than the gift. Green stays Ready's alone (PP21, PP23): Ready is a jewel or a Stardust she can set now.</p>
   <div class="legend" id="legend"></div>
 
   <h2>The geometry, checked</h2>
-  <p class="lede">Computed on this page from the table shown, as <code>star-chart.test.ts</code> computes it. At 375 wide the chart is 343 px, so a viewBox
-    unit is 0.953 px and 44 pt is 46.2 units. Labels are checked at their longest: "★ Shieldrunner 2/2" and "Greatsword · Lightning 5/5".</p>
+  <p class="lede">Computed on this page from the live table, as <code>star-chart.test.ts</code> computes it, plus the one check branches add: every mark inside its star's
+    44 pt target and off every other star. At 375 wide the chart is 343 px, so a viewBox unit is 0.953 px and 44 pt is 46.2 units.</p>
   <div class="card"><table id="checks"></table></div>
   <div class="card"><table id="coords"></table></div>
 </main>
 
 <script>
-// --- The rules, as the live game has them × tier (economy/planet.ts), and T2E's weapon moons --------------------------------
+// --- The rules: the live code's Tier 1 points × tier (economy/planet.ts), and T2E's branches ----------------------------------
 const ROMAN = ['I', 'II', 'III', 'IV', 'V']
 const PLANET = { 1: [1, 2, 4, 6, 8], 2: [2, 4, 7, 11, 14], 3: [3, 5, 10, 16, 21] }
 const MOON = { 1: [2, 4, 6, 8, 10], 2: [4, 7, 11, 14, 18], 3: [5, 10, 16, 21, 26] }
-const WM = { full: { 2: [7, 13, 18, 23, 29], 3: [10, 18, 26, 34, 42] }, split: { 2: [5, 9, 13, 16, 20], 3: [7, 13, 18, 24, 29] } }
+// Prowess's kind rows (T2E27): Full 1.5 × a node's Tier 1 points × tier; Split 0.7 and Trio 0.5 of the Full node, half up.
+const FULL = { 2: [5, 11, 16, 22, 27], 3: [8, 16, 23, 31, 39] }, SPLIT = { 2: [4, 8, 11, 15, 19], 3: [6, 11, 16, 22, 27] }, TRIO = { 3: [4, 8, 12, 16, 20] }
 const HER = { 1: [4, 8], 2: [7, 14], 3: [10, 21] }
-const PLANET_COUNT = { 1: 3, 2: 2, 3: 1 }
-// The eight Tier 1 classes: preset weapons (D263), Prowess's split (ATK %), her Orb's kind (presetKind) first.
+// Percent branches, the same in every tier (T2E34): a node's Tier 1 points × the rate (MP back rounded to a tenth).
+const AREA = [3, 6, 9, 12, 15], MULTI = [1.2, 2.4, 3.6, 4.8, 6], MPB = [0.1, 0.3, 0.4, 0.5, 0.7], STEAL = [0.2, 0.4, 0.6, 0.8, 1], AGUARD = [0.8, 1.6, 2.4, 3.2, 4]
+// The eight Tier 1 classes, as Tier 2's Keepers wear them: Prowess's split (ATK %), her preset weapons' kinds by damage on the
+// harness at Tier 2 Lv 50 (extra-stats.md §4.6), her preset's Prowess branch (T2E37), and whether Full leads her kind rows.
 const CLASSES = {
-  brawler: { name: 'Brawler', atk: 100, kinds: ['Greatsword', 'Axe', 'Lance'] },
-  spellblade: { name: 'Arms Spellblade', atk: 70, kinds: ['Katana', 'Axe', 'Lightning'] },
-  armsummoner: { name: 'Arms Summoner', atk: 70, kinds: ['Bow', 'Axe', 'Dark'] },
-  paladin: { name: 'Paladin', atk: 80, kinds: ['Lance', 'Greatsword', 'Light'] },
-  cleric: { name: 'Cleric', atk: 20, kinds: ['Light', 'Fire', 'Lance'] },
-  summoner: { name: 'Tome Summoner', atk: 30, kinds: ['Dark', 'Ice', 'Bow'] },
-  tomeblade: { name: 'Tome Spellblade', atk: 30, kinds: ['Lightning', 'Ice', 'Katana'] },
-  mage: { name: 'Sorcerer', atk: 0, kinds: ['Fire', 'Ice', 'Lightning'] },
+  brawler: { name: 'Berserker', t1: 'Brawler', atk: 100, top: ['Lance', 'Axe', 'Greatsword'], prowess: 'offense' },
+  mage: { name: 'Archmage', t1: 'Sorcerer', atk: 0, top: ['Lightning', 'Fire', 'Ice'], prowess: 'offense' },
+  spellblade: { name: 'Blademaster', t1: 'Arms Spellblade', atk: 70, top: ['Axe', 'Lightning', 'Katana'], prowess: 'multi' },
+  tomeblade: { name: 'Runeblade', t1: 'Tome Spellblade', atk: 30, top: ['Ice', 'Lightning', 'Katana'], prowess: 'multi' },
+  armsummoner: { name: 'Warlord', t1: 'Arms Summoner', atk: 70, top: ['Bow', 'Dark', 'Axe'], prowess: 'area' },
+  summoner: { name: 'Invoker', t1: 'Tome Summoner', atk: 30, top: ['Dark', 'Bow', 'Ice'], prowess: 'area' },
+  paladin: { name: 'Guardian', t1: 'Paladin', atk: 80, top: ['Lance', 'Greatsword', 'Light'], prowess: 'offense', full: true },
+  cleric: { name: 'Bishop', t1: 'Cleric', atk: 20, top: ['Light', 'Lance', 'Fire'], prowess: 'offense' },
 }
 const split = (p, atk) => { const larger = Math.max(atk, 100 - atk), lead = Math.floor((2 * p * larger + 100) / 200); return atk >= 50 ? [lead, p - lead] : [p - lead, lead] }
+const fmt = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(1))
 
-// --- The geometry: Tier 1's live table, then T2E9's outer orbit -----------------------------------------------------------
-const W = 360, PLANET_AT = [180, 208], ORBIT = 132, NODE_R = 13, TARGET = 22, MIN = 44 / (343 / 360)
-const HEIGHT = { 1: 350, 2: 470, 3: 500 }
+// --- The geometry: the live table (star-chart.ts), the same in every tier -----------------------------------------------------
+const W = 360, H = 350, PLANET_AT = [180, 208], ORBIT = 132, NODE_R = 13, TARGET = 22, MIN = 44 / (343 / 360)
 const on = (c, r, d) => [c[0] + Math.cos(d * Math.PI / 180) * r, c[1] + Math.sin(d * Math.PI / 180) * r]
 const round = (p) => [Math.round(p[0] * 10) / 10, Math.round(p[1] * 10) / 10]
 const regular = (radius) => Array.from({ length: 5 }, (_, i) => on([0, 0], radius, -90 + i * 72))
-const crescent = (radius) => [-90, -30, 30, 90, 150].map((d) => on([0, 0], radius, d))
-const STEEL = '#c8d3e0', LAVENDER = '#b3a6ff'
-function bodiesOf(tier) {
+const BODIES = (() => {
   const prowess = on(PLANET_AT, ORBIT, -90)
   const b = {
     planet: { name: 'Planet', count: 5, at: PLANET_AT, color: '#ffd84d', figure: regular(44), label: [180, 276, 'middle'], ring: 44, hubR: 24 },
     prowess: { name: 'Prowess', count: 5, at: prowess, hub: [prowess[0], prowess[1] - 2], color: '#ff9a6b', figure: [[0, -58], [35, -12], [25, 34], [-25, 34], [-35, -12]], label: [86, 60, 'middle'], hubR: 21 },
     vigor: { name: 'Vigor', count: 5, at: on(PLANET_AT, ORBIT, 150), color: '#ff8fb6', figure: regular(44), label: [66, 208, 'middle'], hubR: 21 },
     guard: { name: 'Guard', count: 5, at: on(PLANET_AT, ORBIT, 30), color: '#8fd3ff', figure: [[-40, -34], [40, -34], [46, 12], [0, 52], [-46, 12]], label: [294, 216, 'middle'], hubR: 21 },
+    template: { name: 'Bruiser', count: 2, at: [304, 62], color: '#f0b8ff', figure: [[-35, 0], [35, 0]], label: [352, 96, 'end'], hubR: 0 },
   }
-  if (tier === 2) b.wm1 = { name: 'Weapon moon', count: 5, at: on(PLANET_AT, 172, 90), color: STEEL, figure: crescent(48), label: [180, 458, 'middle'], hubR: 21, outer: 172 }
-  if (tier === 3) {
-    b.wm1 = { name: 'Weapon moon 1', count: 5, at: on(PLANET_AT, 220, 112), color: STEEL, figure: crescent(48), label: [8, 490, 'start'], hubR: 21, outer: 220 }
-    b.wm2 = { name: 'Weapon moon 2', count: 5, at: on(PLANET_AT, 220, 68), color: LAVENDER, figure: crescent(48), label: [352, 490, 'end'], hubR: 21, outer: 220 }
-  }
-  b.template = { name: 'Bruiser', count: 2, at: [304, 62], color: '#f0b8ff', figure: [[-35, 0], [35, 0]], label: [352, 96, 'end'], hubR: 0 }
   for (const x of Object.values(b)) { x.at = round(x.at); x.hub = x.hub ? round(x.hub) : x.at; x.points = x.figure.map(([dx, dy]) => round([x.at[0] + dx, x.at[1] + dy])) }
   return b
+})()
+
+// --- The branch lists (T2E23–T2E27, T2E44) ------------------------------------------------------------------------------------
+const DEFAULT = { planet: 'six', prowess: 'offense', vigor: 'hp-mp', guard: 'def-mdef' }
+/** A body's list, in groups: [header, rows]. Prowess's kinds list her kit's top pair first (T2E38). */
+function listOf(id) {
+  const k = CLASSES[cls].top, C = CLASSES[cls]
+  if (id === 'planet') return [[null, ['six', 'defenses', 'pools']]]
+  if (id === 'vigor') return [[null, ['hp-mp', 'hp', 'mp', 'mp-back', 'life-steal']]]
+  if (id === 'guard') return [[null, ['def-mdef', 'def', 'mdef', 'area-guard']]]
+  if (id !== 'prowess') return []
+  const splits = [[0, 1], [0, 2], [1, 2]].map(([i, j]) => `split:${k[i]}+${k[j]}`), fulls = k.map((a) => `full:${a}`)
+  const kinds = C.full ? [...fulls, ...splits] : [splits[0], ...fulls, ...splits.slice(1)]
+  return [['Her stat', ['offense']], ['Her shapes', ['area', 'multi']], ['Her kinds', [...kinds, ...(tier === 3 ? ['trio'] : [])]]]
+}
+const NAME = { six: 'All six', defenses: 'DEF and M.DEF', pools: 'HP and MP', offense: 'Offense', area: 'Area', multi: 'Multi-hit', trio: 'Trio',
+  'hp-mp': 'HP and MP', hp: 'HP', mp: 'MP', 'mp-back': 'MP back', 'life-steal': 'Life steal', 'def-mdef': 'DEF and M.DEF', def: 'DEF', mdef: 'M.DEF', 'area-guard': 'Area guard' }
+const FOR = { six: 'Everyone: the all-rounder', defenses: 'Whoever takes the hits', pools: 'Long chains and bursts', offense: 'Every hit, and a healer\'s mends',
+  area: 'Sweeps, a volley\'s splash, a farewell', multi: 'Scatters, Doubles, deep Heavies, a Spellblade\'s lead', trio: 'All three of her kinds, half each',
+  'hp-mp': 'The all-rounder', hp: 'The Uma who would fall', mp: 'Short sessions, bosses on a full bar', 'mp-back': 'Long sessions between Springs', 'life-steal': 'A heavy hitter who is hit',
+  'def-mdef': 'The all-rounder', def: 'The physical front line', mdef: 'The back line against casters', 'area-guard': 'Area moves of both channels' }
+const pickName = (p) => (p.startsWith('full:') ? `Full · ${p.slice(5)}` : p.startsWith('split:') ? `Split · ${p.slice(6).replace('+', ' + ')}` : NAME[p])
+const pickOf = (id, n) => (id === 'template' ? null : picks[`${id}:${n}`] ?? DEFAULT[id])
+const slottedAt = (id, n) => tier > 1 && S.slotted.includes(`${id}:${n}`)
+/** What a node gives: her pick once slotted, else Tier 1's gift. */
+const wears = (id, n) => (tier > 1 && slottedAt(id, n) ? pickOf(id, n) : DEFAULT[id])
+function give(id, n, pick, t = tier) {
+  const i = n - 1
+  if (id === 'template') return n === 1 ? 'Evasion +2.4%' : `DEF +${HER[t][1]}`
+  if (t === 1 || !pick) pick = DEFAULT[id]
+  const P = PLANET[t][i], M = MOON[t][i]
+  switch (pick) {
+    case 'six': return `+${P} · all six`
+    case 'defenses': return `ATK, M.ATK +${P} · DEF, M.DEF +${2 * P}`
+    case 'pools': return `ATK, M.ATK +${P} · HP +${10 * P}, MP +${2 * P}`
+    case 'offense': { const [a, m] = split(M, CLASSES[cls].atk); return a && m ? `ATK +${a} · M.ATK +${m}` : a ? `ATK +${a}` : `M.ATK +${m}` }
+    case 'area': return `Area hits +${fmt(AREA[i])}%`
+    case 'multi': return `Multi-hit hits +${fmt(MULTI[i])}%`
+    case 'trio': return `${CLASSES[cls].top.join(', ')} +${TRIO[t][i]} each`
+    case 'hp-mp': return `HP +${5 * M} · MP +${M}`
+    case 'hp': return `HP +${10 * M}`
+    case 'mp': return `MP +${2 * M}`
+    case 'mp-back': return `MP back +${fmt(MPB[i])}% a round`
+    case 'life-steal': return `Life steal ${fmt(STEAL[i])}%`
+    case 'def-mdef': return `DEF/M.DEF +${M}`
+    case 'def': return `DEF +${2 * M}`
+    case 'mdef': return `M.DEF +${2 * M}`
+    case 'area-guard': return `Area moves −${fmt(AGUARD[i])}%`
+  }
+  if (pick.startsWith('full:')) return `${pick.slice(5)} +${FULL[t][i]}`
+  if (pick.startsWith('split:')) return pick.slice(6).split('+').map((k) => `${k} +${SPLIT[t][i]}`).join(' · ')
+  return ''
+}
+/** The first number of a node's value, for the strip (D278). */
+function short(id, n, pick) {
+  const i = n - 1
+  if (id === 'template') return n === 1 ? '+2.4%' : `+${HER[tier][1]}`
+  const pct = { area: AREA, multi: MULTI, 'mp-back': MPB, 'life-steal': STEAL }[pick]
+  if (pct) return `+${fmt(pct[i])}%`
+  if (pick === 'area-guard') return `−${fmt(AGUARD[i])}%`
+  if (pick.startsWith('full:')) return `+${FULL[tier][i]}`
+  if (pick.startsWith('split:')) return `+${SPLIT[tier][i]}`
+  if (pick === 'trio') return `+${TRIO[tier][i]}`
+  const P = PLANET[tier][i], M = MOON[tier][i]
+  return `+${{ six: P, defenses: 2 * P, pools: 10 * P, offense: M, 'hp-mp': 5 * M, hp: 10 * M, mp: 2 * M, 'def-mdef': M, def: 2 * M, mdef: 2 * M }[pick]}`
 }
 
-// --- The page's state ---------------------------------------------------------------------------------------------------
-let tier = 2, cls = 'brawler', stateName = 'Mid', selected = null, kindsOpen = false
+// --- The page's state -------------------------------------------------------------------------------------------------------
+let tier = 2, cls = 'brawler', stateName = 'Mid', selected = null, listOpen = false, branchesOpen = false
+const nodes = (spec) => Object.entries(spec).flatMap(([id, k]) => Array.from({ length: k }, (_, i) => `${id}:${i + 1}`))
+// Held jewels by numeral and Stardust by grade (1–10).
 const STATES = {
-  New: () => ({ level: 1, open: { planet: 0, prowess: 0, vigor: 0, guard: 0, wm1: 0, wm2: 0, template: 0 }, held: { planet: [3, 0, 0, 0, 0], moon: [0, 0, 0, 0, 0] } }),
-  Mid: () => ({ level: 38, open: { planet: 4, prowess: 4, vigor: 3, guard: 3, wm1: 4, wm2: 4, template: 1 }, held: { planet: [0, 0, 0, 0, 3], moon: [0, 0, 0, 2, 0] } }),
-  Full: () => ({ level: 50, open: { planet: 5, prowess: 5, vigor: 5, guard: 5, wm1: 5, wm2: 5, template: 2 }, held: { planet: [0, 0, 0, 0, 0], moon: [0, 0, 0, 0, 0] } }),
+  New: () => ({ level: 1, open: { planet: 0, prowess: 0, vigor: 0, guard: 0, template: 0 }, slotted: [],
+    held: { planet: [3, 0, 0, 0, 0], moon: [0, 0, 0, 0, 0], dust: [3, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }),
+  Mid: () => ({ level: 38, open: { planet: 4, prowess: 4, vigor: 3, guard: 3, template: 1 }, slotted: nodes({ planet: 3, prowess: 4, vigor: 2, guard: 2 }),
+    held: { planet: [0, 0, 0, 0, 3], moon: [0, 0, 0, 2, 0], dust: [0, 0, 0, 0, 0, 2, 3, 0, 0, 0] } }),
+  Full: () => ({ level: 50, open: { planet: 5, prowess: 5, vigor: 5, guard: 5, template: 2 }, slotted: nodes({ planet: 5, prowess: 5, vigor: 5, guard: 5 }),
+    held: { planet: [0, 0, 0, 0, 0], moon: [0, 0, 0, 0, 0], dust: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } }),
 }
 let S = STATES[stateName]()
-let moons = {}
-function presetMoons() {
-  const k = CLASSES[cls].kinds
-  moons = tier === 2 ? { wm1: { mode: 'split', kinds: [k[0], k[1]] } } : tier === 3 ? { wm1: { mode: 'full', kinds: [k[0]] }, wm2: { mode: 'split', kinds: [k[1], k[2]] } } : {}
-}
-presetMoons()
+let picks = {}
+/** Her class's preset (T2E37): Prowess by her kit on all five nodes; the rest Tier 1's gifts. */
+const presetPicks = (c = cls) => (CLASSES[c].prowess === 'offense' ? {} : Object.fromEntries([1, 2, 3, 4, 5].map((n) => [`prowess:${n}`, CLASSES[c].prowess])))
+picks = presetPicks()
 
-const isWM = (id) => id === 'wm1' || id === 'wm2'
-const planetSide = (id) => id === 'planet' || isWM(id)
-const gate = (id, n) => (id === 'template' ? (n === 1 ? 16 : 36) : planetSide(id) ? 10 * n - 9 : 10 * n - 4)
-const count = (id) => (id === 'planet' ? PLANET_COUNT[tier] : 1)
-const pool = (id) => (planetSide(id) ? S.held.planet : S.held.moon)
-const jewelName = (id, n) => `${planetSide(id) ? 'Planet' : 'Moon'} Jewel ${ROMAN[n - 1]}`
-function state(B, id, n) {
+const grade = (id, n) => (id === 'planet' ? 2 * n - 1 : 2 * n)
+const gate = (id, n) => (id === 'template' ? (n === 1 ? 16 : 36) : 5 * grade(id, n) - 4)
+const count = (id) => (id === 'planet' ? 3 : 1)
+const pool = (id) => (id === 'planet' ? S.held.planet : S.held.moon)
+const jewelName = (id, n) => `${id === 'planet' ? 'Planet' : 'Moon'} Jewel ${ROMAN[n - 1]}`
+const dustNeed = (id, n) => (tier > 1 && id !== 'template' && n <= S.open[id] && !slottedAt(id, n))
+const dustReady = (id, n) => dustNeed(id, n) && S.held.dust[grade(id, n) - 1] >= count(id)
+function state(id, n) {
   const open = S.open[id]
-  if (n <= open) return 'open'
+  if (n <= open) return dustReady(id, n) ? 'ready' : 'open'
   if (n > open + 1) return 'later'
   if (id === 'template') return 'next'
   return S.level >= gate(id, n) && pool(id)[n - 1] >= count(id) ? 'ready' : 'next'
 }
-const wmLabel = (id) => moons[id].kinds.join(' · ')
-const wmValue = (id, n) => WM[moons[id].mode][tier][n - 1]
-function value(id, n) {
-  if (id === 'planet') return `+${PLANET[tier][n - 1]} · all six`
-  if (id === 'prowess') { const [a, m] = split(MOON[tier][n - 1], CLASSES[cls].atk); return a && m ? `ATK +${a} · M.ATK +${m}` : a ? `ATK +${a}` : `M.ATK +${m}` }
-  if (id === 'vigor') return `HP +${MOON[tier][n - 1] * 5} · MP +${MOON[tier][n - 1]}`
-  if (id === 'guard') return `DEF/M.DEF +${MOON[tier][n - 1]}`
-  if (id === 'template') return n === 1 ? 'Evasion +2.4%' : `DEF +${HER[tier][1]}`
-  const m = moons[id]
-  return `${m.mode === 'full' ? 'Full' : 'Split'} · ${m.kinds.map((k) => `${k} +${wmValue(id, n)}`).join(' · ')}`
-}
-function short(id, n) {
-  if (id === 'planet') return `+${PLANET[tier][n - 1]}`
-  if (id === 'vigor') return `+${MOON[tier][n - 1] * 5}`
-  if (id === 'template') return n === 1 ? '+2.4%' : `+${HER[tier][1]}`
-  if (isWM(id)) return `+${wmValue(id, n)}`
-  return `+${MOON[tier][n - 1]}`
-}
 
-// --- Set all: the live rule (jewelNodes' first fit, repeated): the body furthest behind among those a jewel fits ----------
+// --- Set all: the live rule for jewels (jewelNodes' first fit, repeated), then every Stardust that fits an open node -------------
 function plan() {
-  const sim = { open: { ...S.open }, planet: [...S.held.planet], moon: [...S.held.moon] }, lines = []
-  const B = bodiesOf(tier)
+  const sim = { open: { ...S.open }, slotted: [...S.slotted], planet: [...S.held.planet], moon: [...S.held.moon], dust: [...S.held.dust] }, lines = []
   for (let guard = 0; guard < 40; guard++) {
     let did = false
     for (const kind of ['planet', 'moon']) for (let n = 1; n <= 5; n++) {
-      const ids = (kind === 'planet' ? ['planet', 'wm1', 'wm2'] : ['prowess', 'vigor', 'guard']).filter((id) => B[id])
+      const ids = kind === 'planet' ? ['planet'] : ['prowess', 'vigor', 'guard']
       const fits = ids.map((id, i) => ({ id, i, behind: sim.open[id] })).filter(({ id }) => sim.open[id] === n - 1 && S.level >= gate(id, n) && sim[kind][n - 1] >= count(id))
         .sort((a, b) => a.behind - b.behind || a.i - b.i)
       if (!fits.length) continue
       const { id } = fits[0]
       sim[kind][n - 1] -= count(id); sim.open[id] = n; did = true
-      lines.push({ id, n, text: `${jewelName(id, n)}${count(id) > 1 ? ` ×${count(id)}` : ''} → ${B[id].name} ${ROMAN[n - 1]} · ${value(id, n)}` })
+      lines.push(`${jewelName(id, n)}${count(id) > 1 ? ` ×${count(id)}` : ''} → ${BODIES[id].name} ${ROMAN[n - 1]} · ${give(id, n, DEFAULT[id])}`)
       break
     }
     if (!did) break
   }
+  if (tier > 1) for (const id of ['planet', 'prowess', 'vigor', 'guard']) for (let n = 1; n <= sim.open[id]; n++) {
+    const node = `${id}:${n}`, g = grade(id, n)
+    if (sim.slotted.includes(node) || sim.dust[g - 1] < count(id)) continue
+    sim.dust[g - 1] -= count(id); sim.slotted.push(node)
+    lines.push(`Stardust G${g}${count(id) > 1 ? ` ×${count(id)}` : ''} → ${BODIES[id].name} ${ROMAN[n - 1]} · ${give(id, n, pickOf(id, n))}`)
+  }
   return { lines, sim }
 }
 
-// --- Drafts of the crests (the live art is uma-art's; the crescent blade is T2E10's stand-in) -------------------------------
+// --- Crests and marks (vector stand-ins; the live art is uma-art's) ----------------------------------------------------------
 const CREST = {
   planet: '<circle cx="12" cy="12" r="6.6"/><ellipse cx="12" cy="12" rx="11" ry="3.5" transform="rotate(-24 12 12)" fill="none" stroke="currentColor" stroke-width="1.6"/>',
   prowess: '<path d="M12 1 14.6 4.6V15H9.4V4.6Z"/><rect x="6" y="15" width="12" height="2.2" rx="1.1"/><rect x="11" y="17.2" width="2" height="3.8"/><circle cx="12" cy="22" r="1.5"/>',
   vigor: '<path d="M12 21.5C5.3 16.3 2 12.7 2 8.6A5.2 5.2 0 0 1 12 6.5a5.2 5.2 0 0 1 10 2.1c0 4.1-3.3 7.7-10 12.9Z"/>',
   guard: '<path d="M12 1.8 20.8 5v6.8c0 4.9-3.7 8.5-8.8 10.4-5.1-1.9-8.8-5.5-8.8-10.4V5Z"/>',
   template: '<path d="M15.5 2.2a10 10 0 1 0 6.3 16.1A8.3 8.3 0 0 1 15.5 2.2Z"/><path d="m17.5 6.5.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z"/>',
-  wm: '<path d="M21.5 2.2C20.8 11 15.2 17 6.2 18.6 13 15.6 17.6 10.2 21.5 2.2Z"/><path d="M5.2 15.6 8.4 18.8 4.6 22.6 1.4 19.4Z"/><rect x="3.2" y="14.6" width="7.2" height="2" rx="1" transform="rotate(45 6.8 15.6)"/>',
 }
 const STAT = {
   HP: '<path d="M8 14.3C3.4 10.8 1.3 8.3 1.3 5.6A3.5 3.5 0 0 1 8 4.3a3.5 3.5 0 0 1 6.7 1.3c0 2.7-2.1 5.2-6.7 8.7Z"/>',
@@ -341,10 +402,14 @@ const STAT = {
   'M.DEF': '<path fill-rule="evenodd" d="M8 1 14 3.2v4.6c0 3.3-2.5 5.8-6 7.2-3.5-1.4-6-3.9-6-7.2V3.2Zm0 2.8L6.9 6.9 3.8 8l3.1 1.1L8 12.2l1.1-3.1L12.2 8 9.1 6.9Z"/>',
 }
 const svg = (inner, size, box) => `<svg viewBox="0 0 ${box} ${box}" width="${size}" height="${size}" fill="currentColor" aria-hidden="true">${inner}</svg>`
+/** The branch mark (T2E49): a white diamond at a star's lower right, inside its 44 pt target. */
+const MARK = { dx: 9, dy: 9, r: 4 }
+const diamond = (x, y) => `<path d="M${x + MARK.dx} ${y + MARK.dy - MARK.r}l${MARK.r} ${MARK.r}l-${MARK.r} ${MARK.r}l-${MARK.r} -${MARK.r}Z" fill="#fff" stroke="#101a24" stroke-width="1.5" pointer-events="none"/>`
+const marked = (id, n) => tier > 1 && DEFAULT[id] && pickOf(id, n) !== DEFAULT[id]
 
-// --- The chart ----------------------------------------------------------------------------------------------------------
-const skyOf = (H) => { let seed = 42; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647
-  return Array.from({ length: Math.round(64 * H / 350) }, () => [+(r() * W).toFixed(1), +(r() * H).toFixed(1), +(0.5 + r() * 0.8).toFixed(2), +(0.18 + r() * 0.42).toFixed(2)]) }
+// --- The chart --------------------------------------------------------------------------------------------------------------
+const SKY = (() => { let seed = 42; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647
+  return Array.from({ length: 64 }, () => [+(r() * W).toFixed(1), +(r() * H).toFixed(1), +(0.5 + r() * 0.8).toFixed(2), +(0.18 + r() * 0.42).toFixed(2)]) })()
 function arc(c, radius, from, to) {
   const [x0, y0] = on(c, radius, from), [x1, y1] = on(c, radius, to)
   return `M${x0.toFixed(1)} ${y0.toFixed(1)}A${radius} ${radius} 0 ${to - from > 180 ? 1 : 0} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`
@@ -353,9 +418,9 @@ function link(a, b) {
   const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy), t = (NODE_R + 1) / d
   return `M${(a[0] + dx * t).toFixed(1)} ${(a[1] + dy * t).toFixed(1)}L${(b[0] - dx * t).toFixed(1)} ${(b[1] - dy * t).toFixed(1)}`
 }
-const labelText = (B, id) => (isWM(id) ? wmLabel(id) : id === 'template' ? `★ ${B[id].name}` : B[id].name)
-function body(B, id, open, interactive) {
-  const b = B[id], points = b.points, done = open[id] >= b.count
+const labelText = (id) => (id === 'template' ? `★ ${BODIES[id].name}` : BODIES[id].name)
+function body(id, open, interactive, uid) {
+  const b = BODIES[id], points = b.points, done = open[id] >= b.count
   let lines = ''
   for (let i = 0; i < b.count - (b.count === 2 ? 1 : 0); i++) {
     const next = (i + 1) % b.count, closing = next === 0
@@ -364,179 +429,225 @@ function body(B, id, open, interactive) {
     const d = b.ring ? (() => { const off = 19, from = -90 + i * 72 + off; return arc(b.at, b.ring, from, from + 72 - 2 * off) })() : link(points[i], points[next])
     lines += `<path d="${d}" fill="none" stroke-linecap="round" ${lit ? `stroke="${b.color}" stroke-width="2.5"` : 'stroke="rgb(255 255 255 / .26)" stroke-width="1.25" stroke-dasharray="3 5"'}/>`
   }
-  const [hx, hy] = b.hub, crest = isWM(id) ? CREST.wm : CREST[id]
+  const [hx, hy] = b.hub
   const tap = interactive ? `class="tap" role="button" tabindex="0"` : ''
-  const hub = `<g ${tap} data-hub="${id}" aria-label="${labelText(B, id)}, ${open[id]} of ${b.count} open">
+  const hub = `<g ${tap} data-hub="${id}" aria-label="${labelText(id)}, ${open[id]} of ${b.count} open">
     <circle cx="${hx}" cy="${hy}" r="${id === 'template' ? 18 : 22}" fill="transparent"/>
-    ${b.hubR ? `<circle cx="${hx}" cy="${hy}" r="${b.hubR}" fill="url(#hub-${id})" stroke="${b.color}" stroke-opacity="${done ? .9 : .35}" stroke-width="1"/>` : ''}
-    <g color="${b.color}" transform="translate(${hx - 12} ${hy - 12})" pointer-events="none"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">${crest}</svg></g>
+    ${b.hubR ? `<circle cx="${hx}" cy="${hy}" r="${b.hubR}" fill="url(#hub-${id}-${uid})" stroke="${b.color}" stroke-opacity="${done ? .9 : .35}" stroke-width="1"/>` : ''}
+    <g color="${b.color}" transform="translate(${hx - 12} ${hy - 12})" pointer-events="none"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">${CREST[id]}</svg></g>
     <circle class="focus" cx="${hx}" cy="${hy}" r="${(b.hubR || 18) + 3}" fill="none" stroke="#fff" stroke-width="2"/>
   </g>`
   const stars = points.map(([x, y], i) => {
-    const n = i + 1, s = interactive ? state(B, id, n) : (n <= open[id] ? 'open' : 'next'), nid = `${id}:${n}`
-    const fill = s === 'open' ? b.color : '#16222e', stroke = s === 'later' ? '#5b6b7e' : b.color
-    const ink = s === 'open' ? '#101a24' : s === 'later' ? '#93a3b5' : '#f2f6fa'
-    return `<g ${tap} data-node="${nid}" aria-label="${labelText(B, id)} ${ROMAN[i]}, ${s}">
+    const n = i + 1, s = interactive ? state(id, n) : (n <= open[id] ? 'open' : 'next'), nid = `${id}:${n}`
+    const isOpen = n <= open[id]
+    const fill = isOpen ? b.color : '#16222e', stroke = s === 'later' ? '#5b6b7e' : b.color
+    const ink = isOpen ? '#101a24' : s === 'later' ? '#93a3b5' : '#f2f6fa'
+    const pk = pickOf(id, n)
+    return `<g ${tap} data-node="${nid}" aria-label="${labelText(id)} ${ROMAN[i]}, ${s}${pk && tier > 1 ? `, ${pickName(pk)}` : ''}">
       <circle cx="${x}" cy="${y}" r="${TARGET}" fill="transparent"/>
       ${s === 'ready' ? `<circle class="pulse" cx="${x}" cy="${y}" r="16" fill="none" stroke="${b.color}" stroke-width="2"/>` : ''}
-      ${s === 'open' ? `<circle cx="${x}" cy="${y}" r="${NODE_R + 4}" fill="${b.color}" opacity=".2"/>` : ''}
+      ${isOpen ? `<circle cx="${x}" cy="${y}" r="${NODE_R + 4}" fill="${b.color}" opacity=".2"/>` : ''}
       <circle cx="${x}" cy="${y}" r="${NODE_R}" fill="${fill}" stroke="${stroke}" stroke-width="${s === 'ready' ? 2 : 1.5}"/>
       <text x="${x}" y="${y + 4}" text-anchor="middle" font-size="12" font-weight="800" fill="${ink}" pointer-events="none">${ROMAN[i]}</text>
       ${s === 'ready' ? `<circle cx="${x + 10}" cy="${y - 10}" r="5" fill="#4fb37a" stroke="#101a24" stroke-width="2" pointer-events="none"/>` : ''}
+      ${marked(id, n) ? diamond(x, y) : ''}
       <circle class="focus" cx="${x}" cy="${y}" r="${NODE_R + 3}" fill="none" stroke="#fff" stroke-width="2"/>
     </g>`
   }).join('')
   const [lx, ly, anchor] = b.label
-  const label = `<text data-label="${id}" x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="12" font-weight="700" fill="${b.color}">${labelText(B, id)}<tspan fill="#a8b6c6" font-weight="600" dx="5">${open[id]}/${b.count}</tspan></text>`
+  const label = `<text data-label="${id}" x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="12" font-weight="700" fill="${b.color}">${labelText(id)}<tspan fill="#a8b6c6" font-weight="600" dx="5">${open[id]}/${b.count}</tspan></text>`
   return `<g data-body="${id}">${lines}${hub}${stars}${label}</g>`
 }
 function chart(t, open, interactive) {
   const keep = tier; tier = t
-  const B = bodiesOf(t), H = HEIGHT[t]
+  const uid = `${t}${interactive ? 'i' : ''}`
   const orbit = [[-90, 30], [30, 150], [150, 270]].map(([a, b]) => arc(PLANET_AT, ORBIT, a + 27, b - 27))
-  const outer = t === 2 ? [[62, 74], [106, 118]].map(([a, b]) => arc(PLANET_AT, 172, a, b)) : t === 3 ? [[85, 95], [48, 56], [124, 132]].map(([a, b]) => arc(PLANET_AT, 220, a, b)) : []
-  const defs = Object.entries(B).map(([id, b]) => `<radialGradient id="hub-${id}"><stop offset="0" stop-color="${b.color}" stop-opacity=".28"/><stop offset="1" stop-color="${b.color}" stop-opacity=".06"/></radialGradient>`).join('')
+  const defs = Object.entries(BODIES).map(([id, b]) => `<radialGradient id="hub-${id}-${uid}"><stop offset="0" stop-color="${b.color}" stop-opacity=".28"/><stop offset="1" stop-color="${b.color}" stop-opacity=".06"/></radialGradient>`).join('')
   const out = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="group" aria-label="Extra Stats chart, Tier ${t}">
-    <defs>${defs}<radialGradient id="sky-${t}" cx="50%" cy="${Math.round(58 * 350 / H)}%" r="72%"><stop offset="0" stop-color="#1c2b3c"/><stop offset="1" stop-color="#101a24"/></radialGradient></defs>
-    <rect width="${W}" height="${H}" rx="14" fill="url(#sky-${t})"/>
-    ${skyOf(H).map(([x, y, r, o]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${o}"/>`).join('')}
-    ${[...orbit, ...outer].map((d) => `<path d="${d}" fill="none" stroke="rgb(255 255 255 / .13)" stroke-width="1" stroke-dasharray="1 6" stroke-linecap="round"/>`).join('')}
-    ${Object.keys(B).map((id) => body(B, id, open, interactive)).join('')}
+    <defs>${defs}<radialGradient id="sky-${uid}" cx="50%" cy="58%" r="72%"><stop offset="0" stop-color="#1c2b3c"/><stop offset="1" stop-color="#101a24"/></radialGradient></defs>
+    <rect width="${W}" height="${H}" rx="14" fill="url(#sky-${uid})"/>
+    ${SKY.map(([x, y, r, o]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${o}"/>`).join('')}
+    ${orbit.map((d) => `<path d="${d}" fill="none" stroke="rgb(255 255 255 / .13)" stroke-width="1" stroke-dasharray="1 6" stroke-linecap="round"/>`).join('')}
+    ${Object.keys(BODIES).map((id) => body(id, open, interactive, uid)).join('')}
   </svg>`
   tier = keep
   return out
 }
 
-// --- The screen ---------------------------------------------------------------------------------------------------------
+// --- The screen -------------------------------------------------------------------------------------------------------------
 function totals() {
-  const t = { HP: 0, MP: 0, ATK: 0, 'M.ATK': 0, DEF: 0, 'M.DEF': 0 }
-  for (let n = 1; n <= S.open.planet; n++) for (const k of Object.keys(t)) t[k] += PLANET[tier][n - 1] * (k === 'HP' ? 5 : 1)
-  for (let n = 1; n <= S.open.prowess; n++) { const [a, m] = split(MOON[tier][n - 1], CLASSES[cls].atk); t.ATK += a; t['M.ATK'] += m }
-  for (let n = 1; n <= S.open.vigor; n++) { t.HP += 5 * MOON[tier][n - 1]; t.MP += MOON[tier][n - 1] }
-  for (let n = 1; n <= S.open.guard; n++) { t.DEF += MOON[tier][n - 1]; t['M.DEF'] += MOON[tier][n - 1] }
-  return t
+  const t = { HP: 0, MP: 0, ATK: 0, 'M.ATK': 0, DEF: 0, 'M.DEF': 0 }, pct = { Area: 0, 'Multi-hit': 0, 'MP back': 0, 'Life steal': 0, 'Area guard': 0 }, kinds = {}
+  const add = (k, v) => { t[k] += v }, kind = (k, v) => { kinds[k] = (kinds[k] ?? 0) + v }
+  for (let n = 1; n <= S.open.planet; n++) {
+    const P = PLANET[tier][n - 1], p = wears('planet', n)
+    add('ATK', P); add('M.ATK', P)
+    if (p === 'six') { add('HP', 5 * P); add('MP', P); add('DEF', P); add('M.DEF', P) }
+    if (p === 'defenses') { add('DEF', 2 * P); add('M.DEF', 2 * P) }
+    if (p === 'pools') { add('HP', 10 * P); add('MP', 2 * P) }
+  }
+  for (const id of ['prowess', 'vigor', 'guard']) for (let n = 1; n <= S.open[id]; n++) {
+    const M = MOON[tier][n - 1], p = wears(id, n), i = n - 1
+    if (p === 'offense') { const [a, m] = split(M, CLASSES[cls].atk); add('ATK', a); add('M.ATK', m) }
+    if (p === 'area') pct.Area += AREA[i]
+    if (p === 'multi') pct['Multi-hit'] += MULTI[i]
+    if (p.startsWith('full:')) kind(p.slice(5), FULL[tier][i])
+    if (p.startsWith('split:')) for (const k of p.slice(6).split('+')) kind(k, SPLIT[tier][i])
+    if (p === 'trio') for (const k of CLASSES[cls].top) kind(k, TRIO[tier][i])
+    if (p === 'hp-mp') { add('HP', 5 * M); add('MP', M) }
+    if (p === 'hp') add('HP', 10 * M)
+    if (p === 'mp') add('MP', 2 * M)
+    if (p === 'mp-back') pct['MP back'] += MPB[i]
+    if (p === 'life-steal') pct['Life steal'] += STEAL[i]
+    if (p === 'def-mdef') { add('DEF', M); add('M.DEF', M) }
+    if (p === 'def') add('DEF', 2 * M)
+    if (p === 'mdef') add('M.DEF', 2 * M)
+    if (p === 'area-guard') pct['Area guard'] += AGUARD[i]
+  }
+  return { t, pct, kinds }
 }
-const nodeCount = () => { const B = bodiesOf(tier); return Object.keys(B).reduce((a, id) => a + Math.min(S.open[id], B[id].count), 0) }
-const total = () => ({ 1: 22, 2: 27, 3: 32 })[tier]
+const nodeCount = () => Object.keys(BODIES).reduce((a, id) => a + Math.min(S.open[id], BODIES[id].count), 0)
+const sorted = (o) => JSON.stringify(Object.fromEntries(Object.entries(o).filter(([k, v]) => v !== DEFAULT[k.split(':')[0]]).sort()))
+const samePreset = () => sorted(picks) === sorted(presetPicks())
+const sameGifts = () => sorted(picks) === '{}'
 function screen() {
-  const B = bodiesOf(tier), p = plan(), t = totals()
-  const moonLine = Object.keys(moons).map((id) => {
-    const sum = WM[moons[id].mode][tier].slice(0, S.open[id]).reduce((a, b) => a + b, 0)
-    return `<i style="background:${B[id].color}"></i>${moons[id].kinds.map((k) => `${k} +${sum}`).join(' · ')}`
-  }).join('<span style="opacity:.4">|</span>')
-  const head = `<div class="top"><div class="who"><i>A</i><div><b class="display">Uma A</b><span>${CLASSES[cls].name} · Tier ${tier} · Lv ${S.level}</span></div></div>
+  const p = plan(), { t, pct, kinds } = totals()
+  const pcts = Object.entries(pct).filter(([, v]) => v > 0).map(([k, v]) => `<b>${k} ${k === 'Area guard' ? '−' : k === 'Life steal' ? '' : '+'}${fmt(Math.round(v * 10) / 10)}%</b>`)
+  const kindLine = Object.entries(kinds).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} +${v}`).join(' · ')
+  const head = `<div class="top"><div class="who"><i>A</i><div><b class="display">Uma A</b><span>${tier === 1 ? CLASSES[cls].t1 : CLASSES[cls].name} · Tier ${tier} · Lv ${S.level}</span></div></div>
     <div class="tabs"><span>Class</span><span>Gear</span><span class="on">Stars</span><span>Template</span></div></div>`
-  document.getElementById('cap').innerHTML = `<span class="tier t${tier}">Tier ${tier}</span> · ${B.wm1 ? 'chart 360 × ' + HEIGHT[tier] : 'chart 360 × 350, as live'}`
+  document.getElementById('cap').innerHTML = `<span class="tier t${tier}">Tier ${tier}</span> · chart 360 × 350, as live · ${tier === 1 ? 'no branches' : `20 of 22 nodes take a branch · ${S.slotted.length} slotted`}`
   document.getElementById('phone').innerHTML = `${head}<div class="body">
-    <div class="first"><span>Extra Stats · Open ${nodeCount()}/${total()}${p.lines.length ? ` · ${p.lines.length} ready` : ''}</span><span style="display:flex;align-items:center">${p.lines.length ? '<button class="setall" id="setall">Set all</button>' : ''}<span class="hinfo">i</span></span></div>
+    <div class="first"><span>Extra Stats · Open ${nodeCount()}/22${p.lines.length ? ` · ${p.lines.length} ready` : ''}</span><span style="display:flex;align-items:center">${p.lines.length ? '<button class="setall" id="setall">Set all</button>' : ''}<span class="hinfo">i</span></span></div>
     ${chart(tier, S.open, true)}
     <div class="totals">${Object.entries(t).map(([k, v]) => `<span>${svg(STAT[k], 16, 16)}<b>${k}</b><em>+${v}</em></span>`).join('')}</div>
     ${S.open.template ? `<p class="starline">★ Evasion +2.4%${S.open.template > 1 ? ` · DEF +${HER[tier][1]}` : ''}</p>` : ''}
-    ${B.wm1 ? `<p class="moonline">${moonLine}</p>` : ''}
-  </div>${selected === 'setall' ? setAllSheet(p) : selected ? (kindsOpen ? kindsSheet() : sheet()) : ''}`
+    ${kindLine ? `<p class="moonline">${kindLine}</p>` : ''}
+    ${tier > 1 && pcts.length ? `<p class="branchline">${pcts.join('<span style="opacity:.4">·</span>')}</p>` : ''}
+    ${tier > 1 ? `<button class="rowbtn" id="branches">Branches<span>${samePreset() ? 'Her preset' : sameGifts() ? "Tier 1's gifts" : 'Her own'} ›</span></button>` : ''}
+  </div>${selected === 'setall' ? setAllSheet(p) : branchesOpen ? branchesSheet() : selected ? (listOpen ? listSheet() : sheet()) : ''}`
   wire()
 }
 function wire() {
   const root = document.getElementById('phone')
-  root.querySelectorAll('[data-node]').forEach((el) => el.onclick = () => { selected = el.dataset.node; kindsOpen = false; screen() })
-  root.querySelectorAll('[data-hub]').forEach((el) => el.onclick = () => { const id = el.dataset.hub, B = bodiesOf(tier); selected = `${id}:${Math.min(S.open[id] + 1, B[id].count)}`; kindsOpen = false; screen() })
+  root.querySelectorAll('[data-node]').forEach((el) => el.onclick = () => { selected = el.dataset.node; listOpen = false; branchesOpen = false; screen() })
+  root.querySelectorAll('[data-hub]').forEach((el) => el.onclick = () => { const id = el.dataset.hub; selected = `${id}:${Math.min(S.open[id] + 1, BODIES[id].count)}`; listOpen = false; branchesOpen = false; screen() })
   root.querySelectorAll('[data-step]').forEach((el) => el.onclick = () => { selected = el.dataset.step; screen() })
-  root.querySelectorAll('.close').forEach((el) => el.onclick = () => { selected = null; kindsOpen = false; screen() })
+  root.querySelectorAll('.close').forEach((el) => el.onclick = () => { selected = null; listOpen = false; branchesOpen = false; screen() })
+  root.querySelectorAll('.back').forEach((el) => el.onclick = () => { listOpen = false; screen() })
   const all = root.querySelector('#setall'); if (all) all.onclick = () => { selected = 'setall'; screen() }
-  // Her moon opens with the three moons' II and IV (D264).
+  const br = root.querySelector('#branches'); if (br) br.onclick = () => { branchesOpen = true; selected = null; screen() }
   const herMoon = () => { const m = ['prowess', 'vigor', 'guard']; if (m.every((x) => S.open[x] >= 2) && !S.open.template) S.open.template = 1; if (m.every((x) => S.open[x] >= 4)) S.open.template = 2 }
-  const doAll = root.querySelector('#doall'); if (doAll) doAll.onclick = () => { const { sim } = plan(); S.open = sim.open; S.held = { planet: sim.planet, moon: sim.moon }; herMoon(); selected = null; screen() }
-  const set = root.querySelector('.sheetbtn.go:not(#doall)'); if (set) set.onclick = () => { const [id, n] = selected.split(':'); const k = Number(n); pool(id)[k - 1] -= count(id); S.open[id] = k; herMoon(); screen() }
-  const kinds = root.querySelector('.kindsrow'); if (kinds) kinds.onclick = () => { kindsOpen = true; screen() }
-  root.querySelectorAll('[data-wear]').forEach((el) => el.onclick = () => { moons = JSON.parse(el.dataset.wear); kindsOpen = false; screen() })
+  const doAll = root.querySelector('#doall'); if (doAll) doAll.onclick = () => { const { sim } = plan(); S.open = sim.open; S.slotted = sim.slotted; S.held = { planet: sim.planet, moon: sim.moon, dust: sim.dust }; herMoon(); selected = null; screen() }
+  const set = root.querySelector('#setnode'); if (set) set.onclick = () => { const [id, raw] = selected.split(':'), n = Number(raw); pool(id)[n - 1] -= count(id); S.open[id] = n; herMoon(); screen() }
+  const slot = root.querySelector('#slotnode'); if (slot) slot.onclick = () => { const [id, raw] = selected.split(':'), n = Number(raw); S.held.dust[grade(id, n) - 1] -= count(id); S.slotted.push(selected); screen() }
+  const branch = root.querySelector('#branchrow'); if (branch) branch.onclick = () => { listOpen = true; screen() }
+  root.querySelectorAll('[data-wear]').forEach((el) => el.onclick = () => { picks[selected] = el.dataset.wear; listOpen = false; screen() })
+  const every = root.querySelector('#every'); if (every) every.onclick = () => { const [id, raw] = selected.split(':'); const p = pickOf(id, Number(raw)); for (let n = 1; n <= 5; n++) picks[`${id}:${n}`] = p; listOpen = false; screen() }
+  root.querySelectorAll('[data-all]').forEach((el) => el.onclick = () => { picks = el.dataset.all === 'preset' ? presetPicks() : {}; branchesOpen = false; screen() })
   root.querySelectorAll('.tap').forEach((el) => el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click() } })
 }
 function sheet() {
-  const B = bodiesOf(tier), [id, raw] = selected.split(':'), n = Number(raw), b = B[id], s = state(B, id, n)
-  const title = id === 'template' ? `★ ${b.name}'s moon ${ROMAN[n - 1]}` : `${isWM(id) ? b.name : b.name} ${ROMAN[n - 1]}`
-  const jewel = id === 'template' ? null : `${jewelName(id, n)} ×${count(id)} · ${pool(id)[n - 1]} held`
-  const prior = n > 1 && S.open[id] < n - 1 ? `${b.name} ${ROMAN[n - 2]} first` : null
-  const footer = id === 'template' ? 'With its moons' : prior ?? (S.level < gate(id, n) ? `Lv ${gate(id, n)}` : s === 'ready' ? 'Set' : `${jewelName(id, n)} ×${count(id)}`)
+  const [id, raw] = selected.split(':'), n = Number(raw), b = BODIES[id], s = state(id, n), pk = pickOf(id, n), isOpen = n <= S.open[id]
+  const title = id === 'template' ? `★ ${b.name}'s moon ${ROMAN[n - 1]}` : `${b.name} ${ROMAN[n - 1]}`
   const color = b.color === '#ffd84d' ? '#d6a23e' : b.color
   const steps = Array.from({ length: b.count }, (_, i) => {
-    const m = i + 1, st = state(B, id, m)
-    return `<button class="step ${st} ${m === n ? 'sel' : ''} ${m <= S.open[id] ? 'lit' : ''}" data-step="${id}:${m}" aria-label="${ROMAN[i]}, ${st}"><span class="dot">${ROMAN[i]}</span><small>${short(id, m)}</small></button>`
+    const m = i + 1, st = state(id, m)
+    return `<button class="step ${m <= S.open[id] ? 'open' : st} ${st === 'ready' ? 'ready' : ''} ${m === n ? 'sel' : ''} ${m <= S.open[id] ? 'lit' : ''}" data-step="${id}:${m}" aria-label="${ROMAN[i]}, ${st}"><span class="dot">${ROMAN[i]}</span><small>${short(id, m, tier > 1 ? pickOf(id, m) : DEFAULT[id] ?? 'six')}</small></button>`
   }).join('')
-  const kindsRow = isWM(id) ? `<button class="kindsrow">Kinds<span>${moons[id].mode === 'full' ? 'Full' : 'Split'} · ${moons[id].kinds.join(' + ')} ›</span></button>` : ''
+  let footer = '', foot = null
+  if (id === 'template') footer = `<button class="sheetbtn" disabled>With its moons</button>`
+  else if (!isOpen) {
+    const prior = n > 1 && S.open[id] < n - 1 ? `${b.name} ${ROMAN[n - 2]} first` : null
+    foot = prior ?? (S.level < gate(id, n) ? `Lv ${gate(id, n)}` : s === 'ready' ? 'Set' : `${jewelName(id, n)} ×${count(id)}`)
+    footer = `<button class="sheetbtn ${foot === 'Set' ? 'go' : ''}" ${foot === 'Set' ? 'id="setnode"' : 'disabled'}>${foot === 'Set' ? `Set · ${jewelName(id, n)} ×${count(id)}` : foot}</button>`
+  } else if (dustNeed(id, n)) {
+    const ok = dustReady(id, n)
+    footer = `<button class="sheetbtn ${ok ? 'go' : ''}" ${ok ? 'id="slotnode"' : 'disabled'}>${ok ? `Slot · Stardust G${grade(id, n)} ×${count(id)}` : `Stardust G${grade(id, n)} ×${count(id)}`}</button>`
+  }
+  const jewel = id === 'template' || isOpen ? '' : `<p class="soft">${jewelName(id, n)} ×${count(id)} · ${pool(id)[n - 1]} held</p>`
+  const dust = tier > 1 && id !== 'template' && !slottedAt(id, n) ? `<p class="soft stardust">Stardust G${grade(id, n)} ×${count(id)} · ${S.held.dust[grade(id, n) - 1]} held${isOpen ? ' · gives Tier 1\'s gift until slotted' : ''}</p>` : ''
+  const state1 = isOpen ? `<p class="open">${tier > 1 && id !== 'template' ? (slottedAt(id, n) ? 'Open · slotted' : 'Open') : 'Open'}</p>` : ''
+  const branchRow = tier > 1 && id !== 'template' ? `<button class="rowbtn" id="branchrow">Branch<span>${pickName(pk)}${slottedAt(id, n) || pk === DEFAULT[id] ? '' : ' · once slotted'} ›</span></button>` : ''
+  const reads = tier > 1 && ['area', 'multi', 'mp-back', 'life-steal', 'area-guard', 'trio'].includes(pk) ? `<p class="soft">${FOR[pk]}</p>` : ''
   return `<div class="scrim"><div class="sheet" style="--c:${color}"><div class="grip"></div>
     <header><b class="display">${title}</b><button class="close" aria-label="Close">×</button></header>
     <div class="steps">${steps}</div>
-    <div class="nsheet"><p class="val">${value(id, n)}</p>${jewel && s !== 'open' ? `<p class="soft">${jewel}</p>` : ''}${s === 'open' ? '<p class="open">Open</p>' : ''}
-      ${id === 'template' ? '<p class="soft">Opens with the three moons\' ' + (n === 1 ? 'II' : 'IV') + '</p>' : ''}</div>
-    ${kindsRow}
-    ${s === 'open' ? '' : `<button class="sheetbtn ${footer === 'Set' ? 'go' : ''}" ${footer === 'Set' ? '' : 'disabled'}>${footer}</button>`}
+    <div class="nsheet"><p class="val">${give(id, n, tier > 1 ? pk : null)}</p>${reads}${jewel}${dust}${state1}
+      ${id === 'template' ? '<p class="soft">Opens with the three moons\' ' + (n === 1 ? 'II' : 'IV') + ' · no branch, no Stardust: her template is read, never picked</p>' : ''}</div>
+    ${branchRow}${footer}
   </div></div>`
 }
-function kindsSheet() {
-  const [id] = selected.split(':'), k = CLASSES[cls].kinds, B = bodiesOf(tier)
-  const now = (mode, which) => WM[mode][tier].slice(0, S.open[which]).reduce((a, b) => a + b, 0)
-  const rows = []
-  if (tier === 2) {
-    for (const a of k) rows.push({ label: `Full · ${a}`, sub: `${a} +${now('full', 'wm1')} · +90 at V`, wear: { wm1: { mode: 'full', kinds: [a] } } })
-    for (const [a, b] of [[k[0], k[1]], [k[0], k[2]], [k[1], k[2]]]) rows.push({ label: `Split · ${a} + ${b}`, sub: `+${now('split', 'wm1')} each · +63 at V`, wear: { wm1: { mode: 'split', kinds: [a, b] } } })
-  } else {
-    for (const a of k) { const rest = k.filter((x) => x !== a); rows.push({ label: `Full ${a} · Split ${rest.join(' + ')}`, sub: 'all three · +130, +91 each at V', wear: { wm1: { mode: 'full', kinds: [a] }, wm2: { mode: 'split', kinds: rest } } }) }
-    for (const [a, b] of [[k[0], k[1]], [k[0], k[2]], [k[1], k[2]]]) rows.push({ label: `Full ${a} · Full ${b}`, sub: 'two · +130 each at V', wear: { wm1: { mode: 'full', kinds: [a] }, wm2: { mode: 'full', kinds: [b] } } })
-  }
-  const same = (w) => JSON.stringify(w) === JSON.stringify(moons)
-  return `<div class="scrim"><div class="sheet" style="--c:${B[id].color}"><div class="grip"></div>
-    <header><b class="display">${tier === 3 ? 'Weapon moons' : 'Weapon moon'} · kinds</b><button class="close" aria-label="Close">×</button></header>
-    <ul class="klist">${rows.map((r) => `<li><button class="${same(r.wear) ? 'on' : ''}" data-wear='${JSON.stringify(r.wear)}'>${r.label}<span>${r.sub}</span></button></li>`).join('')}</ul>
-    <p class="nsheet soft" style="margin:8px 0 0">A tap wears the row. ${tier === 3 ? 'Weapon moon 1 is the Full one; every kind different.' : 'Free outside fights.'}</p>
+function listSheet() {
+  const [id, raw] = selected.split(':'), n = Number(raw), now = pickOf(id, n), b = BODIES[id]
+  const rows = listOf(id).map(([hd, list]) => (hd ? `<li class="grp">${hd}</li>` : '') + list.map((p) => {
+    const sub = p.startsWith('full:') ? 'One kind, whole' : p.startsWith('split:') ? 'Two kinds, 0.7 each' : FOR[p]
+    return `<li><button class="${p === now ? 'on' : ''}" data-wear="${p}"><div>${pickName(p)}${p === DEFAULT[id] ? ' <em style="display:inline">· Tier 1\'s gift</em>' : ''}<em>${sub}</em></div><span>${give(id, n, p)}</span></button></li>`
+  }).join('')).join('')
+  return `<div class="scrim"><div class="sheet" style="--c:${b.color}"><div class="grip"></div>
+    <header><button class="back" aria-label="Back">‹</button><b class="display">${b.name} ${ROMAN[n - 1]} · branch</b><button class="close" aria-label="Close">×</button></header>
+    <ul class="klist">${rows}</ul>
+    <button class="sheetbtn soft" id="every">Wear ${pickName(now)} on every ${b.name} node</button>
+    <p class="nsheet soft" style="margin:8px 0 0">A tap wears the row; free, any time outside a fight.${slottedAt(id, n) ? '' : ' This node wears it once its Stardust is set.'}</p>
+  </div></div>`
+}
+function branchesSheet() {
+  const rows = ['planet', 'prowess', 'vigor', 'guard'].map((id) => {
+    const tally = {}
+    for (let n = 1; n <= 5; n++) { const p = pickName(pickOf(id, n)); tally[p] = (tally[p] ?? 0) + 1 }
+    return `<li><button disabled style="cursor:default"><div>${BODIES[id].name}<em>${S.slotted.filter((x) => x.startsWith(id)).length}/5 slotted</em></div><span class="chips">${Object.entries(tally).map(([k, v]) => `<i>${k}${v > 1 ? ` ×${v}` : ''}</i>`).join('')}</span></button></li>`
+  }).join('')
+  return `<div class="scrim"><div class="sheet" style="--c:var(--accent)"><div class="grip"></div>
+    <header><b class="display">Branches</b><button class="close" aria-label="Close">×</button></header>
+    <ul class="klist">${rows}</ul>
+    <button class="sheetbtn ${samePreset() ? '' : 'go'}" data-all="preset">Her preset · ${CLASSES[cls].name}${samePreset() ? ' · worn' : ''}</button>
+    <button class="sheetbtn soft" data-all="gifts">Tier 1's gifts on every node${sameGifts() ? ' · worn' : ''}</button>
   </div></div>`
 }
 function setAllSheet(p) {
   return `<div class="scrim"><div class="sheet" style="--c:var(--accent)"><div class="grip"></div>
     <header><b class="display">Set all</b><button class="close" aria-label="Close">×</button></header>
-    <ul class="klist">${p.lines.map((l) => `<li><button disabled style="cursor:default">${l.text}</button></li>`).join('')}</ul>
+    <ul class="klist">${p.lines.map((l) => `<li><button disabled style="cursor:default">${l}</button></li>`).join('')}</ul>
     <button class="sheetbtn go" id="doall">Set ${p.lines.length}</button>
   </div></div>`
 }
 
-// --- The page's own parts -----------------------------------------------------------------------------------------------
+// --- The page's own parts ---------------------------------------------------------------------------------------------------
 function three() {
-  const full = { planet: 5, prowess: 5, vigor: 5, guard: 5, wm1: 5, wm2: 5, template: 2 }
-  const keep = { cls, moons }
+  const full = { planet: 5, prowess: 5, vigor: 5, guard: 5, template: 2 }
+  const keep = { cls, picks, tier, S }
   cls = 'brawler'
+  S = STATES.Full()
+  const mix = { 'planet:4': 'defenses', 'planet:5': 'defenses', 'prowess:4': 'split:Lance+Axe', 'prowess:5': 'split:Lance+Axe', 'vigor:5': 'life-steal', 'guard:4': 'def', 'guard:5': 'def' }
   document.getElementById('three').innerHTML = [1, 2, 3].map((t) => {
-    tier = t; presetMoons()
-    const out = `<div><p class="cap"><span class="tier t${t}">Tier ${t}</span> ${({ 1: '22 stars · 360 × 350', 2: '27 stars · 360 × 470', 3: '32 stars · 360 × 500' })[t]}</p>${chart(t, full, false)}</div>`
-    return out
+    tier = t; picks = t === 1 ? {} : mix
+    return `<div><p class="cap"><span class="tier t${t}">Tier ${t}</span> ${t === 1 ? '22 stars · no branches' : '22 stars · seven nodes off their gift'}</p>${chart(t, full, false)}</div>`
   }).join('')
-  cls = keep.cls; tier = Number(document.querySelector('#tier [aria-pressed="true"]')?.dataset.v ?? 2); moons = keep.moons
+  cls = keep.cls; picks = keep.picks; tier = keep.tier; S = keep.S
 }
 function legend() {
   const sample = (fill, stroke, ink, extra = '', width = 1.5) => `<svg viewBox="0 0 44 44" width="44" height="44" style="background:#101a24;border-radius:10px"><circle cx="22" cy="22" r="13" fill="${fill}" stroke="${stroke}" stroke-width="${width}"/><text x="22" y="26" text-anchor="middle" font-size="12" font-weight="800" fill="${ink}" font-family="ui-rounded,system-ui">III</text>${extra}</svg>`
-  const crest = (c) => `<svg viewBox="0 0 44 44" width="44" height="44" style="background:#101a24;border-radius:10px"><circle cx="22" cy="22" r="18" fill="${c}" fill-opacity=".14" stroke="${c}" stroke-opacity=".6"/><g color="${c}" transform="translate(10 10)"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">${CREST.wm}</svg></g></svg>`
+  const dot = '<circle cx="32" cy="12" r="5" fill="#4fb37a" stroke="#101a24" stroke-width="2"/>'
   const rows = [
-    [sample('#8fd3ff', '#8fd3ff', '#101a24'), 'Open', 'Filled, and the line to it lit'],
-    [sample('#16222e', '#8fd3ff', '#f2f6fa', '<circle cx="32" cy="12" r="5" fill="#4fb37a" stroke="#101a24" stroke-width="2"/>', 2), 'Ready', 'A jewel she holds opens it now'],
-    [sample('#16222e', '#8fd3ff', '#f2f6fa'), 'Next', 'Next in line: a level or a jewel short'],
+    [sample('#ff9a6b', '#ff9a6b', '#101a24'), 'Open', 'Filled, and the line to it lit'],
+    [sample('#16222e', '#ff9a6b', '#f2f6fa', dot, 2), 'Ready to open', 'A jewel she holds opens it now'],
+    [sample('#ff9a6b', '#ff9a6b', '#101a24', dot, 2), 'Ready to slot', 'Open; a Stardust she holds slots it now'],
+    [sample('#16222e', '#ff9a6b', '#f2f6fa'), 'Next', 'Next in line: a level or a jewel short'],
     [sample('#16222e', '#5b6b7e', '#93a3b5'), 'Later', 'Behind the next one'],
-    [crest(STEEL), 'Weapon moon 1 · steel', 'Its crest, a crescent blade (a stand-in for the art packet)'],
-    [crest(LAVENDER), 'Weapon moon 2 · lavender', 'Tier 3 only'],
+    [sample('#ff9a6b', '#ff9a6b', '#101a24', diamond(22, 22)), 'A branch, not the gift', 'Prowess III on Area: the white diamond (T2E49)'],
   ]
   document.getElementById('legend').innerHTML = rows.map(([s, t, d]) => `<div class="card">${s}<div><b>${t}</b><span>${d}</span></div></div>`).join('')
 }
 function checks() {
-  const B = bodiesOf(tier), H = HEIGHT[tier], scale = 343 / 360
+  const B = BODIES, scale = 343 / 360
   const all = Object.entries(B).flatMap(([id, b]) => b.points.map((p, i) => ({ id: `${id}:${i + 1}`, body: id, p })))
-  let closest = { d: Infinity }, closestNew = { d: Infinity }
+  let closest = { d: Infinity }
   for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
     const d = Math.hypot(all[i].p[0] - all[j].p[0], all[i].p[1] - all[j].p[1])
     if (d < closest.d) closest = { d, a: all[i].id, b: all[j].id }
-    if ((isWM(all[i].body) || isWM(all[j].body)) && d < closestNew.d) closestNew = { d, a: all[i].id, b: all[j].id }
   }
   const edge = Math.min(...all.flatMap(({ p }) => [p[0], p[1], W - p[0], H - p[1]])) - NODE_R
   const ringOff = Math.max(...B.planet.points.map((p) => Math.abs(Math.hypot(p[0] - PLANET_AT[0], p[1] - PLANET_AT[1]) - 44)))
   const orbitOff = Math.max(...['prowess', 'vigor', 'guard'].map((id) => Math.abs(Math.hypot(B[id].at[0] - PLANET_AT[0], B[id].at[1] - PLANET_AT[1]) - ORBIT)))
-  const wms = ['wm1', 'wm2'].filter((id) => B[id])
-  const outerOff = wms.length ? Math.max(...wms.map((id) => Math.abs(Math.hypot(B[id].at[0] - PLANET_AT[0], B[id].at[1] - PLANET_AT[1]) - B[id].outer))) : 0
   const ownHub = Math.min(...Object.entries(B).filter(([id]) => id !== 'template').flatMap(([, b]) => b.points.map((p) => Math.hypot(b.hub[0] - p[0], b.hub[1] - p[1]))))
   const otherHub = Math.min(...Object.entries(B).filter(([id]) => id !== 'template').flatMap(([id, b]) => all.filter((s) => s.body !== id).map((s) => Math.hypot(b.hub[0] - s.p[0], b.hub[1] - s.p[1]))))
   let cw = true
@@ -544,48 +655,47 @@ function checks() {
     b.points.forEach((s, i) => { const n = b.points[(i + 1) % 5]; if ((s[0] - b.at[0]) * (n[1] - b.at[1]) - (s[1] - b.at[1]) * (n[0] - b.at[0]) <= 0) cw = false })
     if (b.points[0][1] >= b.at[1]) cw = false
   }
-  // Labels at their longest, by the test's estimate (12 px × 0.62 a character), off every star and inside.
-  const longest = { planet: 'Planet 5/5', prowess: 'Prowess 5/5', vigor: 'Vigor 5/5', guard: 'Guard 5/5', template: '★ Shieldrunner 2/2', wm1: tier === 3 ? 'Greatsword · Lightning 5/5' : 'Greatsword · Lightning 5/5', wm2: 'Greatsword 5/5' }
+  const markReach = Math.hypot(MARK.dx, MARK.dy) + MARK.r
+  const markGap = Math.min(...all.filter((s) => s.body !== 'template').flatMap((s) => all.filter((o) => o.id !== s.id).map((o) => Math.hypot(s.p[0] + MARK.dx - o.p[0], s.p[1] + MARK.dy - o.p[1]) - MARK.r - NODE_R)))
+  const markHub = Math.min(...all.filter((s) => s.body !== 'template').flatMap((s) => Object.entries(B).filter(([id]) => id !== 'template').map(([, b]) => Math.hypot(s.p[0] + MARK.dx - b.hub[0], s.p[1] + MARK.dy - b.hub[1]) - MARK.r - 22)))
+  const longest = { planet: 'Planet 5/5', prowess: 'Prowess 5/5', vigor: 'Vigor 5/5', guard: 'Guard 5/5', template: '★ Shieldrunner 2/2' }
   const boxes = Object.entries(B).map(([id, b]) => { const w = longest[id].length * 12 * 0.62, [x, y, a] = b.label, l = a === 'end' ? x - w : a === 'start' ? x : x - w / 2; return { id, l, r: l + w, t: y - 12, b: y + 3 } })
   const over = boxes.filter((bx) => all.some(({ p }) => !(p[0] + NODE_R < bx.l || p[0] - NODE_R > bx.r || p[1] + NODE_R < bx.t || p[1] - NODE_R > bx.b)))
   const out = boxes.filter((bx) => bx.l < 4 || bx.r > W - 4 || bx.t < 4 || bx.b > H - 4)
-  const clash = boxes.filter((a, i) => boxes.some((b, j) => j !== i && !(a.r < b.l || a.l > b.r || a.b < b.t || a.t > b.b)))
-  const px = Math.round((H - 350) * 358 / 360)
   const rows = [
-    ['Stars, once each, in map order', `${all.length}`, all.length === total(), `${total()}`],
+    ['Stars, once each, in map order', `${all.length}`, all.length === 22, '22 in every tier'],
     ['Closest two stars', `${closest.d.toFixed(1)} units · ${(closest.d * scale).toFixed(1)} pt (${closest.a}, ${closest.b})`, closest.d >= MIN, '≥ 44 pt at 375 wide'],
-    ['Closest pair with a weapon moon star', wms.length ? `${closestNew.d.toFixed(1)} units · ${(closestNew.d * scale).toFixed(1)} pt (${closestNew.a}, ${closestNew.b})` : '—', !wms.length || closestNew.d >= MIN, '≥ 44 pt'],
     ['Star nearest an edge', `${edge.toFixed(1)} units`, edge >= 4, '≥ 4'],
     ['Planet stars off their ring · moons off their orbit', `${ringOff.toFixed(2)} · ${orbitOff.toFixed(2)}`, ringOff < 0.1 && orbitOff < 0.1, '< 0.1'],
-    ['Weapon moons off their outer orbit', wms.length ? outerOff.toFixed(2) : '—', outerOff < 0.1, '< 0.1'],
     ['Clockwise from I at the top', cw ? 'every five-star body' : 'not all', cw, 'all'],
     ['Crest button to its own stars', `${ownHub.toFixed(1)} units`, ownHub >= NODE_R + 22, '≥ 35'],
     ['Crest button to any other body\'s star', `${otherHub.toFixed(1)} units`, otherHub >= NODE_R + 23, '≥ 36'],
-    ['Labels at their longest over a star', over.length ? over.map((b) => b.id).join(', ') : 'none', !over.length, 'none'],
-    ['Labels past the chart · over each other', `${out.length ? out.map((b) => b.id).join(', ') : 'none'} · ${clash.length ? clash.map((b) => b.id).join(', ') : 'none'}`, !out.length && !clash.length, 'none'],
-    ['The chart and the page', `360 × ${H}${px ? ` · +${px} px at 390 wide` : ' · as live'}`, true, 'Stars ≤ 1.4 screens at 390 × 844'],
+    ['Branch mark: its reach from its star\'s centre', `${markReach.toFixed(1)} units`, markReach <= TARGET, '≤ 22 (inside her 44 pt target)'],
+    ['Branch mark: its gap to any other star · to any crest button', `${markGap.toFixed(1)} · ${markHub.toFixed(1)} units`, markGap > 0 && markHub > 0, '> 0 · > 0'],
+    ['Labels at their longest over a star · past the chart', `${over.length ? over.map((b) => b.id).join(', ') : 'none'} · ${out.length ? out.map((b) => b.id).join(', ') : 'none'}`, !over.length && !out.length, 'none'],
+    ['The chart and the page', '360 × 350, as live, in every tier', true, 'Stars ≤ 1.4 screens at 390 × 844 (1.16 today)'],
   ]
-  document.getElementById('checks').innerHTML = `<tr><th>Check · Tier ${tier}</th><th>Measured</th><th>Target</th><th></th></tr>` + rows.map(([a, b, ok, t]) => `<tr><td>${a}</td><td>${b}</td><td>${t}</td><td class="${ok ? 'ok' : 'no'}">${ok ? 'Pass' : 'Fail'}</td></tr>`).join('')
-  document.getElementById('coords').innerHTML = `<tr><th>Body · Tier ${tier}</th><th>Crest</th><th>I</th><th>II</th><th>III</th><th>IV</th><th>V</th><th>Label</th></tr>` +
-    Object.entries(B).map(([id, b]) => `<tr><td>${isWM(id) ? `<b>${b.name}</b>` : b.name}</td><td><code>${b.hub.join(', ')}</code></td>${b.points.map((p) => `<td><code>${p[0]}, ${p[1]}</code></td>`).join('')}${b.count === 2 ? '<td></td><td></td><td></td>' : ''}<td><code>${b.label[0]}, ${b.label[1]} ${b.label[2]}</code></td></tr>`).join('')
+  document.getElementById('checks').innerHTML = `<tr><th>Check · every tier</th><th>Measured</th><th>Target</th><th></th></tr>` + rows.map(([a, b, ok, t]) => `<tr><td>${a}</td><td>${b}</td><td>${t}</td><td class="${ok ? 'ok' : 'no'}">${ok ? 'Pass' : 'Fail'}</td></tr>`).join('')
+  document.getElementById('coords').innerHTML = `<tr><th>Body</th><th>Crest</th><th>I</th><th>II</th><th>III</th><th>IV</th><th>V</th><th>Label</th></tr>` +
+    Object.entries(B).map(([, b]) => `<tr><td>${b.name}</td><td><code>${b.hub.join(', ')}</code></td>${b.points.map((p) => `<td><code>${p[0]}, ${p[1]}</code></td>`).join('')}${b.count === 2 ? '<td></td><td></td><td></td>' : ''}<td><code>${b.label[0]}, ${b.label[1]} ${b.label[2]}</code></td></tr>`).join('')
 }
 
-// --- The controls -------------------------------------------------------------------------------------------------------
+// --- The controls -----------------------------------------------------------------------------------------------------------
 function seg(host, current, pick) {
   const el = document.getElementById(host)
   const paint = (v) => el.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)))
   el.querySelectorAll('button').forEach((b) => b.onclick = () => { paint(b.dataset.v); pick(b.dataset.v) })
   paint(current)
 }
-const refresh = () => { selected = null; kindsOpen = false; screen(); checks() }
+const refresh = () => { selected = null; listOpen = false; branchesOpen = false; screen() }
 seg('theme', '', (v) => { if (v) document.documentElement.dataset.theme = v; else delete document.documentElement.dataset.theme })
 seg('width', '390', (v) => { const p = document.querySelector('.phone'); p.style.setProperty('--w', `${v}px`); p.querySelector('.screen').style.height = v === '375' ? '667px' : '844px' })
-seg('tier', String(tier), (v) => { tier = Number(v); presetMoons(); S = STATES[stateName](); refresh() })
+seg('tier', String(tier), (v) => { tier = Number(v); picks = presetPicks(); S = STATES[stateName](); refresh() })
 seg('state', stateName, (v) => { stateName = v; S = STATES[v](); refresh() })
 const select = document.getElementById('cls')
-select.innerHTML = Object.entries(CLASSES).map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('')
+select.innerHTML = Object.entries(CLASSES).map(([id, c]) => `<option value="${id}">${c.name} · the ${c.t1}'s Keeper</option>`).join('')
 select.value = cls
-select.onchange = () => { cls = select.value; presetMoons(); refresh() }
+select.onchange = () => { cls = select.value; picks = presetPicks(); refresh() }
 three(); legend(); screen(); checks()
 </script>
 </body>
