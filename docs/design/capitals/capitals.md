@@ -1,8 +1,8 @@
 # Capitals v2: the Finals as a mini Rift
 
 **Status:** approved 2026-11-03 (D293): packets H159–H162. One call changed in packeting: CA14 needs no engine bump. Nothing
-is live yet. H159's four-lane foes and H160's run rules and strict v37 parse are built; H160 stays dark on save v36.
-H161 owns the screens and H162 the switch. The preview page is
+is live yet. H159's four-lane foes, H160's run rules and strict v37 parse, and H161's screens are built behind
+`capitalRunsLive()`, still false on save v36. H162 owns the switch. The preview page is
 [previews/capitals.html](previews/capitals.html): a run's shape, the three screens and the pacing against today's.
 
 ## The owner's points

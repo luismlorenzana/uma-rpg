@@ -241,6 +241,13 @@ export const leaveFight = () => edit(import('@rpg/domain/battle'), (d, s, now, t
 export const drinkAtSpring = (springId: string) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.useSpring(s, springId, now, t))
 export const chooseActiveParty = (party: number) => edit(import('@rpg/domain/battle'), (d, s, now, t) => d.setActiveParty(s, party, now, t))
 
+// Capital runs stay lazy and dark until save v37 (H161).
+export const startRun = (continent: string, parties: readonly number[]) =>
+  edit(import('@rpg/domain/capital'), (d, s, now, t) => d.startCapitalRun(s, continent, parties, now, t))
+export const abandonRun = (runId: string) => edit(import('@rpg/domain/capital'), (d, s, now, t) => d.abandonCapitalRun(s, runId, now, t))
+export const beginCapitalFight = (chapter: RpgCampaignChapter, runId: string, lane: number, kind: 'general' | 'final', outfits: ReadonlyMap<string, BattleOutfit>) =>
+  edit(import('@rpg/domain/capital'), (d, s, now, t) => d.startCapitalFight(s, chapter, runId, lane, kind, outfits, now, t))
+
 /** One action in the party's open fight. Saved at once; when it ends the fight, the rewards land in the same save. */
 // --- Drills and Training Logs (D283, H154; dark until save v35) -------------------------------------------------------
 // The day turns at 04:00 on this phone's clock (`drillDay`).

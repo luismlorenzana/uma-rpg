@@ -238,6 +238,8 @@ describe('the profile wording list (H117)', () => {
       'ClassTab.tsx', 'class-sheets.tsx', 'StableCounter.tsx', 'ClassesSheet.tsx', 'PromotionSheet.tsx', 'WeaponSheet.tsx', 'PresetButton.tsx',
       '../observatory/StarsPanel.tsx',
       '../gallery/GalleryPage.tsx', '../gallery/WindowSheet.tsx', '../gallery/WindowDoor.tsx', '../gallery/AscendSheet.tsx', '../gallery/WindowToast.tsx',
+      '../scenario-gate/capital/CapitalPage.tsx', '../scenario-gate/capital/NewRun.tsx', '../scenario-gate/capital/CapitalRunPage.tsx',
+      '../scenario-gate/capital/RunBits.tsx',
     ]
     const allow = new Set(["That outfit isn't in the current game data.", 'Not in the current game data.', 'Unlock her first.', 'Unlock an Uma first.'])
     const root = path.dirname(new URL(import.meta.url).pathname)
