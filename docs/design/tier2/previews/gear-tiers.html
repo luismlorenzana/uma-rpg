@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gear by Tier</title>
-<!-- gear.md: the Tier 1 → 2 → 3 picture of gear. Self-contained; kit tokens from _template.html. -->
+<!-- gear.md: the Tier 1 → 2 → 3 picture of gear, round 2. Self-contained; kit tokens from tier-rework/previews/_template.html. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -15,6 +15,9 @@
     --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
     --radius: 12px; --gap: 12px;
+    --k-greatsword: #c8641e; --k-axe: #8a4fc0; --k-lance: #2f8a3e; --k-katana: #1a8a7b; --k-bow: #c2477a;
+    --k-fire: #d23c2c; --k-ice: #2f78d0; --k-lightning: #a37c00; --k-light: #977f2c; --k-dark: #6a46c0;
+    --s1: #fbf1dd; --s2: #f3dca6; --s3: #e6bd63; --s4: #c99530; --s5: #9a6c14;
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
@@ -25,6 +28,9 @@
       --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
       --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --k-greatsword: #e8873f; --k-axe: #b083e6; --k-lance: #5cbf6a; --k-katana: #3fc2ad; --k-bow: #e57aa5;
+      --k-fire: #f06a58; --k-ice: #5ea2ef; --k-lightning: #e0b52e; --k-light: #e3cf7f; --k-dark: #9f84ec;
+      --s1: #2b2312; --s2: #4a3a15; --s3: #6f5419; --s4: #9a7322; --s5: #c99a38;
     }
   }
   * { box-sizing: border-box; }
@@ -33,9 +39,10 @@
   main { max-width: 430px; margin: 0 auto; padding: 16px; }
   main.wide { max-width: 1100px; }
   h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
-  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 22px 0 8px; }
   h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
   p, li { color: var(--ink-soft); }
+  a { color: var(--info); }
   .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
     box-shadow: 0 1px 0 var(--hairline-strong); }
   .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -43,6 +50,8 @@
     background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
   .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
   .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.acc { background: var(--accent-wash); color: var(--accent-strong); }
   .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
   .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
   .muted { color: var(--ink-faint); }
@@ -50,68 +59,89 @@
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
   th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
   th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
   .legend { font-size: 12px; color: var(--ink-faint); }
   nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
   nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
-</style>
-<style>
-  :root { --k-greatsword: #c8641e; --k-axe: #8a4fc0; --k-lance: #2f8a3e; --k-bow: #c2477a; --k-dark: #6a46c0; }
-  @media (prefers-color-scheme: dark) { :root { --k-greatsword: #e8873f; --k-axe: #b083e6; --k-lance: #5cbf6a; --k-bow: #e57aa5; --k-dark: #9f84ec; } }
   .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
   .pills button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong);
     background: var(--panel); color: var(--ink); cursor: pointer; }
   .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .k { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: var(--kc); white-space: nowrap; }
+  .k::before { content: ''; width: 9px; height: 9px; border-radius: 3px; background: var(--kc); display: inline-block; }
+  .k.tome::before { border-radius: 50%; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 12px 0 4px; }
+  .kpi { background: var(--panel); border-radius: var(--radius); padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .kpi .val { font: 700 20px/1.2 ui-rounded, system-ui, sans-serif; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .sub { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 10px 14px; border-radius: 10px; color: var(--ink); margin-top: 12px; font-size: 13px; }
+  .phone { width: 360px; background: var(--raised); border-radius: 18px; padding: 12px; border: 1px solid var(--hairline-strong); }
+  .phone .title { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .phones { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .li { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--panel); border-radius: 10px; padding: 9px 11px; margin-bottom: 6px; font-size: 13px; }
+  .li .tag { font-size: 11px; color: var(--ink-soft); text-align: right; }
+  .li.on { outline: 2px solid var(--accent); }
+  .li.off { opacity: .5; }
+  .heat { border-collapse: separate; border-spacing: 3px; }
+  .heat td, .heat th { border: 0; }
+  .heat td.c { text-align: center; font-variant-numeric: tabular-nums; border-radius: 6px; min-width: 64px; font-weight: 600; color: var(--ink); font-size: 12px; }
+  .heat td.best { outline: 2px solid var(--ink); outline-offset: -2px; font-weight: 800; }
+  .q1 { background: var(--s1); } .q2 { background: var(--s2); } .q3 { background: var(--s3); } .q4 { background: var(--s4); color: #1b1300 !important; } .q5 { background: var(--s5); color: #fff !important; }
+  @media (prefers-color-scheme: dark) { .q4, .q5 { color: #0f1620 !important; } }
+  .est { font-style: italic; }
+  @media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+<style>
   .tabs3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
   .gear { background: var(--raised); border-radius: 18px; padding: 12px; border: 1px solid var(--hairline-strong); }
-  .gear .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; }
+  .gear .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; gap: 8px; }
   .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); font-weight: 700; margin: 10px 0 6px; }
   .tiles { display: grid; gap: 6px; }
-  .tiles.w { grid-template-columns: 1fr; }
   .tiles.a5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .tiles.a3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .tile { background: var(--panel); border-radius: 10px; padding: 7px 9px; border: 1.5px solid var(--hairline-strong); font-size: 12px; min-width: 0; }
   .tile b { display: block; font-size: 12.5px; color: var(--ink); }
   .tile .v { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .tile.br { border-color: var(--accent); }
-  .tile .bchip { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--accent-strong); margin-right: 4px; }
+  .bchip { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--accent-strong); margin-right: 4px; }
   .kc { border-left: 4px solid var(--kc); }
-  .timeline { display: grid; grid-template-columns: 1.2fr 1fr 1.4fr; gap: 10px; }
+  .timeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
   .phase { background: var(--panel); border-radius: var(--radius); padding: 12px; box-shadow: 0 1px 0 var(--hairline-strong); }
   .phase h4 { margin: 0 0 6px; font-size: 14px; }
   .phase ul { margin: 0; padding-left: 18px; font-size: 13px; }
-  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
-  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 10px 14px; border-radius: 10px; color: var(--ink); margin-top: 12px; font-size: 13px; }
+  @media (max-width: 900px) { .tabs3, .timeline { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <main class="wide">
   <h1>Gear by tier: one Uma's Gear tab, Tier 1 → 2 → 3</h1>
-  <p>From <a href="../gear.md">gear.md</a>. The same Uma at each tier's Lv 50, every slot at G10, on her preset (D263, T2G13)
-    and her suggested branches (T2G6). Pick her class; the values are the code's rows × tier (Might, armor, accessories) and
-    the design's branch rows.</p>
-  <nav class="tabs"><a href="#tab">Her Gear tab by tier</a><a href="#g5">What G5 opens</a><a href="#rows">Every row at G10</a><a href="#pages">The other pages</a></nav>
+  <p>From <a href="../gear.md">gear.md</a>. The same Uma at each tier's Lv 50, every slot at G10, on her class's preset and
+    Suggested types. Tier 2's class is a keeper or an expander of her Tier 1 class (R2-2; names and weapons are classes.md's). Values are the code's rows × tier
+    and the design's riders.</p>
+  <nav class="tabs"><a href="#tab">Her Gear tab by tier</a><a href="#when">What opens when</a><a href="#rows">Every row at G10</a><a href="#pages">Other pages</a></nav>
 
   <section id="tab">
-    <div class="pills" id="cls" role="group" aria-label="Class"><button data-c="brawler" aria-pressed="true">Brawler</button><button data-c="armsummoner">Arms Summoner</button></div>
+    <div class="pills" id="cls" role="group" aria-label="Class"></div>
     <div class="tabs3" id="tabs3"></div>
     <div class="callout" id="note"></div>
   </section>
 
-  <section id="g5">
-    <h2>What a grade's G5 opens, in every tier</h2>
+  <section id="when">
+    <h2>What opens when, in every later tier</h2>
     <div class="timeline">
-      <div class="phase"><h4>G1–G4 (Uma Lv 1–16)</h4><ul>
-        <li>One made item raises one slot one grade, as Tier 1.</li>
-        <li>A weapon: its Tier 1 line in Tier 2; its Tier 2 branch at Tier 3's Might in Tier 3.</li>
-        <li>An accessory slot: the four bases (Tier 2); the forms she knows at their Tier 2 rate (Tier 3).</li></ul></div>
-      <div class="phase"><h4>G5 (Uma Lv 21)</h4><ul>
-        <li><b>A weapon's G5 item takes its branch:</b> Pure or Dual (Tier 2); Keen, Tempered or Evolved (Tier 3).</li>
-        <li><b>An accessory slot's G5 Setting opens</b> its family's two branches (Tier 2) or their step (Tier 3). No item.</li>
-        <li>Armor: nothing new.</li></ul></div>
-      <div class="phase"><h4>G6–G10 (Uma Lv 26–46)</h4><ul>
-        <li>The line's items as before, × tier.</li>
-        <li>One two-kind weapon in her slots; her ★ family pays on any weapons (a Twofold form).</li>
-        <li>A re-forge is one more G5 item; a form swap is one tap.</li></ul></div>
+      <div class="phase"><h4>The Ascend sheet</h4><ul>
+        <li>Her Tier 2 class (a keeper or an expander), then her three weapons and each one's <b>type</b>, Suggested pre-set.</li>
+        <li>She arrives at G0: Pure at ×1.30, a Dual's partner at ×1.10.</li></ul></div>
+      <div class="phase"><h4>A grade's raise (Lv 5g − 4)</h4><ul>
+        <li>Two items a grade: Might or a stat from the first, the type or the rider from the second.</li>
+        <li>A slot's <b>G1</b>: the tree's first ring (Great and its sibling).</li></ul></div>
+      <div class="phase"><h4>A slot's G5 (Lv 21)</h4><ul>
+        <li>Tier 2: <b>Kindred, Seeker, Finisher</b>.</li>
+        <li>Tier 3: <b>Vow, Limit Orb, Apex</b>; Tier 2's forms open from G1 with their step.</li></ul></div>
+      <div class="phase"><h4>Any time, outside fights</h4><ul>
+        <li>Swap a weapon's type or kind, or a slot's form: one tap, free.</li>
+        <li>One two-kind weapon in her slots; the party takes its strongest Kindred.</li></ul></div>
     </div>
   </section>
 
@@ -121,68 +151,76 @@
       <thead><tr><th>Piece</th><th class="n"><span class="tier t1">Tier 1</span></th><th class="n"><span class="tier t2">Tier 2</span></th><th class="n"><span class="tier t3">Tier 3</span></th><th>Source</th></tr></thead>
       <tbody>
         <tr><td>Weapon Might</td><td class="n">68</td><td class="n">122</td><td class="n">177</td><td>`mightAt`</td></tr>
-        <tr><td>A weak hit, at most</td><td class="n">×1.3</td><td class="n">×1.5 (Pure)</td><td class="n">×1.7 (Keen)</td><td>WP6, WP9</td></tr>
+        <tr><td>A weak hit at G10: one kind · two kinds</td><td class="n">×1.3 · —</td><td class="n">×1.5 Pure · ×1.3 Dual</td><td class="n">×1.7 Keen · ×1.5</td><td>T2G24, T2G28</td></tr>
         <tr><td>Armor: HP · DEF · M.DEF · MP</td><td class="n">150 · 40 · 40 · 30</td><td class="n">270 · 72 · 72 · 54</td><td class="n">390 · 104 · 104 · 78</td><td>`armorValues`</td></tr>
-        <tr><td>Armor: evasion · offense</td><td class="n">12% · 25</td><td class="n">12% · 45</td><td class="n">12% · 65</td><td>Speed unscaled</td></tr>
+        <tr><td>Armor: evasion · offense (five pieces)</td><td class="n">12% · 25</td><td class="n">12% · 45</td><td class="n">12% · 65</td><td>Speed unscaled</td></tr>
         <tr><td>Pendant, Charm (base) a slot</td><td class="n">+10</td><td class="n">+18</td><td class="n">+26</td><td>`accessorySlotValue`</td></tr>
-        <tr><td>Great Pendant, Great Charm</td><td class="n">—</td><td class="n">+23</td><td class="n">+36</td><td>T2G10</td></tr>
-        <tr><td>Twofold Pendant, Twofold Charm (each stat)</td><td class="n">—</td><td class="n">+18</td><td class="n">+29</td><td>T2G10</td></tr>
-        <tr><td>Orb (base)</td><td class="n">+20</td><td class="n">+36</td><td class="n">+52</td><td>`accessorySlotValue`</td></tr>
-        <tr><td>Great Orb · Twofold Orb (each kind)</td><td class="n">—</td><td class="n">+47 · +25</td><td class="n">+73 · +42</td><td>T2G10</td></tr>
-        <tr><td>Insignia · Great Insignia · Onset</td><td class="n">+10%</td><td class="n">+10% · +13% · +15%</td><td class="n">+10% · +14% · +16%</td><td>T2G10, percentages flat</td></tr>
-        <tr><td>Orb forms on one kind, at most (the kind cap)</td><td class="n">+68</td><td class="n">+122</td><td class="n">+177</td><td>T2G14</td></tr>
+        <tr><td>Great Pendant, Great Charm</td><td class="n">—</td><td class="n">+23</td><td class="n">+36</td><td>T2G31</td></tr>
+        <tr><td>Twofold: her stat · her other</td><td class="n">—</td><td class="n">+18 · +18</td><td class="n">+26 · +29</td><td>T2G31</td></tr>
+        <tr><td>Kindred: every Uma's hits (a slot)</td><td class="n">—</td><td class="n">+4</td><td class="n">+5</td><td>T2G31, T2G34</td></tr>
+        <tr><td>Vow: her stat · her heals read</td><td class="n">—</td><td class="n">—</td><td class="n">+26 · +52</td><td>T2G31</td></tr>
+        <tr><td>Orb (base) · Great Orb</td><td class="n">+20 · —</td><td class="n">+36 · +47</td><td class="n">+52 · +73</td><td>T2G32</td></tr>
+        <tr><td>Twofold Orb: her kind · a second</td><td class="n">—</td><td class="n">+36 · +14</td><td class="n">+52 · +26</td><td>T2G32</td></tr>
+        <tr><td>Seeker: her kind · any weak hit</td><td class="n">—</td><td class="n">+36 · +7</td><td class="n">+52 · +16</td><td>T2G32</td></tr>
+        <tr><td>Limit Orb: her kind · her Limit Breaks</td><td class="n">—</td><td class="n">—</td><td class="n">+52 · +34</td><td>T2G32</td></tr>
+        <tr><td>Insignia · Great Insignia</td><td class="n">10% · —</td><td class="n">10% · 13%</td><td class="n">10% · 14%</td><td>T2G33</td></tr>
+        <tr><td>Onset · Finisher · Apex: the base + the rider</td><td class="n">—</td><td class="n">10% + 6% · 10% + 4% · —</td><td class="n">10% + 7% · 10% + 6% · 10% + 8%</td><td>T2G33</td></tr>
+        <tr><td>The Orb family on one kind, at most</td><td class="n">+68</td><td class="n">+122</td><td class="n">+177</td><td>T2G37</td></tr>
         <tr><td>★ signature at Lv 50</td><td class="n">+5</td><td class="n">+9</td><td class="n">+13</td><td>`signatureBonus`</td></tr>
-        <tr><td>A rank of everything, refined a line (two Umas)</td><td class="n">30</td><td class="n">30</td><td class="n">30</td><td>D264, T2G16</td></tr>
+        <tr><td>A rank of everything, two Umas, refined a branch</td><td class="n">30 (five lines)</td><td class="n">30 (ten branches)</td><td class="n">30</td><td>D264, T2P39</td></tr>
       </tbody></table></div>
   </section>
 
   <section id="pages">
     <h2>The other pages</h2>
-    <p><a href="gear-weapons.html">Weapons: the tree, the partner table, legal Duals, coverage</a> ·
-      <a href="gear-accessories.html">Accessories: the branches, rows, what each wins</a> ·
-      <a href="gear-costs.html">Armor by tier and what a rank costs</a></p>
+    <p><a href="gear-weapons.html">Weapon types: the Ascend sheet, partners, coverage</a> ·
+      <a href="gear-accessories.html">The accessory tree and what each form wins</a> ·
+      <a href="gear-presets.html">Presets for the sixteen</a> · <a href="gear-costs.html">Armor and what a grade costs</a></p>
   </section>
 </main>
 <script>
+const W = (n, k, t, b) => [n, k, t, b];
 const UMA = {
-  brawler: { name: 'A Brawler (Party 1 and 2)', half: 'Physical', stat: 'ATK',
-    w: [
-      [['Greatsword', 'greatsword', 'G10 · Might 68 · weak ×1.3', ''], ['Axe', 'axe', 'G10 · Might 68 · weak ×1.3', ''], ['Lance', 'lance', 'G10 · Might 68 · weak ×1.3', '']],
-      [['Dual Greatsword + Bow', 'greatsword', 'G10 · Might 122 · weak ×1.3 on either', 'Dual'], ['Pure Axe', 'axe', 'G10 · Might 122 · weak ×1.5', 'Pure'], ['Pure Lance', 'lance', 'G10 · Might 122 · weak ×1.5', 'Pure']],
-      [['Tempered Greatsword + Bow', 'greatsword', 'G10 · Might 177 · ×1.5 on both', 'Tempered'], ['Keen Axe', 'axe', 'G10 · Might 177 · weak ×1.7', 'Keen'], ['Keen Lance', 'lance', 'G10 · Might 177 · weak ×1.7', 'Keen']],
-    ],
-    a: [
-      [['Pendant', 'ATK +10'], ['Pendant', 'ATK +10'], ['Orb · Greatsword', '+20']],
-      [['Great Pendant', 'ATK +23'], ['Great Pendant', 'ATK +23'], ['Great Orb · Greatsword', '+47']],
-      [['Great Pendant', 'ATK +36'], ['Great Pendant', 'ATK +36'], ['Great Orb · Greatsword', '+73']],
-    ],
-    note: 'Her Dual fills the Bow, held once in both parties; her other two go Pure, then Keen. A Charm ★ would wear a Twofold Charm in slot 1 from Tier 2 (ATK +18 and her ★).' },
-  armsummoner: { name: 'An Arms Summoner (Party 2)', half: 'Physical', stat: 'ATK',
-    w: [
-      [['Bow', 'bow', 'G10 · Might 68 · weak ×1.3', ''], ['Axe', 'axe', 'G10 · Might 68 · weak ×1.3', ''], ['Dark Tome', 'dark', 'G10 · Might 68 · weak ×1.3', '']],
-      [['Dual Bow + Greatsword', 'bow', 'G10 · Might 122 · weak ×1.3 on either', 'Dual'], ['Pure Axe', 'axe', 'G10 · Might 122 · weak ×1.5', 'Pure'], ['Pure Dark', 'dark', 'G10 · Might 122 · weak ×1.5', 'Pure']],
-      [['Tempered Bow + Greatsword', 'bow', 'G10 · Might 177 · ×1.5 on both', 'Tempered'], ['Keen Axe', 'axe', 'G10 · Might 177 · weak ×1.7', 'Keen'], ['Keen Dark', 'dark', 'G10 · Might 177 · weak ×1.7', 'Keen']],
-    ],
-    a: [
-      [['Pendant', 'ATK +10'], ['Pendant', 'ATK +10'], ['Orb · Bow', '+20']],
-      [['Twofold Pendant', 'ATK +18 · M.ATK +18'], ['Twofold Pendant', 'ATK +18 · M.ATK +18'], ['Great Orb · Bow', '+47']],
-      [['Twofold Pendant', 'ATK +29 · M.ATK +29'], ['Twofold Pendant', 'ATK +29 · M.ATK +29'], ['Great Orb · Bow', '+73']],
-    ],
-    note: 'Her Dual Bow (a Volley: its splash chips every foe weak to either kind) fills the Greatsword, Party 2\'s one holder. A hybrid\'s preset wears Twofold from G5: both her halves gain. Her best set measured is Great Orb ×2 and a Twofold (19.5% at Tier 2 Lv 50; the preset 17.6%).' },
+  bk: { btn: 'Brawler → Berserker', name: ['A Brawler', 'Berserker', 'Berserker'], half: 'ATK',
+    w: [[W('Greatsword', 'greatsword', 'G10 · Might 68 · ×1.3'), W('Axe', 'axe', 'G10 · Might 68 · ×1.3'), W('Lance', 'lance', 'G10 · Might 68 · ×1.3')],
+      [W('Greatsword + Bow', 'greatsword', 'G10 · Might 122 · ×1.3 on either', 'Dual'), W('Axe', 'axe', 'G10 · Might 122 · ×1.5', 'Pure'), W('Lance', 'lance', 'G10 · Might 122 · ×1.5', 'Pure')],
+      [W('Greatsword + Bow', 'greatsword', 'G10 · Might 177 · ×1.5 on both', 'Tempered'), W('Axe', 'axe', 'G10 · Might 177 · ×1.7', 'Keen'), W('Lance', 'lance', 'G10 · Might 177 · ×1.7', 'Keen')]],
+    a: [[['Pendant', 'ATK +10'], ['Pendant', 'ATK +10'], ['Orb · Greatsword', '+20']], [['Great Pendant', 'ATK +23'], ['Great Pendant', 'ATK +23'], ['Great Orb · Greatsword', '+47']], [['Great Pendant', 'ATK +36'], ['Great Pendant', 'ATK +36'], ['Great Orb · Greatsword', '+73']]],
+    note: 'The Berserker keeps the Brawler\'s weapons and her one stat: Great forms, a Dual Greatsword that fills the Bow (held once in Tier 1\'s parties).' },
+  bx: { btn: 'Brawler → Spellfist', name: ['A Brawler', 'Spellfist', 'Spellfist'], half: 'ATK',
+    w: [[W('Greatsword', 'greatsword', 'G10 · Might 68 · ×1.3'), W('Axe', 'axe', 'G10 · Might 68 · ×1.3'), W('Lance', 'lance', 'G10 · Might 68 · ×1.3')],
+      [W('Greatsword + Bow', 'greatsword', 'G10 · Might 122 · ×1.3 on either', 'Dual'), W('Axe', 'axe', 'G10 · Might 122 · ×1.5', 'Pure'), W('Fire Tome', 'fire', 'G10 · Might 122 on ATK · ×1.5', 'Pure')],
+      [W('Greatsword + Bow', 'greatsword', 'G10 · Might 177 · ×1.5 on both', 'Tempered'), W('Axe', 'axe', 'G10 · Might 177 · ×1.7', 'Keen'), W('Fire Tome', 'fire', 'G10 · Might 177 on ATK · ×1.7', 'Keen')]],
+    a: [[['Pendant', 'ATK +10'], ['Pendant', 'ATK +10'], ['Orb · Greatsword', '+20']], [['Great Pendant', 'ATK +23, both channels'], ['Great Pendant', 'ATK +23'], ['Great Orb · Greatsword', '+47']], [['Great Pendant', 'ATK +36'], ['Great Pendant', 'ATK +36'], ['Great Orb · Greatsword', '+73']]],
+    note: 'Classes\' preset (T2C54) gives her the Fire Tome on ATK, her Greatsword\'s twin: one stat reaches both channels, so her armor\'s +45 and her Great Pendants lift every hit, the Tome\'s too. Raised by Tome Ink and Tome Reagent.' },
+  sx: { btn: 'Tome Summoner → Shaman', name: ['A Tome Summoner', 'Shaman', 'Shaman'], half: 'M.ATK',
+    w: [[W('Dark Tome', 'dark', 'G10 · Might 68 · ×1.3'), W('Blizzard Tome', 'ice', 'G10 · Might 68 · ×1.3'), W('Bow', 'bow', 'G10 · Might 68 · ×1.3')],
+      [W('Dark + Fire', 'dark', 'G10 · Might 122 · ×1.3 on either', 'Dual'), W('Blizzard Tome', 'ice', 'G10 · Might 122 · ×1.5', 'Pure'), W('Bow', 'bow', 'G10 · Might 122 · ×1.5', 'Pure')],
+      [W('Dark + Fire', 'dark', 'G10 · Might 177 · ×1.5 on both', 'Tempered'), W('Blizzard Tome', 'ice', 'G10 · Might 177 · ×1.7', 'Keen'), W('Bow', 'bow', 'G10 · Might 177 · ×1.7', 'Keen')]],
+    a: [[['Charm', 'M.ATK +10'], ['Charm', 'M.ATK +10'], ['Orb · Dark', '+20']], [['Kindred Charm', '+4 on every Uma'], ['Twofold Charm', 'M.ATK +18 · ATK +18'], ['Great Orb · Dark', '+47']], [['Kindred Charm', '+5 on every Uma'], ['Twofold Charm', 'M.ATK +26 · ATK +29'], ['Great Orb · Dark', '+73']]],
+    note: 'A support bears Kindred from a slot\'s G5: her slot\'s +1 shared by the party, +0.2 a grade on every Uma\'s hits. The party takes its strongest Kindred, never the sum.' },
+  ck: { btn: 'Cleric → Bishop', name: ['A Cleric', 'Bishop', 'Bishop'], half: 'M.ATK',
+    w: [[W('Light Tome', 'light', 'G10 · Might 68 · ×1.3'), W('Fire Tome', 'fire', 'G10 · Might 68 · ×1.3'), W('Lance', 'lance', 'G10 · Might 68 · ×1.3')],
+      [W('Light Tome', 'light', 'G10 · Might 122 · ×1.5', 'Pure'), W('Fire Tome', 'fire', 'G10 · Might 122 · ×1.5', 'Pure'), W('Lance + Katana', 'lance', 'G10 · Might 122 · ×1.3 on either', 'Dual')],
+      [W('Light Tome', 'light', 'G10 · Might 177 · ×1.7', 'Keen'), W('Fire Tome', 'fire', 'G10 · Might 177 · ×1.7', 'Keen'), W('Lance + Katana', 'lance', 'G10 · Might 177 · ×1.5 on both', 'Tempered')]],
+    a: [[['Charm', 'M.ATK +10'], ['Charm', 'M.ATK +10'], ['Orb · Light', '+20']], [['Great Charm', 'M.ATK +23'], ['Great Charm', 'M.ATK +23'], ['Great Orb · Light', '+47']], [['Vow Charm', 'M.ATK +26 · heals +52'], ['Great Charm', 'M.ATK +36'], ['Great Orb · Light', '+73']]],
+    note: 'The Bishop, a keeper healer, keeps her stat for her mends; in Tier 3 her Vow Charm lifts her mends ×1.13 against three Great Charms\' ×1.09, for about seven tenths of their damage.' },
 };
 const ARMOR = [['Head', 'DEF', [40, 72, 104]], ['Body', 'HP', [150, 270, 390]], ['Legs', 'MP', [30, 54, 78]], ['Arms', 'M.DEF', [40, 72, 104]], ['Feet', 'Evasion', ['12%', '12%', '12%']]];
 const OFF = [5, 9, 13];
-function draw(c) {
-  for (const b of document.querySelectorAll('#cls button')) b.setAttribute('aria-pressed', String(b.dataset.c === c));
-  const u = UMA[c];
-  document.getElementById('tabs3').innerHTML = [0, 1, 2].map((t) => `<div class="gear"><div class="head"><span>${u.name}</span><span class="tier t${t + 1}">Tier ${t + 1} · Lv 50</span></div>
-    <div class="lbl">Weapons</div><div class="tiles w">${u.w[t].map(([n, k, v, b]) => `<div class="tile kc${b === 'Dual' || b === 'Tempered' ? ' br' : ''}" style="--kc:var(--k-${k})">${b ? `<span class="bchip">${b}</span>` : ''}<b>${n}</b><span class="v">${v}</span></div>`).join('')}</div>
-    <div class="lbl">Armor · ${u.half}, offense +${OFF[t]} a piece to ${u.stat}</div><div class="tiles a5">${ARMOR.map(([s, st, v]) => `<div class="tile"><b>${s}</b><span class="v">${st} +${v[t]}`.replace('+12%', '12%') + '</span></div>').join('')}</div>
-    <div class="lbl">Accessories</div><div class="tiles a3">${u.a[t].map(([n, v]) => `<div class="tile${t && n !== 'Pendant' ? ' br' : ''}"><b>${n}</b><span class="v">G10 · ${v}</span></div>`).join('')}</div></div>`).join('');
+let cur = 'bk';
+document.getElementById('cls').innerHTML = Object.entries(UMA).map(([k, u]) => `<button data-c="${k}" aria-pressed="${k === cur}">${u.btn}</button>`).join('');
+function draw() {
+  for (const b of document.querySelectorAll('#cls button')) b.setAttribute('aria-pressed', String(b.dataset.c === cur));
+  const u = UMA[cur];
+  document.getElementById('tabs3').innerHTML = [0, 1, 2].map((t) => `<div class="gear"><div class="head"><span>${u.name[t]}</span><span class="tier t${t + 1}">Tier ${t + 1} · Lv 50</span></div>
+    <div class="lbl">Weapons</div><div class="tiles">${u.w[t].map(([n, k, v, b]) => `<div class="tile kc${b && b !== 'Pure' && b !== 'Keen' ? ' br' : ''}" style="--kc:var(--k-${k})">${b ? `<span class="bchip">${b}</span>` : ''}<b>${n}</b><span class="v">${v}</span></div>`).join('')}</div>
+    <div class="lbl">Armor · offense +${OFF[t]} a piece to ${u.half}</div><div class="tiles a5">${ARMOR.map(([s, st, v]) => `<div class="tile"><b>${s}</b><span class="v">${st} ${String(v[t]).includes('%') ? v[t] : '+' + v[t]}</span></div>`).join('')}</div>
+    <div class="lbl">Accessories</div><div class="tiles a3">${u.a[t].map(([n, v]) => `<div class="tile${t && !['Pendant', 'Charm'].includes(n) ? ' br' : ''}"><b>${n}</b><span class="v">G10 · ${v}</span></div>`).join('')}</div></div>`).join('');
   document.getElementById('note').textContent = u.note;
 }
-for (const b of document.querySelectorAll('#cls button')) b.onclick = () => draw(b.dataset.c);
-draw('brawler');
+for (const b of document.querySelectorAll('#cls button')) b.onclick = () => { cur = b.dataset.c; draw(); };
+draw();
 </script>
 </body>
 </html>
