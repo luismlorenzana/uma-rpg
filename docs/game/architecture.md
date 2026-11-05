@@ -305,6 +305,12 @@ window records' champion masks removed, lit steps and `updatedAt` unchanged. An 
 input and settles through the removed-stage fallback. The first v37 write backs up the exact stored v36 document as
 `saveBackups/{uid}-v36`; production saves are never edited by hand.
 
+**The honeycomb world shape is staged (H163, D295).** `world/honeycomb.ts` exports the preview's axial layout, pixel
+positions and nearest-Spring ids. `honeycombLive()` stays false on save v37: `worldContinent` still returns the same
+40 regions and five Springs. At v38 it appends eight new regions and the sixth Spring; the old regions and Spring ids
+stay unchanged. A dark inspection layout leaves the eight new region slots open. Save fields and screens are later
+packets; no live map, rule or save shape changes here.
+
 ### The shape
 
 ```
