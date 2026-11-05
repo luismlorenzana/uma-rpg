@@ -453,7 +453,7 @@ term, weaknesses, shields, party value).
   stats, G0 gear and an empty map, as tier2-world §5 measured (engine v13: all 40 opening stages won, 4.7 rounds against
   Tier 1's 6.8). T2B re-measures on engine v21, with the sixteen classes.
 - **Live already:** three weaknesses at every rank in Tiers 2 and 3, a regular's by her role (weaknesses v2, D235,
-  `rpgWeakCounts`). **Not built yet** (T2B): the toolbox term (SB3–SB5), bosses' shields 9 and 10 (SB6; 8 in every tier
+  `rpgWeakCounts`). **Not built yet** (T2B): the toolbox term (SB3–SB5), bosses' shields 9 in Tiers 2 and 3, sub-bosses 7, from Lv 1 (T2B7, gear T2G27; SB6's 10 retired, XR19; 8 in every tier
   today), skill MP ×1.7 (Z5; MP × tier today).
 
 ### 4.3 Pay: Laurels, tickets, Class Marks and Logs
@@ -673,8 +673,9 @@ new system lands where its progress already lives.
 | **Rift** | On a won Tier 2 Rift run | | | | | — |
 
 **Stars' counts** follow [extra-stats.md](extra-stats.md)'s Tier 2 map by the live rule (every body's nodes numbered n
-or less, her moon's I from II and II from IV, then the whole map): **4 · 9 · 13 · 18 · 22** if round 1's weapon moon
-becomes a pick on the existing bodies (assumed, R2-8's first option), **5 · 11 · 16 · 22 · 27** if it stays a body.
+or less, her moon's I from II and II from IV, then the whole map): **4 · 9 · 13 · 18 · 22**: round 1's weapon moon
+became Prowess's kind rows on the existing bodies ([extra stats](extra-stats.md) T2E27), so the map stays 22 nodes and the
+track counts open nodes only, never which stat a node holds (T2E43).
 
 #### 4.6.2 Each new system, and where the board reads it
 
@@ -759,8 +760,12 @@ A first cohort's fighting-party Uma, nonstop (×1.25 for the Wilds at 80%), on t
 | World | 0–1 | 1 | 2 | 6.4 | 8.8 | The same |
 | Rift | 33.5 (fronts from G8, about 17 days of the owner's play) | | | | | The same |
 
-**Ready about day 33.5** (the Rift; 37.6 at 80%), as in Tier 1's model: the new systems change no track's pace but
-Craft's, and Craft V still lands before the Rift.
+**Ready about day 33.5** (the Rift; 37.6 at 80%) **only where the Wilds keep up.** The tracks above are one Uma's own
+pace on Tier 1's amounts. Round 2's farm (professions T2P40–T2P41) doubles what a full window takes (1,900 refined, every
+grade taking both of its line's items), so the Gear, Weapons and Stars tracks wait on the Wilds: **a first cohort of
+twenty working for itself fills its windows in about 63.6 days** (with sub-professions; 111.6 without), and forty at work
+make twenty full windows in 31.8, where the Rift binds again at 33.5. The fighting party itself holds G10 on day 23.4
+(Tier 1 23.0). This is the cross-reference's reading of T2P41 (XR15).
 
 #### 4.6.7 The record and the art
 
@@ -906,14 +911,14 @@ system's own gate (T2W11).
 | The stat lists' Tier 3 entries | T2E | A node's jewel |
 | Three professions, as Tier 2's | T2P | Nothing new |
 | The ★ tip on both held lines of her lead tree (T2U13) | T2U | Depth 5, Class Rank 40 |
-| Tier 3's term (HP and DEF ×1.08 → ×1.48, offense +10%, bosses ×1.1); bosses' shields 10; skill MP ×2.4 | T2B, T2C | Tier 3's foes and skills |
+| Tier 3's term (T2B36: HP and DEF ×1.10 → ×1.12 by Lv 35, ×1.26 from Lv 40 for the crowns; offense +10%, bosses ×1.1); bosses' shields 9 (XR19); skill MP ×2.4 | T2B, T2C | Tier 3's foes and skills |
 
 ### 5.4 Her window (T2W29)
 
 **T2W29: Tier 2's board at Tier 3's numbers, 36 with its Rift.** Class I–V on Tier 3's classes (the sixteen, assumed):
 R10 · R30 · R50 (in Tier 3 also her crown and mastery, if classes keeps them at R50) · a class and its sibling at R50 ·
 three at R50. Craft her three Craft Levels to 12 · 24 · 36 · 48 · 60. Gear and Weapons G2 … G10. Stars the Tier 3 map
-by the same rule (22 if no body is added; 27 or 32 with round 1's weapon moons). World continents 11–15, a won capital
+by the same rule (22 nodes, T2E27). World continents 11–15, a won capital
 run each. The Rift step on a won Tier 3 run (T2W4). No new position, no rebake (T2W28).
 
 ### 5.5 Ascend into Tier 3 (T2W31)
@@ -1008,6 +1013,8 @@ The release's mix: Metal 4, Wood 5, Stone 5, Fish 3, Vegetables 3.
 | Eleven slots and the map | 25.1 · 33.5 · 20.1 · 33.5 · 20.1 days | Vegetables and Fish, 33.5 | 25.1 |
 | The full window (Weapons V) | 41.8 · **55.8** · 20.1 · 33.5 · 20.1 | Vegetables, 55.8 | **31.8** |
 
+- **Round 2 doubles these** (professions T2P40–T2P41, XR15): a full window is 1,900 refined, so the pooled run of twenty
+  takes **63.6 days** (111.6 unpooled); forty at work bring twenty windows back to 31.8.
 - **Without the sub-profession a thin trade binds** (three Healers make every Tome's ink for twenty); with it, a run is
   bound only by its own hours. Speed Tickets close what's left: Vegetables' gap to 31.8 days is about 1,730 hours, 3,460
   tickets, 69,000 Laurels at T2W10's price: most of the four parties' campaign Laurels (83,100).
@@ -1080,12 +1087,12 @@ round 2 leaves whole; **Superseded (R2-n)** names the requirement that replaced 
 | **T2W9** | Ascending into an empty world | **The Ascend sheet says when the new world would hold fewer than five** ("3 of 5 to fight in Tier 2"); no rule change | Block an Ascend that leaves fewer than five; no line | Stands (a line on the sheet's first page) |
 | **T2W10** | Prices by tier | **Speed and Sweep Tickets × tier** (20 · 30 in Tier 2, 30 · 45 in Tier 3) **and the purse's Laurels × the tier she arrives in** (2,000, 3,000), so a Laurel buys the same time in every tier; Marks, Manuals and Logs untiered | Keep the tickets flat (the first knob if Tier 2 plays slow); a flat 1,000 purse | Stands |
 | **T2W11** | When the toolbox opens | **No new gates:** every Tier 2 and 3 addition opens on its system's gate (the Ascend sheet, Class Rank, a grade's levels, a node's jewel and level) | Gates of their own (quests, a day, a building) | Stands, re-cut on round 2's systems (§4.7) |
-| **T2W12** | A run's pacing target | **Tier 1's time, her Craft the clock:** a party's windows in about 32 days nonstop (40 at 80%), a first run of twenty in about 32 with sub-professions, a 24-party world's Wilds in about 64; fights about 130 wins a party; T2P meets the full window's 950 refined items | A faster later tier (tickets flat); a slower one (more steps) | Stands; measured with round 2 by T2W32 |
+| **T2W12** | A run's pacing target | **Tier 1's time for the fighting party (G10 by day 23.4) and for a world of forty at work (twenty windows in 31.8); a first cohort of twenty working for itself takes about twice that (63.6 days), round 2's deeper farm (XR15);** fights about 130 wins a party | A faster later tier (tickets flat); Tier 1's time for every cohort (a half step, T2P41's alternative) | Kept, changed (R2-9, XR15) |
 | **T2W13** | The fifteenth scenario's capital | **Its own four authored Finals routes** (original names, checked against the release), with Tier 3's world packets | Keep reusing continent 1's Finals | Stands |
 | **T2W14** | A sixteenth scenario | **Tier 4 stays closed:** it shows "Tier 4 locked" and joins no world until the owner opens Tier 4; Tier 3's Rift step completes her window only | Open Tier 4 now; let Tier 3 ascend into a placeholder | Stands |
 | **T2W15** | The version plan | **The worlds first on today's engine** (leans, packs, prices, Tier 3's Rift), **then the toolbox as one release a tier:** Tier 2 at engine v22 and save v39 (the Ascend sheet's pages and the board's rules with it), Tier 3 at v23 and v40, each dark behind its switch | Everything at once; one release a system | Stands |
 | **T2W16** | Where promotion happens | **On the Gallery's Ascend sheet, two pages, every pick pre-filled:** who goes (by party, a summary row per Uma), then her page (class, weapons and types, sub-profession); one tap ascends with the defaults; nothing opens over the sheet | A promotion sheet after arrival (her profile's first open in Tier 2); a required pick with no default; a Promote place of its own | **New (R2-5, R2-6)** |
-| **T2W17** | The classes open to her | **Both children of every Tier 1 class she has at Class Rank 50 when she ascends: 6 to 16**, read before she leaves and written to the new world; fixed for the tier; she switches freely among them, each on its own Class Rank; "Opens 6 of 16" on her Gallery tile and sheet row | Only the class she fights as's two; all sixteen for everyone; more opened by Tier 2 content | **New (R2-5)** |
+| **T2W17** | The classes open to her | **Both children of every Tier 1 class she has at Class Rank 50 when she ascends: 6 to 16**, read before she leaves and written to the new world; widened in the tier only by classes' door (T2C48: a held Tier 2 class at Class Rank 20 opens her parent's reclass neighbours' children; reconciled, XR16); she switches freely among them, each on its own Class Rank; "Opens 6 of 16" on her Gallery tile and sheet row | Only the class she fights as's two; all sixteen for everyone; more opened by Tier 2 content | **New (R2-5)** |
 | **T2W18** | Her Suggested Tier 2 class | **The keeper of the class she fights as** when it is at R50, else of her highest R50 class (ties: her family's, then the tree's order); the expander one tap beside it | No Suggested (a pick required); the expander; by her calling | **New (R2-5)** |
 | **T2W19** | Her weapons at promotion | **Her picked class's preset, each weapon's Tier 2 type gear's Suggested, set on the sheet;** a slot offers its channel's kinds, an expander's cross slot included; swaps later as gear rules; Tier 2 → 3 pre-filled with hers; no G5 gate | Defaults with no type until a weapon's G5 (round 1); a weapons visit after arrival | **New (R2-6)** |
 | **T2W20** | Her sub-profession at promotion | **On her page, pre-picked** with professions' Suggested, her line's two shown fixed; changeable there or later | Picked only after arrival on her Template tab (round 1's secondary); none until a Craft Level | **New (R2-9)** |
@@ -1100,7 +1107,7 @@ round 2 leaves whole; **Superseded (R2-n)** names the requirement that replaced 
 | **T2W29** | The Tier 3 board | **Tier 2's board at Tier 3's numbers, 36 with its Rift:** Class on Tier 3's classes (R50 also her crown, if classes keeps it there), Crafts to 60, the Tier 3 map, continents 11–15 | A track for the crown or mastery; 35 without a Rift | **New (R2-10)** |
 | **T2W30** | The Rift's guidance and tests on the sixteen | **The guidance names the Tier 1 class and either child fits** (the keeper Suggested in Use the guided weapons); the fronts' tests ask for round 2's tools (Pure types and self-buffs on Iron, a Dual's partner and kind picks on Arcane, single-target picks on the Duel, area and multi-hit picks and wider debuffs on the Horde) | Name the keeper only; name exact Tier 2 classes a front | **New (R2-2)**; re-cuts T2W5's last clause |
 | **T2W31** | Ascend into Tier 3 | **The same sheet, pre-filled with her Tier 2 picks:** her class (her open set carrying, assumed; Tier 3's options if classes gives one), weapons and types, sub-profession; forms and picks kept as settings; 3,000 Laurels | No picks into Tier 3 (she keeps everything); a Tier 3 promotion of its own | **New (R2-5)** |
-| **T2W32** | A Tier 2 run with round 2 | **Ready about day 33.5 nonstop (37.6 at 80%), the Rift binding as in Tier 1;** Crafts 60 by 24.9–27.8; every other track at Tier 1's pace; the promotion one tap a party | Speed later tiers (tickets flat); a Craft V at 56 | **New (R2-10)**; measures T2W12 |
+| **T2W32** | A Tier 2 run with round 2 | **A first cohort of twenty working for itself: full windows in about 63.6 days (sub-professions pooled; 111.6 without), since round 2's farm doubles a full window (T2P40–T2P41); forty at work: 31.8, the Rift binding at 33.5 (37.6 at 80%); the fighting party at G10 on day 23.4;** Crafts 60 by 24.9–27.8; the promotion one tap a party (reconciled, XR15) | Tier 1's time with a half step in Tier 2 (T2P41's alternative); tickets flat | **New (R2-10)**; measures T2W12 |
 
 **Calls the owner may want to see first:** T2W25 (Class IV names the sibling: the board nudges the swap he asked for;
 the alternative is any two), T2W26 (Craft as a sum, a specialist 14% slower than Tier 1), T2W17 (the open set fixed at
