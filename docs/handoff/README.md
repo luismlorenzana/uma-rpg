@@ -40,14 +40,10 @@ rescue, buffs and debuffs on their paths, pure Brawlers and Sorcerers, a Spellbl
 [screens](../design/collections/previews/screens.html)): every Uma's stained-glass window, lit by a 31-step board a
 tier and standing beside her bust; the Gallery, ranked, in the Observatory's place; Ascend one Uma at a time once her
 window is full; Trials (the Echoes' own place); Drills paying Training Logs. Live since H157 (save v35, D288), with a
-Weapons track since save v36 (D289). H156's three buildings are published in uma-art 2.20.0 (Done below);
-H158 remains to pin them and finish the series' first phase.
+Weapons track since save v36 (D289). H156's three buildings are published in uma-art 2.20.0 and adopted by H158 (D299).
+The series' first phase is finished and live.
 
-| Id | What | Who | Size | Needs | State |
-|---|---|---|---|---|---|
-| [H158](tasks/H158-pin-collections-art.md) | Pin uma-art 2.20.0: the three buildings | Claude or ChatGPT | S | H156 | Ready |
-
-**Done:** H150–H157 (below). **Next:** H158; the places borrow existing buildings until its pin.
+**Done:** H150–H158 (below), including the Gallery, Trials and Drill Yard's own Hub buildings.
 uma-platform's `latest` is release `01ba1c71f403` (2026-11-02),
 which carries the pane maps; undo with `pnpm release:publish -- --rollback f8ab287029e8` in uma-platform.
 
@@ -100,7 +96,8 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
-| H156 | Gallery, Trials and Drills: three original native 48px buildings (platform P86), filling the last cells on the unchanged 288×432 atlas. All 51 older records and pixels remain exact; native/2× comparisons and ≥25% silhouette guards passed, with full platform checks. Uma-art 2.20.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41908742455); H158 owns the pin and is Ready. | Art `9323162` ([platform #67](https://github.com/luismlorenzana/uma-platform/pull/67)) |
+| H158 | Collections' first phase complete: uma-art 2.20.0 pinned, Gallery → `gallery`, Trials → `trials`, Drills → `drill-yard` (D299). Full checks and both phone sizes/themes passed; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/41950893931), health at the merge commit and deployed building-atlas bytes verified. | `e7d5d7e` ([#100](https://github.com/luismlorenzana/uma-rpg/pull/100)) |
+| H156 | Gallery, Trials and Drills: three original native 48px buildings (platform P86), filling the last cells on the unchanged 288×432 atlas. All 51 older records and pixels remain exact; native/2× comparisons and ≥25% silhouette guards passed, with full platform checks. Uma-art 2.20.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41908742455) and adopted by H158 above. | Art `9323162` ([platform #67](https://github.com/luismlorenzana/uma-platform/pull/67)) |
 | H167 | Skill names, one grammar for every Tier 1 tree (D298, [skill-names.md](../design/skill-names/skill-names.md)): a word a tree, Greater · Grand · Supreme, a capstone, line B as A's name with its word; 528 of the 560 live names, the Summoners' Bonded line now Oath and the healers' Heavy Surge; names only, no engine or save change | `9d88510` |
 | H144 | Profile polish finished: uma-art 2.19.0 pinned, five native 24px star crests and eight native 16px stat marks replace the vector stand-ins (D297). Full checks and both phone widths/themes passed; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/41906774018), health at the merge commit and deployed atlas bytes verified. | `5017f41` ([#88](https://github.com/luismlorenzana/uma-rpg/pull/88)) |
 | H141 | Five native 24px star crests and eight native 16px stat marks (platform P80); the 120×220 UI atlas preserves every earlier frame, and native/2×/4× white, dark and night-sky previews passed review. Uma-art 2.19.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41880067892) and adopted by H144 above; H156's 2.20.0 art is published above. | Art `b612403` ([platform #64](https://github.com/luismlorenzana/uma-platform/pull/64)) |
