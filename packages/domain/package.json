@@ -87,6 +87,16 @@
         "default": "./src/save/drills.ts"
       }
     },
+    "./capital": {
+      "require": {
+        "types": "./dist/cjs/save/capital.d.ts",
+        "default": "./dist/cjs/save/capital.js"
+      },
+      "default": {
+        "types": "./src/save/capital.ts",
+        "default": "./src/save/capital.ts"
+      }
+    },
     "./forge": {
       "require": {
         "types": "./dist/cjs/save/forge.d.ts",

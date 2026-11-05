@@ -28,6 +28,7 @@ import { gearV1, isGrades, MAX_DEFEATED, newOwnedUma, newTierWorld, PARTY_SIZE, 
 import { workOf } from './status'
 import { recordRiftWin, tierHasRift, windowFull } from './windows'
 import { emptyWindow } from './window-record'
+import { capitalRunsLive } from './collections'
 
 /** Echoes pay this many times a stage's Class and gear rank EXP (R6). */
 export const ECHO_RANK_PAY = 2
@@ -605,6 +606,7 @@ export function ascendUmasBlock(save: Save, ids: readonly string[], tier = TIER_
   if (ids.length === 0) return 'Pick an Uma'
   if (new Set(ids).size !== ids.length) return 'An Uma is picked twice'
   if (ids.some((id) => !world.umas[id])) return 'Only this tier’s Umas'
+  if (capitalRunsLive() && world.capitalRuns?.some((run) => run.lanes.some((lane) => lane.umas.some((id) => ids.includes(id))))) return 'In a capital run'
   if (world.rift.battle) return 'Finish the open Rift fight first'
   if (openFightOf(world)) return 'Finish the open fight first'
   const dark = ids.filter((id) => !windowFull(save.account.windows?.[id]?.[tier] ?? emptyWindow(), Number(tier)) || !herWonRun(world, id))
