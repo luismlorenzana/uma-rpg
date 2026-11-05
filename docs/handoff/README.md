@@ -58,8 +58,8 @@ lights on a won run. Built dark behind `capitalRunsLive()` (save v37), switched 
 |---|---|---|---|---|---|
 | H159 | The fourth Finals route for every scenario, and the run's foes | Claude | M | — | Done (D296), below |
 | H160 | The run rules and save v37, dark: start, lanes, the Final, pay, the World step | ChatGPT | L | H159 | Done (D300), below |
-| [H161](tasks/H161-capital-run-screens.md) | The screens, dark: the capital page, New run, a run's page, the result | ChatGPT or Claude | L | H160 | Ready |
-| [H162](tasks/H162-capital-runs-switch.md) | The switch: save v37 live, the old capital removed, the manual, the phone check | ChatGPT or Claude | M | H159–H161 | Waits |
+| H161 | The screens, dark: the capital page, New run, a run's page, the result | ChatGPT | L | H160 | Done (D301), below |
+| [H162](tasks/H162-capital-runs-switch.md) | The switch: save v37 live, the old capital removed, the manual, the phone check | ChatGPT or Claude | M | H159–H161 | Ready |
 
 **The honeycomb continent map** ([design](../design/world-map/honeycomb.md), [preview](../design/world-map/previews/honeycomb.html),
 approved D295): every continent as an SVG honeycomb of 48 regions (eight new) for 24 parties, the capital at the centre
@@ -74,7 +74,7 @@ Every packet can go to ChatGPT; no art packet.
 | [H165](tasks/H165-honeycomb-screen.md) | The screen, dark: the SVG honeycomb, its hexes, the quick looks, zoom, 24 parties on screen | ChatGPT or Claude | L | H161, H164 | Waits |
 | [H166](tasks/H166-honeycomb-switch.md) | The switch: save v38 live, the pixel continent map removed, the manual, the phone check | ChatGPT or Claude | M | H162, H165 | Waits |
 
-**Order:** H160 is done; H163 can start now. Then H164 after H163, H165 after H161 and H164, and H166 after H162 and H165.
+**Order:** H160 and H161 are done; H162 and H163 can start now. Then H164 after H163, H165 after H164, and H166 after H162 and H165.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
@@ -96,6 +96,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H161 | Capital-run screens, dark on live v36 (D301): the capital list, inline four-party sign-up, frozen lane rosters, foe sheets, locked/open finals, Abandon, shared fights/results and World tiles. Full checks and both phone sizes/themes passed; scratch play won generals and a run, with all twenty World steps persisted. Initial JS 226.02 KB gzip; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/42020081836), exact health commit, deployed entry and capital-screen chunks verified. | `33b63a4` ([#104](https://github.com/luismlorenzana/uma-rpg/pull/104)) |
 | H160 | Capital-run rules and strict save v37 parsing, dark on live v36 (D300): four frozen parties, twelve generals and four finals, per-entrant pay, World credit, abandon and Ascend lock; carried MP and map wins unchanged. Full checks and 38 new tests passed; current Finals checked locally; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/41959244976), health commit and exact deployed entry verified. | `5c0f0e3` ([#102](https://github.com/luismlorenzana/uma-rpg/pull/102)) |
 | H158 | Collections' first phase complete: uma-art 2.20.0 pinned, Gallery → `gallery`, Trials → `trials`, Drills → `drill-yard` (D299). Full checks and both phone sizes/themes passed; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/41950893931), health at the merge commit and deployed building-atlas bytes verified. | `e7d5d7e` ([#100](https://github.com/luismlorenzana/uma-rpg/pull/100)) |
 | H156 | Gallery, Trials and Drills: three original native 48px buildings (platform P86), filling the last cells on the unchanged 288×432 atlas. All 51 older records and pixels remain exact; native/2× comparisons and ≥25% silhouette guards passed, with full platform checks. Uma-art 2.20.0 is [published](https://github.com/luismlorenzana/uma-platform/actions/runs/41908742455) and adopted by H158 above. | Art `9323162` ([platform #67](https://github.com/luismlorenzana/uma-platform/pull/67)) |
