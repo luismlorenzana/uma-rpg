@@ -308,8 +308,14 @@ input and settles through the removed-stage fallback. The first v37 write backs 
 **The honeycomb world shape is staged (H163, D295).** `world/honeycomb.ts` exports the preview's axial layout, pixel
 positions and nearest-Spring ids. `honeycombLive()` stays false on save v37: `worldContinent` still returns the same
 40 regions and five Springs. At v38 it appends eight new regions and the sixth Spring; the old regions and Spring ids
-stay unchanged. A dark inspection layout leaves the eight new region slots open. Save fields and screens are later
-packets; no live map, rule or save shape changes here.
+stay unchanged. A dark inspection layout leaves the eight new region slots open.
+
+**The honeycomb save is staged too (H164).** At v38, `toV38` appends four empty parties to every world and adds an empty
+`regionTeams` record, never inventing teams for old wins. Up to 240 region entries keep the first claim and first boss
+clear's one to five entrant ids in order and their dates, even after an Uma ascends. Region fights write these once;
+Sweeps, Drills, capitals and the Rift never do. `regionTeamsOf` and `honeycombState` are pure screen reads. The same
+switch raises parties to 24 and open capital runs to six. The live v37 save still has 20 parties, at most five open
+runs and no `regionTeams`; no account fields, engine or pay change. H165 owns the screen and H166 activation.
 
 ### The shape
 

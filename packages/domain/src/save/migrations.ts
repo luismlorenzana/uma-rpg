@@ -2,7 +2,7 @@
 // imports this chain only for a save older than the current version; only the API's sync `parseSave` imports it statically,
 // and the web never calls that, so it stays out of the main bundle (H136, scripts/check-size.mjs).
 import { FACILITY_SLOTS, grantProfessionExp, itemMinutes, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
-import { CAPITAL_RUNS_SAVE, capitalRunsLive, COLLECTIONS_SAVE, collectionsLive } from './collections'
+import { CAPITAL_RUNS_SAVE, capitalRunsLive, COLLECTIONS_SAVE, collectionsLive, HONEYCOMB_SAVE, honeycombLive } from './collections'
 import { facilitySpec } from '../economy/jobs'
 import { gemIdentity, isStarNode, nodeGem } from '../economy/stars'
 import { ITEM_IDENTITIES as ITEM_FAMILIES, isItemId } from '../items/identity'
@@ -216,7 +216,8 @@ export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v33 = version < 33 && isRecord(v32) ? toV33(v32) : v32
   const v34 = version < 34 && isRecord(v33) ? toV34(v33) : v33
   const v35 = version < COLLECTIONS_SAVE && collectionsLive() && isRecord(v34) ? toV35(v34) : v34
-  return version < CAPITAL_RUNS_SAVE && capitalRunsLive() && isRecord(v35) ? toV37(v35) : v35
+  const v37 = version < CAPITAL_RUNS_SAVE && capitalRunsLive() && isRecord(v35) ? toV37(v35) : v35
+  return version < HONEYCOMB_SAVE && honeycombLive() && isRecord(v37) ? toV38(v37) : v37
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the
@@ -1324,4 +1325,11 @@ export function toV35(world: Record<string, unknown>): Record<string, unknown> {
 /** v36 → v37 (D293, H160): no capital run has started. Old map wins and every other field stay as they were. */
 export function toV37(world: Record<string, unknown>): Record<string, unknown> {
   return { ...world, capitalRuns: [], capitals: {} }
+}
+
+/** v37 → v38 (D295, H164): no invented teams for past wins; append four empty parties, leaving every old field intact. */
+export function toV38(world: Record<string, unknown>): Record<string, unknown> {
+  const parties = Array.isArray(world.parties) ? [...world.parties,
+    ...Array.from({ length: 4 }, (_, i) => ({ name: `Party ${21 + i}`, slots: [null, null, null, null, null], lead: null }))] : world.parties
+  return { ...world, parties, regionTeams: {} }
 }
