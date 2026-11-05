@@ -1,6 +1,7 @@
 # The continent map as a honeycomb
 
-**Status:** approved 2026-11-03 (D295), third pass; packets H163–H166. Nothing is built. The preview is
+**Status:** approved 2026-11-03 (D295), third pass. H163 builds the world shape dark behind save v38: the eight new
+regions, six Springs, layout and nearest-Spring lookup. H164 owns the save, H165 the screen, H166 the switch. The preview is
 [previews/honeycomb.html](previews/honeycomb.html): Continent 1's real 40 regions and eight made-up new ones, the six
 Springs, the capital and its run seats, with made-up progress. Tap any hex.
 
