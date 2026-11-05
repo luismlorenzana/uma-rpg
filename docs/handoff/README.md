@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-11-03, after D293.** Tier 1 is built and live: engine v21, save v36. That covers the Tier rework's R1
+> **Status: 2026-11-05, after D302.** Tier 1 is built and live: engine v21, save v37. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -59,7 +59,7 @@ lights on a won run. Save v37 activates the run rules and screens (H162); the ol
 | H159 | The fourth Finals route for every scenario, and the run's foes | Claude | M | — | Done (D296), below |
 | H160 | The run rules and save v37, dark: start, lanes, the Final, pay, the World step | ChatGPT | L | H159 | Done (D300), below |
 | H161 | The screens, dark: the capital page, New run, a run's page, the result | ChatGPT | L | H160 | Done (D301), below |
-| [H162](tasks/H162-capital-runs-switch.md) | The switch: save v37 live, the old capital removed, the manual, the phone check | ChatGPT or Claude | M | H159–H161 | Ready |
+| H162 | The switch: save v37 live, the old capital removed, the manual, the phone check | ChatGPT | M | H159–H161 | Done (D302), below |
 
 **The honeycomb continent map** ([design](../design/world-map/honeycomb.md), [preview](../design/world-map/previews/honeycomb.html),
 approved D295): every continent as an SVG honeycomb of 48 regions (eight new) for 24 parties, the capital at the centre
@@ -74,7 +74,7 @@ Every packet can go to ChatGPT; no art packet.
 | [H165](tasks/H165-honeycomb-screen.md) | The screen, dark: the SVG honeycomb, its hexes, the quick looks, zoom, 24 parties on screen | ChatGPT or Claude | L | H161, H164 | Waits |
 | [H166](tasks/H166-honeycomb-switch.md) | The switch: save v38 live, the pixel continent map removed, the manual, the phone check | ChatGPT or Claude | M | H162, H165 | Waits |
 
-**Order:** H160 and H161 are done; H162 and H163 can start now. Then H164 after H163, H165 after H164, and H166 after H162 and H165.
+**Order:** H160–H162 are done; H163 can start now. Then H164 after H163, H165 after H164, and H166 after H165.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
@@ -85,7 +85,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v21, save v36; uma-kit 0.17.0, uma-art 2.19.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v21, save v37; uma-kit 0.17.0, uma-art 2.20.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 - **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
   "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.
@@ -96,6 +96,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H162 | Capital runs live, save v37 and engine v21 (D302): four parties, twelve generals, four finals and World credit for all twenty; old capital stages and champion masks removed, frozen open fights settle safely. Full checks, both phone sizes/themes, exact scratch migration and repeat pay passed; initial JS 224.94 KB gzip. [Production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/42026926548); exact health commit, deployed entry and capital-page chunk verified; the [phone check](../testing/phone-check.md) includes the run flow. | `076d601` ([#106](https://github.com/luismlorenzana/uma-rpg/pull/106)) |
 | H161 | Capital-run screens, dark on live v36 (D301): the capital list, inline four-party sign-up, frozen lane rosters, foe sheets, locked/open finals, Abandon, shared fights/results and World tiles. Full checks and both phone sizes/themes passed; scratch play won generals and a run, with all twenty World steps persisted. Initial JS 226.02 KB gzip; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/42020081836), exact health commit, deployed entry and capital-screen chunks verified. | `33b63a4` ([#104](https://github.com/luismlorenzana/uma-rpg/pull/104)) |
 | H160 | Capital-run rules and strict save v37 parsing, dark on live v36 (D300): four frozen parties, twelve generals and four finals, per-entrant pay, World credit, abandon and Ascend lock; carried MP and map wins unchanged. Full checks and 38 new tests passed; current Finals checked locally; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/41959244976), health commit and exact deployed entry verified. | `5c0f0e3` ([#102](https://github.com/luismlorenzana/uma-rpg/pull/102)) |
 | H158 | Collections' first phase complete: uma-art 2.20.0 pinned, Gallery → `gallery`, Trials → `trials`, Drills → `drill-yard` (D299). Full checks and both phone sizes/themes passed; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/41950893931), health at the merge commit and deployed building-atlas bytes verified. | `e7d5d7e` ([#100](https://github.com/luismlorenzana/uma-rpg/pull/100)) |
