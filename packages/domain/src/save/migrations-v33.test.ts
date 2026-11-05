@@ -2,7 +2,7 @@
 // into the same hall's 1 and 2: Bonds keep the higher, a kept seat keeps everyone it has, and nothing else moves.
 import { describe, expect, it } from 'vitest'
 import { loadV19Replays, replayV19 } from '../rpg/battle/v19-replays.fixture'
-import { toV37, migrateWorld, toV33, toV34, toV35 } from './migrations'
+import { toV38, toV37, migrateWorld, toV33, toV34, toV35 } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type Save } from './save'
 import { v31Save } from './v31.fixture'
 
@@ -102,14 +102,14 @@ describe('toV33: chained', () => {
 
   it('is chained: migrateWorld runs it on a v32 world and on an older one, then toV34 and toV35', () => {
     const raw = world({ 1: uma({ 'mage-3': bond(1) }) }, { 'mage-3': { hero: '1', learners: [] } })
-    expect(migrateWorld(raw, 32)).toEqual(toV37(toV35(toV34(toV33(raw)))))
+    expect(migrateWorld(raw, 32)).toEqual(toV38(toV37(toV35(toV34(toV33(raw))))))
     expect(migrateWorld(raw, SAVE_SCHEMA_VERSION)).toBe(raw)
-    expect(SAVE_SCHEMA_VERSION).toBe(37)
+    expect(SAVE_SCHEMA_VERSION).toBe(38)
   })
 
   it('parses a stored save with seats to fold to v33, which round-trips, its Heroes and Learners in the kept seats', () => {
     const parsed: Save = parseSave(v32Save())
-    expect(parsed.schemaVersion).toBe(37)
+    expect(parsed.schemaVersion).toBe(38)
     expect(parseSave(JSON.parse(JSON.stringify(parsed)))).toEqual(parsed)
     const w = parsed.tierWorlds['1']!
     expect(Object.keys(w.heroes).filter((id) => /^(brawler|mage)-[34]$/.test(id))).toEqual([])

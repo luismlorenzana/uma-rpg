@@ -1,3 +1,4 @@
+import { legacyWorldContinent as worldContinent } from './legacy-continent.fixture'
 // Tier 1's foes on engine v16 (H66, D202; class-progression.md §4.1, §4.4): every foe of every rank is weak to her twins
 // (CP5), the sub-boss's and the boss's shields are `RPG_FOE_SHIELDS_V16`'s (CP8, SB6; H71 measured today's 6 and 8, D207),
 // and nothing else moves; live from H72 (D210), the generators giving the live engine's foes by default (v19's since H134,
@@ -17,7 +18,7 @@ import { riftFight } from '../rift/generate'
 import { packRoster } from '../rift/roster.fixture'
 import { RIFT_FRONTS } from '../rift/state'
 import { capitalChapter } from './legacy-capital.fixture'
-import { regionChapter, worldContinent } from './world'
+import { regionChapter } from './world'
 
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 const continents = (orders: readonly number[]) => orders.map((order) => worldContinent({ name: 'T', order }))

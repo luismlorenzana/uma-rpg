@@ -143,7 +143,7 @@ describe('game store', () => {
     await boot('u1')
     const save = useGame.getState().save
     expect(save?.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
-    expect(save?.tierWorlds['1']?.parties).toHaveLength(20)
+    expect(save?.tierWorlds['1']?.parties).toHaveLength(24)
   })
 })
 

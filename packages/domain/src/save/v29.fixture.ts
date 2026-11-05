@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 // Test-only (excluded from the build): a full-shaped v29 save for save v30's migration (H110, chained by H112;
 // farm-by-line.md FL17–FL19). R2's catalog and env are gone since H112, so its R2 parts are literals here: R2's sixty
 // ids (`R2_TYPES`, as H77's catalog held them) and the engine's work rows as R2 wrote them:
@@ -89,7 +90,7 @@ export const V29_TIER2_STOCK: Readonly<Record<string, number>> = { 'gold-ore': 4
 
 /** The whole save at v29: the Tier 1 world, a Tier 2 world and a Tier 3 world. */
 export function v29Save(): Save {
-  return {
+  return beforeHoneycomb({
     schemaVersion: 29 as Save['schemaVersion'],
     account: { trainerName: 'Tester', createdAt: V29_T0, updatedAt: V29_T0, achievements: {}, history: {}, defeated: {} },
     tierWorlds: {
@@ -97,5 +98,5 @@ export function v29Save(): Save {
       '2': gradedWorld({ items: { ...V29_TIER2_STOCK }, umas: { '301': gradedUma() } }),
       '3': gradedWorld({ items: { ...V29_ALL_STOCK }, umas: { '401': gradedUma() } }),
     },
-  }
+  })
 }

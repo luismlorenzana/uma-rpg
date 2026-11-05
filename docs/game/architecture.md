@@ -1,6 +1,6 @@
 # Architecture and technical setup
 
-How uma-rpg is built and run: engine v21, save v37. Values come from the code and `docs/technical/infrastructure.md`,
+How uma-rpg is built and run: engine v21, save v38. Values come from the code and `docs/technical/infrastructure.md`,
 which holds every production value and is the place to change them.
 
 ## The pieces
@@ -52,7 +52,7 @@ lazy pages import it directly, so its rules load with the first command or page 
 
 | Folder | What |
 |---|---|
-| `save/` | The save: `version.ts` (`SAVE_SCHEMA_VERSION` 37, in a module with no imports), `save.ts` (the shape and its strict parse: `parseSave` for the API, `parseSaveAsync` for the device) and `migrations.ts` (every step to v37, `toV37` the last; loaded on demand: `parseSaveAsync` imports it only for an old save, and only the API's `parseSave` imports it statically, H136). Its rules, pure functions that return a new save or throw `SaveRuleError`: `class.ts` (an Uma's starting and active class, the classes she holds, her setup per class, one healer a party; main bundle), `class-tiles.ts` (the class tree's tiles; the Stable's chunk), `battle.ts` (switching class, promotion, weapons, lines, the world map's fights, rewards, Springs; through `@rpg/domain/battle`, H62), `classes-v3.ts` (save v32's trade step, `settleClassesV3Trades`; lazy), `sheet.ts` (her battle sheet; the Stable's chunk), `status.ts` (where an Uma is: in a fight or at work), `work.ts` (jobs on the shared engine, Finish all, the slot view the screens read), `forge.ts` (raising grades with made items, the accessory's family and kind), `observatory.ts` (setting jewels), `presets.ts` (each class's standard preset), `targets.ts` (targets), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts` (raw items and tickets for Laurels, selling, Class Manuals), `rules.ts` (unlocks, parties, the grant and the classes' reset seen), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion one Uma at a time; through `@rpg/domain/rift`), `windows.ts` (every Uma's window: the board met, latching, the pre-v35 credit, capital-run World credit and the Rift step; through `@rpg/domain/windows`), `window-record.ts` (the record's day codes; main bundle), `collections.ts` (`collectionsLive`, save v35), `drills.ts` (Drills and Training Logs; through `@rpg/domain/drills`) |
+| `save/` | The save: `version.ts` (`SAVE_SCHEMA_VERSION` 38, in a module with no imports), `save.ts` (the shape and its strict parse: `parseSave` for the API, `parseSaveAsync` for the device) and `migrations.ts` (every step to v38, `toV38` the last; loaded on demand: `parseSaveAsync` imports it only for an old save, and only the API's `parseSave` imports it statically, H136). Its rules, pure functions that return a new save or throw `SaveRuleError`: `class.ts` (an Uma's starting and active class, the classes she holds, her setup per class, one healer a party; main bundle), `class-tiles.ts` (the class tree's tiles; the Stable's chunk), `battle.ts` (switching class, promotion, weapons, lines, the world map's fights, rewards, Springs; through `@rpg/domain/battle`, H62), `classes-v3.ts` (save v32's trade step, `settleClassesV3Trades`; lazy), `sheet.ts` (her battle sheet; the Stable's chunk), `status.ts` (where an Uma is: in a fight or at work), `work.ts` (jobs on the shared engine, Finish all, the slot view the screens read), `forge.ts` (raising grades with made items, the accessory's family and kind), `observatory.ts` (setting jewels), `presets.ts` (each class's standard preset), `targets.ts` (targets), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts` (raw items and tickets for Laurels, selling, Class Manuals), `rules.ts` (unlocks, parties, the grant and the classes' reset seen), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion one Uma at a time; through `@rpg/domain/rift`), `windows.ts` (every Uma's window: the board met, latching, the pre-v35 credit, capital-run World credit and the Rift step; through `@rpg/domain/windows`), `window-record.ts` (the record's day codes; main bundle), `collections.ts` (`collectionsLive`, save v35), `drills.ts` (Drills and Training Logs; through `@rpg/domain/drills`) |
 | `rpg/` | `kinds.ts` (the classes by generation, weapons, damage kinds, twins, statuses), `class-tree.ts` (Classes v3's tree: roots, parents and children, Tier 0's ladder and skill, the suggestion, names by generation, the gates), `rules.ts` (classes, stats, levels, hands, lines, Skill Ranks, the base MP regen, each by generation), `node-identity.ts` (node ids, lines and the skill depth tables, light enough for the parse), `catalog.ts` (every skill tree of every generation), `tree-view.ts` (the Class tab's tree model), `heroes.ts` and `hero-id.ts` (the five halls' sixteen Limit Breaks, and each older engine's for its fights; Bonds) |
 | `rpg/battle/` | The fight: `engine.ts` (the deterministic reducer, engine v21), `limit.ts` (Limit Breaks), `skills.ts`, `auto.ts` (Auto's policy), `types.ts`. `caps.ts` holds the switch: `BATTLE_ENGINE_VERSION` 19 and `rpgRework(stage, engine)` over `RPG_REWORK_ENGINE` (`fight` 16, `economy` 17, `weak` 18, `classes` 19: Classes v3 and Halls v2, live since H134; `t2Weapons` at no engine until the Tier 2 re-plan). A rule outside the engine takes `engine`, defaulting to the live one; the engine passes the fight's own version, so v6–v18 fights replay as they were, pinned by the frozen `v14`- to `v18-replays` fixtures. The engine's functions load through `@rpg/domain/engine`; the main index keeps its types, caps and skill numbers (H62) |
 | `rpg/campaign/` | Foes and their scaling (`enemies.ts`), rewards, Finals and the chapter machinery regions reuse; `weaknesses.ts` deals each stage's foes their own Arms and element lists from v18 (D236) |
@@ -294,6 +294,10 @@ Recent steps:
 - **v37:** capital runs (D293, H162): `toV37` adds empty runs and capital records to every world; the account step
   removes champion masks only, keeping all lit World dates. The run rules keep five concurrent runs, six recent wins
   per continent and signed rosters; they never add their sixteen fights to the map's wins. Engine v21 stays.
+- **v38:** the honeycomb (D295, H166): `toV38` appends four empty parties to every world's twenty, retaining their
+  order/leads, and adds empty `regionTeams`. Existing wins, charges, fights, account fields and timestamps stay.
+  The map adds eight ordinary regions and a sixth Spring per continent; existing region/stage/Spring ids stay.
+  There are 24 parties and at most six open capital runs. Old clears gain no invented teams. Engine v21 stays.
 
 At every schema bump the API's GET migrates the stored save without writing it; in Firestore the first write of the
 new version copies the stored document to `saveBackups/{uid}-v{n}` (D69), and an older app's write is refused once
@@ -305,38 +309,31 @@ window records' champion masks removed, lit steps and `updatedAt` unchanged. An 
 input and settles through the removed-stage fallback. The first v37 write backs up the exact stored v36 document as
 `saveBackups/{uid}-v36`; production saves are never edited by hand.
 
-**The honeycomb world shape is staged (H163, D295).** `world/honeycomb.ts` exports the preview's axial layout, pixel
-positions and nearest-Spring ids. `honeycombLive()` stays false on save v37: `worldContinent` still returns the same
-40 regions and five Springs. At v38 it appends eight new regions and the sixth Spring; the old regions and Spring ids
-stay unchanged. A dark inspection layout leaves the eight new region slots open.
-
-**The honeycomb save is staged too (H164).** At v38, `toV38` appends four empty parties to every world and adds an empty
-`regionTeams` record, never inventing teams for old wins. Up to 240 region entries keep the first claim and first boss
-clear's one to five entrant ids in order and their dates, even after an Uma ascends. Region fights write these once;
-Sweeps, Drills, capitals and the Rift never do. `regionTeamsOf` and `honeycombState` are pure screen reads. The same
-switch raises parties to 24 and open capital runs to six. The live v37 save still has 20 parties, at most five open
-runs and no `regionTeams`; no account fields, engine or pay change.
-
-**The honeycomb screen is staged (H165).** At v38 the continent uses 61 accessible SVG hexes, quick looks, fitted dots
-and zoomed album faces, six Spring buttons in the List and the nearest Spring in a region's header. The continent's
-compact party bar keeps swap, Edit and warnings above the map. The world and region pixel maps stay. H166 owns activation.
+**The honeycomb is live (H163–H166, D295).** `world/honeycomb.ts` provides the 61 axial places and nearest-Spring ids.
+The lazy continent screen uses accessible SVG hexes, shared quick looks, fitted dots and zoomed album faces; its compact
+party bar keeps swap, Edit and warnings. World and region pixel maps stay. Up to 240 `regionTeams` entries keep the first
+claim and first boss clear's one to five entrant ids in order and dates, even after an Uma ascends. Region fights write
+these once; Sweeps, Drills, capitals and the Rift never do. `regionTeamsOf` and `honeycombState` are pure screen reads.
+The first v38 write backs up the exact stored v37 document as `saveBackups/{uid}-v37`; no production save is edited by hand.
 
 ### The shape
 
 ```
-Save { schemaVersion: 37, account, tierWorlds: { "1": TierWorld, … } }
+Save { schemaVersion: 38, account, tierWorlds: { "1": TierWorld, … } }
 account { trainerName, createdAt, updatedAt, achievements { <id>: { at, run | null } },
   history { <outfitId>: [{ tier, at, run }] }, defeated { <castId>: at },
   windows { <outfitId>: { <tier>: { steps: 36 × 3 base-36 day codes ("---" dark) } } },
   windowsStart | null }
 TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, sweepTickets, classMarks, trainingLogs },
-  umas: { <outfitId>: OwnedUma }, parties: [20 × { name, slots[5], lead | null }],
+  umas: { <outfitId>: OwnedUma }, parties: [24 × { name, slots[5], lead | null }],
   world { activeParty, run { wins, mp, battle | null, battles, … }, springs },
   items { <line item or made item id>: count }, buildings: {}, work: { <outfitId>: WorkRow }, targets [≤10],
   heroes: { <seat>: { hero, learners[≤10] } },
   rift { runs [RiftRun], echoes { <front>: { <level>: at } }, battle: RiftBattle | null, battles },
   grant: TierGrant | null, classesV3?: ClassesV3Record, drills { day | null, runs, won { drill-<n>: true } },
-  capitalRuns [≤5 CapitalRun], capitals { <continent>: { started, won, recent [≤6 CapitalWin] } } }
+  capitalRuns [≤6 CapitalRun], capitals { <continent>: { started, won, recent [≤6 CapitalWin] } },
+  regionTeams { <regionId>: { claim?: RegionTeam, clear?: RegionTeam } } }
+RegionTeam { umas [1–5 outfit ids], at }
 CapitalRun { id, continent, startedAt, lanes [4 × { party, umas[5], generals: 0–3, finalAt | null }] }
 CapitalWin { id, wonAt, lanes[4][5] }
 TierGrant { tickets, floor, umas { <outfitId>: { level, exp, tickets } }, deleted { gear, gems, upgrades },

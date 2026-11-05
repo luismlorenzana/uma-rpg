@@ -1,7 +1,7 @@
 # Current phone check
 
 Use this script for a release, in order, on the [live game](https://uma-rpg.web.app). It tests the game as it runs today
-(engine v21, save v37); the screens are in [Game sections](../game/sections.md) and the rules in the [game
+(engine v21, save v38); the screens are in [Game sections](../game/sections.md) and the rules in the [game
 manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
 
 Use your existing save; do not reset it. Before you start, have: one full party of five with one healer; an Uma at Lv 10
@@ -116,7 +116,7 @@ button and footer should stay reachable without horizontal page scrolling, in li
     **Across the profile, at both sizes, light and dark:** target marks readable on every portrait; nothing clipped on long names;
     the four tabs, the class row and the armor tiles fit with no horizontal scroll; sheets fit above the bar; green only on Ready
     dots. The budgets and the type sizes are checked locally: [How to measure](../design/uma-profile-v2/proposal.md#104-how-to-measure).
-16. **Party Hall.** Open a party, edit its name → **Rename**, and fill five slots: expect the name and **5/5** in the
+16. **Party Hall.** Expect 24 parties, including four empty new ones after migration from v37. Open a party, edit its name → **Rename**, and fill five slots: expect the name and **5/5** in the
     list. Pick an Uma from another party: expect "Moves from …" and her gone from the first party. **Make party lead**
     on another member: the ring and flag move and nobody reorders. Put a Paladin and a Cleric in one party: expect "One
     healer a party" on its card and in the editor, and picking never refused; a Healer never counts. Restore the party.
@@ -163,11 +163,18 @@ button and footer should stay reachable without horizontal page scrolling, in li
     1 · 5 · 10 · Max. Read **To Rank 10**, then more: her bar reads "R10 · +n EXP waiting", her share counts down, and
     the sheet stays open. (D102, D250)
 25. **World map.** Open **Scenario Gate**. Expect **Map / List** remembered, and the party bar: "Party n · swap" opens
-    "Who fights?", **Edit parties** opens the Party Hall, and the five faces show their MP. Open a continent and a Lv 1
+    "Who fights?", **Edit parties** opens the Party Hall, and the World/Region's five faces show their MP. Open a continent:
+    its 61-hex honeycomb is fitted with the frontier in view, above the dock. Pinch and **− ⊙ +** zoom from fit to 3×;
+    drag pans without scrolling the page. Fitted team dots become faces from 1.6×. Tap a region: its quick look shows
+    claim/clear dates and five faces, the next stage and **Enter**. Old clears have ✓ and no invented faces. Enter a Lv 1
     region: twelve stages, the first uncleared one open. Tap an open stage: its sheet lists the foes by wave, each with
     "Shield n · Weak:" and her icons (in Tier 1 four kinds on a regular, three on an elite or boss), and **Fight**.
-    (D72, D237)
-26. **Capital runs** (save v37; needs four full parties). Open a continent's **Capital**: its level, "Runs won"
+    Win a first stage in a fresh region: its hex now shows the claim's five. Win its boss: a gold rim, ✓ and the clear's
+    five. Enter and win `w1-x-1`, one of the eight new regions. **List** keeps six Spring buttons at the top and all 48
+    regions. Repeat at both phone sizes/themes with no horizontal overflow. (D72, D237, D295, H166)
+26. **Capital runs** (needs four full parties). Tap the gold capital hex: the quick look has its open runs and last six
+    wins. Tap a won seat: its twenty signed faces and date; an open seat: its run and progress; an empty one: the capital.
+    **Open capital** reaches its level, "Runs won"
     and **New run**. Pick four different parties in the one sheet: partial, busy-run and two-healer parties are
     disabled with why; Start stays disabled before four picks. **Start run**: four lanes keep their five faces. Open
     a lane's **Fight**, inspect its foes and win: "General 1 of 3"; **Next general** keeps that party. Finish the
@@ -196,8 +203,10 @@ button and footer should stay reachable without horizontal page scrolling, in li
     D206)
 31. **Sweep.** On a cleared regular stage tap **Sweep · n → ×1**. Expect one Sweep Ticket spent, a "Swept with a ticket"
     result like a win, and MP unchanged. An elite, a boss or an uncleared stage offers no Sweep. (D79)
-32. **Spring.** With some MP spent, tap the region's **Spring · MP** (or a continent's Spring). Expect the party's MP
-    refilled and its recharge time; it is off during an open fight. (D72)
+32. **Spring.** With some MP spent, tap a continent's Spring hex: Ready and eight region names. **Refill** restores the
+    party's MP and stays open on its two-hour recharge, disabled. The region's **Spring · MP** uses that same nearest
+    Spring, including the clockwise tie rule. Both are off during an open fight. Old five charges carry over by id;
+    Spring 6 starts ready. (D72, H166)
 33. **Drills** (save v35; after the tier's first map win). Open **Battle → Drills**: "Runs n · +10 at 4:00", **Read Logs ·
     n** and five rows, "Drill I · Lv 10" to "Drill V · Lv 50", "2 Logs a win" to "6". Fight Drill I: expect the fight,
     "+2 Training Logs" and one run fewer. Then **Sweep ×1**: one run spent and the Logs added. **Read Logs**: pick an Uma

@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
-vi.mock('./version', () => ({ SAVE_SCHEMA_VERSION: 38 }))
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
+import { describe, expect, it } from 'vitest'
 
 import { autoAction } from '../rpg/battle/auto'
 import { battleActionsLeft, replayBattle } from '../rpg/battle/engine'
@@ -57,7 +57,7 @@ function fight(s: Save, c = chapter(), stage = 1, at = 3) {
   return win(startFight(s, c, `${c.id}-s${stage}`, outfits, T(at - 1)), c, at)
 }
 
-describe('save v38, staged behind honeycombLive (H164)', () => {
+describe('save v38 live (H164, H166)', () => {
   it('constructs 24 parties and empty region teams, round trips synchronously and on device boot', async () => {
     const s = ready()
     expect(PARTY_COUNT).toBe(24); expect(CAPITAL_RUNS_MAX).toBe(6)
@@ -67,13 +67,12 @@ describe('save v38, staged behind honeycombLive (H164)', () => {
   })
 
   it('migrates every v37 world with only four appended parties and an empty record, keeping the account and timestamps', async () => {
-    const raw = ready()
-    raw.schemaVersion = 37
+    const raw: Omit<Save, 'schemaVersion'> & { schemaVersion: number } = { ...ready(), schemaVersion: 37 }
     raw.tierWorlds['2'] = newTierWorld(T(1), 0)
     for (const world of Object.values(raw.tierWorlds)) { world.parties = world.parties.slice(0, 20); delete world.regionTeams }
-    w(raw).parties[0]!.name = 'Keep my order'; w(raw).parties[0]!.lead = '104'
-    w(raw).world.run.wins['w1-1-1-s12'] = 2
-    w(raw).world.springs['w1-spring5'] = T(1)
+    raw.tierWorlds['1']!.parties[0]!.name = 'Keep my order'; raw.tierWorlds['1']!.parties[0]!.lead = '104'
+    raw.tierWorlds['1']!.world.run.wins['w1-1-1-s12'] = 2
+    raw.tierWorlds['1']!.world.springs['w1-spring5'] = T(1)
     const before = clone(raw), result = parseSave(raw)
     expect(result).toEqual({ ...before, schemaVersion: 38,
       tierWorlds: Object.fromEntries(Object.entries(before.tierWorlds).map(([key, world]) => [key, toV38(world as unknown as Record<string, unknown>)])) })
@@ -86,8 +85,9 @@ describe('save v38, staged behind honeycombLive (H164)', () => {
 
   it('chains after v37 for v36 saves, and also preserves pre-v10 parties through their reset', () => {
     const raw = JSON.parse(JSON.stringify(ready())); raw.schemaVersion = 36
-    w(raw).parties = w(raw).parties.slice(0, 20); delete w(raw).regionTeams; delete w(raw).capitalRuns; delete w(raw).capitals
+    raw.tierWorlds['1']!.parties = raw.tierWorlds['1']!.parties.slice(0, 20); delete raw.tierWorlds['1']!.regionTeams; delete raw.tierWorlds['1']!.capitalRuns; delete raw.tierWorlds['1']!.capitals
     expect(w(parseSave(raw))).toMatchObject({ regionTeams: {}, capitalRuns: [], capitals: {} })
+    beforeHoneycomb(raw)
     raw.schemaVersion = 9
     const reset = parseSave(raw)
     expect(w(reset).parties).toHaveLength(24)
@@ -96,7 +96,7 @@ describe('save v38, staged behind honeycombLive (H164)', () => {
   })
 
   it('refuses 20 parties in a current save, and enforces the new active/open-fight party bounds', () => {
-    const raw = ready(); w(raw).parties = w(raw).parties.slice(0, 20)
+    const raw = ready(); raw.tierWorlds['1']!.parties = raw.tierWorlds['1']!.parties.slice(0, 20)
     expect(() => parseSave(raw)).toThrow('expected 24 parties')
     const s = ready(); w(s).world.activeParty = 23; w(s).world.run.party = 23
     expect(parseSave(s)).toEqual(s)

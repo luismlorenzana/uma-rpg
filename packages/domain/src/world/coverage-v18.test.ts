@@ -1,3 +1,4 @@
+import { legacyWorldContinent as worldContinent } from './legacy-continent.fixture'
 // Weaknesses v2's checks (H115, D235; weaknesses-v2.md WK12): the default party, with a Cleric and with a Paladin, against
 // every Tier 1 foe on engine v18, on the generator before any fight. They replace CP4's twin checks (coverage-v16.test.ts,
 // which keeps proving v16–v17). Fast, so it runs on every build; it prints nothing.
@@ -6,7 +7,7 @@ import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/typ
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgDefaultWeapons, rpgWeaponKind, type RpgClass, type RpgDamageKind } from '../rpg/rules'
 import { capitalChapter } from './legacy-capital.fixture'
-import { regionChapter, worldContinent } from './world'
+import { regionChapter } from './world'
 
 const V18 = 18
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))

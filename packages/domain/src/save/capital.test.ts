@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 import { describe, expect, it } from 'vitest'
 
 import { autoAction } from '../rpg/battle/auto'
@@ -56,11 +57,11 @@ function fight(s: Save, lane: number, kind: 'general' | 'final', id = 'w1-run1',
   return win(startCapitalFight(s, chapter(id), id, lane, kind, outfits, T(at)), id, at + 1)
 }
 
-describe('capital runs live at v37', () => {
-  it('creates only the new empty fields and round trips at v37, synchronously and on browser boot', async () => {
+describe('capital runs live at v38', () => {
+  it('creates only the new empty fields and round trips at v38, synchronously and on browser boot', async () => {
     expect(capitalRunsLive()).toBe(true)
     const s = ready()
-    expect(s.schemaVersion).toBe(37)
+    expect(s.schemaVersion).toBe(38)
     expect(world(s)).toMatchObject({ capitalRuns: [], capitals: {} })
     expect(parseSave(s)).toEqual(s)
     expect(await parseSaveAsync(s)).toEqual(s)
@@ -70,13 +71,14 @@ describe('capital runs live at v37', () => {
 
   it('migrates v36, keeping every lit step, old map win and timestamp, and dropping only champions', async () => {
     const s = JSON.parse(JSON.stringify(ready()))
+    beforeHoneycomb(s)
     s.schemaVersion = 36
     delete world(s).capitalRuns; delete world(s).capitals
     world(s).world.run.wins['w1-capital-r1-s2'] = 2
     s.account.windows = { '101': { '1': { ...withSteps(emptyWindow(), ['world-1', 'craft-2'], T(3)), champions: 17 } } }
     const parsed = parseSave(s)
-    expect(parsed).toEqual({ ...s, schemaVersion: 37, account: { ...s.account, windows: { '101': { '1': { steps: s.account.windows['101']!['1']!.steps } } } },
-      tierWorlds: { '1': { ...world(s), capitalRuns: [], capitals: {} } } })
+    expect(parsed).toEqual({ ...s, schemaVersion: 38, account: { ...s.account, windows: { '101': { '1': { steps: s.account.windows['101']!['1']!.steps } } } },
+      tierWorlds: { '1': { ...world(s), capitalRuns: [], capitals: {}, regionTeams: {}, parties: [...world(s).parties, ...newSave('Empty', T(0)).tierWorlds['1']!.parties.slice(20)] } } })
     expect(await parseSaveAsync(s)).toEqual(parsed)
   })
 })
@@ -255,7 +257,7 @@ describe('the sixteen fights', () => {
   })
 })
 
-describe('World steps at v37', () => {
+describe('World steps at v38', () => {
   it('names a won run, ignores retired stage wins on a normal latch, and shows Not run progress', () => {
     const s = ready()
     for (const route of [1, 2, 3]) world(s).world.run.wins[capitalStageIds('w1', route).champion] = 1
@@ -268,7 +270,7 @@ describe('World steps at v37', () => {
     expect(parseSave(latched)).toEqual(latched)
   })
 
-  it('preserves the once-only pre-v35 credit even on a direct migration to v37', () => {
+  it('preserves the once-only pre-v35 credit even on a direct migration to v38', () => {
     const s = ready(); s.account.windowsStart = null
     for (const route of [1, 2, 3]) world(s).world.run.wins[capitalStageIds('w1', route).champion] = 1
     const latched = latchWindows(s, outfits, T(5))
@@ -309,7 +311,7 @@ describe('strict capital parsing', () => {
     ['duplicate Uma across lanes', (s) => { world(s).capitalRuns![0]!.lanes[1].umas[0] = '101' }],
     ['unowned Uma', (s) => { world(s).capitalRuns![0]!.lanes[0].umas[0] = '999' }],
     ['duplicate party index', (s) => { world(s).capitalRuns![0]!.lanes[1].party = 0 }],
-    ['party out of bounds', (s) => { world(s).capitalRuns![0]!.lanes[0].party = 20 }],
+    ['party out of bounds', (s) => { world(s).capitalRuns![0]!.lanes[0].party = 24 }],
     ['four generals', (s) => { world(s).capitalRuns![0]!.lanes[0].generals = 4 as CapitalLane['generals'] }],
     ['early final', (s) => { world(s).capitalRuns![0]!.lanes[0].finalAt = T(2) }],
     ['final before sign-up', (s) => { world(s).capitalRuns![0]!.lanes.forEach((l) => { l.generals = 3 }); world(s).capitalRuns![0]!.lanes[0].finalAt = T(0) }],
@@ -321,12 +323,12 @@ describe('strict capital parsing', () => {
   ]
   it.each(cases)('refuses %s', (_name, change) => { const s = signed(); change(s); expect(() => parseSave(s)).toThrow() })
 
-  it('refuses duplicate Umas across runs and a sixth run', () => {
+  it('refuses duplicate Umas across runs and a seventh run', () => {
     const s = startCapitalRun(signed(40), 'w1', [4, 5, 6, 7], T(2))
     world(s).capitalRuns![1]!.lanes[0].umas[0] = '101'
     expect(() => parseSave(s)).toThrow('two lanes or runs')
-    world(s).capitalRuns = Array.from({ length: 6 }, () => clone(world(s).capitalRuns![0]!))
-    expect(() => parseSave(s)).toThrow('0–5')
+    world(s).capitalRuns = Array.from({ length: 7 }, () => clone(world(s).capitalRuns![0]!))
+    expect(() => parseSave(s)).toThrow('0–6')
   })
 
   it('refuses a forged open fight’s lane and entrants, including browser boot', async () => {

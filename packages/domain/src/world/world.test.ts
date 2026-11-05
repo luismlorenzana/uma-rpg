@@ -10,10 +10,10 @@ import { regionChapter, stageBand, stagePay, stagePlan, TWIN_BOSS_ROW, WORLD_BOS
 const cast = Array.from({ length: 12 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 
 describe('the world map (D66, D71)', () => {
-  it('lays out five continents of 40 regions, half climbing the first five levels and half the last five, every biome at least twice, and five Springs (D97)', () => {
+  it('lays out five continents of 48 regions, half climbing the first five levels and half the last five, every biome at least twice, and six Springs (D97)', () => {
     for (let order = 1; order <= 5; order++) {
       const c = worldContinent({ name: `Continent ${order}`, order })
-      expect(c.regions).toHaveLength(40)
+      expect(c.regions).toHaveLength(48)
       expect(c.levelStart).toBe((order - 1) * 10 + 1)
       for (let row = 0; row < 10; row++) {
         const level = c.levelStart + (row < 5 ? 0 : 5)
@@ -21,8 +21,8 @@ describe('the world map (D66, D71)', () => {
       }
       for (const b of BIOMES) expect(c.regions.filter((r) => r.biome === b.id).length, b.id).toBeGreaterThanOrEqual(2)
       expect(c.regions[0]!.biome).toBe('meadow')
-      expect(new Set(c.regions.map((r) => r.id)).size).toBe(40)
-      expect(c.springs.map((s) => s.id)).toEqual([1, 2, 3, 4, 5].map((k) => `w${order}-spring${k}`))
+      expect(new Set(c.regions.map((r) => r.id)).size).toBe(48)
+      expect(c.springs.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6].map((k) => `w${order}-spring${k}`))
     }
     expect(worldContinent({ name: 'A', order: 3 })).toEqual(worldContinent({ name: 'A', order: 3 }))
   })
@@ -108,7 +108,7 @@ describe('the world map (D66, D71)', () => {
   it('gives PriConne the first continent and Azur Lane and NIKKE the rest by level band (D135)', () => {
     const regions = [1, 2, 3, 4, 5].flatMap((order) => worldContinent({ name: 'URA', order }).regions)
     const count = Object.fromEntries(FRANCHISES.map((f) => [f, regions.filter((r) => bandFranchise(Number(r.continentId.slice(1)), r.row) === f).length]))
-    expect(count).toEqual({ priconne: 40, azurlane: 100, nikke: 60 })
+    expect(count).toEqual({ priconne: 48, azurlane: 120, nikke: 72 })
     expect([1, 2, 3, 4, 5].map((o) => [bandFranchise(o, 0), bandFranchise(o, 9)])).toEqual([['priconne', 'priconne'], ['azurlane', 'nikke'],
       ['azurlane', 'nikke'], ['azurlane', 'nikke'], ['azurlane', 'azurlane']])
     expect([1, 2, 3, 4, 5].map(capitalFranchise)).toEqual(['priconne', 'azurlane', 'nikke', 'azurlane', 'nikke'])

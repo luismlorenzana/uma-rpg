@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 import { describe, expect, it } from 'vitest'
 import { newSave, normalizeTrainerName, parseSave, parseSavePut, renameTrainer, resolveConflict, SaveParseError, STARTING_UNLOCK_TICKETS, SAVE_SCHEMA_VERSION } from './save'
 import { toV26 } from './migrations'
@@ -313,6 +314,7 @@ describe('the v23 migration (D163)', () => {
   /** A v22 save as it was stored: two worlds with no Rift, and a three-key account. */
   function v22(): any {
     const save = JSON.parse(JSON.stringify(newSave('Luis', NOW)))
+    beforeHoneycomb(save)
     save.schemaVersion = 22
     save.tierWorlds['2'] = JSON.parse(JSON.stringify(save.tierWorlds['1']))
     for (const w of Object.values(save.tierWorlds) as Record<string, unknown>[]) delete w.rift
@@ -336,6 +338,7 @@ describe('the v23 migration (D163)', () => {
 
   it('refuses a v23 save missing its Rift, or an account missing its history', () => {
     const noRift = v22()
+    beforeHoneycomb(noRift)
     noRift.schemaVersion = 23
     noRift.account.achievements = {}
     noRift.account.history = {}
@@ -351,6 +354,7 @@ describe('the v24 migration (D171)', () => {
    * their attempts. Its achievements already use the catalog's ids: no stored save held one before v24. */
   function v23(): any {
     const save = rift()
+    beforeHoneycomb(save)
     save.schemaVersion = 23
     delete save.account.defeated
     stripV35(save)
@@ -384,6 +388,7 @@ describe('the v24 migration (D171)', () => {
 
   it('overwrites, so a v24 save relabelled v23 still parses, emptied', () => {
     const relabelled = rift()
+    beforeHoneycomb(relabelled)
     relabelled.schemaVersion = 23
     const migrated = parseSave(relabelled)
     expect(migrated.account.defeated).toEqual({})
@@ -436,7 +441,7 @@ describe('a pre-v10 save\'s parties (D69, D190; H136)', () => {
     ]
     const parsed = parseSave(v9(parties)).tierWorlds['1']!.parties
     const expected = (toV26({ parties: v9(parties).tierWorlds['1'].parties }).parties as { lead: string | null }[]).map((p) => p.lead)
-    expect(parsed.map((p) => p.lead)).toEqual(expected)
+    expect(parsed.map((p) => p.lead)).toEqual([...expected, null, null, null, null])
     expect(expected.slice(0, 4)).toEqual(['102', null, '104', null])
   })
 

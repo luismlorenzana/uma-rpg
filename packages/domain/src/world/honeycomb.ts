@@ -35,8 +35,7 @@ const angle = (tile: Axial): number => {
 const ahead = (tile: Axial, start: number): number => ((angle(tile) - start) % 360 + 360) % 360
 const clockwise = (list: readonly Axial[], start: number): Axial[] => [...list].sort((a, b) => ahead(a, start) - ahead(b, start))
 
-/** All 61 places in preview order. A dark 40-region continent leaves the eight new region slots open.
- * The six Spring positions are present even in this inspection layout; live v37 still generates only five Springs. */
+/** All 61 places in preview order. Partial historical inputs leave missing region slots open. */
 export function continentHoneycomb(continent: WorldContinent): HoneyTile[] {
   const out: HoneyTile[] = [{ q: 0, r: 0, kind: 'capital' }]
   const byRow = (row: number) => continent.regions.filter((r) => r.row === row && r.col < 4).sort((a, b) => a.col - b.col)

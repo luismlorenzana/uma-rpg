@@ -1,6 +1,6 @@
 # Game loops
 
-What the player does, what it pays and what it costs, as the game runs on engine v21 and save v37. Numbers come from the
+What the player does, what it pays and what it costs, as the game runs on engine v21 and save v38. Numbers come from the
 code: generated tables between `live` markers, the rest checked against `packages/domain/src/economy/`, `items/`,
 `work/`, `save/`, `rpg/campaign/rewards.ts` and `rift/`. A tier's next world opens when the first Uma whose window is
 full ascends from the tier below ([windows](#windows), [Ascend](#ascend); the pages are in
@@ -37,7 +37,7 @@ tier's world keeps its own Umas, wallet, Warehouse and work.
 - **Uma Shards (Tier 1 only):** an Uma earns one at Lv 10, 20, 30, 40 and 50, from fights and Sweeps alike. Five Uma
   Shards make a Ticket automatically, so every Uma who reaches Lv 50 pays back one Ticket. A Tier 2 world starts with no
   Tickets and pays no Shards: its Umas are the ones who ascend into it.
-- **Parties:** 20 parties of 5. An Uma belongs to at most one party; adding her to another moves her.
+- **Parties:** 24 parties of 5. An Uma belongs to at most one party; adding her to another moves her.
 - **Active party:** the one that fights, sweeps and drinks at Springs. You can switch any time no fight is open. A fight
   needs all five slots filled; Umas at work fight too (D119).
 - **Classes** ([classes](classes.md)): a new Uma starts as her **calling**, a Tier 0 read from her running styles alone,
@@ -416,7 +416,7 @@ Every made item and value is in [materials](materials.md#gear); `economy/grades.
 
 ## Springs, replays and Sweeps
 
-- **Springs** (5 per continent): refill the active party's MP, then recharge for 2 hours. Not during a fight.
+- **Springs** (6 per continent, each serving its nearest eight regions): refill the active party's MP, then recharge for 2 hours. Not during a fight.
 - **HP** is full every stage. **MP** carries after a win.
 - **Replays:** any cleared stage, for a quarter of its first-clear rewards.
 - **Sweeps:** a cleared regular stage, paid like a replay, for one Sweep Ticket, 1–99 at a time. Each needs the active
@@ -494,7 +494,7 @@ in [combat](combat.md#the-rifts-foes); the rules are `save/rift.ts`, behind `@rp
   row opens her Class tab. A front, Echo or Convergence fight takes one healer at most, as the world map does.
 - **Fronts and seals:** Iron, Arcane, Duel and Horde, twelve stages each. The fronts go in any order, a front's stages
   in order: only its next stage can be fought, and a cleared stage isn't replayed. A front fight takes one of the
-  world's twenty parties, full, all five on the roster. Its 12th stage seals the front.
+  world's twenty-four parties, full, all five on the roster. Its 12th stage seals the front.
 - **Retries:** free and unlimited. Every Rift fight starts with HP and MP full (the world map's carried MP stays
   there), and a retry draws a fresh seed against the same foes.
 - **One open Rift fight** a world, beside the world map's; neither blocks the other. Leaving it pays nothing.

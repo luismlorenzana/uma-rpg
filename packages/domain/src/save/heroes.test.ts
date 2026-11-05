@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 import { describe, expect, it } from 'vitest'
 import {
   BOND_EXP_PER_WIN, BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, bondCapacity, hallOfPlace, HERO_HALL_PLACES, HERO_LIMIT_IDS, heroLimitIds, heroLimitsOfHall,
@@ -141,6 +142,7 @@ describe('Halls of Heroes (D106)', () => {
 
   it('opens the halls on a v18 save with five more Uma Tickets', () => {
     const raw = JSON.parse(JSON.stringify(stable()))
+    beforeHoneycomb(raw)
     raw.schemaVersion = 18
     const w = raw.tierWorlds['1']
     delete w.heroes

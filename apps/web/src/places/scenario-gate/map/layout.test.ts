@@ -1,6 +1,6 @@
-import { BIOMES, worldContinent } from '@rpg/domain'
+import { BIOMES, nearestSpring, worldContinent } from '@rpg/domain'
 import { describe, expect, it } from 'vitest'
-import { clearedIn, continentLayout, regionLayout, springForRegion, worldLayout, type MapLayout } from './layout'
+import { clearedIn, regionLayout, worldLayout, type MapLayout } from './layout'
 import { cornerMaskAt, hasCell, regionTopology, REGION_ROWS, stageEntrance, STAGE_TILES } from './topology'
 import { frames } from './visuals'
 const continents = Array.from({ length: 5 }, (_, i) => worldContinent({ name: 'Synthetic island ' + i, order: i + 1 }))
@@ -48,7 +48,7 @@ describe('published world compositions', { timeout: 30_000 }, () => {
   })
   it.each(continents)('$id: fits two-tile towers and separate phone targets along one connected road without covering ponds', (c) => {
     for (const r of c.regions) {
-      const spring = springForRegion(c, r)!, out = regionLayout(r, progress, spring.id)
+      const spring = nearestSpring(c, r.id)!, out = regionLayout(r, progress, spring)
       expect(out.rows).toBe(REGION_ROWS)
       const { road, wet, stages } = regionTopology(r.biome, r.id)
       const queue = ['3,21'], connected = new Set(queue)
@@ -91,30 +91,16 @@ describe('published world compositions', { timeout: 30_000 }, () => {
     expect(out.sprites.find(s=>s.frame.endsWith('/elite-locked'))?.x).toBe(spots[10]!.x)
     expect(out.sprites.find(s=>s.frame.endsWith('/boss-locked'))?.x).toBe(spots[11]!.x)
   })
-  it.each(continents)('$id: exposes the same continent Springs across their two-row region bands, with shared ready/dry frames', (c) => {
+  it.each(continents)('$id: exposes each nearest honeycomb Spring with shared ready/dry frames', (c) => {
     for (const r of c.regions) {
-      const spring = springForRegion(c, r)!
-      expect(spring.row).toBe(Math.floor(r.row / 2) * 2)
-      const ready = regionLayout(r, { wins: {} }, spring.id)
-      const dry = regionLayout(r, { wins: {}, drySprings: new Set([spring.id]) }, spring.id)
-      expect(ready.spots.filter((s) => s.kind === 'spring').map((s) => s.id)).toEqual([spring.id])
+      const spring = nearestSpring(c, r.id)!
+      expect(c.springs.some((s) => s.id === spring)).toBe(true)
+      const ready = regionLayout(r, { wins: {} }, spring)
+      const dry = regionLayout(r, { wins: {}, drySprings: new Set([spring]) }, spring)
+      expect(ready.spots.filter((s) => s.kind === 'spring').map((s) => s.id)).toEqual([spring])
       expect(dry.spots).toEqual(ready.spots); expect(dry.cells).toEqual(ready.cells)
       expect(ready.sprites.some((s) => s.frame === 'marker/spring')).toBe(true)
       expect(dry.sprites.some((s) => s.frame === 'marker/spring-dry')).toBe(true)
-    }
-    expect(springForRegion(undefined, continents[0]!.regions[0]!)).toBeUndefined()
-  })
-  it('makes forty plots, five domain Springs, a capital and the lowest uncleared frontier regardless of input order', () => {
-    for (const c of continents) {
-      const p = { wins: Object.fromEntries(c.regions.slice(0, 4).flatMap((r) => Array.from({ length: 12 }, (_, i) => [r.id + '-s' + (i + 1), 1]))), drySprings: new Set([c.springs[0]!.id]) }
-      const out = continentLayout(c, p)
-      expect(out).toEqual(continentLayout({ ...c, regions: [...c.regions].reverse(), springs: [...c.springs].reverse() }, p))
-      expect(out.spots.filter((s) => s.kind === 'region')).toHaveLength(40)
-      expect(out.spots.filter((s) => s.kind === 'spring').map((s) => s.id)).toEqual(c.springs.map((s) => s.id))
-      expect(out.spots.filter((s) => s.kind === 'capital')).toHaveLength(1)
-      expect(out.frontier).toBe(c.regions[4]!.id)
-      expect(out.sprites.filter((s) => s.frame === 'marker/spring-dry')).toHaveLength(1)
-      check(out)
     }
   })
   it('makes five shore-edged islands, ordered from low at the bottom to high at the top', () => {

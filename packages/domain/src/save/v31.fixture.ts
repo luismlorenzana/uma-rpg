@@ -135,6 +135,8 @@ function gathering(outfitId: string, building: string, item: string, count: numb
 /** Tier 1's world at v31. */
 export function v31World(): TierWorld {
   const world = newTierWorld(T0, 3, V31_ENGINE)
+  world.parties = world.parties.slice(0, 20)
+  delete world.regionTeams
   const umas = Object.fromEntries(Object.entries(V31_TIER1).map(([id, spec]) => [id, uma(spec, 1)]))
   const parties = world.parties.map((p, i) => (i === 0 ? { ...p, slots: ids(100, 5) } : i === 1 ? { ...p, slots: ids(105, 5), lead: '106' } : p))
   const map = v18Replay(V31_WORLD_FIGHT.name), rift = v18Replay(V31_RIFT_FIGHT.name)
@@ -169,6 +171,8 @@ export function v31World(): TierWorld {
 /** Tier 2's world at v31. */
 export function v31Tier2(): TierWorld {
   const world = newTierWorld(T0, 0, V31_ENGINE)
+  world.parties = world.parties.slice(0, 20)
+  delete world.regionTeams
   return {
     ...world,
     umas: {

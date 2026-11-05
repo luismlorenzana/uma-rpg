@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { autoAction } from '../rpg/battle/auto'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
@@ -80,6 +81,7 @@ describe('asynchronous strict save parsing (H16)', () => {
   it('matches every supported migration version, including the v18 reset, refunds and carried profession EXP', async () => {
     for (let version = 1; version < SAVE_SCHEMA_VERSION; version++) {
       const s = rawOf(party()), w = worldOf(s), raw = s as unknown as Record<string, unknown>
+      if (version < 10) beforeHoneycomb(raw)
       raw.schemaVersion = version
       if (version < 12) {
         const wallet = w.wallet as unknown as Record<string, unknown>

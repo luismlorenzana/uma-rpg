@@ -46,7 +46,7 @@ export function capitalRunBlock(save: Save, continent: string, parties: readonly
       if (run) return `${name(id)} is in Run ${capitalRunOf(run.id)!.n}`
     }
   }
-  if ((world.capitalRuns?.length ?? 0) >= CAPITAL_RUNS_MAX) return CAPITAL_RUNS_MAX === 6 ? 'Six runs are open' : 'Five runs are open'
+  if ((world.capitalRuns?.length ?? 0) >= CAPITAL_RUNS_MAX) return 'Six runs are open'
   if ((world.capitals?.[continent]?.started ?? 0) >= 999_999_999) return 'No more run numbers'
   return null
 }

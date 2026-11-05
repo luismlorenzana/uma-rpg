@@ -19,8 +19,8 @@ export type EnemyRoster = readonly RosterMember[]
 
 /**
  * A region's franchise, by its continent and half (rows 0–4 its first five levels, rows 5–9 its last five). PriConne
- * holds continent 1, Azur Lane continent 5; between them Azur Lane takes each first half and NIKKE each second: 40, 100
- * and 60 regions for 180, 344 and 230 units. Continents past the fifth (later tiers) keep the Azur Lane–NIKKE beat.
+ * holds continent 1, Azur Lane continent 5; between them Azur Lane takes each first half and NIKKE each second: 48, 120
+ * and 72 regions. Continents past the fifth (later tiers) keep the Azur Lane–NIKKE beat.
  */
 export function bandFranchise(continentOrder: number, row: number): Franchise {
   if (continentOrder === 1) return 'priconne'

@@ -1,7 +1,7 @@
 // Save v31 (H114, FL31): v30 work settles without a clock before the Wilds' ten place ids become fifteen. Uncollected
 // output and Craft EXP are paid, queues drop, and everything else stays. Since H134 the chain runs `toV32` after it.
 import { describe, expect, it } from 'vitest'
-import { toV37, migrateWorld, toV31, toV32, toV33, toV34, toV35 } from './migrations'
+import { toV38, toV37, migrateWorld, toV31, toV32, toV33, toV34, toV35 } from './migrations'
 import { newSave, parseSave, SAVE_SCHEMA_VERSION, type TierWorld } from './save'
 import { v30Save, v30World } from './v30.fixture'
 
@@ -23,7 +23,7 @@ describe('toV31 (D230, FL31)', () => {
 
   it('is chained once after v30, with toV32 after it', () => {
     const before = raw(v30World())
-    const expected = toV37(toV35(toV34(toV33(toV32(toV31(raw(v30World())))))))
+    const expected = toV38(toV37(toV35(toV34(toV33(toV32(toV31(raw(v30World()))))))))
     expect(migrateWorld(before, 30)).toEqual(expected)
     const v31 = toV31(raw(v30World()))
     expect(migrateWorld(v31, 31)).toEqual(expected)
@@ -31,13 +31,13 @@ describe('toV31 (D230, FL31)', () => {
     expect(migrateWorld(v32, SAVE_SCHEMA_VERSION)).toBe(v32)
   })
 
-  it('parses a stored v30 save through v31 to v37 and starts new saves at v37', () => {
+  it('parses a stored v30 save through v31 to v38 and starts new saves at v38', () => {
     const parsed = parseSave(JSON.parse(JSON.stringify(v30Save())))
-    expect(parsed.schemaVersion).toBe(37)
+    expect(parsed.schemaVersion).toBe(38)
     expect(Object.values(parsed.tierWorlds).every((world) => Object.keys(world.work).length === 0)).toBe(true)
-    expect(SAVE_SCHEMA_VERSION).toBe(37)
+    expect(SAVE_SCHEMA_VERSION).toBe(38)
     const fresh = newSave('Today', '2026-10-27T12:00:00.000Z')
-    expect(fresh.schemaVersion).toBe(37)
+    expect(fresh.schemaVersion).toBe(38)
     expect(parseSave(JSON.parse(JSON.stringify(fresh)))).toEqual(fresh)
   })
 })

@@ -2,7 +2,7 @@
 // converts R2's sixty types to the farm by line's G1 and G6 by the Craft Level they opened at; everything else stays.
 import { describe, expect, it } from 'vitest'
 import { lineItem } from '../items/lines'
-import { toV37, migrateWorld, settleWork, toV30, toV31, toV32, toV34, toV35, V30_TYPES } from './migrations'
+import { toV38, toV37, migrateWorld, settleWork, toV30, toV31, toV32, toV34, toV35, V30_TYPES } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type TierWorld } from './save'
 import { R2_TYPES, V29_ALL_STOCK, V29_MADE_STOCK, V29_MATERIAL_STOCK, V29_TIER2_STOCK, v29Save, v29World } from './v29.fixture'
 
@@ -105,18 +105,18 @@ describe('toV30 (FL17–FL19)', () => {
 
 describe('chained (H114; through v35 since H157)', () => {
   it('runs once from v29 through v37 and leaves a current world untouched', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(37)
+    expect(SAVE_SCHEMA_VERSION).toBe(38)
     const world = raw(v29World())
-    expect(migrateWorld(world, 29)).toEqual(toV37(toV35(toV34(toV32(toV31(toV30(raw(v29World()))))))))
+    expect(migrateWorld(world, 29)).toEqual(toV38(toV37(toV35(toV34(toV32(toV31(toV30(raw(v29World())))))))))
     const v30 = toV30(raw(v29World()))
-    expect(migrateWorld(v30, 30)).toEqual(toV37(toV35(toV34(toV32(toV31(v30))))))
+    expect(migrateWorld(v30, 30)).toEqual(toV38(toV37(toV35(toV34(toV32(toV31(v30)))))))
     const v32 = toV32(toV31(toV30(raw(v29World()))))
     expect(migrateWorld(v32, SAVE_SCHEMA_VERSION)).toBe(v32)
   })
 
-  it('parses a stored v29 save to v37: settled, converted, every world', () => {
+  it('parses a stored v29 save to v38: settled, converted, every world', () => {
     const parsed = parseSave(JSON.parse(JSON.stringify(v29Save())))
-    expect(parsed.schemaVersion).toBe(37)
+    expect(parsed.schemaVersion).toBe(38)
     expect(parsed.tierWorlds['1']!.work).toEqual({})
     expect(parsed.tierWorlds['1']!.items['gold-ingot']).toBe(V29_MATERIAL_STOCK['iron-ingot']! + 6)
     expect(parsed.tierWorlds['2']!.items).toEqual({ 'copper-ore': 4, 'gold-ingot': 3, 'gold-ore': 2, 'carp-fillet': 5 })

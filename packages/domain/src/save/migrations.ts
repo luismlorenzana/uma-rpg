@@ -2,7 +2,7 @@
 // imports this chain only for a save older than the current version; only the API's sync `parseSave` imports it statically,
 // and the web never calls that, so it stays out of the main bundle (H136, scripts/check-size.mjs).
 import { FACILITY_SLOTS, grantProfessionExp, itemMinutes, PROFESSION_MAX_LEVEL, professionExpToNext } from '../economy/pacing'
-import { CAPITAL_RUNS_SAVE, capitalRunsLive, COLLECTIONS_SAVE, collectionsLive, HONEYCOMB_SAVE, honeycombLive } from './collections'
+import { CAPITAL_RUNS_SAVE, capitalRunsLive, COLLECTIONS_SAVE, collectionsLive, HONEYCOMB_SAVE } from './collections'
 import { facilitySpec } from '../economy/jobs'
 import { gemIdentity, isStarNode, nodeGem } from '../economy/stars'
 import { ITEM_IDENTITIES as ITEM_FAMILIES, isItemId } from '../items/identity'
@@ -217,7 +217,7 @@ export function migrateWorld(raw: unknown, version: number, tier = 1): unknown {
   const v34 = version < 34 && isRecord(v33) ? toV34(v33) : v33
   const v35 = version < COLLECTIONS_SAVE && collectionsLive() && isRecord(v34) ? toV35(v34) : v34
   const v37 = version < CAPITAL_RUNS_SAVE && capitalRunsLive() && isRecord(v35) ? toV37(v35) : v35
-  return version < HONEYCOMB_SAVE && honeycombLive() && isRecord(v37) ? toV38(v37) : v37
+  return version < HONEYCOMB_SAVE && isRecord(v37) ? toV38(v37) : v37
 }
 
 /** Every step to v27, the chain as it stood before R2's switch (H82, D218): the v1 economy's tests, which run with the

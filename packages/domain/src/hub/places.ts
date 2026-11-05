@@ -277,6 +277,7 @@ const TOWN_V1: Place[] = [
 
 /** R2's Warehouse and Exchange (H77): materials and made items, raw materials by pair. */
 const TOWN_V3: Place[] = TOWN_V1.map((p): Place => {
+  if (p.id === 'party-hall') return { ...p, blurb: 'Twenty-four parties of five.' }
   if (p.id === 'warehouse') {
     return { ...p, blurb: 'Every item you own: materials and made items.', details: ['Materials and made items', 'Filled by the Wilds and the Exchange'] }
   }
@@ -300,7 +301,7 @@ const BATTLE: Place[] = [
   {
     id: 'scenario-gate', page: 'battle', kind: 'battle', name: 'Scenario Gate', opensIn: 'S1', slots: 0, at: { x: 0.5, y: 0.3 }, direct: true,
     blurb: 'The world map: five continents of regions to clear.',
-    details: ['Tier 1: five continents of 40 regions', 'Fight rivals with a party of five: EXP, Uma Shards and Laurels'],
+    details: ['Tier 1: five continents of 48 regions', 'Fight rivals with a party of five: EXP, Uma Shards and Laurels'],
   },
   {
     id: 'tier-finale', page: 'battle', kind: 'battle', name: 'The Rift', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.72 }, frame: 'rift',

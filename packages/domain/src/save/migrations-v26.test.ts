@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 import { describe, expect, it } from 'vitest'
 import { migrateWorldToV27, toV26 } from './migrations'
 import { newOwnedUma, newSave, parseSave, SAVE_SCHEMA_VERSION } from './save'
@@ -8,6 +9,7 @@ describe('save v26’s independent party lead (D190)', () => {
   it('migrates the face v25 used without changing any slot', () => {
     // A v25 save in the generation it was written in (the constructors follow the live stage, v28's since H82).
     const raw = JSON.parse(JSON.stringify(newSave('Review', NOW, 16)))
+    beforeHoneycomb(raw)
     raw.schemaVersion = 25
     const owned = JSON.parse(JSON.stringify(newOwnedUma(NOW, undefined, 16)))
     raw.tierWorlds['1'].umas = { '101': owned, '102': owned }

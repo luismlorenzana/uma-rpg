@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 // H162: the live switch and a removed v36 capital stage, kept entirely on synthetic data.
 import { describe, expect, it } from 'vitest'
 import { autoAction } from '../rpg/battle/auto'
@@ -14,7 +15,7 @@ import { emptyWindow, stepDay, withSteps } from './window-record'
 
 describe('capital runs live (H162)', () => {
   it('constructs a current save with empty runs, and no champion masks', async () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(37)
+    expect(SAVE_SCHEMA_VERSION).toBe(38)
     expect(capitalRunsLive()).toBe(true)
     const save = newSave('Capital switch', T(0))
     expect(save.tierWorlds['1']).toMatchObject({ capitalRuns: [], capitals: {} })
@@ -30,14 +31,15 @@ describe('capital runs live (H162)', () => {
     const ready = riftWorldSave(5, 10)
     Object.values(ready.tierWorlds['1']!.umas).forEach((u) => { u.classId = null; u.ranks = { classes: {} } })
     const raw = JSON.parse(JSON.stringify(startFight(ready, legacy, id, OUTFITS, T(1))))
+    beforeHoneycomb(raw)
     raw.schemaVersion = 36
     delete raw.tierWorlds['1'].capitalRuns; delete raw.tierWorlds['1'].capitals
     raw.account.windows = { '101': { '1': { ...withSteps(emptyWindow(), ['world-2', 'craft-1'], T(0)), champions: 7 } } }
     raw.tierWorlds['1'].world.run.battle.input.enemies.forEach((e: { stats: { hp: number } }) => { e.stats.hp = 1 })
     const before = structuredClone(raw)
     let save = await parseSaveAsync(raw)
-    expect(save).toEqual({ ...before, schemaVersion: 37, account: { ...before.account, windows: { '101': { '1': { steps: before.account.windows['101']['1'].steps } } } },
-      tierWorlds: { '1': { ...before.tierWorlds['1'], capitalRuns: [], capitals: {} } } })
+    expect(save).toEqual({ ...before, schemaVersion: 38, account: { ...before.account, windows: { '101': { '1': { steps: before.account.windows['101']['1'].steps } } } },
+      tierWorlds: { '1': { ...before.tierWorlds['1'], capitalRuns: [], capitals: {}, regionTeams: {}, parties: [...before.tierWorlds['1'].parties, ...newSave('Empty', T(0)).tierWorlds['1']!.parties.slice(20)] } } })
     expect(save.account.updatedAt).toBe(before.account.updatedAt)
     expect(save.tierWorlds['1']!.world.run.battle).toEqual(before.tierWorlds['1'].world.run.battle)
     const removed: RpgCampaignChapter = { id: legacy.id, title: 'Synthetic capital', tier: 1, order: 1, levelStart: 10, rows: 0, nodes: [] }
