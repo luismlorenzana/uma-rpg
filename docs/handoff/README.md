@@ -64,17 +64,17 @@ lights on a won run. Save v37 activates the run rules and screens (H162); the ol
 **The honeycomb continent map** ([design](../design/world-map/honeycomb.md), [preview](../design/world-map/previews/honeycomb.html),
 approved D295): every continent as an SVG honeycomb of 48 regions (eight new) for 24 parties, the capital at the centre
 ringed by six run seats, Lv 6–10 inside and Lv 1–5 on the shore, six Springs each serving its nearest eight, and the five
-who claimed and cleared each region on its hex. Built dark behind `honeycombLive()` (save v38), switched on by H166.
-Every packet can go to ChatGPT; no art packet.
+who claimed and cleared each region on its hex. H163's world shape is built dark behind `honeycombLive()` (save v38).
+H164 owns the save and 24 parties, H165 the screen, H166 the switch. Every packet can go to ChatGPT; no art packet.
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
-| [H163](tasks/H163-honeycomb-world-shape.md) | The world's shape, dark: eight new regions a continent, six Springs, the layout, each region's Spring | ChatGPT or Claude | M | — | Ready |
-| [H164](tasks/H164-honeycomb-save.md) | Save v38, dark: who claimed and cleared each region, 24 parties, six open runs | ChatGPT or Claude | L | H160, H163 | Waits |
+| H163 | The world's shape, dark: eight new regions a continent, six Springs, the layout, each region's Spring | ChatGPT | M | — | Done (D304), below |
+| [H164](tasks/H164-honeycomb-save.md) | Save v38, dark: who claimed and cleared each region, 24 parties, six open runs | ChatGPT or Claude | L | H160, H163 | Ready |
 | [H165](tasks/H165-honeycomb-screen.md) | The screen, dark: the SVG honeycomb, its hexes, the quick looks, zoom, 24 parties on screen | ChatGPT or Claude | L | H161, H164 | Waits |
 | [H166](tasks/H166-honeycomb-switch.md) | The switch: save v38 live, the pixel continent map removed, the manual, the phone check | ChatGPT or Claude | M | H162, H165 | Waits |
 
-**Order:** H160–H162 are done; H163 can start now. Then H164 after H163, H165 after H164, and H166 after H165.
+**Order:** H160–H163 are done; H164 can start now. Then H165 after H164, and H166 after H165.
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.
@@ -96,6 +96,7 @@ Packets finished since the last archive go here, newest first; the archive keeps
 
 | Id | Task | Commit |
 |---|---|---|
+| H163 | Honeycomb world shape, dark until save v38 (D304): eight appended regions, six Springs, the exact preview layout and clockwise nearest-Spring ids. Forty-five new tests and full checks passed; all fifteen current continents stay byte-identical, with 40 regions and five Springs. Initial JS 224.97 KB gzip for the merge-stamped build; geometry absent from the web bundle. [Production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/42032551294); exact health commit, deployed entry and Scenario Gate chunk verified. No live screen, save or engine change. | `208e183` ([#108](https://github.com/luismlorenzana/uma-rpg/pull/108)) |
 | H162 | Capital runs live, save v37 and engine v21 (D302): four parties, twelve generals, four finals and World credit for all twenty; old capital stages and champion masks removed, frozen open fights settle safely. Full checks, both phone sizes/themes, exact scratch migration and repeat pay passed; initial JS 224.94 KB gzip. [Production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/42026926548); exact health commit, deployed entry and capital-page chunk verified; the [phone check](../testing/phone-check.md) includes the run flow. | `076d601` ([#106](https://github.com/luismlorenzana/uma-rpg/pull/106)) |
 | H161 | Capital-run screens, dark on live v36 (D301): the capital list, inline four-party sign-up, frozen lane rosters, foe sheets, locked/open finals, Abandon, shared fights/results and World tiles. Full checks and both phone sizes/themes passed; scratch play won generals and a run, with all twenty World steps persisted. Initial JS 226.02 KB gzip; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/42020081836), exact health commit, deployed entry and capital-screen chunks verified. | `33b63a4` ([#104](https://github.com/luismlorenzana/uma-rpg/pull/104)) |
 | H160 | Capital-run rules and strict save v37 parsing, dark on live v36 (D300): four frozen parties, twelve generals and four finals, per-entrant pay, World credit, abandon and Ascend lock; carried MP and map wins unchanged. Full checks and 38 new tests passed; current Finals checked locally; [production green](https://github.com/luismlorenzana/uma-rpg/actions/runs/41959244976), health commit and exact deployed entry verified. | `5c0f0e3` ([#102](https://github.com/luismlorenzana/uma-rpg/pull/102)) |
