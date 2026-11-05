@@ -1,8 +1,7 @@
 # The continent map as a honeycomb
 
-**Status:** approved 2026-11-03 (D295), third pass. H163 builds the world shape dark behind save v38: the eight new
-regions, six Springs, layout and nearest-Spring lookup. H164 builds the save dark too: first claim/clear teams, 24 parties
-and six open capital runs. H165 builds the accessible SVG screen and quick looks dark; H166 owns the switch. The preview is
+**Status:** live at save v38 (H163–H166; D295), engine v21 unchanged: 48 regions, six Springs, first claim/clear teams,
+24 parties, six open capital runs and the accessible SVG screen with quick looks. The preview is
 [previews/honeycomb.html](previews/honeycomb.html): Continent 1's real 40 regions and eight made-up new ones, the six
 Springs, the capital and its run seats, with made-up progress. Tap any hex.
 

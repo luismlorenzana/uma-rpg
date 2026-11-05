@@ -2,13 +2,13 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
-import { HONEYCOMB_SAVE, honeycombLive } from '../save/collections'
+import { legacyWorldContinent } from './legacy-continent.fixture'
 import { BIOMES, biomeById } from './biomes'
 import { continentHoneycomb, honeycombXY, nearestSpring, type HoneyTile } from './honeycomb'
 import { regionChapter, stageRegionId, TWIN_BOSS_ROW, WORLD_SPRINGS, worldContinent } from './world'
 
 const source = (order: number) => ({ name: 'Synthetic continent', order })
-const live = (order = 1) => worldContinent(source(order), HONEYCOMB_SAVE)
+const live = (order = 1) => worldContinent(source(order))
 const radius = ({ q, r }: HoneyTile) => Math.max(Math.abs(q), Math.abs(r), Math.abs(q + r))
 
 // Regenerate the actual approved preview's cells and Spring map, without any DOM, progress or copied layout table.
@@ -23,26 +23,21 @@ function preview() {
   })`, {}, { timeout: 1000 }) as string) as { cells: HoneyTile[]; springs: [string, number][] }
 }
 
-describe('the honeycomb world, dark on save v37 (D295, H163)', () => {
-  it('keeps the current switch, five Springs and all fifteen legacy continents byte-identical', () => {
-    expect(honeycombLive()).toBe(false)
-    expect(honeycombLive(37)).toBe(false)
-    expect(honeycombLive(38)).toBe(true)
-    expect(honeycombLive(39)).toBe(true)
-    expect(WORLD_SPRINGS).toBe(5)
-    const continents = Array.from({ length: 15 }, (_, i) => worldContinent(source(i + 1)))
-    expect(continents.every((c) => c.regions.length === 40 && c.springs.length === 5)).toBe(true)
+describe('the honeycomb world, live on save v38 (D295, H166)', () => {
+  it('keeps all fifteen pre-v38 continent fixtures byte-identical', () => {
+    expect(WORLD_SPRINGS).toBe(6)
+    const continents = Array.from({ length: 15 }, (_, i) => legacyWorldContinent(source(i + 1)))
     // Captured before H163, from synthetic source names only.
     expect(createHash('sha256').update(JSON.stringify(continents)).digest('hex'))
       .toBe('87bbf3c63906181273b878352da919435ef33b5377adb5c823131db06ecf82f1')
   })
 
   it.each(Array.from({ length: 15 }, (_, i) => i + 1))('appends eight stable regions and one Spring to continent %i', (order) => {
-    const dark = worldContinent(source(order), 37), c = live(order), extras = c.regions.slice(40)
+    const dark = legacyWorldContinent(source(order)), c = live(order), extras = c.regions.slice(40)
     expect(c.regions).toHaveLength(48)
     expect(new Set(c.regions.map((r) => r.id)).size).toBe(48)
     expect(JSON.stringify(c.regions.slice(0, 40))).toBe(JSON.stringify(dark.regions))
-    expect(JSON.stringify(c.springs.slice(0, 5))).toBe(JSON.stringify(dark.springs))
+    expect(JSON.stringify(c.springs.slice(0, 5))).toBe(JSON.stringify(dark.springs.map(({ id, continentId }) => ({ id, continentId }))))
     expect(c.springs.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6].map((k) => `w${order}-spring${k}`))
     expect(extras.map((r) => r.id)).toEqual(Array.from({ length: 8 }, (_, i) => `w${order}-x-${i + 1}`))
     expect(extras.map((r) => [r.row, r.col])).toEqual(Array.from({ length: 8 }, (_, i) => [i < 4 ? 0 : 5, i + 4]))
@@ -111,11 +106,11 @@ describe('the approved honeycomb layout (H163)', () => {
   })
 
   it('leaves precisely the eight new slots open for a dark continent, without shifting existing regions', () => {
-    const c = worldContinent(source(1)), dark = continentHoneycomb(c), all = continentHoneycomb(live())
+    const c = legacyWorldContinent(source(1)), dark = continentHoneycomb(c), all = continentHoneycomb(live())
     expect(dark.filter((t) => t.kind === 'region')).toHaveLength(40)
     expect(dark.filter((t) => t.kind === 'open')).toHaveLength(8)
     expect(dark).toEqual(all.map((t) => t.id?.includes('-x-') ? { q: t.q, r: t.r, kind: 'open' } : t))
-    expect(c.springs).toHaveLength(5) // The inspection layout never activates the sixth Spring in live play.
+    expect(c.springs).toHaveLength(5) // Historical fixture only; production always has six.
   })
 
   it('converts axial positions to pointy-top pixels at any scale', () => {

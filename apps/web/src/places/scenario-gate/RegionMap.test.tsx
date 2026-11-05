@@ -58,9 +58,9 @@ describe('region stage destinations and shared Spring', () => {
       expect(springs()).toHaveLength(2)
       expect(springs().every((b) => !b.disabled)).toBe(true)
       await act(async () => { springs()[1]!.click(); await Promise.resolve(); render() })
-      expect(drink).toHaveBeenLastCalledWith('w1-spring1')
+      expect(drink).toHaveBeenLastCalledWith('w1-spring5')
       expect(worldOf(save).world.run.mp[id]).toBeUndefined()
-      expect(Object.keys(worldOf(save).world.springs)).toEqual(['w1-spring1'])
+      expect(Object.keys(worldOf(save).world.springs)).toEqual(['w1-spring5'])
       expect(springs().every((b) => b.disabled && b.getAttribute('aria-label')!.includes('2h 00m'))).toBe(true)
       expect(host.textContent).toContain('Spring · 2h 00m')
       await act(async () => { vi.advanceTimersByTime(2 * 60 * 60 * 1000) })
@@ -68,7 +68,7 @@ describe('region stage destinations and shared Spring', () => {
       await act(async () => { springs()[0]!.click(); await Promise.resolve(); render() })
       expect(drink).toHaveBeenCalledTimes(2)
       // The same marker is dry when this Spring was consumed on the continent screen too.
-      expect(worldOf(save).world.springs['w1-spring1']).toBe('2026-10-13T14:00:00.000Z')
+      expect(worldOf(save).world.springs['w1-spring5']).toBe('2026-10-13T14:00:00.000Z')
       worldOf(save).world.run.wins[region.id + '-s1'] = 1
       await act(async () => { render(); stage(1).click() })
       expect([...document.querySelectorAll<HTMLButtonElement>('button')].some((b) => b.textContent === 'Fight again' && !b.disabled)).toBe(true)

@@ -1,7 +1,7 @@
 // Runtime adapter for the published atlas, following platform's maps-full.ts composition.
 // Cells are tile coordinates; sprites and tap spots are native art pixels. No DOM or master-data names.
 import { BIOMES, type WorldContinent, type WorldRegion } from '@rpg/domain'
-import { frames, propsOf, ROADS, visuals } from './visuals'
+import { frames, propsOf, visuals } from './visuals'
 import { rng } from './random'
 import { cellKey, hasCell, closesBlock, cornerMaskAt, edgeMaskAt, regionTopology, REGION_ROWS, REGION_SPRING, stageCoversCell, STAGE_TILES, worldVariantAt } from './topology'
 
@@ -16,10 +16,6 @@ export const clearedIn = (id: string, progress: MapProgress): number =>
 const empty = (rows: number): MapLayout => ({ cols: 16, rows, cells: [], sprites: [], spots: [] })
 const sprite = (out: MapLayout, frame: string, x: number, y: number) => out.sprites.push({ frame, x, y })
 
-/** The existing Spring on the way into this two-row continent band. Its id/cooldown is shared across screens. */
-export function springForRegion(continent: WorldContinent | undefined, region: WorldRegion) {
-  return continent?.springs.find((s) => s.row === Math.floor(region.row / 2) * 2)
-}
 export function regionLayout(region: WorldRegion, progress: MapProgress, springId?: string): MapLayout {
   const out = empty(REGION_ROWS), { road, wet, stages } = regionTopology(region.biome, region.id)
   const liquidMask = (x: number, y: number) => cornerMaskAt((cx, cy) => hasCell(wet, cx, cy), x, y)
@@ -55,48 +51,10 @@ export function regionLayout(region: WorldRegion, progress: MapProgress, springI
   return out
 }
 
-export const continentBandY = (row: number): number => 4 + (9 - row) * 4
 function commonBiomes(continent: WorldContinent) {
   const count = (biome: string) => continent.regions.filter((r) => r.biome === biome).length
   return BIOMES.map((b) => b.id).sort((a, b) => count(b) - count(a)).slice(0, 2)
 }
-export function continentLayout(continent: WorldContinent, progress: MapProgress): MapLayout {
-  const out = empty(44), road = new Set<string>()
-  const count = (material: string) => continent.regions.filter((r) => visuals[r.biome].road === material).length
-  const material = [...ROADS].sort((a, b) => count(b) - count(a))[0]!
-  const plaza = material === 'stone' ? 'ruins' : material === 'dirt' ? 'desert' : 'coast'
-  const mark = (x: number, y: number) => { if (!closesBlock(road, x, y)) road.add(cellKey(x, y)) }
-  for (let row = 0; row < 4; row++) for (let col = 0; col < 16; col++) out.cells.push({ col, row, frame: 'ground/' + plaza + '-' + worldVariantAt(continent.id, col, row) })
-  for (let row = 0; row < 10; row++) {
-    const y = continentBandY(row), roadY = y + 3, side = row % 2 === 0 ? 0 : 15
-    for (let x = 0; x < 16; x++) mark(x, roadY)
-    for (let yy = roadY - 4; yy <= roadY; yy++) mark(side, yy)
-    for (const region of continent.regions.filter((r) => r.row === row).sort((a, b) => a.col - b.col)) {
-      const x = region.col * 4
-      for (let dy = 0; dy < 4; dy++) for (let dx = 0; dx < 4; dx++) out.cells.push({ col: x + dx, row: y + dy, frame: 'ground/' + region.biome + '-' + worldVariantAt(continent.id + ':' + region.id, x + dx, y + dy) })
-      const prop = propsOf(region.biome)[0]!
-      sprite(out, prop, (x + 1) * TILE, (y + 3) * TILE - frames[prop]!.h)
-      const won = clearedIn(region.id, progress)
-      sprite(out, won === 12 ? 'marker/flag-cleared' : 'marker/flag', (x + 2) * TILE, (y + 1) * TILE)
-      out.spots.push({ id: region.id, kind: 'region', x: x * TILE, y: y * TILE, w: 64, h: 48 })
-      if (won < 12 && !out.frontier) out.frontier = region.id
-    }
-  }
-  for (let x = 0; x < 16; x++) mark(x, 3)
-  for (const spring of [...continent.springs].sort((a, b) => a.row - b.row)) {
-    const x = spring.row % 4 === 0 ? 0 : 15, y = continentBandY(spring.row) * TILE - 32
-    sprite(out, progress.drySprings?.has(spring.id) ? 'marker/spring-dry' : 'marker/spring', x * TILE, y)
-    out.spots.push({ id: spring.id, kind: 'spring', x: x * TILE, y, w: 16, h: 32 })
-  }
-  sprite(out, 'marker/capital', 104, 4)
-  out.spots.push({ id: continent.id, kind: 'capital', x: 104, y: 4, w: 48, h: 48 })
-  for (const k of road) {
-    const [col, row] = k.split(',').map(Number) as [number, number]
-    out.cells.push({ col, row, frame: 'road/' + material + '-' + edgeMaskAt((x, y) => hasCell(road, x, y), col, row) })
-  }
-  return out
-}
-
 export function worldLayout(continents: readonly WorldContinent[], progress: MapProgress): MapLayout {
   const out = empty(22)
   for (let row = 0; row < out.rows; row++) for (let col = 0; col < 16; col++) out.cells.push({ col, row, frame: 'ground/ocean-' + worldVariantAt('world', col, row) })

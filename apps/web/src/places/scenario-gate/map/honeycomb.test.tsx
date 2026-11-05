@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-vi.mock('../../../../../../packages/domain/src/save/version', () => ({ SAVE_SCHEMA_VERSION: 38 }))
 import { syntheticMasterData, buildMemoryRelease } from '@luismlorenzana/uma-data/testing'
 import { AlbumArtProvider } from '@luismlorenzana/uma-kit/album'
 import { outfitRowBase } from '@luismlorenzana/uma-kit/roster'

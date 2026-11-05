@@ -38,6 +38,7 @@ function uma(classId: RpgClass | null, change: (u: OwnedUma) => void = () => {})
 export function v24Save(): Save {
   const save = newSave('Save v25', T0, 16)
   const world = save.tierWorlds['1']!
+  world.parties = world.parties.slice(0, 20)
   const classes: (RpgClass | null)[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner', 'cleric', 'mage', null, null, null, null, 'cleric']
   for (const [i, id] of ids(100, 20).entries()) world.umas[id] = uma(classes[i] ?? null)
   world.umas['100'] = uma('brawler', (u) => {

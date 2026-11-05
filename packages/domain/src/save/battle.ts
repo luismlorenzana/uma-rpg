@@ -43,7 +43,7 @@ import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFlourishActive, umaStride, umaTemplate } from '../roster/template'
 import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit } from './class'
 import { RPG_RESET_TIER0 } from './classes-v3'
-import { capitalRunsLive, honeycombLive } from './collections'
+import { capitalRunsLive } from './collections'
 import { regionOfTier } from './region-teams'
 import { isCapitalRunChapter } from '../world/capital-run-id'
 import { settleCapitalFight } from './capital'
@@ -326,7 +326,7 @@ function withRun(save: Save, run: RpgRun, now: string, tier = TIER_ONE): Save {
   return withWorld(save, tier, { ...world, world: { ...world.world, run } }, now)
 }
 
-/** Makes another of the twenty parties the one that fights; not while a fight is open. */
+/** Makes another of the twenty-four parties the one that fights; not while a fight is open. */
 export function setActiveParty(save: Save, party: number, now: string, tier = TIER_ONE): Save {
   const world = worldOf(save, tier)
   if (!Number.isInteger(party) || party < 0 || party >= world.parties.length) throw new SaveRuleError('bad-party', `party ${party} doesn't exist`)
@@ -499,7 +499,7 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
     classMarks: paid.classMarks, firstClear })
   const next: TierWorld = { ...paid.world, world: { ...world.world, run: closed } }
   const regionId = stageRegionId(node.id)
-  if (honeycombLive() && regionId === chapter.id && regionOfTier(regionId, Number(tier)) && /-s(?:[1-9]|1[0-2])$/.test(node.id)) {
+  if (regionId === chapter.id && regionOfTier(regionId, Number(tier)) && /-s(?:[1-9]|1[0-2])$/.test(node.id)) {
     const record = world.regionTeams?.[regionId] ?? {}
     const hadWin = Array.from({ length: WORLD_STAGES }, (_, i) => (run.wins[`${regionId}-s${i + 1}`] ?? 0) > 0).some(Boolean)
     const claim = !record.claim && !hadWin, clear = !record.clear && node.kind === 'boss' && firstClear

@@ -1,3 +1,4 @@
+import { legacyWorldContinent as worldContinent } from './legacy-continent.fixture'
 // Tier 1's foes, pinned (H45): every region and capital stage of `w1`–`w5`, hashed. Tier 2's foe curve restarts at its
 // Lv 1 (tier2-world Z3), and in Tier 1 the tier level is the lifetime level, so none of this may move by one HP point.
 // A deliberate Tier 1 rebalance changes the digest on purpose: update it in the same change and say so in its D-row.
@@ -6,7 +7,7 @@
 // v18 deals weaknesses v2. v15's digest, 719d3a73, stays pinned with the engine named in `twins-v16.test.ts`.
 import { describe, expect, it } from 'vitest'
 import { capitalChapter } from './legacy-capital.fixture'
-import { regionChapter, worldContinent } from './world'
+import { regionChapter } from './world'
 
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))
 

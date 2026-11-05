@@ -36,6 +36,8 @@ describe('local save repository', () => {
     const file = join(await mkdtemp(join(tmpdir(), 'rpg-save-')), 'save.json')
     const v22 = JSON.parse(JSON.stringify(newSave('Luis', NOW)))
     v22.schemaVersion = 22
+    v22.tierWorlds['1'].parties = v22.tierWorlds['1'].parties.slice(0, 20)
+    delete v22.tierWorlds['1'].regionTeams
     delete v22.account.achievements
     delete v22.account.history
     delete v22.account.defeated
@@ -52,6 +54,8 @@ describe('local save repository', () => {
     const file = join(await mkdtemp(join(tmpdir(), 'rpg-save-')), 'save.json')
     const v23 = JSON.parse(JSON.stringify(newSave('Luis', NOW)))
     v23.schemaVersion = 23
+    v23.tierWorlds['1'].parties = v23.tierWorlds['1'].parties.slice(0, 20)
+    delete v23.tierWorlds['1'].regionTeams
     delete v23.account.defeated
     v23.tierWorlds['1'].rift = { runs: [], echoes: {} }
     await writeFile(file, JSON.stringify({ u: { revision: 7, save: v23 } }))

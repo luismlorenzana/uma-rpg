@@ -69,7 +69,7 @@ describe('collection rules', () => {
 })
 
 describe('party rules', () => {
-  it('starts with twenty empty parties', () => {
+  it('starts with twenty-four empty parties', () => {
     const world = worldOf(newSave('Luis', T0))
     expect(world.parties).toHaveLength(PARTY_COUNT)
     expect(world.parties[19]?.name).toBe('Party 20')
@@ -94,7 +94,7 @@ describe('party rules', () => {
   it('refuses unowned Umas and bad positions', () => {
     const save = unlocked('100101')
     expect(() => setPartySlot(save, 0, 0, '999999', T1)).toThrow(/owned/)
-    expect(() => setPartySlot(save, 20, 0, '100101', T1)).toThrow(SaveRuleError)
+    expect(() => setPartySlot(save, 24, 0, '100101', T1)).toThrow(SaveRuleError)
     expect(() => setPartySlot(save, 0, 5, '100101', T1)).toThrow(SaveRuleError)
   })
 
@@ -136,12 +136,12 @@ describe('save v2 parsing', () => {
     expect(parseSave(JSON.parse(JSON.stringify(save)))).toEqual(save)
   })
 
-  it('migrates a v1 save: no Umas, twenty empty parties', () => {
+  it('migrates a v1 save: no Umas, twenty-four empty parties', () => {
     const v1 = { schemaVersion: 1, account: { trainerName: 'Luis', createdAt: T0, updatedAt: T0 }, tierWorlds: { '1': { createdAt: T0, wallet: { unlockTickets: 20, shards: 0, laurels: 0 } } } }
     const migrated = parseSave(v1)
     expect(migrated.schemaVersion).toBe(SAVE_SCHEMA_VERSION)
     expect(migrated.tierWorlds['1']?.umas).toEqual({})
-    expect(migrated.tierWorlds['1']?.parties).toHaveLength(20)
+    expect(migrated.tierWorlds['1']?.parties).toHaveLength(24)
   })
 
   it('rejects an Uma in two places, an unowned slot, bad levels and a wrong party count', () => {
@@ -160,7 +160,7 @@ describe('save v2 parsing', () => {
     expect(() => parseSave(level)).toThrow(/level/)
     const short = JSON.parse(JSON.stringify(save))
     short.tierWorlds['1'].parties.pop()
-    expect(() => parseSave(short)).toThrow(/20 parties/)
+    expect(() => parseSave(short)).toThrow(/24 parties/)
   })
 })
 

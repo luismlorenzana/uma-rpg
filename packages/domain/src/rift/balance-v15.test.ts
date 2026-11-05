@@ -1,3 +1,4 @@
+import { legacyWorldContinent as worldContinent } from '../world/legacy-continent.fixture'
 // Classes v2's balance (classes-v2.md §9, H60; the hybrids' mirror, H63): engine v15 measured with explicit v15 inputs
 // (never the switch), on the shared balance party (`world/balance-party.ts`, `engine: 15`) and the Rift's v2 guided parties
 // (`riftParty(front, 15)`). The always-on checks are small, on fixed seeds (the mirror's on one seed of its table's fights).
@@ -11,7 +12,7 @@ import { RPG_V2_CLASSES, type RpgClass } from '../rpg/rules'
 import { classPreset } from '../save/presets'
 import { BALANCE_KIT_V2, BALANCE_PARTY, balanceMember, balanceStage, type BalanceOptions } from '../world/balance-party'
 import { play, type PlayObserver } from '../world/balance-play'
-import { regionChapter, worldContinent } from '../world/world'
+import { regionChapter } from '../world/world'
 import { add, cell, duelShields, empty, fight, guardRail, guided, partyOf, pct, planOf, rate, RUNS, seedsOf, type Bucket } from './balance-sim'
 import { riftParty, riftShape, riftTuning, RIFT_TUNING } from './fronts'
 import { riftSeed, type RiftFightPlan } from './generate'

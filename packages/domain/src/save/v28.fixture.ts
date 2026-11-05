@@ -33,7 +33,7 @@ export function v27Uma(craft: { level: number; exp: number }, locker: readonly s
 export function v27World(umas: Record<string, Raw>, extra: Raw = {}): Raw {
   return {
     createdAt: T0, wallet: { unlockTickets: 0, shards: 0, laurels: 0, timeTickets: 0, sweepTickets: 0, gearMarks: 0, classMarks: 0 },
-    umas, parties: defaultParties(), world: newWorldState(T0), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {},
+    umas, parties: defaultParties().slice(0, 20), world: newWorldState(T0), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {},
     rift: { runs: [], echoes: {}, battle: null, battles: 0 }, ...extra,
   }
 }

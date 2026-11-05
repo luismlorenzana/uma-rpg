@@ -2,7 +2,7 @@
 // worlds. The refund of §8.7's worked examples, the reset by world, what stays, the record, and the Healer Sanctum's
 // merge. `toV32` is chained after `toV31` since H134: a v31 save parses to v32.
 import { describe, expect, it } from 'vitest'
-import { toV37, migrateWorld, toV32 } from './migrations'
+import { toV38, toV37, migrateWorld, toV32 } from './migrations'
 import { parseSave, SAVE_SCHEMA_VERSION, type ClassesV3Record, type HeroSeat, type OwnedUma, type Save, type TierWorld } from './save'
 import { UMA, v31Save, v31Tier2, v31World } from './v31.fixture'
 
@@ -103,20 +103,20 @@ describe('toV32: the record (CV26, CV30)', () => {
     expect(toV32(once)).toBe(once)
   })
 
-  it('is chained once after toV31: migrateWorld runs it on a v31 world, not on a current one, and the schema is 37', () => {
+  it('is chained once after toV31: migrateWorld runs it on a v31 world, not on a current one, and the schema is 38', () => {
     const world = raw(v31World())
     const chained = migrateWorld(world, 31)
-    expect(chained).toEqual(toV37(toV32(raw(v31World()))))
+    expect(chained).toEqual(toV38(toV37(toV32(raw(v31World())))))
     expect(migrateWorld(chained, SAVE_SCHEMA_VERSION)).toBe(chained)
     expect(toV32(chained as Raw)).toBe(chained)
-    expect(SAVE_SCHEMA_VERSION).toBe(37)
+    expect(SAVE_SCHEMA_VERSION).toBe(38)
   })
 
-  it('parses a v31 save to v37 with the reset applied, which round-trips', () => {
+  it('parses a v31 save to v38 with the reset applied, which round-trips', () => {
     // The fixture's constructor stamps the live schema; a stored v31 save says 31.
     const save = JSON.parse(JSON.stringify({ ...v31Save(), schemaVersion: 31 })) as Save
     const parsed = parseSave(save)
-    expect(parsed.schemaVersion).toBe(37)
+    expect(parsed.schemaVersion).toBe(38)
     const one = parsed.tierWorlds['1']!
     expect(one.classesV3).toEqual(toV32(raw(save.tierWorlds['1']!)).classesV3)
     expect(one.classesV3!.umas[UMA.B]!.pick).toBe('spellblade')

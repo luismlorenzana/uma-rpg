@@ -30,6 +30,7 @@ export const LAZY_MODULES = [
   'apps/web/src/places/scenario-gate/capital/NewRun.tsx',
   'apps/web/src/places/scenario-gate/map/HoneycombMap.tsx',
   'apps/web/src/places/scenario-gate/map/HoneycombPeek.tsx',
+  'packages/domain/src/world/legacy-continent.fixture.ts',
 ]
 export function entrySrc(html) {
   const scripts = [...html.matchAll(/<script\b[^>]*>/gi)].filter(([tag]) => /\btype\s*=\s*["']module["']/i.test(tag))

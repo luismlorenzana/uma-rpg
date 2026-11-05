@@ -4,7 +4,6 @@
 // the continent's release order with fixed seeds, so ids and contents never move under a save. A region is handed to the
 // battle rules as a small chapter (a start camp and its stages in a line), so fights reuse the chapter machinery.
 import { chapterFor } from '../master/roster'
-import { honeycombLive } from '../save/collections'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/types'
 import { rpgChapterReach, rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
@@ -21,7 +20,7 @@ export const WORLD_REGIONS_PER_ROW = 4
 /** Levels one region climbs (D97). */
 export const WORLD_REGION_LEVELS = 5
 export const WORLD_STAGES = 12
-export const WORLD_SPRINGS = honeycombLive() ? 6 : 5
+export const WORLD_SPRINGS = 6
 /** A Spring refills the active party's MP, then recharges for two hours (D66). */
 export const SPRING_RECHARGE_MS = 2 * 3600 * 1000
 
@@ -31,7 +30,7 @@ export interface WorldRegion {
   level: number; levelTop: number
   row: number; col: number
 }
-export interface WorldSpring { id: string; continentId: string; /** Legacy pixel-map row; the honeycomb uses ring 3's corners. */ row: number }
+export interface WorldSpring { id: string; continentId: string }
 export interface WorldContinent { id: string; order: number; name: string; levelStart: number; regions: WorldRegion[]; springs: WorldSpring[] }
 export interface ContinentSource { name: string; order: number }
 
@@ -48,9 +47,8 @@ export const CONTINENT_LEAN: readonly Biome[] = ['forest', 'coast', 'desert', 't
 const LEAN = CONTINENT_LEAN
 const ROMAN = ['', ' II', ' III']
 
-/** A continent of the first tier: `order` 1–5, levels `10 × (order − 1) + 1` on.
- * The optional save version lets the dark honeycomb shape be inspected without switching live play. */
-export function worldContinent(source: ContinentSource, version?: number): WorldContinent {
+/** A continent of 48 regions: the original forty ids and eight additions around the honeycomb. */
+export function worldContinent(source: ContinentSource): WorldContinent {
   const id = `w${source.order}`
   const levelStart = (source.order - 1) * WORLD_LEVELS + 1
   // Every biome twice, the Meadow and the lean a third time: 40 slots, the Meadow's first copy at the first level.
@@ -67,24 +65,20 @@ export function worldContinent(source: ContinentSource, version?: number): World
     return { id: `${id}-${row + 1}-${col + 1}`, continentId: id, biome, name: `${biomeById(biome).name}${ROMAN[n] ?? ''}`, level,
       levelTop: level + WORLD_REGION_LEVELS - 1, row, col }
   })
-  const honeycomb = honeycombLive(version)
-  if (honeycomb) {
-    const twiceOnly = BIOMES.filter((b) => seen.get(b.id) === 2).map((b) => b.id)
-    shuffle(twiceOnly, `${id}:extra`).slice(0, 8).forEach((biome, i) => {
-      const row = i < 4 ? 0 : 5, level = levelStart + (row === 0 ? 0 : WORLD_REGION_LEVELS)
-      regions.push({ id: `${id}-x-${i + 1}`, continentId: id, biome,
-        name: `${biomeById(biome).name}${ROMAN[seen.get(biome)!]}`, level, levelTop: level + WORLD_REGION_LEVELS - 1, row, col: i + 4 })
-    })
-  }
-  // Rows are retained only for the old pixel map; the honeycomb places Springs on its six corners.
-  const springs = Array.from({ length: honeycomb ? 6 : 5 }, (_, k): WorldSpring => ({ id: `${id}-spring${k + 1}`, continentId: id, row: k * 2 }))
+  const twiceOnly = BIOMES.filter((b) => seen.get(b.id) === 2).map((b) => b.id)
+  shuffle(twiceOnly, `${id}:extra`).slice(0, 8).forEach((biome, i) => {
+    const row = i < 4 ? 0 : 5, level = levelStart + (row === 0 ? 0 : WORLD_REGION_LEVELS)
+    regions.push({ id: `${id}-x-${i + 1}`, continentId: id, biome,
+      name: `${biomeById(biome).name}${ROMAN[seen.get(biome)!]}`, level, levelTop: level + WORLD_REGION_LEVELS - 1, row, col: i + 4 })
+  })
+  const springs = Array.from({ length: WORLD_SPRINGS }, (_, k): WorldSpring => ({ id: `${id}-spring${k + 1}`, continentId: id }))
   return { id, order: source.order, name: source.name, levelStart, regions, springs }
 }
 
 /**
  * World tuning (D75, D141), set against the balance simulation (`SIM=1 npx vitest run src/world/balance.test.ts`). Skills
  * grow with depth faster than the foe curve, so foes gain HP per tier level on top of it (a regular foe ×2.7 HP by tier
- * Lv 50; the step restarts at each tier's Lv 1, Z3, D170); a region boss is a fraction of a chapter champion (one of forty
+ * Lv 50; the step restarts at each tier's Lv 1, Z3, D170); a region boss is a fraction of a chapter champion (one of 48
  * per continent). Offense needs no world step: the foe curve sets it from the share of an Uma's HP a hit takes (D141).
  */
 export const WORLD_TUNING = {

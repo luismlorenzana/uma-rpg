@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 // Windows with the collections live (save v35, D283, H152; the Weapons track since v36, D289).
 import { describe, expect, it } from 'vitest'
 import { WINDOW_STEP_IDS, windowBoard } from '../rpg/windows'
@@ -37,7 +38,7 @@ describe('the switch', () => {
   it('is on here, and a new save starts its windows at once', () => {
     expect(collectionsLive()).toBe(true)
     const save = newSave('W', T(0))
-    expect(save.schemaVersion).toBe(37)
+    expect(save.schemaVersion).toBe(38)
     expect(save.account).toMatchObject({ windows: {}, windowsStart: T(0) })
     expect(save.tierWorlds['1']!.drills).toEqual({ day: null, runs: 10, won: {} })
     expect(save.tierWorlds['1']!.wallet.trainingLogs).toBe(0)
@@ -201,10 +202,11 @@ describe('Weapons (save v36, D289)', () => {
 
   it('parses a v35 save\'s windows into v36\'s', () => {
     const save = JSON.parse(JSON.stringify(newSave('W', T(0))))
+    beforeHoneycomb(save)
     save.schemaVersion = 35
     save.account.windows = { '101': { '1': { steps: '08h'.repeat(5) + '---'.repeat(26), champions: 0 } } }
     const parsed = parseSave(save)
-    expect(parsed.schemaVersion).toBe(37)
+    expect(parsed.schemaVersion).toBe(38)
     expect(parsed.account.windows!['101']!['1']!.steps).toBe('08h'.repeat(5) + '---'.repeat(31))
   })
 })
@@ -251,6 +253,7 @@ describe('save v35', () => {
   it('parses a v34 save into v35 with empty windows still to credit, and round-trips a v35 one', () => {
     const v35 = newSave('W', T(0))
     const v34 = JSON.parse(JSON.stringify(v35))
+    beforeHoneycomb(v34)
     v34.schemaVersion = 34
     delete v34.account.windows
     delete v34.account.windowsStart

@@ -1,6 +1,6 @@
 # Handoff: open work
 
-> **Status: 2026-11-05, after D302.** Tier 1 is built and live: engine v21, save v37. That covers the Tier rework's R1
+> **Status: 2026-11-05, after D307.** Tier 1 is built and live: engine v21, save v38. That covers the Tier rework's R1
 > and R2, the farm by line, the Wilds' trios, weaknesses v2, **Classes v3 with Halls v2** (thirteen classes in a tree,
 > Tier 0 and promotion, five halls; H134), trimmed to sixteen Limit Breaks (D261), and **Uma profile v2** (H117–H125, D272). Tier 2 and Tier 3 worlds run Tier 1's rules × tier
 > until they are re-planned. **The current phase is Tier 1 hardening:** polish Tier 1 from the owner's playtests before
@@ -64,8 +64,8 @@ lights on a won run. Save v37 activates the run rules and screens (H162); the ol
 **The honeycomb continent map** ([design](../design/world-map/honeycomb.md), [preview](../design/world-map/previews/honeycomb.html),
 approved D295): every continent as an SVG honeycomb of 48 regions (eight new) for 24 parties, the capital at the centre
 ringed by six run seats, Lv 6–10 inside and Lv 1–5 on the shore, six Springs each serving its nearest eight, and the five
-who claimed and cleared each region on its hex. H163's world shape and H164's save/24 parties are built dark behind
-`honeycombLive()` (save v38). H165's screen is built dark too; H166 owns the switch. Every packet can go to ChatGPT; no art packet.
+who claimed and cleared each region on its hex. Save v38 activates H163–H165 together (H166), preserving old progress
+and adding four empty parties; the world and region pixel maps stay. No art release is needed.
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|
@@ -85,7 +85,7 @@ balance, Uma Templates). The old R3–R5 packets (H83–H105) were removed on 20
 
 **Also:**
 - **Releases:** the owner checks each one on the phone with the [phone check](../testing/phone-check.md).
-- **Versions:** engine v21, save v37; uma-kit 0.17.0, uma-art 2.20.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
+- **Versions:** engine v21, save v38; uma-kit 0.17.0, uma-art 2.20.0, uma-data 1.3.0, uma-work 0.1.0 and uma-server
   0.2.0. The change protocol for one game or both is [change-protocol.md](../change-protocol.md).
 - **CI:** runs the test suites one package at a time (`pnpm test:ci`, D256), which ended Vitest's `Timeout calling
   "onTaskUpdate"` failures. If it ever recurs with every test passing, rerun the failed job.

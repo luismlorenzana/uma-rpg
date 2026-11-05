@@ -1,7 +1,7 @@
 import { isPartyFull, PARTY_COUNT } from '@rpg/domain'
 import { useWorld } from '../../save/game'
 
-/** The Party Hall's quick look: how many of the twenty parties are full, and how many Umas are placed. */
+/** The Party Hall's quick look: how many of the twenty-four parties are full, and how many Umas are placed. */
 export default function PartyHallPeek() {
   const world = useWorld()
   const parties = world?.parties ?? []

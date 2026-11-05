@@ -4,4 +4,5 @@
 // Weapons steps.
 
 // v37 (D302, H162): capital runs; World lights on a won run, and champion masks leave window records.
-export const SAVE_SCHEMA_VERSION = 37
+// v38 (D295, H166): the honeycomb, first claim/clear teams, 24 parties and six open runs.
+export const SAVE_SCHEMA_VERSION = 38

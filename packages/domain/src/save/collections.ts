@@ -14,7 +14,6 @@ export const capitalRunsLive = (version: number = SAVE_SCHEMA_VERSION): boolean 
 
 /** The honeycomb's 48 regions and six Springs (D295, H163), switched on with save v38 by H166. */
 export const HONEYCOMB_SAVE = 38
-export const honeycombLive = (version: number = SAVE_SCHEMA_VERSION): boolean => version >= HONEYCOMB_SAVE
 
 /** Whether a save version plays the collections' rules; the live one by default. */
 export const collectionsLive = (version: number = SAVE_SCHEMA_VERSION): boolean => version >= COLLECTIONS_SAVE

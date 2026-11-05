@@ -48,7 +48,8 @@ describe('the Wilds by generation (H77)', () => {
     expect(placeById('warehouse')).toMatchObject({ blurb: 'Every item you own: materials and made items.', details: ['Materials and made items', 'Filled by the Wilds and the Exchange'] })
     expect(placeById('exchange')?.details[0]).toBe('Raw materials by pair')
     expect(townPlaces().map((p) => p.id)).toEqual(townPlaces(16).map((p) => p.id))
-    expect(townPlaces().filter((p) => p.id !== 'warehouse' && p.id !== 'exchange')).toEqual(townPlaces(16).filter((p) => p.id !== 'warehouse' && p.id !== 'exchange'))
+    expect(placeById('party-hall')?.blurb).toBe('Twenty-four parties of five.')
+    expect(townPlaces().filter((p) => !['warehouse', 'exchange', 'party-hall'].includes(p.id))).toEqual(townPlaces(16).filter((p) => !['warehouse', 'exchange', 'party-hall'].includes(p.id)))
   })
 
   it('keeps the fifteen 44 pt apart on the smallest phone', () => {

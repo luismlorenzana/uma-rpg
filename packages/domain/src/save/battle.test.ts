@@ -1,3 +1,4 @@
+import { beforeHoneycomb } from './pre-honeycomb.fixture'
 import { describe, expect, it } from 'vitest'
 import { regionChapter, worldContinent } from '../world/world'
 import { applyBattleAction, battleActionsLeft } from '../rpg/battle/engine'
@@ -242,6 +243,7 @@ describe('save parsing', () => {
   it('moves a v13 save to classes: the build’s class carries over, skills reset, an open fight closes (D86)', () => {
     const save = startFight(withParty(), ura, 'w1-1-1-s1', OUTFITS, T(4))
     const old = JSON.parse(JSON.stringify(save))
+    beforeHoneycomb(old)
     old.schemaVersion = 13
     for (const uma of Object.values(old.tierWorlds['1'].umas) as Record<string, unknown>[]) {
       delete uma.classId

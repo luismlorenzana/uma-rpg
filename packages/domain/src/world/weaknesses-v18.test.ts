@@ -1,3 +1,4 @@
+import { legacyWorldContinent as worldContinent } from './legacy-continent.fixture'
 // Weaknesses v2 on engine v18 (H115, D235; weaknesses-v2.md WK1–WK4, WK8, WK10, WK11): the stage dealer's rule, the
 // generators reading it from v18, and v17's generation byte for byte whatever the switch says (digests taken on the
 // generators before H115).
@@ -8,7 +9,7 @@ import { rpgStageWeaknesses, rpgWeakCounts, type WeakFoe } from '../rpg/campaign
 import { RPG_ELEMENTS, RPG_WEAPON_KINDS, rpgElementWeakness, type RpgElement } from '../rpg/kinds'
 import { RPG_V2_CLASSES, rpgHand } from '../rpg/rules'
 import { capitalChapter } from './legacy-capital.fixture'
-import { regionChapter, worldContinent } from './world'
+import { regionChapter } from './world'
 
 const V17 = 17, V18 = 18
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))

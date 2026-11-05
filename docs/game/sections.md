@@ -1,6 +1,6 @@
 # Game sections
 
-Every screen and what is on it, as the game runs today (engine v21, save v37). This page says where things show; the
+Every screen and what is on it, as the game runs today (engine v21, save v38). This page says where things show; the
 rules and numbers behind them are on the other pages, linked from each section. The place list comes from
 `packages/domain/src/hub/places.ts`. Each place's screens live in `apps/web/src/places/<place>/`, registered in
 `places/registry.tsx`; the shell and the Hub are `apps/web/src/hub/`.
@@ -46,7 +46,7 @@ Phaser).
   page. The Scenario Gate skips its quick look and opens its page at once.
 - **Quick looks** (each place's `Peek`; a place without one shows its line):
   - the Stable: Umas owned out of all, Uma Tickets (Tier 1) and the latest four unlocks;
-  - the Party Hall: full parties out of twenty, Umas placed out of owned;
+  - the Party Hall: full parties out of twenty-four, Umas placed out of owned;
   - a hall: its seats, each with its Hero's face, its Limit Break and "3/10" Learners or "Open";
   - a Wilds place: [its compact page](#wilds);
   - the Rift: [its line and fronts](#the-rift);
@@ -84,7 +84,7 @@ Every place, page by page. Its line shows in the place's (i), and is the quick l
 | Place | Id | Kind | Uma slots | What it is |
 |---|---|---|---|---|
 | Stable | `stable` | town | — | Every Uma outfit, locked or yours. Uma Tickets open new ones. |
-| Party Hall | `party-hall` | town | — | Twenty parties of five. |
+| Party Hall | `party-hall` | town | — | Twenty-four parties of five. |
 | Warehouse | `warehouse` | town | — | Every item you own: materials and made items. |
 | Exchange | `exchange` | town | — | Laurels buy raw items and tickets here; Marks buy Manuals. |
 
@@ -141,7 +141,7 @@ with no place).
 `places/PlacePage.tsx`: uma-kit's place header over a scrolling body, between the bars.
 - **Back** returns to where the page was opened from: a sub-view to its place, a place to its Hub page.
 - The place's name and its (i), which shows its line.
-- A counter: Uma Tickets on the Stable (Tier 1 only), full parties out of twenty on the Party Hall, Laurels on the
+- A counter: Uma Tickets on the Stable (Tier 1 only), full parties out of twenty-four on the Party Hall, Laurels on the
   Scenario Gate and the Exchange.
 
 A shut place's page sends you to its quick look.
@@ -388,8 +388,8 @@ her uniqueness in one place, and the only body shown for a locked or elsewhere o
 
 ### Party Hall
 
-Routes: `/town/party-hall` and `:n` (1–20); `PartyHallPage.tsx`.
-- **The list:** twenty parties, each with its name, "5/5 · Edit" (green when full) and five faces with level, class and
+Routes: `/town/party-hall` and `:n` (1–24); `PartyHallPage.tsx`.
+- **The list:** twenty-four parties, each with its name, "5/5 · Edit" (green when full) and five faces with level, class and
   her signature family ("★ Pendant"). The lead has an accent ring and a flag. A party with two healers says "One healer
   a party" in the warning colour.
 - **The editor:** "All parties" (back), the name with **Rename**, then five slots (face, name and "Lead · Sorcerer"; an
@@ -551,15 +551,17 @@ Routes: `/battle/scenario-gate`, then `c/:continent`, `r/:region`, `capital/:con
   - "Party 1 · swap", which opens "Who fights?": every party with members, by its lead's face and its highest level
     ("5/5 · Lv 50"). Off while a fight is open.
   - **Edit parties** (the Party Hall), then "A fight needs five" or "One healer a party" when it applies.
-  - The five: face with "Lv 50", the MP she carries between stages (Springs refill it), her class. A tap opens her Class
-    tab; ‹ › step through the party.
+  - On World and Region, the five: face with "Lv 50", carried MP and class; a tap opens her Class tab. The continent
+    keeps the compact swap/Edit/warnings row to leave room for its map.
 - **World:** five islands on the map; in the list, "Tier 1 · five continents" ("four" for a partial tier), each
-  continent with its crest, "Lv 1–10" ("T2 Lv 1–10" in Tier 2) and "21/480 stages cleared". The tiers above with no
+  continent with its crest, "Lv 1–10" ("T2 Lv 1–10" in Tier 2) and "21/576 stages cleared". The tiers above with no
   world yet show "Tier 2 locked".
-- **Continent:** forty regions in ten rows of four, climbing from the bottom, under two headings: its first five levels,
-  then its last five (D97). **Springs** sit between rows ("◆ Spring · refill the party's MP", or "recharges in 1h 20m";
-  off during a fight). The **Capital** shows its level and "Capital · 2 runs won", or "Capital · open run". Each region shows its biome icon, name and
-  "5/12" or "Cleared ✓".
+- **Continent:** 61 SVG hexes: 48 regions, six Springs, the capital and its six run seats. The shore has its first five
+  levels, the inner regions its last five. Claim/clear teams, progress, twin-boss marks and old clears follow
+  [the map's states](maps.md#shape). Tap a hex for its shared quick look: teams/dates and **Enter**, a Spring's eight
+  names and **Refill**, or a run's four frozen parties. The capital shows open runs and the last six wins. The map
+  opens fitted, pinch and **− ⊙ +** zoom, and drag pans; fitted team dots become faces at 1.6×. **List** keeps all 48
+  regions under their two level bands, with six Spring refill buttons at the top. Refill is off while charging or fighting.
 - **Region:** "Lv 1–5 · 3/12 cleared", **Spring · MP** beside Map/List, and its twelve stages on a path or in a list.
   Each stage: its number (a boss or elite stage, her leader's face), name with ★ (boss) or ♛ (elite), elements, "Lv 3 ·
   2 waves · 9 foes", and "✓ ×3", "open" or "locked".

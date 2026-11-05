@@ -1,4 +1,4 @@
-// The Party Hall (S2, T013): twenty parties of five; /town/party-hall/:n edits one. One party per Uma (D46); a working
+// The Party Hall (S2, T013): twenty-four parties of five; /town/party-hall/:n edits one. One party per Uma (D46); a working
 // member can be recalled from her job here, and fights either way (D119). From classes v2 a party with two healers
 // carries the "One healer a party" note (H59); editing it is never refused.
 import { ACCESSORY_FAMILY_LABEL, activeClass, isGrades, isInFight, isPartyFull, partyLead, partyOf, placeById, umaTemplate, workOf, PARTY_COUNT, PARTY_NAME_MAX, normalizeName, SaveRuleError, type Party, type Place, type TierWorld, umaPick } from '@rpg/domain'

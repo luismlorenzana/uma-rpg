@@ -66,6 +66,7 @@ export function v26Save(): V26Save {
   const { schemaVersion: _, tierWorlds: worlds, ...fresh } = newSave('Save v27', T0, OLD)
   const save: V26Save = { ...fresh, schemaVersion: 26, tierWorlds: { '1': { ...worlds['1']!, umas: {} } } }
   const world = save.tierWorlds['1']!
+  world.parties = world.parties.slice(0, 20)
   const classes: (RpgClass | null)[] = ['brawler', 'mage', 'spellblade', 'paladin', 'summoner', 'brawler', null, 'cleric', null, 'mage']
   for (const [i, id] of ids(100, 20).entries()) world.umas[id] = uma(id, classes[i] ?? null)
   world.umas['102']!.gear = { locker: ['katana-g1'], equipped: { katana: 'katana-g1' }, kinds: {} }

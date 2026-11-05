@@ -79,9 +79,10 @@ import { RPG_VOLLEY, RPG_VOLLEY_MP } from '../rpg/catalog'
 import { bandFranchise, capitalFranchise, FRANCHISES } from '../world/roster'
 import {
   BOSS_WAVES, CONTINENT_LEAN, regionChapter, SPRING_RECHARGE_MS, WAVE_HP, WAVE_PAY, WAVE_STAGES, WORLD_ESCORT,
-  WORLD_FORMATIONS, WORLD_BOSS_TWICE_FROM, WORLD_REGION_LEVELS, WORLD_REGIONS_PER_ROW, WORLD_ROWS, WORLD_STAGES,
+  WORLD_FORMATIONS, WORLD_BOSS_TWICE_FROM, WORLD_REGION_LEVELS, WORLD_ROWS, WORLD_STAGES,
   WORLD_TUNING, worldContinent,
 } from '../world/world'
+import { nearestSpring } from '../world/honeycomb'
 
 type Cell = string | number
 /** A Markdown table; pipes in cells are escaped. */
@@ -644,7 +645,7 @@ function faces(): string {
       FRANCHISE_NAME[capitalFranchise(order)]!]
   })
   const regions = Object.fromEntries(FRANCHISES.map((f) => [f, 0]))
-  for (let order = 1; order <= 5; order++) for (let row = 0; row < 10; row++) regions[bandFranchise(order, row)]! += 4
+  for (let order = 1; order <= 5; order++) for (const region of worldContinent({ name: 'Synthetic continent', order }).regions) regions[bandFranchise(order, region.row)]!++
   return table(['Continent', 'Rows 1–5', 'Rows 6–10', 'Capital'], rows) + '\n\n' +
     table(['Franchise', 'Regions'], FRANCHISES.map((f) => [FRANCHISE_NAME[f]!, regions[f]!]))
 }
@@ -666,12 +667,8 @@ function continents(): string {
     const c = worldContinent({ name: `Continent ${order}`, order })
     out.push(`### Continent ${order} (\`${c.id}\`), Lv ${c.levelStart}–${c.levelStart + 9}, leaning ${CONTINENT_LEAN[order - 1]}`, '')
     const rows: Cell[][] = []
-    for (let row = 9; row >= 0; row--) {
-      const regions = c.regions.filter((r) => r.row === row).sort((a, b) => a.col - b.col)
-      const spring = c.springs.find((s) => s.row === row)
-      rows.push([`${row + 1}`, `Lv ${regions[0]!.level}–${regions[0]!.levelTop}`, ...regions.map((r) => `${r.name} \`${r.id}\``), spring ? `Spring \`${spring.id}\`` : ''])
-    }
-    out.push(table(['Row', 'Levels', 'Region 1', 'Region 2', 'Region 3', 'Region 4', 'Spring on the way in'], rows), '')
+    for (const r of c.regions) rows.push([`\`${r.id}\``, r.name, `Lv ${r.level}–${r.levelTop}`, `\`${nearestSpring(c, r.id)}\``])
+    out.push(table(['Region', 'Biome', 'Levels', 'Nearest Spring'], rows), '')
   }
   return out.join('\n').trimEnd()
 }
@@ -689,10 +686,10 @@ function regionSample(): string {
 function world(): string {
   return table(['Setting', 'Value'], [
     ['Continents', '5 per tier, one per scenario, 10 levels each'],
-    ['Regions', `40 per continent in ${WORLD_ROWS} rows of ${WORLD_REGIONS_PER_ROW}, each climbing ${WORLD_REGION_LEVELS} levels: rows 1–5 the continent's first five, rows 6–10 its last five. Every biome at least twice; the first is a Meadow`],
+    ['Regions', `48 per continent on a honeycomb, each climbing ${WORLD_REGION_LEVELS} levels: 24 in its first five on the shore, 24 in its last five inside. Every biome at least twice; the first is a Meadow`],
     ['Stages', `${WORLD_STAGES} per region: 10 regular climbing its levels two at a time, then an elite (11) and the boss (12) at its top level`],
-    ['Springs', `5 per continent, one every two rows; recharge ${SPRING_RECHARGE_MS / 3600000} h`],
-    ['Capitals', `Runs of ${RPG_FINALS_LANES} full parties: ${CAPITAL_RUN_GENERALS} generals a lane, then ${RPG_FINALS_LANES} finals; ${RPG_FINALS_LANES * (CAPITAL_RUN_GENERALS + 1)} fights at the continent's top level`],
+    ['Springs', `6 per continent, each nearest to eight regions; recharge ${SPRING_RECHARGE_MS / 3600000} h`],
+    ['Capitals', `6 run seats; runs of ${RPG_FINALS_LANES} full parties: ${CAPITAL_RUN_GENERALS} generals a lane, then ${RPG_FINALS_LANES} finals; ${RPG_FINALS_LANES * (CAPITAL_RUN_GENERALS + 1)} fights at the continent's top level`],
     ['Waves pay', x(WAVE_PAY)],
   ])
 }
