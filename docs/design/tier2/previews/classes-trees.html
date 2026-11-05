@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Trees by Tier</title>
-<!-- docs/design/tier2/classes.md (T2C11–T2C22, T2C45, T2C51–T2C53). The Tier rework's preview template: uma-kit's theme tokens. -->
+<!-- docs/design/tier2/classes.md round 3 (T2C11–T2C22, T2C45, T2C51–T2C53, T2C74, T2C78–T2C81). The Tier rework's preview template: uma-kit's theme tokens. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -80,10 +80,13 @@
 <body>
 <main class="wide">
   <h1>Trees by tier</h1>
-  <p>Any of the sixteen Tier 2 classes on any kind she can slot, as her Tier 1 parent's tree plays it today and as Tiers 2
-    and 3 grow it (<a href="../classes.md">classes.md</a> §4.8, §4.10, §6.2–§6.4; T2C11–T2C22, T2C45, T2C51–T2C53). A Tier 2
-    class plays her parent's trees; the Spellfist's Tomes play the Sorcerer's, the Battlemage's Arms the Brawler's. Every
-    name comes from D298's grammar. Dashed nodes are new; a purple ring is a crown.</p>
+  <p>Any of the twenty Tier 2 classes and the twenty-two Tier 3 classes on any kind she can slot, as her Tier 1 ancestor's
+    tree plays it today and as Tiers 2 and 3 grow it (<a href="../classes.md">classes.md</a> round 3, §4.9–§4.11, §6.2; T2C11–T2C22,
+    T2C45, T2C51–T2C53, T2C74, T2C78–T2C81). A later class plays her ancestors' trees: the Spellfist's Tome plays the Sorcerer's,
+    the Battlemage's Arm the Brawler's, a pure variant her parent's five trees of her channel (line C her lead half's word on
+    every one), the Gladiator the Brawler's Arms and the Thaumaturge the Sorcerer's Tomes. Every name comes from D298's
+    grammar; no tree or skill name is added. Dashed nodes are new; a purple ring is a crown. Other pages:
+    <a href="classes-tree.html">the class tree</a> · <a href="classes-tier3.html">the twenty-two</a>.</p>
   <div class="card">
     <div class="row">
       <label>Class <select id="cls"></select></label>
@@ -102,13 +105,13 @@
     <div class="treegrid" id="classline" style="grid-template-columns: 110px minmax(0, 1fr)"></div>
   </div>
 
-  <h2>The ten class lines on the sixteen</h2>
+  <h2>The twelve class lines on the twenty</h2>
   <div class="card scroll"><table id="lines"></table>
-  <p class="note">Round 1's ten lines, re-homed: mirrored classes share one (T2C52). Cast through any of her three weapons; Auto picks the one that lands weak.</p></div>
+  <p class="note">Round 1's ten lines re-homed and two new for the pure variants, Squall and Legion (T2C52, T2C74); mirrored classes share one; a Tier 3 class plays her parent's, crowned. Cast through any of her three weapons; Auto picks the one that lands weak.</p></div>
 
   <h2>Line C's words, by family</h2>
   <div class="card scroll"><table id="cwords"></table>
-  <p class="note">Round 1's 252 names and round 2's 17 checked against every master-data string (all ten release files, case-insensitive, exact) and the game's own strings: no match (classes.md §11).</p></div>
+  <p class="note">Round 1's 252 names, round 2's 17 and round 3's checked against every master-data string (all ten release files, case-insensitive, exact) and the game's own strings: no match (classes.md §11).</p></div>
 </main>
 <script>
 const W = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire Tome', ice: 'Blizzard Tome', lightning: 'Thunder Tome', light: 'Light Tome', dark: 'Dark Tome' }
@@ -136,9 +139,9 @@ const C_SORC = { fire: ['Kindle', 'Random foes, 2 · 3 · 3 hits ×1.05'], ice: 
 // The sixteen: parent, family, weapons, lead half, rule, status level, class line, her one rule in a line.
 const CLASSES = {
   berserker: { name: 'Berserker', parent: 'Brawler', fam: 'brawler', weapons: ARMS, lead: null, level: 'none', line: ['Rampage', 'Skybreaker', 'The tapped foe the full power, every other 0.3'], rule: 'Momentum: +6% a stack on her own hits, a stack a turn, 3 at most' },
-  spellfist: { name: 'Spellfist', parent: 'Brawler', fam: 'brawler', cross: 'sorcerer', weapons: [...ARMS, ...TOMES], lead: null, level: 'none', line: ['Conquest', 'Sundown', 'One foe at the full power; on a Broken foe every other also takes 0.55'], rule: 'Two Arms and a Tome; every hit on ATK; ×1.05 (preset Greatsword, Axe, Thunder)' },
+  spellfist: { name: 'Spellfist', parent: 'Brawler', fam: 'brawler', cross: 'sorcerer', weapons: [...ARMS, ...TOMES], lead: null, level: 'none', line: ['Conquest', 'Sundown', 'One foe at the full power; on a Broken foe every other also takes 0.55'], rule: 'Two Arms and a Tome, one act; every hit on ATK; hand ×1; Pinpoint: one-foe acts +2% a depth (preset Greatsword, Katana, Fire)' },
   archmage: { name: 'Archmage', parent: 'Sorcerer', fam: 'sorcerer', weapons: TOMES, lead: null, level: 'none', line: ['Nebula', 'Starburst', 'Every foe at the area share; a weak foe the full power'], rule: 'Momentum, the Berserker\'s rule' },
-  battlemage: { name: 'Battlemage', parent: 'Sorcerer', fam: 'sorcerer', cross: 'brawler', weapons: [...TOMES, ...ARMS], lead: null, level: 'none', line: ['Quasar', 'Event Horizon', 'One foe, one hit at ×1.25'], rule: 'Two Tomes and an Arm; every hit on M.ATK; ×1.3 (preset Fire, Blizzard, Lance)' },
+  battlemage: { name: 'Battlemage', parent: 'Sorcerer', fam: 'sorcerer', cross: 'brawler', weapons: [...TOMES, ...ARMS], lead: null, level: 'none', line: ['Quasar', 'Event Horizon', 'One foe, one hit at ×1.25'], rule: 'Two Tomes and an Arm, one act; every hit on M.ATK; hand ×1.25; Pinpoint (preset Fire, Blizzard, Katana)' },
   blademaster: { name: 'Blademaster', parent: 'Arms Spellblade', fam: 'spellblade', weapons: [...ARMS, ...TOMES], lead: 'arms', both: true, level: 'path', line: ['Sigil', 'Rune Edge', 'Lead half on one foe, other half on every foe at 0.55'], rule: 'Her familiar\'s extra hit on both halves, and it pierces; hands 0.75 + 0.47' },
   runeblade: { name: 'Runeblade', parent: 'Tome Spellblade', fam: 'spellblade', weapons: [...TOMES, ...ARMS], lead: 'tome', both: true, level: 'path', line: ['Sigil', 'Rune Edge', 'Lead half on one foe, other half on every foe at 0.55'], rule: 'Her familiar\'s extra hit on both halves, and it pierces; hands 0.75 + 0.51' },
   sentinel: { name: 'Sentinel', parent: 'Arms Spellblade', fam: 'spellblade', weapons: [...ARMS, ...TOMES], lead: 'arms', level: 'sup-blade', line: ['Bane', 'Penumbra Edge', 'Her pair on one foe; a Light/Dark weapon\'s status, her Barrier after it'], rule: 'Hands ×0.95; Light/Dark statuses on every skill, topped up; Brave and Faith and a Barrier on the Uma she wards' },
@@ -147,11 +150,27 @@ const CLASSES = {
   invoker: { name: 'Invoker', parent: 'Tome Summoner', fam: 'summoner', weapons: [...TOMES, ...ARMS], lead: 'tome', both: true, level: 'path', line: ['Griffin', 'Kraken', 'Her pair on one foe; her lead summon lingers at 0.5'], rule: 'Both summons linger: two farewells; hands 0.60 + 0.53' },
   druid: { name: 'Druid', parent: 'Arms Summoner', fam: 'summoner', weapons: [...ARMS, ...TOMES], lead: 'arms', level: 'sup-call', line: ['Wraith', 'Banshee', 'Her pair, her lead summon on every foe at 0.55; a Light/Dark weapon\'s status on every foe'], rule: 'Hands ×0.95; Light/Dark statuses on every skill, on every foe, topped up; her farewell mends' },
   shaman: { name: 'Shaman', parent: 'Tome Summoner', fam: 'summoner', weapons: [...TOMES, ...ARMS], lead: 'tome', level: 'sup-call', line: ['Wraith', 'Banshee', 'Her pair, her lead summon on every foe at 0.55; a Light/Dark weapon\'s status on every foe'], rule: 'Hands ×1; Light/Dark statuses on every skill, on every foe, topped up; her farewell mends' },
+  bladedancer: { name: 'Bladedancer', parent: 'Arms Spellblade', fam: 'spellblade', weapons: ARMS, lead: 'arms', level: 'none', line: ['Squall', 'Thousand Cuts', 'Her pair on one foe, each half one hit more (the same total)'], rule: 'The pure pair: three Arms (two lead, one second half), every hit on ATK; hands 0.72 + 0.32; no status' },
+  spellweaver: { name: 'Spellweaver', parent: 'Tome Spellblade', fam: 'spellblade', weapons: TOMES, lead: 'tome', level: 'none', line: ['Squall', 'Thousand Cuts', 'Her pair on one foe, each half one hit more (the same total)'], rule: 'The pure pair: three Tomes, every hit on M.ATK; hands 0.72 + 0.41; no status' },
+  marshal: { name: 'Marshal', parent: 'Arms Summoner', fam: 'summoner', weapons: ARMS, lead: 'arms', level: 'none', line: ['Legion', 'Onslaught', 'Her pair, both summons on every foe at 0.55'], rule: 'The pure pair: three Arms as summons, every hit on ATK; her lead summon lingers; hands 0.57 + 0.40; no status' },
+  animist: { name: 'Animist', parent: 'Tome Summoner', fam: 'summoner', weapons: TOMES, lead: 'tome', level: 'none', line: ['Legion', 'Onslaught', 'Her pair, both summons on every foe at 0.55'], rule: 'The pure pair: three Tomes as summons, every hit on M.ATK; hands 0.57 + 0.37; no status' },
   guardian: { name: 'Guardian', parent: 'Paladin', fam: 'healer', weapons: [...ARMS, ...TOMES], lead: null, level: 'wide+', line: ['Edict', 'Covenant', 'Its status reaches every foe or Uma; through Axe, Blizzard or Thunder its Barrier or mend every Uma'], rule: 'Every status she lands one stack more' },
   bishop: { name: 'Bishop', parent: 'Cleric', fam: 'healer', weapons: [...TOMES, ...ARMS], lead: null, level: 'wide+', line: ['Edict', 'Covenant', 'Its status reaches every foe or Uma; through Axe, Blizzard or Thunder its Barrier or mend every Uma'], rule: 'Every status she lands one stack more' },
   templar: { name: 'Templar', parent: 'Paladin', fam: 'healer', weapons: [...ARMS, ...TOMES], lead: null, level: 'wide', line: ['Solace', 'Absolution', 'A blow or a spell, then a mend on the most hurt and a Barrier on the most threatened (×0.7)'], rule: 'A battle healer: ×0.6 power, ×0.7 MP, mends and Barriers ×0.7' },
   exorcist: { name: 'Exorcist', parent: 'Cleric', fam: 'healer', weapons: [...TOMES, ...ARMS], lead: null, level: 'wide', line: ['Solace', 'Absolution', 'A blow or a spell, then a mend on the most hurt and a Barrier on the most threatened (×0.7)'], rule: 'A battle healer: ×0.6 power, ×0.7 MP, mends and Barriers ×0.7' },
 }
+// Tier 3 (round 3): each her Tier 2 parent's kit and one rule; the Gladiator and the Thaumaturge three weapons of one channel.
+const T3 = [['ravager', 'Ravager', 'berserker', 'Juggernaut: an unbroken foe takes ×0.6 from her hits, not ×0.5'], ['spellhammer', 'Spellhammer', 'spellfist', 'Pinpoint doubled: +4% a depth'],
+  ['gladiator', 'Gladiator', 'spellfist', 'Arsenal: two two-kind weapons, every Arm in reach; three Arms, hand ×1.05, no cross', { cross: null, weapons: ARMS }],
+  ['astromancer', 'Astromancer', 'archmage', 'Resonance: her capstones and class capstone strike again at 30%'], ['spellknight', 'Spellknight', 'battlemage', 'Pinpoint doubled: +4% a depth'],
+  ['thaumaturge', 'Thaumaturge', 'battlemage', 'Arsenal: every element in reach; three Tomes, hand ×1.05, no cross', { cross: null, weapons: TOMES }],
+  ['bladelord', 'Bladelord', 'blademaster', 'Spellbind: both halves weak on one foe, the act +20%'], ['herald', 'Herald', 'sentinel', 'Her keeper sibling\'s twist: the familiar on both halves, piercing; hands +0.03 a half', { both: true }],
+  ['dervish', 'Dervish', 'bladedancer', 'Momentum'], ['runelord', 'Runelord', 'runeblade', 'Spellbind'], ['oracle', 'Oracle', 'enchanter', 'The Herald\'s twist', { both: true }],
+  ['starweaver', 'Starweaver', 'spellweaver', 'Momentum'], ['overlord', 'Overlord', 'warlord', 'Menagerie: her lingering summons stay two pairs'], ['archdruid', 'Archdruid', 'druid', 'Both summons linger, both farewells mend; hands +0.03 a half', { both: true }],
+  ['imperator', 'Imperator', 'marshal', 'Momentum'], ['hierarch', 'Hierarch', 'invoker', 'Menagerie'], ['soulcaller', 'Soulcaller', 'shaman', 'The Archdruid\'s twist', { both: true }],
+  ['mythlord', 'Mythlord', 'animist', 'Momentum'], ['bastion', 'Bastion', 'guardian', 'Overflow: overheal becomes a Barrier, up to 10% of max HP'], ['inquisitor', 'Inquisitor', 'templar', 'Power ×0.7'],
+  ['cardinal', 'Cardinal', 'bishop', 'Overflow'], ['hierophant', 'Hierophant', 'exorcist', 'Power ×0.7']]
+for (const [id, name, p, rule, extra] of T3) CLASSES[id] = { ...CLASSES[p], ...(extra ?? {}), name, t3: true, from: CLASSES[p].name, rule: `${CLASSES[p].rule}; Tier 3: ${rule}` }
 const isLead = (c, w) => c.lead === (TOMES.includes(w) ? 'tome' : 'arms')
 // The family whose tree she plays on this weapon: a cross-wielder's other channel plays the other pure class's.
 const famOf = (c, w) => (c.cross && (c.fam === 'brawler' ? TOMES : ARMS).includes(w) ? c.cross : c.fam)
@@ -192,7 +211,7 @@ function aWhat(c, w, d) {
 const POWER = [1.6, 2.2, 2.9, 3.7, 4.6], MP = [10, 14, 18, 22, 26]
 let cid = 'berserker', w = 'greatsword', tier = 2, line = 'A', held = ['A', 'B']
 const sel = document.getElementById('cls'), wsel = document.getElementById('wpn')
-sel.innerHTML = Object.entries(CLASSES).map(([k, c]) => `<option value="${k}">${c.name} (from ${c.parent})</option>`).join('')
+sel.innerHTML = ['Tier 2', 'Tier 3'].map((g, i) => `<optgroup label="${g}">${Object.entries(CLASSES).filter(([, c]) => !!c.t3 === !!i).map(([k, c]) => `<option value="${k}">${c.name} (from ${c.t3 ? c.from : c.parent})</option>`).join('')}</optgroup>`).join('')
 function fillWeapons() { wsel.innerHTML = CLASSES[cid].weapons.map((k) => `<option value="${k}">${W[k]}</option>`).join(''); if (!CLASSES[cid].weapons.includes(w)) w = CLASSES[cid].weapons[0]; wsel.value = w }
 function lineSeg() {
   const avail = tier >= 2 ? ['A', 'B', 'C'] : ['A', 'B']
@@ -227,7 +246,7 @@ function draw() {
     <div class="muted" style="margin-top:4px">${tier === 1 ? 'Tier 1: her parent as she plays today.' : `Her rule: <b>${c.rule}</b>.`}</div>`
   document.getElementById('tier-note').textContent = tier === 1 ? 'Tier 1, as live: her parent\'s 8 nodes, line A or B, D282\'s statuses.'
     : tier === 2 ? 'Tier 2: line C joins the fork (dashed); every capstone forks Power or Break; her lead weapon\'s tree gains the ★ signature tip (T2U). Statuses by her class\'s level (§4.8).'
-    : 'Tier 3: two of the three lines held (tap to choose); at Class Rank 50 each held capstone is crowned (♛): 5.6 whole, +4 MP, one more stack. No new names.'
+    : 'Tier 3: her Tier 2 parent\'s trees and her Tier 3 rule; two of the three lines held (tap to choose); at Class Rank 50 each held capstone is crowned (♛): 5.6 whole, +4 MP, one more stack. The master slot is retired (T2C81). No new names.'
   const [bw, bc, bwhat] = c.line
   document.getElementById('cl-note').textContent = tier === 1 ? 'No class line in Tier 1: switch to Tier 2 or 3.' : `${c.name}'s line, shared with her mirror. Cast through any of her three weapons.`
   let ch = ''
@@ -255,8 +274,8 @@ document.getElementById('lines').innerHTML = '<tr><th>Class(es)</th><th>Line (CR
     return `<tr><td><b>${who}</b></td><td>Grand ${c.line[0]} · Supreme ${c.line[0]} · ${c.line[1]}</td><td class="muted">${c.line[2]}</td></tr>` }).join('')
 const CW = [['Brawler\'s trees (Berserker; the Spellfist\'s Arms, the Battlemage\'s Arm)', 'Greatsword Rout · Axe Havoc · Lance Tremor · Bow Hail · Katana Fork', 'By tree, as her B lines are'],
   ['Sorcerer\'s trees (Archmage; the Battlemage\'s Tomes, the Spellfist\'s Tome)', 'Fire Kindle · Blizzard Sleet · Thunder Peal · Light Beam · Dark Gloom', 'By tree'],
-  ['Spellblades\' (Blademaster, Runeblade, Sentinel, Enchanter)', 'Swath on her lead half\'s trees · Strafe on her other half\'s', 'A Blademaster\'s Lance is Grand Lunge Swath, a Runeblade\'s Grand Lunge Strafe'],
-  ['Summoners\' (Warlord, Invoker, Druid, Shaman)', 'Hunt on her lead half\'s trees · Maul on her other half\'s', 'Beside Oath and Pack'],
+  ['Spellblades\' (Blademaster, Runeblade, Sentinel, Enchanter; the Bladedancer and Spellweaver Swath on every tree)', 'Swath on her lead half\'s trees · Strafe on her other half\'s', 'A Blademaster\'s Lance is Grand Lunge Swath, a Runeblade\'s Grand Lunge Strafe'],
+  ['Summoners\' (Warlord, Invoker, Druid, Shaman; the Marshal and Animist Hunt on every tree)', 'Hunt on her lead half\'s trees · Maul on her other half\'s', 'Beside Oath and Pack'],
   ['Healers\' (Guardian, Bishop, Templar, Exorcist)', 'Psalm on every tree', 'Beside Surge']]
 document.getElementById('cwords').innerHTML = '<tr><th>Trees</th><th>Line C</th><th>Note</th></tr>' + CW.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td class="muted">${c}</td></tr>`).join('')
 </script>

@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Party Comps</title>
-<!-- docs/design/tier2/classes.md §5 (R2-12; T2C56, T2C63, T2C64), measured by balance.md §4 (T2B21–T2B23, T2B34). The Tier rework's preview template: uma-kit's theme tokens. -->
+<!-- docs/design/tier2/classes.md round 3, §5 and §6.8 (T2C93, T2C94). The Tier rework's preview template: uma-kit's theme tokens. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
     --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
     --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
     --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
-    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a; --sup: #7a5ad0;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a; --pure: #b8452f; --sup: #2f8a9a;
     --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
     --k-greatsword: #d9822b; --k-fire: #d8423a; --k-axe: #8a4fc4; --k-ice: #3a86d8; --k-lance: #3d9a4a; --k-lightning: #c9a60e;
     --k-katana: #1f9a86; --k-light: #b89a3c; --k-bow: #d0507e; --k-dark: #6a3fb0;
@@ -25,7 +25,7 @@
       --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
       --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
       --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
-      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c; --sup: #a98bff;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c; --pure: #f07a62; --sup: #5cc4d4;
       --k-greatsword: #f0a052; --k-fire: #f06a60; --k-axe: #b07ce8; --k-ice: #6aaaf0; --k-lance: #62c06e; --k-lightning: #e6c83a;
       --k-katana: #4cc4ae; --k-light: #e2c870; --k-bow: #ee7ca2; --k-dark: #9d7ae0;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
@@ -34,406 +34,205 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
   main { max-width: 430px; margin: 0 auto; padding: 16px; }
-  main.wide { max-width: 1100px; }
+  main.wide { max-width: 1180px; }
   h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
   h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 24px 0 8px; }
-  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 4px 0 6px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
   p, li { color: var(--ink-soft); }
+  a { color: var(--info); }
   .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap); box-shadow: 0 1px 0 var(--hairline-strong); }
   .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .grid { display: grid; gap: var(--gap); }
   .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  @media (max-width: 860px) { .g2 { grid-template-columns: 1fr; } }
+  .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @media (max-width: 900px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
   .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .chip.warn { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
-  .chip.ok { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
-  .chip.meas { background: var(--accent-wash); color: var(--accent-strong); }
-  .chip.ana { background: var(--sunken); color: var(--ink-soft); }
-  .kind { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; margin: 1px 2px 1px 0; }
-  .kind.off { opacity: .2; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.keeper { background: var(--accent-wash); color: var(--accent-strong); }
+  .chip.expander { background: color-mix(in srgb, var(--t3) 18%, transparent); color: var(--t3); }
+  .chip.support { background: color-mix(in srgb, var(--sup) 18%, transparent); color: var(--sup); }
+  .chip.pure { background: color-mix(in srgb, var(--pure) 18%, transparent); color: var(--pure); }
+  .chip.battle { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.new { background: var(--accent); color: var(--accent-ink); }
+  .chip.measured { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .chip.analytic { background: color-mix(in srgb, var(--warning) 18%, transparent); color: var(--warning); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .kind { display: inline-flex; align-items: center; padding: 1px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; margin: 1px 2px 1px 0; }
+  .kind.partner { opacity: .65; outline: 1.5px dashed currentColor; outline-offset: -1.5px; }
   .muted { color: var(--ink-faint); }
   .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
-  th, td { padding: 5px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
   th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
   td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
-  td.out { color: var(--danger); font-weight: 700; }
-  tr.mean td { font-weight: 700; border-top: 1px solid var(--hairline-strong); }
+  tr.sel td { background: var(--accent-wash); }
   nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
   nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
-  .stack { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--sunken); margin: 6px 0; gap: 2px; }
-  .stack span { display: block; height: 100%; }
-  .legend { font-size: 12px; color: var(--ink-faint); }
-  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 2px; gap: 2px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+  .seg button.on { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
   select { font: 600 13px system-ui; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); }
-  .quick { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 10px; }
-  .quick button { border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); font: 600 12px system-ui; padding: 4px 10px; border-radius: 999px; cursor: pointer; }
-  .big { font: 700 22px/1 ui-rounded, system-ui; font-variant-numeric: tabular-nums; }
+  .bar { height: 10px; border-radius: 5px; background: var(--accent); display: inline-block; vertical-align: middle; }
+  .bar.phys { background: var(--phys); } .bar.magic { background: var(--magic); } .bar.heal { background: var(--heal); } .bar.sup { background: var(--sup); }
   .note { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
-  code { font-size: 12px; }
+  .cls { background: var(--raised); border-radius: 10px; padding: 8px 10px; border: 1px solid var(--hairline); }
+  .cls .nm { font-weight: 700; font-size: 15px; color: var(--ink); }
+  .cls .rule { color: var(--ink); margin: 4px 0; font-size: 13px; }
+  .cls .meta { font-size: 12px; color: var(--ink-faint); }
   svg text { fill: var(--ink-soft); font: 11px system-ui; }
-  svg .lbl { fill: var(--ink); font-weight: 600; }
-  svg .axis { stroke: var(--hairline-strong); } svg .grid { stroke: var(--hairline); }
-  svg .band { fill: color-mix(in srgb, var(--success) 14%, transparent); }
-  svg .mean { stroke: var(--success); stroke-dasharray: 3 3; }
-  svg .knob { fill: var(--accent); stroke: var(--panel); stroke-width: 2; }
-  svg .knob.out { fill: var(--danger); }
-  svg .draft { fill: none; stroke: var(--ink-faint); stroke-width: 2; }
-  svg .hit { fill: transparent; }
-  svg .hit:hover + .knob, svg .hit:focus + .knob { stroke: var(--ink); }
+  svg .axis { stroke: var(--hairline-strong); } svg .gridline { stroke: var(--hairline); }
+  svg .band { fill: color-mix(in srgb, var(--success) 12%, transparent); }
+
+  .comp h3 { margin: 0 0 4px; text-transform: none; letter-spacing: 0; font-size: 15px; color: var(--ink); }
+  .mem { display: grid; grid-template-columns: 120px 1fr 64px 64px; gap: 6px; font-size: 12px; padding: 4px 0; border-top: 1px solid var(--hairline); align-items: center; }
+  .mem:first-of-type { border-top: 0; }
+  .mem b { color: var(--ink); }
+  .tot { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; font-size: 12px; }
+  .tot b { color: var(--ink); }
+  .kc { display: inline-flex; align-items: center; gap: 2px; margin: 1px 4px 1px 0; font-size: 11px; }
+  .kc.zero { opacity: .35; text-decoration: line-through; }
+  .picks select { min-width: 170px; }
+  .warn { color: var(--danger); font-weight: 700; }
 </style>
 </head>
 <body>
 <main class="wide">
-  <h1>Party comps</h1>
-  <p>R2-12's comps of five, each with the ten kinds in hand, as <a href="../classes.md#5-party-comps-r2-12">classes.md §5</a>
-    reads them. <span class="chip meas">measured</span> numbers are
-    <a href="../balance.md#47-the-comps-measured-r2-12-t2b34-t2b35">balance's</a>: the sixteen's rules on a fork of engine
-    v21, every Uma built by the live harness, 16 seeds a stage, at the knobs (T2B24–T2B29) and today's presets. Units are
-    <b>BT</b>, an on-curve Brawler's damage <b>a round</b>. <span class="chip ana">analytic</span> numbers are this doc's
-    first model (T2C56) at the drafted values, kept beside them: it reads which piece of a kit carries a member's value.</p>
-  <nav class="tabs"><a href="#measured">The comps, measured</a><a href="#cards">Each comp</a><a href="#guardrail">Each class against her parent</a>
-    <a href="#stress">The stress check</a><a href="#model">The model</a><a href="#builder">Build a five</a><a href="#formula">How it's counted</a></nav>
+  <h1>Party comps, Tiers 2 and 3</h1>
+  <p>Round 3 (<a href="../classes.md">classes.md</a> §5, §6.8): <b>the owner's swaps are the spine</b>: "the Brawler with a
+    spellblade, or the spellblade with the paladin, that way I'll make my parties balanced". <span class="chip measured">measured</span>
+    numbers are balance's round 2; <span class="chip analytic">analytic</span> ones read the <b>seat model</b> (each member her parent's
+    measured D + S × (1 + her gain)), for balance to re-measure. Other pages: <a href="classes-tree.html">the class tree</a> ·
+    <a href="classes-branches.html">the twenty</a> · <a href="classes-tier3.html">the twenty-two</a>.</p>
+  <nav class="tabs"><a href="#swaps">The owner's swaps</a><a href="#t2">Tier 2, side by side</a><a href="#t3">Tier 3</a><a href="#guard">Each class against her parent</a><a href="#mixes">Kinds</a><a href="#builder">Build a five</a></nav>
 
-  <h2 id="measured">The comps, measured (T2B34)</h2>
-  <div class="card scroll"><table id="meastab"></table>
-    <div class="legend" style="margin-top:6px"><span class="sw" style="background:var(--accent)"></span>measured gain over its Tier 1 party at Lv 50
-      <span class="sw" style="background:var(--ink-faint);margin-left:8px"></span>the model's gain at Lv 50 (analytic, drafted values)</div>
-    <p class="note">Each comp against its Tier 1 party at the same level, Tier 2's toolbox on both; every fight won. Party, support, rounds (fights ·
-      sub-bosses · bosses) and damage taken a fight at Lv 50 (C8: Tier 3 Lv 50). <b>Every Tier 2 comp sits +1.7 to
-      +9.3% over its Tier 1 party</b>, within ±5 points of the comps' mean at every level. The model spread them +3.0 to +9.1% with the keepers first
-      and the support-heavy comps last; measured, the spread is narrower and the order mixed: it priced the supports' statuses below what they did
-      and the keepers' twists above. <b>The support-heavy comps are the safest, not the slowest:</b> C6 and C7 take 9–28% less than C1 on curve and
-      16–27% less at ×2.6.</p>
-    <p class="note"><b>C3 both ways</b> (T2B35): on the Scatter twins 4.23 · 3.85 · 4.25 BT a round at Lv 10 · 30 · 50, on the drafted Heavy twins
-      4.15 · 3.73 · 4.29 (the Battlemage ×1.3 in both). <b>Tier 3</b> (T2B37): C8 crowned 4.98 BT at Lv 50, +17% over itself uncrowned (4.27);
-      C1 crowned 4.82: the crowns and masteries lift every comp alike.</p></div>
+  <h2 id="swaps">The owner's swaps</h2>
+  <div class="row" style="margin-bottom:8px"><span class="seg" id="swaptier"><button data-v="2" class="on">Tier 2</button><button data-v="3">Tier 3</button></span></div>
+  <div class="grid g3" id="swapcards"></div>
 
-  <h2 id="cards">Each comp</h2>
-  <div class="grid g2" id="cardgrid"></div>
+  <h2 id="t2">Tier 2, side by side</h2>
+  <div class="card scroll"><table id="t2tab"></table>
+    <p class="note">Analytic against its Tier 1 party at Lv 50 (the seat model reads about a point under the harness: C1 +3.9% against +4.4% measured). Kinds: how many hands hold each; struck through, none.</p></div>
 
-  <h2 id="guardrail">Each class against her parent (the guardrail, T2B22)</h2>
+  <h2 id="t3">Tier 3 (Lv 50, every class crowned)</h2>
+  <div class="card scroll"><table id="t3tab"></table>
+    <p class="note">On top of the crown every class shares. T1 is round 2's crowned C1 exactly (each member the class whose mastery round 2 measured): 4.82 BT a round. The rest projected from it.</p></div>
+
+  <h2 id="guard">Each class against her parent (Tier 2, the band)</h2>
   <div class="card">
-    <div class="row legend"><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="var(--accent)"/></svg>at the knobs
-      <svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="var(--ink-faint)" stroke-width="2"/></svg>at the drafted values
-      <svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="var(--danger)"/></svg>outside the band
-      <span class="sw" style="background:color-mix(in srgb, var(--success) 14%, transparent);border:1px solid var(--success)"></span>the band: the twelve's mean gain ± 5 points</div>
-    <svg id="guard" viewBox="0 0 1060 330" width="100%" role="img" aria-label="The twelve damage and support classes' gain over their parents at Tier 2 Lv 10, 30 and 50, at the drafted values and at the knobs, with the band"></svg>
-    <div class="scroll"><table id="guardtab"></table></div>
-    <p class="note">Each class in her parent's seat of the owner's party (Party 1 or Party 2; the pure classes in both, averaged). <b>The two misses are the
-      Sentinel's</b> (−9.4 points at Lv 10, +7.0 at Lv 30): her value is the Armor Break the Paladin beside her doesn't yet spread, so it swings
-      with the level; her three-level mean (+3.8%) sits on the band's middle. <b>Recommended: accept them until the class lines exist</b>, and re-read
-      her on the build's run (her Penumbra Edge carries a status at 2 · 2 · 3). The Battlemage's Lv 50 sits on the band's edge (−1.8%). The four
-      healers are read on the stress check: their on-curve gain is damage alone.</p>
+    <svg id="guardsvg" viewBox="0 0 1120 330" width="100%" role="img" aria-label="Each Tier 2 damage and support class's seat gain over her parent at Lv 10, 30 and 50, with the band"></svg>
+    <div class="row"><span class="chip">● measured (round 2)</span><span class="chip">◆ analytic (round 3)</span><span class="chip" style="color:var(--success)">band: round 2's mean ± 5 points</span></div>
   </div>
 
-  <h2 id="stress">The stress check (T2B23)</h2>
-  <div class="grid g2">
-    <div class="card"><h3>The healers (Lv 50; fights won at ×3.2 · ×4)</h3><div class="scroll"><table id="healtab"></table></div>
-      <p class="note">Each region's elite, its boss's first wave and its boss as one fight, foes' offense ×2 to ×4. The battle healer is the
-        on-curve pick, the keeper the attrition pick: ahead in fights won from ×3.2, a fifth less damage taken at ×2.6.</p></div>
-    <div class="card"><h3>The supports (×2.6, Lv 50; the healer's sustain off)</h3><div class="scroll"><table id="suptab"></table></div>
-      <p class="note">Every support's party is safer than her keeper's. A party with no healer is legal (T2B39): two supports carry one through
-        ×2.6 (99.4% won), and a keeper healer's party stays ahead at ×4 (C1 78%, C6 86%, against 73%).</p></div>
-  </div>
-  <div class="card scroll"><h3>Is any variant useless? No: each is the better pick of her pair somewhere</h3><table id="sibtab"></table></div>
-
-  <h2 id="model">The model, side by side (analytic, T2C56)</h2>
-  <div class="card scroll"><table id="side"></table>
-    <div class="legend"><span class="sw" style="background:var(--phys)"></span>damage <span class="sw" style="background:var(--sup);margin-left:8px"></span>support (statuses and Breaks) · healing capacity is HP a round as a share of the party's max HP; on curve a party needs about 1%.</div>
-    <p class="note">The model at the drafted values (Momentum +5%, the cross ×1.05, the supports ×0.85 and ×0.9 at the healers' ladder built up) in BT a <i>turn</i>; kinds on
-      today's presets (the preset changes move no model number). Where it was wrong, measured: the Sentinel (+5% modelled, +50% at Lv 50), the
-      Enchanter (+7%, +18%), the hybrid keepers' twists (+6 to +9%, about 0 to 3%) and the Battlemage (+7%, −11%), which is why the knobs moved.</p></div>
+  <h2 id="mixes">Kinds: the 144 mixes (T2C94)</h2>
+  <div class="card scroll"><table>
+    <tr><th>The owner's parties, each member any child of her Tier 1 class</th><th class="n">Mixes holding all ten</th><th>Kinds a mix can drop (mixes)</th></tr>
+    <tr><td>Party 1 (72 mixes)</td><td class="n"><b>36</b></td><td>Bow 16 · Thunder 16 · Axe 12</td></tr>
+    <tr><td>Party 2 (72)</td><td class="n"><b>44</b></td><td>Dark 16 · Thunder 12 · Katana 4</td></tr>
+    <tr><td>Round 2 (64)</td><td class="n">56</td><td>Thunder 8</td></tr>
+    <tr><td>Tier 3, every descendant (162 a party)</td><td class="n">94 · 98 (106 · 118 with Arsenal's partners)</td><td>The same kinds</td></tr>
+  </table><p class="note">Every comp the owner names holds all ten but C10 (Axe, Thunder). The party hint names a missing kind and an open class whose preset holds it; gear's two-kind weapons add partners.</p></div>
 
   <h2 id="builder">Build a five</h2>
   <div class="card">
-    <div class="quick" id="quick"></div>
-    <div class="row" id="picks"></div>
+    <div class="row"><span class="seg" id="btier"><button data-v="2" class="on">Tier 2</button><button data-v="3">Tier 3</button></span>
+      <span class="muted">Quick:</span><span id="quick" class="row"></span></div>
+    <div class="row picks" id="picks" style="margin-top:8px"></div>
     <div id="out" style="margin-top:10px"></div>
-  </div>
-
-  <h2 id="formula">How it's counted</h2>
-  <div class="card">
-    <h3>Measured (T2B21)</h3>
-    <ul>
-      <li><b>D</b>, her damage a round of the fight, in BT (a knockout costs her turns; her kills are hers).</li>
-      <li><b>S</b>, what the other four lose when her statuses, wards, mends and keeper twist are switched off: overlap, the cap of 3 and the build-up are in it.</li>
-      <li><b>A class's gain:</b> the party's damage a round with her in her parent's seat, minus with her parent, over her parent's V (D + S). Fights weigh 2, sub-bosses and bosses 1.</li>
-      <li><b>The band (T2B22):</b> each of the twelve damage and support classes within ±5 points of the twelve's mean gain at Lv 10, 30 and 50; the four healers on the stress check.</li>
-    </ul>
-    <h3>The builder's estimate</h3>
-    <p>For a five that isn't one of C1–C7, the builder adds each member's measured swap: Σ (her gain × her parent's V) ÷ Σ her parents' D, at each
-      level. On C1–C7 it lands within about a point of the harness (22 of 24 cells within 2.3 points), except where both cross-wielders meet (C3 and
-      C7 at Lv 30 and 50, about 3 points under the harness, which credits the pair more than their sum): read it as a floor there.</p>
-    <h3>The model (T2C56, analytic)</h3>
-    <ul>
-      <li><b>V = D + S + B</b> a turn: D her parent's Tier 1 damage a turn ÷ 993 × her rule's factor; S Σ v × strength × her part × the others' D (Armor Break and Mind Break 5%, Brave and Faith 6% at full); B her Breaks, 6% or 7% of D for the hybrid keepers.</li>
-      <li><b>H</b>, HP a round she can mend or ward (half her casts depth 5, 35% depth 4, 15% depth 3; healing scale 1.64; 0.8 acts a round). The builder shows it for every five: the harness reads sustain on the stress check instead.</li>
-    </ul>
   </div>
 </main>
 <script>
-const K = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire', ice: 'Blizzard', lightning: 'Thunder', light: 'Light', dark: 'Dark' }
-const KINDS = Object.keys(K)
-const f1 = (x) => `${x > 0 ? '+' : x < 0 ? '−' : ''}${Math.abs(x).toFixed(1)}`
-const f2 = (x) => x.toFixed(2), pc = (x) => `${(x * 100).toFixed(0)}%`
-const kind = (k, n) => `<span class="kind ${n ? '' : 'off'}" style="background:var(--k-${k})">${K[k]}${n > 1 ? ` ×${n}` : ''}</span>`
-
-// ---- Measured (balance.md §4.6, §4.7, §4.8; balance-sim and balance-comps pages). ----
-// Her parent's D and S a round at Tier 2 Lv 10 · 30 · 50 (her Tier 2 frame and toolbox).
-const PAR = { Brawler: [[0.98, 1.04, 1.04], [0, 0, 0]], Sorcerer: [[1.02, 1.03, 1.12], [0, 0, 0]],
-  'Arms Spellblade': [[0.76, 0.72, 0.85], [0, 0, 0.02]], 'Tome Spellblade': [[0.77, 0.69, 0.86], [0, 0.05, 0.09]],
-  'Arms Summoner': [[0.72, 0.56, 0.73], [0, 0.06, 0.10]], 'Tome Summoner': [[0.75, 0.55, 0.73], [0, 0.01, 0.02]],
-  Paladin: [[0.35, 0.27, 0.37], [0.05, 0.10, 0.24]], Cleric: [[0.29, 0.26, 0.35], [0.11, 0.17, 0.36]] }
-// Her gain over her parent in her parent's seat: [drafted Lv 10, 30, 50], [knobs Lv 10, 30, 50], D + S at Lv 50, her knob.
-const G = {
-  Berserker: [[4.5, 1.8, 4.5], [5.6, 2.0, 5.2], [1.14, 0], 'Momentum +6%'],
-  Spellfist: [[10.4, 6.7, 3.0], [6.5, 4.5, 4.3], [1.12, 0], 'The Scatter twins'],
-  Archmage: [[4.9, 2.7, 4.1], [5.8, 3.4, 5.1], [1.21, 0], 'Momentum +6%'],
-  Battlemage: [[-2.5, -4.7, -11.4], [10.9, 8.3, -1.8], [1.22, 0], '×1.3, the Scatter twins'],
-  Blademaster: [[0.5, -0.1, -0.1], [9.0, 4.5, 3.6], [0.89, 0.01], 'Pierce, hands +0.03'],
-  Sentinel: [[33.9, 46.0, 49.8], [-2.4, 10.9, 2.9], [0.72, 0.14], 'Topped up, Brave and Faith on her ward, ×0.95'],
-  Runeblade: [[-0.6, 0.6, -0.7], [6.8, 2.3, 2.8], [0.92, 0.05], 'Pierce, hands +0.03'],
-  Enchanter: [[32.6, 19.5, 18.4], [7.0, 2.5, 6.6], [0.69, 0.23], 'Topped up, ×0.8'],
-  Warlord: [[4.1, -0.2, 1.8], [8.6, 2.0, 6.8], [0.78, 0.10], 'Hands +0.03'],
-  Druid: [[12.4, 10.2, -1.9], [7.1, 2.3, -1.5], [0.65, 0.11], 'Topped up, ×0.95, her parent\'s Axe'],
-  Invoker: [[4.0, 1.1, 1.3], [8.6, 3.6, 3.0], [0.77, 0.01], 'Hands +0.03'],
-  Shaman: [[-1.5, 0.0, -2.3], [10.4, 0.8, 1.2], [0.70, 0.03], 'Topped up, ×1'],
-  Guardian: [[5.5, 0.0, 1.1], [5.5, 0.0, 1.1], [0.37, 0.24], 'Kept (stress check)'],
-  Templar: [[12.1, 9.7, 5.7], [12.1, 9.7, 5.7], [0.42, 0.23], 'Kept (stress check)'],
-  Bishop: [[15.5, 0.0, 0.1], [15.5, 0.0, 0.1], [0.35, 0.36], 'Kept (stress check)'],
-  Exorcist: [[15.9, 6.9, 7.3], [15.9, 6.9, 7.3], [0.41, 0.36], 'Kept (stress check)'] }
-const TWELVE = ['Berserker', 'Spellfist', 'Archmage', 'Battlemage', 'Blademaster', 'Sentinel', 'Runeblade', 'Enchanter', 'Warlord', 'Druid', 'Invoker', 'Shaman']
-const HEALERS4 = ['Guardian', 'Templar', 'Bishop', 'Exorcist']
-const meanOf = (which) => [0, 1, 2].map((l) => TWELVE.reduce((a, n) => a + G[n][which][l], 0) / 12)
-const MEAN = { draft: meanOf(0), knob: meanOf(1) }
-// The comps: [id, name, members, analytic Lv 50 gain, measured Lv 10 · 30 · 50, party BT Lv 50, support, share, rounds, taken, members' D + S at Lv 50, read, tier3]
-const COMPS = [
-  ['C1', "Party 1's keepers", ['Berserker', 'Archmage', 'Blademaster', 'Invoker', 'Guardian'], 9.1, [5.5, 3.9, 4.4], 4.21, 0.25, '6%', '3.66 · 4.25 · 6.53', '14 · 281 · 279',
-    [[1.09, 0], [1.17, 0], [0.87, 0.01], [0.74, 0.02], [0.35, 0.21]], 'Tier 1-like, every twist on'],
-  ['C2', "Party 2's keepers", ['Berserker', 'Archmage', 'Runeblade', 'Warlord', 'Bishop'], 9.1, [7.7, 1.7, 5.4], 4.40, 0.54, '12%', '3.50 · 4.11 · 6.35', '123 · 160 · 470',
-    [[1.19, 0], [1.24, 0], [0.89, 0.08], [0.76, 0.07], [0.34, 0.39]], 'Its mirror'],
-  ['C3', 'Both pures expanded', ['Spellfist', 'Battlemage', 'Blademaster', 'Invoker', 'Guardian'], 7.9, [9.3, 8.0, 5.2], 4.25, 0.23, '5%', '3.60 · 4.35 · 6.35', '25 · 293 · 292',
-    [[1.08, 0], [1.23, 0], [0.86, 0.01], [0.72, 0.01], [0.35, 0.21]], 'Both channels in every damage dealer; on the Scatter twins Party 1\'s kinds'],
-  ['C4', 'Templar + Sentinel', ['Berserker', 'Archmage', 'Sentinel', 'Invoker', 'Templar'], 7.5, [4.3, 5.3, 5.7], 4.27, 0.35, '8%', '3.68 · 4.09 · 6.54', '6 · 93 · 274',
-    [[1.23, 0], [1.15, 0], [0.69, 0.13], [0.78, 0.02], [0.42, 0.21]], "The owner's balancing pair: 99.7% won at ×2.6, the second-safest comp"],
-  ['C4b', 'Exorcist + Enchanter', ['Berserker', 'Archmage', 'Enchanter', 'Warlord', 'Exorcist'], 7.3, [7.4, 5.6, 6.7], 4.46, 0.68, '15%', '3.48 · 4.07 · 6.27', '21 · 140 · 237',
-    [[1.27, 0], [1.25, 0], [0.66, 0.22], [0.85, 0.08], [0.43, 0.38]], 'The same on Party 2: the Enchanter brings the Cleric\'s missing Armor Break'],
-  ['C5', 'A Summoner to support', ['Berserker', 'Archmage', 'Runeblade', 'Druid', 'Bishop'], 5.9, [7.9, 2.3, 4.0], 4.35, 0.51, '12%', '3.61 · 4.12 · 6.39', '116 · 268 · 434',
-    [[1.21, 0], [1.26, 0], [0.91, 0.08], [0.62, 0.11], [0.35, 0.32]], 'Enfeeble and Mind Break on every foe, a mend each pair'],
-  ['C6', 'Both hybrids to support', ['Berserker', 'Archmage', 'Sentinel', 'Shaman', 'Guardian'], 3.5, [5.1, 3.1, 3.7], 4.19, 0.34, '8%', '3.69 · 4.20 · 6.77', '11 · 230 · 284',
-    [[1.24, 0], [1.17, 0], [0.70, 0.14], [0.70, 0.04], [0.37, 0.17]], 'The safest: 98.8% won at ×3.2, 85.6% at ×4'],
-  ['C7', 'Every member an expander', ['Spellfist', 'Battlemage', 'Sentinel', 'Shaman', 'Templar'], 3.0, [7.4, 8.5, 5.7], 4.27, 0.39, '9%', '3.56 · 4.26 · 6.62', '7 · 208 · 198',
-    [[1.20, 0], [1.24, 0], [0.69, 0.14], [0.69, 0.03], [0.44, 0.22]], 'The model put it last; measured, among the fastest and safest'],
-  ['C8', 'Tier 3, a mixed five', ['Berserker', 'Battlemage', 'Blademaster', 'Shaman', 'Bishop'], 13, [9.9, 6.9, 24.6], 4.98, 0.47, '9%', '2.89 · 3.26 · 5.28', '4 · 68 · 70',
-    [[1.34, null], [1.62, null], [1.00, null], [0.65, null], [0.37, null]], 'Tier 3 crowned: +17% over itself uncrowned, every comp alike', true],
-]
-
-// ---- The model (T2C56), at the drafted values; weapons are today's presets (they move no model number). ----
-const PER_TURN = { Brawler: 993, Sorcerer: 1128, 'Arms Spellblade': 939, 'Tome Spellblade': 955, 'Arms Summoner': 903, 'Tome Summoner': 893, Paladin: 502, Cleric: 487 }
-const BT = 993, M3 = 1.88, TAPPED = 0.6, STEP = 0.05
-const STATUS_OF = { greatsword: 'AB', lance: 'MB', fire: 'BF', katana: 'AB', bow: 'EN', dark: 'MB', light: 'BF' }
-const RING_STATUS = new Set(['greatsword', 'lance', 'fire']), SECONDARY = new Set(['katana', 'bow', 'light', 'dark'])
-const ACCESS = { wide: [1, 0.5], 'wide+': [1.2, 0.6], 'wide-path': [0.5, 0.25], 'wide-path+': [0.6, 0.3], path: [0.35, 0], 'sup-blade': [1, 0.5], 'sup-call': [1, 1] }
-const VALUE = { AB: 0.05, MB: 0.05, BF: 0.06 }
-const MASTERY = { Brawler: 1.08, Sorcerer: 1.07, 'Arms Spellblade': 1.06, 'Tome Spellblade': 1.06, 'Arms Summoner': 1.03, 'Tome Summoner': 1.03, Paladin: 1, Cleric: 1 }
-const C = {}
-const cls = (name, parent, w, tau, level, o = {}) => { C[name] = { name, parent, w, tau, level, heal: null, ward: 0, mend: 0, chips: 0, ...o } }
-cls('Berserker', 'Brawler', ['greatsword', 'axe', 'lance'], 'mom', 'none')
-cls('Spellfist', 'Brawler', ['greatsword', 'axe', 'lightning'], 1.05 * 1.012, 'none')
-cls('Archmage', 'Sorcerer', ['fire', 'ice', 'lightning'], 'mom', 'none')
-cls('Battlemage', 'Sorcerer', ['fire', 'ice', 'lance'], 1.05 * 1.018, 'none')
-cls('Blademaster', 'Arms Spellblade', ['katana', 'axe', 'lightning'], 1, 'path', { chips: 0.06 })
-cls('Runeblade', 'Tome Spellblade', ['lightning', 'ice', 'katana'], 1, 'path', { chips: 0.06 })
-cls('Sentinel', 'Arms Spellblade', ['katana', 'greatsword', 'light'], 0.85, 'sup-blade', { ward: 1 })
-cls('Enchanter', 'Tome Spellblade', ['light', 'ice', 'katana'], 0.85, 'sup-blade', { ward: 1 })
-cls('Warlord', 'Arms Summoner', ['bow', 'axe', 'dark'], 1.02, 'path', { chips: 0.07 })
-cls('Invoker', 'Tome Summoner', ['dark', 'ice', 'bow'], 1.02, 'path', { chips: 0.07 })
-cls('Druid', 'Arms Summoner', ['bow', 'axe', 'dark'], 0.9, 'sup-call', { mend: 1 })
-cls('Shaman', 'Tome Summoner', ['dark', 'ice', 'bow'], 0.9, 'sup-call', { mend: 1 })
-cls('Guardian', 'Paladin', ['lance', 'greatsword', 'light'], 1, 'wide+', { heal: 't1' })
-cls('Bishop', 'Cleric', ['light', 'fire', 'lance'], 1, 'wide+', { heal: 't1' })
-cls('Templar', 'Paladin', ['lance', 'greatsword', 'light'], 1.2, 'wide', { heal: 'battle' })
-cls('Exorcist', 'Cleric', ['light', 'fire', 'lance'], 1.2, 'wide', { heal: 'battle' })
-const T1 = { Brawler: [['greatsword', 'axe', 'lance'], 'none'], Sorcerer: [['fire', 'ice', 'lightning'], 'none'], 'Arms Spellblade': [['katana', 'axe', 'lightning'], 'path'],
-  'Tome Spellblade': [['lightning', 'ice', 'katana'], 'path'], 'Arms Summoner': [['bow', 'axe', 'dark'], 'path'], 'Tome Summoner': [['dark', 'ice', 'bow'], 'path'],
-  Paladin: [['lance', 'greatsword', 'light'], 'wide'], Cleric: [['light', 'fire', 'lance'], 'wide'] }
-for (const [p, [w, lv]] of Object.entries(T1)) cls(p, p, w, 1, lv, { t1: true, heal: lv === 'wide' ? 't1' : null })
-const HEALERS = new Set(['Guardian', 'Bishop', 'Templar', 'Exorcist', 'Paladin', 'Cleric'])
-
-function carriers(c) {
-  const out = {}
-  for (const w of c.w) {
-    const s = STATUS_OF[w]; if (!s) continue
-    let acc = null
-    if (c.level === 'wide' || c.level === 'wide+') { const plus = c.level === 'wide+' ? '+' : ''; acc = RING_STATUS.has(w) ? ACCESS['wide' + plus] : ACCESS['wide-path' + plus] }
-    else if (c.level === 'sup-blade' || c.level === 'sup-call') acc = SECONDARY.has(w) ? ACCESS[c.level] : null
-    else if (c.level === 'path') acc = SECONDARY.has(w) ? ACCESS.path : null
-    if (!acc) continue
-    if (s === 'BF') acc = [acc[0], acc[0]]
-    const prev = out[s] ?? [0, 0]
-    out[s] = [Math.max(prev[0], acc[0]), Math.max(prev[1], acc[1])]
-  }
-  return out
-}
-const SHARE = { 5: 0.44, 4: 0.40, 3: 0.36 }, MIX = { 5: 0.5, 4: 0.35, 3: 0.15 }
-function healCap(c) {
-  let h = 0
-  if (c.heal) { for (const d of [5, 4, 3]) h += MIX[d] * SHARE[d] * 1.64 * (d === 5 ? 2.6 : 1); if (c.heal === 'battle') h *= 0.7; h = h * 0.8 / 5 }
-  if (c.ward) for (const d of [5, 4, 3]) h += MIX[d] * SHARE[d] / 3 * 1.67 * 0.8 / 5
-  if (c.mend) for (const d of [5, 4, 3]) h += MIX[d] * SHARE[d] * 0.1 * 1.67 * 0.8
-  return h
-}
-const combine = (l) => { l = [...l].sort((a, b) => b - a); return l.length ? Math.min(Math.max(1, l[0]), l[0] + 0.25 * l.slice(1).reduce((a, b) => a + b, 0)) : 0 }
-function model(names, opt = {}) {
-  const tier3 = !!opt.tier3
-  const own = {}
-  for (const n of names) { const c = C[n]; const tau = c.tau === 'mom' ? 1 + STEP * M3 : c.tau; own[n] = PER_TURN[c.parent] / BT * tau * (tier3 ? 1.11 * MASTERY[c.parent] : 1) }
-  const by = {}
-  for (const n of names) for (const [s, [t, o]] of Object.entries(carriers(C[n]))) (by[s] ??= []).push([t, o, n])
-  const support = Object.fromEntries(names.map((n) => [n, 0])); let en = 0
-  for (const [s, lst] of Object.entries(by)) {
-    const st = combine(lst.map((x) => x[0])), so = combine(lst.map((x) => x[1]))
-    const strength = s === 'BF' ? st : TAPPED * st + (1 - TAPPED) * so
-    if (s === 'EN') { en = strength; continue }
-    const wts = lst.map(([t, o, n]) => [n, TAPPED * t + (1 - TAPPED) * o]); const tot = wts.reduce((a, [, x]) => a + x, 0) || 1
-    for (const [n, wgt] of wts) { const others = names.filter((x) => x !== n).reduce((a, x) => a + own[x], 0); support[n] += others * VALUE[s] * strength * wgt / tot }
-  }
-  const chips = Object.fromEntries(names.map((n) => [n, C[n].chips * own[n]]))
-  const kinds = Object.fromEntries(KINDS.map((k) => [k, names.filter((n) => C[n].w.includes(k)).length]))
-  const dmg = names.reduce((a, n) => a + own[n], 0), sup = names.reduce((a, n) => a + support[n] + chips[n], 0)
-  const heal = names.reduce((a, n) => a + healCap(C[n]), 0)
-  return { own, support, chips, kinds, en, dmg, sup, heal, healers: names.filter((n) => HEALERS.has(n)).length }
-}
-// The model's own reads (classes.md §5.3's analytic table).
-const ANA_READ = { C1: 'Tier 1-like, every twist on', C2: 'Its mirror', C3: "Breadth for 1%; wards can't shut a pure out", C4: "The owner's balancing pair: level within 1.5%",
-  C4b: 'The same on Party 2', C5: 'Sustain for 3%', C6: 'The safest; the cap bites the healer', C7: 'No dead weight', C8: 'Tier 3 deepens all alike' }
-const MODEL_ROWS = [
-  ['T1-1', 'Tier 1 Party 1, as built', ['Brawler', 'Sorcerer', 'Arms Spellblade', 'Tome Summoner', 'Paladin'], 'The reference'],
-  ['T1-2', 'Tier 1 Party 2, as built', ['Brawler', 'Sorcerer', 'Tome Spellblade', 'Arms Summoner', 'Cleric'], 'Its mirror'],
-  ...COMPS.map((c) => [c[0], c[1], c[2], ANA_READ[c[0]], c[12]]),
-]
-const ref = (() => { const r = model(COMPS[0][2]); return r.dmg + r.sup })()
-
-// ---- The comps, measured. ----
-const T1MEAS = [[3.87, 3.56, 4.04], [3.77, 3.63, 4.18]]
-const mbar = (meas, ana) => { const X = (v) => Math.max(0, Math.min(100, (v + 2) / 28 * 100))
-  return `<svg viewBox="0 0 160 18" width="160" height="18" role="img" aria-label="Measured ${f1(meas)}%, analytic ${f1(ana)}%"><line x1="${X(0) * 1.6}" x2="${X(0) * 1.6}" y1="1" y2="17" class="axis"/>
-    <rect x="${X(0) * 1.6}" y="2" width="${Math.max(2, (X(meas) - X(0)) * 1.6)}" height="7" rx="2" fill="var(--accent)"><title>Measured, Lv 50: ${f1(meas)}%</title></rect>
-    <rect x="${X(0) * 1.6}" y="11" width="${Math.max(2, (X(ana) - X(0)) * 1.6)}" height="5" rx="2" fill="var(--ink-faint)"><title>The model, Lv 50: ${f1(ana)}%</title></rect></svg>` }
-const nw = 'style="white-space:nowrap"'
-document.getElementById('meastab').innerHTML = '<tr><th style="min-width:200px">Comp</th><th class="n">Measured, Lv 10 · 30 · 50</th><th>Lv 50: measured · model</th><th class="n">Model, Lv 50</th><th class="n">Party (BT)</th><th class="n">Support</th><th class="n">Rounds</th><th class="n">Taken a fight</th></tr>' +
-  `<tr><td><b>Tier 1</b> Party 1 · Party 2<div class="muted" style="font-size:12px">the owner's two parties: ${T1MEAS.map((r) => r.map(f2).join(' · ')).join(' and ')} BT</div></td><td class="n">—</td><td></td><td class="n">—</td><td class="n" ${nw}>4.04 · 4.18</td><td class="n" ${nw}>0.28 · 0.55</td><td class="n" ${nw}>3.70 · 4.47 · 7.05</td><td class="n" ${nw}>28 · 487 · 467</td></tr>` +
-  COMPS.map(([id, name, m, ana, meas, bt, sup, share, rounds, taken, , , t3]) => `<tr><td><b>${id}</b> ${name}<div class="muted" style="font-size:12px">${m.join(', ')}</div></td>
-    <td class="n" ${nw}><b>${meas.map(f1).join(' · ')}%</b></td><td>${t3 ? '<span class="muted">Tier 3, Lv 10 · 30 · 50</span>' : mbar(meas[2], ana)}</td><td class="n" ${nw}>${t3 ? '+13% (T3)' : f1(ana) + '%'}</td>
-    <td class="n">${f2(bt)}</td><td class="n" ${nw}>${f2(sup)} (${share})</td><td class="n" ${nw}>${rounds}</td><td class="n" ${nw}>${taken}</td></tr>`).join('')
-
-function memberTable(c) {
-  const [, , m, , , , , , , , ds, , t3] = c, r = model(m, { tier3: t3 })
-  return '<table><tr><th>Member</th><th>Weapons</th><th class="n">Measured D + S, Lv 50</th><th class="n">Model V <span class="muted">(a turn)</span></th></tr>' +
-    m.map((n, i) => `<tr><td><b>${n}</b></td><td>${C[n].w.map((k) => kind(k, 1)).join('')}</td>
-      <td class="n"><b>${f2(ds[i][0])}</b>${ds[i][1] === null ? '' : ds[i][1] > 0 ? ` + ${f2(ds[i][1])}` : ''}</td><td class="n muted">${f2(r.own[n] + r.support[n] + r.chips[n])}</td></tr>`).join('') + '</table>'
-}
-document.getElementById('cardgrid').innerHTML = COMPS.map((c) => { const [id, name, m, ana, meas, bt, sup, share, , , , read, t3] = c, r = model(m, { tier3: t3 })
-  return `<div class="card"><h3>${id} · ${name}</h3><div class="row">${KINDS.map((k) => kind(k, r.kinds[k])).join('')}</div>
-    <div class="row" style="margin:8px 0"><span class="big">${meas.map(f1).join(' · ')}%</span><span class="muted"><span class="chip meas">measured</span> over ${t3 ? "Tier 1's parties at Tier 3" : id === 'C2' || id === 'C4b' || id === 'C5' ? 'Party 2' : 'Party 1'} at Lv 10 · 30 · 50 · ${f2(bt)} BT a round · support ${f2(sup)} (${share})</span></div>
-    <div class="muted" style="font-size:12px">The model: ${f2(r.dmg + r.sup)} BT a turn, ${t3 ? '+13% (Tier 3 units)' : f1(ana) + '% over its Tier 1 party'} <span class="chip ana">analytic</span></div>
-    <div class="scroll">${memberTable(c)}</div><p class="note">${read}${t3 ? ' · Tier 3\'s D only: the harness gave the crowned party\'s support as a whole (0.47).' : ''}</p></div>` }).join('')
-
-// ---- The guardrail chart: three panels, the twelve, the band. ----
-;(function drawGuard() {
-  const svg = document.getElementById('guard'), W = 1060, LBL = 96, PW = (W - LBL - 20) / 3, T = 26, RH = 22, lo = -12, hi = 20
-  const X = (p, v) => LBL + p * PW + 14 + (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * (PW - 70)
-  let s = ''
-  TWELVE.forEach((n, i) => { s += `<text class="lbl" x="${LBL - 8}" y="${T + i * RH + 15}" text-anchor="end">${n}</text>` })
-  ;['Lv 10', 'Lv 30', 'Lv 50'].forEach((lv, p) => {
-    const m = MEAN.knob[p], y0 = T, y1 = T + TWELVE.length * RH
-    s += `<text x="${LBL + p * PW + PW / 2}" y="14" text-anchor="middle" class="lbl">${lv} · mean ${f1(m)}%</text>`
-    s += `<rect class="band" x="${X(p, m - 5)}" y="${y0}" width="${X(p, m + 5) - X(p, m - 5)}" height="${y1 - y0}"/>`
-    for (const v of [-10, 0, 10, 20]) s += `<line class="grid" x1="${X(p, v)}" x2="${X(p, v)}" y1="${y0}" y2="${y1}"/><text x="${X(p, v)}" y="${y1 + 14}" text-anchor="middle">${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}%</text>`
-    s += `<line class="mean" x1="${X(p, m)}" x2="${X(p, m)}" y1="${y0}" y2="${y1}"/>`
-    TWELVE.forEach((n, i) => {
-      const y = T + i * RH + 11, d = G[n][0][p], k = G[n][1][p], out = Math.abs(k - m) > 5
-      const tip = `${n}, ${lv}: at the knobs ${f1(k)}% (${f1(k - m)} points from the mean${out ? ', outside the band' : ''}); at the drafted values ${f1(d)}%`
-      s += `<line x1="${X(p, d)}" x2="${X(p, k)}" y1="${y}" y2="${y}" stroke="var(--hairline-strong)" stroke-width="2"/>`
-      s += `<circle class="draft" cx="${X(p, d)}" cy="${y}" r="4.5"><title>${tip}</title></circle>`
-      if (d > hi) s += `<text x="${X(p, hi) + 7}" y="${y + 4}">▸ ${f1(d)}</text>`
-      s += `<circle class="hit" cx="${X(p, k)}" cy="${y}" r="10" tabindex="0" aria-label="${tip}"><title>${tip}</title></circle><circle class="knob ${out ? 'out' : ''}" cx="${X(p, k)}" cy="${y}" r="5" pointer-events="none"/>`
-    })
+const M = {"KINDS":["Greatsword","Axe","Lance","Bow","Katana","Fire","Blizzard","Thunder","Light","Dark"],"TIER1":{"brawler":{"name":"Brawler","family":"Warrior","slots":"3 Arms","preset":["Greatsword","Axe","Lance"],"D":1.04,"S":0,"heal":0,"id":"brawler","v":1.04},"sorcerer":{"name":"Sorcerer","family":"Mage","slots":"3 Tomes","preset":["Fire","Blizzard","Thunder"],"D":1.12,"S":0,"heal":0,"id":"sorcerer","v":1.12},"armsblade":{"name":"Arms Spellblade","family":"Spellblade","slots":"2 Arms + 1 Tome","preset":["Katana","Axe","Thunder"],"D":0.85,"S":0.02,"heal":0,"id":"armsblade","v":0.87},"tomeblade":{"name":"Tome Spellblade","family":"Spellblade","slots":"2 Tomes + 1 Arm","preset":["Thunder","Blizzard","Katana"],"D":0.86,"S":0.09,"heal":0,"id":"tomeblade","v":0.95},"armsummoner":{"name":"Arms Summoner","family":"Summoner","slots":"2 Arms + 1 Tome","preset":["Bow","Axe","Dark"],"D":0.73,"S":0.1,"heal":0,"id":"armsummoner","v":0.83},"tomesummoner":{"name":"Tome Summoner","family":"Summoner","slots":"2 Tomes + 1 Arm","preset":["Dark","Blizzard","Bow"],"D":0.73,"S":0.02,"heal":0,"id":"tomesummoner","v":0.75},"paladin":{"name":"Paladin","family":"Healer","slots":"2 Arms + 1 Tome","preset":["Lance","Greatsword","Light"],"D":0.37,"S":0.24,"heal":20,"healer":true,"id":"paladin","v":0.61},"cleric":{"name":"Cleric","family":"Healer","slots":"2 Tomes + 1 Arm","preset":["Light","Fire","Lance"],"D":0.35,"S":0.36,"heal":20,"healer":true,"id":"cleric","v":0.71}},"T2":[{"id":"berserker","name":"Berserker","parent":"brawler","line":"Keeper","slots":"3 Arms","reads":"ATK","act":"One act","hand":"×1","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"Momentum: +6% a stack on her own hits, a stack after each turn, 3 at most","preset":["Greatsword","Axe","Lance"],"D":1.14,"S":0,"heal":0,"gains":[5.6,2,5.2],"measured":true,"role":"Pure physical with a self-buff: the long fight's damage","tier":2,"parentName":"Brawler","family":"Warrior","v":1.09},{"id":"spellfist","name":"Spellfist","parent":"brawler","line":"Expander","slots":"2 Arms + 1 Tome","reads":"ATK on every hit","act":"One act","hand":"×1","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"The cross on ATK and Pinpoint: her one-foe acts +2% a depth","preset":["Greatsword","Katana","Fire"],"D":1.07,"S":0,"heal":0,"gains":[9,6.5,1],"measured":false,"role":"Single big hits on ATK, an element in reach: the boss striker","round2":[6.5,4.5,4.3],"tier":2,"parentName":"Brawler","family":"Warrior","v":1.05},{"id":"archmage","name":"Archmage","parent":"sorcerer","line":"Keeper","slots":"3 Tomes","reads":"M.ATK","act":"One act","hand":"×1","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"Momentum","preset":["Fire","Blizzard","Thunder"],"D":1.21,"S":0,"heal":0,"gains":[5.8,3.4,5.1],"measured":true,"role":"Pure magic with a self-buff: the party's top damage","tier":2,"parentName":"Sorcerer","family":"Mage","v":1.18},{"id":"battlemage","name":"Battlemage","parent":"sorcerer","line":"Expander","slots":"2 Tomes + 1 Arm","reads":"M.ATK on every hit","act":"One act","hand":"×1.25","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"The cross on M.ATK and Pinpoint","preset":["Fire","Blizzard","Katana"],"D":1.23,"S":0,"heal":0,"gains":[9.5,8,-1],"measured":false,"role":"Single big hits on M.ATK, an Arm in reach: the boss caster","round2":[10.9,8.3,-1.8],"tier":2,"parentName":"Sorcerer","family":"Mage","v":1.11},{"id":"blademaster","name":"Blademaster","parent":"armsblade","line":"Keeper","slots":"2 Arms + 1 Tome","reads":"ATK · M.ATK by half","act":"Pair","hand":"0.75 + 0.47","mp":"×0.5 a half","status":"Path","healer":false,"lb":0.95,"rule":"Her familiar's extra hit on both halves, and it pierces","preset":["Katana","Axe","Thunder"],"D":0.89,"S":0.01,"heal":0,"gains":[9,4.5,3.6],"measured":true,"role":"The Break engine on one foe","tier":2,"parentName":"Arms Spellblade","family":"Spellblade","v":0.9},{"id":"sentinel","name":"Sentinel","parent":"armsblade","line":"Support","slots":"2 Arms + 1 Tome","reads":"ATK · M.ATK by half","act":"Pair","hand":"0.68 + 0.42","mp":"×0.5 a half","status":"Support","healer":false,"lb":0.95,"rule":"Support: Armor Break on the foe, Brave and Faith on her ward, topped up; a Barrier after each skill act","preset":["Katana","Greatsword","Light"],"D":0.72,"S":0.14,"heal":3.7,"gains":[-2.4,10.9,2.9],"measured":true,"role":"Offense support with a ward","tier":2,"parentName":"Arms Spellblade","family":"Spellblade","v":0.9},{"id":"bladedancer","name":"Bladedancer","parent":"armsblade","line":"Pure","slots":"3 Arms (2 + 1)","reads":"ATK on every hit","act":"Pair","hand":"0.72 + 0.32","mp":"×0.5 a half","status":"None","healer":false,"lb":0.95,"rule":"The pure pair: both halves Arms, on ATK; her familiar's extra hit on her lead half","preset":["Katana","Axe","Bow"],"D":0.93,"S":0,"heal":0,"gains":[3.6,null,5.3],"measured":false,"role":"Pure physical multi-hit on one foe","tier":2,"parentName":"Arms Spellblade","family":"Spellblade","v":0.92},{"id":"runeblade","name":"Runeblade","parent":"tomeblade","line":"Keeper","slots":"2 Tomes + 1 Arm","reads":"M.ATK · ATK by half","act":"Pair","hand":"0.75 + 0.51","mp":"×0.5 a half","status":"Path","healer":false,"lb":0.95,"rule":"The Blademaster's rule","preset":["Thunder","Blizzard","Katana"],"D":0.92,"S":0.05,"heal":0,"gains":[6.8,2.3,2.8],"measured":true,"role":"The Break engine on one foe, magic-led","tier":2,"parentName":"Tome Spellblade","family":"Spellblade","v":0.98},{"id":"enchanter","name":"Enchanter","parent":"tomeblade","line":"Support","slots":"2 Tomes + 1 Arm","reads":"M.ATK · ATK by half","act":"Pair","hand":"0.58 + 0.38","mp":"×0.5 a half","status":"Support","healer":false,"lb":0.95,"rule":"The Sentinel's rule","preset":["Light","Blizzard","Katana"],"D":0.69,"S":0.23,"heal":3.7,"gains":[7,2.5,6.6],"measured":true,"role":"Offense support with a ward, magic-led","tier":2,"parentName":"Tome Spellblade","family":"Spellblade","v":1.01},{"id":"spellweaver","name":"Spellweaver","parent":"tomeblade","line":"Pure","slots":"3 Tomes (2 + 1)","reads":"M.ATK on every hit","act":"Pair","hand":"0.72 + 0.41","mp":"×0.5 a half","status":"None","healer":false,"lb":0.95,"rule":"The pure pair: both halves Tomes, on M.ATK; her familiar's extra hit on her lead half","preset":["Thunder","Blizzard","Dark"],"D":0.99,"S":0,"heal":0,"gains":[8.3,null,2],"measured":false,"role":"Pure elemental multi-hit on one foe","tier":2,"parentName":"Tome Spellblade","family":"Spellblade","v":0.97},{"id":"warlord","name":"Warlord","parent":"armsummoner","line":"Keeper","slots":"2 Arms + 1 Tome","reads":"ATK · M.ATK by half","act":"Pair","hand":"0.60 + 0.49","mp":"×0.5 a half","status":"Path","healer":false,"lb":0.95,"rule":"Both summons linger: two farewells on every foe at her next pair","preset":["Bow","Axe","Dark"],"D":0.78,"S":0.1,"heal":0,"gains":[8.6,2,6.8],"measured":true,"role":"The Break engine on every foe","tier":2,"parentName":"Arms Summoner","family":"Summoner","v":0.89},{"id":"druid","name":"Druid","parent":"armsummoner","line":"Support","slots":"2 Arms + 1 Tome","reads":"ATK · M.ATK by half","act":"Pair","hand":"0.54 + 0.44","mp":"×0.5 a half","status":"Support","healer":false,"lb":0.95,"rule":"Support: Enfeeble and Mind Break on every foe, topped up; her farewell mends every Uma","preset":["Bow","Axe","Dark"],"D":0.65,"S":0.11,"heal":5.5,"gains":[7.1,2.3,-1.5],"measured":true,"role":"Field support with a mend","tier":2,"parentName":"Arms Summoner","family":"Summoner","v":0.82},{"id":"marshal","name":"Marshal","parent":"armsummoner","line":"Pure","slots":"3 Arms (2 + 1)","reads":"ATK on every hit","act":"Pair","hand":"0.57 + 0.40","mp":"×0.5 a half","status":"None","healer":false,"lb":0.95,"rule":"The pure pair: both summons Arms, on ATK; her lead summon lingers","preset":["Bow","Axe","Katana"],"D":0.86,"S":0,"heal":0,"gains":[10.1,null,1.2],"measured":false,"role":"Pure physical area, a summon that lingers","tier":2,"parentName":"Arms Summoner","family":"Summoner","v":0.84},{"id":"invoker","name":"Invoker","parent":"tomesummoner","line":"Keeper","slots":"2 Tomes + 1 Arm","reads":"M.ATK · ATK by half","act":"Pair","hand":"0.60 + 0.53","mp":"×0.5 a half","status":"Path","healer":false,"lb":0.95,"rule":"The Warlord's rule","preset":["Dark","Blizzard","Bow"],"D":0.77,"S":0.01,"heal":0,"gains":[8.6,3.6,3],"measured":true,"role":"The Break engine on every foe, magic-led","tier":2,"parentName":"Tome Summoner","family":"Summoner","v":0.77},{"id":"shaman","name":"Shaman","parent":"tomesummoner","line":"Support","slots":"2 Tomes + 1 Arm","reads":"M.ATK · ATK by half","act":"Pair","hand":"0.57 + 0.5","mp":"×0.5 a half","status":"Support","healer":false,"lb":0.95,"rule":"The Druid's rule","preset":["Dark","Blizzard","Bow"],"D":0.7,"S":0.03,"heal":5.5,"gains":[10.4,0.8,1.2],"measured":true,"role":"Field support with a mend, magic-led","tier":2,"parentName":"Tome Summoner","family":"Summoner","v":0.76},{"id":"animist","name":"Animist","parent":"tomesummoner","line":"Pure","slots":"3 Tomes (2 + 1)","reads":"M.ATK on every hit","act":"Pair","hand":"0.57 + 0.37","mp":"×0.5 a half","status":"None","healer":false,"lb":0.95,"rule":"The pure pair: both summons Tomes, on M.ATK; her lead summon lingers","preset":["Dark","Blizzard","Thunder"],"D":0.81,"S":0,"heal":0,"gains":[4.4,null,6.3],"measured":false,"role":"Pure elemental area, a summon that lingers","tier":2,"parentName":"Tome Summoner","family":"Summoner","v":0.8},{"id":"guardian","name":"Guardian","parent":"paladin","line":"Keeper","slots":"2 Arms + 1 Tome","reads":"ATK; heals from ATK","act":"One act","hand":"×0.5","mp":"×0.6","status":"Widely, +1","healer":true,"lb":0.8,"rule":"Every status she lands one stack more","preset":["Lance","Greatsword","Light"],"D":0.37,"S":0.24,"heal":20,"gains":[5.5,0,1.1],"measured":true,"role":"The one healer: the attrition pick","tier":2,"parentName":"Paladin","family":"Healer","v":0.62},{"id":"templar","name":"Templar","parent":"paladin","line":"Expander","slots":"2 Arms + 1 Tome","reads":"ATK; heals from ATK","act":"One act","hand":"×0.6","mp":"×0.7","status":"Widely","healer":true,"lb":0.8,"rule":"A battle healer: power ×0.6, mends and Barriers ×0.7","preset":["Lance","Greatsword","Light"],"D":0.42,"S":0.23,"heal":14,"gains":[12.1,9.7,5.7],"measured":true,"role":"The healer who hits: the on-curve pick","tier":2,"parentName":"Paladin","family":"Healer","v":0.64},{"id":"bishop","name":"Bishop","parent":"cleric","line":"Keeper","slots":"2 Tomes + 1 Arm","reads":"M.ATK; heals from M.ATK","act":"One act","hand":"×0.5","mp":"×0.6","status":"Widely, +1","healer":true,"lb":0.8,"rule":"The Guardian's rule","preset":["Light","Fire","Lance"],"D":0.35,"S":0.36,"heal":20,"gains":[15.5,0,0.1],"measured":true,"role":"The one healer, magic-led","tier":2,"parentName":"Cleric","family":"Healer","v":0.71},{"id":"exorcist","name":"Exorcist","parent":"cleric","line":"Expander","slots":"2 Tomes + 1 Arm","reads":"M.ATK; heals from M.ATK","act":"One act","hand":"×0.6","mp":"×0.7","status":"Widely","healer":true,"lb":0.8,"rule":"The Templar's rule","preset":["Light","Fire","Lance"],"D":0.41,"S":0.36,"heal":14,"gains":[15.9,6.9,7.3],"measured":true,"role":"The healer who hits, magic-led","tier":2,"parentName":"Cleric","family":"Healer","v":0.76}],"T3":[{"id":"ravager","name":"Ravager","parent":"berserker","line":"Pure","slots":"3 Arms","reads":"ATK","act":"One act","hand":"×1","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"Juggernaut: an unbroken foe takes ×0.6 from her hits, not ×0.5","preset":["Greatsword","Axe","Lance"],"D":1.23,"S":0,"heal":0,"gains":null,"measured":false,"role":"Momentum and Juggernaut: nothing slows her","g":4.4,"ruleName":"Juggernaut (round 2's Warrior mastery)","tier":3,"parentName":"Berserker","grand":"brawler","family":"Warrior","v":1.14},{"id":"spellhammer","name":"Spellhammer","parent":"spellfist","line":"Kept","slots":"2 Arms + 1 Tome","reads":"ATK on every hit","act":"One act","hand":"×1","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"Pinpoint +4% a depth (from +2%)","preset":["Greatsword","Katana","Fire"],"D":1.18,"S":0,"heal":0,"gains":null,"measured":false,"role":"The Spellfist with a higher ceiling","g":5.5,"ruleName":"Pinpoint, doubled","tier":3,"parentName":"Spellfist","grand":"brawler","family":"Warrior","v":1.11},{"id":"gladiator","name":"Gladiator","parent":"spellfist","line":"Pure","slots":"3 Arms","reads":"ATK","act":"One act","hand":"×1.05","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"Arsenal: two two-kind weapons in her slots, every Arm in reach","preset":["Greatsword","Axe","Lance"],"D":1.15,"S":0,"heal":0,"gains":null,"measured":false,"role":"Pure physical, every physical kind: weak hits and Breaks on every foe","g":5.4,"ruleName":"Arsenal","arsenal":["Katana","Bow"],"tier":3,"parentName":"Spellfist","grand":"brawler","family":"Warrior","v":1.11},{"id":"astromancer","name":"Astromancer","parent":"archmage","line":"Pure","slots":"3 Tomes","reads":"M.ATK","act":"One act","hand":"×1","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"Resonance: her capstones and her class capstone strike again at 30%; the echo chips nothing","preset":["Fire","Blizzard","Thunder"],"D":1.29,"S":0,"heal":0,"gains":null,"measured":false,"role":"Momentum and an echo: the party's top damage","g":3.9,"ruleName":"Resonance (round 2's Mage mastery)","tier":3,"parentName":"Archmage","grand":"sorcerer","family":"Mage","v":1.22},{"id":"spellknight","name":"Spellknight","parent":"battlemage","line":"Kept","slots":"2 Tomes + 1 Arm","reads":"M.ATK on every hit","act":"One act","hand":"×1.25","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"Pinpoint +4% a depth (from +2%)","preset":["Fire","Blizzard","Katana"],"D":1.32,"S":0,"heal":0,"gains":null,"measured":false,"role":"The Battlemage with a higher ceiling","g":4.1,"ruleName":"Pinpoint, doubled","tier":3,"parentName":"Battlemage","grand":"sorcerer","family":"Mage","v":1.15},{"id":"thaumaturge","name":"Thaumaturge","parent":"battlemage","line":"Pure","slots":"3 Tomes","reads":"M.ATK","act":"One act","hand":"×1.05","mp":"×1","status":"None","healer":false,"lb":0.95,"rule":"Arsenal: two two-kind weapons in her slots, every element in reach","preset":["Fire","Blizzard","Thunder"],"D":1.21,"S":0,"heal":0,"gains":null,"measured":false,"role":"Pure magic, every element: weak hits and Breaks on every foe","g":5.2,"ruleName":"Arsenal","arsenal":["Light","Dark"],"tier":3,"parentName":"Battlemage","grand":"sorcerer","family":"Mage","v":1.17},{"id":"bladelord","name":"Bladelord","parent":"blademaster","line":"Keeper","slots":"2 Arms + 1 Tome","reads":"ATK · M.ATK by half","act":"Pair","hand":"0.75 + 0.47","mp":"×0.5 a half","status":"Path","healer":false,"lb":0.95,"rule":"Spellbind: both halves weak on one foe, the act +20%","preset":["Katana","Axe","Thunder"],"D":0.94,"S":0.01,"heal":0,"gains":null,"measured":false,"role":"The Break engine, both channels at once","g":5.1,"ruleName":"Spellbind (round 2's Spellblade mastery)","tier":3,"parentName":"Blademaster","grand":"armsblade","family":"Spellblade","v":0.95},{"id":"herald","name":"Herald","parent":"sentinel","line":"Support","slots":"2 Arms + 1 Tome","reads":"ATK · M.ATK by half","act":"Pair","hand":"0.71 + 0.45","mp":"×0.5 a half","status":"Support","healer":false,"lb":0.95,"rule":"Her keeper sibling's twist: her familiar on both halves, piercing; hands +0.03 a half","preset":["Katana","Greatsword","Light"],"D":0.75,"S":0.14,"heal":3.7,"gains":null,"measured":false,"role":"Offense support who hits harder","g":3.2,"ruleName":"The keeper's twist","tier":3,"parentName":"Sentinel","grand":"armsblade","family":"Spellblade","v":0.92},{"id":"dervish","name":"Dervish","parent":"bladedancer","line":"Pure","slots":"3 Arms (2 + 1)","reads":"ATK on every hit","act":"Pair","hand":"0.72 + 0.32","mp":"×0.5 a half","status":"None","healer":false,"lb":0.95,"rule":"Momentum","preset":["Katana","Axe","Bow"],"D":1.02,"S":0,"heal":0,"gains":null,"measured":false,"role":"Pure physical multi-hit with a self-buff","g":8.2,"ruleName":"Momentum","tier":3,"parentName":"Bladedancer","grand":"armsblade","family":"Spellblade","v":0.99},{"id":"runelord","name":"Runelord","parent":"runeblade","line":"Keeper","slots":"2 Tomes + 1 Arm","reads":"M.ATK · ATK by half","act":"Pair","hand":"0.75 + 0.51","mp":"×0.5 a half","status":"Path","healer":false,"lb":0.95,"rule":"Spellbind","preset":["Thunder","Blizzard","Katana"],"D":0.98,"S":0.05,"heal":0,"gains":null,"measured":false,"role":"The Bladelord, magic-led","g":5.1,"ruleName":"Spellbind","tier":3,"parentName":"Runeblade","grand":"tomeblade","family":"Spellblade","v":1.03},{"id":"oracle","name":"Oracle","parent":"enchanter","line":"Support","slots":"2 Tomes + 1 Arm","reads":"M.ATK · ATK by half","act":"Pair","hand":"0.61 + 0.41","mp":"×0.5 a half","status":"Support","healer":false,"lb":0.95,"rule":"The Herald's rule","preset":["Light","Blizzard","Katana"],"D":0.74,"S":0.23,"heal":3.7,"gains":null,"measured":false,"role":"The Herald, magic-led","g":3.2,"ruleName":"The keeper's twist","tier":3,"parentName":"Enchanter","grand":"tomeblade","family":"Spellblade","v":1.05},{"id":"starweaver","name":"Starweaver","parent":"spellweaver","line":"Pure","slots":"3 Tomes (2 + 1)","reads":"M.ATK on every hit","act":"Pair","hand":"0.72 + 0.41","mp":"×0.5 a half","status":"None","healer":false,"lb":0.95,"rule":"Momentum","preset":["Thunder","Blizzard","Dark"],"D":1.09,"S":0,"heal":0,"gains":null,"measured":false,"role":"Pure elemental multi-hit with a self-buff","g":8.2,"ruleName":"Momentum","tier":3,"parentName":"Spellweaver","grand":"tomeblade","family":"Spellblade","v":1.05},{"id":"overlord","name":"Overlord","parent":"warlord","line":"Keeper","slots":"2 Arms + 1 Tome","reads":"ATK · M.ATK by half","act":"Pair","hand":"0.60 + 0.49","mp":"×0.5 a half","status":"Path","healer":false,"lb":0.95,"rule":"Menagerie: her lingering summons stay two pairs, a farewell at each","preset":["Bow","Axe","Dark"],"D":0.81,"S":0.1,"heal":0,"gains":null,"measured":false,"role":"Farewells on every foe, twice as long","g":3.4,"ruleName":"Menagerie (round 2's Summoner mastery)","tier":3,"parentName":"Warlord","grand":"armsummoner","family":"Summoner","v":0.92},{"id":"archdruid","name":"Archdruid","parent":"druid","line":"Support","slots":"2 Arms + 1 Tome","reads":"ATK · M.ATK by half","act":"Pair","hand":"0.57 + 0.47","mp":"×0.5 a half","status":"Support","healer":false,"lb":0.95,"rule":"Her keeper sibling's twist: both summons linger, and both farewells mend; hands +0.03 a half","preset":["Bow","Axe","Dark"],"D":0.69,"S":0.11,"heal":11,"gains":null,"measured":false,"role":"Field support, two mends a pair","g":4.9,"ruleName":"The keeper's twist","tier":3,"parentName":"Druid","grand":"armsummoner","family":"Summoner","v":0.86},{"id":"imperator","name":"Imperator","parent":"marshal","line":"Pure","slots":"3 Arms (2 + 1)","reads":"ATK on every hit","act":"Pair","hand":"0.57 + 0.40","mp":"×0.5 a half","status":"None","healer":false,"lb":0.95,"rule":"Momentum","preset":["Bow","Axe","Katana"],"D":0.94,"S":0,"heal":0,"gains":null,"measured":false,"role":"Pure physical area with a self-buff","g":8.2,"ruleName":"Momentum","tier":3,"parentName":"Marshal","grand":"armsummoner","family":"Summoner","v":0.91},{"id":"hierarch","name":"Hierarch","parent":"invoker","line":"Keeper","slots":"2 Tomes + 1 Arm","reads":"M.ATK · ATK by half","act":"Pair","hand":"0.60 + 0.53","mp":"×0.5 a half","status":"Path","healer":false,"lb":0.95,"rule":"Menagerie","preset":["Dark","Blizzard","Bow"],"D":0.8,"S":0.01,"heal":0,"gains":null,"measured":false,"role":"The Overlord, magic-led","g":3.4,"ruleName":"Menagerie","tier":3,"parentName":"Invoker","grand":"tomesummoner","family":"Summoner","v":0.8},{"id":"soulcaller","name":"Soulcaller","parent":"shaman","line":"Support","slots":"2 Tomes + 1 Arm","reads":"M.ATK · ATK by half","act":"Pair","hand":"0.60 + 0.53","mp":"×0.5 a half","status":"Support","healer":false,"lb":0.95,"rule":"The Archdruid's rule","preset":["Dark","Blizzard","Bow"],"D":0.74,"S":0.03,"heal":11,"gains":null,"measured":false,"role":"The Archdruid, magic-led","g":4.9,"ruleName":"The keeper's twist","tier":3,"parentName":"Shaman","grand":"tomesummoner","family":"Summoner","v":0.8},{"id":"mythlord","name":"Mythlord","parent":"animist","line":"Pure","slots":"3 Tomes (2 + 1)","reads":"M.ATK on every hit","act":"Pair","hand":"0.57 + 0.37","mp":"×0.5 a half","status":"None","healer":false,"lb":0.95,"rule":"Momentum","preset":["Dark","Blizzard","Thunder"],"D":0.89,"S":0,"heal":0,"gains":null,"measured":false,"role":"Pure elemental area with a self-buff","g":8.2,"ruleName":"Momentum","tier":3,"parentName":"Animist","grand":"tomesummoner","family":"Summoner","v":0.86},{"id":"bastion","name":"Bastion","parent":"guardian","line":"Keeper","slots":"2 Arms + 1 Tome","reads":"ATK; heals from ATK","act":"One act","hand":"×0.5","mp":"×0.6","status":"Widely, +1","healer":true,"lb":0.8,"rule":"Overflow: a mend's healing past max HP becomes a Barrier, up to 10% of max HP","preset":["Lance","Greatsword","Light"],"D":0.37,"S":0.24,"heal":20,"gains":null,"measured":false,"role":"The safest healer: overheal becomes a Barrier","g":0,"ruleName":"Overflow (round 2's Healer mastery)","tier":3,"parentName":"Guardian","grand":"paladin","family":"Healer","v":0.62},{"id":"inquisitor","name":"Inquisitor","parent":"templar","line":"Battle","slots":"2 Arms + 1 Tome","reads":"ATK; heals from ATK","act":"One act","hand":"×0.7","mp":"×0.7","status":"Widely","healer":true,"lb":0.8,"rule":"A deeper battle healer: power ×0.7 (from ×0.6), mends and Barriers ×0.7 kept","preset":["Lance","Greatsword","Light"],"D":0.49,"S":0.23,"heal":14,"gains":null,"measured":false,"role":"The healer who hits hardest","g":10.8,"ruleName":"Power ×0.7","tier":3,"parentName":"Templar","grand":"paladin","family":"Healer","v":0.71},{"id":"cardinal","name":"Cardinal","parent":"bishop","line":"Keeper","slots":"2 Tomes + 1 Arm","reads":"M.ATK; heals from M.ATK","act":"One act","hand":"×0.5","mp":"×0.6","status":"Widely, +1","healer":true,"lb":0.8,"rule":"Overflow","preset":["Light","Fire","Lance"],"D":0.35,"S":0.36,"heal":20,"gains":null,"measured":false,"role":"The Bastion, magic-led","g":0,"ruleName":"Overflow","tier":3,"parentName":"Bishop","grand":"cleric","family":"Healer","v":0.71},{"id":"hierophant","name":"Hierophant","parent":"exorcist","line":"Battle","slots":"2 Tomes + 1 Arm","reads":"M.ATK; heals from M.ATK","act":"One act","hand":"×0.7","mp":"×0.7","status":"Widely","healer":true,"lb":0.8,"rule":"The Inquisitor's rule","preset":["Light","Fire","Lance"],"D":0.48,"S":0.36,"heal":14,"gains":null,"measured":false,"role":"The Inquisitor, magic-led","g":8.9,"ruleName":"Power ×0.7","tier":3,"parentName":"Exorcist","grand":"cleric","family":"Healer","v":0.83}],"COMPS2":[{"id":"P1","name":"Tier 1 Party 1","members":["brawler","sorcerer","armsblade","tomesummoner","paladin"],"D":4.11,"S":0.28,"V":4.39,"heal":20,"kinds":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"P2","name":"Tier 1 Party 2","members":["brawler","sorcerer","tomeblade","armsummoner","cleric"],"D":4.1,"S":0.55,"V":4.65,"heal":20,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"C1","name":"Tier 1-like: Party 1's keepers","base":"P1","members":["berserker","archmage","blademaster","invoker","guardian"],"measured":[5.5,3.9,4.4],"D":4.38,"S":0.26,"V":4.562,"heal":20,"kinds":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"C2","name":"Tier 1-like: Party 2's keepers","base":"P2","members":["berserker","archmage","runeblade","warlord","bishop"],"measured":[7.7,1.7,5.4],"D":4.4,"S":0.51,"V":4.845,"heal":20,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"C3","name":"Swap: a Brawler with a Spellblade","base":"P1","members":["spellfist","archmage","bladedancer","invoker","guardian"],"spine":true,"D":4.35,"S":0.25,"V":4.533,"heal":20,"kinds":{"Greatsword":2,"Axe":1,"Lance":1,"Bow":2,"Katana":2,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":1,"Lance":1,"Bow":2,"Katana":2,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1}},{"id":"C3b","name":"Swap: a Sorcerer with a Tome Spellblade","base":"P2","members":["berserker","battlemage","spellweaver","warlord","bishop"],"spine":true,"D":4.49,"S":0.46,"V":4.769,"heal":20,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":2},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":2}},{"id":"C4","name":"Swap: a Spellblade with the Paladin","base":"P1","members":["berserker","archmage","sentinel","invoker","templar"],"measured":[4.3,5.3,5.7],"spine":true,"D":4.26,"S":0.38,"V":4.584,"heal":17.7,"kinds":{"Greatsword":3,"Axe":1,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1},"hands":{"Greatsword":3,"Axe":1,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1}},{"id":"C4b","name":"Swap: a Tome Spellblade with the Cleric","base":"P2","members":["berserker","archmage","enchanter","warlord","exorcist"],"measured":[7.4,5.6,6.7],"spine":true,"D":4.23,"S":0.69,"V":4.932,"heal":17.7,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1}},{"id":"C5","name":"Both swaps on one party","base":"P1","members":["spellfist","archmage","bladedancer","shaman","templar"],"spine":true,"D":4.33,"S":0.26,"V":4.547,"heal":19.5,"kinds":{"Greatsword":2,"Axe":1,"Lance":1,"Bow":2,"Katana":2,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":1,"Lance":1,"Bow":2,"Katana":2,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1}},{"id":"C6","name":"All pure (Party 1)","base":"P1","members":["berserker","archmage","bladedancer","animist","guardian"],"D":4.46,"S":0.24,"V":4.601,"heal":20,"kinds":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"C6b","name":"All pure (Party 2)","base":"P2","members":["berserker","archmage","spellweaver","marshal","bishop"],"D":4.55,"S":0.36,"V":4.791,"heal":20,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"C7","name":"All hybrid (round 2's C3)","base":"P1","members":["spellfist","battlemage","blademaster","invoker","guardian"],"round2":[9.3,8,5.2],"D":4.33,"S":0.26,"V":4.45,"heal":20,"kinds":{"Greatsword":2,"Axe":1,"Lance":1,"Bow":1,"Katana":3,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":1,"Lance":1,"Bow":1,"Katana":3,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1}},{"id":"C8","name":"Both hybrids to support (round 2's C6)","base":"P1","members":["berserker","archmage","sentinel","shaman","guardian"],"measured":[5.1,3.1,3.7],"D":4.14,"S":0.41,"V":4.542,"heal":29.2,"kinds":{"Greatsword":3,"Axe":1,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1},"hands":{"Greatsword":3,"Axe":1,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1}},{"id":"C9","name":"A Summoner to support (round 2's C5)","base":"P2","members":["berserker","archmage","runeblade","druid","bishop"],"measured":[7.9,2.3,4],"D":4.27,"S":0.52,"V":4.776,"heal":25.5,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"C10","name":"Every member an expander (round 2's C7)","base":"P1","members":["spellfist","battlemage","sentinel","shaman","templar"],"round2":[7.4,8.5,5.7],"D":4.14,"S":0.4,"V":4.458,"heal":23.2,"kinds":{"Greatsword":3,"Axe":0,"Lance":1,"Bow":1,"Katana":3,"Fire":2,"Blizzard":2,"Thunder":0,"Light":2,"Dark":1},"hands":{"Greatsword":3,"Axe":0,"Lance":1,"Bow":1,"Katana":3,"Fire":2,"Blizzard":2,"Thunder":0,"Light":2,"Dark":1}}],"COMPS3":[{"id":"T1","name":"The keepers' line: round 2's crowned C1","from":"C1","members":["ravager","astromancer","bladelord","hierarch","bastion"],"measuredBT":4.82,"D":4.63,"S":0.26,"V":4.728,"heal":20,"kinds":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"T2","name":"The keepers' line from C2","from":"C2","members":["ravager","astromancer","runelord","overlord","cardinal"],"D":4.66,"S":0.51,"V":5.019,"heal":20,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"T3","name":"Swap: a Brawler with a Spellblade","from":"C3","members":["spellhammer","astromancer","dervish","hierarch","bastion"],"spine":true,"D":4.66,"S":0.25,"V":4.738,"heal":20,"kinds":{"Greatsword":2,"Axe":1,"Lance":1,"Bow":2,"Katana":2,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":1,"Lance":1,"Bow":2,"Katana":2,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1}},{"id":"T3g","name":"The Gladiator beside the Bladelord","from":"C3","members":["gladiator","astromancer","bladelord","hierarch","bastion"],"spine":true,"D":4.55,"S":0.26,"V":4.693,"heal":20,"kinds":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":2,"Katana":2,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1},"hands":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"T3b","name":"Swap: a Sorcerer with a Tome Spellblade","from":"C3b","members":["ravager","spellknight","starweaver","overlord","cardinal"],"spine":true,"D":4.8,"S":0.46,"V":4.972,"heal":20,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":2},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":2}},{"id":"T4","name":"Swap: a Spellblade with the Paladin","from":"C4","members":["ravager","astromancer","herald","hierarch","inquisitor"],"spine":true,"D":4.56,"S":0.38,"V":4.802,"heal":17.7,"kinds":{"Greatsword":3,"Axe":1,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1},"hands":{"Greatsword":3,"Axe":1,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1}},{"id":"T4b","name":"Swap: a Tome Spellblade with the Cleric","from":"C4b","members":["ravager","astromancer","oracle","overlord","hierophant"],"spine":true,"D":4.55,"S":0.69,"V":5.157,"heal":17.7,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":2,"Blizzard":2,"Thunder":1,"Light":2,"Dark":1}},{"id":"T6","name":"All pure, every kind","from":"C6","members":["gladiator","thaumaturge","dervish","mythlord","bastion"],"D":4.64,"S":0.24,"V":4.744,"heal":20,"kinds":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":2,"Katana":2,"Fire":1,"Blizzard":2,"Thunder":2,"Light":2,"Dark":2},"hands":{"Greatsword":2,"Axe":2,"Lance":2,"Bow":1,"Katana":1,"Fire":1,"Blizzard":2,"Thunder":2,"Light":1,"Dark":1}},{"id":"T8","name":"A Tier 3 mix (round 2's C8's line)","from":null,"members":["ravager","spellknight","bladelord","soulcaller","cardinal"],"r2":"C8 crowned, measured 4.98","D":4.58,"S":0.4,"V":4.751,"heal":31,"kinds":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":2,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1},"hands":{"Greatsword":1,"Axe":2,"Lance":2,"Bow":1,"Katana":2,"Fire":2,"Blizzard":2,"Thunder":1,"Light":1,"Dark":1}}],"C1":4.562,"T1":4.728}
+// Shared helpers (classes.md round 3 previews).
+const KC = { Greatsword: 'greatsword', Axe: 'axe', Lance: 'lance', Bow: 'bow', Katana: 'katana', Fire: 'fire', Blizzard: 'ice', Thunder: 'lightning', Light: 'light', Dark: 'dark' }
+const kindChip = (k, partner) => `<span class="kind${partner ? ' partner' : ''}" style="background:var(--k-${KC[k]})">${k}</span>`
+const BY = Object.fromEntries([...M.T2, ...M.T3].map((c) => [c.id, c]))
+const anyClass = (id) => M.TIER1[id] ?? BY[id]
+const LINE_CHIP = { Keeper: 'keeper', Expander: 'expander', Support: 'support', Pure: 'pure', Kept: 'expander', Battle: 'battle' }
+const lineChip = (c) => `<span class="chip ${LINE_CHIP[c.line] ?? 'keeper'}">${c.line}</span>`
+const channelOf = (c) => (c.healer ? 'heal' : /^2 Tomes|^3 Tomes/.test(c.slots) ? 'magic' : 'phys')
+const pct = (x, d = 1) => `${x >= 0 ? '+' : '−'}${Math.abs(x).toFixed(d)}%`
+const gainText = (g) => (g == null ? '—' : pct(g, 1))
+const childrenOf = (id) => [...M.T2, ...M.T3].filter((c) => c.parent === id)
+const T1_ORDER = ['brawler', 'sorcerer', 'armsblade', 'tomeblade', 'armsummoner', 'tomesummoner', 'paladin', 'cleric']
+function segment(el, onPick) {
+  el.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return
+    for (const x of el.children) x.classList.toggle('on', x === b)
+    onPick(b.dataset.v)
   })
+}
+
+const comps = { 2: M.COMPS2, 3: M.COMPS3 }
+const kindLine = (cnt) => M.KINDS.map((k) => `<span class="kc ${cnt[k] ? '' : 'zero'}">${kindChip(k)}${cnt[k] > 1 ? `×${cnt[k]}` : ''}</span>`).join('')
+const tierOf = (id) => (M.TIER1[id] ? 1 : anyClass(id).tier)
+function card(c, tier) {
+  const base = tier === 2 ? M.COMPS2.find((x) => x.id === c.base) : M.COMPS2.find((x) => x.id === c.from)
+  const ref = tier === 2 ? M.C1 : M.T1
+  const mems = c.members.map((id) => { const m = anyClass(id)
+    return `<div class="mem"><b>${m.name}</b><span>${m.preset.map((k) => kindChip(k)).join('')}${m.arsenal ? m.arsenal.map((k) => kindChip(k, true)).join('') : ''}</span><span class="muted">D ${m.D.toFixed(2)}${m.S ? ` · S ${m.S.toFixed(2)}` : ''}</span><span class="muted">${m.heal ? `${m.heal}% HP` : ''}</span></div>` }).join('')
+  const meas = c.measured ? `<span class="chip measured">+${c.measured.join(' · +')}%</span>` : ''
+  return `<div class="card comp"><h3>${c.id} · ${c.name}</h3>${mems}
+    <div class="tot"><span>Damage <b>${c.D.toFixed(2)}</b> BT</span><span>Support <b>${c.S.toFixed(2)}</b> (${(c.S / (c.D + c.S) * 100).toFixed(0)}%)</span><span>Healing <b>${c.heal}%</b></span>
+      <span>Against ${tier === 2 ? 'its Tier 1 party' : 'its Tier 2 comp'} <b>${base ? pct((c.V / base.V - 1) * 100) : '—'}</b></span><span>${tier === 2 ? 'C1' : 'T1'} ${pct((c.V / ref - 1) * 100)}</span>${meas}</div>
+    <div style="margin-top:6px">${kindLine(tier === 3 ? c.kinds : c.hands)}</div></div>`
+}
+function drawSwaps(t) { document.getElementById('swapcards').innerHTML = comps[t].filter((c) => c.spine || (t === 2 && c.id === 'C1') || (t === 3 && c.id === 'T1')).map((c) => card(c, t)).join('') }
+drawSwaps(2); segment(document.getElementById('swaptier'), (v) => drawSwaps(Number(v)))
+const P = { P1: M.COMPS2.find((c) => c.id === 'P1'), P2: M.COMPS2.find((c) => c.id === 'P2') }
+document.getElementById('t2tab').innerHTML = '<tr><th>Comp</th><th>Members</th><th>Kinds</th><th class="n">Damage · support</th><th class="n">Healing</th><th class="n">Analytic, Lv 50</th><th>Measured Lv 10 · 30 · 50</th></tr>' +
+  M.COMPS2.map((c) => `<tr class="${c.spine ? 'sel' : ''}"><td><b>${c.id}</b> ${c.name}</td><td>${c.members.map((id) => anyClass(id).name).join(', ')}</td><td>${kindLine(c.hands)}</td>
+    <td class="n">${c.D.toFixed(2)} · ${c.S.toFixed(2)}</td><td class="n">${c.heal}%</td><td class="n"><b>${c.base ? pct((c.V / P[c.base].V - 1) * 100) : 'reference'}</b></td>
+    <td>${c.measured ? `<span class="chip measured">+${c.measured.join(' · +')}%</span>` : c.round2 ? `<span class="muted">+${c.round2.join(' · +')}% on round 2's presets</span>` : '—'}</td></tr>`).join('')
+document.getElementById('t3tab').innerHTML = '<tr><th>Comp</th><th>Members</th><th>Kinds (with Arsenal\'s partners)</th><th class="n">Against its Tier 2 comp</th><th class="n">Against T1</th><th class="n">Projected BT a round</th></tr>' +
+  M.COMPS3.map((c) => { const from = c.from ? M.COMPS2.find((x) => x.id === c.from) : null
+    return `<tr class="${c.spine ? 'sel' : ''}"><td><b>${c.id}</b> ${c.name}</td><td>${c.members.map((id) => anyClass(id).name).join(', ')}</td><td>${kindLine(c.kinds)}</td>
+    <td class="n"><b>${from ? pct((c.V / from.V - 1) * 100) : '—'}</b></td><td class="n">${pct((c.V / M.T1 - 1) * 100)}</td><td class="n">${c.id === 'T1' ? '<b>4.82 measured</b>' : (4.82 * c.V / M.T1).toFixed(2)}</td></tr>` }).join('')
+// The guardrail chart.
+{
+  const BAND = [7.0, 3.9, 3.2], cls = M.T2.filter((c) => !c.healer)
+  const svg = document.getElementById('guardsvg'), X0 = 46, Y0 = 250, H = 220, lo = -6, hi = 16, y = (g) => Y0 - (g - lo) / (hi - lo) * H, bw = (1100 - X0) / cls.length
+  let s = ''
+  for (const g of [-5, 0, 5, 10, 15]) s += `<line class="gridline" x1="${X0}" x2="1100" y1="${y(g)}" y2="${y(g)}"/><text x="${X0 - 6}" y="${y(g) + 4}" text-anchor="end">${g > 0 ? '+' : ''}${g}%</text>`
+  cls.forEach((c, i) => {
+    const x0 = X0 + i * bw
+    c.gains.forEach((g, j) => {
+      const x = x0 + 10 + j * (bw - 20) / 2
+      s += `<rect class="band" x="${x - 5}" y="${y(BAND[j] + 5)}" width="10" height="${y(BAND[j] - 5) - y(BAND[j] + 5)}"/>`
+      if (g == null) return
+      const out = Math.abs(g - BAND[j]) > 5
+      s += c.measured ? `<circle cx="${x}" cy="${y(g)}" r="5" fill="var(--${out ? 'danger' : channelOf(c)})"/>` : `<rect x="${x - 5}" y="${y(g) - 5}" width="10" height="10" transform="rotate(45 ${x} ${y(g)})" fill="var(--${out ? 'danger' : channelOf(c)})"/>`
+    })
+    s += `<text transform="translate(${x0 + bw / 2},${Y0 + 12}) rotate(35)" font-size="11">${c.name}</text>`
+  })
+  s += `<text x="${X0}" y="14">Her seat's gain at Lv 10 · 30 · 50 (three marks a class)</text>`
   svg.innerHTML = s
-})()
-const cell = (v, l, which) => { const out = which === 'knob' && Math.abs(v - MEAN.knob[l]) > 5; return `<span class="${out ? 'out' : ''}" style="${out ? 'color:var(--danger);font-weight:700' : ''}">${f1(v)}</span>` }
-document.getElementById('guardtab').innerHTML = '<tr><th>Class</th><th class="n">At the drafted values, Lv 10 · 30 · 50</th><th class="n">At the knobs, Lv 10 · 30 · 50</th><th class="n">D + S, Lv 50</th><th>Her knob</th></tr>' +
-  TWELVE.map((n) => `<tr><td><b>${n}</b></td><td class="n muted">${G[n][0].map(f1).join(' · ')}%</td><td class="n"><b>${G[n][1].map((v, l) => cell(v, l, 'knob')).join(' · ')}%</b></td><td class="n">${f2(G[n][2][0])} + ${f2(G[n][2][1])}</td><td class="muted">${G[n][3]}</td></tr>`).join('') +
-  `<tr class="mean"><td>Mean of the twelve</td><td class="n">${MEAN.draft.map(f1).join(' · ')}% · 14 of 36 in</td><td class="n">${MEAN.knob.map(f1).join(' · ')}% · ${TWELVE.reduce((a, n) => a + G[n][1].filter((v, l) => Math.abs(v - MEAN.knob[l]) <= 5).length, 0)} of 36 in</td><td></td><td></td></tr>` +
-  HEALERS4.map((n) => `<tr><td><b>${n}</b> <span class="muted">(stress check)</span></td><td class="n muted">${G[n][0].map(f1).join(' · ')}%</td><td class="n">${G[n][1].map(f1).join(' · ')}%</td><td class="n">${f2(G[n][2][0])} + ${f2(G[n][2][1])}</td><td class="muted">${G[n][3]}</td></tr>`).join('')
-
-// ---- The stress check (balance §4.8). ----
-document.getElementById('healtab').innerHTML = '<tr><th>Healer</th><th class="n">On curve, Lv 10 · 30 · 50</th><th class="n">×3.2</th><th class="n">×4</th></tr>' +
-  [['Paladin', '—', 91.9, 67.8], ['Guardian', '+5.5 · 0 · +1.1%', 91.9, 67.5, 1], ['Templar', '+12.1 · +9.7 · +5.7%', 89.7, 63.4], ['Cleric', '—', 85.6, 57.2], ['Bishop', '+15.5 · 0 · +0.1%', 85.0, 56.9, 1], ['Exorcist', '+15.9 · +6.9 · +7.3%', 77.5, 51.9]]
-    .map(([n, c, a, b, keep]) => `<tr><td><b>${n}</b>${keep ? ' <span class="chip">keeper</span>' : n === 'Templar' || n === 'Exorcist' ? ' <span class="chip">battle healer</span>' : ''}</td><td class="n">${c}</td><td class="n">${a.toFixed(1)}%</td><td class="n">${b.toFixed(1)}%</td></tr>`).join('')
-document.getElementById('suptab').innerHTML = '<tr><th>Her parent\'s seat</th><th class="n">Won: parent · keeper · support</th><th class="n">Taken a fight, healer on</th></tr>' +
-  [['Arms Spellblade · Sentinel', '59.7 · 65.9 · <b>82.2%</b>', '4,782 · 4,751 · <b>4,262</b>'], ['Tome Spellblade · Enchanter', '47.5 · 51.2 · <b>74.7%</b>', '5,184 · 4,799 · <b>4,645</b>'],
-    ['Arms Summoner · Druid', '47.5 · 53.4 · <b>69.7%</b>', '5,184 · 5,039 · <b>3,760</b>'], ['Tome Summoner · Shaman', '59.7 · 66.2 · <b>85.3%</b>', '4,782 · 4,779 · <b>3,853</b>']]
-    .map(([a, b, c]) => `<tr><td>${a}</td><td class="n">${b}</td><td class="n">${c}</td></tr>`).join('')
-document.getElementById('sibtab').innerHTML = '<tr><th>Siblings</th><th>Where each is the better pick</th></tr>' + [
-  ['Berserker · Spellfist', 'Level on curve (both in the band at every level); the Spellfist adds an element, the Arcane ward\'s other channel'],
-  ['Archmage · Battlemage', 'The Battlemage at Lv 10 and 30 (+10.9, +8.3%), the Archmage at Lv 50 (+5.1 against −1.8%); the Battlemage answers an Iron ward'],
-  ['Blademaster · Sentinel', 'The Blademaster on curve at Lv 10 and 50; the Sentinel at Lv 30 and under attrition (82% won with the healer down, against 66%)'],
-  ['Runeblade · Enchanter', 'Level at Lv 10 and 30; the Enchanter at Lv 50 and under attrition (75% against 51%)'],
-  ['Warlord · Druid', 'The Warlord on curve at Lv 50 (+6.8 against −1.5%); the Druid under attrition (knockouts 0.20 against 0.44)'],
-  ['Invoker · Shaman', 'The Shaman at Lv 10 and under attrition (85% against 66%); the Invoker at Lv 30 and 50'],
-  ['Guardian · Templar', 'The Templar on curve at every level; the Guardian from ×3.2 (92 against 90%, 68 against 63% at ×4)'],
-  ['Bishop · Exorcist', 'The Exorcist on curve at Lv 30 and 50; the Bishop from ×2.6 (85 against 78% at ×3.2, 57 against 52% at ×4)']]
-  .map(([a, b]) => `<tr><td><b>${a}</b></td><td>${b}</td></tr>`).join('')
-
-// ---- The model, side by side. ----
-function bar(r) { const t = r.dmg + r.sup; return `<div class="stack" title="${f2(r.dmg)} + ${f2(r.sup)} BT" style="width:${Math.min(100, t / 6.2 * 100).toFixed(0)}%"><span style="width:${(r.dmg / t * 100).toFixed(1)}%;background:var(--phys)"></span><span style="width:${(r.sup / t * 100).toFixed(1)}%;background:var(--sup)"></span></div>` }
-document.getElementById('side').innerHTML = '<tr><th>Comp</th><th>Kinds</th><th class="n">Damage</th><th class="n">Support</th><th class="n">V</th><th>Value</th><th class="n">Healing</th><th>Enfeeble</th><th>Read</th></tr>' +
-  MODEL_ROWS.map(([id, name, m, read, t3]) => { const r = model(m, { tier3: t3 })
-    const doubled = KINDS.filter((k) => r.kinds[k] > 1).map((k) => `${K[k]}${r.kinds[k] > 2 ? ' ×' + r.kinds[k] : ''}`).join(', ')
-    const all = KINDS.every((k) => r.kinds[k] > 0)
-    return `<tr><td><b>${id}</b> ${name}</td><td>${all ? '<span class="chip ok">all ten</span>' : '<span class="chip warn">missing</span>'} <span class="muted">${doubled} ×2+</span></td><td class="n">${f2(r.dmg)}</td><td class="n">${f2(r.sup)} <span class="muted">(${pc(r.sup / (r.dmg + r.sup))})</span></td>
-      <td class="n"><b>${f2(r.dmg + r.sup)}</b></td><td style="min-width:140px">${bar(r)}</td><td class="n">${pc(r.heal)}</td><td>${r.en > 0.5 ? 'full, every foe' : r.en > 0 ? 'path' : '—'}</td><td class="muted">${read}${t3 ? ' (Tier 3 units)' : ''}</td></tr>` }).join('')
-
-// ---- The builder: the measured members added, the model beside. ----
-const NAMES = ['Berserker', 'Spellfist', 'Archmage', 'Battlemage', 'Blademaster', 'Runeblade', 'Sentinel', 'Enchanter', 'Warlord', 'Invoker', 'Druid', 'Shaman', 'Guardian', 'Bishop', 'Templar', 'Exorcist']
-let picks = [...COMPS[0][2]]
-function estimate(names) {
-  return [0, 1, 2].map((l) => { let num = 0, den = 0
-    for (const n of names) { const p = C[n].parent, [D, S] = PAR[p]; num += G[n][1][l] / 100 * (D[l] + S[l]); den += D[l] }
-    return num / den * 100 })
 }
-const sameFive = (a, b) => a.length === b.length && [...a].sort().join() === [...b].sort().join()
-function drawPicks() {
-  document.getElementById('picks').innerHTML = picks.map((p, i) => `<select data-i="${i}" aria-label="Member ${i + 1}">${NAMES.map((n) => `<option ${n === p ? 'selected' : ''}>${n}</option>`).join('')}</select>`).join('')
+// Build a five.
+let bt = 2, picks = { 2: ['berserker', 'archmage', 'blademaster', 'invoker', 'guardian'], 3: ['ravager', 'astromancer', 'bladelord', 'hierarch', 'bastion'] }
+function drawBuilder() {
+  const pool = bt === 2 ? M.T2 : M.T3
+  document.getElementById('quick').innerHTML = comps[bt].filter((c) => !c.id.startsWith('P')).map((c) => `<button class="chip" data-c="${c.id}" style="border:0;cursor:pointer">${c.id}</button>`).join('')
+  document.getElementById('picks').innerHTML = picks[bt].map((id, i) => `<select data-i="${i}">${pool.map((c) => `<option value="${c.id}" ${c.id === id ? 'selected' : ''}>${c.name} (${c.parentName})</option>`).join('')}</select>`).join('')
+  const ms = picks[bt].map(anyClass)
+  const cnt = Object.fromEntries(M.KINDS.map((k) => [k, 0]))
+  for (const m of ms) { for (const k of m.preset) cnt[k]++; if (m.arsenal) for (const k of m.arsenal) cnt[k]++ }
+  const D = ms.reduce((s, m) => s + m.D, 0), S = ms.reduce((s, m) => s + m.S, 0), heal = ms.reduce((s, m) => s + m.heal, 0), V = ms.reduce((s, m) => s + m.v, 0)
+  const healers = ms.filter((m) => m.healer).length, dup = new Set(picks[bt]).size < 5
+  const missing = M.KINDS.filter((k) => !cnt[k])
+  const hint = missing.map((k) => { const who = pool.find((c) => c.preset.includes(k) && picks[bt].some((id) => anyClass(id).parent === c.parent)); return `No ${k}${who ? `: the ${who.name}'s preset holds one` : ''}` })
+  document.getElementById('out').innerHTML = `<div>${kindLine(cnt)}</div>
+    <div class="tot"><span>Damage <b>${D.toFixed(2)}</b></span><span>Support <b>${S.toFixed(2)}</b> (${(S / (D + S) * 100).toFixed(0)}%)</span><span>Healing <b>${heal.toFixed(1)}%</b></span>
+    <span>Seat value <b>${V.toFixed(2)}</b>: ${pct((V / (bt === 2 ? M.C1 : M.T1) - 1) * 100)} against ${bt === 2 ? 'C1' : 'T1'} <span class="chip analytic">analytic</span></span></div>
+    ${healers > 1 ? '<p class="warn">One healer a party: two here.</p>' : ''}${dup ? '<p class="warn">A class twice.</p>' : ''}${hint.length ? `<p class="note">${hint.join(' · ')}</p>` : '<p class="note">All ten kinds held.</p>'}`
+  for (const s of document.querySelectorAll('#picks select')) s.addEventListener('change', () => { picks[bt][Number(s.dataset.i)] = s.value; drawBuilder() })
+  for (const b of document.querySelectorAll('#quick button')) b.addEventListener('click', () => { const c = comps[bt].find((x) => x.id === b.dataset.c); picks[bt] = [...c.members]; drawBuilder() })
 }
-function drawOut() {
-  const r = model(picks), all = KINDS.every((k) => r.kinds[k] > 0), missing = KINDS.filter((k) => !r.kinds[k])
-  let hint = ''
-  if (missing.length) {
-    const offers = []
-    for (const k of missing) for (const p of picks) { const sib = NAMES.find((n) => n !== p && C[n].parent === C[p].parent && C[n].w.includes(k)); if (sib) { offers.push(`No ${K[k]}: the ${sib}'s preset holds one (the ${p}'s sibling)`); break } }
-    hint = offers.join(' · ')
-  }
-  const est = estimate(picks), known = COMPS.find((c) => !c[12] && sameFive(c[2], picks))
-  const healerChip = r.healers > 1 ? '<span class="chip warn">One healer a party</span>' : r.healers === 0 ? '<span class="chip">No healer: legal (T2B39); a keeper healer\'s party stays ahead at ×4</span>' : ''
-  document.getElementById('out').innerHTML = `<div class="row">${KINDS.map((k) => kind(k, r.kinds[k])).join('')}
-    ${all ? '<span class="chip ok">all ten kinds</span>' : `<span class="chip warn">missing ${missing.map((k) => K[k]).join(', ')}</span>`} ${healerChip}</div>
-    ${hint ? `<p class="note">${hint}</p>` : ''}
-    <div class="row" style="margin:10px 0 2px"><span class="big">${est.map(f1).join(' · ')}%</span><span class="muted">over her five parents' Tier 1 party at Tier 2 Lv 10 · 30 · 50:
-      each member's measured swap, added <span class="chip meas">measured members</span></span></div>
-    ${known ? `<p class="note">This five is <b>${known[0]}</b>; the harness measured it at <b>${known[4].map(f1).join(' · ')}%</b>.</p>` : '<p class="note">Within about a point of the harness on C1–C7, about 3 points under where both cross-wielders meet (a floor there).</p>'}
-    <div class="muted" style="font-size:12px;margin-bottom:6px">The model: ${f2(r.dmg + r.sup)} BT a turn (damage ${f2(r.dmg)} + support ${f2(r.sup)}), ${((r.dmg + r.sup) / ref * 100 - 100).toFixed(1)}% on C1 · healing ${pc(r.heal)} of the party's HP a round · Enfeeble ${r.en > 0.5 ? 'on every foe' : r.en > 0 ? 'a path' : 'none'} <span class="chip ana">analytic</span></div>
-    <div class="scroll"><table><tr><th>Member</th><th>Weapons</th><th class="n">Her gain in her parent's seat, Lv 10 · 30 · 50</th><th class="n">D + S, Lv 50</th><th class="n">Healing <span class="muted">(model)</span></th><th class="n">Model V</th></tr>` +
-    picks.map((n) => `<tr><td><b>${n}</b> <span class="muted">(${C[n].parent})</span></td><td>${C[n].w.map((k) => kind(k, 1)).join('')}</td><td class="n">${G[n][1].map(f1).join(' · ')}%</td><td class="n">${f2(G[n][2][0])} + ${f2(G[n][2][1])}</td>
-      <td class="n">${healCap(C[n]) ? (healCap(C[n]) * 100).toFixed(1) + '%' : '—'}</td><td class="n muted">${f2(r.own[n] + r.support[n] + r.chips[n])}</td></tr>`).join('') + '</table></div>'
-}
-document.getElementById('picks').addEventListener('change', (e) => { const s = e.target.closest('select'); if (!s) return; picks[Number(s.dataset.i)] = s.value; drawOut() })
-document.getElementById('quick').innerHTML = COMPS.filter((c) => !c[12]).map(([id, name], i) => `<button data-i="${i}">${id} ${name}</button>`).join('')
-document.getElementById('quick').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; picks = [...COMPS[Number(b.dataset.i)][2]]; drawPicks(); drawOut() })
-drawPicks(); drawOut()
+segment(document.getElementById('btier'), (v) => { bt = Number(v); drawBuilder() })
+drawBuilder()
 </script>
 </body>
 </html>
