@@ -575,3 +575,52 @@ replaces is marked **Superseded (R2-n)** in its doc's Decisions table, and the d
 | professions.md | R2-9: two materials a line, three professions an Uma |
 | balance.md | R2-11, R2-12: party value, the guardrail bands, the comps measured |
 | progression.md | R2-5's promotion flow on the Ascend sheet, R2-10's windows, and templates.md's touch-ups for the new classes |
+
+## 10. Round 3: the owner's feedback on classes (2026-11-05)
+
+The owner, after round 2:
+
+> ok, I have my first set of feedback that is mostly focused on the Tier 3 Classes and may need some rework on Class
+> Distribution:
+> - basically, I want Brawlers and Fighters to offer Tier 3 promotions as follows:
+>   - Brawler:
+>     - at Tier 2 -> 1 line pure physical weapons, self-buffs for more damage.
+>     - at Tier 2 -> 1 line that looks slightly like an arms spellblade in terms of damage distribution, but more focused
+>       on single hit damage and minor multi-hits and with the capability of their tome weapon do phys based damage.
+>     - at Tier 3 -> 1 line remains for the pure physical and there always should be an actual class promotion and a
+>       new name and so on, then, an additional branch for the spellblade like variant where 1 remains as the one you
+>       authored in Tier 2 but with higher ceiling or buffs, and then another one that pure phys dps weapons but more
+>       varied phys weapons.
+>   - Sorcerer:
+>     - at Tier 2 -> 1 line pure tome weapons, self-buffs for more damage.
+>     - at Tier 2 -> 1 line that looks slightly like a tome summoner in terms of weapon equipment but more focused on
+>       single hit damage and with the capability of their phys weapon do magic based damage.
+>     - at Tier 3 -> same as Brawler but for Sorcerer.
+> - then, I want Spellblades and summoners to offer maybe a pure elemental or pure physical variants either at Tier 2 or
+>   at Tier 3 where it fits best, so I would normally swap both classes at the same time the Brawler with a spellblade,
+>   or the spellblade with the paladin, that way I'll make my parties balanced.
+
+### 10.1 How round 3 reads it (the main session's calls; each doc may refine, never contradict)
+
+| Id | Call |
+|---|---|
+| R3-1 | **Tier 3 is always a promotion:** every Tier 2 class promotes into at least one Tier 3 class with a new name, picked on the Tier 3 Ascend sheet as Tier 2's are (T2W16). Round 2's "Tier 3 adds no class" (T2C57) is Superseded (R3-1); the crown, two lines held, the master slot and the masteries are re-homed as Tier 3 classes' features or retired, the classes doc's call. |
+| R3-2 | **The Brawler's line, in the owner's words.** Tier 2: the **Berserker** (pure physical, Momentum) stays; the **Spellfist** is reshaped to "an Arms Spellblade's damage distribution" (two Arms and a Tome, her Tome on ATK) **focused on single-hit damage with minor multi-hits**. Tier 3: the Berserker promotes into **one pure-physical class** (a higher ceiling); the Spellfist into **two**: her own Tier 3 (the same kit, a higher ceiling or buffs) and **a pure-physical class with more varied physical weapons**. |
+| R3-3 | **The Sorcerer's line mirrors it:** the **Archmage** (pure Tomes, Momentum); the **Battlemage** reshaped to the Tome Summoner's weapon equipment (two Tomes and an Arm, her Arm on M.ATK) focused on single-hit damage; Tier 3 the same three. "Brawlers and Fighters" reads as Brawlers and Sorcerers, the two the owner's bullets name. |
+| R3-4 | **Spellblades and Summoners gain a pure variant at Tier 2** (the owner: "either at Tier 2 or at Tier 3 where it fits best"; Tier 2, so the owner's swap of a Brawler with a Spellblade works as soon as the Spellfist does): the Arms Spellblade's and the Arms Summoner's are **pure physical**, the Tome Spellblade's and the Tome Summoner's **pure elemental**, each keeping her family's feel (a Spellblade's multi-hit on one foe, a Summoner's area and lingering summons). Their keeper and support children stay: three Tier 2 children each. Tier 3: each of the three promotes into one. The alternative, the pure variant at Tier 3 splitting from the keeper, is listed. |
+| R3-5 | **The healers:** the keeper and the battle healer each promote into one Tier 3 class. |
+| R3-6 | **Counts:** Tier 2 has **20** classes (the Brawler and the Sorcerer two each, the four hybrids three each, the healers two each); Tier 3 has **22** (the Brawler and the Sorcerer three each, the hybrids three each, the healers two each). |
+| R3-7 | **The owner's swaps** are the comps' spine: **a Brawler with a Spellblade** (the Brawler to her Spellfist, the Arms Spellblade to her pure-physical variant) and **a Spellblade with the Paladin** (the Spellblade to her support, the Paladin to her battle healer), with their mirrors, in Tier 2 and in Tier 3; each keeps the party inside the band. |
+| R3-8 | **The guardrail holds** (R2-11): every Tier 2 and Tier 3 class inside the party-value band, measured on the harness fork; Tier 3's promotions take over the crown's measured budget (+17%). |
+| R3-9 | **Names:** new names for the four Tier 2 pure variants and the 22 Tier 3 classes, D298's grammar for any new skill, every name checked against master data and the game's own strings. |
+
+### 10.2 Round 3's owners
+
+Ids continue in each doc (T2C65…, T2B41…, T2G47…, T2W33…, T2E50…, T2P46…, T2U28…).
+
+| Order | Doc | Round 3 |
+|---|---|---|
+| 1 | classes.md | R3-1–R3-7, R3-9: the twenty Tier 2 and twenty-two Tier 3 classes, their kits, the Tier 3 promotion, the comps |
+| 2 | balance.md | R3-8: the new classes measured, the band, the stress check |
+| 2 | gear.md, progression.md | Weapons and presets for the new classes; the Tier 3 promotion on the Ascend sheet; the windows' Class track by tier |
+| 2 | extra-stats.md, professions.md, templates.md | Presets, Prowess splits, demand by class, families: touch-ups |
