@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Party Comps</title>
+<!-- docs/design/tier2/classes.md §5 (R2-12; T2C56, T2C63, T2C64). The Tier rework's preview template: uma-kit's theme tokens. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a; --sup: #7a5ad0;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --k-greatsword: #d9822b; --k-fire: #d8423a; --k-axe: #8a4fc4; --k-ice: #3a86d8; --k-lance: #3d9a4a; --k-lightning: #c9a60e;
+    --k-katana: #1f9a86; --k-light: #b89a3c; --k-bow: #d0507e; --k-dark: #6a3fb0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c; --sup: #a98bff;
+      --k-greatsword: #f0a052; --k-fire: #f06a60; --k-axe: #b07ce8; --k-ice: #6aaaf0; --k-lance: #62c06e; --k-lightning: #e6c83a;
+      --k-katana: #4cc4ae; --k-light: #e2c870; --k-bow: #ee7ca2; --k-dark: #9d7ae0;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 24px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 4px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grid { display: grid; gap: var(--gap); }
+  .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 860px) { .g2 { grid-template-columns: 1fr; } }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.warn { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .chip.ok { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .kind { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; margin: 1px 2px 1px 0; }
+  .kind.off { opacity: .2; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 5px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+  .stack { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--sunken); margin: 6px 0; }
+  .stack span { display: block; height: 100%; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
+  select { font: 600 13px system-ui; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 2px; gap: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+  .seg button.on { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .quick { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 10px; }
+  .quick button { border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); font: 600 12px system-ui; padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+  .big { font: 700 22px/1 ui-rounded, system-ui; }
+  .note { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+  code { font-size: 12px; }
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Party comps</h1>
+  <p>R2-12's comps of five, each with the ten kinds in hand, damage, support and healing, as
+    <a href="../classes.md#5-party-comps-r2-12">classes.md §5</a> computes them: an analytic model on Tier 1's measured
+    harness (Lv 50, both of the owner's comps, 6 seeds a stage). Units are <b>BT</b>, an on-curve Brawler's damage a turn
+    (993). The balance doc measures every comp on the harness next.</p>
+  <nav class="tabs"><a href="#table">Side by side</a><a href="#cards">The comps</a><a href="#builder">Build a five</a><a href="#formula">The formula</a></nav>
+
+  <h2 id="table">Side by side</h2>
+  <div class="card scroll"><table id="side"></table>
+    <div class="legend"><span class="sw" style="background:var(--phys)"></span>damage <span class="sw" style="background:var(--sup);margin-left:8px"></span>support (statuses and Breaks) · healing capacity is HP a round as a share of the party's max HP; on curve a party needs about 1%.</div></div>
+
+  <h2 id="cards">The comps</h2>
+  <div class="grid g2" id="cardgrid"></div>
+
+  <h2 id="builder">Build a five</h2>
+  <div class="card">
+    <div class="quick" id="quick"></div>
+    <div class="row"><span class="seg" id="tierseg"><button data-t="2" class="on">Tier 2</button><button data-t="3">Tier 3 (crowns, masteries)</button></span>
+      <label class="muted">Momentum a stack <select id="step"><option value="0.04">4%</option><option value="0.05" selected>5%</option><option value="0.07">7%</option><option value="0.1">10%</option></select></label></div>
+    <div class="row" id="picks" style="margin-top:10px"></div>
+    <div id="out" style="margin-top:10px"></div>
+  </div>
+
+  <h2 id="formula">The formula (T2C56)</h2>
+  <div class="card">
+    <p><b>V = D + S + B</b> for each member, healing capacity H beside it.</p>
+    <ul>
+      <li><b>D</b>, her damage: her parent's Tier 1 damage a turn ÷ 993 × her rule's factor (Momentum 1 + step × 1.88; a cross 1.05 × 1.012 or × 1.018; a support 0.85 or 0.9; a battle healer 1.2; a Summoner keeper 1.02).</li>
+      <li><b>S</b>, what her statuses add to the other four: Σ v × strength × her part × the others' D. v at full: Armor Break 5%, Mind Break 5%, Brave and Faith 6%. Strength on the tapped foe and the rest: widely 1.0 · 0.5, a healer's path 0.5 · 0.25, a hybrid's path 0.35 · 0, a Spellblade support 1.0 · 0.5, a Summoner support 1.0 · 1.0, a keeper healer ×1.2; the tapped foe takes 60% of the damage; two carriers: the stronger whole, the rest a quarter.</li>
+      <li><b>B</b>, her Breaks: 6% (Spellblade keepers) or 7% (Summoner keepers) of her D.</li>
+      <li><b>H</b>, HP a round she can mend or ward (half her casts depth 5, 35% depth 4, 15% depth 3; healing scale 1.64; 0.8 acts a round). On curve it counts at ε ≈ 0.58 foe HP an HP saved, near nothing: healers and the Summoners' supports are levelled on the stress check.</li>
+    </ul>
+    <p class="note">Calibration: the model gives a Tier 1 healer's statuses 9% of the others' damage, the harness 9.8% (Paladin) and 12.3% (Cleric); a path beside the healer's same status 0.5–1%, alone 3–4% (§2.7).</p>
+  </div>
+</main>
+<script>
+const K = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire', ice: 'Blizzard', lightning: 'Thunder', light: 'Light', dark: 'Dark' }
+const KINDS = Object.keys(K)
+const PER_TURN = { Brawler: 993, Sorcerer: 1128, 'Arms Spellblade': 939, 'Tome Spellblade': 955, 'Arms Summoner': 903, 'Tome Summoner': 893, Paladin: 502, Cleric: 487 }
+const BT = 993, M3 = 1.88, TAPPED = 0.6
+const STATUS_OF = { greatsword: 'AB', lance: 'MB', fire: 'BF', katana: 'AB', bow: 'EN', dark: 'MB', light: 'BF' }
+const RING_STATUS = new Set(['greatsword', 'lance', 'fire']), SECONDARY = new Set(['katana', 'bow', 'light', 'dark'])
+const ACCESS = { wide: [1, 0.5], 'wide+': [1.2, 0.6], 'wide-path': [0.5, 0.25], 'wide-path+': [0.6, 0.3], path: [0.35, 0], 'sup-blade': [1, 0.5], 'sup-call': [1, 1] }
+const VALUE = { AB: 0.05, MB: 0.05, BF: 0.06 }
+const MASTERY = { Brawler: 1.08, Sorcerer: 1.07, 'Arms Spellblade': 1.06, 'Tome Spellblade': 1.06, 'Arms Summoner': 1.03, 'Tome Summoner': 1.03, Paladin: 1, Cleric: 1 }
+const C = {}
+const cls = (name, parent, w, tau, level, o = {}) => { C[name] = { name, parent, w, tau, level, heal: null, ward: 0, mend: 0, chips: 0, ...o } }
+cls('Berserker', 'Brawler', ['greatsword', 'axe', 'lance'], 'mom', 'none')
+cls('Spellfist', 'Brawler', ['greatsword', 'axe', 'fire'], 1.05 * 1.012, 'none')
+cls('Archmage', 'Sorcerer', ['fire', 'ice', 'lightning'], 'mom', 'none')
+cls('Battlemage', 'Sorcerer', ['fire', 'lightning', 'greatsword'], 1.05 * 1.018, 'none')
+cls('Blademaster', 'Arms Spellblade', ['katana', 'axe', 'lightning'], 1, 'path', { chips: 0.06 })
+cls('Runeblade', 'Tome Spellblade', ['lightning', 'ice', 'katana'], 1, 'path', { chips: 0.06 })
+cls('Sentinel', 'Arms Spellblade', ['katana', 'greatsword', 'light'], 0.85, 'sup-blade', { ward: 1 })
+cls('Enchanter', 'Tome Spellblade', ['light', 'ice', 'katana'], 0.85, 'sup-blade', { ward: 1 })
+cls('Warlord', 'Arms Summoner', ['bow', 'axe', 'dark'], 1.02, 'path', { chips: 0.07 })
+cls('Invoker', 'Tome Summoner', ['dark', 'ice', 'bow'], 1.02, 'path', { chips: 0.07 })
+cls('Druid', 'Arms Summoner', ['bow', 'greatsword', 'dark'], 0.9, 'sup-call', { mend: 1 })
+cls('Shaman', 'Tome Summoner', ['dark', 'ice', 'bow'], 0.9, 'sup-call', { mend: 1 })
+cls('Guardian', 'Paladin', ['lance', 'greatsword', 'light'], 1, 'wide+', { heal: 't1' })
+cls('Bishop', 'Cleric', ['light', 'fire', 'lance'], 1, 'wide+', { heal: 't1' })
+cls('Templar', 'Paladin', ['lance', 'greatsword', 'light'], 1.2, 'wide', { heal: 'battle' })
+cls('Exorcist', 'Cleric', ['light', 'fire', 'lance'], 1.2, 'wide', { heal: 'battle' })
+const T1 = { Brawler: [['greatsword', 'axe', 'lance'], 'none'], Sorcerer: [['fire', 'ice', 'lightning'], 'none'], 'Arms Spellblade': [['katana', 'axe', 'lightning'], 'path'],
+  'Tome Spellblade': [['lightning', 'ice', 'katana'], 'path'], 'Arms Summoner': [['bow', 'axe', 'dark'], 'path'], 'Tome Summoner': [['dark', 'ice', 'bow'], 'path'],
+  Paladin: [['lance', 'greatsword', 'light'], 'wide'], Cleric: [['light', 'fire', 'lance'], 'wide'] }
+for (const [p, [w, lv]] of Object.entries(T1)) cls(p, p, w, 1, lv, { t1: true, heal: lv === 'wide' ? 't1' : null })
+const HEALERS = new Set(['Guardian', 'Bishop', 'Templar', 'Exorcist', 'Paladin', 'Cleric'])
+
+function carriers(c) {
+  const out = {}
+  for (const w of c.w) {
+    const s = STATUS_OF[w]; if (!s) continue
+    let acc = null
+    if (c.level === 'wide' || c.level === 'wide+') { const plus = c.level === 'wide+' ? '+' : ''; acc = RING_STATUS.has(w) ? ACCESS['wide' + plus] : ACCESS['wide-path' + plus] }
+    else if (c.level === 'sup-blade' || c.level === 'sup-call') acc = SECONDARY.has(w) ? ACCESS[c.level] : null
+    else if (c.level === 'path') acc = SECONDARY.has(w) ? ACCESS.path : null
+    if (!acc) continue
+    if (s === 'BF') acc = [acc[0], acc[0]]
+    const prev = out[s] ?? [0, 0]
+    out[s] = [Math.max(prev[0], acc[0]), Math.max(prev[1], acc[1])]
+  }
+  return out
+}
+const SHARE = { 5: 0.44, 4: 0.40, 3: 0.36 }, MIX = { 5: 0.5, 4: 0.35, 3: 0.15 }
+function healCap(c) {
+  let h = 0
+  if (c.heal) { for (const d of [5, 4, 3]) h += MIX[d] * SHARE[d] * 1.64 * (d === 5 ? 2.6 : 1); if (c.heal === 'battle') h *= 0.7; h = h * 0.8 / 5 }
+  if (c.ward) for (const d of [5, 4, 3]) h += MIX[d] * SHARE[d] / 3 * 1.67 * 0.8 / 5
+  if (c.mend) for (const d of [5, 4, 3]) h += MIX[d] * SHARE[d] * 0.1 * 1.67 * 0.8
+  return h
+}
+const combine = (l) => { l = [...l].sort((a, b) => b - a); return l.length ? Math.min(Math.max(1, l[0]), l[0] + 0.25 * l.slice(1).reduce((a, b) => a + b, 0)) : 0 }
+function comp(names, opt = {}) {
+  const step = opt.step ?? 0.05, tier3 = !!opt.tier3
+  const own = {}
+  for (const n of names) { const c = C[n]; const tau = c.tau === 'mom' ? 1 + step * M3 : c.tau; own[n] = PER_TURN[c.parent] / BT * tau * (tier3 ? 1.11 * MASTERY[c.parent] : 1) }
+  const by = {}
+  for (const n of names) for (const [s, [t, o]] of Object.entries(carriers(C[n]))) (by[s] ??= []).push([t, o, n])
+  const support = Object.fromEntries(names.map((n) => [n, 0])); let en = 0
+  for (const [s, lst] of Object.entries(by)) {
+    const st = combine(lst.map((x) => x[0])), so = combine(lst.map((x) => x[1]))
+    const strength = s === 'BF' ? st : TAPPED * st + (1 - TAPPED) * so
+    if (s === 'EN') { en = strength; continue }
+    const wts = lst.map(([t, o, n]) => [n, TAPPED * t + (1 - TAPPED) * o]); const tot = wts.reduce((a, [, x]) => a + x, 0) || 1
+    for (const [n, wgt] of wts) { const others = names.filter((x) => x !== n).reduce((a, x) => a + own[x], 0); support[n] += others * VALUE[s] * strength * wgt / tot }
+  }
+  const chips = Object.fromEntries(names.map((n) => [n, C[n].chips * own[n]]))
+  const kinds = Object.fromEntries(KINDS.map((k) => [k, names.filter((n) => C[n].w.includes(k)).length]))
+  const dmg = names.reduce((a, n) => a + own[n], 0), sup = names.reduce((a, n) => a + support[n] + chips[n], 0)
+  const heal = names.reduce((a, n) => a + healCap(C[n]), 0)
+  return { own, support, chips, kinds, en, dmg, sup, heal, healers: names.filter((n) => HEALERS.has(n)).length }
+}
+const COMPS = [
+  ['T1-1', 'Tier 1 Party 1, as built', ['Brawler', 'Sorcerer', 'Arms Spellblade', 'Tome Summoner', 'Paladin'], 'The reference'],
+  ['T1-2', 'Tier 1 Party 2, as built', ['Brawler', 'Sorcerer', 'Tome Spellblade', 'Arms Summoner', 'Cleric'], 'Its mirror'],
+  ['C1', "Party 1's keepers", ['Berserker', 'Archmage', 'Blademaster', 'Invoker', 'Guardian'], 'Tier 1-like, every twist on: +9%'],
+  ['C2', "Party 2's keepers", ['Berserker', 'Archmage', 'Runeblade', 'Warlord', 'Bishop'], 'Its mirror, level to 0.01 BT'],
+  ['C3', 'Both pures swapped', ['Spellfist', 'Battlemage', 'Blademaster', 'Invoker', 'Guardian'], 'Breadth for 1%: a ward or an all-Arms boss never shuts out a pure'],
+  ['C4', 'Battle healer + support Spellblade', ['Berserker', 'Archmage', 'Sentinel', 'Invoker', 'Templar'], "The owner's balancing pair: level within 1.5%, 2 points less healing"],
+  ['C4b', 'The same on Party 2', ['Berserker', 'Archmage', 'Enchanter', 'Warlord', 'Exorcist'], 'The Enchanter brings the Cleric\'s missing Armor Break'],
+  ['C5', 'A Summoner to support', ['Berserker', 'Archmage', 'Runeblade', 'Druid', 'Bishop'], 'Sustain for 3%: Enfeeble at full on every foe, 26% healing'],
+  ['C6', 'Double expander: both hybrids support', ['Berserker', 'Archmage', 'Sentinel', 'Shaman', 'Guardian'], 'The safest; three carriers and the cap bites the healer'],
+  ['C7', 'Every member an expander', ['Spellfist', 'Battlemage', 'Sentinel', 'Shaman', 'Templar'], 'Within 6% of C1: no dead weight'],
+  ['C8', 'Tier 3: a mixed five', ['Berserker', 'Battlemage', 'Blademaster', 'Shaman', 'Bishop'], 'Tier 3 deepens every class alike: +13% on the same shares', true],
+]
+const kind = (k, n) => `<span class="kind ${n ? '' : 'off'}" style="background:var(--k-${k})">${K[k]}${n > 1 ? ` ×${n}` : ''}</span>`
+const f2 = (x) => x.toFixed(2), pc = (x) => `${(x * 100).toFixed(0)}%`
+const ref = comp(COMPS[2][2]).dmg + comp(COMPS[2][2]).sup
+function bar(r) { const t = r.dmg + r.sup; return `<div class="stack" title="${f2(r.dmg)} + ${f2(r.sup)} BT" style="width:${Math.min(100, t / 6.2 * 100).toFixed(0)}%"><span style="width:${(r.dmg / t * 100).toFixed(1)}%;background:var(--phys)"></span><span style="width:${(r.sup / t * 100).toFixed(1)}%;background:var(--sup)"></span></div>` }
+document.getElementById('side').innerHTML = '<tr><th>Comp</th><th>Kinds</th><th class="n">Damage</th><th class="n">Support</th><th class="n">V</th><th>Value</th><th class="n">Healing</th><th>Enfeeble</th><th>Read</th></tr>' +
+  COMPS.map(([id, name, m, read, t3]) => { const r = comp(m, { tier3: t3 })
+    const doubled = KINDS.filter((k) => r.kinds[k] > 1).map((k) => `${K[k]}${r.kinds[k] > 2 ? ' ×' + r.kinds[k] : ''}`).join(', ')
+    const all = KINDS.every((k) => r.kinds[k] > 0)
+    return `<tr><td><b>${id}</b> ${name}</td><td>${all ? '<span class="chip ok">all ten</span>' : '<span class="chip warn">missing</span>'} <span class="muted">${doubled} ×2+</span></td><td class="n">${f2(r.dmg)}</td><td class="n">${f2(r.sup)} <span class="muted">(${pc(r.sup / (r.dmg + r.sup))})</span></td>
+      <td class="n"><b>${f2(r.dmg + r.sup)}</b></td><td style="min-width:140px">${bar(r)}</td><td class="n">${pc(r.heal)}</td><td>${r.en > 0.5 ? 'full, every foe' : r.en > 0 ? 'path' : '—'}</td><td class="muted">${read}${t3 ? ' (Tier 3 units)' : ''}</td></tr>` }).join('')
+
+function memberTable(r, m) {
+  return '<table><tr><th>Member</th><th>Weapons</th><th class="n">Damage</th><th class="n">Support</th><th class="n">Healing</th><th class="n">V</th></tr>' +
+    m.map((n) => `<tr><td><b>${n}</b></td><td>${C[n].w.map((k) => kind(k, 1)).join('')}</td><td class="n">${f2(r.own[n])} <span class="muted">${pc(r.own[n] / r.dmg)}</span></td>
+      <td class="n">${r.support[n] + r.chips[n] > 0.004 ? f2(r.support[n] + r.chips[n]) : '—'}</td><td class="n">${healCap(C[n]) ? (healCap(C[n]) * 100).toFixed(1) + '%' : '—'}</td><td class="n"><b>${f2(r.own[n] + r.support[n] + r.chips[n])}</b></td></tr>`).join('') + '</table>'
+}
+document.getElementById('cardgrid').innerHTML = COMPS.slice(2).map(([id, name, m, read, t3]) => { const r = comp(m, { tier3: t3 })
+  return `<div class="card"><h3>${id} · ${name}</h3><div class="row">${KINDS.map((k) => kind(k, r.kinds[k])).join('')}</div>
+    <div class="row" style="margin:8px 0"><span class="big">${f2(r.dmg + r.sup)}</span><span class="muted">BT · damage ${f2(r.dmg)} + support ${f2(r.sup)} · healing ${pc(r.heal)} a round · ${((r.dmg + r.sup) / ref * 100 - 100).toFixed(1)}% on C1</span></div>
+    <div class="scroll">${memberTable(r, m)}</div><p class="note">${read}</p></div>` }).join('')
+
+// The builder.
+const NAMES = ['Berserker', 'Spellfist', 'Archmage', 'Battlemage', 'Blademaster', 'Runeblade', 'Sentinel', 'Enchanter', 'Warlord', 'Invoker', 'Druid', 'Shaman', 'Guardian', 'Bishop', 'Templar', 'Exorcist']
+let picks = [...COMPS[2][2]], tier3 = false
+function drawPicks() {
+  document.getElementById('picks').innerHTML = picks.map((p, i) => `<select data-i="${i}">${NAMES.map((n) => `<option ${n === p ? 'selected' : ''}>${n}</option>`).join('')}</select>`).join('')
+}
+function drawOut() {
+  const step = Number(document.getElementById('step').value)
+  const r = comp(picks, { step, tier3 }), all = KINDS.every((k) => r.kinds[k] > 0)
+  const missing = KINDS.filter((k) => !r.kinds[k])
+  let hint = ''
+  if (missing.length) {
+    const offers = []
+    for (const k of missing) for (const p of picks) { const sib = NAMES.find((n) => n !== p && C[n].parent === C[p].parent && C[n].w.includes(k)); if (sib) { offers.push(`No ${K[k]}: the ${sib}'s preset holds one (the ${p}'s sibling)`); break } }
+    hint = offers.join(' · ')
+  }
+  document.getElementById('out').innerHTML = `<div class="row">${KINDS.map((k) => kind(k, r.kinds[k])).join('')}
+    ${all ? '<span class="chip ok">all ten kinds</span>' : `<span class="chip warn">missing ${missing.map((k) => K[k]).join(', ')}</span>`}
+    ${r.healers > 1 ? '<span class="chip warn">One healer a party</span>' : r.healers === 0 ? '<span class="chip warn">No healer</span>' : ''}</div>
+    ${hint ? `<p class="note">${hint}</p>` : ''}
+    <div class="row" style="margin:8px 0"><span class="big">${f2(r.dmg + r.sup)}</span><span class="muted">BT · damage ${f2(r.dmg)} + support ${f2(r.sup)} (${pc(r.sup / (r.dmg + r.sup))}) · healing ${pc(r.heal)} a round · Enfeeble ${r.en > 0.5 ? 'full on every foe' : r.en > 0 ? 'a path' : 'none'} · ${((r.dmg + r.sup) / ref * 100 - 100).toFixed(1)}% on C1${tier3 ? ' (Tier 3 units)' : ''}</span></div>
+    ${bar(r)}<div class="scroll">${memberTable(r, picks)}</div>`
+}
+document.getElementById('picks').addEventListener('change', (e) => { const s = e.target.closest('select'); if (!s) return; picks[Number(s.dataset.i)] = s.value; drawOut() })
+document.getElementById('step').addEventListener('change', drawOut)
+document.getElementById('tierseg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return
+  for (const x of e.currentTarget.children) x.classList.toggle('on', x === b); tier3 = b.dataset.t === '3'; drawOut() })
+document.getElementById('quick').innerHTML = COMPS.slice(2).map(([id, name], i) => `<button data-i="${i + 2}">${id} ${name}</button>`).join('')
+document.getElementById('quick').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const c = COMPS[Number(b.dataset.i)]
+  picks = [...c[2]]; tier3 = !!c[4]; for (const x of document.getElementById('tierseg').children) x.classList.toggle('on', (x.dataset.t === '3') === tier3); drawPicks(); drawOut() })
+drawPicks(); drawOut()
+</script>
+</body>
+</html>
