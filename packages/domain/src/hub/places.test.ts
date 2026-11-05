@@ -111,8 +111,8 @@ describe('the Learning page by generation (H59, D178)', () => {
       ['spell-blade-salle', 'Spellblade Salle', 0.22, 0.33, null], ['summoner-circle', 'Summoner Circle', 0.78, 0.33, null],
       // Its own building (uma-art 2.17.0, H135): no frame override, so the map draws `healer-sanctum`.
       ['healer-sanctum', 'Healer Sanctum', 0.5, 0.56, null],
-      // The Gallery in the Observatory's place since save v35 (D283), on uma-art's Cleric Chapel until H156.
-      ['gallery', 'Gallery', 0.5, 0.84, 'cleric-chapel'],
+      // The Gallery in the Observatory's place since save v35 (D283), on its own H156 building since H158.
+      ['gallery', 'Gallery', 0.5, 0.84, 'gallery'],
     ])
     expect(v19.map((p) => p.id)).not.toContain('paladin-bastion')
     expect(v19.map((p) => p.id)).not.toContain('cleric-chapel')
@@ -162,8 +162,8 @@ describe('the Rift (H50)', () => {
     expect(rift).toMatchObject({ page: 'battle', name: 'The Rift', frame: 'rift', opensIn: 'S8' })
     expect(rift.blurb).toBe('Twenty Lv 50 Umas seal four fronts and win the Rift step.')
     expect(CURRENT_SLICE).toBe('S8')
-    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['gallery', 'cleric-chapel'], ['tier-finale', 'rift'], ['trials', 'knights-bastion'],
-      ['drills', 'gym'], ['fields', 'vegetable-garden'], ['armorer', 'lancers-barracks']])
+    expect(PLACES.filter((p) => p.frame).map((p) => [p.id, p.frame])).toEqual([['gallery', 'gallery'], ['tier-finale', 'rift'], ['trials', 'trials'],
+      ['drills', 'drill-yard'], ['fields', 'vegetable-garden'], ['armorer', 'lancers-barracks']])
   })
 
   it('opens only with five Lv 50 Umas, in Tiers 1 and 2', () => {

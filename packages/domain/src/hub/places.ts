@@ -175,10 +175,10 @@ function hall(id: string, name: string, cls: string, at: { x: number; y: number 
     details: ['A Hero always uses her seat’s Limit Break, at full strength.', 'Learners inherit it at 50%, plus 5% a Bond Level.'] }
 }
 
-/** The Gallery (D283, H155): every Uma's window, where the Observatory stood, from save v35. Its own building comes with
- * H156; until then uma-art's unused Cleric Chapel, a chapel of windows. */
+/** The Gallery (D283, H155): every Uma's window, where the Observatory stood, from save v35. Its own building is
+ * H156's stained-glass hall (uma-art 2.20.0, pinned by H158). */
 const GALLERY: Place = {
-  id: 'gallery', page: 'learning', kind: 'town', name: 'Gallery', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.84 }, frame: 'cleric-chapel',
+  id: 'gallery', page: 'learning', kind: 'town', name: 'Gallery', opensIn: 'S8', slots: 0, at: { x: 0.5, y: 0.84 }, frame: 'gallery',
   blurb: 'Every Uma’s window, most complete first.',
   details: ['36 steps light a window', 'A full window ascends'],
 }
@@ -308,14 +308,14 @@ const BATTLE: Place[] = [
     details: ['Four fronts of twelve stages, then the Convergence', 'A win lights the Rift step of all twenty windows'],
   },
   {
-    // Its own building comes with H156's art; until then uma-art's unused Knights' Bastion.
-    id: 'trials', page: 'battle', kind: 'battle', name: 'Trials', opensIn: 'S8', slots: 0, at: { x: 0.2, y: 0.52 }, frame: 'knights-bastion',
+    // H156's own Trials building (uma-art 2.20.0, H158).
+    id: 'trials', page: 'battle', kind: 'battle', name: 'Trials', opensIn: 'S8', slots: 0, at: { x: 0.2, y: 0.52 }, frame: 'trials',
     blurb: 'Class EXP ×2 for Lv 50 parties.',
     details: ['Four fronts at Lv 45, 50 and 55', 'A won Trial sweeps with Sweep Tickets'],
   },
   {
-    // D283, H154: hidden until the collections switch on (save v35); its building comes with H156, uma-art's Gym till then.
-    id: 'drills', page: 'battle', kind: 'battle', name: 'Drills', opensIn: 'S8', slots: 0, at: { x: 0.8, y: 0.52 }, frame: 'gym',
+    // D283, H154: H156's own Drill Yard building (uma-art 2.20.0, H158).
+    id: 'drills', page: 'battle', kind: 'battle', name: 'Drills', opensIn: 'S8', slots: 0, at: { x: 0.8, y: 0.52 }, frame: 'drill-yard',
     blurb: 'Five fights a day pay Training Logs.',
     details: ['Ten runs a day, banked to thirty', 'A Training Log holds one fight’s EXP'],
   },

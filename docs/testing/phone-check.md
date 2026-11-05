@@ -43,8 +43,9 @@ button and footer should stay reachable without horizontal page scrolling, in li
 5. **The Hub.** Swipe through the four pages. Expect Town Hall's plaza (up to five chibis; tap one for her sheet with
    **Fight**, **Profile** and **Feature another**, and feature another to see her step in front), Learning's five halls
    (the Warrior Dojo and the Mage Tower on top, the Spellblade Salle and the Summoner Circle below, the Healer Sanctum's
-   temple in the middle) and the Observatory under them, Battle's Scenario Gate and Rift (locked with "Opens at five Lv
-   50 Umas · n/5" until five are), and the Wilds' fifteen buildings in five rows, each tappable on its own at 375×667.
+   temple in the middle) and the Gallery's own stained-glass hall under them, Battle's Scenario Gate and Rift (locked with "Opens at five Lv
+   50 Umas · n/5" until five are), Trials on its own building and Drills on the Drill Yard, and the Wilds' fifteen buildings
+   in five rows, each tappable on its own at 375×667.
    Tap the Stable: its quick look opens in the side panel with **Enter Stable**; swipe it away. Tap the Scenario Gate:
    its page opens at once. Open **Menu**: "Every place" by page, with locks and ready counts, then the Account.
 6. **Stable roster.** Tap **Town → Stable → Enter Stable**. Expect Uma Level, highest first, by default, with owned Umas

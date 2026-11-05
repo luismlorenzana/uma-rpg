@@ -63,10 +63,10 @@ Phaser).
   physical-led halls on the left, magic-led on the right. The Warrior Dojo (the Brawler Dojo's id) and the Mage Tower on
   top, the Spellblade Salle and the Summoner Circle below them, the **Healer Sanctum** (`healer-sanctum`, uma-art's own
   temple) in the middle where the Paladin Bastion and the Cleric Chapel stood, and the **Gallery** under it, where the
-  Observatory stood (H155, D283), on uma-art's unused Cleric Chapel until its own building lands (H156).
+  Observatory stood (H155, D283), on its own Gallery building (uma-art 2.20.0, H156, H158).
 - **Battle:** a drill ground of its own, with flagstone roads, banners, weapon racks, training dummies and torches (H31,
   D148): the Scenario Gate above, the Rift below, **Trials** on the left between them (H153, D283) and **Drills** on the
-  right (H154), on uma-art's unused Knights' Bastion and Gym until their own buildings land (H156). The Rift keeps the Tier Finale's id, `tier-finale`, and
+  right (H154), on their own Trials and Drill Yard buildings (uma-art 2.20.0, H156, H158). The Rift keeps the Tier Finale's id, `tier-finale`, and
   draws uma-art's `rift` building (`Place.frame`, H50).
 - **Wilds:** fifteen places in five rows of three, a row a line, in the order Metal, Vegetables, Wood, Fish and Stone.
   The gathering place is on the left, its workbench on the trunk road, its making place on the right (D230, H114). The
@@ -522,6 +522,7 @@ The five halls share `places/halls/HallPage.tsx` (D106; Halls v2's page, H133, D
 `places/gallery/GalleryPage.tsx` (H155, D283, D287; the rules are [loops](loops.md#windows) and [Ascend](loops.md#ascend)):
 every Uma's window in the world, most complete first, where the Observatory stood. `/learning/observatory` and its old
 `/:id` route land here; `/learning/gallery/:id` opens her Window sheet.
+- **Hub building:** its own Gallery, from uma-art 2.20.0 (H156, H158).
 - **Head:** "3 full · 2 ready", "Collection 62%" (lit steps over every owned Uma's steps) and **Ascend 2** while any Uma
   is ready.
 - **Filters:** All · Ready · Owned · Locked.
@@ -658,6 +659,7 @@ The rank content (H153, D283; [collections](../design/collections/collections.md
 a place of their own. Routes: `/battle/trials` and `fight`; screens in `places/trials/`. It opens and locks with the Rift
 (five Lv 50 Umas, Tiers 1 and 2; "No Trials in this tier yet" in Tier 3). The rules are the Echoes' ([loops](loops.md#the-rift)),
 and code and save keep the name `echo`; the screen says Trial.
+- **Hub building:** its own Trials building, from uma-art 2.20.0 (H156, H158).
 - **The page:** "Class EXP ×2 · Lv 50 parties", **Resume the open fight** while a Trial is open, and four rows (crest,
   front) of Lv 45, 50 and 55, "✓" on each won.
 - **A Trial's sheet** ("Iron Trial · Lv 55", `TrialSheet.tsx`): its foes, a party of five Lv 50 Umas, its guided weapons
@@ -669,6 +671,7 @@ and code and save keep the name `echo`; the screen says Trial.
 
 The daily farm (H154, D283, D286; the rules are [loops](loops.md#drills-and-training-logs)). Routes: `/battle/drills` and
 `fight`; screens in `places/drills/`. It opens with the tier's first map win.
+- **Hub building:** the Drill Yard, from uma-art 2.20.0 (H156, H158).
 - **The page:** "Runs 18 · +10 at 4:00" ("Runs 30 · full") and **Read Logs · 18**; **Resume the open fight** while a
   Drill is open; then five rows, "Drill III · Lv 30" ("T2 Lv 30" in Tier 2) and "4 Logs a win", each with **Fight**, or
   once won **Sweep ×1** and **×5** (greyed without the runs, or while a fight is open).
