@@ -1,15 +1,15 @@
 // The Scenario Gate opens the active tier's world map (D66, D97, H35): five continents, one per scenario of the tier, each ten levels of
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
 // `r/<region>`, `capital/<continent>`, `fight`. Canvas maps keep the complete lists one tap away.
-import { biomeById, capitalId, capitalStageIds, openFightOf, rpgFinals, rpgMapRoutes, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
+import { biomeById, capitalId, capitalRunNodeOf, capitalRunsLive, capitalStageIds, openFightOf, rpgFinals, rpgMapRoutes, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
-import { useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CampaignGate, type Campaign } from '../../battle/campaign'
 import { campaignFightSource } from '../../battle/fight-source'
 import { formatLevel, formatLevels } from '../../battle/labels'
 import { pagePath, useHubNavigation } from '../../hub/navigation'
-import { beginFight, drinkAtSpring, useGame, useWorld } from '../../save/game'
+import { beginCapitalFight, beginFight, drinkAtSpring, useGame, useWorld } from '../../save/game'
 import { LockIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import type { PageProps } from '../registry'
@@ -21,17 +21,22 @@ import { clearedIn, continentBandY, continentLayout, worldLayout } from './map/l
 import { BiomeIcon, MapCanvas } from './map/MapCanvas'
 import { MapViewSwitch, useMapView } from './map/MapView'
 import { RegionMap } from './RegionMap'
-import { fightPlace } from './fight-place'
+import { ResumeFight } from './ResumeFight'
+import { capitalAgain, capitalLine, capitalReturn } from './capital/capital-view'
+
+const CapitalPage = lazy(() => import('./capital/CapitalPage'))
 
 export default function ScenarioGatePage({ place, rest }: PageProps) {
-  const [kind, id] = rest.split('/')
+  const [kind, id, sub, runId] = rest.split('/')
   return (
     <CampaignGate>
       {(campaign) => {
         if (kind === 'fight') return <FightRoute campaign={campaign} place={place} />
         if (kind === 'capital' && id) {
           const continent = campaign.continents.find((c) => c.id === id)
-          return continent ? <CapitalMap campaign={campaign} continent={continent} place={place} /> : <p className="p-4 text-ink-soft">Capital not found.</p>
+          return continent ? capitalRunsLive()
+            ? <Suspense fallback={<p className="p-3 text-ink-soft">Opening the capital…</p>}><CapitalPage campaign={campaign} continent={continent} place={place} runId={sub === 'run' ? runId : undefined} /></Suspense>
+            : <CapitalMap campaign={campaign} continent={continent} place={place} /> : <p className="p-4 text-ink-soft">Capital not found.</p>
         }
         if (kind === 'r' && id) {
           const region = campaign.regionInfo(id) ? campaign.region(id) : null
@@ -60,18 +65,6 @@ function clearedByRegion(wins: Record<string, number>): Map<string, number> {
     out.set(region, (out.get(region) ?? 0) + 1)
   }
   return out
-}
-
-function ResumeFight({ place }: { place: PageProps['place'] }) {
-  const world = useWorld()
-  const nav = useHubNavigation()
-  const open = world ? openFightOf(world) : null
-  if (!open) return null
-  return (
-    <button type="button" onClick={() => nav.sub(fightPlace(place, open.battle?.nodeId), 'fight')} className="flex min-h-11 w-full items-center justify-center rounded-sm bg-accent font-display font-bold text-accent-ink">
-      Resume the open fight
-    </button>
-  )
 }
 
 function WorldMap({ campaign, place }: { campaign: Campaign; place: PageProps['place'] }) {
@@ -163,7 +156,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
           else if (spot.kind === 'capital') nav.sub(place, `capital/${continent.id}`)
           else void drinkAtSpring(spot.id).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The Spring didn’t answer.'))
         }} describe={(spot) => {
-          if (spot.kind === 'capital') return { label: `${continent.name}, Capital, ${formatLevel(continent.levelStart + 9)}, ${wonFinals} of 6 cleared`, content: <span className="absolute inset-x-0 bottom-0 rounded-xs bg-page/90 text-[11px] font-bold">Capital · {wonFinals}/6</span> }
+          if (spot.kind === 'capital') return { label: capitalRunsLive() ? `${continent.name}, ${formatLevel(continent.levelStart + 9)}, ${capitalLine(world, continent.id)}` : `${continent.name}, Capital, ${formatLevel(continent.levelStart + 9)}, ${wonFinals} of 6 cleared`, content: <span className="absolute inset-x-0 bottom-0 rounded-xs bg-page/90 text-[11px] font-bold">{capitalRunsLive() ? capitalLine(world, continent.id) : `Capital · ${wonFinals}/6`}</span> }
           if (spot.kind === 'spring') {
             const ready = springReadyAt(world, spot.id, now)
             return { label: ready ? `Spring, recharges in ${formatDuration(Date.parse(ready) - Date.parse(now))}` : 'Spring, refill party MP', disabled: !!ready || !!openFightOf(world) }
@@ -212,14 +205,14 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
         <button type="button" onClick={() => nav.sub(place, `capital/${continent.id}`)}
           className="flex min-h-14 w-full items-center justify-between gap-2 rounded-md border border-accent/50 bg-raised p-3 text-left">
           <span><span className="block font-display font-bold">{continent.name}</span><span className="block text-[12px] text-ink-soft">Capital · {formatLevel(continent.levelStart + 9)}</span></span>
-          <span className="text-[12px] text-ink-soft">{wonFinals}/6</span>
+          <span className="text-[12px] text-ink-soft">{capitalRunsLive() ? capitalLine(world, continent.id) : `${wonFinals}/6`}</span>
         </button>
       </div>}
     </div>
   )
 }
 
-function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps['place'] }) {
+export function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps['place'] }) {
   const world = useWorld()
   const navigate = useNavigate()
   const [ended, setEnded] = useState<{ result: Result; nodeId: string } | null>(null)
@@ -233,14 +226,20 @@ function FightRoute({ campaign, place }: { campaign: Campaign; place: PageProps[
   const stageId = ended?.nodeId ?? fight?.nodeId
   const region = stageId ? campaign.stageRegion(stageId) : null
   const capital = campaign.continents.find((c) => capitalId(c.id) === region?.id)
-  const toRegion = () => navigate(pagePath(place, capital ? `capital/${capital.id}` : region ? `r/${region.id}` : ''), { replace: true })
+  const runReturn = capitalRunsLive() && stageId ? capitalReturn(stageId, ended?.result.capital?.won) : null
+  const toRegion = () => navigate(pagePath(place, runReturn ?? (capital ? `capital/${capital.id}` : region ? `r/${region.id}` : '')), { replace: true })
   if (!region) return <p className="p-4 text-ink-soft">No fight is open.</p>
   if (ended) {
+    const ref = capitalRunsLive() ? capitalRunNodeOf(ended.nodeId) : null
+    const again = ref ? capitalAgain(ended.result) : null
     return (
       <>
         <FightResult campaign={campaign} chapter={region} result={ended.result} onMap={toRegion} engine={shownFight.current?.version}
-          onAgain={() => {
-            beginFight(region, ended.nodeId, campaign.outfits).then(() => setEnded(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The fight couldn’t start.'))
+          againLabel={again?.label}
+          onAgain={ref && !again ? undefined : () => {
+            setError(null)
+            const start = ref && again ? beginCapitalFight(region, ref.runId, again.lane, again.kind, campaign.outfits) : beginFight(region, ended.nodeId, campaign.outfits)
+            start.then(() => setEnded(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The fight couldn’t start.'))
           }} />
         {error && <p className="fixed inset-x-0 bottom-24 z-50 mx-4 rounded-sm bg-danger/90 p-2 text-center text-[13px]">{error}</p>}
       </>

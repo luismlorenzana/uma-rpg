@@ -1,7 +1,7 @@
 // The campaign in the app: the active tier's world map (D66: five continents, one per scenario, of generated regions;
 // ids w6–w10 in Tier 2, H35) with the enemy roster's faces (D135), and the outfits' battle data. Pages render through
 // CampaignGate once master data and the roster are loaded.
-import { biomeById, capitalChapter, capitalId, regionChapter, stageRegionId, worldContinent, type EnemyRoster, type RosterOutfit, type RpgCampaignChapter, type WorldContinent, type WorldRegion } from '@rpg/domain'
+import { biomeById, capitalChapter, capitalId, capitalRunChapter, capitalRunNodeOf, capitalRunOf, capitalRunsLive, regionChapter, stageRegionId, worldContinent, type EnemyRoster, type RosterOutfit, type RpgCampaignChapter, type WorldContinent, type WorldRegion } from '@rpg/domain'
 import { useMemo, type ReactNode } from 'react'
 import { retryCast, useCast, type Cast } from '../content/cast'
 import type { MasterView } from '../master/master'
@@ -41,16 +41,18 @@ export function buildCampaign(view: MasterView, cast: Cast, tier = 1): Campaign 
   const region = (id: string): RpgCampaignChapter | null => {
     const info = regions.get(id)
     const capital = capitals.get(id)
-    if (!info && !capital) return null
+    const run = capitalRunsLive() ? capitalRunOf(id) : null
+    const runContinent = run ? continents.find((c) => c.id === run.continentId) : undefined
+    if (!info && !capital && !runContinent) return null
     let chapter = built.get(id)
-    if (!chapter) built.set(id, (chapter = capital ? capitalChapter(capital, roster) : regionChapter(info!, roster)))
+    if (!chapter) built.set(id, (chapter = runContinent ? capitalRunChapter(runContinent, id, roster) : capital ? capitalChapter(capital, roster) : regionChapter(info!, roster)))
     return chapter
   }
   const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
   return {
     view, cast, tier, continents, outfits, region, roster,
     regionInfo: (id) => regions.get(id) ?? null,
-    stageRegion: (stageId) => region(stageRegionId(stageId)),
+    stageRegion: (stageId) => region(capitalRunNodeOf(stageId)?.runId ?? stageRegionId(stageId)),
     color: (id) => {
       const r = regions.get(id), capital = capitals.get(id)
       return r ? biomeById(r.biome).color : view.chapters.find((c) => c.tier === tier && c.order === capital?.order)?.color ?? '#3a4a66'

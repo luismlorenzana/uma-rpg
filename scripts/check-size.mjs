@@ -25,6 +25,9 @@ export const LAZY_MODULES = [
   'packages/domain/src/save/class-tiles.ts',
   'packages/domain/src/items/families.ts',
   'packages/domain/src/items/names-v1.ts',
+  'apps/web/src/places/scenario-gate/capital/CapitalPage.tsx',
+  'apps/web/src/places/scenario-gate/capital/CapitalRunPage.tsx',
+  'apps/web/src/places/scenario-gate/capital/NewRun.tsx',
 ]
 export function entrySrc(html) {
   const scripts = [...html.matchAll(/<script\b[^>]*>/gi)].filter(([tag]) => /\btype\s*=\s*["']module["']/i.test(tag))

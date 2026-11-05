@@ -2,7 +2,7 @@
 // armor kinds, her Bonds with her Heroes, D106), Laurels, Marks, Uma Shards at Lv10/20/30/40/50 and any Ticket they made.
 // From engine v16 (H70) each skill that ranked up with her Class Rank says so under its bar.
 import {
-  BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, heroLimit, rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter,
+  BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, capitalRunsLive, heroLimit, rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter,
   type RpgClass,
 } from '@rpg/domain'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
@@ -13,12 +13,13 @@ import { HelpButton } from '../../ui/HelpButton'
 import { LaurelIcon, ShardIcon, TicketIcon } from '../../ui/icons'
 import { useActiveTier, useWorld } from '../../save/game'
 import { rankUpLines } from './rank-ups'
+import { capitalResultLine } from './capital/capital-view'
 
 export function FightResult({ campaign, chapter, result, onAgain, onMap, againLabel, engine }: {
   campaign: Campaign
   chapter: RpgCampaignChapter
   result: Result
-  onAgain: () => void
+  onAgain?: () => void
   onMap: () => void
   againLabel?: string
   /** The fight's own engine version (a Sweep's is the live one). */
@@ -28,11 +29,13 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
   const tier = useActiveTier()
   const win = result.outcome === 'victory'
   const node = chapter.nodes.find((n) => n.id === result.nodeId)
+  const capital = capitalRunsLive() ? result.capital : undefined
   return (
     <div data-theme="dark" className="fixed inset-0 z-40 flex flex-col bg-page">
       <div className="pt-safe min-h-0 flex-1 overflow-y-auto p-4">
         <p className="text-[12px] text-ink-faint">{chapter.title} · {node?.name}</p>
         <h1 className={`font-display text-4xl font-extrabold ${win ? 'text-accent' : 'text-ink-soft'}`}>{win ? 'Victory!' : 'Defeated'}</h1>
+        {capital && <p className="mt-2 font-display font-bold text-accent" data-capital-result>{capitalResultLine(result)}</p>}
         <p className="text-[13px] text-ink-soft">
           {result.rounds > 0 ? `${result.rounds} round${result.rounds === 1 ? '' : 's'}`
             : `Swept ${'swept' in result && (result as { swept: number }).swept > 1 ? `${(result as { swept: number }).swept} times` : 'with a ticket'}`}
@@ -106,9 +109,9 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
           </div>
         )}
       </div>
-      <div className="pb-safe grid grid-cols-2 gap-2 border-t border-hairline bg-panel p-3">
-        <button type="button" onClick={onAgain} className="min-h-12 rounded-sm border border-hairline-strong font-semibold">{againLabel ?? (win ? 'Fight again' : 'Retry')}</button>
-        <button type="button" onClick={onMap} className="min-h-12 rounded-sm bg-accent font-display font-bold text-accent-ink">Back to the map</button>
+      <div className={`pb-safe grid ${onAgain ? 'grid-cols-2' : 'grid-cols-1'} gap-2 border-t border-hairline bg-panel p-3`}>
+        {onAgain && <button type="button" onClick={onAgain} className="min-h-12 rounded-sm border border-hairline-strong font-semibold">{againLabel ?? (win ? 'Fight again' : 'Retry')}</button>}
+        <button type="button" onClick={onMap} className="min-h-12 rounded-sm bg-accent font-display font-bold text-accent-ink">{capital ? capital.won ? 'Back to the capital' : 'Back to the run' : 'Back to the map'}</button>
       </div>
     </div>
   )
