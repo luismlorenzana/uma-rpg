@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Classes by Tier</title>
-<!-- docs/design/tier2/classes.md (T2C). Built from the Tier rework's preview template: uma-kit's theme tokens, light and dark. -->
+<!-- docs/design/tier2/classes.md (T2C1–T2C64, round 2). Built from the Tier rework's preview template: uma-kit's theme tokens, light and dark. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -87,11 +87,13 @@
 <body>
 <main class="wide">
   <h1>Classes by tier</h1>
-  <p>The eight Tier 1 classes from Tier 1 (live, engine v21) through Tiers 2 and 3, as
-    <a href="../classes.md">classes.md</a> (T2C1–T2C30) proposes. Tier 1's numbers are the live code's; Lv 50 sheets come from
-    the balance harness's on-curve Uma. Nothing in Tiers 2 and 3 is built.</p>
+  <p>The classes from Tier 1 (live, engine v21) through Tiers 2 and 3, as <a href="../classes.md">classes.md</a>
+    (round 2: T2C31–T2C64) proposes: every Tier 1 class promotes on the Ascend into a Keeper and an Expander, sixteen in
+    all, and Tier 3 deepens them. Tier 1's numbers are the live code's; Lv 50 sheets come from the balance harness's
+    on-curve Uma. Nothing in Tiers 2 and 3 is built. The sixteen in detail: <a href="classes-branches.html">the sixteen</a> ·
+    <a href="classes-comps.html">party comps</a> · <a href="classes-promotion.html">promotion</a> · <a href="classes-trees.html">trees</a>.</p>
   <nav class="tabs">
-    <a href="#glance">At a glance</a><a href="#families">The eight, by family</a><a href="#pace">Class Rank</a>
+    <a href="#glance">At a glance</a><a href="#families">The sixteen, by family</a><a href="#pace">Class Rank</a>
     <a href="#sheets">Lv 50 sheets</a><a href="#mp">MP and healing</a><a href="#status">Buffs and debuffs</a>
     <a href="#halls">Halls</a><a href="#counts">Counts</a>
   </nav>
@@ -112,44 +114,44 @@
     <div class="card">
       <div class="row"><span class="tier t2">Tier 2</span><span class="chip new">proposed</span></div>
       <ul class="adds">
-        <li>The eight open from Class Rank 1; no Tier 0</li>
-        <li>A <b>class branch</b>: <span class="chip ring">Ring +15%</span> or <span class="chip ld">Light/Dark +15%</span>, her preset or her reverse set</li>
-        <li>A <b>class line</b> at Class Rank 20 · 30 · 40 (Grand · Supreme · its capstone)</li>
+        <li><b>16 classes</b>: a Keeper and an Expander from each Tier 1 class, picked on the Ascend; the Tier 1 classes stay in Tier 1's world</li>
+        <li>Open: both children of every Tier 1 class at Class Rank 50 (at least 6); <b>the door</b> at Class Rank 20 opens more</li>
+        <li>Statuses at <b>four</b> levels: none · a path · <b>support</b> · widely</li>
+        <li>A <b>class line</b> a class at Class Rank 20 · 30 · 40 (mirrors share: 10 lines)</li>
         <li><b>Line C</b> on every tree; each capstone <b>Power or Break</b>; ★ signature tip (T2U)</li>
-        <li>18 held, 3 → 10 equipped</li>
-        <li>LB+: +20% at Bond 10 · skill MP ×1.7 · healing ÷ 540</li>
+        <li>18 held, 3 → 10 equipped · LB+ +20% at Bond 10 · skill MP ×1.7 · healing ÷ 540</li>
       </ul>
     </div>
     <div class="card">
       <div class="row"><span class="tier t3">Tier 3</span><span class="chip new">proposed</span></div>
       <ul class="adds">
+        <li><b>The same sixteen</b>, no new class, no promotion; every Tier 2 class she held is open</li>
         <li><b>Two lines held</b> on every tree, Auto between them</li>
         <li>At Class Rank 50 every capstone she holds is <b>crowned</b>: 5.6 whole, +4 MP, one more stack</li>
         <li>Her family's <b>mastery</b> and a <b>master slot</b></li>
-        <li>27 held, 10 + master equipped</li>
-        <li>Skill MP ×2.4 · healing ÷ 780 · MP back a round's sixth step</li>
-        <li>Her Limit Break reads the crown's 5.6</li>
+        <li>27 held, 10 + master equipped · skill MP ×2.4 · healing ÷ 780 · MP regen's sixth step</li>
       </ul>
     </div>
   </div>
 
-  <h2 id="families">The eight, by family</h2>
-  <p>A family's two classes share its two branches. Branch 1 (preselected at Ascend) is her standard preset's group.</p>
+  <h2 id="families">The sixteen, by family</h2>
+  <p>Each Tier 1 class's two children. Mirrors share a rule; every class keeps her parent's slots' count, lean, trees, hall and Limit Break scale.</p>
   <div class="grid g5" id="families-grid"></div>
 
   <h2 id="pace">Class Rank by Uma Level</h2>
   <div class="card">
     <svg id="pace-chart" viewBox="0 0 1040 300" width="100%" role="img" aria-label="Class Rank against Uma Level, Tier 1 and later tiers"></svg>
     <div class="row legend"><span class="chip" style="color:var(--t1)">— Tier 1: Tier 0 to Rank 10 at Lv 10, then her Tier 1 class from Rank 10</span>
-      <span class="chip" style="color:var(--t2)">— Tiers 2 and 3: every class from Rank 1</span></div>
+      <span class="chip" style="color:var(--t2)">- - Tiers 2 and 3 (XR1): Ranks 1–10 one shared ladder over every class she holds, then each alone: the same curve</span>
+      <span class="chip muted">· · each class from Rank 1 alone (not proposed)</span></div>
     <div class="scroll"><table id="pace-table"></table></div>
-    <p class="note">2E Class EXP a win, Uma Level's curve (120 + 16 × rank). A campaign is 50,960 Class EXP: two classes from Rank 1 to 50 in a later tier.</p>
+    <p class="note">2E Class EXP a win, Uma Level's curve (120 + 16 × rank). A campaign is 50,960 Class EXP: the shared 3,600, then two classes from Rank 10 to 50. The door opens at Class Rank 20 on any held class (about Lv 16).</p>
   </div>
 
   <h2 id="sheets">Lv 50 sheets, by tier (SB1)</h2>
   <div class="card">
     <div class="row"><span class="seg" id="tier-seg"><button data-t="1" class="on">Tier 1</button><button data-t="2">Tier 2</button><button data-t="3">Tier 3</button></span>
-      <span class="legend">On curve: her preset, G10 × tier, every Extra Stats node × tier, no template. Mirrors share a row.</span></div>
+      <span class="legend">On curve: her preset, G10 × tier, every Extra Stats node × tier, no template. A Tier 2 class wears her parent’s sheet (leans never change).</span></div>
     <div class="scroll"><table id="sheet-table"></table></div>
     <p class="note">Offense holds SB1 exactly (×1.80, ×2.61). HP grows ×1.73 and ×2.47, MP ×1.72 and ×2.45: their base has a flat part.</p>
   </div>
@@ -168,14 +170,15 @@
     </div>
   </div>
 
-  <h2 id="status">Buffs and debuffs by tier (D282's three levels)</h2>
+  <h2 id="status">Buffs and debuffs by tier: four levels from Tier 2</h2>
   <div class="card scroll"><table>
-    <tr><th>Class</th><th><span class="tier t1">Tier 1</span></th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th><th>Never</th></tr>
-    <tr><td><b>Brawler, Sorcerer</b></td><td>None: pure damage</td><td>None: both branches pure damage</td><td>None</td><td>A status in any tier</td></tr>
-    <tr><td><b>Spellblades, Summoners</b></td><td>A path: line A of a secondary weapon (Katana, Bow, Light, Dark) from depth 3, 1 · 1 · 2</td><td>+ the Light/Dark branch's line rides the path (Blademaster, Warlock)</td><td>+ a crowned capstone one stack more (2 → 3)</td><td>A status through a Ring weapon</td></tr>
-    <tr><td><b>Paladin, Cleric</b></td><td>Every skill of the Greatsword, Lance and Fire (1 · 1 · 2 · 2 · 3), and the path (2 · 2 · 3)</td><td>+ the Guardian's line spreads them from depth 3; the Templar's set holds three path weapons</td><td>+ a crowned capstone one stack more (to 3)</td><td>—</td></tr>
+    <tr><th>Level</th><th><span class="tier t1">Tier 1</span> (D282)</th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th></tr>
+    <tr><td><b>None</b></td><td>Brawler, Sorcerer</td><td>Berserker, Spellfist, Archmage, Battlemage</td><td>The same</td></tr>
+    <tr><td><b>A path</b>: line A of a Light/Dark weapon, depth 3+, 1 · 1 · 2, the tapped foe</td><td>Spellblades, Summoners</td><td>Blademaster, Runeblade, Warlord, Invoker</td><td>+ a crowned capstone one stack more</td></tr>
+    <tr><td><b>Support</b> (new): every skill of a Light/Dark weapon, 1 · 1 · 2 · 2 · 3</td><td>—</td><td>Sentinel, Enchanter (the tapped foe, every foe at depth 5) · Druid, Shaman (every foe)</td><td>+ a crowned capstone one stack more</td></tr>
+    <tr><td><b>Widely</b>: every skill of Greatsword, Lance, Fire (1 · 1 · 2 · 2 · 3) and the path (2 · 2 · 3)</td><td>Paladin, Cleric</td><td>Templar, Exorcist (Tier 1's) · Guardian, Bishop <b>one stack more</b> (2 · 2 · 3 · 3 · 3, path 3 · 3 · 3)</td><td>+ a crowned capstone one stack more (to 3)</td></tr>
   </table>
-  <p class="note">Five statuses (Armor Break, Mind Break, Enfeeble, Brave, Faith), ±10% a stack, cap 3, two rounds, in every tier. Aegis, Breaker, Clarity, Hex and Shatter stay retired.</p></div>
+  <p class="note">Five statuses (Armor Break, Mind Break, Enfeeble, Brave, Faith), ±10% a stack, cap 3, two rounds, in every tier. Aegis, Breaker, Clarity, Hex and Shatter stay retired. Momentum is no status: her own +5% a stack, on no one else.</p></div>
 
   <h2 id="halls">The Halls by tier</h2>
   <div class="card scroll"><table>
@@ -183,37 +186,44 @@
     <tr><td>Seats</td><td>16: Dojo 2, Tower 2, Salle 4, Circle 4, Sanctum 4</td><td>The same 16, no new seat</td><td>The same</td></tr>
     <tr><td>On arrival</td><td>—</td><td>No seat, no Bond: the new world's halls start empty</td><td>The same</td></tr>
     <tr><td>Power at 100%</td><td>Own (×1.9–×2.9) × class scale × open depth</td><td>The same; <b>LB+ +20% at Bond 10</b> (100% → 120%)</td><td>The same; open depth <b>5.6</b> at Class Rank 50</td></tr>
-    <tr><td>Class scale</td><td>×1 Tier 0 · ×0.95 · ×0.8</td><td>×0.95 · ×0.8</td><td>×0.95 · ×0.8</td></tr>
+    <tr><td>Home classes</td><td>The Tier 1 class by seat</td><td>Her seat's Tier 1 home class's two children</td><td>The same</td></tr>
+    <tr><td>Class scale</td><td>×1 Tier 0 · ×0.95 · ×0.8</td><td>Her parent's: ×0.95 twelve classes · ×0.8 the four healers</td><td>The same</td></tr>
     <tr><td>Hits on one foe</td><td>At most 10</td><td>At most 10</td><td>At most 10</td></tr>
-    <tr><td>Coverage</td><td>Every class closes her default gaps with two Heroes (28–45 of 120 pairs)</td><td colspan="2">For all sixteen sets (preset and reverse): 13–16 of the 16 seats add a kind she lacks; her best two Heroes add 4–6 kinds</td></tr>
+    <tr><td>Coverage</td><td>Every class closes her default gaps with two Heroes (28–45 of 120 pairs)</td><td colspan="2">On the sixteen presets: 13–16 of the 16 seats add a kind she lacks; her best two Heroes add 4–5 kinds</td></tr>
   </table></div>
 
   <h2 id="counts">Counts</h2>
   <div class="card scroll"><table>
     <tr><th></th><th><span class="tier t1">Tier 1</span></th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th></tr>
+    <tr><td>Classes in the world</td><td>5 Tier 0 + 8 Tier 1</td><td>16</td><td>16</td></tr>
+    <tr><td>Open on arrival</td><td>Her calling's Tier 0 (every Tier 0 free)</td><td>At least 6</td><td>Every one she held in Tier 2</td></tr>
+    <tr><td>Class rules</td><td>—</td><td>8 (mirrors share)</td><td>8 + 5 masteries</td></tr>
     <tr><td>Trees she uses</td><td>3</td><td>3 + her class line</td><td>3 + her class line</td></tr>
     <tr><td>Nodes a weapon tree</td><td>8</td><td>14 (+ ★ tip on her lead tree)</td><td>14; crowns are a state</td></tr>
     <tr><td>Lines held a tree</td><td>1</td><td>1</td><td>2</td></tr>
     <tr><td>Skills held</td><td>15</td><td>18</td><td>27</td></tr>
     <tr><td>Equipped</td><td>3 → 7 (Lv 10, 20, 30, 40)</td><td>3 → 10 (Lv 10, 15, 20, 25, 30, 35, 40)</td><td>10 + the master slot</td></tr>
-    <tr><td>Picks a class</td><td>3</td><td>7</td><td>10</td></tr>
-    <tr><td>Nodes in the catalog</td><td>560</td><td>1,028 (+ 210 line C, 210 Break tips, 48 class-line nodes)</td><td>1,028</td></tr>
+    <tr><td>Nodes in the catalog</td><td>560</td><td>1,028 (+ 210 line C, 210 Break tips, 48 class-line nodes, 30 names)</td><td>1,028</td></tr>
+    <tr><td>New names</td><td>—</td><td>16 classes, Momentum</td><td>—</td></tr>
   </table></div>
 </main>
 <script>
 const FAMILIES = [
-  { name: 'Warrior', hall: 'Dojo', classes: [['Brawler', '3 Arms · ×1', 'phys']], ring: 'Berserker', ld: 'Warlord', one: 'ring', mastery: 'Juggernaut' },
-  { name: 'Mage', hall: 'Tower', classes: [['Sorcerer', '3 Tomes · ×1', 'magic']], ring: 'Sage', ld: 'Augur', one: 'ring', mastery: 'Resonance' },
-  { name: 'Spellblade', hall: 'Salle', classes: [['Arms Spellblade', '2 Arms + Tome · 0.72 + 0.44', 'phys'], ['Tome Spellblade', '2 Tomes + Arm · 0.72 + 0.48', 'magic']], ring: 'Rune Knight', ld: 'Blademaster', one: 'ring', mastery: 'Spellbind' },
-  { name: 'Summoner', hall: 'Circle', classes: [['Arms Summoner', '2 Arms + Tome · 0.57 + 0.46', 'phys'], ['Tome Summoner', '2 Tomes + Arm · 0.57 + 0.5', 'magic']], ring: 'Invoker', ld: 'Warlock', one: 'ld', mastery: 'Menagerie' },
-  { name: 'Healer', hall: 'Sanctum', classes: [['Paladin', '2 Arms + Tome · ×0.5, from ATK', 'heal'], ['Cleric', '2 Tomes + Arm · ×0.5, from M.ATK', 'heal']], ring: 'Guardian', ld: 'Templar', one: 'ring', mastery: 'Overflow' },
+  { name: 'Warrior', hall: 'Dojo', mastery: 'Juggernaut', rows: [['Brawler', 'phys', 'Berserker', 'Momentum: +5% a stack, a stack a turn, 3 at most', 'Spellfist', 'Two Arms and a Tome, every hit on ATK, ×1.05']] },
+  { name: 'Mage', hall: 'Tower', mastery: 'Resonance', rows: [['Sorcerer', 'magic', 'Archmage', 'Momentum', 'Battlemage', 'Two Tomes and an Arm, every hit on M.ATK, ×1.05']] },
+  { name: 'Spellblade', hall: 'Salle', mastery: 'Spellbind', rows: [['Arms Spellblade', 'phys', 'Blademaster', 'Her familiar\'s hit on both halves', 'Sentinel', 'Support: hands ×0.85, Light/Dark statuses on every skill, a Barrier'],
+    ['Tome Spellblade', 'magic', 'Runeblade', 'The same', 'Enchanter', 'The same, magic-led']] },
+  { name: 'Summoner', hall: 'Circle', mastery: 'Menagerie', rows: [['Arms Summoner', 'phys', 'Warlord', 'Both summons linger', 'Druid', 'Support: hands ×0.9, statuses on every foe, a mend'],
+    ['Tome Summoner', 'magic', 'Invoker', 'The same', 'Shaman', 'The same, magic-led']] },
+  { name: 'Healer', hall: 'Sanctum', mastery: 'Overflow', rows: [['Paladin', 'heal', 'Guardian', 'Every status one stack more', 'Templar', 'Battle healer: ×0.6 power, ×0.7 healing'],
+    ['Cleric', 'heal', 'Bishop', 'The same', 'Exorcist', 'The same']] },
 ]
 const fg = document.getElementById('families-grid')
 for (const f of FAMILIES) {
   const d = document.createElement('div'); d.className = 'card fam'
-  d.innerHTML = `<h3>${f.name} · ${f.hall}</h3>` + f.classes.map(([n, s, c]) => `<div class="cls"><b>${n}</b> <span class="chip ${c}">${c === 'heal' ? 'Healer' : c === 'phys' ? 'Physical' : 'Magical'}</span><div class="muted">${s}</div></div>`).join('')
-    + `<div class="cls"><div class="row"><span class="chip ring">Ring</span> ${f.ring}${f.one === 'ring' ? ' <span class="chip new">branch 1</span>' : ''}</div>`
-    + `<div class="row" style="margin-top:4px"><span class="chip ld">Light/Dark</span> ${f.ld}${f.one === 'ld' ? ' <span class="chip new">branch 1</span>' : ''}</div></div>`
+  d.innerHTML = `<h3>${f.name} · ${f.hall}</h3>` + f.rows.map(([p, c, k, kr, e, er]) => `<div class="cls"><span class="chip ${c}">${p}</span>
+    <div style="margin-top:4px"><b>${k}</b> <span class="chip new">Keeper</span><div class="muted">${kr}</div></div>
+    <div style="margin-top:4px"><b>${e}</b> <span class="chip ld">Expander</span><div class="muted">${er}</div></div></div>`).join('')
     + `<div class="cls muted">Tier 3 mastery: <b>${f.mastery}</b></div>`
   fg.appendChild(d)
 }
@@ -229,26 +239,26 @@ let s = ''
 for (const R of [10, 20, 30, 40, 50]) s += `<line class="grid" x1="${X0}" x2="${X0 + XW}" y1="${y(R)}" y2="${y(R)}"/><text x="${X0 - 8}" y="${y(R) + 4}" text-anchor="end">${R}</text>`
 for (const L of [1, 10, 20, 30, 40, 50]) s += `<text x="${x(L)}" y="${Y0 + 18}" text-anchor="middle">Lv ${L}</text>`
 s += `<line class="axis" x1="${X0}" x2="${X0 + XW}" y1="${Y0}" y2="${Y0}"/><line class="axis" x1="${X0}" x2="${X0}" y1="${Y0}" y2="${Y0 - YH}"/>`
-for (const [t1, cls] of [[true, 't1'], [false, 't2']]) {
+for (const [t1, cls, dash] of [[false, 'grid', '2 4'], [true, 't1', ''], [true, 't2', '6 6']]) {
   let p = ''; for (let L = 1; L <= 50; L++) p += `${L === 1 ? 'M' : 'L'}${x(L).toFixed(1)},${y(rankAt(L, t1)).toFixed(1)}`
-  s += `<path class="${cls}" d="${p}" fill="none" stroke-width="3"/>`
+  s += `<path class="${cls}" d="${p}" fill="none" stroke-width="${cls === 'grid' ? 2 : 3}" stroke-dasharray="${dash}"/>`
 }
 s += `<text x="${X0 + 6}" y="${Y0 - YH - 6}">Class Rank</text>`
 svg.innerHTML = s
 const firstAt = (R, t1) => { for (let L = 1; L <= 50; L++) if (rankAt(L, t1) >= R) return L; return '—' }
 const pt = document.getElementById('pace-table')
-pt.innerHTML = '<tr><th>Class Rank</th><th>Opens</th><th class="n">Tier 1, Uma Lv</th><th class="n">Tiers 2 and 3, Uma Lv</th></tr>' +
-  [[1, 'Depth 1'], [10, 'Depth 2'], [20, 'Depth 3 (the fork) · the class line'], [30, 'Depth 4 · its second skill'], [40, 'Depth 5 (the capstones) · its capstone'], [50, 'Tier 3: the crowns, the mastery, the master slot']]
-    .map(([R, o]) => `<tr><td>${R}</td><td>${o}</td><td class="n">${R === 10 ? 10 : firstAt(R, true)}</td><td class="n">${firstAt(R, false)}</td></tr>`).join('')
+pt.innerHTML = '<tr><th>Class Rank</th><th>Opens</th><th class="n">Tier 1, Uma Lv</th><th class="n">Tiers 2 and 3 (XR1), Uma Lv</th><th class="n">Each from Rank 1 alone</th></tr>' +
+  [[1, 'Depth 1'], [10, 'Depth 2'], [20, 'Depth 3 (the fork) · the class line · the door'], [30, 'Depth 4 · its second skill'], [40, 'Depth 5 (the capstones) · its capstone'], [50, 'Tier 3: the crowns, the mastery, the master slot']]
+    .map(([R, o]) => `<tr><td>${R}</td><td>${o}</td><td class="n">${R === 10 ? 10 : firstAt(R, true)}</td><td class="n"><b>${R === 10 ? 10 : firstAt(R, true)}</b></td><td class="n muted">${firstAt(R, false)}</td></tr>`).join('')
 
 // Lv 50 sheets from the live code (balanceMember, gear and stars on curve).
 const SHEETS = [
-  ['Brawler (Greatsword)', 'phys', [[1460, 212, 209, 114, 204, 181, 297], [2531, 367, 377, 205, 368, 324, 535], [3610, 522, 545, 296, 532, 468, 774]]],
-  ['Sorcerer (Fire)', 'magic', [[1230, 294, 114, 214, 184, 200, 302], [2139, 505, 205, 386, 331, 360, 544], [3055, 717, 296, 558, 478, 520, 787]]],
-  ['Arms Spellblade (Katana) · Arms Summoner (Bow)', 'phys', [[1322, 245, 200, 128, 194, 191, 288], [2296, 423, 362, 229, 349, 342, 520], [3277, 600, 522, 333, 505, 494, 751]]],
-  ['Tome Spellblade (Thunder) · Tome Summoner (Dark)', 'magic', [[1322, 245, 128, 200, 194, 191, 288], [2296, 423, 229, 362, 349, 342, 520], [3277, 600, 333, 522, 505, 494, 751]]],
-  ['Paladin (Lance)', 'heal', [[1322, 294, 193, 109, 209, 191, 281], [2296, 505, 347, 197, 377, 342, 505], [3277, 717, 503, 284, 545, 494, 732]]],
-  ['Cleric (Light)', 'heal', [[1322, 294, 109, 193, 194, 205, 281], [2296, 505, 197, 347, 349, 369, 505], [3277, 717, 284, 503, 505, 533, 732]]],
+  ['Brawler (Greatsword) · Berserker, Spellfist', 'phys', [[1460, 212, 209, 114, 204, 181, 297], [2531, 367, 377, 205, 368, 324, 535], [3610, 522, 545, 296, 532, 468, 774]]],
+  ['Sorcerer (Fire) · Archmage, Battlemage', 'magic', [[1230, 294, 114, 214, 184, 200, 302], [2139, 505, 205, 386, 331, 360, 544], [3055, 717, 296, 558, 478, 520, 787]]],
+  ['Arms Spellblade, Arms Summoner · Blademaster, Sentinel, Warlord, Druid', 'phys', [[1322, 245, 200, 128, 194, 191, 288], [2296, 423, 362, 229, 349, 342, 520], [3277, 600, 522, 333, 505, 494, 751]]],
+  ['Tome Spellblade, Tome Summoner · Runeblade, Enchanter, Invoker, Shaman', 'magic', [[1322, 245, 128, 200, 194, 191, 288], [2296, 423, 229, 362, 349, 342, 520], [3277, 600, 333, 522, 505, 494, 751]]],
+  ['Paladin (Lance) · Guardian, Templar', 'heal', [[1322, 294, 193, 109, 209, 191, 281], [2296, 505, 347, 197, 377, 342, 505], [3277, 717, 503, 284, 545, 494, 732]]],
+  ['Cleric (Light) · Bishop, Exorcist', 'heal', [[1322, 294, 109, 193, 194, 205, 281], [2296, 505, 197, 347, 349, 369, 505], [3277, 717, 284, 503, 505, 533, 732]]],
 ]
 const fmt = (n) => n.toLocaleString('en-US')
 function drawSheet(t) {
@@ -262,8 +272,8 @@ document.getElementById('tier-seg').addEventListener('click', (e) => { const b =
   for (const x of e.currentTarget.children) x.classList.toggle('on', x === b); drawSheet(Number(b.dataset.t)) })
 
 const MP = [
-  ['Brawler', 212, 367, 522, 26, [52, 44], [78, 62]], ['Sorcerer', 294, 505, 717, 26, [52, 44], [78, 62]],
-  ['Spellblade · Summoner', 245, 423, 600, 26, [52, 44], [78, 62]], ['Paladin · Cleric', 294, 505, 717, 16, [32, 27], [48, 37]],
+  ['Berserker · Spellfist', 212, 367, 522, 26, [52, 44], [78, 62]], ['Archmage · Battlemage', 294, 505, 717, 26, [52, 44], [78, 62]],
+  ['A Spellblade\'s or Summoner\'s child', 245, 423, 600, 26, [52, 44], [78, 62]], ['Guardian · Bishop (×0.6)', 294, 505, 717, 16, [32, 27], [48, 37]], ['Templar · Exorcist (×0.7)', 294, 505, 717, 18, [36, 31], [54, 44]],
 ]
 document.getElementById('mp-table').innerHTML = '<tr><th>Class</th><th class="n">T1</th><th class="n">T2 today</th><th class="n">T2 ×1.7</th><th class="n">T3 today</th><th class="n">T3 ×2.4</th></tr>' +
   MP.map(([n, b1, b2, b3, c1, c2, c3]) => `<tr><td>${n}</td><td class="n">${(b1 / c1).toFixed(1)}</td><td class="n muted">${(b2 / c2[0]).toFixed(1)}</td><td class="n"><b>${(b2 / c2[1]).toFixed(1)}</b></td><td class="n muted">${(b3 / c3[0]).toFixed(1)}</td><td class="n"><b>${(b3 / c3[1]).toFixed(1)}</b></td></tr>`).join('')

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Class Branches</title>
-<!-- docs/design/tier2/classes.md (T2C4–T2C13, T2C23, T2C26). The Tier rework's preview template: uma-kit's theme tokens. -->
+<title>The Sixteen Classes</title>
+<!-- docs/design/tier2/classes.md (T2C31–T2C45, T2C54). The Tier rework's preview template: uma-kit's theme tokens. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -14,7 +14,6 @@
     --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
     --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
     --ring: #c2643a; --ld: #7a5ad0;
-    /* D234: every kind its own colour, each Arm beside its twin. */
     --k-greatsword: #d9822b; --k-fire: #d8423a; --k-axe: #8a4fc4; --k-ice: #3a86d8; --k-lance: #3d9a4a; --k-lightning: #c9a60e;
     --k-katana: #1f9a86; --k-light: #b89a3c; --k-bow: #d0507e; --k-dark: #6a3fb0;
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
@@ -34,30 +33,25 @@
     }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--page); color: var(--ink);
-    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
   main { max-width: 430px; margin: 0 auto; padding: 16px; }
   main.wide { max-width: 1100px; }
   h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
   h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 24px 0 8px; }
   h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
   p, li { color: var(--ink-soft); }
-  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
-    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap); box-shadow: 0 1px 0 var(--hairline-strong); }
   .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .grid { display: grid; gap: var(--gap); }
   .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   @media (max-width: 860px) { .g2 { grid-template-columns: 1fr; } }
-  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
-    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .chip.ring { background: color-mix(in srgb, var(--ring) 18%, transparent); color: var(--ring); }
-  .chip.ld { background: color-mix(in srgb, var(--ld) 18%, transparent); color: var(--ld); }
-  .chip.new { background: var(--accent-wash); color: var(--accent-strong); }
-  .chip.st { background: color-mix(in srgb, var(--heal) 16%, transparent); color: var(--heal); }
-  .kind { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700;
-    color: #fff; white-space: nowrap; }
-  .kind.boost { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .kind.off { opacity: .22; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.keep { background: var(--accent-wash); color: var(--accent-strong); }
+  .chip.exp { background: color-mix(in srgb, var(--t3) 18%, transparent); color: var(--t3); }
+  .kind { display: inline-flex; align-items: center; padding: 1px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; margin: 1px 2px 1px 0; }
   .muted { color: var(--ink-faint); }
   .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
@@ -66,158 +60,163 @@
   td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
   nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
   nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
-  .branch h3 { margin: 0 0 6px; }
-  .line { display: grid; grid-template-columns: 96px 1fr; gap: 4px 10px; margin-top: 8px; font-size: 13px; }
-  .line .k { color: var(--ink-faint); }
-  .steps { display: flex; gap: 6px; flex-wrap: wrap; }
-  .step { padding: 3px 8px; border-radius: 8px; background: var(--raised); border: 1px solid var(--hairline-strong); font-size: 12px; font-weight: 600; }
-  .step.cap { border-color: var(--accent); background: var(--accent-wash); }
-  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 2px; gap: 2px; }
-  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
-  .seg button.on { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
-  .member { display: grid; grid-template-columns: 150px 210px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--hairline); }
-  .member:first-of-type { border-top: 0; }
-  .kinds10 { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 6px; }
-  .verdict { font-weight: 700; }
-  .verdict.ok { color: var(--success); } .verdict.miss { color: var(--danger); }
-  .hint { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+  .pair { display: grid; grid-template-columns: 150px 1fr 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--hairline); }
+  .pair:first-child { border-top: 0; }
+  .pair .p { font-weight: 700; }
+  .cls { background: var(--raised); border-radius: 10px; padding: 8px 10px; border: 1px solid var(--hairline); }
+  .cls .nm { font-weight: 700; font-size: 15px; }
+  .cls .rule { color: var(--ink); margin: 4px 0; font-size: 13px; }
+  .cls .meta { font-size: 12px; color: var(--ink-faint); }
+  @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
   .note { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
-  .quick { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 0; }
-  .quick button { border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); font: 600 12px system-ui; padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+  svg text { fill: var(--ink-soft); font: 11px system-ui; }
+  svg .axis { stroke: var(--hairline-strong); } svg .grid { stroke: var(--hairline); }
+  .lvl { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
 </style>
 </head>
 <body>
 <main class="wide">
-  <h1>Class branches, sets and parties</h1>
-  <p>Tier 2's class branch for the eight Tier 1 classes (<a href="../classes.md">classes.md</a> §4.2–§4.6, T2C4–T2C13): ten
-    branches, two a family, each a weapon group's focus (+15%), a set and a class line; the owner's two comps flipped
-    member by member; and what the Halls add to either set.</p>
-  <nav class="tabs"><a href="#groups">The two groups</a><a href="#branches">The ten branches</a><a href="#sets">Every class's two sets</a>
-    <a href="#builder">Party builder</a><a href="#halls">Hall coverage</a></nav>
+  <h1>The sixteen Tier 2 classes</h1>
+  <p>Each Tier 1 class promotes on the Ascend into a <span class="chip keep">Keeper</span>, who keeps her identity with one
+    sharpening rule, and an <span class="chip exp">Expander</span>, who widens it with one twist
+    (<a href="../classes.md">classes.md</a> §4, T2C31–T2C45). Mirrors share a rule: eight rules, sixteen classes. Every
+    class keeps her parent's three slots' count, lean, armor half, trees, hall and Limit Break scale.</p>
+  <nav class="tabs"><a href="#sixteen">The sixteen</a><a href="#momentum">Momentum</a><a href="#cross">Crossing channels</a>
+    <a href="#both">Both halves</a><a href="#support">The supports</a><a href="#healers">The healers</a><a href="#levels">Four status levels</a></nav>
 
-  <h2 id="groups">The two weapon groups</h2>
+  <h2 id="sixteen">The sixteen, by parent</h2>
+  <div class="card" id="pairs"></div>
+
+  <h2 id="momentum">Momentum: the pure keepers' self-buff</h2>
   <div class="grid g2">
-    <div class="card"><div class="row"><span class="chip ring">Ring</span><span class="muted">the ring's three twin sets · Heavy, Sweep, Scatter</span></div>
-      <div class="row" style="margin-top:8px" id="g-ring"></div>
-      <p class="note">Pure damage for a Spellblade or a Summoner; every-skill statuses for a healer (Greatsword, Lance, Fire).</p></div>
-    <div class="card"><div class="row"><span class="chip ld">Light/Dark</span><span class="muted">Light, Dark and Twilight sets · Double, Volley</span></div>
-      <div class="row" style="margin-top:8px" id="g-ld"></div>
-      <p class="note">D282's secondary weapons: the path's statuses for the hybrids and the healers. The volleys give it its own reach.</p></div>
+    <div class="card">
+      <h3>Her damage by the turns she gets in a fight</h3>
+      <svg id="mom" viewBox="0 0 520 240" width="100%" role="img" aria-label="Momentum's bonus by turns in a fight"></svg>
+      <div class="row"><label class="muted">Step a stack <input id="step" type="range" min="3" max="10" value="5" step="1"></label><b id="stepv">5%</b></div>
+      <p class="note">A stack after each of her turns, three at most, the fight long, lost when she falls. Her first act has none.</p>
+    </div>
+    <div class="card">
+      <h3>At Lv 50, on the harness's turns a fight</h3>
+      <div class="scroll"><table id="momtab"></table></div>
+      <p class="note">Turns a fight read from Tier 1's harness at Lv 50 (both comps, 6 seeds a stage). At +10% a stack the keepers would lead their expanders by about 13% of their own damage; +5% keeps them within 3 points.</p>
+    </div>
   </div>
 
-  <h2 id="branches">The ten branches</h2>
-  <p>A family's two classes share its two branches: names, line, crown and mastery; each casts it with her own hand. The
-    line opens at Class Rank 20 · 30 · 40 and is cast through one of her focus weapons.</p>
-  <div class="grid g2" id="branch-grid"></div>
-
-  <h2 id="sets">Every class's two sets</h2>
-  <div class="card scroll"><table id="sets-table"></table>
-    <p class="note">Outlined: the kinds her branch boosts. Branch 1 is her standard preset (D263), its group the one holding two of three; branch 2 her reverse set, picked by a script for the most party mixes at all ten kinds.</p></div>
-
-  <h2 id="builder">Party builder: the owner's two comps</h2>
-  <div class="card">
-    <div class="row"><span class="seg" id="party-seg"><button data-p="0" class="on">Party 1</button><button data-p="1">Party 2</button></span>
-      <span class="muted" id="party-score"></span></div>
-    <div class="quick" id="quick"></div>
-    <div id="members"></div>
-    <div class="kinds10" id="kinds10"></div>
-    <div><span class="verdict" id="verdict"></span></div>
-    <div class="hint" id="hint"></div>
-    <p class="note">Every count is one kind a weapon, so it holds whatever weapon branch she takes. 33 of the 64 mixes hold all ten kinds (16 and 17).</p>
+  <h2 id="cross">Crossing channels: the Spellfist and the Battlemage</h2>
+  <div class="grid g2">
+    <div class="card scroll"><table>
+      <tr><th>A hit of her other channel</th><th>Reads</th></tr>
+      <tr><td><b>Offense</b></td><td>Her stat (ATK or M.ATK), + that weapon's Might, + her flat on its kind, + her signature</td></tr>
+      <tr><td><b>Defense</b></td><td>The kind's channel: an element against M.DEF, an Arm against DEF</td></tr>
+      <tr><td><b>Weakness, shields, locks</b></td><td>The kind</td></tr>
+      <tr><td><b>Statuses</b></td><td>The kind's channel (her Fire hit: Faith and Mind Break, not Brave or Armor Break)</td></tr>
+      <tr><td><b>The Rift's ward</b></td><td>The kind's channel</td></tr>
+      <tr><td><b>Her tree</b></td><td>The other pure class's tree for that weapon</td></tr>
+      <tr><td><b>Her hand</b></td><td>×1.05, one act a turn, MP ×1</td></tr>
+    </table></div>
+    <div class="card">
+      <h3>What crossing is worth on its own (Tier 2 Lv 50)</h3>
+      <div class="scroll"><table id="crosstab"></table></div>
+      <p class="note">Her best hit a turn on one regular, every Tier 2 weakness list equally likely (strikers and guards 1 Arm + 2 elements, casters and skirmishers 2 Arms + 1), foe defenses from <code>rpgFoe</code> at lifetime Lv 100. A breadth pick: the hand's ×1.05 carries her into the band.</p>
+    </div>
   </div>
 
-  <h2 id="halls">Hall coverage of both sets</h2>
-  <div class="card scroll"><table id="halls-table"></table>
-    <p class="note">The sixteen seats' kinds (D261). A seat adds a kind when its Limit Break carries one her three weapons miss. LB+ (+20% at Bond 10) from Tier 2.</p></div>
+  <h2 id="both">Both halves: the hybrid keepers</h2>
+  <div class="grid g2">
+    <div class="card"><div class="row"><b>Blademaster · Runeblade</b><span class="chip keep">Keeper</span></div>
+      <p>Tier 1: her bound familiar lands one extra hit on her <b>lead</b> half, the same total. <b>Keeper: on both halves.</b> A weak other half chips one more shield point; a Pierce tree's hit splits in two, both piercing.</p>
+      <p class="note">Worth: the same damage, about 0.5 more chips a turn; the model credits +6% of her damage to Breaks.</p></div>
+    <div class="card"><div class="row"><b>Warlord · Invoker</b><span class="chip keep">Keeper</span></div>
+      <p>Tier 1: her <b>lead</b> summon lingers and strikes every foe in farewell at her next pair. <b>Keeper: both summons linger.</b> Two farewells, one of each kind, on every foe: each weak foe chips one more point a pair.</p>
+      <p class="note">Worth: +2% damage, about one more chip a turn on three foes; the model credits +7% to Breaks.</p></div>
+  </div>
+
+  <h2 id="support">The supports: a little of the healers' kit</h2>
+  <div class="card scroll"><table id="suptab"></table>
+    <p class="note">Her healing scale is her higher of ATK and M.ATK ÷ (300 × the tier's multiplier), about ×1.67 on curve at Lv 50. A support is no healer: one healer a party is unchanged.</p></div>
+
+  <h2 id="healers">The healers: one stack more, or a battle healer</h2>
+  <div class="card scroll"><table>
+    <tr><th></th><th>Guardian · Bishop <span class="chip keep">Keeper</span></th><th>Templar · Exorcist <span class="chip exp">Expander</span></th></tr>
+    <tr><td>Power · MP</td><td>×0.5 · ×0.6</td><td><b>×0.6 · ×0.7</b></td></tr>
+    <tr><td>Mends, Barriers, Regen, drain, revive</td><td>Tier 1's shares</td><td><b>×0.7</b> (Rescue's 60% floor and the revive kept)</td></tr>
+    <tr><td>Statuses</td><td><b>One stack more:</b> Greatsword, Lance, Fire 2 · 2 · 3 · 3 · 3; path 3 · 3 · 3</td><td>Tier 1's: 1 · 1 · 2 · 2 · 3; path 2 · 2 · 3</td></tr>
+    <tr><td>Healing capacity, Lv 50</td><td>About 20% of the party's HP a round</td><td>About 14%</td></tr>
+    <tr><td>Damage share</td><td>About 10%</td><td>About 13%</td></tr>
+    <tr><td>Party value against her parent (model, on curve)</td><td>+9 to +10%</td><td>+11 to +12%, the stress check brings it back</td></tr>
+  </table></div>
+
+  <h2 id="levels">Statuses: four levels</h2>
+  <div class="card scroll"><table id="levtab"></table>
+    <p class="note">D282's three levels, with <b>support</b> added between the path and widely (R2-3's "wider buffs and debuffs"). Five statuses, +10% a stack, three at most, two rounds; no retired status returns.</p></div>
 </main>
 <script>
-const KIND = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire', ice: 'Blizzard', lightning: 'Thunder', light: 'Light', dark: 'Dark' }
-const ALL = Object.keys(KIND)
-const RING = new Set(['greatsword', 'axe', 'lance', 'fire', 'ice', 'lightning'])
-const chip = (k, cls = '') => `<span class="kind ${cls}" style="background:var(--k-${k})">${KIND[k]}</span>`
-document.getElementById('g-ring').innerHTML = ['greatsword', 'fire', 'axe', 'ice', 'lance', 'lightning'].map((k) => chip(k)).join('')
-document.getElementById('g-ld').innerHTML = ['katana', 'light', 'bow', 'dark'].map((k) => chip(k)).join('')
-
-const BRANCHES = [
-  ['Warrior', 'Brawler', 'Berserker', 'ring', ['Grand Rampage', 'Supreme Rampage', 'Skybreaker'], 'The tapped foe takes the full power, every other foe 0.3 (1.0 on one foe, 1.6 on three, 2.2 on five)', 'None', 'depth + 4'],
-  ['Warrior', 'Brawler', 'Warlord', 'ld', ['Grand Conquest', 'Supreme Conquest', 'Sundown'], 'One foe at the full power; on a Broken foe every other foe also takes 0.55', 'None', 'depth + 2'],
-  ['Mage', 'Sorcerer', 'Sage', 'ring', ['Grand Nebula', 'Supreme Nebula', 'Starburst'], 'Every foe at the area share; a foe weak to its kind takes the full power', 'None', 'depth + 4'],
-  ['Mage', 'Sorcerer', 'Augur', 'ld', ['Grand Quasar', 'Supreme Quasar', 'Event Horizon'], 'One foe, one hit at ×1.25 the power', 'None', 'depth × 1.5'],
-  ['Spellblade', 'Arms and Tome Spellblade', 'Rune Knight', 'ring', ['Grand Sigil', 'Supreme Sigil', 'Rune Edge'], 'Her pair: her lead half on one foe (her familiar\'s extra hit), her other half on every foe at 0.55', 'None', 'depth + 2'],
-  ['Spellblade', 'Arms and Tome Spellblade', 'Blademaster', 'ld', ['Grand Bane', 'Supreme Bane', 'Penumbra Edge'], 'Her pair on one foe; through a Light/Dark weapon its path status (Armor Break, Enfeeble, Mind Break; Brave and Faith on every Uma)', '1 · 1 · 2', 'depth'],
-  ['Summoner', 'Arms and Tome Summoner', 'Invoker', 'ring', ['Grand Griffin', 'Supreme Griffin', 'Kraken'], 'Her pair on one foe; her lead summon lingers at 0.5, not 0.3: a harder farewell on every foe', 'None', 'depth + 2'],
-  ['Summoner', 'Arms and Tome Summoner', 'Warlock', 'ld', ['Grand Wraith', 'Supreme Wraith', 'Banshee'], 'Her pair, her lead summon on every foe at 0.55; through a Light/Dark weapon its path status on the tapped foe', '1 · 1 · 2', 'depth + 4'],
-  ['Healer', 'Paladin and Cleric', 'Guardian', 'ring', ['Grand Edict', 'Supreme Edict', 'Covenant'], 'A blow or a spell on one foe; through the Greatsword, Lance or Fire its status reaches every foe or every Uma from depth 3; through the Axe, Blizzard or Thunder its Barrier or mend reaches every Uma', '2 · 2 · 3', 'depth + 4'],
-  ['Healer', 'Paladin and Cleric', 'Templar', 'ld', ['Grand Solace', 'Supreme Solace', 'Absolution'], 'A blow or a spell on one foe, then a mend on the most hurt and a Barrier on the most threatened, both whole; Regen, drain or a path status ride it', 'Path 2 · 2 · 3', 'depth + 4'],
+const K = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire', ice: 'Blizzard', lightning: 'Thunder', light: 'Light', dark: 'Dark' }
+const kind = (k) => `<span class="kind" style="background:var(--k-${k})">${K[k]}</span>`
+const PAIRS = [
+  ['Brawler', 'phys', 'Warrior · Dojo', ['Berserker', 'Momentum: +5% a stack on her own hits, a stack a turn, 3 at most', '3 Arms · ATK · ×1', ['greatsword', 'axe', 'lance'], 'None', 'The long fight\'s damage'],
+    ['Spellfist', 'Two Arms and a Tome; <b>every hit on ATK</b>', '2 Arms + Tome · all ATK · ×1.05', ['greatsword', 'axe', 'fire'], 'None', 'A bruiser who covers an element']],
+  ['Sorcerer', 'magic', 'Mage · Tower', ['Archmage', 'Momentum, the same rule', '3 Tomes · M.ATK · ×1', ['fire', 'ice', 'lightning'], 'None', 'The long fight\'s magic'],
+    ['Battlemage', 'Two Tomes and an Arm; <b>every hit on M.ATK</b>', '2 Tomes + Arm · all M.ATK · ×1.05', ['fire', 'lightning', 'greatsword'], 'None', 'A caster who covers an Arm']],
+  ['Arms Spellblade', 'phys', 'Spellblade · Salle', ['Blademaster', 'Her familiar\'s extra hit on <b>both</b> halves', '2 Arms + Tome · 0.72 + 0.44', ['katana', 'axe', 'lightning'], 'A path', 'The Break engine on one foe'],
+    ['Sentinel', 'Hands ×0.85; <b>Light/Dark statuses on every skill</b>; a Barrier after each act', '2 Arms + Tome · 0.61 + 0.37', ['katana', 'greatsword', 'light'], 'Support, the tapped foe', 'Offense support: Armor Break, Brave and Faith']],
+  ['Tome Spellblade', 'magic', 'Spellblade · Salle', ['Runeblade', 'The same as the Blademaster', '2 Tomes + Arm · 0.72 + 0.48', ['lightning', 'ice', 'katana'], 'A path', 'The Break engine, magic-led'],
+    ['Enchanter', 'The same as the Sentinel', '2 Tomes + Arm · 0.61 + 0.41', ['light', 'ice', 'katana'], 'Support, the tapped foe', 'Offense support, magic-led']],
+  ['Arms Summoner', 'phys', 'Summoner · Circle', ['Warlord', '<b>Both</b> summons linger: two farewells', '2 Arms + Tome · 0.57 + 0.46', ['bow', 'axe', 'dark'], 'A path', 'The Break engine on every foe'],
+    ['Druid', 'Hands ×0.9; <b>Light/Dark statuses on every skill, every foe</b>; her farewell mends every Uma', '2 Arms + Tome · 0.51 + 0.41', ['bow', 'greatsword', 'dark'], 'Support, every foe', 'Field support: Enfeeble and Mind Break']],
+  ['Tome Summoner', 'magic', 'Summoner · Circle', ['Invoker', 'The same as the Warlord', '2 Tomes + Arm · 0.57 + 0.5', ['dark', 'ice', 'bow'], 'A path', 'The Break engine, magic-led'],
+    ['Shaman', 'The same as the Druid', '2 Tomes + Arm · 0.51 + 0.45', ['dark', 'ice', 'bow'], 'Support, every foe', 'Field support, magic-led']],
+  ['Paladin', 'heal', 'Healer · Sanctum', ['Guardian', 'Every status she lands <b>one stack more</b>', '2 Arms + Tome · ×0.5 · heals from ATK', ['lance', 'greatsword', 'light'], 'Widely, +1 stack', 'The one healer, statuses at the cap'],
+    ['Templar', 'A battle healer: <b>×0.6</b> power, <b>×0.7</b> mends and Barriers', '2 Arms + Tome · ×0.6 · MP ×0.7', ['lance', 'greatsword', 'light'], 'Widely', 'The healer who hits']],
+  ['Cleric', 'heal', 'Healer · Sanctum', ['Bishop', 'The same as the Guardian', '2 Tomes + Arm · ×0.5 · heals from M.ATK', ['light', 'fire', 'lance'], 'Widely, +1 stack', 'The one healer, magic-led'],
+    ['Exorcist', 'The same as the Templar', '2 Tomes + Arm · ×0.6 · MP ×0.7', ['light', 'fire', 'lance'], 'Widely', 'The healer who hits, magic-led']],
 ]
-const MASTERY = { Warrior: 'Juggernaut', Mage: 'Resonance', Spellblade: 'Spellbind', Summoner: 'Menagerie', Healer: 'Overflow' }
-document.getElementById('branch-grid').innerHTML = BRANCHES.map(([fam, cls, name, g, steps, what, st, mp]) => `
-  <div class="card branch"><h3>${fam} · ${cls}</h3>
-    <div class="row"><b style="font-size:15px">${name}</b><span class="chip ${g}">${g === 'ring' ? 'Ring' : 'Light/Dark'} +15%</span></div>
-    <div class="line"><span class="k">Class line</span><div class="steps">${steps.map((s, i) => `<span class="step ${i === 2 ? 'cap' : ''}">${['CR 20', 'CR 30', 'CR 40'][i]} · ${s}</span>`).join('')}</div>
-      <span class="k">Does</span><span>${what}</span>
-      <span class="k">Status</span><span>${st === 'None' ? '<span class="muted">None</span>' : `<span class="chip st">${st}</span>`}</span>
-      <span class="k">MP</span><span>${mp} (full turn, her hand and the tier on top)</span>
-      <span class="k">Tier 3</span><span>${steps[2]} crowned at Class Rank 50 (5.6 whole) · mastery <b>${MASTERY[fam]}</b></span></div></div>`).join('')
+const card = ([n, rule, slots, ws, st, role], tag) => `<div class="cls"><div class="row"><span class="nm">${n}</span>${tag}</div><div class="rule">${rule}</div>
+  <div class="meta">${slots}</div><div style="margin-top:4px">${ws.map(kind).join('')}</div><div class="meta">Statuses: ${st} · ${role}</div></div>`
+document.getElementById('pairs').innerHTML = PAIRS.map(([p, ch, fam, k, e]) => `<div class="pair"><div><div class="p">${p}</div><span class="chip ${ch}">${ch === 'heal' ? 'Healer' : ch === 'phys' ? 'Physical' : 'Magical'}</span><div class="muted" style="font-size:12px;margin-top:4px">${fam}</div></div>
+  ${card(k, '<span class="chip keep">Keeper</span>')}${card(e, '<span class="chip exp">Expander</span>')}</div>`).join('')
 
-const SETS = [
-  ['Brawler', ['greatsword', 'axe', 'lance'], 'Berserker', 'ring', ['bow', 'katana', 'greatsword'], 'Warlord', 'ld'],
-  ['Sorcerer', ['fire', 'ice', 'lightning'], 'Sage', 'ring', ['light', 'dark', 'fire'], 'Augur', 'ld'],
-  ['Arms Spellblade', ['katana', 'axe', 'lightning'], 'Rune Knight', 'ring', ['katana', 'bow', 'dark'], 'Blademaster', 'ld'],
-  ['Tome Spellblade', ['lightning', 'ice', 'katana'], 'Rune Knight', 'ring', ['light', 'dark', 'katana'], 'Blademaster', 'ld'],
-  ['Arms Summoner', ['bow', 'axe', 'dark'], 'Warlock', 'ld', ['axe', 'lance', 'ice'], 'Invoker', 'ring'],
-  ['Tome Summoner', ['dark', 'ice', 'bow'], 'Warlock', 'ld', ['ice', 'lightning', 'axe'], 'Invoker', 'ring'],
-  ['Paladin', ['lance', 'greatsword', 'light'], 'Guardian', 'ring', ['katana', 'bow', 'light'], 'Templar', 'ld'],
-  ['Cleric', ['light', 'fire', 'lance'], 'Guardian', 'ring', ['light', 'dark', 'bow'], 'Templar', 'ld'],
-]
-const inGroup = (k, g) => (g === 'ring') === RING.has(k)
-const setChips = (set, g) => set.map((k) => chip(k, inGroup(k, g) ? 'boost' : '')).join(' ')
-document.getElementById('sets-table').innerHTML = '<tr><th>Class</th><th>Branch 1 (preselected)</th><th>Its set: the standard preset</th><th>Branch 2</th><th>Its reverse set</th></tr>' +
-  SETS.map(([c, s1, b1, g1, s2, b2, g2]) => `<tr><td><b>${c}</b></td><td>${b1} <span class="chip ${g1}">${g1 === 'ring' ? 'Ring' : 'Light/Dark'}</span></td><td>${setChips(s1, g1)}</td><td>${b2} <span class="chip ${g2}">${g2 === 'ring' ? 'Ring' : 'Light/Dark'}</span></td><td>${setChips(s2, g2)}</td></tr>`).join('')
-
-const BY = Object.fromEntries(SETS.map((r) => [r[0], r]))
-const PARTIES = [['Brawler', 'Sorcerer', 'Arms Spellblade', 'Tome Summoner', 'Paladin'], ['Brawler', 'Sorcerer', 'Tome Spellblade', 'Arms Summoner', 'Cleric']]
-let party = 0
-let flips = [0, 0, 0, 0, 0]
-const setOf = (c, f) => (f ? BY[c][4] : BY[c][1])
-const held = (p, fl) => { const s = new Set(); PARTIES[p].forEach((c, i) => setOf(c, fl[i]).forEach((k) => s.add(k))); return s }
-function score(p) { let n = 0; for (let m = 0; m < 32; m++) { const fl = [0, 1, 2, 3, 4].map((i) => (m >> (4 - i)) & 1); if (held(p, fl).size === 10) n++ } return n }
-function draw() {
-  document.getElementById('party-score').textContent = `${score(party)} of its 32 mixes hold all ten kinds`
-  document.getElementById('members').innerHTML = PARTIES[party].map((c, i) => { const r = BY[c], f = flips[i]
-    return `<div class="member"><b>${c}</b><span class="seg" data-i="${i}"><button data-f="0" class="${f ? '' : 'on'}">${r[2]}</button><button data-f="1" class="${f ? 'on' : ''}">${r[5]}</button></span><span>${setChips(setOf(c, f), f ? r[6] : r[3])}</span></div>` }).join('')
-  const h = held(party, flips)
-  document.getElementById('kinds10').innerHTML = ALL.map((k) => chip(k, h.has(k) ? '' : 'off')).join('')
-  const miss = ALL.filter((k) => !h.has(k))
-  const v = document.getElementById('verdict')
-  v.className = 'verdict ' + (miss.length ? 'miss' : 'ok')
-  v.textContent = miss.length ? `${10 - miss.length} of ten: no ${miss.map((k) => KIND[k]).join(', ')}` : 'All ten kinds'
-  const hints = miss.map((k) => { const who = PARTIES[party].filter((c, i) => setOf(c, 1 - flips[i]).includes(k))
-    return who.length ? `No ${KIND[k]}: the ${who.map((c, i) => `${c}'s ${flips[PARTIES[party].indexOf(c)] ? BY[c][2] : BY[c][5]} set`).join(' or the ')} holds one.` : `No ${KIND[k]}: no member's other set holds it.` })
-  document.getElementById('hint').textContent = hints.join(' ')
+// Momentum: mean stacks over n turns (a stack after each), cap 3.
+const mean = (n) => { let s = 0; for (let k = 0; k < n; k++) s += Math.min(k, 3); return s / n }
+const LV50 = [['Fights', 1.51], ['Sub-bosses', 1.76], ['Bosses', 2.21], ['All, by damage', 1.88]]
+function drawMom() {
+  const step = Number(document.getElementById('step').value) / 100
+  document.getElementById('stepv').textContent = `${Math.round(step * 100)}%`
+  const X0 = 40, Y0 = 210, XW = 460, YH = 180, maxY = 0.3
+  const x = (n) => X0 + (n - 1) / 11 * XW, y = (v) => Y0 - v / maxY * YH
+  let s = ''
+  for (const v of [0, 0.1, 0.2, 0.3]) s += `<line class="grid" x1="${X0}" x2="${X0 + XW}" y1="${y(v)}" y2="${y(v)}"/><text x="${X0 - 6}" y="${y(v) + 4}" text-anchor="end">+${v * 100}%</text>`
+  for (let n = 1; n <= 12; n++) s += `<text x="${x(n)}" y="${Y0 + 16}" text-anchor="middle">${n}</text>`
+  s += `<text x="${X0 + XW / 2}" y="${Y0 + 30}" text-anchor="middle">her turns in the fight</text>`
+  let p = ''; for (let n = 1; n <= 12; n++) p += `${n === 1 ? 'M' : 'L'}${x(n).toFixed(1)},${y(step * mean(n)).toFixed(1)}`
+  s += `<path d="${p}" fill="none" stroke="var(--accent)" stroke-width="3"/>`
+  s += `<line x1="${X0}" x2="${X0 + XW}" y1="${y(step * 3)}" y2="${y(step * 3)}" stroke="var(--accent)" stroke-dasharray="4 4"/><text x="${X0 + XW}" y="${y(step * 3) - 4}" text-anchor="end">cap +${Math.round(step * 300)}%</text>`
+  document.getElementById('mom').innerHTML = s
+  document.getElementById('momtab').innerHTML = '<tr><th>Lv 50</th><th class="n">Mean stacks</th><th class="n">Her damage</th></tr>' +
+    LV50.map(([k, m]) => `<tr><td>${k}</td><td class="n">${m.toFixed(2)}</td><td class="n"><b>+${(m * step * 100).toFixed(1)}%</b></td></tr>`).join('')
 }
-const QUICK = [['All branch 1', [0, 0, 0, 0, 0]], ['The owner\'s swap: Sorcerer and Summoner', [0, 1, 0, 1, 0]], ['… and the healer', [0, 1, 0, 1, 1]], ['… and the Spellblade', [0, 1, 1, 1, 0]], ['Light/Dark pure classes', [1, 1, 0, 0, 0]], ['Everyone flipped', [1, 1, 1, 1, 1]]]
-document.getElementById('quick').innerHTML = QUICK.map(([n], i) => `<button data-q="${i}">${n}</button>`).join('')
-document.getElementById('quick').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; flips = [...QUICK[Number(b.dataset.q)][1]]; draw() })
-document.getElementById('members').addEventListener('click', (e) => { const b = e.target.closest('button'); const s = e.target.closest('.seg'); if (!b || !s) return; flips[Number(s.dataset.i)] = Number(b.dataset.f); draw() })
-document.getElementById('party-seg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return
-  for (const x of e.currentTarget.children) x.classList.toggle('on', x === b); party = Number(b.dataset.p); draw() })
-draw()
+document.getElementById('step').addEventListener('input', drawMom); drawMom()
 
-const SEATS = { 'Triad Onslaught': ['greatsword', 'axe', 'lance'], 'Ten Thousand Swings': ['greatsword'], 'Triad Tempest': ['fire', 'ice', 'lightning'], 'Ten Thousand Candles': ['fire'],
-  'Shrike Pact': ['katana', 'lance'], 'Firefly Pact': ['katana', 'light'], 'Storm Heron Pact': ['light', 'lightning'], 'Wisp Pact': ['light', 'katana'],
-  'Centaur Warband': ['axe', 'bow'], 'Gargoyle Flock': ['axe', 'dark'], 'Frostshade Wyrm': ['dark', 'ice'], 'Night Colossus': ['dark', 'axe'],
-  "Archangel's Judgment": ['lance', 'light'], "Archdemon's Toll": ['greatsword', 'dark'], "Seraph's Storm": ['lightning', 'light'], "Cinder Fiend's Barrage": ['fire', 'dark'] }
-function coverage(set) {
-  const miss = ALL.filter((k) => !set.includes(k)); const adds = Object.fromEntries(Object.entries(SEATS).map(([n, ks]) => [n, ks.filter((k) => miss.includes(k))]))
-  const one = Object.values(adds).filter((v) => v.length).length; let best = 0, bestPair = ''
-  const names = Object.keys(SEATS)
-  for (let a = 0; a < names.length; a++) for (let b = a + 1; b < names.length; b++) { const g = new Set([...adds[names[a]], ...adds[names[b]]]); if (g.size > best) { best = g.size; bestPair = `${names[a]} + ${names[b]}` } }
-  return { miss, one, best, bestPair }
-}
-document.getElementById('halls-table').innerHTML = '<tr><th>Class</th><th>Set</th><th>Kinds it misses</th><th class="n">Seats adding one</th><th class="n">Two Heroes add</th><th>For example</th></tr>' +
-  SETS.flatMap(([c, s1, b1, g1, s2, b2]) => [[c, b1, s1], ['', b2, s2]]).map(([c, b, s]) => { const v = coverage(s)
-    return `<tr><td><b>${c}</b></td><td>${b}</td><td>${v.miss.map((k) => chip(k)).join(' ')}</td><td class="n">${v.one} / 16</td><td class="n">${v.best}</td><td class="muted">${v.bestPair}</td></tr>` }).join('')
+document.getElementById('crosstab').innerHTML = '<tr><th>Kit</th><th class="n">Best hit</th><th class="n">vs keeper</th><th class="n">Weak in reach</th></tr>' +
+  [['Berserker: 3 Arms', 387, '—', 75], ['<b>Spellfist: 2 Arms + Tome on ATK</b>', 392, '+1.2%', 70], ['1 Arm + 2 Tomes on ATK', 391, '+1.0%', 70],
+    ['3 Arms + a fourth slot (not proposed)', 405, '+4.5%', 84], ['Archmage: 3 Tomes', 385, '—', 75], ['<b>Battlemage: 2 Tomes + Arm on M.ATK</b>', 391, '+1.8%', 70]]
+    .map(([a, b, c, d]) => `<tr><td>${a}</td><td class="n">${b}</td><td class="n">${c}</td><td class="n">${d}%</td></tr>`).join('')
+
+document.getElementById('suptab').innerHTML = `<tr><th></th><th>Sentinel · Enchanter <span class="chip exp">Expander</span></th><th>Druid · Shaman <span class="chip exp">Expander</span></th></tr>
+  <tr><td>Hands</td><td>Her parent's × 0.85: 0.61 + 0.37 · 0.61 + 0.41</td><td>Her parent's × 0.9: 0.51 + 0.41 · 0.51 + 0.45</td></tr>
+  <tr><td>Statuses</td><td>Every skill of her Katana, Bow, Light and Dark trees, <b>1 · 1 · 2 · 2 · 3</b>; the tapped foe, every foe at depth 5</td><td>The same ladder; <b>every foe at every depth</b></td></tr>
+  <tr><td>Her piece of the kit</td><td><b>A Barrier</b> after each skill act on the most threatened: a third of the healers' share (9 · 11 · 12 · 13 · 15%) × her healing scale</td><td><b>A mend:</b> her farewell mends every Uma a tenth of the healers' share (2.8 · 3.2 · 3.6 · 4.0 · 4.4%) × her healing scale</td></tr>
+  <tr><td>Preset</td><td>${['katana', 'greatsword', 'light'].map(kind).join('')} · ${['light', 'ice', 'katana'].map(kind).join('')}</td><td>${['bow', 'greatsword', 'dark'].map(kind).join('')} · ${['dark', 'ice', 'bow'].map(kind).join('')}</td></tr>
+  <tr><td>Role</td><td>Offense support: fills a Paladin's Brave and Faith, a Cleric's Armor Break</td><td>Field support: every foe weaker and softer to magic</td></tr>
+  <tr><td>Capacity, Lv 50</td><td>About 3.7% of the party's HP a round</td><td>About 5.5%, and Enfeeble at full on every foe</td></tr>
+  <tr><td>Party value vs parent (model)</td><td>+5 to +7%</td><td>−2%, its value in sustain (the stress check)</td></tr>`
+
+const LEV = [['None', 'var(--locked)', 'Berserker, Spellfist, Archmage, Battlemage', '—', '—', '—'],
+  ['A path', 'var(--info)', 'Blademaster, Runeblade, Warlord, Invoker', 'Line A of a Light/Dark weapon, depth 3+', '1 · 1 · 2', 'The tapped foe'],
+  ['Support (new)', 'var(--t3)', 'Sentinel, Enchanter · Druid, Shaman', 'Every skill of a Light/Dark weapon', '1 · 1 · 2 · 2 · 3', 'The tapped foe (every foe at depth 5) · every foe'],
+  ['Widely', 'var(--heal)', 'Guardian, Bishop (+1: 2 · 2 · 3 · 3 · 3) · Templar, Exorcist', 'Every skill of Greatsword, Lance, Fire; the path on Light/Dark', '1 · 1 · 2 · 2 · 3; path 2 · 2 · 3', 'The tapped foe, every foe at depth 5']]
+document.getElementById('levtab').innerHTML = '<tr><th>Level</th><th>Classes</th><th>Weapons</th><th>Stacks by depth</th><th>Reach</th></tr>' +
+  LEV.map(([a, c, b, d, e, f]) => `<tr><td><span class="lvl" style="background:${c}"></span><b>${a}</b></td><td>${b}</td><td>${d}</td><td>${e}</td><td>${f}</td></tr>`).join('')
 </script>
 </body>
 </html>
