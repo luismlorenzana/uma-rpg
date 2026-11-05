@@ -116,7 +116,8 @@
       <ul class="adds">
         <li><b>16 classes</b>: a Keeper and an Expander from each Tier 1 class, picked on the Ascend; the Tier 1 classes stay in Tier 1's world</li>
         <li>Open: both children of every Tier 1 class at Class Rank 50 (at least 6); <b>the door</b> at Class Rank 20 opens more</li>
-        <li>Statuses at <b>four</b> levels: none · a path · <b>support</b> · widely</li>
+        <li>Statuses at <b>four</b> levels: none · a path · <b>support</b> (topped up) · widely</li>
+        <li>Measured (balance T2B21–T2B34): a class against her parent <b>+7.0 · +3.9 · +3.2%</b> on average at Lv 10 · 30 · 50; every comp +1.7 to +9.3% over its Tier 1 party</li>
         <li>A <b>class line</b> a class at Class Rank 20 · 30 · 40 (mirrors share: 10 lines)</li>
         <li><b>Line C</b> on every tree; each capstone <b>Power or Break</b>; ★ signature tip (T2U)</li>
         <li>18 held, 3 → 10 equipped · LB+ +20% at Bond 10 · skill MP ×1.7 · healing ÷ 540</li>
@@ -130,6 +131,7 @@
         <li>At Class Rank 50 every capstone she holds is <b>crowned</b>: 5.6 whole, +4 MP, one more stack</li>
         <li>Her family's <b>mastery</b> and a <b>master slot</b></li>
         <li>27 held, 10 + master equipped · skill MP ×2.4 · healing ÷ 780 · MP regen's sixth step</li>
+        <li>Measured: the crowns and masteries +17% at Lv 50, every comp alike (T2B37)</li>
       </ul>
     </div>
   </div>
@@ -175,10 +177,10 @@
     <tr><th>Level</th><th><span class="tier t1">Tier 1</span> (D282)</th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th></tr>
     <tr><td><b>None</b></td><td>Brawler, Sorcerer</td><td>Berserker, Spellfist, Archmage, Battlemage</td><td>The same</td></tr>
     <tr><td><b>A path</b>: line A of a Light/Dark weapon, depth 3+, 1 · 1 · 2, the tapped foe</td><td>Spellblades, Summoners</td><td>Blademaster, Runeblade, Warlord, Invoker</td><td>+ a crowned capstone one stack more</td></tr>
-    <tr><td><b>Support</b> (new): every skill of a Light/Dark weapon, 1 · 1 · 2 · 2 · 3</td><td>—</td><td>Sentinel, Enchanter (the tapped foe, every foe at depth 5) · Druid, Shaman (every foe)</td><td>+ a crowned capstone one stack more</td></tr>
+    <tr><td><b>Support</b> (new): every skill of a Light/Dark weapon, 1 · 1 · 1 · 2 · 2, <b>topped up</b> (never built past its stacks; T2B24)</td><td>—</td><td>Sentinel, Enchanter (the tapped foe, every foe at depth 5) · Druid, Shaman (every foe); Brave and Faith on the Uma she wards</td><td>+ a crowned capstone one stack more (2 → 3)</td></tr>
     <tr><td><b>Widely</b>: every skill of Greatsword, Lance, Fire (1 · 1 · 2 · 2 · 3) and the path (2 · 2 · 3)</td><td>Paladin, Cleric</td><td>Templar, Exorcist (Tier 1's) · Guardian, Bishop <b>one stack more</b> (2 · 2 · 3 · 3 · 3, path 3 · 3 · 3)</td><td>+ a crowned capstone one stack more (to 3)</td></tr>
   </table>
-  <p class="note">Five statuses (Armor Break, Mind Break, Enfeeble, Brave, Faith), ±10% a stack, cap 3, two rounds, in every tier. Aegis, Breaker, Clarity, Hex and Shatter stay retired. Momentum is no status: her own +5% a stack, on no one else.</p></div>
+  <p class="note">Five statuses (Armor Break, Mind Break, Enfeeble, Brave, Faith), ±10% a stack, cap 3, two rounds, in every tier. Aegis, Breaker, Clarity, Hex and Shatter stay retired. Momentum is no status: her own +6% a stack, on no one else.</p></div>
 
   <h2 id="halls">The Halls by tier</h2>
   <div class="card scroll"><table>
@@ -209,12 +211,12 @@
 </main>
 <script>
 const FAMILIES = [
-  { name: 'Warrior', hall: 'Dojo', mastery: 'Juggernaut', rows: [['Brawler', 'phys', 'Berserker', 'Momentum: +5% a stack, a stack a turn, 3 at most', 'Spellfist', 'Two Arms and a Tome, every hit on ATK, ×1.05']] },
-  { name: 'Mage', hall: 'Tower', mastery: 'Resonance', rows: [['Sorcerer', 'magic', 'Archmage', 'Momentum', 'Battlemage', 'Two Tomes and an Arm, every hit on M.ATK, ×1.05']] },
-  { name: 'Spellblade', hall: 'Salle', mastery: 'Spellbind', rows: [['Arms Spellblade', 'phys', 'Blademaster', 'Her familiar\'s hit on both halves', 'Sentinel', 'Support: hands ×0.85, Light/Dark statuses on every skill, a Barrier'],
-    ['Tome Spellblade', 'magic', 'Runeblade', 'The same', 'Enchanter', 'The same, magic-led']] },
-  { name: 'Summoner', hall: 'Circle', mastery: 'Menagerie', rows: [['Arms Summoner', 'phys', 'Warlord', 'Both summons linger', 'Druid', 'Support: hands ×0.9, statuses on every foe, a mend'],
-    ['Tome Summoner', 'magic', 'Invoker', 'The same', 'Shaman', 'The same, magic-led']] },
+  { name: 'Warrior', hall: 'Dojo', mastery: 'Juggernaut', rows: [['Brawler', 'phys', 'Berserker', 'Momentum: +6% a stack, a stack a turn, 3 at most', 'Spellfist', 'Two Arms and a Tome, every hit on ATK, ×1.05; Greatsword, Axe, Thunder']] },
+  { name: 'Mage', hall: 'Tower', mastery: 'Resonance', rows: [['Sorcerer', 'magic', 'Archmage', 'Momentum', 'Battlemage', 'Two Tomes and an Arm, every hit on M.ATK, ×1.3; Fire, Blizzard, Lance']] },
+  { name: 'Spellblade', hall: 'Salle', mastery: 'Spellbind', rows: [['Arms Spellblade', 'phys', 'Blademaster', 'Her familiar\'s hit on both halves, piercing; hands +0.03', 'Sentinel', 'Support: hands ×0.95, Light/Dark statuses on every skill (topped up), Brave and Faith and a Barrier on her ward'],
+    ['Tome Spellblade', 'magic', 'Runeblade', 'The same', 'Enchanter', 'The same, magic-led; hands ×0.8']] },
+  { name: 'Summoner', hall: 'Circle', mastery: 'Menagerie', rows: [['Arms Summoner', 'phys', 'Warlord', 'Both summons linger; hands +0.03', 'Druid', 'Support: hands ×0.95, statuses on every foe (topped up), a mend'],
+    ['Tome Summoner', 'magic', 'Invoker', 'The same', 'Shaman', 'The same, magic-led; hands ×1']] },
   { name: 'Healer', hall: 'Sanctum', mastery: 'Overflow', rows: [['Paladin', 'heal', 'Guardian', 'Every status one stack more', 'Templar', 'Battle healer: ×0.6 power, ×0.7 healing'],
     ['Cleric', 'heal', 'Bishop', 'The same', 'Exorcist', 'The same']] },
 ]

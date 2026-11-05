@@ -79,8 +79,10 @@
   <h1>The sixteen Tier 2 classes</h1>
   <p>Each Tier 1 class promotes on the Ascend into a <span class="chip keep">Keeper</span>, who keeps her identity with one
     sharpening rule, and an <span class="chip exp">Expander</span>, who widens it with one twist
-    (<a href="../classes.md">classes.md</a> §4, T2C31–T2C45). Mirrors share a rule: eight rules, sixteen classes. Every
-    class keeps her parent's three slots' count, lean, armor half, trees, hall and Limit Break scale.</p>
+    (<a href="../classes.md">classes.md</a> §4, T2C31–T2C45). Mirrors share a rule: eight rules, sixteen classes; a rule's
+    knob, her hand, is measured per class. Every class keeps her parent's three slots' count, lean, armor half, trees, hall
+    and Limit Break scale. Kits are at <a href="../balance.md#45-the-knobs-in-order-t2b33-and-the-values-t2b24t2b31">balance's
+    knobs</a> (T2B24–T2B29); each gain is measured on its harness, her parent's seat, Tier 2 Lv 10 · 30 · 50.</p>
   <nav class="tabs"><a href="#sixteen">The sixteen</a><a href="#momentum">Momentum</a><a href="#cross">Crossing channels</a>
     <a href="#both">Both halves</a><a href="#support">The supports</a><a href="#healers">The healers</a><a href="#levels">Four status levels</a></nav>
 
@@ -92,13 +94,13 @@
     <div class="card">
       <h3>Her damage by the turns she gets in a fight</h3>
       <svg id="mom" viewBox="0 0 520 240" width="100%" role="img" aria-label="Momentum's bonus by turns in a fight"></svg>
-      <div class="row"><label class="muted">Step a stack <input id="step" type="range" min="3" max="10" value="5" step="1"></label><b id="stepv">5%</b></div>
-      <p class="note">A stack after each of her turns, three at most, the fight long, lost when she falls. Her first act has none.</p>
+      <div class="row"><label class="muted">Step a stack <input id="step" type="range" min="3" max="10" value="6" step="1"></label><b id="stepv">6%</b></div>
+      <p class="note">A stack after each of her turns, three at most, the fight long, lost when she falls. Her first act has none. +6% a stack (T2B26; drafted +5%).</p>
     </div>
     <div class="card">
       <h3>At Lv 50, on the harness's turns a fight</h3>
       <div class="scroll"><table id="momtab"></table></div>
-      <p class="note">Turns a fight read from Tier 1's harness at Lv 50 (both comps, 6 seeds a stage). At +10% a stack the keepers would lead their expanders by about 13% of their own damage; +5% keeps them within 3 points.</p>
+      <p class="note">Turns a fight read from Tier 1's harness at Lv 50 (both comps, 6 seeds a stage). <b>Measured</b> (her parent's seat): the Berserker +5.6 · +2.0 · +5.2%, the Archmage +5.8 · +3.4 · +5.1% at Lv 10 · 30 · 50; at +5% they were a point short of the band's middle at Lv 50 (+4.5, +4.1%). At +10% a stack the keepers would lead their expanders by about 13% of their own damage.</p>
     </div>
   </div>
 
@@ -112,23 +114,25 @@
       <tr><td><b>Statuses</b></td><td>The kind's channel (her Fire hit: Faith and Mind Break, not Brave or Armor Break)</td></tr>
       <tr><td><b>The Rift's ward</b></td><td>The kind's channel</td></tr>
       <tr><td><b>Her tree</b></td><td>The other pure class's tree for that weapon</td></tr>
-      <tr><td><b>Her hand</b></td><td>×1.05, one act a turn, MP ×1</td></tr>
+      <tr><td><b>Her hand</b></td><td>The Spellfist ×1.05, <b>the Battlemage ×1.3</b> (T2B27; drafted ×1.05 both); one act a turn, MP ×1</td></tr>
+      <tr><td><b>Her preset</b></td><td>The Scatter twins: <span class="kind" style="background:var(--k-greatsword)">Greatsword</span><span class="kind" style="background:var(--k-axe)">Axe</span><span class="kind" style="background:var(--k-lightning)">Thunder</span> · <span class="kind" style="background:var(--k-fire)">Fire</span><span class="kind" style="background:var(--k-ice)">Blizzard</span><span class="kind" style="background:var(--k-lance)">Lance</span></td></tr>
     </table></div>
     <div class="card">
-      <h3>What crossing is worth on its own (Tier 2 Lv 50)</h3>
+      <h3>What crossing is worth on its own (Tier 2 Lv 50, analytic)</h3>
       <div class="scroll"><table id="crosstab"></table></div>
-      <p class="note">Her best hit a turn on one regular, every Tier 2 weakness list equally likely (strikers and guards 1 Arm + 2 elements, casters and skirmishers 2 Arms + 1), foe defenses from <code>rpgFoe</code> at lifetime Lv 100. A breadth pick: the hand's ×1.05 carries her into the band.</p>
+      <p class="note">Her best hit a turn on one regular, every Tier 2 weakness list equally likely (strikers and guards 1 Arm + 2 elements, casters and skirmishers 2 Arms + 1), foe defenses from <code>rpgFoe</code> at lifetime Lv 100. A breadth pick: the hand carries her into the band.
+        <b>Measured</b> (her parent's seat, Lv 10 · 30 · 50): at ×1.05 on the Heavy twins the Spellfist +10.4 · +6.7 · +3.0%, the Battlemage −2.5 · −4.7 · −11.4%; at the knobs the Spellfist +6.5 · +4.5 · +4.3%, the Battlemage +10.9 · +8.3 · −1.8%. Her Arm meets the higher DEF of Tier 2's strikers and guards, and a hand never reaches her Limit Break.</p>
     </div>
   </div>
 
   <h2 id="both">Both halves: the hybrid keepers</h2>
   <div class="grid g2">
     <div class="card"><div class="row"><b>Blademaster · Runeblade</b><span class="chip keep">Keeper</span></div>
-      <p>Tier 1: her bound familiar lands one extra hit on her <b>lead</b> half, the same total. <b>Keeper: on both halves.</b> A weak other half chips one more shield point; a Pierce tree's hit splits in two, both piercing.</p>
-      <p class="note">Worth: the same damage, about 0.5 more chips a turn; the model credits +6% of her damage to Breaks.</p></div>
+      <p>Tier 1: her bound familiar lands one extra hit on her <b>lead</b> half, the same total. <b>Keeper: on both halves, and it pierces</b> (T2B28). A weak other half chips one more shield point; the familiar's hit skips the unbroken halving on every tree. Hands +0.03 a half: 0.75 + 0.47 · 0.75 + 0.51.</p>
+      <p class="note">Measured: the drafted rule alone was worth about 0% (the same damage in more hits); with the Pierce and the hands the Blademaster +9.0 · +4.5 · +3.6%, the Runeblade +6.8 · +2.3 · +2.8%.</p></div>
     <div class="card"><div class="row"><b>Warlord · Invoker</b><span class="chip keep">Keeper</span></div>
-      <p>Tier 1: her <b>lead</b> summon lingers and strikes every foe in farewell at her next pair. <b>Keeper: both summons linger.</b> Two farewells, one of each kind, on every foe: each weak foe chips one more point a pair.</p>
-      <p class="note">Worth: +2% damage, about one more chip a turn on three foes; the model credits +7% to Breaks.</p></div>
+      <p>Tier 1: her <b>lead</b> summon lingers and strikes every foe in farewell at her next pair. <b>Keeper: both summons linger.</b> Two farewells, one of each kind, on every foe: each weak foe chips one more point a pair. Hands +0.03 a half (T2B29): 0.60 + 0.49 · 0.60 + 0.53.</p>
+      <p class="note">Measured: the second farewell alone is worth 1–3%; with the hands the Warlord +8.6 · +2.0 · +6.8%, the Invoker +8.6 · +3.6 · +3.0%.</p></div>
   </div>
 
   <h2 id="support">The supports: a little of the healers' kit</h2>
@@ -143,36 +147,39 @@
     <tr><td>Statuses</td><td><b>One stack more:</b> Greatsword, Lance, Fire 2 · 2 · 3 · 3 · 3; path 3 · 3 · 3</td><td>Tier 1's: 1 · 1 · 2 · 2 · 3; path 2 · 2 · 3</td></tr>
     <tr><td>Healing capacity, Lv 50</td><td>About 20% of the party's HP a round</td><td>About 14%</td></tr>
     <tr><td>Damage share</td><td>About 10%</td><td>About 13%</td></tr>
-    <tr><td>Party value against her parent (model, on curve)</td><td>+9 to +10%</td><td>+11 to +12%, the stress check brings it back</td></tr>
+    <tr><td>Measured on curve, Lv 10 · 30 · 50</td><td>Guardian +5.5 · 0 · +1.1%; Bishop +15.5 · 0 · +0.1%</td><td><b>Templar +12.1 · +9.7 · +5.7%; Exorcist +15.9 · +6.9 · +7.3%</b></td></tr>
+    <tr><td>Measured under attrition (Lv 50, won at ×3.2 · ×4)</td><td><b>Guardian 91.9 · 67.5%; Bishop 85.0 · 56.9%</b></td><td>Templar 89.7 · 63.4%; Exorcist 77.5 · 51.9%</td></tr>
+    <tr><td>The better pick</td><td>Under attrition, from ×3.2 (T2B30)</td><td>On curve (T2B31)</td></tr>
   </table></div>
 
   <h2 id="levels">Statuses: four levels</h2>
   <div class="card scroll"><table id="levtab"></table>
-    <p class="note">D282's three levels, with <b>support</b> added between the path and widely (R2-3's "wider buffs and debuffs"). Five statuses, +10% a stack, three at most, two rounds; no retired status returns.</p></div>
+    <p class="note">D282's three levels, with <b>support</b> added between the path and widely (R2-3's "wider buffs and debuffs"). Five statuses, +10% a stack, three at most, two rounds; no retired status returns. <b>The support level tops up</b> (T2B24): a pair class casts her lone other-channel weapon every act, so a built-up status sat at 3 by the third round (the drafted healers' ladder put the Sentinel +34 to +50%).</p></div>
 </main>
 <script>
 const K = { greatsword: 'Greatsword', axe: 'Axe', lance: 'Lance', bow: 'Bow', katana: 'Katana', fire: 'Fire', ice: 'Blizzard', lightning: 'Thunder', light: 'Light', dark: 'Dark' }
 const kind = (k) => `<span class="kind" style="background:var(--k-${k})">${K[k]}</span>`
 const PAIRS = [
-  ['Brawler', 'phys', 'Warrior · Dojo', ['Berserker', 'Momentum: +5% a stack on her own hits, a stack a turn, 3 at most', '3 Arms · ATK · ×1', ['greatsword', 'axe', 'lance'], 'None', 'The long fight\'s damage'],
-    ['Spellfist', 'Two Arms and a Tome; <b>every hit on ATK</b>', '2 Arms + Tome · all ATK · ×1.05', ['greatsword', 'axe', 'fire'], 'None', 'A bruiser who covers an element']],
-  ['Sorcerer', 'magic', 'Mage · Tower', ['Archmage', 'Momentum, the same rule', '3 Tomes · M.ATK · ×1', ['fire', 'ice', 'lightning'], 'None', 'The long fight\'s magic'],
-    ['Battlemage', 'Two Tomes and an Arm; <b>every hit on M.ATK</b>', '2 Tomes + Arm · all M.ATK · ×1.05', ['fire', 'lightning', 'greatsword'], 'None', 'A caster who covers an Arm']],
-  ['Arms Spellblade', 'phys', 'Spellblade · Salle', ['Blademaster', 'Her familiar\'s extra hit on <b>both</b> halves', '2 Arms + Tome · 0.72 + 0.44', ['katana', 'axe', 'lightning'], 'A path', 'The Break engine on one foe'],
-    ['Sentinel', 'Hands ×0.85; <b>Light/Dark statuses on every skill</b>; a Barrier after each act', '2 Arms + Tome · 0.61 + 0.37', ['katana', 'greatsword', 'light'], 'Support, the tapped foe', 'Offense support: Armor Break, Brave and Faith']],
-  ['Tome Spellblade', 'magic', 'Spellblade · Salle', ['Runeblade', 'The same as the Blademaster', '2 Tomes + Arm · 0.72 + 0.48', ['lightning', 'ice', 'katana'], 'A path', 'The Break engine, magic-led'],
-    ['Enchanter', 'The same as the Sentinel', '2 Tomes + Arm · 0.61 + 0.41', ['light', 'ice', 'katana'], 'Support, the tapped foe', 'Offense support, magic-led']],
-  ['Arms Summoner', 'phys', 'Summoner · Circle', ['Warlord', '<b>Both</b> summons linger: two farewells', '2 Arms + Tome · 0.57 + 0.46', ['bow', 'axe', 'dark'], 'A path', 'The Break engine on every foe'],
-    ['Druid', 'Hands ×0.9; <b>Light/Dark statuses on every skill, every foe</b>; her farewell mends every Uma', '2 Arms + Tome · 0.51 + 0.41', ['bow', 'greatsword', 'dark'], 'Support, every foe', 'Field support: Enfeeble and Mind Break']],
-  ['Tome Summoner', 'magic', 'Summoner · Circle', ['Invoker', 'The same as the Warlord', '2 Tomes + Arm · 0.57 + 0.5', ['dark', 'ice', 'bow'], 'A path', 'The Break engine, magic-led'],
-    ['Shaman', 'The same as the Druid', '2 Tomes + Arm · 0.51 + 0.45', ['dark', 'ice', 'bow'], 'Support, every foe', 'Field support, magic-led']],
-  ['Paladin', 'heal', 'Healer · Sanctum', ['Guardian', 'Every status she lands <b>one stack more</b>', '2 Arms + Tome · ×0.5 · heals from ATK', ['lance', 'greatsword', 'light'], 'Widely, +1 stack', 'The one healer, statuses at the cap'],
-    ['Templar', 'A battle healer: <b>×0.6</b> power, <b>×0.7</b> mends and Barriers', '2 Arms + Tome · ×0.6 · MP ×0.7', ['lance', 'greatsword', 'light'], 'Widely', 'The healer who hits']],
-  ['Cleric', 'heal', 'Healer · Sanctum', ['Bishop', 'The same as the Guardian', '2 Tomes + Arm · ×0.5 · heals from M.ATK', ['light', 'fire', 'lance'], 'Widely, +1 stack', 'The one healer, magic-led'],
-    ['Exorcist', 'The same as the Templar', '2 Tomes + Arm · ×0.6 · MP ×0.7', ['light', 'fire', 'lance'], 'Widely', 'The healer who hits, magic-led']],
+  ['Brawler', 'phys', 'Warrior · Dojo', ['Berserker', 'Momentum: +6% a stack on her own hits, a stack a turn, 3 at most', '3 Arms · ATK · ×1', ['greatsword', 'axe', 'lance'], 'None', 'The long fight\'s damage', '+5.6 · +2.0 · +5.2%'],
+    ['Spellfist', 'Two Arms and a Tome; <b>every hit on ATK</b>', '2 Arms + Tome · all ATK · ×1.05', ['greatsword', 'axe', 'lightning'], 'None', 'A bruiser who covers an element', '+6.5 · +4.5 · +4.3%']],
+  ['Sorcerer', 'magic', 'Mage · Tower', ['Archmage', 'Momentum, the same rule', '3 Tomes · M.ATK · ×1', ['fire', 'ice', 'lightning'], 'None', 'The long fight\'s magic', '+5.8 · +3.4 · +5.1%'],
+    ['Battlemage', 'Two Tomes and an Arm; <b>every hit on M.ATK</b>', '2 Tomes + Arm · all M.ATK · <b>×1.3</b>', ['fire', 'ice', 'lance'], 'None', 'A caster who covers an Arm', '+10.9 · +8.3 · −1.8%']],
+  ['Arms Spellblade', 'phys', 'Spellblade · Salle', ['Blademaster', 'Her familiar\'s extra hit on <b>both</b> halves, and <b>it pierces</b>', '2 Arms + Tome · 0.75 + 0.47', ['katana', 'axe', 'lightning'], 'A path', 'The Break engine on one foe', '+9.0 · +4.5 · +3.6%'],
+    ['Sentinel', 'Hands ×0.95; <b>Light/Dark statuses on every skill, topped up at 1 · 1 · 1 · 2 · 2</b>; Brave and Faith and a Barrier on the Uma she wards', '2 Arms + Tome · 0.68 + 0.42', ['katana', 'greatsword', 'light'], 'Support, the tapped foe', 'Offense support: Armor Break, her ward\'s Brave and Faith', '−2.4 · +10.9 · +2.9%']],
+  ['Tome Spellblade', 'magic', 'Spellblade · Salle', ['Runeblade', 'The same as the Blademaster', '2 Tomes + Arm · 0.75 + 0.51', ['lightning', 'ice', 'katana'], 'A path', 'The Break engine, magic-led', '+6.8 · +2.3 · +2.8%'],
+    ['Enchanter', 'The same as the Sentinel, hands ×0.8', '2 Tomes + Arm · 0.58 + 0.38', ['light', 'ice', 'katana'], 'Support, the tapped foe', 'Offense support, magic-led', '+7.0 · +2.5 · +6.6%']],
+  ['Arms Summoner', 'phys', 'Summoner · Circle', ['Warlord', '<b>Both</b> summons linger: two farewells', '2 Arms + Tome · 0.60 + 0.49', ['bow', 'axe', 'dark'], 'A path', 'The Break engine on every foe', '+8.6 · +2.0 · +6.8%'],
+    ['Druid', 'Hands ×0.95; <b>Light/Dark statuses on every skill, every foe, topped up</b>; her farewell mends every Uma', '2 Arms + Tome · 0.54 + 0.44', ['bow', 'axe', 'dark'], 'Support, every foe', 'Field support: Enfeeble and Mind Break', '+7.1 · +2.3 · −1.5%']],
+  ['Tome Summoner', 'magic', 'Summoner · Circle', ['Invoker', 'The same as the Warlord', '2 Tomes + Arm · 0.60 + 0.53', ['dark', 'ice', 'bow'], 'A path', 'The Break engine, magic-led', '+8.6 · +3.6 · +3.0%'],
+    ['Shaman', 'The same as the Druid, hands ×1', '2 Tomes + Arm · 0.57 + 0.5', ['dark', 'ice', 'bow'], 'Support, every foe', 'Field support, magic-led', '+10.4 · +0.8 · +1.2%']],
+  ['Paladin', 'heal', 'Healer · Sanctum', ['Guardian', 'Every status she lands <b>one stack more</b>', '2 Arms + Tome · ×0.5 · heals from ATK', ['lance', 'greatsword', 'light'], 'Widely, +1 stack', 'The one healer, statuses at the cap', '+5.5 · 0 · +1.1% (stress check)'],
+    ['Templar', 'A battle healer: <b>×0.6</b> power, <b>×0.7</b> mends and Barriers', '2 Arms + Tome · ×0.6 · MP ×0.7', ['lance', 'greatsword', 'light'], 'Widely', 'The healer who hits', '+12.1 · +9.7 · +5.7% (stress check)']],
+  ['Cleric', 'heal', 'Healer · Sanctum', ['Bishop', 'The same as the Guardian', '2 Tomes + Arm · ×0.5 · heals from M.ATK', ['light', 'fire', 'lance'], 'Widely, +1 stack', 'The one healer, magic-led', '+15.5 · 0 · +0.1% (stress check)'],
+    ['Exorcist', 'The same as the Templar', '2 Tomes + Arm · ×0.6 · MP ×0.7', ['light', 'fire', 'lance'], 'Widely', 'The healer who hits, magic-led', '+15.9 · +6.9 · +7.3% (stress check)']],
 ]
-const card = ([n, rule, slots, ws, st, role], tag) => `<div class="cls"><div class="row"><span class="nm">${n}</span>${tag}</div><div class="rule">${rule}</div>
-  <div class="meta">${slots}</div><div style="margin-top:4px">${ws.map(kind).join('')}</div><div class="meta">Statuses: ${st} · ${role}</div></div>`
+const card = ([n, rule, slots, ws, st, role, gain], tag) => `<div class="cls"><div class="row"><span class="nm">${n}</span>${tag}</div><div class="rule">${rule}</div>
+  <div class="meta">${slots}</div><div style="margin-top:4px">${ws.map(kind).join('')}</div><div class="meta">Statuses: ${st} · ${role}</div>
+  <div class="meta">Measured against her parent, Lv 10 · 30 · 50: <b style="color:var(--ink)">${gain}</b></div></div>`
 document.getElementById('pairs').innerHTML = PAIRS.map(([p, ch, fam, k, e]) => `<div class="pair"><div><div class="p">${p}</div><span class="chip ${ch}">${ch === 'heal' ? 'Healer' : ch === 'phys' ? 'Physical' : 'Magical'}</span><div class="muted" style="font-size:12px;margin-top:4px">${fam}</div></div>
   ${card(k, '<span class="chip keep">Keeper</span>')}${card(e, '<span class="chip exp">Expander</span>')}</div>`).join('')
 
@@ -203,17 +210,18 @@ document.getElementById('crosstab').innerHTML = '<tr><th>Kit</th><th class="n">B
     .map(([a, b, c, d]) => `<tr><td>${a}</td><td class="n">${b}</td><td class="n">${c}</td><td class="n">${d}%</td></tr>`).join('')
 
 document.getElementById('suptab').innerHTML = `<tr><th></th><th>Sentinel · Enchanter <span class="chip exp">Expander</span></th><th>Druid · Shaman <span class="chip exp">Expander</span></th></tr>
-  <tr><td>Hands</td><td>Her parent's × 0.85: 0.61 + 0.37 · 0.61 + 0.41</td><td>Her parent's × 0.9: 0.51 + 0.41 · 0.51 + 0.45</td></tr>
-  <tr><td>Statuses</td><td>Every skill of her Katana, Bow, Light and Dark trees, <b>1 · 1 · 2 · 2 · 3</b>; the tapped foe, every foe at depth 5</td><td>The same ladder; <b>every foe at every depth</b></td></tr>
+  <tr><td>Hands (T2B25)</td><td>The Sentinel her parent's × 0.95: 0.68 + 0.42 · the Enchanter × 0.8: 0.58 + 0.38</td><td>The Druid × 0.95: 0.54 + 0.44 · the Shaman × 1: 0.57 + 0.5</td></tr>
+  <tr><td>Statuses (T2B24)</td><td>Every skill of her Katana, Bow, Light and Dark trees, <b>1 · 1 · 1 · 2 · 2, topped up</b> (never built past its stacks); debuffs on the tapped foe, every foe at depth 5; <b>Brave and Faith on the Uma she wards</b></td><td>The same ladder and rule; debuffs on <b>every foe at every depth</b>; Brave and Faith on the most threatened Uma</td></tr>
   <tr><td>Her piece of the kit</td><td><b>A Barrier</b> after each skill act on the most threatened: a third of the healers' share (9 · 11 · 12 · 13 · 15%) × her healing scale</td><td><b>A mend:</b> her farewell mends every Uma a tenth of the healers' share (2.8 · 3.2 · 3.6 · 4.0 · 4.4%) × her healing scale</td></tr>
-  <tr><td>Preset</td><td>${['katana', 'greatsword', 'light'].map(kind).join('')} · ${['light', 'ice', 'katana'].map(kind).join('')}</td><td>${['bow', 'greatsword', 'dark'].map(kind).join('')} · ${['dark', 'ice', 'bow'].map(kind).join('')}</td></tr>
-  <tr><td>Role</td><td>Offense support: fills a Paladin's Brave and Faith, a Cleric's Armor Break</td><td>Field support: every foe weaker and softer to magic</td></tr>
-  <tr><td>Capacity, Lv 50</td><td>About 3.7% of the party's HP a round</td><td>About 5.5%, and Enfeeble at full on every foe</td></tr>
-  <tr><td>Party value vs parent (model)</td><td>+5 to +7%</td><td>−2%, its value in sustain (the stress check)</td></tr>`
+  <tr><td>Preset</td><td>${['katana', 'greatsword', 'light'].map(kind).join('')} · ${['light', 'ice', 'katana'].map(kind).join('')}</td><td>${['bow', 'axe', 'dark'].map(kind).join('')} (her parent's) · ${['dark', 'ice', 'bow'].map(kind).join('')}</td></tr>
+  <tr><td>Role</td><td>Offense support: a Cleric's missing Armor Break; Brave and Faith and a Barrier on her ward</td><td>Field support: every foe weaker and softer to magic</td></tr>
+  <tr><td>Capacity, Lv 50 (model)</td><td>About 3.7% of the party's HP a round</td><td>About 5.5%, and Enfeeble on every foe</td></tr>
+  <tr><td>Measured on curve, Lv 10 · 30 · 50</td><td>Sentinel −2.4 · +10.9 · +2.9%; Enchanter +7.0 · +2.5 · +6.6%</td><td>Druid +7.1 · +2.3 · −1.5%; Shaman +10.4 · +0.8 · +1.2%</td></tr>
+  <tr><td>Measured under attrition (×2.6, the healer's sustain off: won)</td><td>Sentinel 82% (her keeper's party 66%); Enchanter 75% (51%)</td><td>Druid 70% (53%); Shaman 85% (66%)</td></tr>`
 
 const LEV = [['None', 'var(--locked)', 'Berserker, Spellfist, Archmage, Battlemage', '—', '—', '—'],
   ['A path', 'var(--info)', 'Blademaster, Runeblade, Warlord, Invoker', 'Line A of a Light/Dark weapon, depth 3+', '1 · 1 · 2', 'The tapped foe'],
-  ['Support (new)', 'var(--t3)', 'Sentinel, Enchanter · Druid, Shaman', 'Every skill of a Light/Dark weapon', '1 · 1 · 2 · 2 · 3', 'The tapped foe (every foe at depth 5) · every foe'],
+  ['Support (new)', 'var(--t3)', 'Sentinel, Enchanter · Druid, Shaman', 'Every skill of a Light/Dark weapon', '<b>1 · 1 · 1 · 2 · 2, topped up</b>', 'Debuffs: the tapped foe (every foe at depth 5) · every foe; Brave and Faith on the Uma she wards'],
   ['Widely', 'var(--heal)', 'Guardian, Bishop (+1: 2 · 2 · 3 · 3 · 3) · Templar, Exorcist', 'Every skill of Greatsword, Lance, Fire; the path on Light/Dark', '1 · 1 · 2 · 2 · 3; path 2 · 2 · 3', 'The tapped foe, every foe at depth 5']]
 document.getElementById('levtab').innerHTML = '<tr><th>Level</th><th>Classes</th><th>Weapons</th><th>Stacks by depth</th><th>Reach</th></tr>' +
   LEV.map(([a, c, b, d, e, f]) => `<tr><td><span class="lvl" style="background:${c}"></span><b>${a}</b></td><td>${b}</td><td>${d}</td><td>${e}</td><td>${f}</td></tr>`).join('')

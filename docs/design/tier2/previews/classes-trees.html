@@ -135,18 +135,18 @@ const C_BRAWLER = { greatsword: ['Rout', 'Random foes, A\'s hits ×1.05'], axe: 
 const C_SORC = { fire: ['Kindle', 'Random foes, 2 · 3 · 3 hits ×1.05'], ice: ['Sleet', 'Random foes, 2 · 2 · 3 hits ×1.05; −4 MP'], lightning: ['Peal', 'Every foe at the area share; +4 MP'], light: ['Beam', 'Her foe and one other, two hits each, the other at 0.6; +2 MP'], dark: ['Gloom', 'Every foe evenly at the area share; +2 MP'] }
 // The sixteen: parent, family, weapons, lead half, rule, status level, class line, her one rule in a line.
 const CLASSES = {
-  berserker: { name: 'Berserker', parent: 'Brawler', fam: 'brawler', weapons: ARMS, lead: null, level: 'none', line: ['Rampage', 'Skybreaker', 'The tapped foe the full power, every other 0.3'], rule: 'Momentum: +5% a stack on her own hits, a stack a turn, 3 at most' },
-  spellfist: { name: 'Spellfist', parent: 'Brawler', fam: 'brawler', cross: 'sorcerer', weapons: [...ARMS, ...TOMES], lead: null, level: 'none', line: ['Conquest', 'Sundown', 'One foe at the full power; on a Broken foe every other also takes 0.55'], rule: 'Two Arms and a Tome; every hit on ATK; ×1.05' },
+  berserker: { name: 'Berserker', parent: 'Brawler', fam: 'brawler', weapons: ARMS, lead: null, level: 'none', line: ['Rampage', 'Skybreaker', 'The tapped foe the full power, every other 0.3'], rule: 'Momentum: +6% a stack on her own hits, a stack a turn, 3 at most' },
+  spellfist: { name: 'Spellfist', parent: 'Brawler', fam: 'brawler', cross: 'sorcerer', weapons: [...ARMS, ...TOMES], lead: null, level: 'none', line: ['Conquest', 'Sundown', 'One foe at the full power; on a Broken foe every other also takes 0.55'], rule: 'Two Arms and a Tome; every hit on ATK; ×1.05 (preset Greatsword, Axe, Thunder)' },
   archmage: { name: 'Archmage', parent: 'Sorcerer', fam: 'sorcerer', weapons: TOMES, lead: null, level: 'none', line: ['Nebula', 'Starburst', 'Every foe at the area share; a weak foe the full power'], rule: 'Momentum, the Berserker\'s rule' },
-  battlemage: { name: 'Battlemage', parent: 'Sorcerer', fam: 'sorcerer', cross: 'brawler', weapons: [...TOMES, ...ARMS], lead: null, level: 'none', line: ['Quasar', 'Event Horizon', 'One foe, one hit at ×1.25'], rule: 'Two Tomes and an Arm; every hit on M.ATK; ×1.05' },
-  blademaster: { name: 'Blademaster', parent: 'Arms Spellblade', fam: 'spellblade', weapons: [...ARMS, ...TOMES], lead: 'arms', both: true, level: 'path', line: ['Sigil', 'Rune Edge', 'Lead half on one foe, other half on every foe at 0.55'], rule: 'Her familiar\'s extra hit on both halves' },
-  runeblade: { name: 'Runeblade', parent: 'Tome Spellblade', fam: 'spellblade', weapons: [...TOMES, ...ARMS], lead: 'tome', both: true, level: 'path', line: ['Sigil', 'Rune Edge', 'Lead half on one foe, other half on every foe at 0.55'], rule: 'Her familiar\'s extra hit on both halves' },
-  sentinel: { name: 'Sentinel', parent: 'Arms Spellblade', fam: 'spellblade', weapons: [...ARMS, ...TOMES], lead: 'arms', level: 'sup-blade', line: ['Bane', 'Penumbra Edge', 'Her pair on one foe; a Light/Dark weapon\'s status, her Barrier after it'], rule: 'Hands ×0.85; Light/Dark statuses on every skill; a Barrier after each act' },
-  enchanter: { name: 'Enchanter', parent: 'Tome Spellblade', fam: 'spellblade', weapons: [...TOMES, ...ARMS], lead: 'tome', level: 'sup-blade', line: ['Bane', 'Penumbra Edge', 'Her pair on one foe; a Light/Dark weapon\'s status, her Barrier after it'], rule: 'Hands ×0.85; Light/Dark statuses on every skill; a Barrier after each act' },
-  warlord: { name: 'Warlord', parent: 'Arms Summoner', fam: 'summoner', weapons: [...ARMS, ...TOMES], lead: 'arms', both: true, level: 'path', line: ['Griffin', 'Kraken', 'Her pair on one foe; her lead summon lingers at 0.5'], rule: 'Both summons linger: two farewells' },
-  invoker: { name: 'Invoker', parent: 'Tome Summoner', fam: 'summoner', weapons: [...TOMES, ...ARMS], lead: 'tome', both: true, level: 'path', line: ['Griffin', 'Kraken', 'Her pair on one foe; her lead summon lingers at 0.5'], rule: 'Both summons linger: two farewells' },
-  druid: { name: 'Druid', parent: 'Arms Summoner', fam: 'summoner', weapons: [...ARMS, ...TOMES], lead: 'arms', level: 'sup-call', line: ['Wraith', 'Banshee', 'Her pair, her lead summon on every foe at 0.55; a Light/Dark weapon\'s status on every foe'], rule: 'Hands ×0.9; Light/Dark statuses on every skill, on every foe; her farewell mends' },
-  shaman: { name: 'Shaman', parent: 'Tome Summoner', fam: 'summoner', weapons: [...TOMES, ...ARMS], lead: 'tome', level: 'sup-call', line: ['Wraith', 'Banshee', 'Her pair, her lead summon on every foe at 0.55; a Light/Dark weapon\'s status on every foe'], rule: 'Hands ×0.9; Light/Dark statuses on every skill, on every foe; her farewell mends' },
+  battlemage: { name: 'Battlemage', parent: 'Sorcerer', fam: 'sorcerer', cross: 'brawler', weapons: [...TOMES, ...ARMS], lead: null, level: 'none', line: ['Quasar', 'Event Horizon', 'One foe, one hit at ×1.25'], rule: 'Two Tomes and an Arm; every hit on M.ATK; ×1.3 (preset Fire, Blizzard, Lance)' },
+  blademaster: { name: 'Blademaster', parent: 'Arms Spellblade', fam: 'spellblade', weapons: [...ARMS, ...TOMES], lead: 'arms', both: true, level: 'path', line: ['Sigil', 'Rune Edge', 'Lead half on one foe, other half on every foe at 0.55'], rule: 'Her familiar\'s extra hit on both halves, and it pierces; hands 0.75 + 0.47' },
+  runeblade: { name: 'Runeblade', parent: 'Tome Spellblade', fam: 'spellblade', weapons: [...TOMES, ...ARMS], lead: 'tome', both: true, level: 'path', line: ['Sigil', 'Rune Edge', 'Lead half on one foe, other half on every foe at 0.55'], rule: 'Her familiar\'s extra hit on both halves, and it pierces; hands 0.75 + 0.51' },
+  sentinel: { name: 'Sentinel', parent: 'Arms Spellblade', fam: 'spellblade', weapons: [...ARMS, ...TOMES], lead: 'arms', level: 'sup-blade', line: ['Bane', 'Penumbra Edge', 'Her pair on one foe; a Light/Dark weapon\'s status, her Barrier after it'], rule: 'Hands ×0.95; Light/Dark statuses on every skill, topped up; Brave and Faith and a Barrier on the Uma she wards' },
+  enchanter: { name: 'Enchanter', parent: 'Tome Spellblade', fam: 'spellblade', weapons: [...TOMES, ...ARMS], lead: 'tome', level: 'sup-blade', line: ['Bane', 'Penumbra Edge', 'Her pair on one foe; a Light/Dark weapon\'s status, her Barrier after it'], rule: 'Hands ×0.8; Light/Dark statuses on every skill, topped up; Brave and Faith and a Barrier on the Uma she wards' },
+  warlord: { name: 'Warlord', parent: 'Arms Summoner', fam: 'summoner', weapons: [...ARMS, ...TOMES], lead: 'arms', both: true, level: 'path', line: ['Griffin', 'Kraken', 'Her pair on one foe; her lead summon lingers at 0.5'], rule: 'Both summons linger: two farewells; hands 0.60 + 0.49' },
+  invoker: { name: 'Invoker', parent: 'Tome Summoner', fam: 'summoner', weapons: [...TOMES, ...ARMS], lead: 'tome', both: true, level: 'path', line: ['Griffin', 'Kraken', 'Her pair on one foe; her lead summon lingers at 0.5'], rule: 'Both summons linger: two farewells; hands 0.60 + 0.53' },
+  druid: { name: 'Druid', parent: 'Arms Summoner', fam: 'summoner', weapons: [...ARMS, ...TOMES], lead: 'arms', level: 'sup-call', line: ['Wraith', 'Banshee', 'Her pair, her lead summon on every foe at 0.55; a Light/Dark weapon\'s status on every foe'], rule: 'Hands ×0.95; Light/Dark statuses on every skill, on every foe, topped up; her farewell mends' },
+  shaman: { name: 'Shaman', parent: 'Tome Summoner', fam: 'summoner', weapons: [...TOMES, ...ARMS], lead: 'tome', level: 'sup-call', line: ['Wraith', 'Banshee', 'Her pair, her lead summon on every foe at 0.55; a Light/Dark weapon\'s status on every foe'], rule: 'Hands ×1; Light/Dark statuses on every skill, on every foe, topped up; her farewell mends' },
   guardian: { name: 'Guardian', parent: 'Paladin', fam: 'healer', weapons: [...ARMS, ...TOMES], lead: null, level: 'wide+', line: ['Edict', 'Covenant', 'Its status reaches every foe or Uma; through Axe, Blizzard or Thunder its Barrier or mend every Uma'], rule: 'Every status she lands one stack more' },
   bishop: { name: 'Bishop', parent: 'Cleric', fam: 'healer', weapons: [...TOMES, ...ARMS], lead: null, level: 'wide+', line: ['Edict', 'Covenant', 'Its status reaches every foe or Uma; through Axe, Blizzard or Thunder its Barrier or mend every Uma'], rule: 'Every status she lands one stack more' },
   templar: { name: 'Templar', parent: 'Paladin', fam: 'healer', weapons: [...ARMS, ...TOMES], lead: null, level: 'wide', line: ['Solace', 'Absolution', 'A blow or a spell, then a mend on the most hurt and a Barrier on the most threatened (×0.7)'], rule: 'A battle healer: ×0.6 power, ×0.7 MP, mends and Barriers ×0.7' },
@@ -166,7 +166,8 @@ function lines(c, w) {
   return { B: ['Surge', EVERY[w] && c.level !== 'wide+' ? 'One more stack of its status; +2 MP' : `A mend or Barrier ×1.15${w === 'light' ? '; depth 3 also revives' : ''}; +2 MP`],
     C: ['Psalm', 'Her mend or Barrier reaches every Uma from depth 3 (×0.4 the rest); +2 MP'] }
 }
-const LADDER = { 'wide': [1, 1, 2, 2, 3], 'wide+': [2, 2, 3, 3, 3], 'sup-blade': [1, 1, 2, 2, 3], 'sup-call': [1, 1, 2, 2, 3] }
+// The support ladder is topped up, never built past its stacks (T2B24); a crowned capstone gains one stack.
+const LADDER = { 'wide': [1, 1, 2, 2, 3], 'wide+': [2, 2, 3, 3, 3], 'sup-blade': [1, 1, 1, 2, 2], 'sup-call': [1, 1, 1, 2, 2] }
 function status(c, w, d, tier, l) {
   if (tier === 1) {
     // Her parent's level (D282).
@@ -177,7 +178,7 @@ function status(c, w, d, tier, l) {
   const lv = c.level
   if (lv === 'none') return ''
   if (lv === 'path') return SECONDARY[w] && d >= 3 && l === 'A' ? `path: ${SECONDARY[w]} ${[1, 1, 2][d - 3]}` : ''
-  if (lv === 'sup-blade' || lv === 'sup-call') return SECONDARY[w] ? `${SECONDARY[w]} ${LADDER[lv][d - 1]} · every skill${lv === 'sup-call' && w !== 'light' ? ', every foe' : d === 5 && w !== 'light' ? ', every foe' : ''}` : ''
+  if (lv === 'sup-blade' || lv === 'sup-call') return SECONDARY[w] ? `${SECONDARY[w]} ${LADDER[lv][d - 1]} · every skill, topped up${w === 'light' ? ', on her ward' : lv === 'sup-call' || d === 5 ? ', every foe' : ''}` : ''
   if (EVERY[w]) return `${EVERY[w]} ${LADDER[lv][d - 1]}`
   return SECONDARY[w] && d >= 3 && l === 'A' ? `path: ${SECONDARY[w]} ${(lv === 'wide+' ? [3, 3, 3] : [2, 2, 3])[d - 3]}` : ''
 }
@@ -185,7 +186,7 @@ function aWhat(c, w, d) {
   const f = famOf(c, w)
   if (f === 'healer') return `${ARMS.includes(w) ? 'A blow: a Barrier on the most threatened' : 'A spell: a mend on the most hurt'}${c.level === 'wide' && c.name !== 'Paladin' ? ' (×0.7)' : ''}`
   if (f === 'summoner') return `A summon in its shape: ${SHAPE[w].toLowerCase()}`
-  if (f === 'spellblade') return 'Her half on one foe, her kind\'s hits'
+  if (f === 'spellblade') return `Her half on one foe, her kind's hits${c.both && tier >= 2 ? '; her familiar\'s hit pierces' : ''}`
   return SHAPE[w] + (c.cross && famOf(c, w) !== c.fam ? ` · on ${c.fam === 'brawler' ? 'ATK' : 'M.ATK'}` : '')
 }
 const POWER = [1.6, 2.2, 2.9, 3.7, 4.6], MP = [10, 14, 18, 22, 26]
@@ -233,7 +234,7 @@ function draw() {
   const lst = c.level === 'none' ? '' : c.level === 'path' ? ['1', '1', '2'] : c.level === 'wide+' ? ['3', '3', '3'] : ['2', '2', '3']
   for (const d of [3, 4, 5]) {
     const crowned = tier === 3 && d === 5
-    ch += `<div class="dh"><b>Class Rank ${[20, 30, 40][d - 3]}</b><br>${POWER[d - 1]} · ${MP[d - 1]} MP +</div><div class="node ${tier === 1 ? 'unheld' : 'held'} new ${crowned ? 'crown' : ''}"><div class="nm">${d === 3 ? `Grand ${bw}` : d === 4 ? `Supreme ${bw}` : bc}${crowned ? ' ♛' : ''}</div><div class="sub">${bwhat}${lst ? ` · status ${lst[d - 3]} a stack${lst[d - 3] === '1' ? '' : 's'}` : ' · no status'}${crowned ? ' · crowned at Class Rank 50, with her family\'s mastery' : ''}</div></div>`
+    ch += `<div class="dh"><b>Class Rank ${[20, 30, 40][d - 3]}</b><br>${POWER[d - 1]} · ${MP[d - 1]} MP +</div><div class="node ${tier === 1 ? 'unheld' : 'held'} new ${crowned ? 'crown' : ''}"><div class="nm">${d === 3 ? `Grand ${bw}` : d === 4 ? `Supreme ${bw}` : bc}${crowned ? ' ♛' : ''}</div><div class="sub">${bwhat}${lst ? ` · status ${lst[d - 3]} stack${lst[d - 3] === '1' ? '' : 's'}${c.level.startsWith('sup') ? ', topped up' : ''}` : ' · no status'}${crowned ? ' · crowned at Class Rank 50, with her family\'s mastery' : ''}</div></div>`
   }
   document.getElementById('classline').innerHTML = ch
 }
