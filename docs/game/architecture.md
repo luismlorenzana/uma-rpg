@@ -315,7 +315,11 @@ stay unchanged. A dark inspection layout leaves the eight new region slots open.
 clear's one to five entrant ids in order and their dates, even after an Uma ascends. Region fights write these once;
 Sweeps, Drills, capitals and the Rift never do. `regionTeamsOf` and `honeycombState` are pure screen reads. The same
 switch raises parties to 24 and open capital runs to six. The live v37 save still has 20 parties, at most five open
-runs and no `regionTeams`; no account fields, engine or pay change. H165 owns the screen and H166 activation.
+runs and no `regionTeams`; no account fields, engine or pay change.
+
+**The honeycomb screen is staged (H165).** At v38 the continent uses 61 accessible SVG hexes, quick looks, fitted dots
+and zoomed album faces, six Spring buttons in the List and the nearest Spring in a region's header. The continent's
+compact party bar keeps swap, Edit and warnings above the map. The world and region pixel maps stay. H166 owns activation.
 
 ### The shape
 

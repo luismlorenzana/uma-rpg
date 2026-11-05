@@ -1,7 +1,7 @@
 // The Scenario Gate opens the active tier's world map (D66, D97, H35): five continents, one per scenario of the tier, each ten levels of
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
 // `r/<region>`, `capital/<continent>`, `fight`. Canvas maps keep the complete lists one tap away.
-import { biomeById, capitalId, capitalRunNodeOf, openFightOf, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
+import { biomeById, capitalId, capitalRunNodeOf, honeycombLive, openFightOf, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
 import { lazy, Suspense, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -22,6 +22,7 @@ import { MapViewSwitch, useMapView } from './map/MapView'
 import { RegionMap } from './RegionMap'
 import { ResumeFight } from './ResumeFight'
 import { capitalAgain, capitalLine, capitalReturn } from './capital/capital-view'
+import { HoneycombMap } from './map/HoneycombMap'
 
 const CapitalPage = lazy(() => import('./capital/CapitalPage'))
 
@@ -121,7 +122,7 @@ function WorldMap({ campaign, place }: { campaign: Campaign; place: PageProps['p
   )
 }
 
-function ContinentMap({ campaign, continent, place }: { campaign: Campaign; continent: WorldContinent; place: PageProps['place'] }) {
+export function ContinentMap({ campaign, continent, place }: { campaign: Campaign; continent: WorldContinent; place: PageProps['place'] }) {
   const world = useWorld()
   const nav = useHubNavigation()
   const now = useNow(30_000)
@@ -129,7 +130,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
   const [view, setView] = useMapView()
   const wins = world ? worldRun(world).wins : undefined
   const dryIds = world ? continent.springs.filter((s) => springReadyAt(world, s.id, now)).map((s) => s.id).join(',') : ''
-  const layout = useMemo(() => continentLayout(continent, { wins: wins ?? {}, drySprings: new Set(dryIds.split(',')) }), [continent, wins, dryIds])
+  const layout = useMemo(() => honeycombLive() ? null : continentLayout(continent, { wins: wins ?? {}, drySprings: new Set(dryIds.split(',')) }), [continent, wins, dryIds])
   if (!world) return null
   const cleared = clearedByRegion(worldRun(world).wins)
   const rows = Array.from({ length: 10 }, (_, row) => row)
@@ -141,11 +142,11 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
           <span className="shrink-0 text-[12px] text-ink-soft">{formatLevels(continent.levelStart, continent.levelStart + 9)}</span>
         </div>
         <MapViewSwitch view={view} onChange={setView} />
-        <ActivePartyBar campaign={campaign} />
+        <ActivePartyBar campaign={campaign} compact={honeycombLive()} />
         <ResumeFight place={place} />
         {error && <p className="text-[12px] text-danger">{error}</p>}
       </div>
-      {view === 'map' ? <MapCanvas layout={layout} focusKey={continent.id} focusId={layout.frontier ?? continent.id}
+      {view === 'map' ? honeycombLive() ? <HoneycombMap key={continent.id} campaign={campaign} continent={continent} onEnter={(path) => nav.sub(place, path)} /> : <MapCanvas layout={layout!} focusKey={continent.id} focusId={layout!.frontier ?? continent.id}
         onSpot={(spot) => {
           if (spot.kind === 'region') nav.sub(place, `r/${spot.id}`)
           else if (spot.kind === 'capital') nav.sub(place, `capital/${continent.id}`)
@@ -159,10 +160,18 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
           const r = continent.regions.find((r) => r.id === spot.id)!, won = cleared.get(r.id) ?? 0
           return { label: `${r.name}, ${formatLevels(r.level, r.levelTop)}, ${won} of 12 cleared`, content: <><span className="absolute inset-x-0 top-0 rounded-xs bg-page/80 px-0.5 text-center text-[10px] font-semibold leading-tight">{r.name}</span><span className="absolute bottom-0 right-0 rounded-xs bg-page/85 px-1 text-[10px] text-ink-soft">{won}/12</span></> }
         }}>
-        {[0, 5].map((row) => <h3 key={row} className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-page/90 px-2 text-[11px] font-bold" style={{ top: `${(continentBandY(row) + 3) / layout.rows * 100}%` }}>{formatLevels(continent.levelStart + (row === 0 ? 0 : 5), continent.levelStart + (row === 0 ? 4 : 9))}</h3>)}
+        {[0, 5].map((row) => <h3 key={row} className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-page/90 px-2 text-[11px] font-bold" style={{ top: `${(continentBandY(row) + 3) / layout!.rows * 100}%` }}>{formatLevels(continent.levelStart + (row === 0 ? 0 : 5), continent.levelStart + (row === 0 ? 4 : 9))}</h3>)}
       </MapCanvas> : <div className="space-y-2 p-3">
+        {honeycombLive() && <div className="grid grid-cols-2 gap-1.5" aria-label="Springs">
+          {continent.springs.map((spring, i) => {
+            const ready = springReadyAt(world, spring.id, now)
+            return <button key={spring.id} type="button" disabled={!!ready || !!openFightOf(world)}
+              onClick={() => drinkAtSpring(spring.id).then(() => setError(null), (e: unknown) => setError(e instanceof Error ? e.message : 'Cannot refill'))}
+              className="min-h-11 rounded-sm border border-info/50 bg-info/10 px-2 text-[12px] font-semibold text-ink disabled:opacity-50">Spring {i + 1} · {ready ? formatDuration(Date.parse(ready) - Date.parse(now)) : 'Ready'}</button>
+          })}
+        </div>}
         {rows.map((row) => {
-          const spring = continent.springs.find((s) => s.row === row)
+          const spring = honeycombLive() ? undefined : continent.springs.find((s) => s.row === row)
           const ready = spring ? springReadyAt(world, spring.id, now) : null
           // A heading where the climb changes: the first five levels, then the last five (D97).
           const first = continent.regions.find((r) => r.row === row)
@@ -188,7 +197,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
                       <button key={r.id} type="button" onClick={() => nav.sub(place, `r/${r.id}`)}
                         className="min-h-14 rounded-sm border-l-4 bg-raised px-2 py-1.5 text-left active:bg-white/5" style={{ borderColor: biome.color, background: `color-mix(in srgb, ${biome.color} 18%, var(--color-raised, #1b2533))` }}>
                         <span className="flex items-center gap-1 text-[13px] font-semibold"><BiomeIcon biome={r.biome} /><span className="truncate">{r.name}</span></span>
-                        <span className="block text-[11px] text-ink-soft">{won === 12 ? 'Cleared ✓' : `${won}/12`}</span>
+                        <span className="block text-[11px] text-ink-soft">{(honeycombLive() ? !!wins?.[`${r.id}-s12`] : won === 12) ? 'Cleared ✓' : `${won}/12`}</span>
                       </button>
                     )
                   })}

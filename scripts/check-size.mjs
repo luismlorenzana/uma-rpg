@@ -28,6 +28,8 @@ export const LAZY_MODULES = [
   'apps/web/src/places/scenario-gate/capital/CapitalPage.tsx',
   'apps/web/src/places/scenario-gate/capital/CapitalRunPage.tsx',
   'apps/web/src/places/scenario-gate/capital/NewRun.tsx',
+  'apps/web/src/places/scenario-gate/map/HoneycombMap.tsx',
+  'apps/web/src/places/scenario-gate/map/HoneycombPeek.tsx',
 ]
 export function entrySrc(html) {
   const scripts = [...html.matchAll(/<script\b[^>]*>/gi)].filter(([tag]) => /\btype\s*=\s*["']module["']/i.test(tag))
