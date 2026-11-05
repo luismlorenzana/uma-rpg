@@ -2,14 +2,14 @@
 // refused every upload once a world passed it, and the device couldn't read its own copy back.
 import { describe, expect, it } from 'vitest'
 import { drillNodeId } from '../rpg/drill-id'
-import { capitalStageIds } from '../world/capital'
+import { capitalStageIds } from '../world/legacy-capital.fixture'
 import { worldContinent } from '../world/world'
 import { MP_MAX, newSave, parseSave, WINS_MAX } from './save'
 
 const T = '2026-11-03T03:00:00.000Z'
 
 describe('the save\'s bounds (D292)', () => {
-  it('parses a world that has won every stage of Tier 1: its regions, capitals and Drills', () => {
+  it('parses a world that has won every stage of Tier 1: its regions, retired capital wins and Drills', () => {
     const save = JSON.parse(JSON.stringify(newSave('Bounds', T)))
     const wins: Record<string, number> = {}
     for (let order = 1; order <= 5; order++) {

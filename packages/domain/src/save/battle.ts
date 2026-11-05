@@ -4,7 +4,6 @@
 // functions that return a new save or throw SaveRuleError, like the collection rules. Design: docs/archive/design/battles.md,
 // docs/archive/design/class-rework.md, docs/archive/design/progression.md.
 import type { BattleAction, BattleInput, BattleState, BattleStep, RpgFlourish } from '../rpg/battle/types'
-import { recordChampion } from './windows'
 import { DRILL_LOGS, drillId, drillOfNode, isDrillChapter } from '../rpg/drill-id'
 import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
@@ -498,8 +497,7 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, gearMarks: paid.gearMarks,
     classMarks: paid.classMarks, firstClear })
   const next: TierWorld = { ...paid.world, world: { ...world.world, run: closed } }
-  // A won capital champion counts toward each entrant's World step (D283; nothing while the collections are dark).
-  return { save: recordChampion(withWorld(save, tier, next, now), String(tier), node.id, entrants.map((e) => e.outfitId)), result }
+  return { save: withWorld(save, tier, next, now), result }
 }
 
 /**

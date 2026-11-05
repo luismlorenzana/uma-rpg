@@ -2,7 +2,7 @@
 // armor kinds, her Bonds with her Heroes, D106), Laurels, Marks, Uma Shards at Lv10/20/30/40/50 and any Ticket they made.
 // From engine v16 (H70) each skill that ranked up with her Class Rank says so under its bar.
 import {
-  BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, capitalRunsLive, heroLimit, rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter,
+  BOND_EXP_TO_NEXT, BOND_MAX_LEVEL, heroLimit, rpgExpToNext, RPG_TIER_MAX_LEVEL, type FightResult as Result, type RankGain, type RpgCampaignChapter,
   type RpgClass,
 } from '@rpg/domain'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
@@ -29,7 +29,7 @@ export function FightResult({ campaign, chapter, result, onAgain, onMap, againLa
   const tier = useActiveTier()
   const win = result.outcome === 'victory'
   const node = chapter.nodes.find((n) => n.id === result.nodeId)
-  const capital = capitalRunsLive() ? result.capital : undefined
+  const capital = result.capital
   return (
     <div data-theme="dark" className="fixed inset-0 z-40 flex flex-col bg-page">
       <div className="pt-safe min-h-0 flex-1 overflow-y-auto p-4">

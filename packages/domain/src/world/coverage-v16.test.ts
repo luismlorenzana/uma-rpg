@@ -12,7 +12,7 @@ import type { BattleWeaknesses } from '../rpg/battle/types'
 import { riftGuidedBuild, riftParty } from '../rift/fronts'
 import { RIFT_FRONTS, type RiftFront } from '../rift/state'
 import { BIOMES } from './biomes'
-import { capitalChapter } from './capital'
+import { capitalChapter } from './legacy-capital.fixture'
 import { regionChapter, worldContinent } from './world'
 
 const V16 = 16

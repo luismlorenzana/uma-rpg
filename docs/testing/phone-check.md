@@ -1,7 +1,7 @@
 # Current phone check
 
 Use this script for a release, in order, on the [live game](https://uma-rpg.web.app). It tests the game as it runs today
-(engine v21, save v36); the screens are in [Game sections](../game/sections.md) and the rules in the [game
+(engine v21, save v37); the screens are in [Game sections](../game/sections.md) and the rules in the [game
 manual](../game/README.md). Record the App build, device, date and any failed step when reporting a problem.
 
 Use your existing save; do not reset it. Before you start, have: one full party of five with one healer; an Uma at Lv 10
@@ -167,7 +167,17 @@ button and footer should stay reachable without horizontal page scrolling, in li
     region: twelve stages, the first uncleared one open. Tap an open stage: its sheet lists the foes by wave, each with
     "Shield n · Weak:" and her icons (in Tier 1 four kinds on a regular, three on an elite or boss), and **Fight**.
     (D72, D237)
-26. **Fight.** Tap **Fight**. Expect the header (the wave chip on a multi-wave stage, Round, Auto, speed, menu), foe
+26. **Capital runs** (save v37; needs four full parties). Open a continent's **Capital**: its level, "Runs won"
+    and **New run**. Pick four different parties in the one sheet: partial, busy-run and two-healer parties are
+    disabled with why; Start stays disabled before four picks. **Start run**: four lanes keep their five faces. Open
+    a lane's **Fight**, inspect its foes and win: "General 1 of 3"; **Next general** keeps that party. Finish the
+    generals; **The Final** stays locked before all twelve, then its four bosses open. Win one: "Final 1 of 4".
+    Win the fourth: "Capital won · World I for 20", **Back to the capital**, the run gone and Runs won up one.
+    On each signed Uma's **Window**, World I is lit; a later run by the same Umas pays a quarter. Reload: the
+    migration keeps old World dates and progress, with Cloud save Synced. On a spare run, **Abandon run → Abandon**
+    keeps its confirmation open on "Run abandoned". At both sizes and themes, no horizontal scrolling and the fixed
+    sheet footer stays reachable. Sign up or abandon only a run you mean to play or lose.
+27. **Fight.** Tap **Fight**. Expect the header (the wave chip on a multi-wave stage, Round, Auto, speed, menu), foe
     cards with the shield badge and up to four weakness icons and no "Weak:" word, and the party's HP and MP bars. Pick
     a weapon in the three-weapon row and tap a foe: its preview shows above it (yellow when weak), then the hit; a weak
     hit chips the shield. Open **Skills**: each skill's MP and "weak: …"; cast one. On a stage with several foes, cast a
@@ -176,23 +186,23 @@ button and footer should stay reachable without horizontal page scrolling, in li
     lingering summon strikes every foe in farewell. Use **Guard** on an ally. When **LB** appears, open it and use a
     Limit Break at 0 MP; a Healer Sanctum one leaves its stack (Brave or Faith on every ally, or Armor Break or Mind
     Break on the foe first). (D206, D237, D246, D248)
-27. **Auto and speed.** Tap **Auto**, then the speed: 1× → 2× → 4×. Expect allies to act without input and effects to
+28. **Auto and speed.** Tap **Auto**, then the speed: 1× → 2× → 4×. Expect allies to act without input and effects to
     speed up; a manual tap stops Auto. Reload between fights: expect Auto and the speed remembered. (D89)
-28. **Leave and resume.** Mid-fight, open the menu → **Back to the map**, then reload. Tap **Resume the open fight**:
+29. **Leave and resume.** Mid-fight, open the menu → **Back to the map**, then reload. Tap **Resume the open fight**:
     expect the same round, HP and MP. Then **Give up**: expect no rewards, no clear and MP as before the fight.
-29. **Result.** Win a stage. Expect **Victory!**, the rounds and "First clear!" on a first win, the Laurels chip, and
+30. **Result.** Win a stage. Expect **Victory!**, the rounds and "First clear!" on a first win, the Laurels chip, and
     for each Uma her EXP, her Class Rank bar and any "… reached Rank n" or "… opened" line; a Learner's Bond. Tap
     **Fight again** and win: no "First clear!", a smaller pay, and the map keeps the clear and counts the win. (D79,
     D206)
-30. **Sweep.** On a cleared regular stage tap **Sweep · n → ×1**. Expect one Sweep Ticket spent, a "Swept with a ticket"
+31. **Sweep.** On a cleared regular stage tap **Sweep · n → ×1**. Expect one Sweep Ticket spent, a "Swept with a ticket"
     result like a win, and MP unchanged. An elite, a boss or an uncleared stage offers no Sweep. (D79)
-31. **Spring.** With some MP spent, tap the region's **Spring · MP** (or a continent's Spring). Expect the party's MP
+32. **Spring.** With some MP spent, tap the region's **Spring · MP** (or a continent's Spring). Expect the party's MP
     refilled and its recharge time; it is off during an open fight. (D72)
-32. **Drills** (save v35; after the tier's first map win). Open **Battle → Drills**: "Runs n · +10 at 4:00", **Read Logs ·
+33. **Drills** (save v35; after the tier's first map win). Open **Battle → Drills**: "Runs n · +10 at 4:00", **Read Logs ·
     n** and five rows, "Drill I · Lv 10" to "Drill V · Lv 50", "2 Logs a win" to "6". Fight Drill I: expect the fight,
     "+2 Training Logs" and one run fewer. Then **Sweep ×1**: one run spent and the Logs added. **Read Logs**: pick an Uma
     below Lv 50, a count, **Read n**: "Lv a → b · Ra → Rb", and the sheet stays open. (D286)
-33. **The Rift and Trials** (a tier with five Lv 50 Umas; skip otherwise). Open the Rift's quick look and page: each
+34. **The Rift and Trials** (a tier with five Lv 50 Umas; skip otherwise). Open the Rift's quick look and page: each
     front's guidance by family ("2 Brawler · Arms Spellblade · Arms Summoner · Paladin"). Open **Battle → Trials** and a
     Trial: its foes ("Shield n · Weak:" and the ward), a party, its guided weapons with **Use the guided weapons**, and
     under them each guided class the party lacks ("Needs an Arms Summoner") with the Umas who could fill it, "Ready to
@@ -201,10 +211,10 @@ button and footer should stay reachable without horizontal page scrolling, in li
     twenty windows with "n/36". After a won run, the Rift shows a **Gallery** door, "Rift won · n ready", and **Sign up
     twenty** again. With a ready Uma, the Gallery's **Ascend n** lists her ticked, "Lv 1 in Tier 2" and the purse;
     ascend only an Uma you mean to move up. Sign up twenty only for a run you mean to play. (H50, H153, D206, D283, CV23)
-34. **Tiers.** Tap the crest: the Tier sheet shows one card per tier, a tier with no world locked with "Promote Umas
+35. **Tiers.** Tap the crest: the Tier sheet shows one card per tier, a tier with no world locked with "Promote Umas
     through the Tier n Rift". With a Tier 2 world, pick it: expect the veil, Tier 2's Town Hall in dusk amber and its
     own wallet with no Uma Tickets chip; its Umas' Classes sheet has no Tier 0 row. Switch back. (H35, H36)
-35. **Phone only — push.** In the Home Screen app open **Account → Notifications**, turn it on, allow the prompt and tap
+36. **Phone only — push.** In the Home Screen app open **Account → Notifications**, turn it on, allow the prompt and tap
     **Send a test**. Expect the test push. Leave a job near its end and close the app: expect "Work done" with its
     place, item and count within about five minutes of the end; tap it and expect that place on its tier, its Ready
     state and the app badge.

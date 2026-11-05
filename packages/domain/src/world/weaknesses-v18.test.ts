@@ -7,7 +7,7 @@ import { rpgCampaignChapter, type RpgCampaignChapter } from '../rpg/campaign/cha
 import { rpgStageWeaknesses, rpgWeakCounts, type WeakFoe } from '../rpg/campaign/weaknesses'
 import { RPG_ELEMENTS, RPG_WEAPON_KINDS, rpgElementWeakness, type RpgElement } from '../rpg/kinds'
 import { RPG_V2_CLASSES, rpgHand } from '../rpg/rules'
-import { capitalChapter } from './capital'
+import { capitalChapter } from './legacy-capital.fixture'
 import { regionChapter, worldContinent } from './world'
 
 const V17 = 17, V18 = 18

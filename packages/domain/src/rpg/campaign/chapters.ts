@@ -6,7 +6,7 @@ import { RPG_SKILL_POWER } from '../node-identity'
 import { BATTLE_ENGINE_VERSION, rpgRework } from '../battle/caps'
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../battle/types'
 import { RPG_FOE_ROLES, RPG_FOE_TUNING, rpgFoe, rpgFoeShields, type RpgFoeRole } from './enemies'
-import { rpgFinals, rpgMapRoutes, type RpgEscortRole, type RpgFinalsFoe, type RpgFinalsRoute } from './finals'
+import { rpgFinals, type RpgEscortRole, type RpgFinalsFoe, type RpgFinalsRoute } from './finals'
 import { rpgStageWeaknesses } from './weaknesses'
 
 /** Ten levels a chapter (D48): Debut 1–3, Classic 4–6, Senior 7–9, Finals 10. Five chapters fill a tier's Lv1–50. */
@@ -107,7 +107,8 @@ function layout(start: number, order: number): Layout[] {
   const finalLevel = start + RPG_CHAPTER_LEVELS - 1
   const last = add({ id: 'final-camp', col: 2, kind: 'camp', level: finalLevel, stage: finals, element: null })
   link(previous, [last]); row += 1
-  const routes = rpgMapRoutes(rpgFinals(order)).map((spec, index) => ({ index, spec, col: index * 2 }))
+  // Historical chapter layout: its three routes stay frozen for old engine/replay tests.
+  const routes = rpgFinals(order).routes.slice(0, 3).map((spec, index) => ({ index, spec, col: index * 2 }))
   const guards = routes.map((r) => add({ id: rpgFinalsNodeIds(r.index + 1).vanguard, col: r.col, kind: 'sub-boss', level: finalLevel,
     stage: finals, element: r.spec.vanguard.element, route: r }))
   last.exits.push(...guards.map((n) => n.id)); row += 1

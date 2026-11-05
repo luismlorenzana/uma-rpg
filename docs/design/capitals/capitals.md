@@ -1,8 +1,7 @@
 # Capitals v2: the Finals as a mini Rift
 
-**Status:** approved 2026-11-03 (D293): packets H159–H162. One call changed in packeting: CA14 needs no engine bump. Nothing
-is live yet. H159's four-lane foes, H160's run rules and strict v37 parse, and H161's screens are built behind
-`capitalRunsLive()`, still false on save v36. H162 owns the switch. The preview page is
+**Status:** live on save v37, engine v21 (H162, D302), following H159's foes, H160's rules and H161's screens.
+Approved 2026-11-03 (D293); CA14 needs no engine bump. The preview page is
 [previews/capitals.html](previews/capitals.html): a run's shape, the three screens and the pacing against today's.
 
 ## The owner's points
@@ -184,8 +183,8 @@ Vanguards (a sub-boss's weight, halved), the final boss as a two-wave boss.
 ## 13. Packets
 
 1. **H159, built (D296):** the fourth Finals route for the fourteen scenarios and the run's foe generator. No engine bump.
-2. **H160, built dark:** the run rules and save v37, the window's World step and record change. Save v36 stays live.
-3. The capital page, New run and the run page (dark), the continent map's capital line.
-4. The switch: v37 live, the manual (maps, loops, sections), the phone check.
+2. **H160, built (D300):** the run rules and save v37, the window's World step and record change.
+3. **H161, built (D301):** the capital page, New run, the run page, results, continent labels and World tiles.
+4. **H162, live (D302):** save v37, the old three-route capital removed, the manual and phone check updated.
 
 No art: the capital castle and the fight backdrop stay.

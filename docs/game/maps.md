@@ -15,7 +15,7 @@ Stages are compact 2×2-tile buildings: square chess towers, an elite tower and 
 three columns: 1–2–3, then 6–5–4, 7–8–9, and 12–11–10 at the top. Each stage rises slightly within its row.
 Cleared buildings turn completely gray; colored buildings remain to clear, with a ring around the next stage.
 Tapping still opens the same rival sheet. The larger 4×4 structures remain in the art package for other uses.
-Springs refill MP, and the capital opens its Finals routes. A region shows its continent band's existing Spring at
+Springs refill MP, and the capital opens its runs. A region shows its continent band's existing Spring at
 the start of its road and as **Spring · MP** in the header. It shares that Spring's two-hour recharge, not a new charge.
 
 ## Shape
@@ -27,6 +27,7 @@ the start of its road and as **Spring · MP** in the header. It shares that Spri
 | Regions | 40 per continent in 10 rows of 4, each climbing 5 levels: rows 1–5 the continent's first five, rows 6–10 its last five. Every biome at least twice; the first is a Meadow |
 | Stages | 12 per region: 10 regular climbing its levels two at a time, then an elite (11) and the boss (12) at its top level |
 | Springs | 5 per continent, one every two rows; recharge 2 h |
+| Capitals | Runs of 4 full parties: 3 generals a lane, then 4 finals; 16 fights at the continent's top level |
 | Waves pay | ×1.5 |
 <!-- /live -->
 
@@ -40,7 +41,7 @@ the start of its road and as **Spring · MP** in the header. It shares that Spri
 - **Progress belongs to the world**, not to a party: one world-wide record of wins per stage, MP per Uma, and one open
   fight at a time.
 - **Springs** refill the active party's MP, then recharge for two hours.
-- Each continent's **capital** (Lv 10 of its band) holds three authored Finals routes ([below](#capitals)).
+- Each continent's **capital** (Lv 10 of its band) holds runs of four full parties ([below](#capitals)).
 
 ## Biomes
 
@@ -140,7 +141,7 @@ Within a region, faces go by tier:
 | Regular stages (1–10) | Regular units |
 | Elite (11) | A Sub-boss with two Key enemy assistants |
 | Boss (12) | Sub-bosses in the two opening waves, then a Boss with two Sub-boss guards. On a continent's top row (row 10), two Bosses and one Sub-boss guard |
-| Capital Finals | Vanguard: a Sub-boss with Key enemy minions. Champion: a Boss with Sub-boss minions |
+| Capital runs | General: a Sub-boss with Key minions. Final: three Keys, then a Boss with Sub-boss minions |
 
 - **Picking:** a stage picks each face by hash from its franchise's units of that tier, sorted by id, and never repeats a
   face within the stage.
@@ -213,17 +214,29 @@ Volcano `w1-4-2`, Lv 1–5:
 
 ## Capitals
 
-Each continent's capital (`world/capital.ts`) holds three authored Finals routes at Lv 10 of its band, each a vanguard
-and then a champion. All vanguards open at once; each champion opens after her own vanguard. Vanguards pay as sub-bosses,
-champions as bosses; their EXP is halved so all three routes add about one level. Replays pay a quarter, and neither can
-be swept.
+Each continent's capital (`world/capital.ts`, `save/capital.ts`; save v37, H162) holds **runs** at the continent's top
+level: Lv 10, 20, 30, 40 or 50 of its tier. Start one by assigning four full Party Hall parties to four lanes, twenty
+different Umas. There is no level gate. The run keeps those five per lane even if the Party Hall changes; their builds
+can change between fights. An Uma can join only one open run, and cannot ascend until it ends. Up to five runs can be
+open across the world's capitals.
 
-Its foes come from the scenario-chapter generator (`rpg/campaign/chapters.ts`), so they skip the region rules above:
-- a vanguard is a captain (sub-boss, shield 6) and a champion a champion (boss, shield 8), each with two escorts, regular
-  foes of the route's authored roles and elements, shield 3;
-- none of them acts twice, and they take neither the world's regular-foe HP step nor a region boss's half;
-- the sub-boss and the boss grow with the skill depth the continent's first level opens, as a region's do;
-- weaknesses v2 deals their lists as it does a stage's.
+- **Generals:** each lane walks three in order, with its own party. A general is a Sub-boss (shield 6) with two regular
+  escorts (shield 3), wearing Key faces. Generals I and III lead with the lane's first element, II with its second.
+- **The Final:** all twelve generals must fall first. Four final bosses then open, one per lane, fought by that lane's
+  party in any order. Each has two waves: three Key-faced regulars, then a Boss (shield 8) with two Sub-boss-faced
+  regular escorts (shield 3). All four finals won ends the run and lights **World n** for all twenty.
+- **Foes:** four authored lanes a scenario, each with its line, two elements and escort roles. They use the chapter
+  generator's tuning and weaknesses v2, without a region's regular-foe HP step or a region boss's half. Mechanics are
+  fixed for a capital and lane; faces come fresh from its franchise each run, fixed for its run id.
+- **Fights:** HP and MP start full; the world's carried MP stays unchanged. One healer at most per party, free retries,
+  and no Sweeps. A run fight occupies the world's existing open-fight slot. A loss advances and pays nothing.
+- **Pay:** generals pay half a sub-boss's EXP; finals the usual two-wave boss EXP. Her first run pays full until her
+  World n step is lit; later runs of that continent pay her a quarter. Class EXP is twice her Uma EXP; Laurels, Marks,
+  Bonds and Tier 1 Shards use the usual payment rules. Three generals and a final add about 1.3 levels at their level.
+- **Abandon:** loses run progress and frees the twenty; nothing is refunded or spent. Finish its own open fight first.
+
+The old three-route capital's wins remain inert in the save. An old open capital fight resumes from its frozen input
+and settles as a removed regular stage at its foes' level. Existing lit World steps keep their dates.
 
 ## Continents
 

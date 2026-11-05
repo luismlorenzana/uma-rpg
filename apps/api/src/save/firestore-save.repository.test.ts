@@ -60,47 +60,68 @@ const RESET = {
 describe('the Firestore save repository (D45, D69)', () => {
   beforeEach(() => store.clear())
 
-  it('runs on save v36 since D289', () => {
-    expect(V).toBe(36)
+  it('runs on save v37 since H162', () => {
+    expect(V).toBe(37)
   })
 
-  it('keeps saveBackups/{uid}-v31 on the first v36 write, and no backup on later v36 writes', async () => {
+  it('backs up the exact stored v36 document on the first v37 write, then refuses an older client', async () => {
+    const repo = new FirestoreSaveRepository()
+    const raw = JSON.parse(JSON.stringify(newSave('Migration test', NOW)))
+    raw.schemaVersion = 36
+    delete raw.tierWorlds['1'].capitalRuns; delete raw.tierWorlds['1'].capitals
+    raw.account.windows = { '101': { '1': { steps: '---'.repeat(36), champions: 7 } } }
+    const original = { revision: 9, save: JSON.stringify(raw), updatedAt: 'kept' }
+    store.set('saves/u', structuredClone(original))
+    const loaded = await repo.load('u')
+    expect(loaded.save?.schemaVersion).toBe(37)
+    expect(loaded.save?.account.updatedAt).toBe(NOW)
+    expect(store.get('saves/u')).toEqual(original)
+    expect(store.has('saveBackups/u-v36')).toBe(false)
+    await repo.put('u', 9, loaded.save!, 37)
+    expect(store.get('saveBackups/u-v36')).toEqual({ ...original, backedUpAt: SERVER_TIME })
+    await expect(repo.put('u', 10, loaded.save!, 36)).rejects.toBeInstanceOf(RevisionConflict)
+    store.delete('saveBackups/u-v36')
+    await repo.put('u', 10, loaded.save!, 37)
+    expect(store.has('saveBackups/u-v36')).toBe(false)
+  })
+
+  it('keeps saveBackups/{uid}-v31 on the first v37 write, and no backup on later v37 writes', async () => {
     const repo = new FirestoreSaveRepository()
     const v31 = { revision: 7, save: storedV31('Luis') }
     store.set('saves/u', structuredClone(v31))
-    // Loading migrates what's stored to v36 (the reset applied) and writes nothing.
+    // Loading migrates what's stored to v37 (the reset applied) and writes nothing.
     const loaded = await repo.load('u')
     expect(loaded.revision).toBe(7)
-    expect(loaded.save?.schemaVersion).toBe(36)
+    expect(loaded.save?.schemaVersion).toBe(37)
     expect(loaded.save?.tierWorlds['1']).toMatchObject(RESET)
     expect(loaded.save?.tierWorlds['1']!.heroes).not.toHaveProperty('paladin-1')
     expect(store.get('saves/u')).toEqual(v31)
     expect(store.has('saveBackups/u-v31')).toBe(false)
-    // The new app's first write: v36 is stored, and the v31 document is copied whole first.
+    // The new app's first write: v37 is stored, and the v31 document is copied whole first.
     const next = await repo.put('u', 7, loaded.save!, V)
     expect(next.revision).toBe(8)
     expect(store.get('saveBackups/u-v31')).toEqual({ ...v31, backedUpAt: SERVER_TIME })
     expect(store.get('saves/u')).toMatchObject({ revision: 8 })
-    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 36, tierWorlds: { '1': RESET } })
-    // A later v36 write over v36 backs nothing up.
+    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 37, tierWorlds: { '1': RESET } })
+    // A later v37 write over v37 backs nothing up.
     store.delete('saveBackups/u-v31')
     await repo.put('u', 8, loaded.save!, V)
     expect([...store.keys()]).toEqual(['saves/u'])
   })
 
-  it('stores an old app’s v31 write as v36 with the same backup while v31 is stored, then refuses its next one (D45)', async () => {
+  it('stores an old app’s v31 write as v37 with the same backup while v31 is stored, then refuses its next one (D45)', async () => {
     const repo = new FirestoreSaveRepository()
     store.set('saves/u', { revision: 3, save: storedV31('Luis') })
-    // The API parses every save it's sent to the current version (`parseSavePut`), so a v31 app's body arrives as v36:
+    // The API parses every save it's sent to the current version (`parseSavePut`), so a v31 app's body arrives as v37:
     // her reset applied (a Warrior, the Healer Sanctum's Hero, her Manuals in the wallet).
     const sent = parseSavePut({ baseRevision: 3, save: storedV31('Luis') })
     expect(sent.sentSchemaVersion).toBe(31)
     expect(sent.save.tierWorlds['1']).toMatchObject(RESET)
     await repo.put('u', 3, sent.save, sent.sentSchemaVersion)
     expect(store.get('saves/u')).toMatchObject({ revision: 4 })
-    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 36, tierWorlds: { '1': RESET } })
+    expect(JSON.parse(store.get('saves/u')!.save as string)).toMatchObject({ schemaVersion: 37, tierWorlds: { '1': RESET } })
     expect(store.get('saveBackups/u-v31')).toMatchObject({ revision: 3, save: { schemaVersion: 31 } })
-    // Now v36 is stored: the old app's next write is refused with what's stored, and nothing changes.
+    // Now v37 is stored: the old app's next write is refused with what's stored, and nothing changes.
     await expect(repo.put('u', 4, sent.save, 31)).rejects.toBeInstanceOf(RevisionConflict)
     expect(store.get('saves/u')).toMatchObject({ revision: 4 })
   })

@@ -1,6 +1,6 @@
 // The window on screen (D283, H155; collections.md §4, §7): the pixel rule that lights it, and the words its board, the
 // profile's square and the Gallery read. Pure, so tests hold them.
-import { capitalRunsLive, WINDOW_DARK, WINDOW_STEP_IDS, type WindowNumeral, type WindowRecords, type WindowStepId, type WindowTrack } from '@rpg/domain'
+import { WINDOW_DARK, WINDOW_STEP_IDS, type WindowNumeral, type WindowRecords, type WindowStepId, type WindowTrack } from '@rpg/domain'
 import type { WindowNext, WindowView } from '@rpg/domain/windows'
 
 /** The pane map's values: the lead is always drawn, the face lights with the last step, every other pane in 1–250. */
@@ -70,14 +70,14 @@ export function nextLabel(next: WindowNext): string {
     case 'gear':
     case 'weapons': return `${next.have} of ${next.need} at G${next.grade}`
     case 'stars': return `${next.have}/${next.need}`
-    case 'world': return capitalRunsLive() ? next.run ? `${next.have} of 4 finals` : 'Not run' : `${next.have} of ${next.need}`
+    case 'world': return next.run ? `${next.have} of 4 finals` : 'Not run'
   }
 }
 
 /** Where a track's steps come from, for a tile's inline line. */
 export const TRACK_SOURCE: Readonly<Record<WindowView['steps'][number]['track'], string>> = {
   level: 'Campaign · Drills', class: 'Campaign · Trials · Manuals', craft: 'Wilds jobs', gear: 'Made items', weapons: 'Made items · any class', stars: 'Planet and Moon Jewels',
-  world: capitalRunsLive() ? 'Capital runs' : 'Capital Finals', rift: 'The Rift',
+  world: 'Capital runs', rift: 'The Rift',
 }
 
 /** The track names for the board's rows. */

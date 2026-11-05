@@ -1,6 +1,6 @@
 # Architecture and technical setup
 
-How uma-rpg is built and run: engine v21, save v36. Values come from the code and `docs/technical/infrastructure.md`,
+How uma-rpg is built and run: engine v21, save v37. Values come from the code and `docs/technical/infrastructure.md`,
 which holds every production value and is the place to change them.
 
 ## The pieces
@@ -52,7 +52,7 @@ lazy pages import it directly, so its rules load with the first command or page 
 
 | Folder | What |
 |---|---|
-| `save/` | The save: `version.ts` (`SAVE_SCHEMA_VERSION` 36, in a module with no imports), `save.ts` (the shape and its strict parse: `parseSave` for the API, `parseSaveAsync` for the device) and `migrations.ts` (every step to v35, `toV35` the last; loaded on demand: `parseSaveAsync` imports it only for an old save, and only the API's `parseSave` imports it statically, H136). Its rules, pure functions that return a new save or throw `SaveRuleError`: `class.ts` (an Uma's starting and active class, the classes she holds, her setup per class, one healer a party; main bundle), `class-tiles.ts` (the class tree's tiles; the Stable's chunk), `battle.ts` (switching class, promotion, weapons, lines, the world map's fights, rewards, Springs; through `@rpg/domain/battle`, H62), `classes-v3.ts` (save v32's trade step, `settleClassesV3Trades`; lazy), `sheet.ts` (her battle sheet; the Stable's chunk), `status.ts` (where an Uma is: in a fight or at work), `work.ts` (jobs on the shared engine, Finish all, the slot view the screens read), `forge.ts` (raising grades with made items, the accessory's family and kind), `observatory.ts` (setting jewels), `presets.ts` (each class's standard preset), `targets.ts` (targets), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts` (raw items and tickets for Laurels, selling, Class Manuals), `rules.ts` (unlocks, parties, the grant and the classes' reset seen), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion one Uma at a time; through `@rpg/domain/rift`), `windows.ts` (every Uma's window: the board met, latching, the switch's credit, the champions and the Rift step; through `@rpg/domain/windows`), `window-record.ts` (the record's day codes; main bundle), `collections.ts` (`collectionsLive`, save v35), `drills.ts` (Drills and Training Logs; through `@rpg/domain/drills`) |
+| `save/` | The save: `version.ts` (`SAVE_SCHEMA_VERSION` 37, in a module with no imports), `save.ts` (the shape and its strict parse: `parseSave` for the API, `parseSaveAsync` for the device) and `migrations.ts` (every step to v37, `toV37` the last; loaded on demand: `parseSaveAsync` imports it only for an old save, and only the API's `parseSave` imports it statically, H136). Its rules, pure functions that return a new save or throw `SaveRuleError`: `class.ts` (an Uma's starting and active class, the classes she holds, her setup per class, one healer a party; main bundle), `class-tiles.ts` (the class tree's tiles; the Stable's chunk), `battle.ts` (switching class, promotion, weapons, lines, the world map's fights, rewards, Springs; through `@rpg/domain/battle`, H62), `classes-v3.ts` (save v32's trade step, `settleClassesV3Trades`; lazy), `sheet.ts` (her battle sheet; the Stable's chunk), `status.ts` (where an Uma is: in a fight or at work), `work.ts` (jobs on the shared engine, Finish all, the slot view the screens read), `forge.ts` (raising grades with made items, the accessory's family and kind), `observatory.ts` (setting jewels), `presets.ts` (each class's standard preset), `targets.ts` (targets), `upgrades.ts` ("Can upgrade"), `heroes.ts` (Halls of Heroes, Learners, Bonds), `exchange.ts` (raw items and tickets for Laurels, selling, Class Manuals), `rules.ts` (unlocks, parties, the grant and the classes' reset seen), `notify.ts` (push text), `rift.ts` (the Rift's run rules and Ascend: sign-up, fronts, the Convergence, Echoes and Sweeps, promotion one Uma at a time; through `@rpg/domain/rift`), `windows.ts` (every Uma's window: the board met, latching, the pre-v35 credit, capital-run World credit and the Rift step; through `@rpg/domain/windows`), `window-record.ts` (the record's day codes; main bundle), `collections.ts` (`collectionsLive`, save v35), `drills.ts` (Drills and Training Logs; through `@rpg/domain/drills`) |
 | `rpg/` | `kinds.ts` (the classes by generation, weapons, damage kinds, twins, statuses), `class-tree.ts` (Classes v3's tree: roots, parents and children, Tier 0's ladder and skill, the suggestion, names by generation, the gates), `rules.ts` (classes, stats, levels, hands, lines, Skill Ranks, the base MP regen, each by generation), `node-identity.ts` (node ids, lines and the skill depth tables, light enough for the parse), `catalog.ts` (every skill tree of every generation), `tree-view.ts` (the Class tab's tree model), `heroes.ts` and `hero-id.ts` (the five halls' sixteen Limit Breaks, and each older engine's for its fights; Bonds) |
 | `rpg/battle/` | The fight: `engine.ts` (the deterministic reducer, engine v21), `limit.ts` (Limit Breaks), `skills.ts`, `auto.ts` (Auto's policy), `types.ts`. `caps.ts` holds the switch: `BATTLE_ENGINE_VERSION` 19 and `rpgRework(stage, engine)` over `RPG_REWORK_ENGINE` (`fight` 16, `economy` 17, `weak` 18, `classes` 19: Classes v3 and Halls v2, live since H134; `t2Weapons` at no engine until the Tier 2 re-plan). A rule outside the engine takes `engine`, defaulting to the live one; the engine passes the fight's own version, so v6–v18 fights replay as they were, pinned by the frozen `v14`- to `v18-replays` fixtures. The engine's functions load through `@rpg/domain/engine`; the main index keeps its types, caps and skill numbers (H62) |
 | `rpg/campaign/` | Foes and their scaling (`enemies.ts`), rewards, Finals and the chapter machinery regions reuse; `weaknesses.ts` deals each stage's foes their own Arms and element lists from v18 (D236) |
@@ -60,7 +60,7 @@ lazy pages import it directly, so its rules load with the first command or page 
 | `work/` | uma-rpg's side of `@luismlorenzana/uma-work` (SC3): `env-v4.ts` (the fifteen Wilds places as buildings, four slots at ×1.25), `kinds-v4/` (gather and process `material.ts`, make `make.ts`), `kinds-v3/trade.ts` (the trade gate and open shop), `env-v3.ts` (`liveWorkEnv`, the env every work rule builds), `env.ts` (Speed Tickets, Craft EXP, Laurels, who may work), `request.ts`. `kinds/` and `env.ts`' facilities are v1's, kept for old work rows and the v1 tests |
 | `economy/` | `pacing.ts` (times, steps, job sizes, prices, Laurels), `professions.ts` (fifteen professions, five trades, one a Tier 0 calling), `places-v4.ts` (each place's line and its one kind of job: `PLACES_V4`, `workPlace`, `jobKindV4`), `grades.ts` (gear by grade: the gate, tier scaling, Might, armor), `accessories.ts` (the four families, the signature), `planet.ts` (the Planet, three moons and her moon), `ranks.ts` (Class Ranks and Marks), `bonus.ts` (points), `stock.ts` (Warehouse names: line and made items). v1's `jobs.ts`, `stars.ts`, `gems.ts`, `gear.ts` and `gear-id.ts` serve the migrations and old saves (ids and recipes; their names are `items/names-v1.ts`'); `*.sim.ts` are the pacing ledgers (test support) |
 | `items/` | `lines.ts` (five lines of ten grades: the hundred line items), `made-id.ts` (the made items' ids), `made.ts` (their names and places), `made-v4.ts` (one-line recipes), `stock-id.ts` (what a Warehouse may hold). v1's 160 items serve the migrations: `catalog.ts` (ids, families, grades and pairs, built from `identity.ts`) and `kinds.ts`; `names-v1.ts` holds the v1 names (items, families, gear and Star Gems: `itemNameV1` … `stockNameV1`) and is the only reader of `families.ts`; both load on demand (H136) |
-| `world/` | `world.ts` (continents, regions, the stage generator), `biomes.ts`, `capital.ts` (each continent's Finals routes), `roster.ts` (enemy faces by franchise and tier); balance support (`balance-party.ts`, `balance-play.ts`, `balance-measure.ts`) and the `SIM=1` simulations (`balance*.test.ts`) |
+| `world/` | `world.ts` (continents, regions, the stage generator), `biomes.ts`, `capital.ts` (each capital run's four lanes and sixteen fights), `roster.ts` (enemy faces by franchise and tier); balance support (`balance-party.ts`, `balance-play.ts`, `balance-measure.ts`) and the `SIM=1` simulations (`balance*.test.ts`) |
 | `hub/places.ts` | Every place on the four Hub pages (Town Hall 5, Learning 7, Battle 2, the Wilds 15), and Town Hall's plaza |
 | `master/`, `roster/` | `master/roster.ts`: master data to the game's roster, by stable id; `roster/template.ts`: the Uma Template and the calling (D203; by running style from v19, D240); `aptitudes.ts` and `stats.ts`. Album queries and order live in uma-kit |
 | `docs/` | The renderer for these docs' live blocks (test-only, not built) |
@@ -203,7 +203,7 @@ lazy pages import it directly, so its rules load with the first command or page 
 
 ## The save
 
-- **Schema v36** (`save/version.ts`, re-exported by `save/save.ts`).
+- **Schema v37** (`save/version.ts`, re-exported by `save/save.ts`).
 - One save per player; worlds are kept per tier (`tierWorlds["1"]`).
 - Older saves migrate on parse: `migrations.ts`' `migrateWorld` runs each world's steps in order, and `save.ts` adds the
   account's own. A world older than v10 is reset, keeping its Umas and parties (D69).
@@ -291,25 +291,27 @@ Recent steps:
 - **v36:** the window's Weapons track (D289; [windows](loops.md#windows)), on the account only (`widenAccount` in
   `save.ts`): each v35 record gains five steps at its end, dark, or on a full window lit on its latest day. No world
   changes.
+- **v37:** capital runs (D293, H162): `toV37` adds empty runs and capital records to every world; the account step
+  removes champion masks only, keeping all lit World dates. The run rules keep five concurrent runs, six recent wins
+  per continent and signed rosters; they never add their sixteen fights to the map's wins. Engine v21 stays.
 
 At every schema bump the API's GET migrates the stored save without writing it; in Firestore the first write of the
 new version copies the stored document to `saveBackups/{uid}-v{n}` (D69), and an older app's write is refused once
 the newer version is stored (D45).
 
-**Staged, still dark (H160–H161):** `capitalRunsLive()` in `save/collections.ts` stays false while the live save is v36.
-`toV37` and the account's v37 step are written but not applied: worlds will gain open `capitalRuns` and `capitals`
-(started/won counters and six recent wins), and windows will drop only their champion masks, keeping lit steps. The
-run rules load through `@rpg/domain/capital`, outside the initial bundle. Today's three Finals routes, champion credit
-and live save shape stay unchanged. H161's capital, sign-up and run pages load lazily only behind that gate; their
-shared fight results, continent labels and World tile wording use it too. H162 owns the switch and the live manual changes.
+**Capital runs are live (H162).** Their rules load through `@rpg/domain/capital`, and the capital/run pages stay
+lazy, outside the initial bundle. A stored v36 save migrates on parse: empty `capitalRuns` and `capitals` in each world,
+window records' champion masks removed, lit steps and `updatedAt` unchanged. An open old capital fight keeps its frozen
+input and settles through the removed-stage fallback. The first v37 write backs up the exact stored v36 document as
+`saveBackups/{uid}-v36`; production saves are never edited by hand.
 
 ### The shape
 
 ```
-Save { schemaVersion: 36, account, tierWorlds: { "1": TierWorld, … } }
+Save { schemaVersion: 37, account, tierWorlds: { "1": TierWorld, … } }
 account { trainerName, createdAt, updatedAt, achievements { <id>: { at, run | null } },
   history { <outfitId>: [{ tier, at, run }] }, defeated { <castId>: at },
-  windows { <outfitId>: { <tier>: { steps: 36 × 3 base-36 day codes ("---" dark), champions: 15-bit mask } } },
+  windows { <outfitId>: { <tier>: { steps: 36 × 3 base-36 day codes ("---" dark) } } },
   windowsStart | null }
 TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, sweepTickets, classMarks, trainingLogs },
   umas: { <outfitId>: OwnedUma }, parties: [20 × { name, slots[5], lead | null }],
@@ -317,7 +319,10 @@ TierWorld { createdAt, wallet { unlockTickets, shards, laurels, timeTickets, swe
   items { <line item or made item id>: count }, buildings: {}, work: { <outfitId>: WorkRow }, targets [≤10],
   heroes: { <seat>: { hero, learners[≤10] } },
   rift { runs [RiftRun], echoes { <front>: { <level>: at } }, battle: RiftBattle | null, battles },
-  grant: TierGrant | null, classesV3?: ClassesV3Record, drills { day | null, runs, won { drill-<n>: true } } }
+  grant: TierGrant | null, classesV3?: ClassesV3Record, drills { day | null, runs, won { drill-<n>: true } },
+  capitalRuns [≤5 CapitalRun], capitals { <continent>: { started, won, recent [≤6 CapitalWin] } } }
+CapitalRun { id, continent, startedAt, lanes [4 × { party, umas[5], generals: 0–3, finalAt | null }] }
+CapitalWin { id, wonAt, lanes[4][5] }
 TierGrant { tickets, floor, umas { <outfitId>: { level, exp, tickets } }, deleted { gear, gems, upgrades },
   back { laurels, items, stock }, seen }
 ClassesV3Record { manuals, marks, umas { <outfitId>: { classId, ranks, pick, manuals, left, trade? { from, to } } },

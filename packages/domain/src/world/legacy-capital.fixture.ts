@@ -1,0 +1,42 @@
+// Frozen pre-v37 capital generator for historical engine/replay tests (H162). Never imported by the app.
+import { rpgCampaignChapter, rpgFinalsNodeIds, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
+import { rpgFinals } from '../rpg/campaign/finals'
+import { capitalFranchise, stageFaces, type EnemyRoster } from './roster'
+import { WORLD_LEVELS, type WorldContinent } from './world'
+
+import { capitalId } from './capital'
+export function capitalStageIds(continentId: string, route: number): { vanguard: string; champion: string } {
+  if (!Number.isInteger(route) || route < 1 || route > 3) throw new RangeError('Bad Finals route')
+  const id = `${capitalId(continentId)}-r${route}`
+  return { vanguard: `${id}-s1`, champion: `${id}-s2` }
+}
+
+/** Reuse the authored chapter foes, elements, escorts, weaknesses and tuning; only the world layout, ids and faces change.
+ * Faces come from the capital's franchise (D135): a vanguard is a Sub-boss with Key enemy minions, a champion a Boss
+ * with Sub-boss minions. Each route opens independently from start; its champion needs its vanguard.
+ * Stage 0 deliberately pays the vanguard as a sub-boss, not the legacy chapter's vanguard reward kind. Its foes are an
+ * engine's generation's, as the chapter's (D202): from v16 her twins and Tier 1's shields; the live one by default. */
+export function capitalChapter(continent: WorldContinent, roster: EnemyRoster, engine: number = 21): RpgCampaignChapter {
+  const id = capitalId(continent.id), finals = rpgFinals(continent.order)
+  // The legacy generator wants a cast for its own names; the faces are replaced below.
+  const chapter = rpgCampaignChapter({ scenarioId: id, name: continent.name, order: continent.order }, [{ id: '', name: '' }], engine)
+  const franchise = capitalFranchise(continent.order)
+  const reface = (node: RpgMapNode): RpgMapNode => {
+    const face = stageFaces(roster, franchise, node.id)
+    const [lead, minion] = node.kind === 'boss' ? (['boss', 'subboss'] as const) : (['subboss', 'key'] as const)
+    return { ...node, enemies: node.enemies.map((e, slot) => ({ ...e, castId: face(slot === 0 ? lead : minion, slot)?.id ?? '' })) }
+  }
+  const level = continent.levelStart + WORLD_LEVELS - 1
+  const nodes: RpgMapNode[] = []
+  finals.routes.slice(0, 3).forEach((route, i) => {
+    const old = rpgFinalsNodeIds(i + 1), ids = capitalStageIds(continent.id, i + 1)
+    const vanguard = chapter.nodes.find((n) => n.id === old.vanguard)!
+    const champion = chapter.nodes.find((n) => n.id === old.champion)!
+    nodes.push(reface({ ...vanguard, id: ids.vanguard, row: 1, stage: 0, name: `${route.name} · Vanguard`, note: null,
+      exits: [ids.champion] }))
+    nodes.push(reface({ ...champion, id: ids.champion, row: 2, stage: 0, name: `${route.name} · Champion`, note: null, exits: [] }))
+  })
+  const start: RpgMapNode = { id: 'start', row: 0, col: 2, kind: 'camp', level, stage: 0,
+    name: 'Capital', element: null, note: null, enemies: [], exits: nodes.filter((n) => n.kind === 'sub-boss').map((n) => n.id) }
+  return { ...chapter, id, levelStart: level, rows: 3, nodes: [start, ...nodes] }
+}

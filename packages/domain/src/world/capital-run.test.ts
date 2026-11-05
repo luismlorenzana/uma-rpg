@@ -6,10 +6,12 @@ import type { BattleEnemy } from '../rpg/battle/types'
 import { rpgFinals } from '../rpg/campaign/finals'
 import { rpgRunBattleStep } from '../rpg/campaign/run'
 import type { RpgClass } from '../rpg/rules'
-import { actInFight, chooseClass, openFightOf, startFight, type BattleOutfit } from '../save/battle'
+import { actInFight, chooseClass, openFightOf, type BattleOutfit } from '../save/battle'
+import { startCapitalRun, startCapitalFight } from '../save/capital'
 import { setPartySlot, unlockUma, worldOf } from '../save/rules'
 import { newSave, type Save } from '../save/save'
-import { capitalChapter, capitalRunChapter } from './capital'
+import { capitalRunChapter } from './capital'
+import { capitalChapter } from './legacy-capital.fixture'
 import { capitalRunNodeId, capitalRunNodeOf, isCapitalRunChapter } from './capital-run-id'
 import { stagePay, worldContinent } from './world'
 
@@ -90,7 +92,7 @@ describe('a capital run’s fights (D293, H159)', () => {
     for (const id of ['w2-run1', 'w1-capital', 'w1-run0', 'run1']) expect(() => capitalRunChapter(c1, id, roster), id).toThrow(RangeError)
   })
 
-  it('leaves the map’s three-route capital as it was', () => {
+  it('keeps the retired capital’s historical fixture frozen', () => {
     const fourTier = roster.filter((m) => Number(m.id.slice(-1)) < 4)
     const sha = (v: unknown) => createHash('sha256').update(JSON.stringify(v)).digest('hex').slice(0, 16)
     // Fingerprinted before the fourth routes were written (H159): the capital still holds three routes, byte for byte.
@@ -102,7 +104,7 @@ describe('a capital run’s fights (D293, H159)', () => {
 
 describe('a capital run’s final, fought', () => {
   const classes: readonly RpgClass[] = ['brawler', 'mage', 'spellblade', 'cleric', 'summoner']
-  const outfits = new Map(classes.map((_, i) => {
+  const outfits = new Map(Array.from({ length: 20 }, (_, i) => {
     const outfitId = `${9100000 + i}`
     const outfit: BattleOutfit = { outfitId, baseStats: { speed: 110, stamina: 110, power: 110, guts: 110, wit: 110 },
       growthRatePercents: { speed: 10, stamina: 10, power: 10, guts: 0, wit: 0 },
@@ -112,18 +114,20 @@ describe('a capital run’s final, fought', () => {
   const NOW = '2026-11-03T12:00:00.000Z'
   function party(): Save {
     let save = newSave('Run test', NOW)
-    ;[...outfits.keys()].forEach((id, i) => { save = setPartySlot(unlockUma(save, id, NOW), 0, i, id, NOW) })
+    ;[...outfits.keys()].forEach((id, i) => { save = setPartySlot(unlockUma(save, id, NOW), Math.floor(i / 5), i % 5, id, NOW) })
     const w = worldOf(save)
     save = { ...save, tierWorlds: { '1': { ...w, umas: Object.fromEntries(Object.entries(w.umas).map(([id, u]) =>
       [id, { ...u, level: 10, ranks: { ...u.ranks, classes: Object.fromEntries(classes.map((c) => [c, { rank: 10, exp: 0 }])) } }])) } } }
-    ;[...outfits.keys()].forEach((id, i) => { save = chooseClass(save, id, classes[i]!, NOW) })
+    ;[...outfits.keys()].forEach((id, i) => { save = chooseClass(save, id, classes[i % 5]!, NOW) })
+    save = startCapitalRun(save, 'w1', [0, 1, 2, 3], NOW)
+    worldOf(save).capitalRuns![0]!.lanes.forEach((lane) => { lane.generals = 3 })
     return save
   }
 
   it('plays its escorts’ wave, then its boss’s, to a win', () => {
     const run = capitalRunChapter(c1, 'w1-run1', roster)
     const nodeId = capitalRunNodeId(run.id, 1, 'final')
-    let save = startFight(party(), run, nodeId, outfits, NOW)
+    let save = startCapitalFight(party(), run, run.id, 1, 'final', outfits, NOW)
     const seen = new Set<string>()
     for (let i = 0; i < 900; i++) {
       const state = rpgRunBattleStep(openFightOf(worldOf(save))!)!.state

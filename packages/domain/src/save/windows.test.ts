@@ -1,15 +1,15 @@
 // Windows with the collections live (save v35, D283, H152; the Weapons track since v36, D289).
 import { describe, expect, it } from 'vitest'
 import { WINDOW_STEP_IDS, windowBoard } from '../rpg/windows'
-import { capitalStageIds } from '../world/capital'
+import { capitalStageIds } from '../world/legacy-capital.fixture'
 import { collectionsLive } from './collections'
 import { toV35 } from './migrations'
 import { ascendUmas, ascendUmasBlock, signUpBlock, signUpRift } from './rift'
 import { OUTFITS, riftWorldSave, T, TWENTY } from './rift-rules.fixture'
 import { worldOf } from './rules'
 import { newOwnedUma, newSave, parseSave, type OwnedUma, type Save } from './save'
-import { championBit, codeDay, dayCode, emptyWindow, stepCode, stepDay, widenSteps, WINDOW_STEPS_LENGTH, withSteps, type WindowRecord } from './window-record'
-import { lastLitDay, latchWindows, readyToAscend, recordChampion, recordRiftWin, windowFull, windowMet, windowNext, windowOf, wornFloor } from './windows'
+import { codeDay, dayCode, emptyWindow, stepCode, stepDay, widenSteps, WINDOW_STEPS_LENGTH, withSteps, type WindowRecord } from './window-record'
+import { lastLitDay, latchWindows, readyToAscend, recordCapitalWin, recordRiftWin, windowFull, windowMet, windowNext, windowOf, wornFloor } from './windows'
 
 const outfit = OUTFITS.get('101')!
 const uma = (change: (u: OwnedUma) => void = () => {}): OwnedUma => {
@@ -37,7 +37,7 @@ describe('the switch', () => {
   it('is on here, and a new save starts its windows at once', () => {
     expect(collectionsLive()).toBe(true)
     const save = newSave('W', T(0))
-    expect(save.schemaVersion).toBe(36)
+    expect(save.schemaVersion).toBe(37)
     expect(save.account).toMatchObject({ windows: {}, windowsStart: T(0) })
     expect(save.tierWorlds['1']!.drills).toEqual({ day: null, runs: 10, won: {} })
     expect(save.tierWorlds['1']!.wallet.trainingLogs).toBe(0)
@@ -51,51 +51,49 @@ describe('the board', () => {
     expect(windowBoard(1, true).map((s) => s.track).filter((t, i, all) => all.indexOf(t) === i)).toEqual(['level', 'class', 'craft', 'gear', 'weapons', 'stars', 'world', 'rift'])
     expect(windowBoard(3, false)).toHaveLength(35)
     expect(windowBoard(1, true).find((s) => s.id === 'weapons-3')!.rule).toBe('Five weapons at G6')
-    expect(windowBoard(2, true).find((s) => s.id === 'world-1')!.rule).toBe("Continent 6: its capital's three champions")
+    expect(windowBoard(2, true).find((s) => s.id === 'world-1')!.rule).toBe('Continent 6: a won capital run')
   })
 })
 
 describe('windowMet', () => {
   it('reads Level and Craft at 10, 20 … 50', () => {
-    expect(ids(windowMet(uma((u) => { u.level = 29; u.craft = { level: 30, exp: 0 } }), outfit, 1, 0)))
+    expect(ids(windowMet(uma((u) => { u.level = 29; u.craft = { level: 30, exp: 0 } }), outfit, 1)))
       .toEqual(['craft-1', 'craft-2', 'craft-3', 'level-1', 'level-2'])
-    expect(windowMet(uma((u) => { u.level = 50 }), outfit, 1, 0).has('level-5')).toBe(true)
-    expect(windowMet(uma((u) => { u.level = 49 }), outfit, 1, 0).has('level-5')).toBe(false)
+    expect(windowMet(uma((u) => { u.level = 50 }), outfit, 1).has('level-5')).toBe(true)
+    expect(windowMet(uma((u) => { u.level = 49 }), outfit, 1).has('level-5')).toBe(false)
   })
 
   it('reads Class from her best classes, not the one she fights as', () => {
     const tier0 = uma((u) => { u.classId = null; ranks(u, { recruit: 10 }) })
-    expect(windowMet(tier0, outfit, 1, 0).has('class-1')).toBe(true)
-    expect(windowMet(tier0, outfit, 2, 0).has('class-1')).toBe(false)
+    expect(windowMet(tier0, outfit, 1).has('class-1')).toBe(true)
+    expect(windowMet(tier0, outfit, 2).has('class-1')).toBe(false)
     const masters = uma((u) => { u.classId = 'paladin'; ranks(u, { brawler: 50, spellblade: 50, armsummoner: 49, paladin: 12 }) })
-    expect(ids(windowMet(masters, outfit, 1, 0)).filter((s) => s.startsWith('class'))).toEqual(['class-1', 'class-2', 'class-3', 'class-4'])
+    expect(ids(windowMet(masters, outfit, 1)).filter((s) => s.startsWith('class'))).toEqual(['class-1', 'class-2', 'class-3', 'class-4'])
     ranks(masters, { armsummoner: 50 })
-    expect(windowMet(masters, outfit, 1, 0).has('class-5')).toBe(true)
+    expect(windowMet(masters, outfit, 1).has('class-5')).toBe(true)
   })
 
   it('reads Gear from the lowest of her eleven worn slots', () => {
     const u = uma((x) => allGrades(x, 6))
     expect(wornFloor(u, outfit, 1)).toBe(6)
-    expect(ids(windowMet(u, outfit, 1, 0)).filter((s) => s.startsWith('gear'))).toEqual(['gear-1', 'gear-2', 'gear-3'])
+    expect(ids(windowMet(u, outfit, 1)).filter((s) => s.startsWith('gear'))).toEqual(['gear-1', 'gear-2', 'gear-3'])
     ;(u.gear as { accessories: { grade: number }[] }).accessories[2]!.grade = 5
-    expect(windowMet(u, outfit, 1, 0).has('gear-3')).toBe(false)
+    expect(windowMet(u, outfit, 1).has('gear-3')).toBe(false)
     // A weapon she doesn't wear doesn't count.
     ;(u.gear as { accessories: { grade: number }[]; weapons: Record<string, { grade: number }> }).accessories[2]!.grade = 6
     ;(u.gear as { weapons: Record<string, { grade: number }> }).weapons.katana = { grade: 0 }
-    expect(windowMet(u, outfit, 1, 0).has('gear-3')).toBe(true)
+    expect(windowMet(u, outfit, 1).has('gear-3')).toBe(true)
   })
 
   it('reads Stars by node rank, with her moon from II and IV', () => {
     const u = uma((x) => nodes(x, 4))
-    expect(ids(windowMet(u, outfit, 1, 0)).filter((s) => s.startsWith('stars'))).toEqual(['stars-1', 'stars-2', 'stars-3', 'stars-4'])
+    expect(ids(windowMet(u, outfit, 1)).filter((s) => s.startsWith('stars'))).toEqual(['stars-1', 'stars-2', 'stars-3', 'stars-4'])
     ;(u.stars as { open: string[] }).open = (u.stars as { open: string[] }).open.filter((n) => n !== 'planet:4')
-    expect(windowMet(u, outfit, 1, 0).has('stars-4')).toBe(false)
+    expect(windowMet(u, outfit, 1).has('stars-4')).toBe(false)
   })
 
-  it('reads World from the champions she beat: all three a continent', () => {
-    const two = championBit(1, 1) + championBit(1, 2)
-    expect(windowMet(uma(), outfit, 1, two).has('world-1')).toBe(false)
-    expect(windowMet(uma(), outfit, 1, two + championBit(1, 3)).has('world-1')).toBe(true)
+  it('never infers World from her current state', () => {
+    expect([...windowMet(uma((u) => { u.level = 50 }), outfit, 1)].some((id) => id.startsWith('world-'))).toBe(false)
   })
 })
 
@@ -110,7 +108,7 @@ describe('the record', () => {
 
   it('stays inside the budget: 270 Umas, one tier, under 45 KB (36 steps since v36)', () => {
     const full = withSteps(emptyWindow(), WINDOW_STEP_IDS, T(0))
-    const windows = Object.fromEntries(Array.from({ length: 270 }, (_, i) => [String(100101 + i), { '1': { ...full, champions: 32767 } }]))
+    const windows = Object.fromEntries(Array.from({ length: 270 }, (_, i) => [String(100101 + i), { '1': full }]))
     expect(JSON.stringify(windows).length).toBeLessThan(45_000)
   })
 })
@@ -153,12 +151,13 @@ describe('latchWindows', () => {
 })
 
 describe('the hooks', () => {
-  it('records a won capital champion for each entrant, and nothing for another stage', () => {
+  it('lights a won capital’s World step for every signed entrant', () => {
     const save = started(riftWorldSave(5, 20))
-    const after = recordChampion(save, '1', capitalStageIds('w2', 3).champion, ['101', '102'])
-    expect(after.account.windows!['101']!['1']!.champions).toBe(championBit(2, 3))
-    expect(recordChampion(save, '1', 'w1-1-1-s12', ['101'])).toBe(save)
-    expect(recordChampion(after, '1', capitalStageIds('w2', 3).champion, ['101', '102'])).toBe(after)
+    const after = recordCapitalWin(save, '1', 'w2', ['101', '102'], T(5))
+    expect(stepDay(after.account.windows!['101']!['1']!, 'world-2')).toBe(T(5).slice(0, 10))
+    expect(stepDay(after.account.windows!['102']!['1']!, 'world-2')).toBe(T(5).slice(0, 10))
+    expect(recordCapitalWin(save, '1', 'w6', ['101'], T(5))).toBe(save)
+    expect(recordCapitalWin(after, '1', 'w2', ['101', '102'], T(6))).toBe(after)
   })
 
   it('records the Rift step for a won run\'s twenty', () => {
@@ -181,8 +180,8 @@ describe('Weapons (save v36, D289)', () => {
   })
 
   it('lights a step at five weapon kinds of that grade, any class\'s', () => {
-    expect(ids(windowMet(graded({ greatsword: 4, axe: 4, lance: 4, bow: 4 }), outfit, 1, 0)).filter((id) => id.startsWith('weapons'))).toEqual([])
-    expect(ids(windowMet(graded({ greatsword: 6, axe: 4, lance: 4, bow: 4, katana: 4 }), outfit, 1, 0)).filter((id) => id.startsWith('weapons')))
+    expect(ids(windowMet(graded({ greatsword: 4, axe: 4, lance: 4, bow: 4 }), outfit, 1)).filter((id) => id.startsWith('weapons'))).toEqual([])
+    expect(ids(windowMet(graded({ greatsword: 6, axe: 4, lance: 4, bow: 4, katana: 4 }), outfit, 1)).filter((id) => id.startsWith('weapons')))
       .toEqual(['weapons-1', 'weapons-2'])
   })
 
@@ -205,7 +204,7 @@ describe('Weapons (save v36, D289)', () => {
     save.schemaVersion = 35
     save.account.windows = { '101': { '1': { steps: '08h'.repeat(5) + '---'.repeat(26), champions: 0 } } }
     const parsed = parseSave(save)
-    expect(parsed.schemaVersion).toBe(36)
+    expect(parsed.schemaVersion).toBe(37)
     expect(parsed.account.windows!['101']!['1']!.steps).toBe('08h'.repeat(5) + '---'.repeat(31))
   })
 })
@@ -219,14 +218,17 @@ describe('the board on screen (H155)', () => {
     expect(next.get('craft')).toMatchObject({ numeral: 1, need: 10 })
     expect(next.get('gear')).toMatchObject({ numeral: 1, need: 11, grade: 2 })
     expect(next.get('stars')).toMatchObject({ numeral: 1, need: 4 })
-    expect(next.get('world')).toEqual({ track: 'world', numeral: 1, have: 0, need: 3 })
+    expect(next.get('world')).toEqual({ track: 'world', numeral: 1, have: 0, need: 4 })
   })
 
-  it('counts a continent\'s champions and the moon\'s nodes toward the next step', () => {
-    const save = recordChampion(started(riftWorldSave(1, 10)), '1', capitalStageIds('w1', 2).champion, ['101'])
+  it('counts a run’s finals and the moon’s nodes toward the next step', () => {
+    const save = started(riftWorldSave(20, 10))
+    save.tierWorlds['1']!.capitalRuns = [{ id: 'w1-run1', continent: 'w1', startedAt: T(0), lanes: [0, 1, 2, 3].map((party) => ({
+      party, umas: save.tierWorlds['1']!.parties[party]!.slots as [string, string, string, string, string], generals: 3, finalAt: party === 0 ? T(1) : null,
+    })) as import('./save').CapitalLanes }]
     const her = uma((u) => nodes(u, 1))
     const next = new Map(windowNext(save, her, outfit, '101', 1).map((n) => [n.track, n]))
-    expect(next.get('world')).toMatchObject({ numeral: 1, have: 1, need: 3 })
+    expect(next.get('world')).toMatchObject({ numeral: 1, have: 1, need: 4, run: 'w1-run1' })
     expect(next.get('stars')).toMatchObject({ numeral: 1, have: 4, need: 4 })
   })
 
@@ -257,13 +259,13 @@ describe('save v35', () => {
     const parsed = parseSave(v34)
     expect(parsed.account).toMatchObject({ windows: {}, windowsStart: null })
     expect(parsed.tierWorlds['1']!.drills).toEqual({ day: null, runs: 10, won: {} })
-    const lit = recordChampion(recordRiftWin(newSave('W', T(0)), '1', ['101'], T(5)), '1', capitalStageIds('w1', 2).champion, ['101'])
+    const lit = recordCapitalWin(recordRiftWin(newSave('W', T(0)), '1', ['101'], T(5)), '1', 'w1', ['101'], T(5))
     expect(parseSave(JSON.parse(JSON.stringify(lit))).account.windows).toEqual(lit.account.windows)
   })
 
   it('refuses a malformed record', () => {
     const save = JSON.parse(JSON.stringify(newSave('W', T(0))))
-    save.account.windows = { '101': { '1': { steps: '#'.repeat(108), champions: 0 } } }
+    save.account.windows = { '101': { '1': { steps: '#'.repeat(108) } } }
     expect(() => parseSave(save)).toThrow(/steps/)
     save.account.windows = { '101': { '1': { steps: '---'.repeat(36), champions: 32768 } } }
     expect(() => parseSave(save)).toThrow(/champions/)

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import type { BattleEnemy, BattleWeaknesses, EnemyRank } from '../rpg/battle/types'
 import type { RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgDefaultWeapons, rpgWeaponKind, type RpgClass, type RpgDamageKind } from '../rpg/rules'
-import { capitalChapter } from './capital'
+import { capitalChapter } from './legacy-capital.fixture'
 import { regionChapter, worldContinent } from './world'
 
 const V18 = 18

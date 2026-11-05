@@ -51,7 +51,8 @@ describe('the board’s words', () => {
     expect(nextLabel({ track: 'level', numeral: 4, have: 34, need: 40 })).toBe('Lv 34/40')
     expect(nextLabel({ track: 'class', numeral: 5, have: 41, need: 50 })).toBe('R41/50')
     expect(nextLabel({ track: 'gear', numeral: 3, have: 8, need: 11, grade: 6 })).toBe('8 of 11 at G6')
-    expect(nextLabel({ track: 'world', numeral: 1, have: 1, need: 3 })).toBe('1 of 3')
+    expect(nextLabel({ track: 'world', numeral: 1, have: 0, need: 4 })).toBe('Not run')
+    expect(nextLabel({ track: 'world', numeral: 1, have: 2, need: 4, run: 'w1-run1' })).toBe('2 of 4 finals')
   })
 })
 

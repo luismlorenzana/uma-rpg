@@ -1,7 +1,7 @@
 // The Scenario Gate opens the active tier's world map (D66, D97, H35): five continents, one per scenario of the tier, each ten levels of
 // biome regions with Springs between them, the lower rows climbing its first five levels and the upper its last five; a region's twelve stages; the open fight. Routes: `` (world), `c/<continent>`,
 // `r/<region>`, `capital/<continent>`, `fight`. Canvas maps keep the complete lists one tap away.
-import { biomeById, capitalId, capitalRunNodeOf, capitalRunsLive, capitalStageIds, openFightOf, rpgFinals, rpgMapRoutes, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
+import { biomeById, capitalId, capitalRunNodeOf, openFightOf, springReadyAt, tierKey, worldRun, SaveRuleError, type FightResult as Result, type WorldContinent } from '@rpg/domain'
 import { AtlasSprite } from '@luismlorenzana/uma-kit/content'
 import { lazy, Suspense, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -14,7 +14,6 @@ import { LockIcon } from '../../ui/icons'
 import { formatDuration, useNow } from '../../ui/useNow'
 import type { PageProps } from '../registry'
 import { ActivePartyBar } from './ActiveParty'
-import { CapitalMap } from './CapitalMap'
 import { FightResult } from './FightResult'
 import { FightScreen } from './FightScreen'
 import { clearedIn, continentBandY, continentLayout, worldLayout } from './map/layout'
@@ -34,9 +33,8 @@ export default function ScenarioGatePage({ place, rest }: PageProps) {
         if (kind === 'fight') return <FightRoute campaign={campaign} place={place} />
         if (kind === 'capital' && id) {
           const continent = campaign.continents.find((c) => c.id === id)
-          return continent ? capitalRunsLive()
-            ? <Suspense fallback={<p className="p-3 text-ink-soft">Opening the capital…</p>}><CapitalPage campaign={campaign} continent={continent} place={place} runId={sub === 'run' ? runId : undefined} /></Suspense>
-            : <CapitalMap campaign={campaign} continent={continent} place={place} /> : <p className="p-4 text-ink-soft">Capital not found.</p>
+          return continent ? <Suspense fallback={<p className="p-3 text-ink-soft">Opening the capital…</p>}><CapitalPage campaign={campaign} continent={continent} place={place} runId={sub === 'run' ? runId : undefined} /></Suspense>
+            : <p className="p-4 text-ink-soft">Capital not found.</p>
         }
         if (kind === 'r' && id) {
           const region = campaign.regionInfo(id) ? campaign.region(id) : null
@@ -135,9 +133,6 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
   if (!world) return null
   const cleared = clearedByRegion(worldRun(world).wins)
   const rows = Array.from({ length: 10 }, (_, row) => row)
-  const finals = rpgFinals(continent.order)
-  const wonFinals = rpgMapRoutes(finals).flatMap((_, i) => Object.values(capitalStageIds(continent.id, i + 1)))
-    .filter((id) => (worldRun(world).wins[id] ?? 0) > 0).length
   return (
     <div>
       <div data-map-header className="sticky top-0 z-10 space-y-2 border-b border-hairline bg-page/95 p-3 backdrop-blur">
@@ -156,7 +151,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
           else if (spot.kind === 'capital') nav.sub(place, `capital/${continent.id}`)
           else void drinkAtSpring(spot.id).then(() => setError(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The Spring didn’t answer.'))
         }} describe={(spot) => {
-          if (spot.kind === 'capital') return { label: capitalRunsLive() ? `${continent.name}, ${formatLevel(continent.levelStart + 9)}, ${capitalLine(world, continent.id)}` : `${continent.name}, Capital, ${formatLevel(continent.levelStart + 9)}, ${wonFinals} of 6 cleared`, content: <span className="absolute inset-x-0 bottom-0 rounded-xs bg-page/90 text-[11px] font-bold">{capitalRunsLive() ? capitalLine(world, continent.id) : `Capital · ${wonFinals}/6`}</span> }
+          if (spot.kind === 'capital') return { label: `${continent.name}, ${formatLevel(continent.levelStart + 9)}, ${capitalLine(world, continent.id)}`, content: <span className="absolute inset-x-0 bottom-0 rounded-xs bg-page/90 text-[11px] font-bold">{capitalLine(world, continent.id)}</span> }
           if (spot.kind === 'spring') {
             const ready = springReadyAt(world, spot.id, now)
             return { label: ready ? `Spring, recharges in ${formatDuration(Date.parse(ready) - Date.parse(now))}` : 'Spring, refill party MP', disabled: !!ready || !!openFightOf(world) }
@@ -205,7 +200,7 @@ function ContinentMap({ campaign, continent, place }: { campaign: Campaign; cont
         <button type="button" onClick={() => nav.sub(place, `capital/${continent.id}`)}
           className="flex min-h-14 w-full items-center justify-between gap-2 rounded-md border border-accent/50 bg-raised p-3 text-left">
           <span><span className="block font-display font-bold">{continent.name}</span><span className="block text-[12px] text-ink-soft">Capital · {formatLevel(continent.levelStart + 9)}</span></span>
-          <span className="text-[12px] text-ink-soft">{capitalRunsLive() ? capitalLine(world, continent.id) : `${wonFinals}/6`}</span>
+          <span className="text-[12px] text-ink-soft">{capitalLine(world, continent.id)}</span>
         </button>
       </div>}
     </div>
@@ -226,17 +221,17 @@ export function FightRoute({ campaign, place }: { campaign: Campaign; place: Pag
   const stageId = ended?.nodeId ?? fight?.nodeId
   const region = stageId ? campaign.stageRegion(stageId) : null
   const capital = campaign.continents.find((c) => capitalId(c.id) === region?.id)
-  const runReturn = capitalRunsLive() && stageId ? capitalReturn(stageId, ended?.result.capital?.won) : null
+  const runReturn = stageId ? capitalReturn(stageId, ended?.result.capital?.won) : null
   const toRegion = () => navigate(pagePath(place, runReturn ?? (capital ? `capital/${capital.id}` : region ? `r/${region.id}` : '')), { replace: true })
   if (!region) return <p className="p-4 text-ink-soft">No fight is open.</p>
   if (ended) {
-    const ref = capitalRunsLive() ? capitalRunNodeOf(ended.nodeId) : null
+    const ref = capitalRunNodeOf(ended.nodeId)
     const again = ref ? capitalAgain(ended.result) : null
     return (
       <>
         <FightResult campaign={campaign} chapter={region} result={ended.result} onMap={toRegion} engine={shownFight.current?.version}
           againLabel={again?.label}
-          onAgain={ref && !again ? undefined : () => {
+          onAgain={(ref && !again) || !region.nodes.some((n) => n.id === ended.nodeId) ? undefined : () => {
             setError(null)
             const start = ref && again ? beginCapitalFight(region, ref.runId, again.lane, again.kind, campaign.outfits) : beginFight(region, ended.nodeId, campaign.outfits)
             start.then(() => setEnded(null), (err: unknown) => setError(err instanceof SaveRuleError ? err.message : 'The fight couldn’t start.'))

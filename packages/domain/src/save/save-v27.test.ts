@@ -28,7 +28,7 @@ function editedV32Uma(id: string, change: (uma: Raw) => void): unknown {
 
 describe('save v27 (H69, live since H72)', () => {
   it('runs with the Tier rework’s fight and economy live, Classes v3 (H134) and the save v36', () => {
-    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), RPG_WEAPON_SLOTS, SAVE_SCHEMA_VERSION]).toEqual([21, true, 3, 36])
+    expect([BATTLE_ENGINE_VERSION, rpgRework('fight'), RPG_WEAPON_SLOTS, SAVE_SCHEMA_VERSION]).toEqual([21, true, 3, 37])
   })
 
   it('parses a v26 world through the chain: three weapons, lines and every Uma’s calling, which v32 records and resets', () => {

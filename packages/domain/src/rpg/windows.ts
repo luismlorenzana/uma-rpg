@@ -2,7 +2,6 @@
 // tier. This is the catalog only, pure: its ids, the order the save keeps them in, and each step's numbers. What her state
 // meets is `save/windows.ts`'s. Weapons joined the board with save v36 (D289), at the record's end.
 
-import { capitalRunsLive } from '../save/collections'
 
 /** The tracks in the board's order, top to bottom. */
 export const WINDOW_TRACKS = ['level', 'class', 'craft', 'gear', 'weapons', 'stars', 'world'] as const
@@ -32,8 +31,6 @@ export const WINDOW_GRADES = [2, 4, 6, 8, 10] as const
 export const WINDOW_WEAPONS = 5
 /** Stars n: her open nodes then (every Planet and moon node numbered n or less, her moon's I from II and II from IV). */
 export const WINDOW_NODES = [4, 9, 13, 18, 22] as const
-/** World n: a continent's three capital champions. */
-export const WINDOW_ROUTES = 3
 
 export interface WindowStep {
   id: WindowStepId
@@ -57,7 +54,7 @@ function rule(track: WindowTrack, n: WindowNumeral, tier: number): string {
     case 'gear': return `All eleven worn slots at G${WINDOW_GRADES[i]}`
     case 'weapons': return `Five weapons at G${WINDOW_GRADES[i]}`
     case 'stars': return n === 5 ? 'The whole map: 22 nodes' : `Every node to ${['I', 'II', 'III', 'IV'][i]}: ${WINDOW_NODES[i]} nodes`
-    case 'world': return `Continent ${tierFirstContinent(tier) + i}: ${capitalRunsLive() ? 'a won capital run' : "its capital's three champions"}`
+    case 'world': return `Continent ${tierFirstContinent(tier) + i}: a won capital run`
   }
 }
 
