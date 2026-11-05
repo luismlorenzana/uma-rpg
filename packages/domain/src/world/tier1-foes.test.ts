@@ -5,7 +5,7 @@
 // R1's shields, 6 and 8 (class-progression.md §4, §14; D202, D207). H116 leaves that engine-v17 generation frozen while
 // v18 deals weaknesses v2. v15's digest, 719d3a73, stays pinned with the engine named in `twins-v16.test.ts`.
 import { describe, expect, it } from 'vitest'
-import { capitalChapter } from './capital'
+import { capitalChapter } from './legacy-capital.fixture'
 import { regionChapter, worldContinent } from './world'
 
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))

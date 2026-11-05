@@ -1,5 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
-vi.mock('./version', () => ({ SAVE_SCHEMA_VERSION: 37 }))
+import { describe, expect, it } from 'vitest'
 
 import { autoAction } from '../rpg/battle/auto'
 import { battleActionsLeft, replayBattle } from '../rpg/battle/engine'
@@ -7,7 +6,8 @@ import type { BattleEnemy } from '../rpg/battle/types'
 import { rpgBattleExp, rpgBattleLaurels } from '../rpg/campaign/rewards'
 import { rpgExpToNext } from '../rpg/rules'
 import { windowBoard } from '../rpg/windows'
-import { capitalRunChapter, capitalStageIds } from '../world/capital'
+import { capitalRunChapter } from '../world/capital'
+import { capitalStageIds } from '../world/legacy-capital.fixture'
 import { capitalRunNodeId } from '../world/capital-run-id'
 import { worldContinent } from '../world/world'
 import { actInFight, retreat } from './battle'
@@ -19,7 +19,7 @@ import { ids, outfit, ROSTER, T, TWENTY } from './rift-rules.fixture'
 import { worldOf } from './rules'
 import { newOwnedUma, newSave, parseSave, parseSaveAsync, type CapitalLane, type Save } from './save'
 import { emptyWindow, stepDay, withSteps } from './window-record'
-import { latchWindows, recordCapitalWin, recordChampion, windowMet, windowNext } from './windows'
+import { latchWindows, recordCapitalWin, windowMet, windowNext } from './windows'
 
 const c1 = worldContinent({ order: 1, name: 'Test Continent' })
 const outfits = new Map(ids(101, 100).map((id) => [id, outfit(id)]))
@@ -56,7 +56,7 @@ function fight(s: Save, lane: number, kind: 'general' | 'final', id = 'w1-run1',
   return win(startCapitalFight(s, chapter(id), id, lane, kind, outfits, T(at)), id, at + 1)
 }
 
-describe('capital runs live at v37 in this suite, dark in production', () => {
+describe('capital runs live at v37', () => {
   it('creates only the new empty fields and round trips at v37, synchronously and on browser boot', async () => {
     expect(capitalRunsLive()).toBe(true)
     const s = ready()
@@ -69,7 +69,7 @@ describe('capital runs live at v37 in this suite, dark in production', () => {
   })
 
   it('migrates v36, keeping every lit step, old map win and timestamp, and dropping only champions', async () => {
-    const s = ready()
+    const s = JSON.parse(JSON.stringify(ready()))
     s.schemaVersion = 36
     delete world(s).capitalRuns; delete world(s).capitals
     world(s).world.run.wins['w1-capital-r1-s2'] = 2
@@ -256,12 +256,11 @@ describe('the sixteen fights', () => {
 })
 
 describe('World steps at v37', () => {
-  it('names a won run, ignores old champion masks and old stage wins on a normal latch, and shows Not run progress', () => {
+  it('names a won run, ignores retired stage wins on a normal latch, and shows Not run progress', () => {
     const s = ready()
     for (const route of [1, 2, 3]) world(s).world.run.wins[capitalStageIds('w1', route).champion] = 1
     expect(windowBoard(2, true).find((n) => n.id === 'world-1')!.rule).toBe('Continent 6: a won capital run')
-    expect(windowMet(world(s).umas['101']!, outfits.get('101')!, 1, 32767).has('world-1')).toBe(false)
-    expect(recordChampion(s, '1', 'w1-capital-r1-s2', ['101'])).toBe(s)
+    expect(windowMet(world(s).umas['101']!, outfits.get('101')!, 1).has('world-1')).toBe(false)
     const latched = latchWindows(s, outfits, T(5))
     expect(stepDay(latched.account.windows!['101']!['1']!, 'world-1')).toBeNull()
     expect(windowNext(latched, world(s).umas['101']!, outfits.get('101')!, '101', 1).find((n) => n.track === 'world'))
@@ -318,7 +317,7 @@ describe('strict capital parsing', () => {
     ['fractional counter', (s) => { world(s).capitals!.w1!.started = 1.5 }],
     ['more wins than starts', (s) => { world(s).capitals!.w1!.won = 2 }],
     ['foreign capital counter', (s) => { world(s).capitals!.w6 = { started: 0, won: 0, recent: [] } }],
-    ['old champion field at v37', (s) => { s.account.windows = { '101': { '1': { ...emptyWindow(), champions: 0 } } } }],
+    ['old champion field at v37', (s) => { Object.assign(s.account, { windows: { '101': { '1': { ...emptyWindow(), champions: 0 } } } }) }],
   ]
   it.each(cases)('refuses %s', (_name, change) => { const s = signed(); change(s); expect(() => parseSave(s)).toThrow() })
 

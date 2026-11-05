@@ -1,7 +1,7 @@
 // Save v34's migration (D264), unmocked: `toV34` on raw v33 worlds. Her slot stays slot 1 and two empty ones join it, a Bell
 // loses its kind as it becomes the Charm, Planet Jewels in stock count three each, and her moon opens where its rank is set.
 import { describe, expect, it } from 'vitest'
-import { migrateWorld, toV34, toV35 } from './migrations'
+import { toV37, migrateWorld, toV34, toV35 } from './migrations'
 import { worldOf } from './rules'
 import { newOwnedUma, newSave, parseSave, type Save } from './save'
 import { SAVE_SCHEMA_VERSION } from './version'
@@ -56,11 +56,11 @@ describe('toV34: jewels', () => {
 })
 
 describe('toV34: the chain', () => {
-  it('is chained: migrateWorld runs it on a v33 world, then toV35, and not on a v35 one', () => {
+  it('is chained: migrateWorld runs it on a v33 world, then toV35, and not on a current one', () => {
     const raw = world({ 1: uma() }, { 'jewel-planet-1': 1 })
-    expect(migrateWorld(raw, 33)).toEqual(toV35(toV34(raw)))
+    expect(migrateWorld(raw, 33)).toEqual(toV37(toV35(toV34(raw))))
     expect(migrateWorld(raw, SAVE_SCHEMA_VERSION)).toBe(raw)
-    expect(SAVE_SCHEMA_VERSION).toBe(36)
+    expect(SAVE_SCHEMA_VERSION).toBe(37)
   })
 
   it('leaves anything malformed for the strict parse', () => {
@@ -68,14 +68,14 @@ describe('toV34: the chain', () => {
     expect(() => toV34({})).not.toThrow()
   })
 
-  it('parses a stored v33 save to v36, three slots on every Uma, which round-trips', () => {
+  it('parses a stored v33 save to v37, three slots on every Uma, which round-trips', () => {
     const save = newSave('Slots', '2026-10-30T12:00:00.000Z') as unknown as Raw
     const w = (save.tierWorlds as Record<string, Raw>)['1']!
     w.items = { 'jewel-planet-2': 2 }
     w.umas = { 101: { ...newOwnedUma('2026-10-30T12:00:00.000Z'), gear: { weapons: {}, armor: {}, accessories: [EMPTY] } } }
     const stored = JSON.parse(JSON.stringify({ ...save, schemaVersion: 33 })) as Raw
     const parsed: Save = parseSave(stored)
-    expect(parsed.schemaVersion).toBe(36)
+    expect(parsed.schemaVersion).toBe(37)
     expect(worldOf(parsed).umas['101']!.gear).toMatchObject({ accessories: [EMPTY, EMPTY, EMPTY] })
     expect(worldOf(parsed).items).toEqual({ 'jewel-planet-2': 6 })
     expect(parseSave(JSON.parse(JSON.stringify(parsed)))).toEqual(parsed)

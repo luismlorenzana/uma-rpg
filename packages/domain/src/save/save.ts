@@ -59,7 +59,7 @@ import { migrateWorld, type TierGrant } from './migrations'
 import { SAVE_SCHEMA_VERSION } from './version'
 import { CAPITAL_RUNS_SAVE, capitalRunsLive, collectionsLive, WEAPONS_SAVE } from './collections'
 import { capitalRunNodeOf, capitalRunOf } from '../world/capital-run-id'
-import { validSteps, widenSteps, WINDOW_CHAMPIONS_MAX, type WindowRecord, type WindowRecords } from './window-record'
+import { validSteps, widenSteps, type WindowRecord, type WindowRecords } from './window-record'
 
 export type { TierGrant } from './migrations'
 
@@ -495,12 +495,9 @@ function parseWindows(value: unknown, path: string): WindowRecords {
     for (const [key, rec] of Object.entries(object(raw, at, Object.keys((raw as Obj | null) ?? {})))) {
       const rp = `${at}.${key}`
       if (!/^[1-9]\d{0,2}$/.test(key)) throw new SaveParseError(rp, 'tier keys are positive integers')
-      const r = object(rec, rp, capitalRunsLive() ? ['steps'] : ['steps', 'champions'])
+      const r = object(rec, rp, ['steps'])
       if (!validSteps(r.steps)) throw new SaveParseError(`${rp}.steps`, `expected ${WINDOW_STEPS_MAX} three-character day codes`)
-      if (capitalRunsLive()) { tiers[key] = { steps: r.steps }; continue }
-      const champions = count(r.champions, `${rp}.champions`)
-      if (champions > WINDOW_CHAMPIONS_MAX) throw new SaveParseError(`${rp}.champions`, `expected 0–${WINDOW_CHAMPIONS_MAX}`)
-      tiers[key] = { steps: r.steps, champions }
+      tiers[key] = { steps: r.steps }
     }
     out[id] = tiers
   }

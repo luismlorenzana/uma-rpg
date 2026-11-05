@@ -61,6 +61,8 @@ import { TIERS } from '../save/rules'
 import { DRILL_RUNS_A_DAY, DRILL_RUNS_MAX } from '../save/save'
 import { DRILL_LOGS, DRILL_NUMERALS, logExp } from '../rpg/drills'
 import { windowBoard, type WindowStepId } from '../rpg/windows'
+import { RPG_FINALS_LANES } from '../rpg/campaign/finals'
+import { CAPITAL_RUN_GENERALS } from '../world/capital-run-id'
 import { rpgTierLevel } from '../rpg/campaign/chapters'
 import { BIOMES, signatureWeaknesses } from '../world/biomes'
 import {
@@ -690,6 +692,7 @@ function world(): string {
     ['Regions', `40 per continent in ${WORLD_ROWS} rows of ${WORLD_REGIONS_PER_ROW}, each climbing ${WORLD_REGION_LEVELS} levels: rows 1–5 the continent's first five, rows 6–10 its last five. Every biome at least twice; the first is a Meadow`],
     ['Stages', `${WORLD_STAGES} per region: 10 regular climbing its levels two at a time, then an elite (11) and the boss (12) at its top level`],
     ['Springs', `5 per continent, one every two rows; recharge ${SPRING_RECHARGE_MS / 3600000} h`],
+    ['Capitals', `Runs of ${RPG_FINALS_LANES} full parties: ${CAPITAL_RUN_GENERALS} generals a lane, then ${RPG_FINALS_LANES} finals; ${RPG_FINALS_LANES * (CAPITAL_RUN_GENERALS + 1)} fights at the continent's top level`],
     ['Waves pay', x(WAVE_PAY)],
   ])
 }

@@ -1,14 +1,11 @@
 // A window's record in the save (collections.md §8, D283): kept small, because the save is one document. Each step is
-// three base-36 characters in the catalog's order, the day it lit as days since 2026-01-01 (UTC), `---` while dark; the
-// capital champions she has beaten are a 15-bit mask. No save import here, so `save.ts` can parse it without a cycle.
-import { WINDOW_ROUTES, WINDOW_STEP_IDS, WINDOW_STEPS_MAX, type WindowStepId } from '../rpg/windows'
-import { capitalRunsLive } from './collections'
+// three base-36 characters in the catalog's order, the day it lit as days since 2026-01-01 (UTC), `---` while dark.
+// World steps light on won capital runs (v37). No save import here, so `save.ts` can parse it without a cycle.
+import { WINDOW_STEP_IDS, WINDOW_STEPS_MAX, type WindowStepId } from '../rpg/windows'
 
 export interface WindowRecord {
   /** `WINDOW_STEPS_MAX` × 3 characters. */
   steps: string
-  /** Bit 3 × (n − 1) + (route − 1): continent n of her tier's five, route 1–3. Absent from save v37 (H160). */
-  champions?: number
 }
 
 /** The account's windows: by outfit id, then by tier key ("1", "2"…). */
@@ -19,9 +16,7 @@ const DAY = 86_400_000
 export const WINDOW_DARK = '---'
 export const WINDOW_CODE = /^(?:---|[0-9a-z]{3})$/
 export const WINDOW_STEPS_LENGTH = WINDOW_STEPS_MAX * 3
-export const WINDOW_CHAMPIONS_MAX = 2 ** (5 * WINDOW_ROUTES) - 1
-
-export const emptyWindow = (): WindowRecord => ({ steps: WINDOW_DARK.repeat(WINDOW_STEPS_MAX), ...(capitalRunsLive() ? {} : { champions: 0 }) })
+export const emptyWindow = (): WindowRecord => ({ steps: WINDOW_DARK.repeat(WINDOW_STEPS_MAX) })
 
 /** The day a time falls on, as the record's code. */
 export function dayCode(now: string): string {
@@ -51,13 +46,6 @@ export function withSteps(record: WindowRecord, ids: Iterable<WindowStepId>, now
   }
   return steps === record.steps ? record : { ...record, steps }
 }
-
-/** The bit of continent n's route (1–3) in her tier's mask. */
-export const championBit = (continent: number, route: number): number => 2 ** (WINDOW_ROUTES * (continent - 1) + (route - 1))
-
-/** Whether all three of continent n's champions are in the mask. */
-export const championsWon = (mask: number, continent: number): boolean =>
-  [1, 2, 3].every((route) => Math.floor(mask / championBit(continent, route)) % 2 === 1)
 
 /** A save v35 record's steps (31) as v36's (D289): the five Weapons steps at the end, dark, or, when every v35 step was
  * lit (a full window, an ascended Uma's among them), lit on its latest day so a full window stays full. */

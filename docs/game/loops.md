@@ -1,6 +1,6 @@
 # Game loops
 
-What the player does, what it pays and what it costs, as the game runs on engine v21 and save v36. Numbers come from the
+What the player does, what it pays and what it costs, as the game runs on engine v21 and save v37. Numbers come from the
 code: generated tables between `live` markers, the rest checked against `packages/domain/src/economy/`, `items/`,
 `work/`, `save/`, `rpg/campaign/rewards.ts` and `rift/`. A tier's next world opens when the first Uma whose window is
 full ascends from the tier below ([windows](#windows), [Ascend](#ascend); the pages are in
@@ -69,8 +69,8 @@ Uma EXP to next level: 120 + 16 × level, up to Lv 50. A stage pays its weight �
 - **Uma EXP is never sped up (D102):** a stage pays a share of **her own** level, so a Lv 1 Uma in a Lv 40 fight still
   gains about a third of a level. Fighting below her level pays less; above it, no more.
 - A regular stage at her level pays about a third of a level: about three fights a level-up. A region's twelve first
-  clears carry a party across its five levels, a little short of the next region's first level (D97). A capital's Finals
-  pay half their EXP ([maps](maps.md)).
+  clears carry a party across its five levels, a little short of the next region's first level (D97). A capital run's
+  generals pay half sub-boss EXP and its final the two-wave boss rate ([maps](maps.md#capitals)).
 - **Her Uma Level** sets her stats, her skill slots (3 → 7), the grades her gear can reach (Lv 5g − 4) and the Extra
   Stats nodes she can open. Skills open with **Class Rank** ([ranks](#ranks)).
 
@@ -131,7 +131,8 @@ A stage in waves pays ×1.5 EXP and Laurels. Replays and Sweeps pay 25% of the f
 - **Lv 41–50** stages pay their Laurels ×4 (D82).
 - **Laurels × tier:** the table is Tier 1's; a stage pays its tier's multiple, so Tier 2's regions and capitals pay
   twice. A region's tier is its continent's: `w6`–`w10` are Tier 2 (D170).
-- A capital's Finals pay Laurels at these rates and half their EXP ([maps](maps.md)).
+- A capital run uses these Laurels rates; its generals pay half sub-boss EXP and its finals the two-wave boss rate.
+  Each Uma's World step determines full or quarter pay ([maps](maps.md#capitals)).
 - A loss, or giving up, pays nothing and costs nothing (MP is as it was before the fight).
 
 ## Currencies
@@ -460,6 +461,13 @@ The daily farm (D283, D286; `save/drills.ts`, behind `@rpg/domain/drills`; the p
 | A Training Log | A third of her next level in Uma EXP (Lv 1: 46 · Lv 10: 94 · Lv 30: 200 · Lv 49: 302), 2× that to the class she fights as, and Uma Shards by level in Tier 1; read up to Lv 50 |
 <!-- /live -->
 
+## Capital runs
+
+At **Scenario Gate → continent → Capital**, start a run with four full parties. Each frozen party walks its lane's
+three generals; after all twelve, the four finals open. Winning the fourth lights World n for the twenty. Every fight
+starts full without changing carried MP; retries are free, and Abandon frees the twenty while losing its progress.
+An Uma in an open run cannot sign up to another or ascend. See [Capitals](maps.md#capitals) for foes, pay and limits.
+
 ## The Rift
 
 The end-of-tier event ([the Rift](../design/rift.md), D161, D168; its run rules and Ascend in H48, D174). Its foes are
@@ -541,20 +549,20 @@ lights pane by pane as she earns her tier's **board**, her face last, and only a
     grows by its grade, raised on the Gear tab of a class that holds it). With Class V's three classes at Rank 50, it's
     the board's ask of a well-rounded Uma.
   - **Stars:** every node to I, II, III and IV (4, 9, 13, 18 open, her moon's from II and IV), then the whole map, 22.
-  - **World:** continent n's capital's three champions beaten with her in the party (Tier 2's are continents 6 to 10).
-    Each won champion records the bit for the party's five (`recordChampion`).
-  - **The Rift:** on the roster of a won run (`recordRiftWin`). Tier 3 has none yet: its board is 30.
+  - **World:** on a won run of continent n's capital (Tier 2's are continents 6 to 10). The fourth final lights the step
+    for all twenty signed Umas (`recordCapitalWin`).
+  - **The Rift:** on the roster of a won run (`recordRiftWin`). Tier 3 has none yet: its board is 35.
 - **Latching (CO2):** the first time her state meets a step it's hers, dated that day, for good. A class switch, a lower
   grade, Classes v3's kind of reset and an ascension never darken one. Every change on the device checks every Uma
   (`latchWindows`, in the store's commit), and so does opening the save once the roster has loaded. A latch doesn't move
   `updatedAt`: any device works out the same steps from the same state.
 - **Per tier:** a step is earned in the tier she's in. Her lower tiers' windows stay as they were when she ascended.
 - **The switch's credit** (collections.md §9): the first time a save latches (`windowsStart` empty), every step each
-  Uma's state meets; World for an Uma at a continent's top level (10n in Tier 1) in a world that has won its three
+  Uma's state meets; for a save from before v35, World for an Uma at a continent's top level (10n in Tier 1) in a world that has won its three
   champions; the Rift step for every roster of a won run; and a full window for each tier an Uma ascended from, dated
   the day she did.
 - **The record:** `account.windows[outfit][tier]`, 36 three-character day codes (`---` dark: save v35's 31 in their
-  order, then the five Weapons steps) and a 15-bit mask of the champions she beat, about 150 bytes an Uma a tier;
+  order, then the five Weapons steps), about 130 bytes an Uma a tier; no champion mask from save v37.
   `account.windowsStart` is the switch's day. Save v36 gave every v35 record its Weapons steps dark, or, on a window
   already full, lit on its last day.
 - **The reveal** (P84): her window is drawn from the release's `outfit-glass` and its pane map, `outfit-glass-order`.
@@ -596,11 +604,11 @@ lights pane by pane as she earns her tier's **board**, her face last, and only a
 | Stars III | Every node to III: 13 nodes | Every node to III: 13 nodes | Every node to III: 13 nodes |
 | Stars IV | Every node to IV: 18 nodes | Every node to IV: 18 nodes | Every node to IV: 18 nodes |
 | Stars V | The whole map: 22 nodes | The whole map: 22 nodes | The whole map: 22 nodes |
-| World I | Continent 1: its capital's three champions | Continent 6: its capital's three champions | Continent 11: its capital's three champions |
-| World II | Continent 2: its capital's three champions | Continent 7: its capital's three champions | Continent 12: its capital's three champions |
-| World III | Continent 3: its capital's three champions | Continent 8: its capital's three champions | Continent 13: its capital's three champions |
-| World IV | Continent 4: its capital's three champions | Continent 9: its capital's three champions | Continent 14: its capital's three champions |
-| World V | Continent 5: its capital's three champions | Continent 10: its capital's three champions | Continent 15: its capital's three champions |
+| World I | Continent 1: a won capital run | Continent 6: a won capital run | Continent 11: a won capital run |
+| World II | Continent 2: a won capital run | Continent 7: a won capital run | Continent 12: a won capital run |
+| World III | Continent 3: a won capital run | Continent 8: a won capital run | Continent 13: a won capital run |
+| World IV | Continent 4: a won capital run | Continent 9: a won capital run | Continent 14: a won capital run |
+| World V | Continent 5: a won capital run | Continent 10: a won capital run | Continent 15: a won capital run |
 | Rift | On a won Rift run | On a won Rift run | — |
 
 Tier 1: 36 steps · Tier 2: 36 steps · Tier 3: 35 steps.

@@ -16,7 +16,7 @@ import { RIFT_FRONT_SPECS, riftGuidedBuild, riftTuning } from '../rift/fronts'
 import { riftFight } from '../rift/generate'
 import { packRoster } from '../rift/roster.fixture'
 import { RIFT_FRONTS } from '../rift/state'
-import { capitalChapter } from './capital'
+import { capitalChapter } from './legacy-capital.fixture'
 import { regionChapter, worldContinent } from './world'
 
 const cast = Array.from({ length: 30 }, (_, i) => ({ id: `c${i}`, name: `Rival ${i}` }))

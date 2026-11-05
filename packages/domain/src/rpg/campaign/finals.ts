@@ -12,8 +12,6 @@ export interface RpgFinalsFoe {
 }
 export interface RpgFinalsRoute { name: string; line: string; vanguard: RpgFinalsFoe; champion: RpgFinalsFoe }
 export interface RpgFinals { routes: readonly [RpgFinalsRoute, RpgFinalsRoute, RpgFinalsRoute, RpgFinalsRoute] }
-/** The routes today's capital and the legacy chapter hold, until capital runs replace them (H162). */
-export const RPG_FINALS_ROUTES = 3
 /** A capital run's lanes: every authored route (D293). */
 export const RPG_FINALS_LANES = 4
 
@@ -176,8 +174,6 @@ const SLUG_ORDER = ['ura-finale', 'unity-cup', 'trackblazer', 'grand-concert', '
   'great-food-festival', 'mecha-umamusume', 'twinkle-legends', 'design-your-island', 'yukoma-hot-springs', 'beyond-dreams', 'tracen-diner'] as const
 export const RPG_FINALS: readonly RpgFinals[] = SLUG_ORDER.map((slug) => BY_SLUG[slug]!)
 
-/** The three routes today's capital and the legacy chapter read (`RPG_FINALS_ROUTES`), until H162. */
-export const rpgMapRoutes = (finals: RpgFinals): readonly RpgFinalsRoute[] => finals.routes.slice(0, RPG_FINALS_ROUTES)
 
 /** A chapter's Finals by release order. A scenario newer than the fourteen authored ones reuses them in turn until it gets its own. */
 export function rpgFinals(order: number): RpgFinals {

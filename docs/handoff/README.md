@@ -52,7 +52,7 @@ the Warrior and the Mage promote into three Tier 1 classes, the Spellblade, the 
 
 **Capitals v2** ([design](../design/capitals/capitals.md), [preview](../design/capitals/previews/capitals.html), approved
 D293): each capital becomes runs of four full parties, four lanes of three generals, then four final bosses; World n
-lights on a won run. Built dark behind `capitalRunsLive()` (save v37), switched on by H162. Every packet can go to ChatGPT.
+lights on a won run. Save v37 activates the run rules and screens (H162); the old three-route capital is removed.
 
 | Id | What | Who | Size | Needs | State |
 |---|---|---|---|---|---|

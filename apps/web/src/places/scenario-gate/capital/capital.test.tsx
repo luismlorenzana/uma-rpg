@@ -19,9 +19,6 @@ import { CapitalRunPage } from './CapitalRunPage'
 import { NewRun } from './NewRun'
 import { CAPITAL_WORDS, capitalAgain, capitalLine, capitalResultLine, capitalReturn, finalLock, generalLine, partyBlock, runCount, runName, runParties, startLabel } from './capital-view'
 
-vi.mock('../../../../../../packages/domain/src/save/version', () => ({ SAVE_SCHEMA_VERSION: 37 }))
-const live = vi.hoisted(() => ({ on: true }))
-vi.mock('@rpg/domain', async (original) => ({ ...await original<typeof import('@rpg/domain')>(), capitalRunsLive: () => live.on }))
 let campaign: Campaign
 vi.mock('../../../battle/campaign', async (original) => ({ ...await original<typeof import('../../../battle/campaign')>(), CampaignGate: ({ children }: { children: (c: Campaign) => ReactNode }) => children(campaign) }))
 vi.mock('../../../battle/CastFace', () => ({ CastFace: ({ castId }: { castId: string }) => <span>{castId}</span> }))
@@ -53,7 +50,7 @@ function show(s: Save, children: ReactNode) {
   useGame.setState({ save: s, status: 'ready', activeTier: 1, uid: null })
   return render(<MotionRoot features={domMax}><MemoryRouter initialEntries={['/battle/scenario-gate/capital/w1']}><Location />{children}</MemoryRouter></MotionRoot>)
 }
-beforeEach(() => { live.on = true; vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true); setReducedMotion(true) })
+beforeEach(() => { vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true); setReducedMotion(true) })
 afterEach(() => { cleanup(); resetGame(); vi.unstubAllGlobals() })
 
 describe('capital runs’ screens (H161)', () => {
@@ -143,7 +140,7 @@ describe('capital runs’ screens (H161)', () => {
     expect(useGame.getState().save?.tierWorlds['1']!.capitalRuns).toEqual([])
   })
 
-  it('resolves run chapters after reload, titles their shared fights and keeps legacy capitals dark', async () => {
+  it('resolves run chapters after reload and titles their shared fights', async () => {
     await fixture()
     const chapter = campaign.region('w1-run2')!
     expect(chapter).toEqual(capitalRunChapter(campaign.continents[0]!, 'w1-run2', campaign.roster))
@@ -152,12 +149,11 @@ describe('capital runs’ screens (H161)', () => {
     const s = await fixture(), world = s.tierWorlds['1']!
     world.world.run.battle = { nodeId: 'w1-run2-l2-g2' } as typeof world.world.run.battle
     expect(campaignFightSource(world, chapter, null)).toMatchObject({ title: 'Mile Final', name: 'General 2', back: 'Back to the run' })
-    live.on = false
-    expect(campaign.region('w1-run2')).toBeNull()
+    expect(campaign.region('w1-capital')?.nodes).toEqual([])
+    cleanup()
     show(await fixture(), <ScenarioGatePage place={place} rest="capital/w1" />)
-    expect(document.querySelector('[data-capital-page]')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'New run' })).toBeNull()
-    expect(screen.getAllByRole('button', { name: /^Stage / })).toHaveLength(6)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'New run' })).toBeTruthy())
+    expect(screen.queryByRole('button', { name: /^Stage / })).toBeNull()
   })
 
   it('renders result progress, retry/next choices, and returns the fourth final to the capital', async () => {
@@ -189,12 +185,11 @@ describe('capital runs’ screens (H161)', () => {
     expect(screen.getByText('No fight is open.')).toBeTruthy()
   })
 
-  it('shows World’s run progress, while retaining the old champions wording in the dark', () => {
+  it('shows World’s run progress', () => {
     expect(nextLabel({ track: 'world', numeral: 1, have: 0, need: 4 })).toBe('Not run')
     expect(nextLabel({ track: 'world', numeral: 1, have: 2, need: 4, run: 'w1-run3' })).toBe('2 of 4 finals')
     expect(TRACK_SOURCE.world).toBe('Capital runs')
-    live.on = false
-    expect(nextLabel({ track: 'world', numeral: 1, have: 1, need: 3 })).toBe('1 of 3')
+
   })
 
   it('keeps view words compact and continent markers honest', async () => {

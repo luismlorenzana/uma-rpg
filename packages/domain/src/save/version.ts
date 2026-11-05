@@ -3,4 +3,5 @@
 // collections: every Uma's window, Drills and Training Logs, and Ascend one Uma at a time. v36 (D289): the window's
 // Weapons steps.
 
-export const SAVE_SCHEMA_VERSION = 36
+// v37 (D302, H162): capital runs; World lights on a won run, and champion masks leave window records.
+export const SAVE_SCHEMA_VERSION = 37

@@ -1,6 +1,6 @@
 # Game sections
 
-Every screen and what is on it, as the game runs today (engine v21, save v36). This page says where things show; the
+Every screen and what is on it, as the game runs today (engine v21, save v37). This page says where things show; the
 rules and numbers behind them are on the other pages, linked from each section. The place list comes from
 `packages/domain/src/hub/places.ts`. Each place's screens live in `apps/web/src/places/<place>/`, registered in
 `places/registry.tsx`; the shell and the Hub are `apps/web/src/hub/`.
@@ -240,7 +240,7 @@ The collections on screen (H155, D283, D287; the rules are [loops](loops.md#wind
     ("60%"), of five tiles ("Lv 30", "R30", "2 at R50", "Craft 20", "G6", "5 at G6", "Stars III", "Cont. 7"), then the
     **Rift** tile across. A
     lit tile shows its day ("2 Nov"), a row's next tile what's left ("Lv 34/40", "R41/50", "Craft 22/30", "8 of 11 at
-    G6", "3 of 5 at G6", "10/13", "1 of 3"), the rest are dark. A tap writes the tile's rule and where it comes from under the board
+    G6", "3 of 5 at G6", "10/13", World's "Not run" or "2 of 4 finals"), the rest are dark. A tap writes the tile's rule and where it comes from under the board
     ("All eleven worn slots at G6 · Made items");
   - a full window in a tier with a Rift: **Ready to ascend · Gallery** (from the Gallery, **Ready to ascend** opens its
     Ascend sheet);
@@ -542,7 +542,7 @@ every Uma's window in the world, most complete first, where the Observatory stoo
 
 ### Scenario Gate
 
-Routes: `/battle/scenario-gate`, then `c/:continent`, `r/:region`, `capital/:continent` and `fight`
+Routes: `/battle/scenario-gate`, then `c/:continent`, `r/:region`, `capital/:continent`, `capital/:continent/run/:runId` and `fight`
 (`places/scenario-gate/`; the world is [the world map](maps.md)).
 
 - **Every map screen's header:** its name and levels, **Map / List** (remembered on the device), the active party bar,
@@ -558,13 +558,22 @@ Routes: `/battle/scenario-gate`, then `c/:continent`, `r/:region`, `capital/:con
   world yet show "Tier 2 locked".
 - **Continent:** forty regions in ten rows of four, climbing from the bottom, under two headings: its first five levels,
   then its last five (D97). **Springs** sit between rows ("◆ Spring · refill the party's MP", or "recharges in 1h 20m";
-  off during a fight). The **Capital** shows "Capital · Lv 10" and "2/6". Each region shows its biome icon, name and
+  off during a fight). The **Capital** shows its level and "Capital · 2 runs won", or "Capital · open run". Each region shows its biome icon, name and
   "5/12" or "Cleared ✓".
 - **Region:** "Lv 1–5 · 3/12 cleared", **Spring · MP** beside Map/List, and its twelve stages on a path or in a list.
   Each stage: its number (a boss or elite stage, her leader's face), name with ★ (boss) or ♛ (elite), elements, "Lv 3 ·
   2 waves · 9 foes", and "✓ ×3", "open" or "locked".
-- **Capital:** three routes, each with its name, its line, its elements and "1/2": a Vanguard ♛, then a Champion ★.
-- **The stage sheet:** "Lv 3 · Stage" ("Elite", "Region boss"; a capital's "Vanguard" and "Champion"), its elements and
+- **Capital:** its live master-data name, level and "Runs won: 2"; open runs as cards ("Run 3", "Parties 1, 2, 5, 6",
+  "7/16", lanes/finals pips), then **New run**.
+- **New run:** one sheet, four authored lanes with their line and elements and a party each. A party list replaces the
+  sheet body inline; eligible parties first, others greyed with "Not full", "In Run 2", "Two healers" or "Picked for
+  another lane". **Start run · 3 of 4 parties** is disabled until four valid choices; **Start run** opens the run page.
+- **Run:** four lane cards, each with its party label, its five signed faces, generals' pips, "General 2 of 3 · Lv 10"
+  and **Fight**, or "Through ✓". Fight opens the next general's foe sheet, then its footer starts the fight.
+  **The Final** waits on "Beat every lane’s generals · 7 of 12", then shows four bosses, their lane's party and
+  **Fight**, or "Won ✓". **Abandon run** opens "Progress is lost" and **Abandon**; after it, the same sheet reads
+  "Run abandoned" with **Back to the capital**.
+- **The stage sheet:** "Lv 3 · Stage" ("Elite", "Region boss"), its elements and
   waves, then the foes by wave (`battle/FoeRow.tsx`): face, elements, name, Boss or Elite, "Acts twice", and "Shield 4 ·
   Weak:" with her weakness icons, Arms first (up to four, [combat](combat.md#weaknesses-shields-and-breaks)). Footer:
   **Fight** ("Fight again" once cleared; "Locked", "Fight open" or "One healer a party", disabled), and on a cleared
@@ -597,6 +606,12 @@ Routes: `/battle/scenario-gate`, then `c/:continent`, `r/:region`, `capital/:con
   her Class Rank bar with a line for each skill that rose ("{skill} reached Rank 3", or "{skill} opened" for a new
   depth), and her Bonds ("Bond up! 2 → 3"). A loss says "No penalty", with tips in its (i). Buttons: **Fight again** (or
   **Retry**) and **Back to the map**.
+
+**Capital fights** use that same screen, with the lane's title and "General 2" or "Final". Back returns to the run,
+and **Resume the open fight** uses the same map slot. Results add "General 2 of 3", "Final 3 of 4", or
+"Capital won · World I for 20". A won general offers **Next general** for the same signed five while one remains; a
+loss **Retry**. **Back to the run** returns to its page; the won run's last result offers **Back to the capital**.
+An old capital stage left open at the switch still resumes; its removed node cannot be fought again.
 
 The fight screen plays a **fight source** (`battle/fight-source.ts`, H50): the world map's open fight, the region's
 title and biome, and foes sized by rank; the Rift hands it its own.

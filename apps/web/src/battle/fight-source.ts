@@ -1,7 +1,7 @@
 // What the fight screen plays (H50): the world map and the Rift share `FightScreen`, each handing it a source with its
 // open fight, its header, its backdrop, how a foe reads on the stage, and how to act and leave. The world map's source is
 // built here (`campaignFightSource`), so its fights play exactly as before; the Rift builds its own with `faceRank`.
-import { capitalRunNodeOf, capitalRunsLive, openFightOf, rpgFinals, type BattleAction, type BattleEnemy, type BattleInput, type BattleStep, type Biome, type EnemyRank, type EnemyTier,
+import { capitalRunNodeOf, openFightOf, rpgFinals, type BattleAction, type BattleEnemy, type BattleInput, type BattleStep, type Biome, type EnemyRank, type EnemyTier,
   type FightResult, type RpgCampaignChapter, type TierWorld, type WorldRegion } from '@rpg/domain'
 import { fightAction, leaveFight } from '../save/game'
 
@@ -40,7 +40,7 @@ export function faceRank(roster: ReadonlyMap<string, { tier?: EnemyTier }>): (en
 export function campaignFightSource(world: TierWorld | null, chapter: RpgCampaignChapter, region: WorldRegion | null): FightSource<FightResult> {
   const battle = world ? openFightOf(world)?.battle ?? null : null
   const node = battle ? chapter.nodes.find((n) => n.id === battle.nodeId) : undefined
-  const capital = capitalRunsLive() && battle ? capitalRunNodeOf(battle.nodeId) : null
+  const capital = battle ? capitalRunNodeOf(battle.nodeId) : null
   return {
     battle, title: capital ? rpgFinals(chapter.order).routes[capital.lane - 1]!.name : chapter.title,
     name: capital ? capital.final ? 'Final' : `General ${capital.general}` : node?.name ?? 'Fight',

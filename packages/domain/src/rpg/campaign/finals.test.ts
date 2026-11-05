@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { RPG_ELEMENTS } from '../rules'
-import { RPG_FINALS, RPG_FINALS_LANES, RPG_FINALS_ROUTES, rpgFinals, rpgMapRoutes } from './finals'
+import { RPG_FINALS, RPG_FINALS_LANES, rpgFinals } from './finals'
 
 describe('the Finals routes (D293, H159)', () => {
   it('gives every scenario four routes with four different champion elements', () => {
     expect(RPG_FINALS_LANES).toBe(4)
-    expect(RPG_FINALS_ROUTES).toBe(3)
     for (const finals of RPG_FINALS) {
       expect(finals.routes).toHaveLength(RPG_FINALS_LANES)
       expect(new Set(finals.routes.map((r) => r.champion.element)).size).toBe(4)
@@ -37,8 +36,4 @@ describe('the Finals routes (D293, H159)', () => {
     })
   })
 
-  it('leaves the map its first three routes, unchanged', () => {
-    for (const finals of RPG_FINALS) expect(rpgMapRoutes(finals)).toEqual(finals.routes.slice(0, 3))
-    expect(rpgMapRoutes(rpgFinals(1)).map((r) => r.name)).toEqual(['Sprint Final', 'Mile Final', 'Long-Distance Final'])
-  })
 })

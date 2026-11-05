@@ -20,7 +20,7 @@ import {
 } from '../rpg/rules'
 import { rpgChapterReach } from '../rpg/campaign/chapters'
 import { classPresetV3 } from '../save/presets'
-import { capitalChapter } from './capital'
+import { capitalChapter } from './legacy-capital.fixture'
 import { BALANCE_PARTY, balanceClassRank, balanceClassRankOf, balanceMember, balanceSeat, balanceStage, type BalanceOptions } from './balance-party'
 import { play } from './balance-play'
 import {

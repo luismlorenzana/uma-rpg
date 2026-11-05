@@ -1,7 +1,7 @@
 // The campaign in the app: the active tier's world map (D66: five continents, one per scenario, of generated regions;
 // ids w6–w10 in Tier 2, H35) with the enemy roster's faces (D135), and the outfits' battle data. Pages render through
 // CampaignGate once master data and the roster are loaded.
-import { biomeById, capitalChapter, capitalId, capitalRunChapter, capitalRunNodeOf, capitalRunOf, capitalRunsLive, regionChapter, stageRegionId, worldContinent, type EnemyRoster, type RosterOutfit, type RpgCampaignChapter, type WorldContinent, type WorldRegion } from '@rpg/domain'
+import { biomeById, capitalId, capitalRunChapter, capitalRunNodeOf, capitalRunOf, regionChapter, stageRegionId, worldContinent, type EnemyRoster, type RosterOutfit, type RpgCampaignChapter, type WorldContinent, type WorldRegion } from '@rpg/domain'
 import { useMemo, type ReactNode } from 'react'
 import { retryCast, useCast, type Cast } from '../content/cast'
 import type { MasterView } from '../master/master'
@@ -41,11 +41,15 @@ export function buildCampaign(view: MasterView, cast: Cast, tier = 1): Campaign 
   const region = (id: string): RpgCampaignChapter | null => {
     const info = regions.get(id)
     const capital = capitals.get(id)
-    const run = capitalRunsLive() ? capitalRunOf(id) : null
+    const run = capitalRunOf(id)
     const runContinent = run ? continents.find((c) => c.id === run.continentId) : undefined
     if (!info && !capital && !runContinent) return null
     let chapter = built.get(id)
-    if (!chapter) built.set(id, (chapter = runContinent ? capitalRunChapter(runContinent, id, roster) : capital ? capitalChapter(capital, roster) : regionChapter(info!, roster)))
+    // A v36 capital fight can still resume from its frozen input. With no nodes, settlement uses the removed-stage
+    // fallback (a regular fight at its foes' level); none of the old vanguards/champions can be started again.
+    if (!chapter) built.set(id, (chapter = runContinent ? capitalRunChapter(runContinent, id, roster) : capital
+      ? { id, order: capital.order, tier, title: `${capital.name} · Capital`, levelStart: capital.levelStart + 9, rows: 0, nodes: [] }
+      : regionChapter(info!, roster)))
     return chapter
   }
   const outfits = new Map(view.roster.map((o) => [o.outfitId, o]))
