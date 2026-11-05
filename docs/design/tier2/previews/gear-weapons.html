@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Weapon Trees</title>
-<!-- gear.md (T2G1–T2G7): weapons in Tiers 2 and 3 on Tier 1 as built. Self-contained; kit tokens from _template.html. -->
+<title>Weapon Types</title>
+<!-- gear.md: weapon types picked at promotion, partners, Suggested for sixteen, coverage. Self-contained; kit tokens from tier-rework/previews/_template.html. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -15,6 +15,9 @@
     --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
     --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
     --radius: 12px; --gap: 12px;
+    --k-greatsword: #c8641e; --k-axe: #8a4fc0; --k-lance: #2f8a3e; --k-katana: #1a8a7b; --k-bow: #c2477a;
+    --k-fire: #d23c2c; --k-ice: #2f78d0; --k-lightning: #a37c00; --k-light: #977f2c; --k-dark: #6a46c0;
+    --s1: #fbf1dd; --s2: #f3dca6; --s3: #e6bd63; --s4: #c99530; --s5: #9a6c14;
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
@@ -25,6 +28,9 @@
       --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
       --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
       --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --k-greatsword: #e8873f; --k-axe: #b083e6; --k-lance: #5cbf6a; --k-katana: #3fc2ad; --k-bow: #e57aa5;
+      --k-fire: #f06a58; --k-ice: #5ea2ef; --k-lightning: #e0b52e; --k-light: #e3cf7f; --k-dark: #9f84ec;
+      --s1: #2b2312; --s2: #4a3a15; --s3: #6f5419; --s4: #9a7322; --s5: #c99a38;
     }
   }
   * { box-sizing: border-box; }
@@ -33,15 +39,19 @@
   main { max-width: 430px; margin: 0 auto; padding: 16px; }
   main.wide { max-width: 1100px; }
   h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
-  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 20px 0 8px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 22px 0 8px; }
   h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
   p, li { color: var(--ink-soft); }
+  a { color: var(--info); }
   .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
     box-shadow: 0 1px 0 var(--hairline-strong); }
   .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .grid { display: grid; gap: 8px; }
   .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
     background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.acc { background: var(--accent-wash); color: var(--accent-strong); }
   .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
   .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
   .muted { color: var(--ink-faint); }
@@ -49,281 +59,199 @@
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
   th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
   th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
   .legend { font-size: 12px; color: var(--ink-faint); }
   nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
   nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
-</style>
-<style>
-  /* The ten kinds (D234's hues): an Arm outlined, a Tome filled. Text always names the kind. */
-  :root {
-    --k-greatsword: #c8641e; --k-axe: #8a4fc0; --k-lance: #2f8a3e; --k-katana: #1a8a7b; --k-bow: #c2477a;
-    --k-fire: #d23c2c; --k-ice: #2f78d0; --k-lightning: #a37c00; --k-light: #977f2c; --k-dark: #6a46c0;
-    --p1: #2a78d6; --p2: #eb6834; --on-k: #ffffff;
-    --s0: #f3f6fa; --s1: #fdf6e6; --s2: #e9c46f; --s3: #dcaa48; --s4: #b9831f; --s5: #8a5f10;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --k-greatsword: #e8873f; --k-axe: #b083e6; --k-lance: #5cbf6a; --k-katana: #3fc2ad; --k-bow: #e57aa5;
-      --k-fire: #f06a58; --k-ice: #5ea2ef; --k-lightning: #e0b52e; --k-light: #e3cf7f; --k-dark: #9f84ec;
-      --p1: #3987e5; --p2: #d95926; --on-k: #0f1620;
-      --s0: #1f2a37; --s1: #3b2f17; --s2: #5c4618; --s3: #8a6519; --s4: #b8851f; --s5: #e0ac40;
-    }
-  }
-  .k { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 6px; font-size: 12px; font-weight: 650;
-    line-height: 1.5; white-space: nowrap; border: 1.5px solid var(--kc); }
-  .k.arm { color: var(--kc); background: transparent; }
-  .k.tome { background: var(--kc); color: var(--on-k); }
-  .k.tome.lt { color: #1b1300; }
-  .shape { font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--ink-soft); }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .pills button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .k { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: var(--kc); white-space: nowrap; }
+  .k::before { content: ''; width: 9px; height: 9px; border-radius: 3px; background: var(--kc); display: inline-block; }
+  .k.tome::before { border-radius: 50%; }
   .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 12px 0 4px; }
   .kpi { background: var(--panel); border-radius: var(--radius); padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
   .kpi .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
   .kpi .val { font: 700 20px/1.2 ui-rounded, system-ui, sans-serif; margin-top: 4px; font-variant-numeric: tabular-nums; }
   .kpi .sub { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
-  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
-  .pills button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong);
-    background: var(--panel); color: var(--ink); cursor: pointer; }
-  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
-  /* The tree */
-  .treegrid { display: grid; grid-template-columns: 200px 1fr 1.5fr; gap: 12px; align-items: stretch; }
-  .col { background: var(--raised); border-radius: 10px; padding: 10px; }
-  .col h4 { margin: 0 0 8px; font-size: 13px; display: flex; gap: 8px; align-items: center; }
-  .leaf { background: var(--panel); border: 1.5px solid var(--hairline-strong); border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; }
-  .leaf b { display: block; font-size: 13px; }
-  .leaf .meta { font-size: 12px; color: var(--ink-soft); }
-  .leaf.two { border-color: var(--accent); }
-  .arrow { font-size: 12px; color: var(--ink-faint); margin: 2px 0 6px 4px; }
-  /* Bars */
-  .bars { display: grid; grid-template-columns: 280px 1fr 64px; gap: 4px 10px; align-items: center; font-size: 13px; }
-  .bars .name { color: var(--ink); }
-  .bars .name.em { font-weight: 700; }
-  .track { position: relative; height: 22px; }
-  .bar { position: absolute; left: 0; height: 9px; border-radius: 0 4px 4px 0; }
-  .bar.a { top: 1px; background: var(--p1); } .bar.b { top: 12px; background: var(--p2); }
-  .refline { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--ink-faint); }
-  .num { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ink-soft); }
-  .key { display: inline-flex; align-items: center; gap: 6px; margin-right: 14px; font-size: 12px; color: var(--ink-soft); }
-  .key i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .heat td.c { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; border-radius: 6px; min-width: 40px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 10px 14px; border-radius: 10px; color: var(--ink); margin-top: 12px; font-size: 13px; }
+  .phone { width: 360px; background: var(--raised); border-radius: 18px; padding: 12px; border: 1px solid var(--hairline-strong); }
+  .phone .title { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .phones { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .li { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--panel); border-radius: 10px; padding: 9px 11px; margin-bottom: 6px; font-size: 13px; }
+  .li .tag { font-size: 11px; color: var(--ink-soft); text-align: right; }
+  .li.on { outline: 2px solid var(--accent); }
+  .li.off { opacity: .5; }
   .heat { border-collapse: separate; border-spacing: 3px; }
   .heat td, .heat th { border: 0; }
-  .h1 { background: var(--s1); color: #3a2a08; } .h2 { background: var(--s2); color: #3a2a08; } .h3 { background: var(--s3); color: #1b1300; }
-  @media (prefers-color-scheme: dark) { .h1, .h2 { color: #f3e3c3; } .h3 { color: #1b1300; } }
-  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 10px 14px; border-radius: 10px; color: var(--ink); margin-top: 12px; font-size: 13px; }
-  .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-  .cards .card { margin: 0; }
-  .cards h4 { margin: 0 0 6px; font-size: 13px; }
-  .cards .line { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
-  #tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--panel); font-size: 12px; padding: 6px 9px;
-    border-radius: 8px; max-width: 280px; opacity: 0; transition: opacity .08s; z-index: 10; }
-  [data-tip] { cursor: default; }
-  details summary { cursor: pointer; font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+  .heat td.c { text-align: center; font-variant-numeric: tabular-nums; border-radius: 6px; min-width: 64px; font-weight: 600; color: var(--ink); font-size: 12px; }
+  .heat td.best { outline: 2px solid var(--ink); outline-offset: -2px; font-weight: 800; }
+  .q1 { background: var(--s1); } .q2 { background: var(--s2); } .q3 { background: var(--s3); } .q4 { background: var(--s4); color: #1b1300 !important; } .q5 { background: var(--s5); color: #fff !important; }
+  @media (prefers-color-scheme: dark) { .q4, .q5 { color: #0f1620 !important; } }
+  .est { font-style: italic; }
+  @media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+<style>
+  .slotrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--panel); border-radius: 10px; padding: 9px 11px; margin-bottom: 6px; font-size: 13px; border: 1.5px solid var(--hairline-strong); }
+  .slotrow.sel { border-color: var(--accent); }
+  .slotrow .ch { font-size: 11px; color: var(--ink-soft); }
+  .type { font-size: 11px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--accent-strong); }
+  .sugg { font-size: 10px; font-weight: 700; color: var(--success); margin-left: 6px; }
+  svg text { fill: var(--ink-soft); font-size: 11px; }
+  .gridline { stroke: var(--hairline-strong); }
+  .lineP { stroke: var(--phys); } .lineD { stroke: var(--magic); } .lineK { stroke: var(--t3); } .lineT { stroke: var(--heal); }
 </style>
 </head>
 <body>
 <main class="wide">
-  <h1>Weapons in Tiers 2 and 3: trees, partners and coverage</h1>
-  <p>From <a href="../gear.md">gear.md</a> (T2G1–T2G7), on Tier 1 as built: ten kinds in five shapes, the re-paired twins
-    (Katana–Light, Bow–Dark), grades per weapon kind, weaknesses v2. Coverage is counted on the live weakness dealer over
-    every region stage of each tier, for the owner's two parties on their presets.</p>
-  <nav class="tabs"><a href="#tree">The tree</a><a href="#partners">The partner table</a><a href="#legal">Legal Duals</a>
-    <a href="#coverage">Coverage</a><a href="#holders">Who holds each kind</a><a href="#alone">One Uma alone</a><a href="#suggested">Suggested</a></nav>
+  <h1>Weapon types in Tiers 2 and 3: picked at promotion, swapped freely</h1>
+  <p>From <a href="../gear.md">gear.md</a> (T2G21–T2G28). On the Ascend sheet she picks her Tier 2 class, then her three
+    weapons and each one's <b>type</b> (Suggested pre-set); afterwards a type swaps with one tap on the Gear tab, free. Every
+    Tier 2 grade takes its line's two items: the first raises Might, the second the type, whatever type she wears.</p>
+  <nav class="tabs"><a href="#sheet">The Ascend sheet's weapons</a><a href="#grades">Types by grade</a><a href="#partners">Partners</a><a href="#sixteen">Suggested for sixteen</a><a href="#cover">Coverage</a><a href="#pages">Other pages</a></nav>
 
   <div class="kpis">
-    <div class="kpi"><div class="lbl">Might at G10</div><div class="val">68 · 122 · 177</div><div class="sub">Tiers 1 · 2 · 3, from the code</div></div>
-    <div class="kpi"><div class="lbl">A weak hit, at most</div><div class="val">×1.3 · ×1.5 · ×1.7</div><div class="sub">Base · Pure · Keen</div></div>
-    <div class="kpi"><div class="lbl">Two-kind weapons in her slots</div><div class="val">0 · 1 · 1</div><div class="sub">Every class (T2G3)</div></div>
-    <div class="kpi"><div class="lbl">Answers a regular, Party 1</div><div class="val">4.32 · 4.28 · 4.32</div><div class="sub">Every kind in two hands from Tier 2</div></div>
+    <div class="kpi"><div class="lbl">Types a weapon can wear</div><div class="val">1 · 2 · 3</div><div class="sub">Tier 1 · Pure, Dual · Keen, Tempered, Evolved</div></div>
+    <div class="kpi"><div class="lbl">A weak hit at G10, at most</div><div class="val">×1.3 · ×1.5 · ×1.7</div><div class="sub">Each tier starts where the last ended</div></div>
+    <div class="kpi"><div class="lbl">Answers a regular, C1</div><div class="val">4.32 · 4.28 · 4.32</div><div class="sub">Tier 1 · 2 · 3, Suggested types; expander comps 4.14–4.38</div></div>
+    <div class="kpi"><div class="lbl">A type swap costs</div><div class="val">Nothing</div><div class="sub">One tap, outside fights (T2G22)</div></div>
   </div>
 
-  <section id="tree">
-    <h2>The tree, one kind at a time</h2>
-    <p>Every kind has the same tree; only its two partners differ. The branch rides the G5 item (an Arms Gem G5 or Tome
-      Ink G5): no Branch Gem (T2G4). Pick a kind:</p>
-    <div class="pills" id="kinds" role="group" aria-label="Kind"></div>
-    <div class="card">
-      <div class="treegrid">
-        <div class="col"><h4><span class="tier t1">Tier 1</span> a straight line</h4>
-          <div class="leaf"><b id="t1-name">Greatsword</b><div class="meta">G0 → G10 · one kind · weak ×1.3 · Might 1 → 68</div></div>
-          <div class="meta muted" style="font-size:12px">Branches carry through Ascend; grades reset.</div></div>
-        <div class="col"><h4><span class="tier t2">Tier 2</span> at G5: Pure or Dual</h4>
-          <div class="arrow">G1–G4 as Tier 1, then the G5 item picks:</div>
-          <div class="leaf"><b id="t2-pure">Pure Greatsword</b><div class="meta">one kind · weak ×1.5 · Might 34 → 122</div></div>
-          <div class="leaf two"><b id="t2-dual">Dual Greatsword + Bow</b><div class="meta">+ its Tier 2 partner · weak ×1.3 · coverage only</div></div>
-          <div class="meta muted" style="font-size:12px">One two-kind weapon in her slots.</div></div>
-        <div class="col"><h4><span class="tier t3">Tier 3</span> at G5: both lines fork</h4>
-          <div class="arrow">From Pure:</div>
-          <div class="leaf"><b id="t3-keen">Keen Greatsword</b><div class="meta">one kind · weak ×1.7 · Might 49 → 177</div></div>
-          <div class="leaf two"><b id="t3-tp">Tempered Greatsword + Bow</b><div class="meta">+ its Tier 2 partner · ×1.5 on both</div></div>
-          <div class="arrow">From Dual:</div>
-          <div class="leaf two"><b id="t3-td">Tempered Greatsword + Bow</b><div class="meta">keeps its partner · ×1.5 on both</div></div>
-          <div class="leaf two"><b id="t3-ev">Evolved Greatsword + Katana</b><div class="meta">turns to its Tier 3 partner · ×1.5 on both</div></div>
-          <div class="meta muted" style="font-size:12px">Still one two-kind weapon: her Dual line Tempers or Evolves, her Pure lines go Keen.</div></div>
-      </div>
-      <div class="callout" id="tree-note"></div>
+  <section id="sheet">
+    <h2>The Ascend sheet's weapons step</h2>
+    <p>Progression owns the sheet (T2W19); this is what gear puts on it. Pick a class; tap a slot to see its type list.</p>
+    <div class="pills" id="cls" role="group" aria-label="Tier 2 class"></div>
+    <div class="phones">
+      <div class="phone"><div class="title"><span id="ptitle"></span><span class="tier t2">Tier 2</span></div><div id="slots"></div>
+        <div class="legend" id="covers"></div></div>
+      <div class="phone"><div class="title"><span id="stitle"></span><span class="chip">Slot</span></div><div id="types"></div>
+        <div class="legend">Answers: her share of Tier 2's regulars with this weapon's type, her other two on Suggested. One tap wears a row.</div></div>
     </div>
+  </section>
+
+  <section id="grades">
+    <h2>Types by grade: the second item raises the type</h2>
+    <p>A Tier 2 grade takes an Arms Gem (or Tome Ink) for Might and an Arms Whetstone (or Tome Reagent) for the type, +0.02 on
+      its weak multiplier a grade. A Dual's own kind keeps ×1.3; its partner's weak hits grow from ×1.1.</p>
+    <div class="card scroll"><svg id="chart" viewBox="0 0 760 260" width="100%" role="img" aria-label="Weak multiplier by grade for each type"></svg>
+      <p class="legend">Lines: <span style="color:var(--phys)">Pure</span>, <span style="color:var(--magic)">Dual's partner</span> (its own kind ×1.3 flat), <span style="color:var(--t3)">Keen</span>, <span style="color:var(--heal)">Tempered and Evolved, both kinds</span>. Tier 1's ×1.3 dashed.</p></div>
   </section>
 
   <section id="partners">
-    <h2>The partner table (T2G1)</h2>
-    <p>Each weapon's partners are of its own channel and the other weapon group. The owner's six Ring rows stand by name;
-      the four authored rows keep WP32's rule ("a twin set Duals into a twin set, both channels") on today's twins, so the
-      Arms rows stay and the Tome rows swap.</p>
-    <div class="card scroll"><table id="ptable"><thead><tr><th>Weapon</th><th>Shape</th><th>Group</th><th>Tier 2 partner (Dual, Tempered)</th><th>Tier 3 partner (Evolved)</th><th>Whose</th></tr></thead><tbody></tbody></table></div>
-    <div class="card">
-      <h3>Read by twin set: almost every row is a set to a set</h3>
-      <table>
-        <thead><tr><th>Twin set (shape)</th><th>Tier 2: its Arm → · its Tome →</th><th>Same set?</th><th>Tier 3: its Arm → · its Tome →</th><th>Same set?</th></tr></thead>
-        <tbody id="sets"></tbody>
-      </table>
-      <p class="legend">Only the owner's Ice set splits, in both tiers. Every kind is someone's partner across both tiers: each Light/Dark kind three times, the Lance and Lightning twice, the other Ring kinds once.</p>
-    </div>
+    <h2>The partner table (kept from round 1)</h2>
+    <div class="card scroll"><table id="ptab"></table>
+      <p class="legend">Every partner is of its weapon's own channel and the other group, so every two-kind weapon bridges Ring (Heavy, Sweep, Scatter) and Light/Dark (Double, Volley). One two-kind weapon in her slots in every later tier.</p></div>
   </section>
 
-  <section id="legal">
-    <h2>Every set keeps a legal Dual</h2>
-    <p>A partner she already slots is illegal (her slotted kinds stay all different). With this table every preset,
-      default and Rift guided build keeps at least one.</p>
-    <div class="card scroll"><table id="legal-t"><thead><tr><th>Class</th><th>Preset (D263)</th><th>Default, until she picks</th><th>Rift guided build</th></tr></thead><tbody></tbody></table></div>
+  <section id="sixteen">
+    <h2>Suggested types for the sixteen</h2>
+    <div class="card scroll"><table id="stab"></table>
+      <p class="legend">Weapons are classes.md's presets (T2C54); gear sets the types. Suggested is the Dual that leaves the fewest kinds in one hand over all 64 keeper and expander mixes of the owner's two parties.</p></div>
   </section>
 
-  <section id="coverage">
-    <h2>Coverage: answers a regular, by build (T2G2)</h2>
-    <p>For each regular the dealer makes, how many of the five hold a kind on her list. The dashed line is each party's
-      Tier 1 (4.32 · 4.35): later tiers stay at it.</p>
-    <div class="card">
-      <div class="row" style="margin-bottom:8px"><span class="key"><i style="background:var(--p1)"></i>Party 1: Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Paladin</span>
-        <span class="key"><i style="background:var(--p2)"></i>Party 2: Brawler, Sorcerer, Tome Spellblade, Arms Summoner, Cleric</span></div>
-      <div class="bars" id="cov"></div>
-      <details><summary>Show the numbers (regulars, sub-bosses, bosses)</summary><div class="scroll"><table id="cov-t"><thead><tr><th>Build</th><th>Regular P1 · P2</th><th>Sub-boss</th><th>Boss</th><th>Kinds held once</th></tr></thead><tbody></tbody></table></div></details>
-    </div>
-    <div class="callout"><b>What grows:</b> sub-bosses and bosses (weak to three in every tier) gain about 15% of answers,
-      3.71–3.77 → 4.27–4.42, so their shields go up one to keep Tier 1's shield per answer: sub-bosses 6 → 7, bosses 8 → 9
-      (provided to balance.md). <b>Why one two-kind weapon:</b> the old two in Tier 3 lifts regulars to 4.60–4.64; with no
-      cap at all a Brawler or a Sorcerer holds her whole channel.</div>
+  <section id="cover">
+    <h2>Coverage: answers a regular (sub-boss · boss)</h2>
+    <div class="card scroll"><table id="ctab"></table>
+      <p class="legend">Live weakness dealer, every region stage of a tier (2,400 stages: about 10,100 regulars, 200 sub-bosses, 220 bosses). Tier 1: Party 1 4.32, Party 2 4.35; with every kind graded and re-picked every stage, 5.00.</p></div>
+    <div class="callout"><b>The bound holds:</b> every comp answers a regular at or under Tier 1's 4.32–4.35; the Tier 1-like comps keep every kind in two hands, the expander comps one to three kinds in one hand (classes' presets hold the Greatsword three or four times). Re-typing every stage (free) lifts a party about 0.4; Tier 1's free kind swaps already reach 5.00 with every kind graded. Sub-bosses and bosses gain about 15%, so their shields rise one from Tier 2 Lv 1 (T2B7).</div>
   </section>
 
-  <section id="holders">
-    <h2>Who holds each kind</h2>
-    <p>Members holding each kind, on presets (Tier 1) and with the suggested picks (Tiers 2 and 3).</p>
-    <div class="card scroll"><table class="heat" id="hold"></table>
-      <p class="legend">1 is a kind in one pair of hands; the suggested Duals fill exactly the five kinds each party holds once.</p></div>
-  </section>
-
-  <section id="alone">
-    <h2>One Uma alone: the share of a tier's regulars she answers</h2>
-    <div class="card scroll"><table id="alone-t"><thead><tr><th>Class (preset)</th><th>Tier 1</th><th>Tier 2, no branch</th><th>Tier 2, each legal Dual</th><th>Tier 3, Evolved</th></tr></thead><tbody></tbody></table>
-      <p class="legend">Bold is the suggested Dual. Tier 2 lists hold three kinds, not four, so every Uma loses 11–19 points; her Dual gives back 9–15.</p></div>
-  </section>
-
-  <section id="suggested">
-    <h2>The suggested branches (T2G6)</h2>
-    <p>Marked "Suggested" on the G5 raise sheet: the picks that put every kind in two hands in both parties. Any legal pick is fine.</p>
-    <div class="cards" id="sugg"></div>
+  <section id="pages">
+    <h2>The other pages</h2>
+    <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-accessories.html">The accessory tree</a> ·
+      <a href="gear-presets.html">Presets for the sixteen</a> · <a href="gear-costs.html">Armor and what a grade costs</a></p>
   </section>
 </main>
-<div id="tip" role="tooltip"></div>
 <script>
 const K = {
-  greatsword: { n: 'Greatsword', arm: true, shape: 'Heavy', g: 'Ring', p2: 'bow', p3: 'katana', who: "The owner's" },
-  axe: { n: 'Axe', arm: true, shape: 'Sweep', g: 'Ring', p2: 'bow', p3: 'katana', who: "The owner's" },
-  lance: { n: 'Lance', arm: true, shape: 'Scatter', g: 'Ring', p2: 'katana', p3: 'bow', who: "The owner's" },
-  bow: { n: 'Bow', arm: true, shape: 'Volley', g: 'Light/Dark', p2: 'greatsword', p3: 'lance', who: 'Authored, kept' },
-  katana: { n: 'Katana', arm: true, shape: 'Double', g: 'Light/Dark', p2: 'axe', p3: 'lance', who: 'Authored, kept' },
-  fire: { n: 'Fire', arm: false, shape: 'Heavy', g: 'Ring', p2: 'dark', p3: 'light', who: "The owner's" },
-  ice: { n: 'Ice', arm: false, shape: 'Sweep', g: 'Ring', p2: 'light', p3: 'dark', who: "The owner's" },
-  lightning: { n: 'Lightning', arm: false, shape: 'Scatter', g: 'Ring', p2: 'light', p3: 'dark', who: "The owner's" },
-  light: { n: 'Light', arm: false, shape: 'Double', g: 'Light/Dark', p2: 'ice', p3: 'lightning', who: 'Authored, changed (was Fire)' },
-  dark: { n: 'Dark', arm: false, shape: 'Volley', g: 'Light/Dark', p2: 'fire', p3: 'lightning', who: 'Authored, changed (was Ice)' },
+  greatsword: ['Greatsword', 1], axe: ['Axe', 1], lance: ['Lance', 1], bow: ['Bow', 1], katana: ['Katana', 1],
+  fire: ['Fire', 0], ice: ['Blizzard', 0], lightning: ['Thunder', 0], light: ['Light', 0], dark: ['Dark', 0],
 };
-const ORDER = ['greatsword', 'axe', 'lance', 'bow', 'katana', 'fire', 'ice', 'lightning', 'light', 'dark'];
-const chip = (k) => `<span class="k ${K[k].arm ? 'arm' : 'tome'}${!K[k].arm && (k === 'lightning' || k === 'light') ? ' lt' : ''}" style="--kc:var(--k-${k})">${K[k].n}</span>`;
-const name = (k) => K[k].arm ? K[k].n : `${K[k].n}`;
-// Tree
-const kinds = document.getElementById('kinds');
-function show(k) {
-  for (const b of kinds.children) b.setAttribute('aria-pressed', String(b.dataset.k === k));
-  const n = name(k), p2 = name(K[k].p2), p3 = name(K[k].p3);
-  document.getElementById('t1-name').textContent = n;
-  document.getElementById('t2-pure').textContent = `Pure ${n}`;
-  document.getElementById('t2-dual').textContent = `Dual ${n} + ${p2}`;
-  document.getElementById('t3-keen').textContent = `Keen ${n}`;
-  document.getElementById('t3-tp').textContent = `Tempered ${n} + ${p2}`;
-  document.getElementById('t3-td').textContent = `Tempered ${n} + ${p2}`;
-  document.getElementById('t3-ev').textContent = `Evolved ${n} + ${p3}`;
-  document.getElementById('tree-note').innerHTML = `<b>${n}</b> (${K[k].shape}, ${K[k].g} group): its Tier 2 partner ${chip(K[k].p2)} (${K[K[k].p2].shape}), its Tier 3 partner ${chip(K[k].p3)} (${K[K[k].p3].shape}). The partner adds a kind to its hits for weaknesses and locks, never a hit: the ${K[k].shape.toLowerCase()} shape stays.`;
+const P2 = { greatsword: 'bow', axe: 'bow', lance: 'katana', fire: 'dark', ice: 'light', lightning: 'light', bow: 'greatsword', katana: 'axe', light: 'ice', dark: 'fire' };
+const P3 = { greatsword: 'katana', axe: 'katana', lance: 'bow', fire: 'light', ice: 'dark', lightning: 'dark', bow: 'lance', katana: 'lance', light: 'lightning', dark: 'lightning' };
+const SHAPE = { greatsword: 'Heavy', fire: 'Heavy', axe: 'Sweep', ice: 'Sweep', lance: 'Scatter', lightning: 'Scatter', katana: 'Double', light: 'Double', bow: 'Volley', dark: 'Volley' };
+const kc = (k) => `<span class="k ${K[k][1] ? 'arm' : 'tome'}" style="--kc:var(--k-${k})">${K[k][0]}</span>`;
+// class: weapons (lead first), Suggested dual slot (Tier 2), Tier 3 two-kind (T = Tempered, E = Evolved), solo answers [none, dual on slot 0,1,2]
+const C = [
+  ['Berserker', ['greatsword', 'axe', 'lance'], 0, 'T', 'Keeper · 3 Arms', [76, 91, 91, 91]],
+  ['Spellfist', ['greatsword', 'axe', 'fire'], 0, 'T', 'Expander · every hit on ATK', [72, 87, 87, 82]],
+  ['Archmage', ['fire', 'ice', 'lightning'], 0, 'E', 'Keeper · 3 Tomes', [81, 87, 93, 93]],
+  ['Battlemage', ['fire', 'lightning', 'greatsword'], 0, 'T', 'Expander · every hit on M.ATK', [72, 80, 84, 84]],
+  ['Blademaster', ['katana', 'axe', 'lightning'], 2, 'E', 'Keeper · 2 Arms + 1 Tome', [69, null, 85, 80]],
+  ['Sentinel', ['katana', 'greatsword', 'light'], 0, 'T', 'Support · 2 Arms + 1 Tome', [71, 84, 84, 82]],
+  ['Runeblade', ['lightning', 'ice', 'katana'], 0, 'E', 'Keeper · 2 Tomes + 1 Arm', [70, 82, 82, 82]],
+  ['Enchanter', ['light', 'ice', 'katana'], 2, 'T', 'Support · 2 Tomes + 1 Arm', [70, null, null, 81]],
+  ['Warlord', ['bow', 'axe', 'dark'], 0, 'T', 'Keeper · 2 Arms + 1 Tome', [71, 85, null, 83]],
+  ['Druid', ['bow', 'greatsword', 'dark'], 2, 'E', 'Support · 2 Arms + 1 Tome', [69, null, null, 82]],
+  ['Invoker · Shaman', ['dark', 'ice', 'bow'], 0, 'T', 'Keeper · support', [68, 84, 84, 80]],
+  ['Guardian · Templar', ['lance', 'greatsword', 'light'], 0, 'T', 'Healers · 2 Arms + 1 Tome', [71, 86, 84, 82]],
+  ['Bishop · Exorcist', ['light', 'fire', 'lance'], 2, 'T', 'Healers · 2 Tomes + 1 Arm', [71, 86, 84, 83]],
+];
+let cur = 0, slot = 0;
+const legal = (w, k) => !w.includes(P2[k]);
+function drawSheet() {
+  const [name, w, d, , ch, solo] = C[cur];
+  document.getElementById('ptitle').textContent = `Her weapons · ${name}`;
+  document.getElementById('slots').innerHTML = w.map((k, i) => {
+    const t = i === d ? `Dual + ${K[P2[k]][0]}` : 'Pure';
+    return `<div class="slotrow${i === slot ? ' sel' : ''}" data-i="${i}" style="cursor:pointer"><span>${kc(k)} <span class="ch">· ${SHAPE[k]}</span></span><span><span class="type">${t}</span><span class="sugg">Suggested</span></span></div>`;
+  }).join('');
+  const kinds = new Set([...w, P2[w[d]]]);
+  document.getElementById('covers').textContent = `${ch} · covers ${kinds.size} kinds · swap any time on Gear`;
+  for (const el of document.querySelectorAll('.slotrow')) el.onclick = () => { slot = Number(el.dataset.i); drawSheet(); };
+  const k = w[slot];
+  document.getElementById('stitle').textContent = K[k][0];
+  const rows = [['Pure', `×1.30 → ×1.50 on ${K[k][0]}`, slot === d ? solo[0] : solo[d + 1], slot !== d]];
+  if (legal(w, k)) rows.push([`Dual + ${K[P2[k]][0]}`, `${K[P2[k]][0]}'s foes too, ×1.10 → ×1.30`, solo[slot + 1], slot === d]);
+  else rows.push([`Dual + ${K[P2[k]][0]}`, `Off: she already slots the ${K[P2[k]][0]}`, null, false, true]);
+  document.getElementById('types').innerHTML = rows.map(([t, v, a, on, off]) => `<div class="li${on ? ' on' : ''}${off ? ' off' : ''}"><span><b>${t}</b><br><span class="tag" style="text-align:left">${v}</span></span><span class="tag">${a ? `${a}% of regulars` : ''}</span></div>`).join('') +
+    (slot !== d && legal(w, k) ? '<p class="legend">Dual here would make a second two-kind weapon: her Suggested Dual turns Pure.</p>' : '');
 }
-for (const k of ORDER) { const b = document.createElement('button'); b.dataset.k = k; b.textContent = K[k].n; b.onclick = () => show(k); kinds.appendChild(b) }
-show('greatsword');
-// Partner table
-document.querySelector('#ptable tbody').innerHTML = ORDER.map((k) => `<tr><td>${chip(k)}</td><td class="shape">${K[k].shape}</td><td>${K[k].g}</td><td>${chip(K[k].p2)} <span class="shape">${K[K[k].p2].shape}</span></td><td>${chip(K[k].p3)} <span class="shape">${K[K[k].p3].shape}</span></td><td>${K[k].who}</td></tr>`).join('');
-const SETS = [['greatsword', 'fire'], ['axe', 'ice'], ['lance', 'lightning'], ['katana', 'light'], ['bow', 'dark']];
-const twinOf = (k) => SETS.find((s) => s.includes(k));
-document.getElementById('sets').innerHTML = SETS.map(([a, t]) => {
-  const same2 = twinOf(K[a].p2) === twinOf(K[t].p2), same3 = twinOf(K[a].p3) === twinOf(K[t].p3);
-  return `<tr><td>${chip(a)} ${chip(t)} <span class="shape">${K[a].shape}</span></td><td>${chip(K[a].p2)} · ${chip(K[t].p2)}</td><td>${same2 ? 'Yes' : '<b>No</b> (the owner\'s)'}</td><td>${chip(K[a].p3)} · ${chip(K[t].p3)}</td><td>${same3 ? 'Yes' : '<b>No</b> (the owner\'s)'}</td></tr>`;
-}).join('');
-// Legal Duals
-const D = (w, p) => `${chip(w)}+${chip(p)}`;
-const LEGAL = [
-  ['Brawler', [D('greatsword', 'bow'), D('axe', 'bow'), D('lance', 'katana')], 'The same', `(Bow, Katana, Axe) ${D('bow', 'greatsword')}`],
-  ['Sorcerer', [D('fire', 'dark'), D('ice', 'light'), D('lightning', 'light')], 'The same', `(Light, Dark, Fire) ${D('light', 'ice')}`],
-  ['Arms Spellblade', [D('axe', 'bow'), D('lightning', 'light')], `(Katana, Lance, Thunder) ${D('katana', 'axe')} ${D('lightning', 'light')}`, `(Bow, Greatsword, Fire) ${D('fire', 'dark')}`],
-  ['Tome Spellblade', [D('lightning', 'light'), D('ice', 'light'), D('katana', 'axe')], `(Light, Thunder, Katana) ${D('light', 'ice')} ${D('katana', 'axe')}`, '(Dark, Blizzard, Axe) all three'],
-  ['Arms Summoner', [D('bow', 'greatsword'), D('dark', 'fire')], 'The same', '(Lance, Greatsword, Thunder) all three'],
-  ['Tome Summoner', [D('dark', 'fire'), D('ice', 'light'), D('bow', 'greatsword')], '(Dark, Blizzard, Axe) all three', '(Fire, Thunder, Katana) all three'],
-  ['Paladin', [D('lance', 'katana'), D('greatsword', 'bow'), D('light', 'ice')], '(Greatsword, Axe, Light) all three', '—'],
-  ['Cleric', [D('light', 'ice'), D('fire', 'dark'), D('lance', 'katana')], `(Light, Blizzard, Bow) ${D('bow', 'greatsword')}`, '—'],
+document.getElementById('cls').innerHTML = C.map((c, i) => `<button data-i="${i}" aria-pressed="${i === 0}">${c[0]}</button>`).join('');
+for (const b of document.querySelectorAll('#cls button')) b.onclick = () => { cur = Number(b.dataset.i); slot = 0; for (const x of document.querySelectorAll('#cls button')) x.setAttribute('aria-pressed', String(x === b)); drawSheet(); };
+drawSheet();
+
+// chart
+(function () {
+  const svg = document.getElementById('chart');
+  const X = (g) => 60 + g * 32, Y = (m) => 230 - (m - 1.0) * 250;
+  let s = '';
+  for (const m of [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7]) s += `<line class="gridline" x1="60" x2="380" y1="${Y(m)}" y2="${Y(m)}"/><text x="24" y="${Y(m) + 4}">×${m.toFixed(1)}</text>`;
+  for (const m of [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7]) s += `<line class="gridline" x1="420" x2="740" y1="${Y(m)}" y2="${Y(m)}"/>`;
+  const line = (x0, f, cls, dash) => `<polyline fill="none" stroke-width="2.5" class="${cls}" ${dash ? 'stroke-dasharray="4 4"' : ''} points="${Array.from({ length: 11 }, (_, g) => `${x0 + g * 32},${Y(f(g))}`).join(' ')}"/>`;
+  s += `<text x="60" y="16" font-weight="700">Tier 2 (G0 → G10)</text><text x="420" y="16" font-weight="700">Tier 3 (G0 → G10)</text>`;
+  s += line(60, () => 1.3, 'gridline', true) + line(60, (g) => 1.3 + 0.02 * g, 'lineP') + line(60, (g) => 1.1 + 0.02 * g, 'lineD');
+  s += line(420, (g) => 1.5 + 0.02 * g, 'lineK') + line(420, (g) => 1.3 + 0.02 * g, 'lineT');
+  s += `<text x="384" y="${Y(1.5) + 4}">Pure</text><text x="384" y="${Y(1.3) - 4}">Dual's partner</text><text x="744" y="${Y(1.7) + 4}" text-anchor="end" dx="-4" dy="-6">Keen</text><text x="744" y="${Y(1.5) + 16}" text-anchor="end">Tempered · Evolved</text>`;
+  for (let g = 0; g <= 10; g += 2) s += `<text x="${X(g) - 6}" y="250">G${g}</text><text x="${X(g) + 354}" y="250">G${g}</text>`;
+  svg.innerHTML = s;
+})();
+
+document.getElementById('ptab').innerHTML = '<thead><tr><th>Weapon</th><th>Shape</th><th>Tier 2 partner (Dual, Tempered)</th><th>Tier 3 partner (Evolved)</th><th>Whose</th></tr></thead><tbody>' +
+  Object.keys(K).map((k) => `<tr><td>${kc(k)}</td><td>${SHAPE[k]}</td><td>${kc(P2[k])}</td><td>${kc(P3[k])}</td><td class="muted">${['bow', 'katana', 'light', 'dark'].includes(k) ? 'Round 1 (twin sets)' : "The owner's"}</td></tr>`).join('') + '</tbody>';
+
+document.getElementById('stab').innerHTML = '<thead><tr><th>Class</th><th>Slots</th><th>Tier 2 Suggested</th><th>Tier 3 Suggested</th></tr></thead><tbody>' +
+  C.map(([n, w, d, t3, ch]) => {
+    const t2 = w.map((k, i) => (i === d ? `<b>Dual</b> ${kc(k)} + ${kc(P2[k])}` : `Pure ${kc(k)}`)).join(' · ');
+    const t3s = w.map((k, i) => (i === d ? `<b>${t3 === 'E' ? 'Evolved' : 'Tempered'}</b> ${kc(k)} + ${kc(t3 === 'E' ? P3[k] : P2[k])}` : `Keen ${kc(k)}`)).join(' · ');
+    return `<tr><td><b>${n}</b></td><td class="muted">${ch}</td><td>${t2}</td><td>${t3s}</td></tr>`;
+  }).join('') + '</tbody>';
+
+const CV = [
+  ['C1 Party 1\'s keepers (Berserker, Archmage, Blademaster, Invoker, Guardian)', '3.64', '4.28 · 4.34 · 4.27', '0', '4.32 · 4.35 · 4.29', '0'],
+  ['C2 Party 2\'s keepers (Berserker, Archmage, Runeblade, Warlord, Bishop)', '3.69', '4.29 · 4.35 · 4.42', '0', '4.29 · 4.33 · 4.32', '0'],
+  ['C3 both pures expanded (Spellfist, Battlemage + C1\'s three)', '3.51', '4.17 · 4.08 · 4.16', 'Lance, Blizzard', '4.14 · 4.03 · 4.10', 'Lance, Blizzard, Light'],
+  ['C4 Templar and Sentinel (Berserker, Archmage, Sentinel, Invoker, Templar)', '3.66', '4.32 · 4.42 · 4.32', 'Thunder', '4.38 · 4.48 · 4.35', 'Thunder, Dark'],
+  ['C4b the same on Party 2 (Enchanter, Warlord, Exorcist)', '3.69', '4.28 · 4.35 · 4.38', 'Thunder', '4.32 · 4.34 · 4.31', 'Thunder, Dark'],
+  ['C5 a Summoner to support (Druid in C2)', '3.66', '4.25 · 4.26 · 4.34', 'Axe', '4.23 · 4.22 · 4.34', 'Axe'],
+  ['C6 both hybrids to support (Sentinel, Shaman in C1)', '3.66', '4.32 · 4.42 · 4.32', 'Thunder', '4.38 · 4.48 · 4.35', 'Thunder, Dark'],
+  ['C7 every member an expander', '3.54', '4.21 · 4.16 · 4.22', 'Lance, Blizzard, Thunder', '4.20 · 4.16 · 4.17', 'Lance, Blizzard, Thunder'],
+  ['C3 on gear\'s Scatter twins (Spellfist Greatsword, Axe, Thunder; Battlemage Fire, Blizzard, Lance)', '3.51', '4.19 · 4.24 · 4.10', '0', '4.19 · 4.20 · 4.09', '0'],
+  ['C1 re-typed every stage (free) · no two-kind cap', '—', '4.72 · 4.85', '—', '4.82 · 4.98', '—'],
 ];
-document.querySelector('#legal-t tbody').innerHTML = LEGAL.map(([c, p, d, g]) => `<tr><td><b>${c}</b></td><td>${p.join(' ')}</td><td>${d}</td><td>${g}</td></tr>`).join('');
-// Coverage bars
-const COV = [
-  ['Tier 1, presets', 4.32, 4.35, '3.75 · 3.71', '3.77 · 3.77', '5 · 5', true],
-  ['Tier 2, no branch', 3.64, 3.69, '3.62 · 3.71', '3.70 · 3.74', '5 · 5'],
-  ['Tier 2, the suggested Duals', 4.28, 4.29, '4.34 · 4.35', '4.27 · 4.42', '0 · 0', true],
-  ['Tier 2, each member\'s best Dual', 4.39, 4.38, '4.38 · 4.35', '4.32 · 4.38', '1 · 2'],
-  ['Tier 2, every legal Dual (no count cap)', 4.85, 4.79, '4.86 · 4.80', '4.80 · 4.75', '0 · 0'],
-  ['Tier 3, no branch', 3.63, 3.67, '3.69 · 3.71', '3.73 · 3.76', '5 · 5'],
-  ['Tier 3, one two-kind weapon, suggested', 4.32, 4.29, '4.35 · 4.33', '4.29 · 4.32', '0 · 0', true],
-  ['Tier 3, the old cap (two for the six between)', 4.64, 4.60, '4.63 · 4.64', '4.58 · 4.58', '1 · 1'],
-];
-const X = (v) => `${(v / 5) * 100}%`;
-document.getElementById('cov').innerHTML = COV.map(([n, a, b, , , , em]) => `<div class="name${em ? ' em' : ''}">${n}</div><div class="track" data-tip="${n}: Party 1 ${a.toFixed(2)}, Party 2 ${b.toFixed(2)} answers a regular (Tier 1: 4.32 · 4.35)"><div class="refline" style="left:${X(4.335)}"></div><div class="bar a" style="width:${X(a)}"></div><div class="bar b" style="width:${X(b)}"></div></div><div class="num">${a.toFixed(2)} · ${b.toFixed(2)}</div>`).join('')
-  + `<div></div><div class="num" style="display:flex;justify-content:space-between"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div><div></div>`;
-document.querySelector('#cov-t tbody').innerHTML = COV.map(([n, a, b, s, bo, once]) => `<tr><td>${n}</td><td>${a.toFixed(2)} · ${b.toFixed(2)}</td><td>${s}</td><td>${bo}</td><td>${once}</td></tr>`).join('');
-// Holders
-const HOLD = [
-  ['Party 1, Tier 1', [2, 2, 2, 1, 1, 1, 2, 2, 1, 1]], ['Party 1, Tier 2 suggested', [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]], ['Party 1, Tier 3 suggested', [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]],
-  ['Party 2, Tier 1', [1, 2, 2, 1, 1, 2, 2, 2, 1, 1]], ['Party 2, Tier 2 suggested', [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]], ['Party 2, Tier 3 suggested', [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]],
-];
-document.getElementById('hold').innerHTML = `<thead><tr><th></th>${ORDER.map((k) => `<th>${chip(k)}</th>`).join('')}</tr></thead><tbody>` + HOLD.map(([n, v]) => `<tr><th>${n}</th>${v.map((x, i) => `<td class="c h${x}" data-tip="${n}: ${K[ORDER[i]].n} held by ${x}">${x}</td>`).join('')}</tr>`).join('') + '</tbody>';
-// One Uma alone
-const ALONE = [
-  ['Brawler (Greatsword, Axe, Lance)', '89%', '76%', '<b>91%</b> with any of her three', '91%'],
-  ['Sorcerer (Fire, Ice, Lightning)', '100%', '81%', 'Fire + Dark <b>87%</b> · Ice + Light 93% · Lightning + Light 93%', 'Fire + Light 93%'],
-  ['Arms Spellblade (Katana, Axe, Thunder)', '79%', '69%', 'Axe + Bow 85% · Thunder + Light <b>80%</b>', 'Thunder + Dark 78%'],
-  ['Tome Spellblade (Thunder, Ice, Katana)', '80%', '70%', 'Thunder + Light <b>82%</b> · Ice + Light 82% · Katana + Axe 82%', 'Thunder + Dark 79%'],
-  ['Arms Summoner (Bow, Axe, Dark)', '83%', '71%', 'Bow + Greatsword <b>85%</b> · Dark + Fire 83%', 'Bow + Lance 85%'],
-  ['Tome Summoner (Dark, Ice, Bow)', '79%', '68%', 'Dark + Fire <b>84%</b> · Ice + Light 84% · Bow + Greatsword 80%', 'Dark + Lightning 79%'],
-  ['Paladin (Lance, Greatsword, Light)', '84%', '71%', 'Lance + Katana <b>86%</b> · Greatsword + Bow 84% · Light + Ice 82%', 'Lance + Bow 84%'],
-  ['Cleric (Light, Fire, Lance)', '83%', '71%', 'Light + Ice 86% · Fire + Dark 84% · Lance + Katana <b>83%</b>', 'Lance + Bow 83%'],
-];
-document.querySelector('#alone-t tbody').innerHTML = ALONE.map((r) => `<tr>${r.map((c, i) => i ? `<td>${c}</td>` : `<td><b>${c}</b></td>`).join('')}</tr>`).join('');
-// Suggested
-const SUG = [
-  ['Brawler', D('greatsword', 'bow'), 'Tempered Greatsword + Bow', 'Keen Axe, Keen Lance', 'Fills the Bow'],
-  ['Sorcerer', D('fire', 'dark'), 'Evolved Fire + Light', 'Keen Blizzard, Keen Thunder', 'Fills Dark'],
-  ['Arms Spellblade', D('lightning', 'light'), 'Evolved Thunder + Dark', 'Keen Katana, Keen Axe', 'Fills Light'],
-  ['Tome Spellblade', D('lightning', 'light'), 'Evolved Thunder + Dark', 'Keen Blizzard, Keen Katana', 'Fills Light'],
-  ['Arms Summoner', D('bow', 'greatsword'), 'Tempered Bow + Greatsword', 'Keen Axe, Keen Dark', 'Fills the Greatsword'],
-  ['Tome Summoner', D('dark', 'fire'), 'Tempered Dark + Fire', 'Keen Blizzard, Keen Bow', 'Fills Fire'],
-  ['Paladin', D('lance', 'katana'), 'Tempered Lance + Katana', 'Keen Greatsword, Keen Light', 'Fills the Katana'],
-  ['Cleric', D('lance', 'katana'), 'Tempered Lance + Katana', 'Keen Light, Keen Fire', 'Fills the Katana'],
-];
-document.getElementById('sugg').innerHTML = SUG.map(([c, d, t3, keen, why]) => `<div class="card"><h4>${c}</h4><div class="row"><span class="tier t2">Tier 2</span> Dual ${d}</div><div class="line">The other two Pure. ${why}.</div><div class="row" style="margin-top:8px"><span class="tier t3">Tier 3</span> <span style="font-size:12px">${t3}</span></div><div class="line">${keen}</div></div>`).join('');
-// Tooltip
-const tip = document.getElementById('tip');
-document.addEventListener('mousemove', (e) => { const t = e.target.closest('[data-tip]'); if (!t) { tip.style.opacity = 0; return } tip.textContent = t.dataset.tip; tip.style.left = `${e.clientX + 14}px`; tip.style.top = `${e.clientY + 14}px`; tip.style.opacity = 1 });
+document.getElementById('ctab').innerHTML = '<thead><tr><th>Comp (classes.md T2C63)</th><th class="n">T2, no type</th><th class="n"><span class="tier t2">T2</span> Suggested</th><th>In one hand</th><th class="n"><span class="tier t3">T3</span> Suggested</th><th>In one hand</th></tr></thead><tbody>' +
+  CV.map((r) => `<tr>${r.map((x, i) => `<td${i === 1 || i === 2 || i === 4 ? ' class="n"' : ''}>${i === 2 || i === 4 ? `<b>${x}</b>` : x}</td>`).join('')}</tr>`).join('') + '</tbody>';
 </script>
 </body>
 </html>

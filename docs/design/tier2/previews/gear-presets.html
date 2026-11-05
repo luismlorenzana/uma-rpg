@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gear Presets</title>
+<!-- gear.md: presets for the sixteen Tier 2 classes. Self-contained; kit tokens from tier-rework/previews/_template.html. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-strong: #b87f18; --accent-wash: #fbf1dd; --accent-ink: #1b1406;
+    --success: #2f7a4f; --danger: #c23b33; --warning: #d08a0e; --info: #2f6fe0; --locked: #8a94a3;
+    --phys: #c2643a; --magic: #5b6ee0; --heal: #2f9a6a;
+    --t1: #e8c25a; --t2: #c07a3a; --t3: #7a5ad0;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; --gap: 12px;
+    --k-greatsword: #c8641e; --k-axe: #8a4fc0; --k-lance: #2f8a3e; --k-katana: #1a8a7b; --k-bow: #c2477a;
+    --k-fire: #d23c2c; --k-ice: #2f78d0; --k-lightning: #a37c00; --k-light: #977f2c; --k-dark: #6a46c0;
+    --s1: #fbf1dd; --s2: #f3dca6; --s3: #e6bd63; --s4: #c99530; --s5: #9a6c14;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-strong: #e8b65a; --accent-wash: #2b2312;
+      --success: #4fb37a; --danger: #e0645c; --warning: #e0a33a; --info: #5b8def;
+      --phys: #e08a5e; --magic: #8b9cff; --heal: #4fc08c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --k-greatsword: #e8873f; --k-axe: #b083e6; --k-lance: #5cbf6a; --k-katana: #3fc2ad; --k-bow: #e57aa5;
+      --k-fire: #f06a58; --k-ice: #5ea2ef; --k-lightning: #e0b52e; --k-light: #e3cf7f; --k-dark: #9f84ec;
+      --s1: #2b2312; --s2: #4a3a15; --s3: #6f5419; --s4: #9a7322; --s5: #c99a38;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 430px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1100px; }
+  h1 { font: 700 20px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 4px 0 12px; }
+  h2 { font: 700 16px/1.25 ui-rounded, system-ui, sans-serif; margin: 22px 0 8px; }
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  a { color: var(--info); }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-bottom: var(--gap);
+    box-shadow: 0 1px 0 var(--hairline-strong); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+    background: var(--sunken); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.phys { background: color-mix(in srgb, var(--phys) 18%, transparent); color: var(--phys); }
+  .chip.magic { background: color-mix(in srgb, var(--magic) 18%, transparent); color: var(--magic); }
+  .chip.heal { background: color-mix(in srgb, var(--heal) 18%, transparent); color: var(--heal); }
+  .chip.acc { background: var(--accent-wash); color: var(--accent-strong); }
+  .tier { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #1b1406; }
+  .tier.t1 { background: var(--t1); } .tier.t2 { background: var(--t2); color: #fff; } .tier.t3 { background: var(--t3); color: #fff; }
+  .muted { color: var(--ink-faint); }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .legend { font-size: 12px; color: var(--ink-faint); }
+  nav.tabs { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; }
+  nav.tabs a { padding: 4px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .pills button { font: 600 12px system-ui, sans-serif; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--hairline-strong);
+    background: var(--panel); color: var(--ink); cursor: pointer; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .k { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: var(--kc); white-space: nowrap; }
+  .k::before { content: ''; width: 9px; height: 9px; border-radius: 3px; background: var(--kc); display: inline-block; }
+  .k.tome::before { border-radius: 50%; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 12px 0 4px; }
+  .kpi { background: var(--panel); border-radius: var(--radius); padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .kpi .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .kpi .val { font: 700 20px/1.2 ui-rounded, system-ui, sans-serif; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .sub { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-wash); padding: 10px 14px; border-radius: 10px; color: var(--ink); margin-top: 12px; font-size: 13px; }
+  .phone { width: 360px; background: var(--raised); border-radius: 18px; padding: 12px; border: 1px solid var(--hairline-strong); }
+  .phone .title { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .phones { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .li { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--panel); border-radius: 10px; padding: 9px 11px; margin-bottom: 6px; font-size: 13px; }
+  .li .tag { font-size: 11px; color: var(--ink-soft); text-align: right; }
+  .li.on { outline: 2px solid var(--accent); }
+  .li.off { opacity: .5; }
+  .heat { border-collapse: separate; border-spacing: 3px; }
+  .heat td, .heat th { border: 0; }
+  .heat td.c { text-align: center; font-variant-numeric: tabular-nums; border-radius: 6px; min-width: 64px; font-weight: 600; color: var(--ink); font-size: 12px; }
+  .heat td.best { outline: 2px solid var(--ink); outline-offset: -2px; font-weight: 800; }
+  .q1 { background: var(--s1); } .q2 { background: var(--s2); } .q3 { background: var(--s3); } .q4 { background: var(--s4); color: #1b1300 !important; } .q5 { background: var(--s5); color: #fff !important; }
+  @media (prefers-color-scheme: dark) { .q4, .q5 { color: #0f1620 !important; } }
+  .est { font-style: italic; }
+  @media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+<style>
+  .pre { display: grid; grid-template-columns: 1.1fr 1.6fr 1fr 1fr 1fr; gap: 0; }
+  .slots { display: flex; gap: 4px; flex-wrap: wrap; }
+  .sl { font-size: 11px; font-weight: 700; padding: 3px 7px; border-radius: 8px; background: var(--raised); border: 1px solid var(--hairline-strong); white-space: nowrap; }
+  .sl.new { border-color: var(--accent); background: var(--accent-wash); color: var(--accent-ink); }
+  @media (prefers-color-scheme: dark) { .sl.new { color: var(--ink); } }
+  .star { color: var(--accent-strong); }
+</style>
+</head>
+<body>
+<main class="wide">
+  <h1>Presets for the sixteen classes</h1>
+  <p>From <a href="../gear.md">gear.md</a> (T2G26, T2G36). D266's rule extended: her armor half's stat twice and an Orb, each
+    slot in its best open form for her role; her weapons on their Suggested types; her ★ family first. A preset spends nothing
+    and moves no grade. The classes and their weapons are classes.md's (T2C54); gear sets the types and the slots.</p>
+  <nav class="tabs"><a href="#table">The sixteen</a><a href="#star">Her ★</a><a href="#measured">Measured</a><a href="#pages">Other pages</a></nav>
+
+  <section id="table">
+    <h2>Weapons, types and three slots</h2>
+    <div class="pills" id="fp" role="group" aria-label="Filter"><button data-f="all" aria-pressed="true">All sixteen</button><button data-f="K">Keepers</button><button data-f="X">Expanders</button></div>
+    <div class="card scroll"><table id="pt"></table>
+      <p class="legend">Highlighted slots change from the keeper's. Great Orb on <code>presetKind</code>'s kind: her first weapon's, a Summoner's lead that twins her lone weapon. Below Tier 2's G5 a supporter wears her keeper's set; Vow opens at Tier 3's G5.</p></div>
+  </section>
+
+  <section id="star">
+    <h2>Her ★ family first</h2>
+    <div class="card">
+      <p>From her first Tier 2 grade a Twofold form of her ★ family gives both stats, so the preset puts her ★ first for every
+        class (D266's "unless her weapons can't use it" ends in Tier 2). Pick a ★ family:</p>
+      <div class="pills" id="sp" role="group" aria-label="★ family"><button data-s="pendant" aria-pressed="true">★ Pendant</button><button data-s="bell">★ Charm</button><button data-s="orb">★ Orb</button><button data-s="insignia">★ Insignia</button></div>
+      <div class="scroll"><table id="st"></table></div>
+    </div>
+  </section>
+
+  <section id="measured">
+    <h2>Measured: the preset against her best set (Lv 50, her damage a turn)</h2>
+    <div class="card scroll"><table id="mt"></table>
+      <p class="legend">Each row is a Tier 1 parent on curve in the owner's parties, standing for her keeper and her expander (a pure expander's one stat behaves as the pure's). Party value for the supporters' Kindred preset at three quarters of her keeper's damage: +0.2 to +0.6 points over the keeper's set.</p></div>
+  </section>
+
+  <section id="pages">
+    <h2>The other pages</h2>
+    <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-weapons.html">Weapon types</a> ·
+      <a href="gear-accessories.html">The accessory tree</a> · <a href="gear-costs.html">Armor and what a grade costs</a></p>
+  </section>
+</main>
+<script>
+const K = { greatsword: ['Greatsword', 1], axe: ['Axe', 1], lance: ['Lance', 1], bow: ['Bow', 1], katana: ['Katana', 1], fire: ['Fire', 0], ice: ['Blizzard', 0], lightning: ['Thunder', 0], light: ['Light', 0], dark: ['Dark', 0] };
+const P2 = { greatsword: 'bow', axe: 'bow', lance: 'katana', fire: 'dark', ice: 'light', lightning: 'light', bow: 'greatsword', katana: 'axe', light: 'ice', dark: 'fire' };
+const kc = (k) => `<span class="k ${K[k][1] ? 'arm' : 'tome'}" style="--kc:var(--k-${k})">${K[k][0]}</span>`;
+// [class, K|X, weapons, dual slot, stat family ('P' | 'C'), two-stat?, role]
+const R = [
+  ['Berserker', 'K', ['greatsword', 'axe', 'lance'], 0, 'P', 0, ''], ['Spellfist', 'X', ['greatsword', 'axe', 'fire'], 0, 'P', 0, 'Fire Tome on ATK'],
+  ['Archmage', 'K', ['fire', 'ice', 'lightning'], 0, 'C', 0, ''], ['Battlemage', 'X', ['fire', 'lightning', 'greatsword'], 0, 'C', 0, 'Greatsword on M.ATK'],
+  ['Blademaster', 'K', ['katana', 'axe', 'lightning'], 2, 'P', 1, ''], ['Sentinel', 'X', ['katana', 'greatsword', 'light'], 0, 'P', 1, 'sup'],
+  ['Runeblade', 'K', ['lightning', 'ice', 'katana'], 0, 'C', 1, ''], ['Enchanter', 'X', ['light', 'ice', 'katana'], 2, 'C', 1, 'sup'],
+  ['Warlord', 'K', ['bow', 'axe', 'dark'], 0, 'P', 1, ''], ['Druid', 'X', ['bow', 'greatsword', 'dark'], 2, 'P', 1, 'sup'],
+  ['Invoker', 'K', ['dark', 'ice', 'bow'], 0, 'C', 1, ''], ['Shaman', 'X', ['dark', 'ice', 'bow'], 0, 'C', 1, 'sup'],
+  ['Guardian', 'K', ['lance', 'greatsword', 'light'], 0, 'P', 0, 'vow'], ['Templar', 'X', ['lance', 'greatsword', 'light'], 0, 'P', 0, 'battle healer'],
+  ['Bishop', 'K', ['light', 'fire', 'lance'], 2, 'C', 0, 'vow'], ['Exorcist', 'X', ['light', 'fire', 'lance'], 2, 'C', 0, 'battle healer'],
+];
+const ORB = { brawler: 'greatsword' };
+const fam = (f) => (f === 'P' ? 'Pendant' : 'Charm');
+const sl = (t, n) => `<span class="sl${n ? ' new' : ''}">${t}</span>`;
+function sets(r) {
+  const [, , w, , f, two, role] = r;
+  const orb = `Great Orb · ${K[w[0]][0]}`;
+  const a = two ? [`Twofold ${fam(f)}`, `Twofold ${fam(f)}`, orb] : [`Great ${fam(f)}`, `Great ${fam(f)}`, orb];
+  const b = role === 'sup' ? [`Kindred ${fam(f)}`, `Twofold ${fam(f)}`, orb] : a;
+  const c = role === 'vow' ? [`Vow ${fam(f)}`, `Great ${fam(f)}`, orb] : b;
+  return [a, b, c];
+}
+let filt = 'all';
+function draw() {
+  for (const b of document.querySelectorAll('#fp button')) b.setAttribute('aria-pressed', String(b.dataset.f === filt));
+  document.getElementById('pt').innerHTML = '<thead><tr><th>Class</th><th>Weapons, Tier 2 Suggested types</th><th>Tier 2, a slot G1–G4</th><th>Tier 2, G5 on</th><th>Tier 3, G5 on</th></tr></thead><tbody>' +
+    R.filter((r) => filt === 'all' || r[1] === filt).map((r) => {
+      const [n, , w, d, , , role] = r;
+      const [a, b, c] = sets(r);
+      const ws = w.map((k, i) => (i === d ? `<b>Dual</b> ${kc(k)} + ${kc(P2[k])}` : `Pure ${kc(k)}`)).join(' · ');
+      return `<tr><td><b>${n}</b>${role && role !== 'sup' && role !== 'vow' ? `<br><span class="muted">${role}</span>` : role === 'sup' ? '<br><span class="muted">support</span>' : role === 'vow' ? '<br><span class="muted">keeper healer</span>' : ''}</td><td>${ws}</td>` +
+        `<td><div class="slots">${a.map((x) => sl(x)).join('')}</div></td><td><div class="slots">${b.map((x, i) => sl(x, x !== a[i])).join('')}</div></td><td><div class="slots">${c.map((x, i) => sl(x, x !== b[i])).join('')}</div></td></tr>`;
+    }).join('') + '</tbody>';
+}
+for (const b of document.querySelectorAll('#fp button')) b.onclick = () => { filt = b.dataset.f; draw(); };
+draw();
+let star = 'pendant';
+function drawStar() {
+  for (const b of document.querySelectorAll('#sp button')) b.setAttribute('aria-pressed', String(b.dataset.s === star));
+  const ex = [R[0], R[2], R[4], R[14]];
+  document.getElementById('st').innerHTML = '<thead><tr><th>Class</th><th>Tier 2 preset, a slot G1–G4, ★ first</th></tr></thead><tbody>' + ex.map((r) => {
+    const a = sets(r)[0].slice();
+    const own = r[4] === 'P' ? 'pendant' : 'bell';
+    if (star === own) { a[0] = `<span class="star">★</span> ${a[0]}`; }
+    else if (star === 'pendant' || star === 'bell') a[0] = `<span class="star">★</span> Twofold ${star === 'pendant' ? 'Pendant' : 'Charm'}`;
+    else if (star === 'orb') a[2] = `<span class="star">★</span> ${a[2]}`;
+    else a[0] = `<span class="star">★</span> Great Insignia`;
+    return `<tr><td><b>${r[0]}</b></td><td><div class="slots">${a.map((x) => sl(x)).join('')}</div></td></tr>`;
+  }).join('') + '</tbody>';
+}
+for (const b of document.querySelectorAll('#sp button')) b.onclick = () => { star = b.dataset.s; drawStar(); };
+drawStar();
+const M = [
+  ['Berserker · Spellfist (the Brawler)', 'Great ×2 + Great Orb', 15.2, 'Great ×3', 19.0, 17.2, 19.5],
+  ['Archmage · Battlemage (the Sorcerer)', 'Great ×2 + Great Orb', 19.1, 'Great ×3', 20.5, 20.1, 22.0],
+  ['Blademaster · Sentinel (the Arms Spellblade)', 'Twofold ×2 + Great Orb', 18.6, 'Twofold ×3', 19.1, 18.4, 19.6],
+  ['Runeblade · Enchanter (the Tome Spellblade)', 'Twofold ×2 + Great Orb', 17.8, 'Twofold + Great Orb ×2', 18.4, 18.1, 19.6],
+  ['Warlord · Druid (the Arms Summoner)', 'Twofold ×2 + Great Orb', 17.5, 'Twofold Orb ×3', 20.1, 20.3, 23.3],
+  ['Invoker · Shaman (the Tome Summoner)', 'Twofold ×2 + Great Orb', 20.8, 'Twofold Orb ×3', 24.7, 19.2, 22.0],
+  ['Guardian · Templar (the Paladin)', 'Great ×2 + Great Orb', 22.2, 'Seeker ×3 (≈)', 25.2, 24.4, 27.0],
+  ['Bishop · Exorcist (the Cleric)', 'Great ×2 + Great Orb', 18.5, 'Seeker ×3 (≈)', 20.6, 20.2, 23.6],
+];
+document.getElementById('mt').innerHTML = '<thead><tr><th>Class</th><th>Preset</th><th class="n"><span class="tier t2">T2</span> preset</th><th>T2 best set (mean)</th><th class="n">T2 best</th><th class="n"><span class="tier t3">T3</span> preset</th><th class="n">T3 best</th></tr></thead><tbody>' +
+  M.map(([c, p, a, b, bv, t3, t3b]) => `<tr><td><b>${c}</b></td><td>${p}</td><td class="n">${a.toFixed(1)}%</td><td>${b}</td><td class="n">${bv.toFixed(1)}%</td><td class="n">${t3.toFixed(1)}%</td><td class="n">${t3b.toFixed(1)}%</td></tr>`).join('') + '</tbody>';
+</script>
+</body>
+</html>
