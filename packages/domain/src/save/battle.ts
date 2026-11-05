@@ -8,7 +8,7 @@ import { DRILL_LOGS, drillId, drillOfNode, isDrillChapter } from '../rpg/drill-i
 import { rpgTierLevel, type RpgCampaignChapter, type RpgMapNode } from '../rpg/campaign/chapters'
 import { rpgBattleExp, rpgBattleLaurels, rpgRewardKind, rpgShardsBetween } from '../rpg/campaign/rewards'
 import { FIRST_CLEAR_LAURELS, LATE_LAURELS, REPLAY_SHARE } from '../economy/pacing'
-import { SPRING_RECHARGE_MS, stageExpPay, stagePay } from '../world/world'
+import { SPRING_RECHARGE_MS, stageExpPay, stagePay, stageRegionId, WORLD_STAGES } from '../world/world'
 import {
   rpgAbandonRunBattle, rpgActInRun, rpgBeginRunBattle, rpgCloseRunBattle, rpgMemberLevel,
   type RpgPartyMember, type RpgRun,
@@ -43,7 +43,8 @@ import { BATTLE_ENGINE_VERSION, rpgRework } from '../rpg/battle/caps'
 import { STRIDE_FLOURISH, umaCalling, umaCallingPick, umaCallingPickBlock, umaFlourishActive, umaStride, umaTemplate } from '../roster/template'
 import { activeClass, classOf, healerBlock, withClassWeapons, type BattleOutfit } from './class'
 import { RPG_RESET_TIER0 } from './classes-v3'
-import { capitalRunsLive } from './collections'
+import { capitalRunsLive, honeycombLive } from './collections'
+import { regionOfTier } from './region-teams'
 import { isCapitalRunChapter } from '../world/capital-run-id'
 import { settleCapitalFight } from './capital'
 
@@ -497,6 +498,16 @@ export function settleFight(save: Save, chapter: RpgCampaignChapter, run: RpgRun
   Object.assign(result, { members: paid.members, shards: paid.shards, tickets: paid.tickets, laurels: paid.laurels, gearMarks: paid.gearMarks,
     classMarks: paid.classMarks, firstClear })
   const next: TierWorld = { ...paid.world, world: { ...world.world, run: closed } }
+  const regionId = stageRegionId(node.id)
+  if (honeycombLive() && regionId === chapter.id && regionOfTier(regionId, Number(tier)) && /-s(?:[1-9]|1[0-2])$/.test(node.id)) {
+    const record = world.regionTeams?.[regionId] ?? {}
+    const hadWin = Array.from({ length: WORLD_STAGES }, (_, i) => (run.wins[`${regionId}-s${i + 1}`] ?? 0) > 0).some(Boolean)
+    const claim = !record.claim && !hadWin, clear = !record.clear && node.kind === 'boss' && firstClear
+    if (claim || clear) {
+      const team = { umas: battle.input.allies.map((a) => a.id), at: now }
+      next.regionTeams = { ...world.regionTeams, [regionId]: { ...record, ...(claim ? { claim: team } : {}), ...(clear ? { clear: team } : {}) } }
+    }
+  }
   return { save: withWorld(save, tier, next, now), result }
 }
 

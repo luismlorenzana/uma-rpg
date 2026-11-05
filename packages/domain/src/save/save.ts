@@ -57,7 +57,8 @@ import {
 } from '../rift/state'
 import { migrateWorld, type TierGrant } from './migrations'
 import { SAVE_SCHEMA_VERSION } from './version'
-import { CAPITAL_RUNS_SAVE, capitalRunsLive, collectionsLive, WEAPONS_SAVE } from './collections'
+import { CAPITAL_RUNS_SAVE, capitalRunsLive, collectionsLive, honeycombLive, WEAPONS_SAVE } from './collections'
+import { REGION_TEAMS_MAX, regionOfTier, type RegionTeam, type RegionTeams } from './region-teams'
 import { capitalRunNodeOf, capitalRunOf } from '../world/capital-run-id'
 import { validSteps, widenSteps, type WindowRecord, type WindowRecords } from './window-record'
 
@@ -69,7 +70,7 @@ export const MAX_TARGETS = 10
 export const STARTING_UNLOCK_TICKETS = 20
 export const TRAINER_NAME_MAX = 24
 export const DEFAULT_TRAINER_NAME = 'Trainer'
-export const PARTY_COUNT = 20
+export const PARTY_COUNT = honeycombLive() ? 24 : 20
 export const PARTY_SIZE = 5
 export const PARTY_NAME_MAX = 24
 export const MAX_UMA_LEVEL = 50
@@ -209,6 +210,8 @@ export interface TierWorld extends WorkState<RpgWorkRequest> {
   capitalRuns?: CapitalRun[]
   /** The run counters and the last six wins of each capital in this world. */
   capitals?: Record<string, CapitalRecord>
+  /** Save v38 (D295, H164): first claim/clear teams, at most one record per region; absent before the switch. */
+  regionTeams?: Record<string, RegionTeams>
 }
 
 export type CapitalParty = [string, string, string, string, string]
@@ -224,7 +227,7 @@ export interface CapitalRun { id: string; continent: string; startedAt: string; 
 /** A won run keeps its faces even after its Umas ascend. */
 export interface CapitalWin { id: string; wonAt: string; lanes: CapitalParty[] }
 export interface CapitalRecord { started: number; won: number; recent: CapitalWin[] }
-export const CAPITAL_RUNS_MAX = 5
+export const CAPITAL_RUNS_MAX = honeycombLive() ? 6 : 5
 export const CAPITAL_RECENT_MAX = 6
 
 /** A world's Drills (D283, CO23, CO24): the last day turned (`YYYY-MM-DD` on the phone's clock, after 04:00), the runs
@@ -388,7 +391,7 @@ export const newOwnedUma = (now: string, startClass?: RpgClass, engine: number =
 
 /** The world's state (D66). */
 export interface WorldState {
-  /** The party that fights: any of the twenty, swapped any time outside a fight. */
+  /** The party that fights, swapped any time outside a fight. */
   activeParty: number
   /** World-wide progress as one run: wins per stage, MP per Uma (absent is full), the open fight and its party. */
   run: RpgRun
@@ -402,7 +405,8 @@ export const newWorldState = (now: string): WorldState => ({ activeParty: 0, run
 export function newTierWorld(now: string, unlockTickets: number, engine: number = BATTLE_ENGINE_VERSION): TierWorld {
   if (rpgRework('economy', engine)) {
     return { createdAt: now, wallet: newWallet(unlockTickets, engine), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, targets: [], heroes: {},
-      rift: newRiftState(), grant: null, ...(collectionsLive() ? { drills: newDrills() } : {}), ...(capitalRunsLive() ? { capitalRuns: [], capitals: {} } : {}) }
+      rift: newRiftState(), grant: null, ...(collectionsLive() ? { drills: newDrills() } : {}), ...(capitalRunsLive() ? { capitalRuns: [], capitals: {} } : {}),
+      ...(honeycombLive() ? { regionTeams: {} } : {}) }
   }
   return { createdAt: now, wallet: newWallet(unlockTickets, engine), umas: {}, parties: defaultParties(), world: newWorldState(now), items: {}, buildings: {}, work: {}, gems: {}, gear: {}, targets: [], heroes: {},
     rift: newRiftState() }
@@ -1023,8 +1027,8 @@ function parseUmas(value: unknown, path: string, v28?: { tier: number }): Record
   return umas
 }
 
-function parseParties(value: unknown, path: string, umas: Record<string, OwnedUma>): Party[] {
-  if (!Array.isArray(value) || value.length !== PARTY_COUNT) throw new SaveParseError(path, `expected ${PARTY_COUNT} parties`)
+function parseParties(value: unknown, path: string, umas: Record<string, OwnedUma>, expected = PARTY_COUNT): Party[] {
+  if (!Array.isArray(value) || value.length !== expected) throw new SaveParseError(path, `expected ${expected} parties`)
   const seen = new Set<string>()
   return value.map((raw, i) => {
     const at = `${path}.${i}`
@@ -1158,9 +1162,10 @@ function resetTierWorld(value: unknown, path: string): TierWorld {
     umas[id] = newOwnedUma(timestamp((raw as Obj | null)?.unlockedAt, `${path}.umas.${id}.unlockedAt`))
   }
   const tickets = ((typeof w.wallet === 'object' && w.wallet !== null ? w.wallet : {}) as Obj).unlockTickets
+  const parties = w.parties === undefined ? defaultParties() : parseParties(withLeads(w.parties), `${path}.parties`, umas, honeycombLive() ? 20 : PARTY_COUNT)
   return {
     ...newTierWorld(createdAt, typeof tickets === 'number' && Number.isSafeInteger(tickets) && tickets >= 0 ? tickets : 0),
-    umas, parties: w.parties === undefined ? defaultParties() : parseParties(withLeads(w.parties), `${path}.parties`, umas),
+    umas, parties: honeycombLive() && w.parties !== undefined ? [...parties, ...defaultParties().slice(20)] : parties,
   }
 }
 
@@ -1336,14 +1341,32 @@ function parseCapitals(w: Obj, path: string, tier: number, umas: Record<string, 
   return { capitalRuns, capitals }
 }
 
-/** v28's world (H78; R2's build decision 7): v27's without the gear and gem shelves, places with no levels, and the grant.
- * v31 (H114) keeps its shape; its work and stock read by the Wilds' trios. From the classes stage (save v32, H130) its
- * Umas, ranks and seats read v32's, and it may hold the class reset's record. */
+/** v38's bounded regional history. Faces can outlive their ownership, so only ids, order and dates are validated. */
+function parseRegionTeams(value: unknown, path: string, tier: number): Record<string, RegionTeams> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new SaveParseError(path, 'expected an object')
+  const entries = Object.entries(value)
+  if (entries.length > REGION_TEAMS_MAX) throw new SaveParseError(path, 'too many entries')
+  const team = (value: unknown, at: string): RegionTeam => {
+    const t = object(value, at, ['umas', 'at']), umas = ids(t.umas, `${at}.umas`, PARTY_SIZE)
+    if (umas.length === 0 || umas.some((id) => !OUTFIT_ID.test(id))) throw new SaveParseError(`${at}.umas`, 'expected one to five outfit ids')
+    return { umas: [...umas], at: timestamp(t.at, `${at}.at`) }
+  }
+  return Object.fromEntries(entries.map(([id, raw]) => {
+    const at = `${path}.${id}`
+    if (!regionOfTier(id, tier)) throw new SaveParseError(at, 'not a region of this tier')
+    const r = object(raw, at, ['claim', 'clear'])
+    if (r.claim === undefined && r.clear === undefined) throw new SaveParseError(at, 'expected a claim or clear')
+    return [id, { ...(r.claim === undefined ? {} : { claim: team(r.claim, `${at}.claim`) }),
+      ...(r.clear === undefined ? {} : { clear: team(r.clear, `${at}.clear`) }) }]
+  }))
+}
+
+/** v28's world without the gear/gem shelves; later generations add fields only through their live save switches. */
 function parseTierWorldV28(value: unknown, path: string, tier: number, check: CheckBattle): TierWorld {
   const v32 = rpgRework('classes')
   const v35 = collectionsLive()
   const w = object(value, path, ['createdAt', 'wallet', 'umas', 'parties', 'world', 'items', 'buildings', 'work', 'targets', 'heroes', 'rift', 'grant',
-    ...(v32 ? ['classesV3'] : []), ...(v35 ? ['drills'] : []), ...(capitalRunsLive() ? ['capitalRuns', 'capitals'] : [])])
+    ...(v32 ? ['classesV3'] : []), ...(v35 ? ['drills'] : []), ...(capitalRunsLive() ? ['capitalRuns', 'capitals'] : []), ...(honeycombLive() ? ['regionTeams'] : [])])
   const umas = parseUmas(w.umas, `${path}.umas`, { tier })
   object(w.buildings, `${path}.buildings`, [])
   const world: TierWorld = {
@@ -1356,6 +1379,7 @@ function parseTierWorldV28(value: unknown, path: string, tier: number, check: Ch
     ...(v35 ? { drills: parseDrills(w.drills, `${path}.drills`) } : {}),
   }
   if (capitalRunsLive()) Object.assign(world, parseCapitals(w, path, tier, umas, world.world.run))
+  if (honeycombLive()) world.regionTeams = parseRegionTeams(w.regionTeams, `${path}.regionTeams`, tier)
   return world
 }
 
