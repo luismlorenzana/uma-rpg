@@ -16,11 +16,14 @@
 > ([§6.2](#62-what-every-tier-3-class-keeps-and-adds-t2c78t2c82)). Round-2 calls round 3 replaces are marked
 > **Superseded (R3-n)** ([§3.5](#35-round-2-t2c31t2c64-in-round-3)); the doc reads as one design.
 >
-> **Numbers:** Tier 1 from the manual and the code (`packages/domain/src`); the sixteen kept classes' measured values
-> from [balance](balance.md)'s round 2 (T2B20–T2B40); the new kits **analytic**, set with round 2's knob values as the
-> reference and code numbers (offenses, Might, foe defenses at Tier 2 and 3 Lv 50; a live-engine run of single-target
-> kits), each marked for balance to confirm ([§7](#7-provides-and-assumes)). Throwaway tests printed them; none is
-> committed.
+> **Numbers:** Tier 1 from the manual and the code (`packages/domain/src`). Round 3 drafted the new kits **analytic**;
+> **[balance](balance.md)'s round 3 then measured all forty-two** on its rebuilt fork (T2B41–T2B66), and **this doc
+> carries its knobs** (the cross-reference, 2026-11-05): the crosses' hands, **the trunk hand** (a hand on depths 1–2
+> apart from depths 3–5, [§4.2](#42-what-a-tier-2-class-keeps-and-the-one-rule-that-changes-her-t2c33-t2c67)), the pure
+> variants' second hands, the Sentinel's ladder, the Druid's, the Warlord's and the Invoker's hands, Arsenal's hands,
+> Resonance on her deepest depth, the supports' Tier 3 twist without its +0.03, and **mends and Barriers ×1.3 in
+> Overflow's place**. Each amended call keeps its drafted value as the alternative ([§12](#12-decisions)); every gain,
+> comp and stress figure below is balance's measured one unless marked analytic.
 >
 > **Pages** (desktop, light and dark): [the class tree, Tier 1 → 2 → 3](previews/classes-tree.html) (new) ·
 > [classes by tier](previews/classes-tiers.html) · [the twenty](previews/classes-branches.html) ·
@@ -58,9 +61,9 @@ switches among the ones open to her after.
  Tome Summoner ───┬ Invoker      keeper ─────────────────────────────── Hierarch     + Menagerie
                   ├ Shaman       support ────────────────────────────── Soulcaller   + the keeper's twist
                   └ Animist      pure     3 Tomes, the pure pair ────── Mythlord     + Momentum
- Paladin ─────────┬ Guardian     keeper   healer, a stack more ──────── Bastion      + Overflow
+ Paladin ─────────┬ Guardian     keeper   healer, a stack more ──────── Bastion      + mends ×1.3
                   └ Templar      battle   healer ×0.6 power ─────────── Inquisitor   power ×0.7
- Cleric ──────────┬ Bishop       keeper ─────────────────────────────── Cardinal     + Overflow
+ Cleric ──────────┬ Bishop       keeper ─────────────────────────────── Cardinal     + mends ×1.3
                   └ Exorcist     battle ─────────────────────────────── Hierophant   power ×0.7
 ```
 
@@ -85,25 +88,31 @@ switches among the ones open to her after.
 | **A weapon tree** | Trunk, then line A or B: 8 nodes | + line C, Power or Break tips: 14 nodes | **Two lines held**; crowned capstones |
 | **Skills held · equipped** | 15 · 3 → 7 | 18 · 3 → 10 | 27 · 10 (**the master slot retired**) |
 | **Skill MP · healing divisor** | ×1 · ÷ 300 | ×1.7 · ÷ 540 | ×2.4 · ÷ 780 |
-| **Each class against her parent** (R2-11) | — | The sixteen measured: **+7.0 · +3.9 · +3.2%** mean at Lv 10 · 30 · 50, 34 of 36 cells in the band; **the four pure variants and the two reshaped crosses analytic**, set inside the band | **+3.2 to +8.2%** over her Tier 2 parent (analytic, mean +5.3%), on top of the crown every class shares |
-| **Tier 3's budget** | — | — | **About +17% at Lv 50** (the crown + one rule in each mastery's place; the keepers' line is round 2's measured crowned C1 exactly) |
-| **The owner's swaps** | — | **A Brawler with a Spellblade** (C3: Spellfist + Bladedancer) and **a Spellblade with the Paladin** (C4: Sentinel + Templar) each level with Party 1's keepers (C1) within 0.6%, analytic; their mirrors within 1.8% of Party 2's (C2) | The same swaps one tier down, +3.1 to +4.8% over their Tier 2 comps |
+| **Each class against her parent** (R2-11) | — | **Measured (balance T2B43, T2B66):** the sixteen damage and support classes **48 of 48 cells in the band**, mean **+3.4 · +3.0 · +5.3%** at Lv 10 · 30 · 50 on gear's kits; the healers on the stress check | **Measured (T2B51):** the eighteen **52 of 54 cells** within ±5 points of their mean (+4.7 · +2.9 · +3.9%) over their Tier 2 parent; the Gladiator's two a point past, accepted |
+| **Tier 3's budget** | — | — | **+17.0% and +18.8% at Lv 50** over the same parties uncrowned (the crown +11.8 and +14.9%), measured (T2B56); the rules alone +2 to +6% below the crown |
+| **The owner's swaps** | — | **A Brawler with a Spellblade** (C3: Spellfist + Bladedancer) **+3.3 · +3.0 · +5.7%** over Party 1 and **a Spellblade with the Paladin** (C4: Sentinel + Templar) **+3.6 · +2.2 · +5.1%**, level with Party 1's keepers (C1, +3.7 · +2.6 · +5.8%) within 0.7 points, measured (T2B59) | The same swaps one tier down (T3, T4) **+2.1 to +6.3%** over their Tier 2 comps, the keepers' T1 +2.0 to +4.7% |
 
 **Round 3 in seven lines:**
 1. **Every Tier 2 class promotes in Tier 3, and each promotion has a new name** (R3-1): 22 Tier 3 classes (T2C65).
 2. **The Spellfist and the Battlemage hit once and hard** (R3-2, R3-3): one act a turn, the cross on her stat, presets of
-   Heavy and Double kinds, and **Pinpoint**: her acts that strike one foe +2% a depth, ×1.1 at depth 5 (T2C71–T2C73).
+   Heavy and Double kinds, and **Pinpoint**: her acts that strike one foe +2% a depth, ×1.1 at depth 5 (T2C71–T2C73);
+   hands **×1.25 and ×1.1**, measured (T2B44).
 3. **Four pure variants at Tier 2** (R3-4): the hybrids' third child, all one channel, her family's pair and twist
-   kept, no statuses (**the pure pair**, T2C67, T2C68). The owner's "swap a Brawler with a Spellblade" works from Tier 2.
+   kept, no statuses (**the pure pair**, T2C67, T2C68), her second hand split by **the trunk hand** (T2B45, T2B46). The
+   owner's "swap a Brawler with a Spellblade" works from Tier 2.
 4. **The Spellfist and the Battlemage split in Tier 3** (R3-2, R3-3): Spellhammer and Spellknight keep the kit with
    Pinpoint doubled (+4% a depth); Gladiator and Thaumaturge go pure with **Arsenal**, two two-kind weapons, every kind of her channel in
    reach (T2C83–T2C85).
 5. **Every other line promotes into one** (R3-4, R3-5): keepers take their family's mastery, supports their keeper
-   sibling's twist, pures Momentum, keeper healers Overflow, battle healers more power (T2C86, T2C87).
-6. **Round 2's Tier 3 features find a home** (R3-1): the crown and two lines held on every Tier 3 class, the masteries as
-   the rules above, the master slot retired; Tier 3's budget stays about +17% at Lv 50 (T2C78–T2C82, T2C92).
-7. **The comps follow the owner's swaps** (R3-7): every Tier 2 comp +1.4 to +6.1% over its Tier 1 party, analytic,
-   the swaps level with C1 or C2; every Tier 3 comp +3.1 to +4.8% over its Tier 2 comp (T2C93).
+   sibling's twist, pures Momentum, keeper healers **mends and Barriers ×1.3** (Overflow retired, T2B55), battle healers
+   more power (T2C86, T2C87).
+6. **Round 2's Tier 3 features find a home** (R3-1): the crown and two lines held on every Tier 3 class, four masteries
+   as the rules above, the master slot retired; Tier 3's budget measured **+17.0 and +18.8%** at Lv 50 (T2C78–T2C82,
+   T2C92, T2B56).
+7. **The comps follow the owner's swaps** (R3-7), measured (T2B58, T2B59): every Tier 2 comp **+1.0 to +5.8%** over its
+   Tier 1 party, the swaps level with C1 or C2; every Tier 3 comp **−0.4 to +9.3%** over its Tier 2 comp (T2C93). **No
+   class is useless** (T2B64): every one in her band, almost every one the better pick somewhere
+   ([§5.6](#56-the-stress-check-and-is-any-class-useless-t2b60-t2b64)).
 
 ## 2. Tier 1 as built
 
@@ -374,14 +383,16 @@ that no longer exists, fixed here.
 |---|---|---|---|
 | T2C31 | Sixteen Tier 2 classes | **Superseded (R3-6)** | Twenty (T2C66): round 2's sixteen and four pure variants |
 | T2C32 | Their names | **Kept** | The four new names in T2C69 |
-| T2C33 | What a Tier 2 class keeps | **Kept, changed (R3-4)** | A pure variant turns her slots one channel (T2C67, T2C68) |
+| T2C33 | What a Tier 2 class keeps | **Kept, changed (R3-4, T2B45)** | A pure variant turns her slots one channel (T2C67, T2C68); a hand may differ on her trunk and her lines (§4.2) |
 | T2C34 | Momentum | **Kept** | Also the pure variants' Tier 3 rule (T2C86) |
-| T2C35 | The pure expanders: the cross, hands ×1.05 · ×1.3 | **Kept, changed (R3-2, R3-3)** | The cross stands; one act a turn, Pinpoint, single-target presets, and hands ×1 · ×1.25 for Pinpoint's share (T2C71–T2C73) |
+| T2C35 | The pure expanders: the cross, hands ×1.05 · ×1.3 | **Kept, changed (R3-2, R3-3)** | The cross stands; one act a turn, Pinpoint, single-target presets, and hands ×1.25 · ×1.1, measured (T2C71–T2C73, T2B44) |
 | T2C36 | Their gear | **Kept** | Also the pure variants' (T2C70) |
-| T2C37, T2C38 | The hybrid keepers | **Kept** | Their twist is also their support siblings' Tier 3 rule (T2C86) |
-| T2C39–T2C42 | The supports | **Kept** | — |
-| T2C43, T2C44 | The healer keepers, the battle healers | **Kept** | — |
-| T2C45 | Statuses by class, four levels | **Kept, changed (R3-4)** | The pure variants at none (T2C75) |
+| T2C37 | The Spellblade keepers | **Kept** | Their twist is also their support siblings' Tier 3 rule (T2C86) |
+| T2C38 | The Summoner keepers | **Kept, changed (T2B49)** | The Warlord's +0.03 on her lines only, the Invoker's +0.01 |
+| T2C39 | The supports' kit | **Kept, changed (T2B47, T2B48)** | The Sentinel ×0.9, one stack, the tapped foe; the Druid's hands by depth |
+| T2C40–T2C42 | The supports' Barrier, mend, the one-healer rule | **Kept** | — |
+| T2C43, T2C44 | The healer keepers, the battle healers | **Kept** | The keepers' stack more works below depth 5 only (a finding, T2B61) |
+| T2C45 | Statuses by class, four levels | **Kept, changed (R3-4, T2B47)** | The pure variants at none (T2C75); the support level's ladder and reach a class's numbers (the Sentinel's one stack) |
 | T2C46 | The Tier 2 promotion: both children | **Superseded (R3-4)** | Every child, two or three a Tier 1 class (T2C76) |
 | T2C47 | Switching and Class Rank | **Kept** | Also Tier 3's (T2C89) |
 | T2C48 | The door | **Kept** | Tier 3's door is T2C90 |
@@ -399,11 +410,11 @@ that no longer exists, fixed here.
 | T2C60, T2C61 | The save, the engine | **Superseded (R3-1, R3-6)** | T2C95, T2C96 |
 | T2C62 | The previews | **Superseded** | Seven pages (T2C98) |
 | T2C63 | The comps and the party hint | **Superseded (R3-7)** | The owner's swaps as the spine (T2C93); the hint kept (T2C94) |
-| T2C64 | Where the band is read | **Kept** | Tier 2's band; Tier 3's is T2C92 |
+| T2C64 | Where the band is read | **Kept** | Tier 2's band, read on the sixteen damage and support classes (T2B43); Tier 3's is T2C92 |
 
 **Counts (159 calls):** CP, CV, HV, RC, SN and A1–A10 (95): Kept 38 · Kept, changed 30 · Superseded 26 · Broken 1 (CP34).
-Round 1 (30): Kept 8 · Kept, changed 13 · Superseded 8 · listed for the owner 1 (T2C5). Round 2 (34): Kept 18 · Kept,
-changed 6 · Superseded 10.
+Round 1 (30): Kept 8 · Kept, changed 13 · Superseded 8 · listed for the owner 1 (T2C5). Round 2 (34): Kept 16 · Kept,
+changed 8 · Superseded 10.
 
 ## 4. Tier 2 in full
 
@@ -415,21 +426,21 @@ parent's order); MP is the hand's MP; the lean and the armor half are her parent
 | Class | Parent | Line | Slots · each slot's hits read | Act · hand · MP | Her rule | Statuses | Healer | LB scale | What she's for |
 |---|---|---|---|---|---|---|---|---|---|
 | **Berserker** | Brawler | Keeper | 3 Arms · ATK | One act · ×1 · ×1 | **Momentum** (§4.3) | None | No | ×0.95 | Pure physical, a self-buff: the long fight's damage |
-| **Spellfist** | Brawler | Expander | 2 Arms + 1 Tome · **ATK on every hit** | One act · **×1** · ×1 | **The cross, and Pinpoint** (+2% a depth, §4.4) | None | No | ×0.95 | **Single big hits** with an element in reach: the boss and sub-boss striker |
+| **Spellfist** | Brawler | Expander | 2 Arms + 1 Tome · **ATK on every hit** | One act · **×1.25** · ×1 | **The cross, and Pinpoint** (+2% a depth, §4.4) | None | No | ×0.95 | **Single big hits** with an element in reach: the boss and sub-boss striker |
 | **Archmage** | Sorcerer | Keeper | 3 Tomes · M.ATK | One act · ×1 · ×1 | Momentum | None | No | ×0.95 | Pure magic, a self-buff: the party's top damage |
-| **Battlemage** | Sorcerer | Expander | 2 Tomes + 1 Arm · **M.ATK on every hit** | One act · **×1.25** · ×1 | **The cross, and Pinpoint** | None | No | ×0.95 | **Single big hits** with an Arm in reach: the boss caster |
+| **Battlemage** | Sorcerer | Expander | 2 Tomes + 1 Arm · **M.ATK on every hit** | One act · **×1.1** · ×1 | **The cross, and Pinpoint** | None | No | ×0.95 | **Single big hits** with an Arm in reach: the boss caster |
 | **Blademaster** | Arms Spellblade | Keeper | 2 Arms + 1 Tome · ATK, M.ATK | Pair · 0.75 + 0.47 · ×0.5 a half | Her familiar's hit on both halves, piercing (§4.6) | A path | No | ×0.95 | The Break engine on one foe |
-| **Sentinel** | Arms Spellblade | Support | 2 Arms + 1 Tome · ATK, M.ATK | Pair · 0.68 + 0.42 · ×0.5 a half | Support: statuses topped up, a Barrier (§4.7) | Support, the tapped foe | No | ×0.95 | Offense support with a ward |
-| **Bladedancer** | Arms Spellblade | **Pure** | **3 Arms (2 + 1) · ATK on every hit** | Pair · **0.72 + 0.32** · ×0.5 a half | **The pure pair** (§4.5) | **None** | No | ×0.95 | **Pure physical multi-hit on one foe** |
+| **Sentinel** | Arms Spellblade | Support | 2 Arms + 1 Tome · ATK, M.ATK | Pair · **0.65 + 0.40** · ×0.5 a half | Support: statuses topped up, **one stack**, a Barrier (§4.7) | Support, one stack, the tapped foe | No | ×0.95 | Offense support with a ward |
+| **Bladedancer** | Arms Spellblade | **Pure** | **3 Arms (2 + 1) · ATK on every hit** | Pair · **trunk 0.72 + 0.53, lines 0.72 + 0.33** · ×0.5 a half | **The pure pair** (§4.5) | **None** | No | ×0.95 | **Pure physical multi-hit on one foe** |
 | **Runeblade** | Tome Spellblade | Keeper | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.75 + 0.51 · ×0.5 a half | The Blademaster's | A path | No | ×0.95 | The Break engine on one foe, magic-led |
 | **Enchanter** | Tome Spellblade | Support | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.58 + 0.38 · ×0.5 a half | The Sentinel's | Support, the tapped foe | No | ×0.95 | Offense support with a ward, magic-led |
-| **Spellweaver** | Tome Spellblade | **Pure** | **3 Tomes (2 + 1) · M.ATK on every hit** | Pair · **0.72 + 0.41** · ×0.5 a half | **The pure pair** | **None** | No | ×0.95 | **Pure elemental multi-hit on one foe** |
-| **Warlord** | Arms Summoner | Keeper | 2 Arms + 1 Tome · ATK, M.ATK | Pair · 0.60 + 0.49 · ×0.5 a half | Both summons linger (§4.6) | A path | No | ×0.95 | The Break engine on every foe |
-| **Druid** | Arms Summoner | Support | 2 Arms + 1 Tome · ATK, M.ATK | Pair · 0.54 + 0.44 · ×0.5 a half | Support: statuses on every foe, a mend | Support, every foe | No | ×0.95 | Field support with a mend |
-| **Marshal** | Arms Summoner | **Pure** | **3 Arms (2 + 1) · ATK on every hit** | Pair · **0.57 + 0.40** · ×0.5 a half | **The pure pair** | **None** | No | ×0.95 | **Pure physical area, a summon that lingers** |
-| **Invoker** | Tome Summoner | Keeper | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.60 + 0.53 · ×0.5 a half | The Warlord's | A path | No | ×0.95 | The Break engine on every foe, magic-led |
+| **Spellweaver** | Tome Spellblade | **Pure** | **3 Tomes (2 + 1) · M.ATK on every hit** | Pair · **trunk 0.72 + 0.44, lines 0.72 + 0.50** · ×0.5 a half | **The pure pair** | **None** | No | ×0.95 | **Pure elemental multi-hit on one foe** |
+| **Warlord** | Arms Summoner | Keeper | 2 Arms + 1 Tome · ATK, M.ATK | Pair · **trunk 0.57 + 0.46, lines 0.60 + 0.49** · ×0.5 a half | Both summons linger (§4.6) | A path | No | ×0.95 | The Break engine on every foe |
+| **Druid** | Arms Summoner | Support | 2 Arms + 1 Tome · ATK, M.ATK | Pair · **trunk 0.52 + 0.42, lines 0.60 + 0.48** · ×0.5 a half | Support: statuses on every foe, a mend | Support, every foe | No | ×0.95 | Field support with a mend |
+| **Marshal** | Arms Summoner | **Pure** | **3 Arms (2 + 1) · ATK on every hit** | Pair · **trunk 0.57 + 0.56, lines 0.57 + 0.40** · ×0.5 a half | **The pure pair** | **None** | No | ×0.95 | **Pure physical area, a summon that lingers** |
+| **Invoker** | Tome Summoner | Keeper | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · **0.58 + 0.51** · ×0.5 a half | The Warlord's | A path | No | ×0.95 | The Break engine on every foe, magic-led |
 | **Shaman** | Tome Summoner | Support | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.57 + 0.5 · ×0.5 a half | The Druid's | Support, every foe | No | ×0.95 | Field support with a mend, magic-led |
-| **Animist** | Tome Summoner | **Pure** | **3 Tomes (2 + 1) · M.ATK on every hit** | Pair · **0.57 + 0.37** · ×0.5 a half | **The pure pair** | **None** | No | ×0.95 | **Pure elemental area, a summon that lingers** |
+| **Animist** | Tome Summoner | **Pure** | **3 Tomes (2 + 1) · M.ATK on every hit** | Pair · **trunk 0.57 + 0.54, lines 0.57 + 0.33** · ×0.5 a half | **The pure pair** | **None** | No | ×0.95 | **Pure elemental area, a summon that lingers** |
 | **Guardian** | Paladin | Keeper | 2 Arms + 1 Tome · ATK; heals from ATK | One act · ×0.5 · ×0.6 | Every status one stack more (§4.8) | Widely, +1 | **Yes** | ×0.8 | The one healer, the attrition pick |
 | **Templar** | Paladin | Expander | 2 Arms + 1 Tome · ATK; heals from ATK | One act · ×0.6 · ×0.7 | A battle healer | Widely | **Yes** | ×0.8 | The healer who hits, the on-curve pick |
 | **Bishop** | Cleric | Keeper | 2 Tomes + 1 Arm · M.ATK; heals from M.ATK | One act · ×0.5 · ×0.6 | The Guardian's | Widely, +1 | **Yes** | ×0.8 | The one healer, magic-led |
@@ -440,9 +451,10 @@ parent's order); MP is the hand's MP; the lean and the armor half are her parent
 - **"Pure"** names a class whose three weapons and every hit are one channel: the Berserker and the Archmage, the
   four pure variants, and in Tier 3 the Gladiator and the Thaumaturge. A pure class carries no status (D282's level
   "none").
-- **Hands:** the fourteen classes round 3 leaves as they were wear balance's measured knobs (T2B25–T2B29); the
-  Spellfist's and the Battlemage's are round 3's, ×1 and ×1.25 beside Pinpoint (§4.4); the four pure variants' second
-  half is analytic (§4.5), for balance to confirm.
+- **Hands:** balance's round 3, measured on the twenty (T2B44–T2B49, T2B66): the crosses **×1.25 and ×1.1** beside
+  Pinpoint (§4.4); **the trunk hand** on six of them (the four pure variants, the Warlord, the Druid: "trunk" is her hand
+  on depths 1–2 and Attacks, "lines" on depths 3–5, §4.2); the Sentinel ×0.9 and the Invoker +0.01; the rest as round 2
+  measured them (T2B25–T2B29).
 - **One healer a party** (CV22) is a ceiling, not a floor (T2B39); the four healer classes count, the supports don't.
 - **A Tier 2 world plays only these twenty.** Her Tier 1 classes stay in Tier 1's world with her record there.
 
@@ -463,9 +475,20 @@ parent's order); MP is the hand's MP; the lean and the armor half are her parent
 |---|---|
 | Her lean, her armor half, her Limit Break scale, her family, her hall | The stat her hits read (a cross, a pure variant) |
 | Her slots' **count and order** (2 + 1, or 3); a keeper's, a support's and a healer's channels too | **A pure variant's channels:** her parent's 2 + 1 turned all her lead channel; her third slot still gives her pair's second half |
-| Her parent's trees of each weapon's channel (names, shapes, powers, lines B and C) | Her hand (a cross, a keeper +0.03 a half, a support's cut, a battle healer's, a pure variant's second half) |
+| Her parent's trees of each weapon's channel (names, shapes, powers, lines B and C) | Her hand (a cross, a keeper's step, a support's cut, a battle healer's, a pure variant's second half), **on her trunk and her lines apart where her class needs it** (below) |
 | Her act's shape: one act (the pures, the crosses, the healers) or a pair (the hybrids' children) | Who a status reaches and at what stacks (four levels, §4.9); a pure variant carries none |
 | Her MP regen; equipped slots; Skill Ranks | A familiar's hit or a lingering summon on both halves; a Barrier or a mend; Momentum; Pinpoint |
+
+**The trunk hand** (balance T2B45). A hand is her power on her skills and Attacks (lead half + second half for a pair,
+one number for an act). **A class may carry two:** one on her **trunk** (depths 1–2 and her Attacks) and one on her
+**lines** (depths 3–5, where lines A, B and C and the paths begin), shown on her sheet as "Hand: 0.72 + 0.53 on her
+trunk, 0.72 + 0.33 on her lines". A Limit Break never reads a hand; MP never scales with it; her class line, cast at
+Class Rank 20 · 30 · 40, reads her lines' hand. Balance split it where a class's gain over her parent slopes with level
+in a way one hand can't follow at both ends: a pure variant's stat lead grows with level while an all-one-channel kit
+Breaks fewer foes early, a keeper's second summon pays most in Lv 10's long fights, the Druid's Mind Break overlaps the
+Cleric's at depth 5. **Six Tier 2 classes carry it** (the Bladedancer, the Spellweaver, the Marshal, the Animist, the
+Warlord, the Druid) **and one Tier 3** (the Gladiator); their Tier 3 children keep their parent's. Every other class has
+one hand.
 
 **The lines of each family, by what they do with her parent:**
 
@@ -502,10 +525,11 @@ none):
 | Mean stacks | 1.51 | 1.76 | 2.21 | **1.88** |
 | Her damage | +9.1% | +10.6% | +13.3% | **+11.3%** |
 
-**Measured** (balance §4.4–§4.6, her parent's seat in the owner's two parties): her damage a round at Lv 50 is the
-Berserker's 1.14 BT against the Brawler's 1.04 and the Archmage's 1.21 against the Sorcerer's 1.12; her seat's gain
-**+5.6 · +2.0 · +5.2%** (Berserker) and **+5.8 · +3.4 · +5.1%** (Archmage) at Lv 10 · 30 · 50, inside the band at every
-level. At +5% they were +4.5 · +1.8 · +4.5% and +4.9 · +2.7 · +4.1%, a point short of the twelve's mean at Lv 50.
+**Measured** (balance round 3, T2B41; her parent's seat in the owner's two parties): her D at Lv 50 is the Berserker's
+1.09 · 1.22 BT against the Brawler's 1.00 · 1.13 and the Archmage's 1.10 · 1.17 against the Sorcerer's 1.02 · 1.10 (Party
+1 · Party 2); her seat's gain **+3.4 · +0.6 · +6.0%** (Berserker) and **+3.8 · +1.5 · +5.8%** (Archmage) at Lv 10 · 30 ·
+50, inside the band at every level (round 2 read +5.6 · +2.0 · +5.2% and +5.8 · +3.4 · +5.1%). At +5% round 2 read them a
+point short of the band's middle at Lv 50; the step stays +6% (T2B26, kept).
 
 - **Why +6%, not the drafted +5% or the statuses' +10%** (T2B26): +5% left both pure keepers short of the band's middle at
   Lv 50; +6% puts them on it; at +10% the keepers would lead their expanders by about 13% of their own damage (§4.4). The
@@ -526,7 +550,7 @@ single hit damage and with the capability of their phys weapon do magic based da
 | **Slots** | 2 Arms + 1 Tome, the Arms first: the Arms Spellblade's mix | 2 Tomes + 1 Arm, the Tomes first: the Tome Summoner's mix |
 | **Act** | **One act a turn** (her parent's), one weapon's skill | The same |
 | **Every hit reads** | **ATK**, her Tome's too (the cross, kept) | **M.ATK**, her Arm's too |
-| **Hand · MP** | **×1** (round 2 ×1.05) · ×1 | **×1.25** (round 2 ×1.3) · ×1 |
+| **Hand · MP** | **×1.25** (drafted ×1, round 2 ×1.05; T2B44) · ×1 | **×1.1** (drafted ×1.25, round 2 ×1.3; T2B44) · ×1 |
 | **Pinpoint** (new) | **An act that strikes only the tapped foe: +2% a depth** (×1.02 at depth 1 … **×1.1 at depth 5**) | The same |
 | **Preset** (lead first) | **Greatsword, Katana, Fire Tome**: two Heavy single hits and the Katana's double, her minor multi-hit; Fire on ATK | **Fire Tome, Blizzard Tome, Katana**: Fire's single hit, the Katana's double on M.ATK, and one sweep |
 | **Her trees** | The Brawler's Arms trees and the Sorcerer's Tome trees | The Sorcerer's Tome trees and the Brawler's Arms trees |
@@ -584,17 +608,21 @@ single-target kit costs nothing early and up to a twentieth of the party late, w
 area skills have grown. A flat factor would overshoot Lv 10 and fall short at Lv 50; **+2% a depth** grows with the cost.
 The Battlemage keeps one sweep, since a Sorcerer's seat with none lost twice the Brawler's.
 
-**What they're worth** (analytic, her parent's seat; round 2 measured the cross at +6.5 · +4.5 · +4.3% and +10.9 · +8.3 ·
-−1.8%, at ×1.05 and ×1.3 on the Scatter twins):
+**What they're worth, measured** (balance T2B42, T2B44; her parent's seat in both parties, averaged; the band is the
+sixteen's mean ± 5 at each level):
 
-| | Round 2 (measured) | The one-foe kit | The hand | Pinpoint | **Round 3, Lv 10 · 30 · 50 (analytic)** | The band at Lv 10 · 30 · 50 |
-|---|---|---|---|---|---|---|
-| **Spellfist** | +6.5 · +4.5 · +4.3% | +3 · 0 · −6.5 points | ×1.05 → ×1: −2.6 | +2.3 · +4.6 · +5.8 | **about +9 · +6.5 · +1%** | +2 to +12 · −1.1 to +8.9 · −1.8 to +8.2 |
-| **Battlemage** | +10.9 · +8.3 · −1.8% | about −1 (the Katana for the Lance) | ×1.3 → ×1.25: −2 | +1.5 · +3 · +4 (two of her three) | **about +9.5 · +8 · −1%** | the same |
+| | Round 2's kit, re-measured at Lv 50 | **Drafted** (×1 · ×1.25) | **The knob: hands ×1.25 · ×1.1** | On gear's kits (T2B66) | The band on gear's kits, Lv 10 · 30 · 50 |
+|---|---|---|---|---|---|
+| **Spellfist** | ×1.05 on Greatsword, Axe, Thunder: +1.5% (round 2 read +4.3%) | −4.0 · −1.2 · **−7.6%** (out at Lv 10 and 50) | **+3.2 · +1.5 · +3.0%** | +4.9 · +3.1 · +7.9% (her Dual Katana + Axe) | −1.6 to +8.4 · −2.0 to +8.0 · +0.3 to +10.3 |
+| **Battlemage** | ×1.3 on Fire, Blizzard, Lance: +7.0% (round 2 −1.8%, reproduced only without the Lance's Might) | +5.0 · **+9.1 · +10.7%** (out at Lv 30 and 50) | **+0.1 · +2.0 · +4.8%** | the same (her kit unchanged) | the same |
 
-Points are of her parent's value; a point of her own damage is worth about 0.55 of a point of the seat's gain for a pure
-seat (round 2: the Berserker's damage +9.6%, her seat +5.2%). **The Battlemage at Lv 50 stays the cell nearest the edge,
-as in round 2**; her knobs, in order: Pinpoint's step (+2% → +3% a depth for her), then her hand.
+- **Why the crosses' hands, not Pinpoint's step** (T2B44): the Spellfist's deficit is the Axe's sweep and the Lance's
+  scatter she gave up, at every depth, while Pinpoint grows by depth; a hand fixes all three levels, and the Battlemage,
+  who kept her sweep, comes down by the same lever. A Pinpoint step of +3% for the Spellfist alone moved her as a hand
+  does and would break the mirrors' shared rule, so **Pinpoint stays +2% a depth** (T2C73 confirmed).
+- **Round 2's fork left the cross weapon's Might out** (T2B42), which is why its Battlemage needed ×1.3; with the Might
+  in, her drafted ×1.25 was a fifth more on nearly everything she does.
+- Her Party 2 seat stays the Spellfist's weakest (−2.7% at Lv 50: Party 2's Cleric already carries Fire), averaged inside.
 
 **Their gear** (T2C36, kept): her parent's armor half; every Pendant counts on every hit of the Spellfist, every Charm on
 every hit of the Battlemage; Prowess all to her stat; her other channel's weapon grades with its own items (D289). **Her
@@ -612,7 +640,8 @@ Summoner a **pure elemental** one, each keeping her family's feel. Her keeper an
 | **Slots** | **3 Arms**: two lead, one pair | **3 Tomes** | **3 Arms** | **3 Tomes** |
 | **Her act** | **A pair:** her lead half from her first two weapons, her second half from her third, every act | The same | The same, as summons | The same, as summons |
 | **Every hit reads** | **ATK** | **M.ATK** | **ATK** | **M.ATK** |
-| **Hands** (lead + second) · MP | 0.72 + **0.32** · ×0.5 a half | 0.72 + **0.41** | 0.57 + **0.40** | 0.57 + **0.37** |
+| **Hands** (lead + second) · MP | **trunk** 0.72 + **0.53**, **lines** 0.72 + **0.33** · ×0.5 a half | trunk 0.72 + **0.44**, lines 0.72 + **0.50** | trunk 0.57 + **0.56**, lines 0.57 + **0.40** | trunk 0.57 + **0.54**, lines 0.57 + **0.33** |
+| **Suggested types** (gear T2G51, T2B66) | Pure ×3 | Dual Thunder + Light | **Dual Bow + Greatsword** (her keeper's) | **Dual Dark + Fire** (her keeper's) |
 | **Her family's feel, kept** | Her familiar's extra hit on her lead half; one foe; Pierce on line B | The same | Her lead summon lingers and strikes every foe in farewell; area | The same |
 | **Statuses** | **None** | None | None | None |
 | **Her trees** | The Arms Spellblade's five Arms trees | The Tome Spellblade's five Tome trees | The Arms Summoner's five Arms trees | The Tome Summoner's five Tome trees |
@@ -630,7 +659,7 @@ Summoner a **pure elemental** one, each keeping her family's feel. Her keeper an
 - **Why her third slot gives her second half:** it mirrors her parent exactly (her lone weapon was always her second
   half), so her preset and her trees read the same and nothing new is learned.
 
-**Her second half's hand** (analytic, code numbers at Tier 2 Lv 50: her parent's offenses from the live harness,
+**Her second half's hand, drafted** (analytic, code numbers at Tier 2 Lv 50: her parent's offenses from the live harness,
 regular foes' defenses from `rpgFoe` at lifetime Lv 100, damage = offense² ÷ (offense + defense), the four roles alike):
 
 | | Her parent's second half | Hers | One hit, ×1 power: parent → hers | Lead half | Her parent's D + S (lost S) | **Second hand** |
@@ -648,6 +677,24 @@ Marshal +10.1 · +1.2%, Animist +4.4 · +6.3%** (at Lv 10 no path is open, so he
 is smaller: ×1.50 a hit, against ×1.69 at Lv 50). Mirrors differ for the reason round 2's crosses do: the Tome
 Spellblade's and the Arms Summoner's lost statuses are the ones no one else in Party 2 carries.
 
+**Measured** (balance T2B46, T2B66; her parent's seat, Lv 10 · 30 · 50). One hand couldn't hold both ends: the drafted
+hands missed at Lv 10 for three of the four, as an all-one-channel kit Breaks fewer foes early while her stat's lead
+grows with level. **The trunk hand** (§4.2) sets each end on its own:
+
+| | Drafted hand, measured | **Trunk · lines** (T2B46) | At the knob (balance's kits) | **On gear's kits** (T2B66) |
+|---|---|---|---|---|
+| **Bladedancer** | 0.32: **−8.7** · −0.2 · +2.7% | **0.53 · 0.33** | −0.2 · −0.1 · +5.5% | −1.6 · +3.1 · +0.5% (Pure ×3, Offense, a Twofold Orb) |
+| **Spellweaver** | 0.41: +4.1 · +1.8 · **−1.8%** | **0.44 · 0.50** | +5.0 · +4.0 · +1.0% | +5.7 · +6.0 · +1.1% (Dual Thunder + Light, Offense) |
+| **Marshal** | 0.40: **−7.2** · −1.9 · +3.0% | **0.56 · 0.40** (0.46 on her lines on balance's first kit) | +0.8 · −1.0 · +4.9% | +2.0 · −1.9 · +7.7% (Dual Bow + Greatsword, Offense) |
+| **Animist** | 0.37: **−8.2** · +7.7 · +5.5% | **0.54 · 0.33** | +2.1 · +3.3 · +3.0% | +3.1 · +6.6 · +8.4% (Dual Dark + Fire, Offense) |
+
+Bold cells were outside the band. **On gear's kits all four sit inside** (the band there −1.6 to +8.4 · −2.0 to +8.0 ·
++0.3 to +10.3), the Marshal at Lv 30 and the Bladedancer at Lv 50 within 0.2 of an edge. **Their Suggested types are
+their keeper sibling's Dual** for the Marshal and the Animist (gear's T2G51 had Pure ×3 and Blizzard + Light, which cost
+them 6 to 17 points at Lv 10: a Summoner's area hits reach every foe, so a partner kind's weakness pays on every foe
+struck, T2B66); **Offense is their Prowess** (extra stats' T2E51, confirmed: the Marshal +11.8% at Lv 50 against +4.9%
+with Area).
+
 **Why at Tier 2, not at Tier 3** (R3-4's alternative, T2C67): at Tier 3 the pure line would split from the keeper,
 so the owner's first swap (**a Brawler with a Spellblade**: the Brawler to her Spellfist, the Spellblade to pure
 physical) could only start a tier after the Spellfist does. At Tier 2 the two sides of the swap arrive together, and each
@@ -660,25 +707,30 @@ hybrid line has its three ways (sharpen, support, purify) for both tiers.
 | **Blademaster, Runeblade** | Her bound familiar lands one extra hit on her **lead** half (the same total) | **On both halves, and it pierces** (T2B28) | One more hit on her other half, the same total: a weak other half chips one more shield point. **The familiar's hit pierces** (skips the unbroken halving) on every tree, Pierce being the Spellblades' own line B |
 | **Warlord, Invoker** | Her **lead** summon lingers; at her next pair it strikes every foe once in farewell (its linger share × 0.1) | **Both summons linger** | Two farewells at her next pair, one of each kind, on every foe: each weak foe chips one more point a pair. Oath (B, linger 0.4) now matters on either half |
 
-- **Her hands +0.03 a half** (T2B28, T2B29): the Blademaster 0.75 + 0.47, the Runeblade 0.75 + 0.51, the Warlord 0.60 +
-  0.49, the Invoker 0.60 + 0.53 (lead first; MP ×0.5 a half kept).
-- **What it's worth, measured** (balance §4.4–§4.6): the drafted rules alone were worth about nothing on curve (the
-  Blademaster +0.5 · −0.1 · −0.1%, the Runeblade −0.6 · +0.6 · −0.7%: the same damage in more hits; the second farewell
-  1–3%). With the familiar's Pierce (+1 to +7% alone) and the hands: **the Blademaster +9.0 · +4.5 · +3.6%, the Runeblade
-  +6.8 · +2.3 · +2.8%, the Warlord +8.6 · +2.0 · +6.8%, the Invoker +8.6 · +3.6 · +3.0%** at Lv 10 · 30 · 50. A chip is
-  still a party value (a Break doubles everyone's damage on that foe for two rounds): the second familiar and farewell
-  add one to the Duel's rail (T2B38). The model (round 2's analytic model) credited
-  +6% and +7% of her damage to Breaks.
+- **Her hands** (T2B28, T2B49): the Spellblade keepers **+0.03 a half**, the Blademaster 0.75 + 0.47 and the Runeblade
+  0.75 + 0.51; **the Warlord +0.03 on her lines only** (trunk 0.57 + 0.46, her parent's; lines 0.60 + 0.49); **the
+  Invoker +0.01** (0.58 + 0.51). Lead first; MP ×0.5 a half kept.
+- **What it's worth, measured** (balance round 2, then round 3's T2B41 and T2B49): the drafted rules alone were worth
+  about nothing on curve (the Blademaster +0.5 · −0.1 · −0.1%, the Runeblade −0.6 · +0.6 · −0.7%: the same damage in more
+  hits; the second farewell 1–3%). With the familiar's Pierce (+1 to +7% alone) and the hands, round 3 reads **the
+  Blademaster +4.5 · +5.8 · +8.5%, the Runeblade +3.8 · +0.2 · +4.8%, the Warlord +6.4 · +2.3 · +6.5%, the Invoker +3.8 ·
+  +7.1 · +4.3%** at Lv 10 · 30 · 50. A chip is still a party value (a Break doubles everyone's damage on that foe for two
+  rounds): the second familiar and farewell add one to the Duel's rail (T2B38). The model (round 2's analytic model)
+  credited +6% and +7% of her damage to Breaks.
+- **Why the Summoner keepers' step moved** (T2B49): at round 2's +0.03 on both, the Warlord read +8.9% at Lv 10 and the
+  Invoker +7.6% at Lv 30, both near the band's top. A second summon's farewell pays most in Lv 10's long fights, so the
+  Warlord keeps her parent's hand on her trunk and takes her +0.03 on her lines; the Invoker, ahead at every level, steps
+  +0.01.
 - **Statuses: her parent's path** (1 · 1 · 2 on a secondary weapon's line A from depth 3).
-- **The knob, applied:** the hands (D249's order), +0.03 a half; the alternative +0.05 with no Pierce for the Spellblades.
+- **The knob, applied:** the hands (D249's order); the alternative +0.05 with no Pierce for the Spellblades.
 
 ### 4.7 The support expanders: a little of the healers' kit (T2C39–T2C42)
 
 | | **Sentinel, Enchanter** (from the Spellblades) | **Druid, Shaman** (from the Summoners) |
 |---|---|---|
-| **Her hands** (T2B25) | The Sentinel her parent's **× 0.95**: 0.68 + 0.42; the Enchanter **× 0.8**: 0.58 + 0.38; MP ×0.5 a half | The Druid her parent's **× 0.95**: 0.54 + 0.44; the Shaman **× 1**: 0.57 + 0.5 |
-| **Statuses** (T2B24) | **Every skill** of her Katana, Bow, Light and Dark trees (every line) carries its status at the support ladder, **1 · 1 · 1 · 2 · 2** by depth, **topped up to its stacks, never built past them** | The same ladder, the same rule, on the same four weapons |
-| **Where** | A debuff on **the tapped foe**, on every foe at depth 5; Brave and Faith on **the Uma she wards** (her Barrier's target) | A debuff on **every foe at every depth**; Brave and Faith on the most threatened Uma |
+| **Her hands** (T2B25, T2B47, T2B48) | The Sentinel her parent's **× 0.9**: 0.65 + 0.40; the Enchanter **× 0.8**: 0.58 + 0.38; MP ×0.5 a half | The Druid **by depth**: trunk 0.52 + 0.42, lines 0.60 + 0.48 (on her Dual Bow + Greatsword); the Shaman **× 1**: 0.57 + 0.5 |
+| **Statuses** (T2B24, T2B47) | **Every skill** of her Katana, Bow, Light and Dark trees (every line) carries its status at her support ladder, **topped up to its stacks, never built past them**: the Enchanter **1 · 1 · 1 · 2 · 2** by depth, **the Sentinel one stack at every depth** | The same rule on the same four weapons, **1 · 1 · 1 · 2 · 2** |
+| **Where** | Brave and Faith on **the Uma she wards** (her Barrier's target); the Enchanter's debuff on **the tapped foe**, on every foe at depth 5; **the Sentinel's on the tapped foe only** | A debuff on **every foe at every depth**; Brave and Faith on the most threatened Uma |
 | **Her Ring trees** | Damage only | Damage only |
 | **Her piece of the kit** | **A Barrier** after each of her skill acts on the most threatened Uma: **a third of the healers' Barrier share** at her act's depth (9 · 11 · 12 · 13 · 15% of the target's max HP), × her healing scale | **A mend:** her lingering summon's farewell also mends every Uma **a tenth of the healers' mend share** at the summon's depth (2.8 · 3.2 · 3.6 · 4.0 · 4.4% of each one's max HP), × her healing scale |
 | **Kept from her parent** | Her familiar's extra hit on her lead half | Her lead summon lingers |
@@ -700,9 +752,22 @@ hybrid line has its three ways (sharpen, support, purify) for both tiers.
   and Faith (on her ward now), the Enchanter's lone Arm Armor Break (every foe at depth 5), the Druid's lone Tome Mind
   Break on every foe, the Shaman's lone Arm Enfeeble on every foe (sustain, nothing on curve, so no cut). The Druid
   wears her parent's Axe: the drafted Greatsword cost her the Axe's sweep.
-- **Measured** (balance §4.6, §4.8): **the Sentinel −2.4 · +10.9 · +2.9%, the Enchanter +7.0 · +2.5 · +6.6%, the Druid
-  +7.1 · +2.3 · −1.5%, the Shaman +10.4 · +0.8 · +1.2%** at Lv 10 · 30 · 50; and under attrition every support's party is
-  safer than her keeper's: with the healer down it wins 70–85% of fights at ×2.6 where the keeper's wins 51–66%.
+- **Why the Sentinel her own ladder and reach** (T2B47): round 3's re-measure read her **+18% at Lv 50**: her Brave and
+  Faith at two stacks on Party 1's Brawler (the Uma she wards is the front line) fill the gap the Paladin leaves, and her
+  Armor Break reached every foe at depth 5. A hand cut alone did nothing (×0.85: +16%: a support's value is in rounds
+  saved, not her own damage), and one ladder for both Spellblade supports cost the Enchanter her band (−9% at Lv 50: in
+  Party 2 the Cleric carries Brave and Faith and the Enchanter needs her second stack). So **the support ladder and its
+  reach are a class's numbers, as hands are**: the Sentinel one stack and the tapped foe, ×0.9; the other three as
+  round 2.
+- **Why the Druid's hand by depth** (T2B48): her Mind Break on every foe overlaps the Cleric's, who carries it widely from
+  depth 5, so her gain fell with level (+4.2 · −1.8 · −8.8%); a trunk hand at her parent's and a line hand ×1.12 hold
+  both ends. On gear's Dual Bow + Greatsword the values are 0.52 + 0.42 and 0.60 + 0.48 (on round 2's Dual Dark + Fire,
+  0.54 + 0.44 and 0.64 + 0.51).
+- **Measured** (balance T2B47, T2B48, T2B66; on gear's kits): **the Sentinel +4.0 · +1.9 · +9.0%, the Enchanter +1.8 ·
+  +7.4 · +1.6%, the Druid +2.8 · +2.6 · +2.7%, the Shaman +5.9 · −0.8 · +4.8%** at Lv 10 · 30 · 50; **D for S at about
+  one for one** (the Sentinel 0.71 + 0.09 BT against her parent's 0.83, the Enchanter 0.68 + 0.25 against 0.95). Under
+  attrition **every support's party is the safest of her three** with the healer down (+10 to +21 points of fights won at
+  ×4 over her keeper's, §5.6).
 - **Overlap:** a status two members carry adds less, three stacks at most (the cap). The harness counts it (S is what the
   other four lose, T2B21).
 
@@ -716,32 +781,37 @@ hybrid line has its three ways (sharpen, support, purify) for both tiers.
 | **Line B, Surge** | Where her status already stands at 3, Surge gives the mend or Barrier ×1.15 (the live rule for trees with no status to stack) | Tier 1's |
 | **Healing capacity, on-curve Lv 50** | About 20% of the party's max HP a round (Tier 1's) | About 14% |
 | **Damage share in her party** (measured, Lv 50) | About 9% (Tier 1's) | About 10% |
-| **Measured on curve** (her parent's seat, Lv 10 · 30 · 50) | Guardian +5.5 · 0 · +1.1%; Bishop +15.5 · 0 · +0.1% | **Templar +12.1 · +9.7 · +5.7%; Exorcist +15.9 · +6.9 · +7.3%** |
-| **Measured under attrition** (Lv 50, fights won at ×3.2 · ×4) | **Guardian 91.9 · 67.5%; Bishop 85.0 · 56.9%** | Templar 89.7 · 63.4%; Exorcist 77.5 · 51.9% |
+| **Measured on curve** (her parent's seat, Lv 10 · 30 · 50; balance T2B60) | Guardian +2.1 · 0 · 0%; Bishop +12.3 · 0 · 0% | **Templar +8.6 · +7.4 · +12.0%; Exorcist +12.1 · +2.8 · +6.7%** |
+| **Measured under attrition** (Tier 2 Lv 50, fights won · knockouts a fight at ×4 · ×5) | **Guardian 92.2% · 0.99, 71.9% · 2.09; Bishop 93.0% · 1.00, 65.1% · 2.33** | Templar 88.3% · 1.22, 65.1% · 2.37; Exorcist 88.8% · 1.27, 61.7% · 2.48 |
 | **Her role** | The party's support and its safe healer: the attrition pick | The healer who hits: a fifth more damage, a third less healing, the same statuses: the on-curve pick |
 
-- **Both stand as written** (T2B30, T2B31). Each is the better pick somewhere: the battle healer on curve (ahead of her
-  keeper by up to 10 points at every level but Lv 10's Bishop, level with her), the keeper under attrition (+2 to +8
-  points of fights won from ×3.2, a fifth less damage taken at ×2.6); the two within 1.3% in party damage a round at
-  ×2.6. A round longer on the keepers' statuses was tried and refused: it put them past their battle healers on curve too.
+- **Both stand as written** (T2B30, T2B31, re-measured in T2B60). Each is the better pick somewhere: the battle healer
+  on curve (ahead of her keeper at every level but Lv 10's Bishop, level with her), the keeper under attrition (+1 point
+  of fights won at ×3.2, **+3 to +7 at ×4 and ×5**). A round longer on the keepers' statuses was tried and refused: it put
+  them past their battle healers on curve too.
+- **A finding** (T2B61): **the keeper's stack more works at depths 1–4 only** (Tier 2 Lv 1–28). From depth 5 Auto casts
+  her capstones, whose statuses already stand at three, so the Guardian and the Bishop play exactly their parent's
+  fights. Kept: the keeper still out-survives her battle healer, who gives up a third of her healing; Tier 3 adds the
+  keepers' sustain step (mends and Barriers ×1.3, §6.5).
 - **Still one healer a party.** The Templar and the Exorcist count; the owner can't field a battle healer beside a keeper.
 - **Why the keeper's rule is statuses, not more healing:** on curve a party takes about 1% of its HP a round (§2.7), so
   more healing adds almost nothing to a fight's value; one stack more is worth +0 to +6% on curve (re-cast statuses
   reach 3 anyway) and keeps her ahead of the battle healer whenever healing matters (the stress check, T2B23).
 - **The battle healer pairs with a support:** her lost healing (−6% of the party's HP a round) is about the Sentinel's
   ward (3.7%) or the Druid's mend (5.5%) — the owner's "swap the Paladin for damage and a Spellblade to support so they
-  balance each other" (C4: measured +4.3 · +5.3 · +5.7% over Party 1, and 99.7% of fights won at ×2.6, the second-safest
-  comp).
+  balance each other" (C4: measured **+3.6 · +2.2 · +5.1%** over Party 1, and the party takes the least of the swaps,
+  4 · 158 · 140 HP a fight at Lv 50 against C1's 6 · 185 · 259, T2B59).
 
 ### 4.9 Statuses: four levels on twenty (T2C45, T2C75)
 
-D282's three levels, round 2's support level between the path and widely, and balance's rule for it (T2B24):
+D282's three levels, round 2's support level between the path and widely, and balance's rule for it (T2B24), its ladder
+and reach a class's numbers (T2B47):
 
 | Level | Tier 2 classes | Tier 3 classes | Weapons | Stacks by depth | Stacking | Reach |
 |---|---|---|---|---|---|---|
 | **None** | Berserker, Spellfist, Archmage, Battlemage, **Bladedancer, Spellweaver, Marshal, Animist** | Ravager, Spellhammer, Gladiator, Astromancer, Spellknight, Thaumaturge, Dervish, Starweaver, Imperator, Mythlord | — | — | — | — |
 | **A path** | Blademaster, Runeblade, Warlord, Invoker | Bladelord, Runelord, Overlord, Hierarch | Line A of a Light/Dark weapon, from depth 3 | 1 · 1 · 2 | Built up (Tier 1's) | The tapped foe |
-| **Support** | Sentinel, Enchanter · Druid, Shaman | Herald, Oracle · Archdruid, Soulcaller | **Every skill** of a Light/Dark weapon | **1 · 1 · 1 · 2 · 2** | **Topped up to its stacks, never built past them** | Debuffs: the Spellblades' the tapped foe, every foe at depth 5; the Summoners' **every foe**; **Brave and Faith on the Uma she wards** (a Summoner's: the most threatened) |
+| **Support** | Sentinel, Enchanter · Druid, Shaman | Herald, Oracle · Archdruid, Soulcaller | **Every skill** of a Light/Dark weapon | **1 · 1 · 1 · 2 · 2**; **the Sentinel and the Herald 1 · 1 · 1 · 1 · 1** | **Topped up to its stacks, never built past them** | Debuffs: the Enchanter's and the Oracle's the tapped foe, every foe at depth 5; **the Sentinel's and the Herald's the tapped foe only**; the Summoners' **every foe**; **Brave and Faith on the Uma she wards** (a Summoner's: the most threatened) |
 | **Widely** | Guardian, Bishop (**+1 stack**: 2 · 2 · 3 · 3 · 3, path 3 · 3 · 3) · Templar, Exorcist | Bastion, Cardinal (+1) · Inquisitor, Hierophant | Every skill of Greatsword, Lance, Fire; the path on Light/Dark | 1 · 1 · 2 · 2 · 3; path 2 · 2 · 3 | Built up | The tapped foe, every foe at depth 5; buffs every Uma |
 
 - **The pure variants join "none"** (T2C75): their Katana and Bow (or Light and Dark) line A plays as damage (§4.5).
@@ -816,7 +886,7 @@ calling's own Tier 1 classes; a kin parent's child is never Suggested and outsid
 | **Archmage** | Grand Nebula · Supreme Nebula · **Starburst** | Every foe at the area share (0.55); a foe weak to its kind takes the full power | None |
 | **Battlemage** | Grand Quasar · Supreme Quasar · **Event Horizon** | One foe, one hit at ×1.25 the power (Pinpoint) | None |
 | **Blademaster, Runeblade** | Grand Sigil · Supreme Sigil · **Rune Edge** | Her pair: her lead half on one foe, her other half on every foe at 0.55; the familiar on both | A path |
-| **Sentinel, Enchanter** | Grand Bane · Supreme Bane · **Penumbra Edge** | Her pair on one foe; through a Light/Dark weapon its status, her Barrier after it | 2 · 2 · 3, topped up |
+| **Sentinel, Enchanter** | Grand Bane · Supreme Bane · **Penumbra Edge** | Her pair on one foe; through a Light/Dark weapon its status, her Barrier after it | 2 · 2 · 3, topped up; **the Sentinel's 1 · 1 · 1** (her ladder, T2B47) |
 | **Bladedancer, Spellweaver** (new) | **Grand Squall · Supreme Squall · Thousand Cuts** | Her pair on one foe, each half one hit more (the same total) | None |
 | **Warlord, Invoker** | Grand Griffin · Supreme Griffin · **Kraken** | Her pair on one foe; her lead summon lingers at 0.5, not 0.3 | A path |
 | **Druid, Shaman** | Grand Wraith · Supreme Wraith · **Banshee** | Her pair, her lead summon on every foe at 0.55; through a Light/Dark weapon its status on every foe | 2 · 2 · 3, topped up |
@@ -825,7 +895,8 @@ calling's own Tier 1 classes; a kin parent's child is never Suggested and outsid
 | **Templar, Exorcist** | Grand Solace · Supreme Solace · **Absolution** | A blow or a spell on one foe, then a mend on the most hurt and a Barrier on the most threatened, both whole (× her 0.7) | 2 · 2 · 3 |
 
 - Priced like a line (CP15): 10–20% over the same depth's line A in its context, behind it elsewhere; balance measures
-  them on the build's run (round 2 left the class lines out, T2B20).
+  them on the build's run (rounds 2 and 3 left the class lines out, T2B41). A class line reads her **lines' hand** (its
+  depths are 3–5, §4.2).
 - **Equipped** (T2C16): 3 at Lv 1, one more at Lv 10, 15, 20, 25, 30, 35, 40: 10 of 18 held. **Skill Ranks** as Tier 1.
 - **A Tier 3 class plays her Tier 2 parent's trees and class line** (the Gladiator the Brawler's Arms, the Thaumaturge
   the Sorcerer's Tomes, with the Spellfist's and Battlemage's class lines), crowned at Class Rank 50 (§6.2).
@@ -904,7 +975,17 @@ Might (§4.4).
 **The owner** (round 3): "I would normally swap both classes at the same time the Brawler with a spellblade, or the
 spellblade with the paladin, that way I'll make my parties balanced." His two swaps are this section's spine, in Tier 2
 here and in Tier 3 in [§6.8](#68-tier-3-comps-t2c93); Tier 1-like, all-pure, all-hybrid and support-heavy comps sit beside
-them. **Measured** numbers are balance's round 2 (T2B34); **analytic** ones are this doc's, for balance to re-measure.
+them. **Measured** numbers are balance's round 3 (T2B58, T2B59), every comp on its fork at the proposed knobs, Lv 10 ·
+30 · 50 against its Tier 1 party in Tier 2's toolbox; **analytic** ones are this doc's seat model, drafted before the
+measure and kept beside it as the reading of why ([§5.1](#51-party-value-measured-t2b21-and-the-seat-model-t2c56-t2c93)).
+
+**The answer to the owner, measured** (T2B59): **both swaps keep the party in the band, in both tiers.** A Brawler with a
+Spellblade (C3) runs **+3.3 · +3.0 · +5.7%** over Party 1 and a Spellblade with the Paladin (C4) **+3.6 · +2.2 · +5.1%**,
+level with Party 1's keepers (C1, +3.7 · +2.6 · +5.8%) within 0.7 points; their mirrors on Party 2 within 3.8 of C2;
+both swaps on one party (C5) +4.5 · +4.2 · +5.7%. Every member of each swap sits in her own band (§5.5). **What a swap
+changes is the party's shape, not its speed:** the Brawler-and-Spellblade swap moves an element to the Brawler's seat and
+the Spellblade's Thunder to an Arm; the Spellblade-and-Paladin swap trades a third of the healer's healing for the
+Sentinel's ward and statuses, and the party takes less.
 
 ### 5.1 Party value: measured (T2B21) and the seat model (T2C56, T2C93)
 
@@ -913,28 +994,35 @@ them. **Measured** numbers are balance's round 2 (T2B34); **analytic** ones are 
 | **Units: BT** | An on-curve Brawler's damage **a round** at the same tier, level and kind of fight |
 | **D**, her damage | Her damage a round of the fight |
 | **S**, what her statuses add | What the **other four lose** when her statuses, wards, mends and keeper twist are switched off |
-| **H**, her sustain | On the stress check ([§5.6](#56-the-stress-check-t2b23)) |
+| **H**, her sustain | On the stress check ([§5.6](#56-the-stress-check-and-is-any-class-useless-t2b60-t2b64)) |
 | **A class's gain** | The party's damage a round with her in her parent's seat, minus with her parent, over her parent's V |
 | **Weights** | Regular fights 2, sub-bosses 1, bosses 1 (D266) |
 
-**The seat model** (this round's analytic party value): **a comp's value is the sum of its members' seat values, each
+**The seat model** (this doc's analytic party value): **a comp's value is the sum of its members' seat values, each
 her Tier 1 parent's measured D + S × (1 + her gain at Lv 50)**; a Tier 3 member her Tier 2 parent's seat value × (1 +
-her Tier 3 gain). Gains are balance's measured ones for the sixteen kept classes and this doc's analytic ones for the
-four pure variants and the two reshaped crosses (§4.4, §4.5) and the twenty-two Tier 3 classes (§6). **Why this model,
-not round 2's sum of D + S:** it reads a member through what her seat does to the party, so a pure seat's overkill (her
-damage +9.6%, her seat +5.2%: the Berserker's) is in it. **Checked against the measured comps:** C1 +3.9% (measured
-+4.4%), C2 +4.2% (+5.4%), C4 +4.4% (+5.7%), C4b +6.1% (+6.7%), C8 +3.5% (+3.7%), C9 +2.7% (+4.0%): about a point under,
-in the same order.
+her Tier 3 gain). Round 3 drafted it on round 2's measured gains for the sixteen kept classes and analytic ones for the
+four pure variants, the two reshaped crosses (§4.4, §4.5) and the twenty-two Tier 3 classes (§6); §5.2's and §5.3's member
+tables are that draft. **Why this model, not round 2's sum of D + S:** it reads a member through what her seat does to
+the party, so a pure seat's overkill (her damage +9.6%, her seat +5.2%: the Berserker's) is in it. **Checked against
+round 3's measured comps:** re-read on the measured gains (§5.5, gear's kits), the model lands within 2.6 points of
+every measured comp at Lv 50 (mean 1.2): C1 +5.0% (measured +5.8%), C2 +4.7% (+3.9%), C3 +3.9% (+5.7%), C4 +6.8%
+(+5.1%), C8 +5.5% (+3.1%), C10 +7.3% (+4.7%). It over-reads the support-heavy comps (C4, C8, C10), whose members'
+statuses and wards overlap, which a sum of seats can't see; the harness can. (The measured comps wore balance's kits, so
+the comps holding the pure variants differ by about a point by construction, T2B66.)
 
-**R2-11's band, as balance reads it** (T2B22): on curve at Tier 2 Lv 10, 30 and 50, each damage and support class's gain
-within ±5 points of their mean gain at that level (round 2's twelve: +7.0 · +3.9 · +3.2%); the healers on the stress
-check. Round 3 adds the four pure variants to the reading (sixteen damage and support classes) and Tier 3's own band
-(T2C92).
+**R2-11's band, as balance reads it** (T2B43): on curve at Tier 2 Lv 10, 30 and 50, **each of the sixteen damage and
+support classes' gain within ±5 points of their mean gain at that level** (round 2's twelve and the four pure
+variants); the healers on the stress check. **Measured at the knobs: 48 of 48 cells** (means +3.3 · +2.5 · +4.7%; on
+gear's kits +3.4 · +3.0 · +5.3%). Tier 3 has its own band (T2C92, T2B51).
 
 ### 5.2 The owner's swaps
 
+Each comp's member table is the seat model's draft (round 2's BT frame, the drafted kits); the **measured** line under it
+is the design's number (T2B58).
+
 **C3. A Brawler with a Spellblade** (Party 1): the Brawler to her **Spellfist**, the Arms Spellblade to her
 **Bladedancer**. The Spellblade's Tome moves to the Brawler's line; the party's channel mix stays.
+
 | Member | Weapons | Damage (BT · share) | Support (BT) | Healing (% HP a round) | Seat value |
 |---|---|---|---|---|---|
 | **Spellfist** | Greatsword, Katana, Fire | 1.07 · 25% | — | — | 1.05 |
@@ -944,9 +1032,10 @@ check. Round 3 adds the four pure variants to the reading (sixteen damage and su
 | Guardian | Lance, Greatsword, Light | 0.37 · 9% | 0.24 | 20% | 0.62 |
 | **Party** | **GS 2** · Axe 1 · Lance 1 · **Bow 2** · **Katana 2** · **Fire 2** · **Ice 2** · Thunder 1 · Light 1 · Dark 1 | **4.35** | **0.25 (5%)** | **20%** | **4.53** |
 
-Read: **+3.3% over Party 1, level with C1 (−0.6%)**: the swap balances as the owner described. The Bladedancer is C1's
-Blademaster without her Thunder; the Spellfist carries a Fire to every boss on ATK. All ten kinds held; the Lance,
-Thunder, Light and Dark in one hand each.
+Read: analytic +3.3% over Party 1, level with C1 (−0.6%). **Measured: +3.3 · +3.0 · +5.7%, C1 +3.7 · +2.6 · +5.8%:
+within 0.4 points**; the party takes 24 · 146 · 151 HP a fight at Lv 50 (fights · sub-bosses · bosses) against C1's 6 ·
+185 · 259. The swap balances as the owner described. The Bladedancer is C1's Blademaster without her Thunder; the
+Spellfist carries a Fire to every boss on ATK. All ten kinds held; the Lance, Thunder, Light and Dark in one hand each.
 
 **C3b. Its mirror: a Sorcerer with a Tome Spellblade** (Party 2): the Sorcerer to her **Battlemage**, the Tome
 Spellblade to her **Spellweaver**.
@@ -960,9 +1049,9 @@ Spellblade to her **Spellweaver**.
 | Bishop | Light, Fire, Lance | 0.35 · 8% | 0.36 | 20% | 0.71 |
 | **Party** | GS 1 · **Axe 2** · **Lance 2** · Bow 1 · Katana 1 · **Fire 2** · **Ice 2** · Thunder 1 · Light 1 · **Dark 2** | **4.49** | **0.46 (9%)** | **20%** | **4.77** |
 
-Read: **+2.6% over Party 2, 1.6% under C2**: the Tome Spellblade's Armor Break leaves with her (no one else in Party 2
-carries it), which the Spellweaver's hand only partly replaces; the Battlemage's Katana brings the Katana the Spellweaver
-drops.
+Read: analytic +2.6% over Party 2, 1.6% under C2. **Measured: +4.0 · +3.4 · +2.9%, C2 +4.7 · +1.5 · +3.9%: within 1.9
+points.** The Tome Spellblade's Armor Break leaves with her (no one else in Party 2 carries it), which the Spellweaver's
+hands replace; the Battlemage's Katana brings the Katana the Spellweaver drops.
 
 **C4. A Spellblade with the Paladin** (Party 1, measured in round 2): the Arms Spellblade to her **Sentinel**, the
 Paladin to her **Templar**.
@@ -976,12 +1065,13 @@ Paladin to her **Templar**.
 | **Templar** | Lance, Greatsword, Light | 0.42 · 10% | 0.23 | 14% | 0.64 |
 | **Party** | **GS 3** · Axe 1 · **Lance 2** · Bow 1 · Katana 1 · Fire 1 · **Ice 2** · Thunder 1 · **Light 2** · Dark 1 | **4.26** | **0.38 (8%)** | **17.7%** | **4.58** |
 
-Read: **measured +4.3 · +5.3 · +5.7% over Party 1** (analytic +4.4%), and 99.7% of fights won at ×2.6, the second-safest
-comp: the battle healer's lost healing is about the Sentinel's ward.
+Read: analytic +4.4%. **Measured: +3.6 · +2.2 · +5.1% over Party 1, within 0.7 points of C1**, and the party takes 4 ·
+158 · 140 HP a fight at Lv 50, the least of the swaps: the battle healer's lost healing is about the Sentinel's ward. The
+Sentinel's ×0.9, one stack and the tapped foe (T2B47) bring C4 down from +8.4% at Lv 50 on the drafted kit.
 
-**C4b. Its mirror on Party 2** (measured): Berserker, Archmage, **Enchanter** (Light, Blizzard, Katana), Warlord,
-**Exorcist**. **Measured +7.4 · +5.6 · +6.7%** (analytic +6.1%); support 0.69 BT (14%), the most of any comp; healing
-17.7% of the party's HP a round.
+**C4b. Its mirror on Party 2**: Berserker, Archmage, **Enchanter** (Light, Blizzard, Katana), Warlord, **Exorcist**.
+**Measured +4.2 · +5.3 · +3.8%**, within 3.8 points of C2 (analytic +6.1%); support 0.69 BT (14%), the most of any comp;
+healing 17.7% of the party's HP a round.
 
 **C5. Both swaps on one party** (Party 1): the Brawler to her Spellfist and the Arms Spellblade to her Bladedancer, the
 Tome Summoner to her **Shaman** and the Paladin to her **Templar** (the support beside the battle healer, the Summoner's
@@ -996,14 +1086,16 @@ way).
 | **Templar** | Lance, Greatsword, Light | 0.42 · 10% | 0.23 | 14% | 0.64 |
 | **Party** | **GS 2** · Axe 1 · Lance 1 · **Bow 2** · **Katana 2** · **Fire 2** · **Ice 2** · Thunder 1 · Light 1 · Dark 1 | **4.33** | **0.26 (6%)** | **19.5%** | **4.55** |
 
-Read: **+3.6% over Party 1, level with C1**: four of five changed, the party's value where it was. The Shaman's mend and
-Enfeeble cover the Templar's lost healing.
+Read: analytic +3.6% over Party 1, level with C1. **Measured: +4.5 · +4.2 · +5.7%, within 1.6 points of C1**, and the
+party takes 24 · 107 · 123 HP a fight at Lv 50: four of five changed, the party's value where it was. The Shaman's mend
+and Enfeeble cover the Templar's lost healing.
 
 ### 5.3 Tier 1-like, all-pure, all-hybrid and support-heavy
 
 **C1 and C2, Tier 1-like** (every member her parent's keeper, measured): C1 Berserker, Archmage, Blademaster, Invoker,
-Guardian **+5.5 · +3.9 · +4.4%** over Party 1; C2 Berserker, Archmage, Runeblade, Warlord, Bishop **+7.7 · +1.7 · +5.4%**
-over Party 2. Each holds its Tier 1 party's ten kinds, five in two hands.
+Guardian **+3.7 · +2.6 · +5.8%** over Party 1; C2 Berserker, Archmage, Runeblade, Warlord, Bishop **+4.7 · +1.5 · +3.9%**
+over Party 2 (round 2 read +5.5 · +3.9 · +4.4% and +7.7 · +1.7 · +5.4% on its fork). Each holds its Tier 1 party's ten
+kinds, five in two hands.
 
 **C6. All pure** (Party 1): every damage member one channel.
 
@@ -1016,109 +1108,133 @@ over Party 2. Each holds its Tier 1 party's ten kinds, five in two hands.
 | Guardian | Lance, Greatsword, Light | 0.37 · 8% | 0.24 | 20% | 0.62 |
 | **Party** | **GS 2** · **Axe 2** · **Lance 2** · Bow 1 · Katana 1 · Fire 1 · **Ice 2** · **Thunder 2** · Light 1 · Dark 1 | **4.46** | **0.24 (5%)** | **20%** | **4.60** |
 
-Read: **+4.8% over Party 1**, the most damage of the Party 1 comps and the least support (5%, the Guardian's alone). Two
-channels split cleanly: three Arms classes and two Tome classes; a Rift ward shuts out two of five, as in Tier 1.
-**C6b on Party 2** (Berserker, Archmage, **Spellweaver**, **Marshal**, Bishop): +3.0% over Party 2, every kind held.
+Read: analytic +4.8% over Party 1. **Measured: +3.4 · +2.1 · +4.7%**, the most damage of the Party 1 comps and the
+least support (5%, the Guardian's alone), and the least safe under attrition (the Animist carries no ward and gives up
+her parent's path). Two channels split cleanly: three Arms classes and two Tome classes; a Rift ward shuts out two of
+five, as in Tier 1. **C6b on Party 2** (Berserker, Archmage, **Spellweaver**, **Marshal**, Bishop): **measured +4.2 ·
++2.1 · +3.1%** (analytic +3.0%), every kind held. On gear's kits (the Marshal's and the Animist's keeper Duals, Offense)
+the comps holding the pure variants move by about a point (T2B66).
 
 **C7. All hybrid** (round 2's C3, the crosses reshaped): Spellfist, Battlemage, Blademaster, Invoker, Guardian.
-Analytic **+1.4% over Party 1**, the lowest at Lv 50 because both crosses' Lv 50 cells are their lowest (+1% and −1%);
-round 2 measured it +9.3 · +8.0 · +5.2% on the Scatter-twin presets. Every kind held, the Katana in three hands.
+**Measured +2.3 · +4.9 · +5.7%** over Party 1 (analytic +1.4%, drafted on the crosses' hands before balance set them;
+round 2 measured +9.3 · +8.0 · +5.2% on the Scatter-twin presets). Every kind held, the Katana in three hands.
 
-**The support-heavy comps** (measured in round 2, unchanged by round 3): **C8** Berserker, Archmage, Sentinel, Shaman,
-Guardian (round 2's C6) **+5.1 · +3.1 · +3.7%**, the safest; **C9** Berserker, Archmage, Runeblade, Druid, Bishop (round
-2's C5) **+7.9 · +2.3 · +4.0%**; **C10** every member an expander, Spellfist, Battlemage, Sentinel, Shaman, Templar
-(round 2's C7, measured +7.4 · +8.5 · +5.7% on the old presets): analytic +1.5%, and **the one comp that drops kinds**
-(the Axe and Thunder) with the one-foe crosses: the party hint names them.
+**The support-heavy comps** (measured, round 3): **C8** Berserker, Archmage, Sentinel, Shaman, Guardian (round 2's C6)
+**+3.4 · +1.0 · +3.1%**; **C9** Berserker, Archmage, Runeblade, Druid, Bishop (round 2's C5) **+5.3 · +1.5 · +3.5%**;
+**C10** every member an expander, Spellfist, Battlemage, Sentinel, Shaman, Templar (round 2's C7) **+5.0 · +2.3 · +4.7%**
+(analytic +1.5%), and **the one comp that drops kinds** (the Axe and Thunder) with the one-foe crosses: the party hint
+names them. **The support-heavy comps take the least** (C10 5 · 83 · 90 HP a fight at Lv 50, C4 4 · 158 · 140, against
+C1's 6 · 185 · 259 and C6's 6 · 220 · 337): the owner can field them at no pace cost.
 
 ### 5.4 The comps side by side
 
-| Comp | Members | Kinds in two hands · missing | Damage · support (share) | Healing | **Analytic, Lv 50: against its Tier 1 party · against C1 or C2** | Measured, Lv 10 · 30 · 50 (round 2) |
-|---|---|---|---|---|---|---|
-| **Tier 1 Party 1** | Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Paladin | 5 · — | 4.11 · 0.28 (6%) | 20% | 4.39 (the reference) | the reference |
-| **Tier 1 Party 2** | Brawler, Sorcerer, Tome Spellblade, Arms Summoner, Cleric | 5 · — | 4.10 · 0.55 (12%) | 20% | 4.65 (the reference) | the reference |
-| **C1** Party 1's keepers | Berserker, Archmage, Blademaster, Invoker, Guardian | 5 · — | 4.38 · 0.26 (6%) | 20% | **+3.9%** | **+5.5 · +3.9 · +4.4%** |
-| **C2** Party 2's keepers | Berserker, Archmage, Runeblade, Warlord, Bishop | 5 · — | 4.40 · 0.51 (10%) | 20% | **+4.2%** | **+7.7 · +1.7 · +5.4%** |
-| **C3** A Brawler with a Spellblade | Spellfist, Archmage, Bladedancer, Invoker, Guardian | 5 · — | 4.35 · 0.25 (5%) | 20% | **+3.3%** · −0.6% vs C1 | — |
-| **C3b** A Sorcerer with a Tome Spellblade | Berserker, Battlemage, Spellweaver, Warlord, Bishop | 5 · — | 4.49 · 0.46 (9%) | 20% | **+2.6%** · −1.6% vs C2 | — |
-| **C4** A Spellblade with the Paladin | Berserker, Archmage, Sentinel, Invoker, Templar | 4 · — | 4.26 · 0.38 (8%) | 17.7% | **+4.4%** · +0.5% vs C1 | **+4.3 · +5.3 · +5.7%** |
-| **C4b** A Tome Spellblade with the Cleric | Berserker, Archmage, Enchanter, Warlord, Exorcist | 5 · — | 4.23 · 0.69 (14%) | 17.7% | **+6.1%** · +1.8% vs C2 | **+7.4 · +5.6 · +6.7%** |
-| **C5** Both swaps on one party | Spellfist, Archmage, Bladedancer, Shaman, Templar | 5 · — | 4.33 · 0.26 (6%) | 19.5% | **+3.6%** · −0.3% vs C1 | — |
-| **C6** All pure (Party 1) | Berserker, Archmage, Bladedancer, Animist, Guardian | 5 · — | 4.46 · 0.24 (5%) | 20% | **+4.8%** · +0.9% vs C1 | — |
-| **C6b** All pure (Party 2) | Berserker, Archmage, Spellweaver, Marshal, Bishop | 5 · — | 4.55 · 0.36 (7%) | 20% | **+3.0%** · −1.1% vs C2 | — |
-| **C7** All hybrid | Spellfist, Battlemage, Blademaster, Invoker, Guardian | 4 · — | 4.33 · 0.26 (6%) | 20% | **+1.4%** · −2.5% vs C1 | +9.3 · +8.0 · +5.2% (round 2's presets) |
-| **C8** Both hybrids to support | Berserker, Archmage, Sentinel, Shaman, Guardian | 4 · — | 4.14 · 0.41 (9%) | 29.2% | **+3.5%** · −0.4% vs C1 | **+5.1 · +3.1 · +3.7%** |
-| **C9** A Summoner to support | Berserker, Archmage, Runeblade, Druid, Bishop | 5 · — | 4.27 · 0.52 (11%) | 25.5% | **+2.7%** · −1.4% vs C2 | **+7.9 · +2.3 · +4.0%** |
-| **C10** Every member an expander | Spellfist, Battlemage, Sentinel, Shaman, Templar | 5 · Axe, Thunder | 4.14 · 0.40 (9%) | 23.2% | **+1.5%** · −2.3% vs C1 | +7.4 · +8.5 · +5.7% (round 2's presets) |
+| Comp | Members | Kinds in two hands · missing | Damage · support (share), the draft | Healing | The seat model, Lv 50: drafted · on the measured gains | **Measured, Lv 10 · 30 · 50** (T2B58) | Taken a fight, Lv 50 (fights · sub · boss) |
+|---|---|---|---|---|---|---|---|
+| **Tier 1 Party 1** | Brawler, Sorcerer, Arms Spellblade, Tome Summoner, Paladin | 5 · — | 4.11 · 0.28 (6%) | 20% | 4.39 (the reference) | the reference | — |
+| **Tier 1 Party 2** | Brawler, Sorcerer, Tome Spellblade, Arms Summoner, Cleric | 5 · — | 4.10 · 0.55 (12%) | 20% | 4.65 (the reference) | the reference | — |
+| **C1** Party 1's keepers | Berserker, Archmage, Blademaster, Invoker, Guardian | 5 · — | 4.38 · 0.26 (6%) | 20% | +3.9% · +5.0% | **+3.7 · +2.6 · +5.8%** | 6 · 185 · 259 |
+| **C2** Party 2's keepers | Berserker, Archmage, Runeblade, Warlord, Bishop | 5 · — | 4.40 · 0.51 (10%) | 20% | +4.2% · +4.7% | **+4.7 · +1.5 · +3.9%** | 53 · 208 · 325 |
+| **C3** A Brawler with a Spellblade | Spellfist, Archmage, Bladedancer, Invoker, Guardian | 5 · — | 4.35 · 0.25 (5%) | 20% | +3.3% · +3.9% | **+3.3 · +3.0 · +5.7%** | 24 · 146 · 151 |
+| **C3b** A Sorcerer with a Tome Spellblade | Berserker, Battlemage, Spellweaver, Warlord, Bishop | 5 · — | 4.49 · 0.46 (9%) | 20% | +2.6% · +3.7% | **+4.0 · +3.4 · +2.9%** | 68 · 314 · 295 |
+| **C4** A Spellblade with the Paladin | Berserker, Archmage, Sentinel, Invoker, Templar | 4 · — | 4.26 · 0.38 (8%) | 17.7% | +4.4% · +6.8% | **+3.6 · +2.2 · +5.1%** | 4 · 158 · 140 |
+| **C4b** A Tome Spellblade with the Cleric | Berserker, Archmage, Enchanter, Warlord, Exorcist | 5 · — | 4.23 · 0.69 (14%) | 17.7% | +6.1% · +5.2% | **+4.2 · +5.3 · +3.8%** | 11 · 292 · 190 |
+| **C5** Both swaps on one party | Spellfist, Archmage, Bladedancer, Shaman, Templar | 5 · — | 4.33 · 0.26 (6%) | 19.5% | +3.6% · +5.7% | **+4.5 · +4.2 · +5.7%** | 24 · 107 · 123 |
+| **C6** All pure (Party 1) | Berserker, Archmage, Bladedancer, Animist, Guardian | 5 · — | 4.46 · 0.24 (5%) | 20% | +4.8% · +4.1% | **+3.4 · +2.1 · +4.7%** | 6 · 220 · 337 |
+| **C6b** All pure (Party 2) | Berserker, Archmage, Spellweaver, Marshal, Bishop | 5 · — | 4.55 · 0.36 (7%) | 20% | +3.0% · +4.1% | **+4.2 · +2.1 · +3.1%** | 54 · 219 · 387 |
+| **C7** All hybrid | Spellfist, Battlemage, Blademaster, Invoker, Guardian | 4 · — | 4.33 · 0.26 (6%) | 20% | +1.4% · +5.2% | **+2.3 · +4.9 · +5.7%** | 43 · 164 · 273 |
+| **C8** Both hybrids to support | Berserker, Archmage, Sentinel, Shaman, Guardian | 4 · — | 4.14 · 0.41 (9%) | 29.2% | +3.5% · +5.5% | **+3.4 · +1.0 · +3.1%** | 7 · 199 · 210 |
+| **C9** A Summoner to support | Berserker, Archmage, Runeblade, Druid, Bishop | 5 · — | 4.27 · 0.52 (11%) | 25.5% | +2.7% · +4.1% | **+5.3 · +1.5 · +3.5%** | 60 · 209 · 417 |
+| **C10** Every member an expander | Spellfist, Battlemage, Sentinel, Shaman, Templar | 5 · Axe, Thunder | 4.14 · 0.40 (9%) | 23.2% | +1.5% · +7.3% | **+5.0 · +2.3 · +4.7%** | 5 · 83 · 90 |
 
-- **Every Tier 2 comp sits +1.4 to +6.1% over its Tier 1 party at Lv 50** (analytic; the model reads about a point under
-  the harness), **within ±5 points of the comps' mean (+3.5%)**: R2-11's ask, the owner's swaps included.
-- **The owner's swaps are level with the comps they come from:** C3 and C5 within 0.6% of C1, C4 +0.5%; C3b 1.6% under
-  C2 and C4b 1.8% over. Balancing pairs, as he said.
-- **The comps that pair both crosses** (C7, C10) are the lowest at Lv 50, by the crosses' Lv 50 cells; they are the first
-  reading balance re-measures.
+- **Every Tier 2 comp sits +1.0 to +5.8% over its Tier 1 party at every level, measured** (T2B58), inside ±5 points of
+  the comps' mean (+3.7%): Tier 1-like, swapped-pure, swapped-support and all-hybrid alike (R2-11). Every fight won. The
+  drafted values spread them −0.1 to +8.4%; the crosses' hands lift C3 and C5 and the Sentinel's knob brings C4, C8 and
+  C10 down (T2B58).
+- **The owner's swaps are level with the comps they come from** (T2B59): C3 and C4 within 0.7 points of C1; C3b and C4b
+  within 3.8 of C2; C5 within 1.6 of C1. Balancing pairs, as he said.
+- **The seat model, re-read on the measured gains, lands within 2.6 points of the measure at Lv 50** (§5.1),
+  over-reading the support-heavy comps.
 - **Healing:** a keeper healer 20% of the party's HP a round, a battle healer 14%, a Spellblade support's Barrier 3.7%, a
-  Summoner support's mend 5.5% (§4.7, §4.8): the support-heavy comps hold 23–29%.
+  Summoner support's mend 5.5% (§4.7, §4.8): the support-heavy comps hold 23–29% and take the least.
 
 ### 5.5 Each class against her parent (the guardrail)
 
-| Class (parent) | Gain, Lv 10 · 30 · 50 | Source | D + S at Lv 50 (her parent's) | Her knob |
+Measured by balance (T2B43, T2B44–T2B49, T2B66), her parent's seat, the Brawler's and the Sorcerer's children in both
+parties averaged; **bold** cells were outside the band. "Gear's kits" are gear's Suggested types and Extra Stats'
+Prowess as merged (the Marshal's, the Animist's and the Enchanter's keeper Duals, Offense on the pure variants), the kit
+the game ships.
+
+| Class (parent) | At the drafted values, Lv 10 · 30 · 50 | **At the knobs, on gear's kits** | D + S at Lv 50, BT (her parent's V) | Her knob |
 |---|---|---|---|---|
-| Berserker (Brawler) | +5.6 · +2.0 · +5.2% | Measured (T2B26) | 1.14 + 0 (1.04) | Momentum +6% |
-| **Spellfist** (Brawler) | **about +9 · +6.5 · +1%** | **Analytic** (round 2: +6.5 · +4.5 · +4.3) | 1.07 + 0 | **Pinpoint's step**, then her hand |
-| Archmage (Sorcerer) | +5.8 · +3.4 · +5.1% | Measured | 1.21 + 0 (1.12) | Momentum |
-| **Battlemage** (Sorcerer) | **about +9.5 · +8 · −1%** | **Analytic** (round 2: +10.9 · +8.3 · −1.8) | 1.23 + 0 | **Pinpoint's step**, then her hand |
-| Blademaster (Arms Spellblade) | +9.0 · +4.5 · +3.6% | Measured (T2B28) | 0.89 + 0.01 (0.85 + 0.02) | Pierce, hands +0.03 |
-| Sentinel (Arms Spellblade) | −2.4 · +10.9 · +2.9% | Measured (T2B24, T2B25) | 0.72 + 0.14 | Topped up; ×0.95 |
-| **Bladedancer** (Arms Spellblade) | **about +3.6 · — · +5.3%** | **Analytic** | 0.93 + 0 | **Her second hand 0.32** |
-| Runeblade (Tome Spellblade) | +6.8 · +2.3 · +2.8% | Measured | 0.92 + 0.05 (0.86 + 0.09) | Pierce, hands +0.03 |
-| Enchanter (Tome Spellblade) | +7.0 · +2.5 · +6.6% | Measured | 0.69 + 0.23 | Topped up; ×0.8 |
-| **Spellweaver** (Tome Spellblade) | **about +8.3 · — · +2.0%** | **Analytic** | 0.99 + 0 | **Her second hand 0.41** |
-| Warlord (Arms Summoner) | +8.6 · +2.0 · +6.8% | Measured (T2B29) | 0.78 + 0.10 (0.73 + 0.10) | Hands +0.03 |
-| Druid (Arms Summoner) | +7.1 · +2.3 · −1.5% | Measured | 0.65 + 0.11 | Topped up; ×0.95 |
-| **Marshal** (Arms Summoner) | **about +10.1 · — · +1.2%** | **Analytic** | 0.86 + 0 | **Her second hand 0.40** |
-| Invoker (Tome Summoner) | +8.6 · +3.6 · +3.0% | Measured | 0.77 + 0.01 (0.73 + 0.02) | Hands +0.03 |
-| Shaman (Tome Summoner) | +10.4 · +0.8 · +1.2% | Measured | 0.70 + 0.03 | Topped up; ×1 |
-| **Animist** (Tome Summoner) | **about +4.4 · — · +6.3%** | **Analytic** | 0.81 + 0 | **Her second hand 0.37** |
-| **The band** (round 2's twelve) | **+7.0 · +3.9 · +3.2% ± 5** | | | |
-| Guardian · Templar (Paladin) | +5.5 · 0 · +1.1% · +12.1 · +9.7 · +5.7% | Measured; read on the stress check | 0.37 + 0.24 · 0.42 + 0.23 | Kept (T2B30, T2B31) |
-| Bishop · Exorcist (Cleric) | +15.5 · 0 · +0.1% · +15.9 · +6.9 · +7.3% | The same | 0.35 + 0.36 · 0.41 + 0.36 | Kept |
+| Berserker (Brawler) | +3.4 · +0.6 · +6.0% | **+3.4 · +0.6 · +6.0%** | 1.09 (1.00) · 1.22 (1.13) | Momentum +6% (kept) |
+| Spellfist (Brawler) | **−4.0** · −1.2 · **−7.6%** | **+4.9 · +3.1 · +7.9%** (her Dual Katana + Axe; +3.2 · +1.5 · +3.0% on balance's) | 1.17 (1.00) · 1.20 (1.13) | **Hand ×1.25** (T2B44) |
+| Archmage (Sorcerer) | +3.8 · +1.5 · +5.8% | **+3.8 · +1.5 · +5.8%** | 1.10 (1.02) · 1.17 (1.10) | Momentum |
+| Battlemage (Sorcerer) | +5.0 · **+9.1 · +10.7%** | **+0.1 · +2.0 · +4.8%** | 1.12 (1.02) · 1.18 (1.10) | **Hand ×1.1** (T2B44) |
+| Blademaster (Arms Spellblade) | +4.5 · +5.8 · +8.5% | **+4.5 · +5.8 · +8.5%** | 0.88 + 0.02 (0.83) | Pierce, hands +0.03 |
+| Sentinel (Arms Spellblade) | +6.4 · **+8.8 · +17.8%** | **+4.0 · +1.9 · +9.0%** | 0.71 + 0.09 (0.83) | **×0.9, one stack, the tapped foe** (T2B47) |
+| Bladedancer (Arms Spellblade) | **−8.7** · −0.2 · +2.7% | **−1.6 · +3.1 · +0.5%** (Pure ×3; −0.2 · −0.1 · +5.5% on balance's) | 0.84 (0.83) | **Trunk 0.53, lines 0.33** (T2B46) |
+| Runeblade (Tome Spellblade) | +3.8 · +0.2 · +4.8% | **+3.8 · +0.2 · +4.8%** | 0.91 + 0.10 (0.95) | Pierce, hands +0.03 |
+| Enchanter (Tome Spellblade) | +1.8 · +7.4 · +1.6% | **+1.8 · +7.4 · +1.6%** (her keeper's Dual Katana + Axe) | 0.68 + 0.25 (0.95) | ×0.8; her keeper's Dual (T2B66) |
+| Spellweaver (Tome Spellblade) | +4.1 · +1.8 · **−1.8%** | **+5.7 · +6.0 · +1.1%** (+5.0 · +4.0 · +1.0% on balance's) | 0.99 (0.95) | **Trunk 0.44, lines 0.50** (T2B46) |
+| Warlord (Arms Summoner) | **+8.9** · +2.3 · +6.5% | **+6.4 · +2.3 · +6.5%** | 0.79 + 0.06 (0.80) | **+0.03 on her lines only** (T2B49) |
+| Druid (Arms Summoner) | +4.2 · −1.8 · **−8.8%** | **+2.8 · +2.6 · +2.7%** (Dual Bow + Greatsword) | 0.74 + 0.10 (0.80) | **Trunk 0.52 + 0.42, lines 0.60 + 0.48** (T2B48, T2B66) |
+| Marshal (Arms Summoner) | **−7.2** · −1.9 · +3.0% | **+2.0 · −1.9 · +7.7%** (her keeper's Dual Bow + Greatsword) | 0.86 (0.80) | **Trunk 0.56, lines 0.40** (T2B46, T2B66) |
+| Invoker (Tome Summoner) | +5.7 · +7.6 · +6.2% | **+3.8 · +7.1 · +4.3%** | 0.77 + 0.01 (0.75) | **+0.01** (T2B49) |
+| Shaman (Tome Summoner) | +5.9 · −0.8 · +4.8% | **+5.9 · −0.8 · +4.8%** | 0.71 + 0.05 (0.75) | ×1 |
+| Animist (Tome Summoner) | **−8.2** · +7.7 · +5.5% | **+3.1 · +6.6 · +8.4%** (her keeper's Dual Dark + Fire) | 0.76 (0.75) | **Trunk 0.54, lines 0.33** (T2B46) |
+| **Mean of the sixteen** (the band ±5) | +1.8 · +2.9 · +4.1%: **36 of 48 cells** | **+3.4 · +3.0 · +5.3%: 48 of 48** (balance's kits +3.3 · +2.5 · +4.7%, 48 of 48) | | |
+| Guardian · Templar (Paladin) | +2.1 · 0 · 0% · +8.6 · +7.4 · +12.0% | the same; read on the stress check | 0.37 + 0.14 · 0.41 + 0.16 (0.50) | Kept (T2B30, T2B31) |
+| Bishop · Exorcist (Cleric) | +12.3 · 0 · 0% · +12.1 · +2.8 · +6.7% | the same | 0.31 + 0.34 · 0.34 + 0.32 (0.65) | Kept |
 
-- **Every analytic cell sits inside round 2's band** at the levels it reads (Lv 30 for the pure variants lies between
-  their Lv 10 and Lv 50). **The cells nearest an edge:** the Battlemage at Lv 50 (−1%, the edge −1.8%), the Spellfist at
-  Lv 10 (+9, the edge +12) and the Marshal at Lv 10 (+10.1). Balance re-reads the sixteen with the four new classes in
-  the mean.
-- **Round 2's two misses stand** (the Sentinel at Lv 10 and 30, T2B22), to re-read with the class lines.
-- **Mirrors:** the Spellweaver and the Marshal lead their mirrors at Lv 10 and trail at Lv 50, for the reason round 2's
-  crosses did (each replaces a status no one else in Party 2 carries); T2B16 reads them.
+- **Every damage and support class inside, at every level.** Nearest an edge on gear's kits: the Marshal at Lv 30 and the
+  Bladedancer at Lv 50 (within 0.2); on balance's, the Enchanter's and the Invoker's Lv 30 (within 0.4), inside the
+  measure's noise.
+- **D and S:** the supports trade D for S at about one for one; the pure variants hold D and lose S.
+- **The misses the knobs fixed** were the new kits set analytically (the crosses both ways, the pure variants at Lv 10)
+  and three kept classes the re-measure moved (the Sentinel, the Druid, the Warlord): T2B42's rebuilt fork read every
+  number again, round 2's for the kept twelve moving 0 to 4 points.
+- **Mirrors** (T2B16): four of eight pairs within 5 points; the Spellblade supports 7.4 apart at Lv 50, each mirror in a
+  different party. The band, not the mirror, is the guardrail.
 
-### 5.6 The stress check (T2B23)
+### 5.6 The stress check, and is any class useless (T2B60, T2B64)
 
-Balance's attrition check stands as measured in round 2 (balance §4.8): each region's elite, its boss's first wave and
-its boss **as one fight**, the foes' offense ×2 to ×4, Tier 2 Lv 30 and 50 and Tier 3 Lv 50.
+Balance's attrition check (T2B23, extended in T2B60): each region's elite, its boss's first wave and its boss **as one
+fight** (three waves, HP and MP carried), foes' offense multiplied, Tier 2 Lv 50 and Tier 3 Lv 50, 16 seeds. On the
+honeycomb's stages every party wins everything to ×3.2, so round 3 reads ×4 and ×5 (Tier 2) and ×5 and ×6 (Tier 3).
 
 | What it found (Tier 2 Lv 50) | |
 |---|---|
-| Where a healer matters | At ×2.6 she starts to matter, at ×4 she decides (Party 1 99% won with the Paladin, 60% with her sustain off) |
-| The healers | **The battle healer on curve, the keeper from ×3.2:** Guardian 91.9 · 67.5% of fights won at ×3.2 · ×4, Templar 89.7 · 63.4%; Bishop 85.0 · 56.9%, Exorcist 77.5 · 51.9% |
-| The supports | Every support's party safer than her keeper's: with the healer down 70–85% won where the keeper's wins 51–66% |
-| A party with no healer | Two supports carry it through ×2.6; a keeper healer's party stays ahead at ×4 (T2B39) |
+| Where a healer decides | Party 1 wins 92% at ×4 and 72% at ×5 with the Paladin, 46% and 30% with her sustain off |
+| The healers | **The battle healer on curve, the keeper from ×3.2:** Guardian 92.2% · 71.9% of fights won at ×4 · ×5, Templar 88.3 · 65.1%; Bishop 93.0 · 65.1%, Exorcist 88.8 · 61.7% (+3 to +7 points to the keeper) |
+| The supports | **Every support's party is the safest of her three** with the healer down: at ×4 the Sentinel's 59.4% won, the Enchanter's 55.5%, the Druid's 64.3%, the Shaman's 65.9%, +10 to +21 points over her keeper's |
+| The pure variants | The pure Spellblades as safe as their keepers; **the pure Summoners the least safe pick in the game** (the Marshal 78.6% and the Animist 79.7% at ×4, −13 to −15 points): no ward, and their parent's Enfeeble or Mind Break path given up. The party hint can name it ("No sustain beside a pure Summoner", T2C94) |
+| Tier 3 | §6.5 |
 
-**Round 3 adds to the check** (balance's to run): **the four pure variants carry no sustain**, so a party that swaps a
-support for a pure variant (C3 for C8) is the less safe one, as a keeper's is; **the Tier 3 healers** (Bastion and
-Cardinal with Overflow against Inquisitor and Hierophant at ×0.7 power) and **the Archdruid's and Soulcaller's two mends
-a pair** (§6.4) are read at Tier 3 Lv 50.
+**Is any class useless? No** (T2B64, the owner's fear, measured). Every class sits inside her band (§5.5), so none is
+worth less to a party on curve than her siblings, and almost every one is the better pick somewhere. The Rift's wards
+(T2B63: every foe of a Tier 2 Lv 50 stage warding one channel; her gain over her parent there) give the crosses and the
+pure variants their own ground:
 
-**Is any variant useless? No**, measured for the sixteen (balance §4.8); for the four new classes, analytic:
-
-| Siblings | Where each is the better pick |
+| Siblings | Where each is the better pick (measured) |
 |---|---|
-| Berserker · Spellfist | The Berserker on long fights and crowds (Momentum, her Axe); the Spellfist on bosses and sub-bosses (Pinpoint, every act one foe), and she adds an element |
-| Archmage · Battlemage | The Battlemage at Lv 10 and 30; the Archmage at Lv 50; the Battlemage answers an Iron ward |
-| Blademaster · Sentinel · **Bladedancer** | The Blademaster on curve at Lv 10 and 50; the Sentinel at Lv 30 and under attrition; **the Bladedancer where her party already carries Armor Break** (a Paladin, a Guardian) and beside a Brave-and-Faith ward: every hit of hers is physical |
-| Runeblade · Enchanter · **Spellweaver** | Level at Lv 10 and 30; the Enchanter at Lv 50 and under attrition; **the Spellweaver beside a Mind Break carrier** (the Cleric's Lance) and at Lv 10 |
-| Warlord · Druid · **Marshal** | The Warlord on curve at Lv 50; the Druid under attrition; **the Marshal at Lv 10 and on the Iron front** (Iron wards elements; every hit of hers is physical) |
-| Invoker · Shaman · **Animist** | The Shaman at Lv 10 and under attrition; the Invoker at Lv 30; **the Animist at Lv 50** (+6.3%) |
+| Berserker · **Spellfist** | The Berserker on curve and on Iron fronts (magic warded: +5.4 · +7.3%); **the Spellfist on Arcane fronts** (physical warded: **+10.3 · +11.9%** against +3.4 · +5.5%) |
+| Archmage · **Battlemage** | The Archmage on curve at Lv 10 and 50 and on Arcane fronts (+8.0 · +10.0%); **the Battlemage on Iron fronts (+17.8 · +17.1%** against +2.5 · +4.3%) |
+| Blademaster · Sentinel · **Bladedancer** | The Blademaster on curve at Lv 10 and 30 and on Arcane fronts; the Sentinel at Lv 50 and under attrition; **the Bladedancer on Iron fronts (+12.3%** against +3.2 and −3.2%) |
+| Runeblade · Enchanter · **Spellweaver** | The Runeblade at Lv 50; the Enchanter at Lv 30, under attrition and on Iron fronts (+8.0%); **the Spellweaver on Arcane fronts (+15.6%** against +6.8 and −3.3%) and at Lv 10 |
+| Warlord · Druid · **Marshal** | The Warlord at Lv 10 and 50; the Druid at Lv 30, under attrition and on Arcane fronts (+15.1%); **the Marshal on Iron fronts (+21.4%** against +6.2 and +3.4%) |
+| Invoker · Shaman · **Animist** | The Invoker at Lv 30; the Shaman at Lv 10 and 50, under attrition and on Arcane fronts; **the Animist ahead of the Shaman at Lv 30**, nowhere first: the weakest niche of the forty-two (her Arcane front −2.2%: she gives up the path a long warded fight pays for) |
 | Guardian · Templar; Bishop · Exorcist | The battle healer on curve, the keeper from ×3.2 |
+
+- **The Animist** is in her band at every level, so she is no worse than her siblings on curve; she is simply never the
+  standout. Her place is the all-elemental party (C6), which holds every kind and runs +2 to +5%. **Recommended: leave
+  her** (T2B64); the knob, if the owner wants her a place of her own, is her lines' hand (0.33 → 0.36 puts her ahead of
+  the Invoker at Lv 50). On gear's kits (her keeper's Dual Dark + Fire, Offense) she reads +3.1 · +6.6 · +8.4%: ahead of
+  the Shaman at Lv 30 and of both siblings at Lv 50, the place of her own that knob would have bought, so no knob is
+  needed.
+- **The rule that was useless** was a Tier 3 one: the keeper healers' Overflow, retired for mends and Barriers ×1.3
+  (§6.5, T2B55).
+- **The owner's swaps** (T2B59, §5.2): both keep the party in the band in both tiers; what they change is the party's
+  shape (an element on the Brawler's seat, a ward in the healer's place), not its speed.
 
 ### 5.7 Kinds: the 144 mixes (T2C94)
 
@@ -1134,7 +1250,8 @@ same), counted on the presets (§4.13):
 
 - **Every comp the owner names holds all ten** (C1–C9); C10 drops the Axe and Thunder.
 - **The party hint** (T2C94): a party that drops a kind names an open class of a member whose preset holds it ("No Bow:
-  the Invoker's preset holds one"); gear's two-kind weapons add their partners on top (gear's coverage, T2G27).
+  the Invoker's preset holds one"); gear's two-kind weapons add their partners on top: with Suggested types 48 and 60 of
+  72 mixes hold all ten (gear's coverage, T2G53).
 
 ## 6. Tier 3 in full
 
@@ -1148,26 +1265,26 @@ hands, lean, act, trees, class line, statuses, her parent's rule) and adds **one
 | Class | Parent | Line | Slots · reads | Act · hand · MP | **Her Tier 3 rule** (on top of her parent's) | Statuses | Healer | LB scale | What she's for |
 |---|---|---|---|---|---|---|---|---|---|
 | **Ravager** | Berserker | Pure physical | 3 Arms · ATK | One act · ×1 · ×1 | **Juggernaut:** an unbroken foe takes ×0.6 from her hits, not ×0.5 (round 2's Warrior mastery) | None | No | ×0.95 | Momentum and Juggernaut: nothing slows her |
-| **Spellhammer** | Spellfist | Kept | 2 Arms + 1 Tome · ATK | One act · ×1 · ×1 | **Pinpoint doubled:** +4% a depth (×1.2 at depth 5) | None | No | ×0.95 | The Spellfist with a higher ceiling |
-| **Gladiator** | Spellfist | Pure, varied | **3 Arms** · ATK | One act · **×1.05** · ×1 | **Arsenal:** two two-kind weapons in her slots, every Arm in reach (§6.3) | None | No | ×0.95 | Pure physical, all five physical kinds: weak hits and Breaks on every foe |
-| **Astromancer** | Archmage | Pure magic | 3 Tomes · M.ATK | One act · ×1 · ×1 | **Resonance:** her capstones and her class capstone strike again at 30%; the echo chips nothing (round 2's Mage mastery) | None | No | ×0.95 | Momentum and an echo: the party's top damage |
-| **Spellknight** | Battlemage | Kept | 2 Tomes + 1 Arm · M.ATK | One act · ×1.25 · ×1 | **Pinpoint doubled** | None | No | ×0.95 | The Battlemage with a higher ceiling |
-| **Thaumaturge** | Battlemage | Pure, varied | **3 Tomes** · M.ATK | One act · **×1.05** · ×1 | **Arsenal:** every element in reach | None | No | ×0.95 | Pure magic, all five elements |
+| **Spellhammer** | Spellfist | Kept | 2 Arms + 1 Tome · ATK | One act · ×1.25 · ×1 | **Pinpoint doubled:** +4% a depth (×1.2 at depth 5) | None | No | ×0.95 | The Spellfist with a higher ceiling |
+| **Gladiator** | Spellfist | Pure, varied | **3 Arms** · ATK | One act · **×1.05 trunk, ×1.2 lines** · ×1 | **Arsenal:** two two-kind weapons in her slots, every Arm in reach (§6.3) | None | No | ×0.95 | Pure physical, all five physical kinds: weak hits and Breaks on every foe |
+| **Astromancer** | Archmage | Pure magic | 3 Tomes · M.ATK | One act · ×1 · ×1 | **Resonance:** her deepest open depth's skills strike again at **10%**; the echo chips nothing (round 2's Mage mastery, re-cut by T2B52) | None | No | ×0.95 | Momentum and an echo: the party's top damage |
+| **Spellknight** | Battlemage | Kept | 2 Tomes + 1 Arm · M.ATK | One act · ×1.1 · ×1 | **Pinpoint doubled** | None | No | ×0.95 | The Battlemage with a higher ceiling |
+| **Thaumaturge** | Battlemage | Pure, varied | **3 Tomes** · M.ATK | One act · **×1.1** · ×1 | **Arsenal:** every element in reach | None | No | ×0.95 | Pure magic, all five elements |
 | **Bladelord** | Blademaster | Keeper | 2 Arms + 1 Tome · ATK, M.ATK | Pair · 0.75 + 0.47 · ×0.5 a half | **Spellbind:** both halves weak on one foe, the act +20% (round 2's Spellblade mastery) | A path | No | ×0.95 | The Break engine, both channels at once |
-| **Herald** | Sentinel | Support | 2 Arms + 1 Tome · ATK, M.ATK | Pair · **0.71 + 0.45** · ×0.5 a half | **Her keeper sibling's twist:** her familiar on both halves, piercing; hands +0.03 a half | Support | No | ×0.95 | Offense support who hits harder |
-| **Dervish** | Bladedancer | Pure physical | 3 Arms (2 + 1) · ATK | Pair · 0.72 + 0.32 · ×0.5 a half | **Momentum** | None | No | ×0.95 | Pure physical multi-hit with a self-buff |
+| **Herald** | Sentinel | Support | 2 Arms + 1 Tome · ATK, M.ATK | Pair · 0.65 + 0.40 · ×0.5 a half | **Her keeper sibling's twist:** her familiar on both halves, piercing (her hands her parent's, T2B54) | Support | No | ×0.95 | Offense support who hits harder |
+| **Dervish** | Bladedancer | Pure physical | 3 Arms (2 + 1) · ATK | Pair · trunk 0.72 + 0.53, lines 0.72 + 0.33 · ×0.5 a half | **Momentum** | None | No | ×0.95 | Pure physical multi-hit with a self-buff |
 | **Runelord** | Runeblade | Keeper | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.75 + 0.51 · ×0.5 a half | **Spellbind** | A path | No | ×0.95 | The Bladelord, magic-led |
-| **Oracle** | Enchanter | Support | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · **0.61 + 0.41** · ×0.5 a half | **The Herald's** | Support | No | ×0.95 | The Herald, magic-led |
-| **Starweaver** | Spellweaver | Pure magic | 3 Tomes (2 + 1) · M.ATK | Pair · 0.72 + 0.41 · ×0.5 a half | **Momentum** | None | No | ×0.95 | Pure elemental multi-hit with a self-buff |
-| **Overlord** | Warlord | Keeper | 2 Arms + 1 Tome · ATK, M.ATK | Pair · 0.60 + 0.49 · ×0.5 a half | **Menagerie:** her lingering summons stay two pairs, a farewell at each (round 2's Summoner mastery) | A path | No | ×0.95 | Farewells on every foe, twice as long |
-| **Archdruid** | Druid | Support | 2 Arms + 1 Tome · ATK, M.ATK | Pair · **0.57 + 0.47** · ×0.5 a half | **Her keeper sibling's twist:** both summons linger, **both farewells mend**; hands +0.03 a half | Support | No | ×0.95 | Field support, two mends a pair |
-| **Imperator** | Marshal | Pure physical | 3 Arms (2 + 1) · ATK | Pair · 0.57 + 0.40 · ×0.5 a half | **Momentum** | None | No | ×0.95 | Pure physical area with a self-buff |
-| **Hierarch** | Invoker | Keeper | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.60 + 0.53 · ×0.5 a half | **Menagerie** | A path | No | ×0.95 | The Overlord, magic-led |
-| **Soulcaller** | Shaman | Support | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · **0.60 + 0.53** · ×0.5 a half | **The Archdruid's** | Support | No | ×0.95 | The Archdruid, magic-led |
-| **Mythlord** | Animist | Pure magic | 3 Tomes (2 + 1) · M.ATK | Pair · 0.57 + 0.37 · ×0.5 a half | **Momentum** | None | No | ×0.95 | Pure elemental area with a self-buff |
-| **Bastion** | Guardian | Keeper | 2 Arms + 1 Tome · ATK; heals from ATK | One act · ×0.5 · ×0.6 | **Overflow:** a mend's healing past max HP becomes a Barrier, up to 10% of max HP (round 2's Healer mastery) | Widely, +1 | **Yes** | ×0.8 | The safest healer |
+| **Oracle** | Enchanter | Support | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.58 + 0.38 · ×0.5 a half | **The Herald's** | Support | No | ×0.95 | The Herald, magic-led |
+| **Starweaver** | Spellweaver | Pure magic | 3 Tomes (2 + 1) · M.ATK | Pair · trunk 0.72 + 0.44, lines 0.72 + 0.50 · ×0.5 a half | **Momentum** | None | No | ×0.95 | Pure elemental multi-hit with a self-buff |
+| **Overlord** | Warlord | Keeper | 2 Arms + 1 Tome · ATK, M.ATK | Pair · trunk 0.57 + 0.46, lines 0.60 + 0.49 · ×0.5 a half | **Menagerie:** her lingering summons stay two pairs, a farewell at each (round 2's Summoner mastery) | A path | No | ×0.95 | Farewells on every foe, twice as long |
+| **Archdruid** | Druid | Support | 2 Arms + 1 Tome · ATK, M.ATK | Pair · trunk 0.52 + 0.42, lines 0.60 + 0.48 · ×0.5 a half | **Her keeper sibling's twist:** both summons linger, **both farewells mend** (her hands her parent's, T2B54) | Support | No | ×0.95 | Field support, two mends a pair |
+| **Imperator** | Marshal | Pure physical | 3 Arms (2 + 1) · ATK | Pair · trunk 0.57 + 0.56, lines 0.57 + 0.40 · ×0.5 a half | **Momentum** | None | No | ×0.95 | Pure physical area with a self-buff |
+| **Hierarch** | Invoker | Keeper | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.58 + 0.51 · ×0.5 a half | **Menagerie** | A path | No | ×0.95 | The Overlord, magic-led |
+| **Soulcaller** | Shaman | Support | 2 Tomes + 1 Arm · M.ATK, ATK | Pair · 0.57 + 0.5 · ×0.5 a half | **The Archdruid's** | Support | No | ×0.95 | The Archdruid, magic-led |
+| **Mythlord** | Animist | Pure magic | 3 Tomes (2 + 1) · M.ATK | Pair · trunk 0.57 + 0.54, lines 0.57 + 0.33 · ×0.5 a half | **Momentum** | None | No | ×0.95 | Pure elemental area with a self-buff |
+| **Bastion** | Guardian | Keeper | 2 Arms + 1 Tome · ATK; heals from ATK | One act · ×0.5 · ×0.6 | **Mends and Barriers ×1.3**, sustain only (in place of Overflow, round 2's Healer mastery, retired by T2B55) | Widely, +1 | **Yes** | ×0.8 | The safest healer: the attrition pick |
 | **Inquisitor** | Templar | Battle | 2 Arms + 1 Tome · ATK; heals from ATK | One act · **×0.7** · ×0.7 | **A deeper battle healer:** power ×0.7 (from ×0.6); mends and Barriers ×0.7 kept | Widely | **Yes** | ×0.8 | The healer who hits hardest |
-| **Cardinal** | Bishop | Keeper | 2 Tomes + 1 Arm · M.ATK; heals from M.ATK | One act · ×0.5 · ×0.6 | **Overflow** | Widely, +1 | **Yes** | ×0.8 | The Bastion, magic-led |
+| **Cardinal** | Bishop | Keeper | 2 Tomes + 1 Arm · M.ATK; heals from M.ATK | One act · ×0.5 · ×0.6 | **The Bastion's** | Widely, +1 | **Yes** | ×0.8 | The Bastion, magic-led |
 | **Hierophant** | Exorcist | Battle | 2 Tomes + 1 Arm · M.ATK; heals from M.ATK | One act · **×0.7** · ×0.7 | **The Inquisitor's** | Widely | **Yes** | ×0.8 | The Inquisitor, magic-led |
 
 - **Twenty-two: R3-6's count** (T2C65): the Brawler's and the Sorcerer's lines three each, the hybrids' three each (one
@@ -1183,22 +1300,23 @@ Round 2's Tier 3 had no promotion and four tier-wide features. Round 3 gives eac
 
 | Round 2's Tier 3 feature | Round 3 | Why |
 |---|---|---|
-| **The crown** (T2C20, T2C21): at Class Rank 50 every held capstone plays 5.6 whole, +4 MP, one more stack; MP back's sixth step (6%) | **Kept on every Tier 3 class** (T2C79): her ceiling at Class Rank 50 | It is most of Tier 3's measured +17% and reads the same on every class; a promotion that crowned only some classes would need twenty-two prices |
-| **Two lines held** (T2C19): two of a tree's three lines, each with its tip; Auto between them | **Kept on every Tier 3 class** (T2C80) | Tier 3's tree depth; balance never priced it (T2B20 left it out), so it moves no measured number |
+| **The crown** (T2C20, T2C21): at Class Rank 50 every held capstone plays 5.6 whole, +4 MP, one more stack; MP back's sixth step (6%) | **Kept on every Tier 3 class** (T2C79): her ceiling at Class Rank 50 | It is about two thirds of Tier 3's measured budget (+11.8 and +14.9% of +17.0 and +18.8%, T2B56) and reads the same on every class; a promotion that crowned only some classes would need twenty-two prices |
+| **Two lines held** (T2C19): two of a tree's three lines, each with its tip; Auto between them | **Kept on every Tier 3 class** (T2C80) | Tier 3's tree depth; balance never priced it (T2B20, T2B41 left it out), so it moves no measured number |
 | **The master slot** (T2C16): one crowned capstone outside her ten equipped | **Retired** (T2C81) | The crown already makes every held capstone 5.6; an eleventh slot re-equips one and adds a screen; the promotion is Tier 3's new piece |
-| **The five masteries** (T2C22, T2C58): by hall family at Class Rank 50 | **Re-homed** (T2C82) as the Tier 3 rules of the lines that had them, from Class Rank 1 | Each was drafted and measured as a family's sharpening; on a keeper's line it is that line's promotion |
+| **The five masteries** (T2C22, T2C58): by hall family at Class Rank 50 | **Four re-homed** (T2C82) as the Tier 3 rules of the lines that had them, from Class Rank 1 (Resonance re-cut to act from it, T2B52); **Overflow retired** (T2B55) | Each was drafted and measured as a family's sharpening; on a keeper's line it is that line's promotion. Overflow measured as worth nothing: mends aim at the most hurt and rarely overheal |
 
 | Round 2's mastery (family) | Round 3: the Tier 3 rule of | Round 2's other carriers, now |
 |---|---|---|
 | **Juggernaut** (Warrior) | **Ravager** | The Spellfist's line: Pinpoint doubled (Spellhammer), Arsenal (Gladiator) |
-| **Resonance** (Mage) | **Astromancer** | The Battlemage's line: the same as the Spellfist's |
+| **Resonance** (Mage) | **Astromancer**, re-cut: her deepest open depth's skills echo at 10% (T2B52) | The Battlemage's line: the same as the Spellfist's |
 | **Spellbind** (Spellblade) | **Bladelord, Runelord** | The supports: their keeper's twist (Herald, Oracle); the pures: Momentum (Dervish, Starweaver) |
 | **Menagerie** (Summoner) | **Overlord, Hierarch** | The supports: their keeper's twist (Archdruid, Soulcaller); the pures: Momentum (Imperator, Mythlord) |
-| **Overflow** (Healer) | **Bastion, Cardinal** | The battle healers: power ×0.7 (Inquisitor, Hierophant) |
+| **Overflow** (Healer) | **Retired** (T2B55): the Bastion's and the Cardinal's rule is **mends and Barriers ×1.3** | The battle healers: power ×0.7 (Inquisitor, Hierophant) |
 
 **What a Tier 3 class is, in one line:** her Tier 2 parent + one rule (from Class Rank 1) + the crown (Class Rank 50) +
-two lines held. **What never changes:** her slots' count and channels (but the Gladiator's and the Thaumaturge's), her
-lean, her armor half, her trees, her hall, her Limit Break scale.
+two lines held, her parent's hands kept but Arsenal's (T2B53, T2B54). **What never changes:** her slots' count and
+channels (but the Gladiator's and the Thaumaturge's), her lean, her armor half, her trees, her hall, her Limit Break
+scale.
 
 ### 6.3 The Brawler's and the Sorcerer's lines (T2C83–T2C85)
 
@@ -1210,10 +1328,10 @@ buffs, and then another one that pure phys dps weapons but more varied phys weap
 |---|---|---|---|
 | Berserker | **Ravager** | Momentum + **Juggernaut** | Her hits on an unbroken foe ×0.6, not ×0.5: +20% on what she deals before a Break |
 | Spellfist | **Spellhammer** | The cross + **Pinpoint +4% a depth** | The same kit and preset; her one-foe acts ×1.2 at depth 5 (×1.1 in Tier 2): "higher ceiling" |
-| Spellfist | **Gladiator** | **Arsenal** | **Three Arms** (her Tome slot an Arm, so no cross), **two two-kind weapons**, hand ×1.05, no Pinpoint; the Brawler's Arms trees |
-| Archmage | **Astromancer** | Momentum + **Resonance** | Her capstones echo at 30% |
+| Spellfist | **Gladiator** | **Arsenal** | **Three Arms** (her Tome slot an Arm, so no cross), **two two-kind weapons**, hand **×1.05 on her trunk, ×1.2 on her lines**, no Pinpoint; the Brawler's Arms trees |
+| Archmage | **Astromancer** | Momentum + **Resonance** | Her deepest open depth's skills echo at 10%, the echo chipping nothing |
 | Battlemage | **Spellknight** | The cross + **Pinpoint +4% a depth** | The same kit and preset |
-| Battlemage | **Thaumaturge** | **Arsenal** | **Three Tomes**, two two-kind weapons, hand ×1.05, no Pinpoint; the Sorcerer's Tome trees |
+| Battlemage | **Thaumaturge** | **Arsenal** | **Three Tomes**, two two-kind weapons, hand **×1.1**, no Pinpoint; the Sorcerer's Tome trees |
 
 **"More varied physical weapons": Arsenal** (T2C85). Gear allows one two-kind weapon in a class's slots (T2G3); **the
 Gladiator and the Thaumaturge may wear two**, so with three weapons she carries **all five kinds of her channel**:
@@ -1227,9 +1345,16 @@ Gladiator and the Thaumaturge may wear two**, so with three weapons she carries 
   regulars 1 + 2 or 2 + 1, sub-bosses and bosses 3), so **every foe has a weak kind in her hands**, against about 90% for
   a three-weapon class with one Dual. Her two-kind weapons hit weak at the Tempered or Evolved ×1.5 at G10, not the Keen
   ×1.7, so she trades a little on her best kinds for reach: about +3% of her damage on weak hits, and **every foe she
-  touches chips**, so her party Breaks sooner. Her hand ×1.05 (the Spellfist's ×1 and +5%, the Battlemage's ×1.25 back
-  to a pure class's) carries the rest: analytic gain over her parent **+5.4% (Gladiator) and +5.2% (Thaumaturge)** at
-  Tier 3 Lv 50, before the crown.
+  touches chips**, so her party Breaks sooner. **Her hands** (T2B53): drafted ×1.05 for both, against a Spellfist at ×1
+  and a Battlemage at ×1.25; with their parents at ×1.25 and ×1.1 (T2B44), **the Gladiator ×1.05 on her trunk and ×1.2
+  on her lines, the Thaumaturge ×1.1**. Measured over her parent, Tier 3 Lv 10 · 30 · 50: **the Gladiator +6.9 · −2.4 ·
+  +9.7%, the Thaumaturge +4.4 · +1.1 · +4.3%**.
+- **The Gladiator's two cells sit a point past the band's edge** (Lv 30 −2.4 against −2.1, Lv 50 +9.7 against +9.0),
+  accepted (T2B51): her gain swings with the fight's length. In Lv 30's short fights the Spellfist's one-foe Pinpoint acts
+  end them; in Lv 50's long ones Arsenal's breadth (a weak kind on every foe, more Breaks) and her crowned Sweep and Scatter
+  capstones pay. A line hand of ×1.15 puts Lv 50 in and Lv 30 out, ×1.25 the reverse; ×1.2 leaves both within a point,
+  inside the measure's noise, to re-read on the build's run with the class lines (the Spellfist's Sundown and line C
+  change the short fights).
 - **Why this, not the alternatives** the owner's words allow: **a fourth slot** (+4.5% on her best hit, round 2's
   analytic, §4.4) would break three docs' slot counts (gear, Extra Stats' kind rows, the window's worn slots) for
   two classes; **a rule that rewards mixing shapes** (a stack for each act with a different weapon from her last) would
@@ -1240,36 +1365,53 @@ Gladiator and the Thaumaturge may wear two**, so with three weapons she carries 
 
 ### 6.4 The hybrids' lines (T2C86)
 
-Each hybrid's three Tier 2 children promote one each, by one pattern:
+Each hybrid's three Tier 2 children promote one each, by one pattern (gains measured over her Tier 2 parent at the
+proposed knobs, Tier 3 Lv 10 · 30 · 50, T2B51–T2B54):
 
-| Tier 2 line | Tier 3 | Her rule | Analytic gain over her parent, Tier 3 Lv 50 |
-|---|---|---|---|
-| **Keeper** (Blademaster, Runeblade) | Bladelord, Runelord | **Spellbind** (round 2's): both halves weak on one foe, the act +20% | +5.1% |
-| **Keeper** (Warlord, Invoker) | Overlord, Hierarch | **Menagerie** (round 2's): her lingering summons stay two pairs, a farewell at each | +3.4% |
-| **Support** (Sentinel, Enchanter) | Herald, Oracle | **Her keeper sibling's twist:** the familiar on both halves, piercing; hands +0.03 a half | +3.2% |
-| **Support** (Druid, Shaman) | Archdruid, Soulcaller | **Her keeper sibling's twist:** both summons linger, and **both farewells mend**; hands +0.03 a half | +4.9% (and twice the mend: 11% of the party's HP a round) |
-| **Pure** (Bladedancer, Spellweaver) | Dervish, Starweaver | **Momentum** (the pure keepers'): +6% a stack, a stack a turn, three at most | +8.2% |
-| **Pure** (Marshal, Animist) | Imperator, Mythlord | **Momentum** | +8.2% |
+| Tier 2 line | Tier 3 | Her rule | Measured gain over her parent | Drafted (analytic, Lv 50) |
+|---|---|---|---|---|
+| **Keeper** (Blademaster, Runeblade) | Bladelord, Runelord | **Spellbind** (round 2's): both halves weak on one foe, the act +20% | +2.2 · +4.2 · +6.9%; +3.7 · +1.5 · +3.1% | +5.1% |
+| **Keeper** (Warlord, Invoker) | Overlord, Hierarch | **Menagerie** (round 2's): her lingering summons stay two pairs, a farewell at each | +1.8 · +0.9 · +1.2%; +3.1 · +0.8 · +4.1% | +3.4% |
+| **Support** (Sentinel, Enchanter) | Herald, Oracle | **Her keeper sibling's twist:** the familiar on both halves, piercing; **her Tier 2 hands kept** (T2B54) | +6.3 · +4.6 · +1.2%; +7.7 · +6.0 · +3.1% | +3.2% |
+| **Support** (Druid, Shaman) | Archdruid, Soulcaller | **Her keeper sibling's twist:** both summons linger, and **both farewells mend**; her Tier 2 hands kept | +5.1 · +5.7 · −0.2%; +4.7 · +2.8 · +1.7% (and twice the mend) | +4.9% |
+| **Pure** (Bladedancer, Spellweaver) | Dervish, Starweaver | **Momentum** (the pure keepers'): +6% a stack, a stack a turn, three at most | +3.8 · +2.9 · +3.4%; +1.8 · +2.3 · +6.2% | +8.2% |
+| **Pure** (Marshal, Animist) | Imperator, Mythlord | **Momentum** | +6.7 · +6.6 · +1.9%; +6.9 · +4.3 · +5.4% | +8.2% |
 
 - **Why these:** a keeper's line sharpens again with its family's mastery, as drafted and measured (T2B37); a support
   borrows the trick her keeper sibling already has, so she deals more without carrying more status (the support level was
   round 2's largest error, T2B24, and stays as measured); a pure line takes the pure classes' self-buff, so **every pure
   line in the game has Momentum by Tier 3** except the Brawler's and Sorcerer's crosses, whose identity is Pinpoint and
   Arsenal.
+- **Why the supports drop the +0.03** (T2B54): drafted with their keeper's twist **and** their keeper's +0.03 a half, the
+  Oracle and the Archdruid read +10 to +12% at Lv 10–30 (the Herald and the Soulcaller at the edge). The twist is the
+  step; the hands made it two. **The Herald 0.65 + 0.40, the Oracle 0.58 + 0.38, the Archdruid and the Soulcaller their
+  parents'** (alternative: the drafted +0.03 a half).
+- **Menagerie and Momentum kept** as drafted (inside at every level); Momentum's step on the pure lines stays +6%.
+- **On gear's kits** (Keen ×3 on the four pure lines, Offense): the Dervish +6.0 · +2.7 · +5.3% and the Imperator +3.8 ·
+  +3.4 · +4.0% inside; **the Starweaver −1.5 · −0.2 · −1.3% and the Mythlord −2.7 · +0.9 · +0.4%, a point and 2.4
+  points past at Lv 10** (T2B66), to re-read on the build's run. Their Keen ×3 is gear's fix for Arsenal's coverage
+  (T2G55): Tempered on their parent's Dual would put 18 of the 324 Tier 3 mixes past the bosses' shields.
 - **No new mechanic:** every rule here is round 2's (Spellbind, Menagerie, the keepers' twists, Momentum).
-- **Gains** are analytic (her damage step × the seat's pass-through: 0.55 a pure seat, 0.85 a hybrid's, round 2's
-  measured ratios); the Herald's and Archdruid's from round 2's measured keepers' gains over their parents.
+- **Under attrition** (Tier 3 Lv 50, healer's sustain off at ×5): the Soulcaller's party wins 94% and the Archdruid's
+  89% against the keepers' 76 and 68%; the two mends a pair are the strongest sustain outside a healer. The Herald is a
+  little safer than her keeper (+4 points), the Oracle level. **The pure lines are the least safe** (the Mythlord 69% at
+  ×6 with the healer on).
 
 ### 6.5 The healers' lines (T2C87)
 
-| Tier 2 | Tier 3 | Her rule | On curve | Under attrition |
+| Tier 2 | Tier 3 | Her rule | On curve (over her parent, Lv 10 · 30 · 50) | Under attrition (Tier 3 Lv 50, won · KOs at ×6) |
 |---|---|---|---|---|
-| Guardian, Bishop (one stack more) | **Bastion, Cardinal** | **Overflow** (round 2's): a mend past max HP becomes a Barrier, up to 10% of max HP | Her parent's (+0) | **Safer:** the overheal a keeper wastes becomes a ward |
-| Templar, Exorcist (battle healers) | **Inquisitor, Hierophant** | **Power ×0.7** (from ×0.6); mends and Barriers ×0.7 kept, Rescue and the revive kept | **+10.8%, +8.9%** of her parent's value | Her parent's healing |
+| Guardian, Bishop (one stack more) | **Bastion, Cardinal** | **Mends and Barriers ×1.3** (T2B55; Overflow retired) | Her parent's: the Bastion +0.0 · +0.3 · +0.0%, the Cardinal 0.0 · −0.2% at Lv 30 · 50 (her −6.2% at Lv 10 was Overflow's, which ×1.3 replaces) | **The attrition pick:** the Bastion 93.8% · 0.88, the Cardinal 93.2% · 0.89 |
+| Templar, Exorcist (battle healers) | **Inquisitor, Hierophant** | **Power ×0.7** (from ×0.6); mends and Barriers ×0.7 kept, Rescue and the revive kept | **The on-curve pick:** the Inquisitor +8.2 · +11.4 · +13.1%, the Hierophant +18.3 · +7.5 · +13.9% | The Inquisitor 87.8% · 1.04, the Hierophant 78.1% · 1.77 |
 
 - **The trade widens both ways, as the owner asked of healers:** the keeper's line gains only sustain, the battle
-  healer's only damage. Read on the stress check at Tier 3 Lv 50 (T2B23's bands: the keeper ahead in wins from ×3.2, the
-  battle healer on curve).
+  healer's only damage. **The keeper is the attrition pick** (+6 and +15 points of fights won at ×6 over her battle
+  healer), the battle healer the on-curve pick (+8 to +18%).
+- **Why Overflow retired** (T2B55): measured at 0, 10, 20 and 30% of max HP it played the same fights. Her mends aim at
+  the most hurt, so they rarely overheal; with it the Paladin's line only tied her battle healer at ×6 (87.5 against
+  87.8%). **Mends and Barriers ×1.3** lift the keepers' fights won at ×6 from 87.5 to 93.8% (the Bastion) and from 88.5 to
+  93.2% (the Cardinal), on curve unchanged. Alternative: ×1.15 (+1.6 points at ×6). Gear's Vow (her heals read more of her
+  stat, a slot's Tier 3 G5) multiplies with it.
 - **Still one healer a party.**
 
 ### 6.6 Promotion and switching in Tier 3 (T2C89–T2C91)
@@ -1300,47 +1442,60 @@ case): her page lists her Tier 3 options.
 
 ### 6.7 Tier 3's budget and band (T2C92)
 
-**Round 2 measured the crowns and masteries at +17% at Tier 3 Lv 50** (T2B37: C8 4.98 BT a round against 4.27
-uncrowned; C1 crowned 4.82). Round 3 keeps that budget:
+**Round 2 measured the crowns and masteries at +17% at Tier 3 Lv 50** (T2B37). R3-8 asks Tier 3's promotions to take
+over that budget; **balance measured it held** (T2B56):
 
-| Piece | Round 2 | Round 3 |
+| Piece | Round 2 | Round 3 (measured) |
 |---|---|---|
-| The crown at Class Rank 50 | Every class | **Every class** (unchanged) |
-| A family's mastery at Class Rank 50 | Every class (five) | **One rule a class from Class Rank 1**: five lines take their mastery unchanged; the other seventeen rules sit in the masteries' range |
-| Tier 3 at Lv 50 against the same comp in Tier 2's frame | +17% (measured) | **About +17%**: **T1, the keepers' line, is round 2's crowned C1 exactly** (each member the class whose mastery round 2 measured), 4.82 BT; the other comps project 4.78–5.26 (§6.8) |
-| Tier 3 below Class Rank 50 | The sixteen as in Tier 2 | **Her parent + her rule:** about +5% of her value from Lv 1 to 35 |
+| The crown at Class Rank 50 | Every class | **Every class** (unchanged): **+11.8% (Party 1's line) and +14.9% (Party 2's)** at Lv 50 |
+| A family's mastery at Class Rank 50 | Every class (five) | **One rule a class from Class Rank 1**: four lines take their mastery (Resonance re-cut, T2B52), the keeper healers mends ×1.3 in Overflow's place (T2B55), the other seventeen rules in the masteries' range |
+| Tier 3 at Lv 50 against the same comp in Tier 2's frame | +17% | **+17.0% (T1 against C1) and +18.8% (T2 against C2)**, uncrowned parents in Tier 3's frame |
+| Tier 3 below Class Rank 50 | The sixteen as in Tier 2 | **Her parent + her rule:** the keepers' lines +4.1 and +6.0% at Lv 10, +2.0 and +2.4% at Lv 30 (drafted about +5%) |
+| Against Tier 1's parties in Tier 3's frame, Lv 50 | — | +15.4% and +15.6%: the whole of Tiers 2 and 3's class step |
 
-- **The Tier 3 band** (T2C92): on curve at Tier 3 Lv 10, 30 and 50, **each Tier 3 damage and support class's gain over
-  her Tier 2 parent** (both crowned at Lv 50) **within ±5 points of the eighteen's mean**; the four healer classes on the
-  stress check. Analytic at Lv 50: **mean +5.3%, every one of the eighteen between +3.2 and +8.2%** (the pure lines'
-  Momentum highest, the supports' twist and Menagerie lowest).
-- **Balance re-sizes Tier 3's term** (T2B36) below Lv 40 by about +0.03 (the rules now work before the crown); its
-  1.26 from Lv 40 stands.
+- **The Tier 3 band** (T2C92, measured in T2B51): on curve at Tier 3 Lv 10, 30 and 50, **each Tier 3 damage and support
+  class's gain over her Tier 2 parent** (both crowned at Lv 50, the parents at the Tier 2 knobs) **within ±5 points of the
+  eighteen's mean**; the four healer classes on the stress check. **At the drafted values 44 of 54 cells** (the
+  Astromancer 0% below depth 5 and +17–20% from it, the Thaumaturge −6 to −11%, the Oracle's and the Archdruid's +0.03);
+  **at the knobs 52 of 54** (means +4.7 · +2.9 · +3.9%), the Gladiator's two a point past, accepted (§6.3).
+- **Resonance by depth** (T2B52): a Tier 3 rule acts from Class Rank 1 (T2C78), and an echo on capstones waits for depth
+  5 (Tier 3 Lv 29): drafted at 30% on capstones, the Astromancer read 0.0 · +16.1 · +20.1%. **On her deepest open depth's
+  skills at 10%** she reads +7.7 · +2.3 · +6.4%, in the band's middle (tested: 15% on her deepest +10.8 · +5.8 · +9.4%;
+  12% on capstones 0 · +4.3 · +6.8%).
+- **Tier 3's term, measured** (T2B57): foes' HP and DEF **× 1.13 from Tier 3 Lv 1 to 40, rising to × 1.19 by Lv 50**
+  (round 2: 1.10 → 1.12 by Lv 35, rising to 1.26 by Lv 40); offense +10% by Lv 50 and bosses × 1.1 kept. The rules now
+  act from Class Rank 1 (classes' +0.03 estimate below Lv 40), and the crown shows less than round 2 priced: its 30%
+  capstone echo is gone.
 
 ### 6.8 Tier 3 comps (T2C93)
 
-The owner's swaps one tier down (Tier 3 Lv 50, every class crowned; analytic seat model on top of the crown every class
-shares; party damage projected from T1's measured 4.82 BT a round):
+The owner's swaps one tier down, **measured** (T2B58; Tier 3 Lv 10 · 30 · 50, every class crowned from Lv 36, each comp
+against its Tier 2 comp in Tier 3's frame and against Tier 1's party there), beside this doc's drafted seat model (Lv 50,
+on top of the crown; party damage projected from round 2's crowned C1, 4.82 BT a round):
 
-| Comp | Members | Kinds in two hands · missing | Damage · support (share) | Healing | **Against its Tier 2 comp · against T1** | Projected BT a round |
-|---|---|---|---|---|---|---|
-| **T1** The keepers' line (C1's): round 2's crowned C1 | Ravager, Astromancer, Bladelord, Hierarch, Bastion | 5 · — | 4.63 · 0.26 (5%) | 20% | **+3.6%** · — | **4.82 (measured)** |
-| **T2** The keepers' line (C2's) | Ravager, Astromancer, Runelord, Overlord, Cardinal | 5 · — | 4.66 · 0.51 (10%) | 20% | **+3.6%** · +6.2% | 5.12 |
-| **T3** A Brawler with a Spellblade (C3's) | Spellhammer, Astromancer, Dervish, Hierarch, Bastion | 5 · — | 4.66 · 0.25 (5%) | 20% | **+4.5%** · +0.2% | 4.83 |
-| **T3g** The Gladiator beside the Bladelord | Gladiator, Astromancer, Bladelord, Hierarch, Bastion | 7 · — | 4.55 · 0.26 (5%) | 20% | **+3.5%** · −0.7% | 4.78 |
-| **T3b** A Sorcerer with a Tome Spellblade (C3b's) | Ravager, Spellknight, Starweaver, Overlord, Cardinal | 5 · — | 4.80 · 0.46 (9%) | 20% | **+4.3%** · +5.2% | 5.07 |
-| **T4** A Spellblade with the Paladin (C4's) | Ravager, Astromancer, Herald, Hierarch, Inquisitor | 4 · — | 4.56 · 0.38 (8%) | 17.7% | **+4.8%** · +1.6% | 4.90 |
-| **T4b** A Tome Spellblade with the Cleric (C4b's) | Ravager, Astromancer, Oracle, Overlord, Hierophant | 5 · — | 4.55 · 0.69 (13%) | 17.7% | **+4.6%** · +9.1% | 5.26 |
-| **T6** All pure, every kind | Gladiator, Thaumaturge, Dervish, Mythlord, Bastion | 9 · — | 4.64 · 0.24 (5%) | 20% | **+3.1%** (from C6) · +0.3% | 4.84 |
-| **T8** A Tier 3 mix (round 2's C8's line) | Ravager, Spellknight, Bladelord, Soulcaller, Cardinal | 5 · — | 4.58 · 0.40 (8%) | 31% | — · +0.5% | 4.84 (round 2's C8 measured 4.98) |
+| Comp | Members | Kinds in two hands · missing | Damage · support (share) | Healing | Drafted, Lv 50: against its Tier 2 comp · against T1 | **Measured: against its Tier 2 comp, Lv 10 · 30 · 50** | **Against Tier 1's party** | Party, Lv 50 (BT) |
+|---|---|---|---|---|---|---|---|---|
+| **T1** The keepers' line (C1's) | Ravager, Astromancer, Bladelord, Hierarch, Bastion | 5 · — | 4.63 · 0.26 (5%) | 20% | +3.6% · — | **+4.1 · +2.0 · +4.7%** | +11.8 · +9.6 · +15.4% | 4.25 |
+| **T2** The keepers' line (C2's) | Ravager, Astromancer, Runelord, Overlord, Cardinal | 5 · — | 4.66 · 0.51 (10%) | 20% | +3.6% · +6.2% | **+6.0 · +2.4 · +3.3%** | +14.3 · +11.2 · +15.6% | 4.40 |
+| **T3** A Brawler with a Spellblade (C3's) | Spellhammer, Astromancer, Dervish, Hierarch, Bastion | 5 · — | 4.66 · 0.25 (5%) | 20% | +4.5% · +0.2% | **+3.1 · +2.1 · +2.6%** | +10.7 · +11.9 · +14.1% | 4.21 |
+| **T3g** The Gladiator beside the Bladelord | Gladiator, Astromancer, Bladelord, Hierarch, Bastion | 7 · — | 4.55 · 0.26 (5%) | 20% | +3.5% · −0.7% | **+4.4 · −0.4 · +3.9%** | +11.8 · +10.6 · +17.6% | 4.34 |
+| **T3b** A Sorcerer with a Tome Spellblade (C3b's) | Ravager, Spellknight, Starweaver, Overlord, Cardinal | 5 · — | 4.80 · 0.46 (9%) | 20% | +4.3% · +5.2% | **+3.7 · +4.3 · +3.0%** | +11.2 · +12.9 · +13.8% | 4.33 |
+| **T4** A Spellblade with the Paladin (C4's) | Ravager, Astromancer, Herald, Hierarch, Inquisitor | 4 · — | 4.56 · 0.38 (8%) | 17.7% | +4.8% · +1.6% | **+6.3 · +5.6 · +4.6%** | +14.8 · +12.7 · +16.6% | 4.30 |
+| **T4b** A Tome Spellblade with the Cleric (C4b's) | Ravager, Astromancer, Oracle, Overlord, Hierophant | 5 · — | 4.55 · 0.69 (13%) | 17.7% | +4.6% · +9.1% | **+9.3 · +5.1 · +4.0%** | +16.7 · +13.9 · +16.8% | 4.44 |
+| **T5** Both swaps on one party (C5's) | Spellhammer, Astromancer, Dervish, Soulcaller, Inquisitor | 5 · — | — | — | — | **+4.8 · +3.2 · +6.0%** | +13.7 · +13.5 · +17.9% | 4.35 |
+| **T6** All pure, every kind | Gladiator, Thaumaturge, Dervish, Mythlord, Bastion | 9 · — | 4.64 · 0.24 (5%) | 20% | +3.1% (from C6) · +0.3% | **+4.6 · +7.6 · +6.9%** (from C6) | +13.8 · +13.9 · +17.5% | 4.33 |
+| **T7** All hybrid (C7's) | Spellhammer, Spellknight, Bladelord, Hierarch, Bastion | 4 · — | — | — | — | **+2.3 · +5.1 · +1.8%** | +9.1 · +13.7 · +15.3% | 4.25 |
+| **T8** A Tier 3 mix (round 2's C8's line) | Ravager, Spellknight, Bladelord, Soulcaller, Cardinal | 5 · — | 4.58 · 0.40 (8%) | 31% | — · +0.5% | **+4.0 · +3.0 · +4.2%** | +15.4 · +11.2 · +13.8% | 4.33 |
 
-- **Every Tier 3 comp sits +3.1 to +4.8% over its Tier 2 comp** (on top of the crown), so **the owner's swaps balance in
-  Tier 3 as in Tier 2**: T3 and T3g within 0.7% of T1, T4 +1.6%.
+- **Every Tier 3 comp sits −0.4 to +9.3% over its Tier 2 comp, measured** (mean +4.2%; T4b at Lv 10 0.1 past the
+  comps' band) and **+9.1 to +17.9% over Tier 1's parties** in Tier 3's frame: Tier 3 deepens every comp alike.
+- **The owner's swaps balance in Tier 3 as in Tier 2** (T2B59): T3 within 2.1 points of T1, T4 within 3.6; their
+  mirrors T3b and T4b within 2.3 and 3.3 of T2; both swaps on one party (T5) within 1.3 of T1.
 - **The Gladiator's way** (T3g): when the Brawler's line goes pure physical, her Spellblade stays the keeper (both
   channels), the swap read the other way round; **T6, all pure**, holds **nine kinds in two hands** with Arsenal's
-  partners.
-- **T8** (round 2's measured C8, crowned, 4.98) changes two rules: the Spellknight's Pinpoint for the Battlemage's
-  Resonance and the Soulcaller's twist for the Shaman's Menagerie; analytic, it reads 3% under C8's measure.
+  partners, Arsenal and Momentum together, and is the least safe line under attrition (the Mythlord, §6.4).
+- **The drafted seat model** read every comp +3.1 to +4.8% at Lv 50; measured +1.8 to +6.9%. T5 and T7 were added by
+  balance.
 
 **T6. All pure, every kind** (Tier 3 Lv 50):
 
@@ -1359,8 +1514,8 @@ shares; party damage projected from T1's measured 4.82 BT a round):
 |---|---|---|---|
 | Classes in the world | 5 Tier 0 + 8 Tier 1 | **20** | **22** |
 | Open to an Uma on arrival | Every Tier 0 | **6–20** (Class V: at least 6) | **3–22** (Class V: at least 3) |
-| Rules (mirrors share) | — | 10 | 10 Tier 2 rules carried + **11 Tier 3 rules** (Juggernaut, Resonance, Pinpoint doubled, Arsenal, Spellbind, Menagerie, the two keeper twists, Momentum, Overflow, power ×0.7) |
-| New mechanics | — | Momentum, the cross, the keepers' twists, the support level, the battle healer, **Pinpoint, the pure pair** | **Arsenal** (the rest are round 2's) |
+| Rules (mirrors share) | — | 10 | 10 Tier 2 rules carried + **11 Tier 3 rules** (Juggernaut, Resonance, Pinpoint doubled, Arsenal, Spellbind, Menagerie, the two keeper twists, Momentum, mends and Barriers ×1.3, power ×0.7) |
+| New mechanics | — | Momentum, the cross, the keepers' twists, the support level, the battle healer, **Pinpoint, the pure pair, the trunk hand** | **Arsenal** (the rest are round 2's) |
 | Status-free classes | Brawler, Sorcerer | 8 | 10 |
 | Trees she uses | 3 | 3 + her class line | 3 + her class line |
 | Nodes a weapon tree | 8 | 14 (+ ★ tip on her lead tree) | 14; crowns are a state |
@@ -1374,10 +1529,10 @@ shares; party damage projected from T1's measured 4.82 BT a round):
 
 | Doc | This doc provides (round 3) | This doc assumes |
 |---|---|---|
-| **balance.md (T2B)** | **What to measure next** (R3-8), on the harness fork at Tier 2 Lv 10 · 30 · 50 and Tier 3 Lv 10 · 30 · 50, 16 seeds: (1) **the four pure variants** (the pure pair: lead from her first two weapons, second from her third, every hit on her stat; hands 0.72 + 0.32, 0.72 + 0.41, 0.57 + 0.40, 0.57 + 0.37; no status, her Light/Dark-side line A as damage at her parent's pure-power factor; presets §4.13), in her parent's seat; (2) **the Spellfist and the Battlemage reshaped** (one act, Pinpoint +2% a depth at step 5 on acts that strike only the tapped foe, Limit Breaks included; hands ×1 and ×1.25; presets Greatsword, Katana, Fire and Fire, Blizzard, Katana); (3) **the band on sixteen damage and support classes** (T2B22 with the four new in the mean); (4) **the twenty-two against their Tier 2 parents** (T2C92's Tier 3 band; Juggernaut, Resonance, Spellbind, Menagerie, Overflow as round 2 measured; Pinpoint doubled; Arsenal with two two-kind weapons; the support twists with hands +0.03; Momentum on the four pure lines; the battle healers ×0.7); (5) **the comps** C3, C3b, C5, C6, C6b, C7, C10 and T1–T8 (§5.4, §6.8); (6) **the stress check** on the Tier 3 healers and the Archdruid's two mends. **The knob order:** (1) the pure variants' second hands, (2) Pinpoint's step (Tier 2 +2%, Tier 3 +4% a depth; the Battlemage's first), (3) the crosses' hands, (4) the Gladiator's and the Thaumaturge's hands (×1.05), (5) the low Tier 3 rules (Menagerie's farewell share, the supports' twist hands), (6) Momentum's step on the pure Tier 3 lines (6% → 5% if they lead), (7) the Tier 3 battle healers' power, (8) Overflow's cap. **Tier 3's term** (T2B36) below Lv 40 about +0.03 | It owns R2-11's measurement (T2B21), the band (T2B22), the stress check (T2B23), the term, statuses ±10% a stack, cap 3; the sixteen kept classes' values as measured (T2B24–T2B31) |
-| **gear.md (T2G)** | **Slots and channels of the forty-two** (§4.1, §6.1): 3 Arms (Berserker, Bladedancer, Marshal, Ravager, Gladiator, Dervish, Imperator), 3 Tomes (Archmage, Spellweaver, Animist, Astromancer, Thaumaturge, Starweaver, Mythlord), 2 Arms + 1 Tome (Spellfist, Blademaster, Sentinel, Warlord, Druid, Guardian, Templar and their Tier 3 children), 2 Tomes + 1 Arm (Battlemage, Runeblade, Enchanter, Invoker, Shaman, Bishop, Exorcist and theirs); **which stat each slot reads** (the crosses and the pure classes one stat on every hit); **a pure variant's third slot gives her pair's second half**; **Arsenal: the Gladiator and the Thaumaturge may wear two two-kind weapons** (an exception to T2G3's one), preset Greatsword Evolved + Katana, Axe Tempered + Bow, Lance Keen and Fire Evolved + Light, Blizzard Evolved + Dark, Thunder Keen; **the twenty presets** (§4.13; a Tier 3 class wears her parent's but the Gladiator and the Thaumaturge); the crosses' other-channel weapons now the Spellfist's **Fire** (was Thunder) and the Battlemage's **Katana** (was Lance); Pendants for the Arms-only and Spellfist lines, Charms for the Tome-only and Battlemage lines | Weapon types (T2G21–T2G28), one two-kind weapon a class (T2G3); the accessory tree's three slots; Suggested types for the six new or reshaped kits are gear's |
+| **balance.md (T2B)** | **Round 3 measured, round 3 cross-referenced** (T2B41–T2B66): every kit of §4 and §6 as balance's knobs leave it. **Amended here:** T2C68 (the pure variants' second hands by **the trunk hand**, T2B45, T2B46, T2B66), T2C71 and T2C72 (the crosses ×1.25 and ×1.1, T2B44), T2C39 and T2C45 (the Sentinel ×0.9, one stack, the tapped foe; the Druid by depth on gear's Bow + Greatsword, T2B47, T2B48, T2B66), T2C38 (the Warlord's +0.03 on her lines, the Invoker's +0.01, T2B49), T2C83–T2C85 (Arsenal's hands, T2B53), T2C82 and T2C84 (Resonance on her deepest depth at 10%, T2B52), T2C86 (the supports' twist without the +0.03, T2B54), T2C82 and T2C87 (mends and Barriers ×1.3 in Overflow's place, T2B55); **confirmed:** T2C34, T2C37, T2C43 (with T2B61's finding), T2C44, T2C73, T2C79, the crown, Pinpoint doubled; **measured:** T2C92 (T2B51, T2B56), T2C93 (T2B58, T2B59), T2C99 (run, T2B50). **For the build's run:** the class lines, line C and two lines held (not measured); the Gladiator's two edge cells; the Starweaver's and Mythlord's Lv 10 on gear's Keen ×3 | It owns R2-11's measurement (T2B21), the band (T2B43, T2B51), the stress check (T2B60), the terms (T2B57), statuses ±10% a stack, cap 3 |
+| **gear.md (T2G)** | **Slots and channels of the forty-two** (§4.1, §6.1): 3 Arms (Berserker, Bladedancer, Marshal, Ravager, Gladiator, Dervish, Imperator), 3 Tomes (Archmage, Spellweaver, Animist, Astromancer, Thaumaturge, Starweaver, Mythlord), 2 Arms + 1 Tome (Spellfist, Blademaster, Sentinel, Warlord, Druid, Guardian, Templar and their Tier 3 children), 2 Tomes + 1 Arm (Battlemage, Runeblade, Enchanter, Invoker, Shaman, Bishop, Exorcist and theirs); **which stat each slot reads** (the crosses and the pure classes one stat on every hit); **a pure variant's third slot gives her pair's second half**; **Arsenal: the Gladiator and the Thaumaturge may wear two two-kind weapons** (an exception to T2G3's one), preset Greatsword Evolved + Katana, Axe Tempered + Bow, Lance Keen and Fire Evolved + Light, Blizzard Evolved + Dark, Thunder Keen; **the twenty presets** (§4.13; a Tier 3 class wears her parent's but the Gladiator and the Thaumaturge); the crosses' other-channel weapons now the Spellfist's **Fire** (was Thunder) and the Battlemage's **Katana** (was Lance); Pendants for the Arms-only and Spellfist lines, Charms for the Tome-only and Battlemage lines | Weapon types (T2G21–T2G28), one two-kind weapon a class (T2G3); the accessory tree's three slots; Suggested types are gear's (T2G51, T2G56), **the Enchanter, the Marshal and the Animist on their keeper sibling's Dual** (Katana + Axe, Bow + Greatsword, Dark + Fire: T2B66, which this doc's hands assume) |
 | **progression.md (T2W)** | **The Tier 2 open set**: every child of every Tier 1 class at R50 (two or three a class), **6–20** ("Opens 8 of 20"); **the Tier 3 promotion** (§6.6): the Tier 3 children of every Tier 2 class at R50, **3–22**, Suggested the child of the class she fights as (the Spellfist's and the Battlemage's kept child), the Tier 3 door; **a sibling** in Tier 2 is another child of the same Tier 1 class (one or two), **in Tier 3 a class of the same Tier 1 line** (Class IV); Umas already in a Tier 3 world become their Tier 1 class's keeper's Tier 3 child | The Ascend sheet's pages (T2W16), its open-set writing (T2W17), Class V's three; T2W31's Tier 3 sheet lists the Tier 3 options on the same page |
-| **extra-stats.md (T2E)** | **Prowess splits:** all to her stat for the Spellfist, Battlemage and every pure class (the four pure variants, the Gladiator, the Thaumaturge and the pure Tier 3 lines); the rest their parent's; **the shapes each class leans on** for the Area and Multi-hit presets: the Bladedancer, Spellweaver, Dervish, Starweaver multi-hit on one foe; the Marshal, Animist, Imperator, Mythlord area; the Spellfist, Battlemage, Spellhammer, Spellknight single hits (Offense); the Gladiator and Thaumaturge varied (Offense); the rest as round 2 | Extra Stats × tier; no branch adds a status |
+| **extra-stats.md (T2E)** | **Prowess splits:** all to her stat for the Spellfist, Battlemage and every pure class (the four pure variants, the Gladiator, the Thaumaturge and the pure Tier 3 lines); the rest their parent's; **the shapes each class leans on:** the Bladedancer, Spellweaver, Dervish, Starweaver multi-hit on one foe; the Marshal, Animist, Imperator, Mythlord area (their preset Prowess Offense, T2E51, confirmed by T2B66); the Spellfist, Battlemage, Spellhammer, Spellknight single hits (Offense); the Gladiator and Thaumaturge varied (Offense); the rest as round 2 | Extra Stats × tier; no branch adds a status |
 | **professions.md (T2P)** | **Arms/Tome split by class** (weapon demand): 3/0 Berserker, Bladedancer, Marshal and the Ravager, Gladiator, Dervish, Imperator; 0/3 Archmage, Spellweaver, Animist and the Astromancer, Thaumaturge, Starweaver, Mythlord; 2/1 and 1/2 the rest; **the presets pull more Katanas** (the Spellfist, Battlemage, Bladedancer and Marshal hold one) and fewer Thunder Tomes | Her calling fixes her trade; a class switch moves nothing |
 | **templates.md (T2U)** | **Her Flourish's family** (§4.10: Warrior and Mage 8 in Tier 2 and 9 in Tier 3, Spellblade and Summoner 6, Healer 4); **her lead weapon** by class (the Spellfist's Greatsword, the Battlemage's Fire, the Bladedancer's Katana, the Spellweaver's Thunder, the Marshal's Bow, the Animist's Dark; a Tier 3 class her parent's, the Gladiator's Greatsword, the Thaumaturge's Fire) | It owns the ★ tip and the Flourish's 4% |
 
@@ -1396,15 +1551,17 @@ Rough, not packets. Tier 2's classes ship with Tier 2's toolbox (progression's e
 - **Trees:** a later class reads her ancestors' tree ids (the Bladedancer's Katana `spellblade-katana`, the Gladiator's
   Lance `brawler-lance`); the catalog adds line C, the Break flags and the class lines only (`<class>-line.<depth>`, 60
   ids, 36 names).
-- **Engine, Tier 2's stage** (`t2Classes`, v22): the twenty kits (hands; a hit's offense stat; **the pure pair**: a pair
-  class's second half from her third slot, both halves one channel; the familiar on both halves and its Pierce; both
-  summons lingering; the support level's top-up and her ward's Brave and Faith; the support Barrier and the farewell
+- **Engine, Tier 2's stage** (`t2Classes`, v22): the twenty kits (hands, **a hand by depth**: a skill's hand by her
+  trunk or her lines, an Attack her trunk's; a hit's offense stat; **the pure pair**: a pair class's second half from her
+  third slot, both halves one channel; the familiar on both halves and its Pierce; both summons lingering; **a class's
+  support ladder and reach** with the level's top-up and her ward's Brave and Faith; the support Barrier and the farewell
   mend; the keeper healers' +1 stack; the battle healers' shares), **Pinpoint** (step 5, by the act's targets and depth),
   Momentum, class lines, line C, the Break tip, skill MP ×1.7 and the healing divisor; a status-free class's Light/Dark
   line A as damage.
-- **Engine, Tier 3's stage** (`t3Classes`, v23): the twenty-two rules (Juggernaut, Resonance, Spellbind, Menagerie,
-  Overflow, Pinpoint +4% a depth, the supports' twists, Momentum on the pure lines, ×0.7 power), **Arsenal** (gear's
-  two-kind cap read by class), the crown, two lines held, skill MP ×2.4. Fights on older engines replay as they were.
+- **Engine, Tier 3's stage** (`t3Classes`, v23): the twenty-two rules (Juggernaut, **Resonance by her open depth**,
+  Spellbind, Menagerie, **the keepers' mends and Barriers ×1.3**, Pinpoint +4% a depth, the supports' twists, Momentum on
+  the pure lines, ×0.7 power), **Arsenal** (gear's two-kind cap read by class), the crown, two lines held, skill MP ×2.4,
+  Tier 3's term (balance T2B57). Fights on older engines replay as they were.
 - **Migration:** none in Tier 1's world. An Uma already in a Tier 2 world becomes her Tier 1 class's keeper (T2W23); one
   already in a Tier 3 world her keeper's Tier 3 child (§6.6).
 
@@ -1452,7 +1609,9 @@ Rough, not packets. Tier 2's classes ship with Tier 2's toolbox (progression's e
   Bulwark, Cyclone, Tempest and Sovereign (old skills in the catalog), Horde (a Rift front), Flurry (the Brawler's Lance
   tree), Warlock (one letter from the Warlord), Swordsaint (beside the Summoners' Sword Saint capstone), Elementalist
   (12 characters), Primarch (another game's word).
-- **One game string by design:** "Overflow" (round 2's) appears in the code only as a word in a comment.
+- **"Overflow"** (round 2's) is retired with its rule (T2B55); it appeared in the code only as a word in a comment. The
+  cross-reference adds no name: "the trunk hand" and "lines" are descriptions on her sheet, and the keepers' rule is a
+  number ("mends and Barriers ×1.3").
 - **The owner's working titles** ("True Brawler", "Wild Magic Brawler", "True Sorcerer", "Blade wielding Sorcerer")
   stay the alternative in T2C32.
 
@@ -1468,12 +1627,12 @@ replaces says **Superseded (R3-n)**.
 | **T2C65** | Tier 3 is a promotion (R3-1) | **Twenty-two Tier 3 classes: every Tier 2 class promotes into one, the Spellfist and the Battlemage into two, each a new name; she keeps her Tier 2 parent's kit and rule and adds one rule.** Supersedes T2C57 | Round 2's "no new class" (R3-1 rules it out); two children for every Tier 2 class (40, the "extreme variants" the owner fears) |
 | **T2C66** | The classes in Tier 2 (R3-6) | **Twenty: the Brawler and the Sorcerer two children each, the four hybrids three (keeper, support, pure), the healers two.** Supersedes T2C31 | Sixteen, pure variants at Tier 3 (T2C67's alternative) |
 | **T2C67** | Where the pure variants arrive (R3-4) | **Tier 2, as each hybrid's third child**, so the owner's swap of a Brawler with a Spellblade works as soon as the Spellfist does | At Tier 3, splitting from the keeper: the swap would start a tier late, and Tier 2's hybrid lines would have no damage-only pick |
-| **T2C68** | The pure variants' rule: the pure pair | **Her parent's three slots turned all her lead channel (2 + 1): her lead half from her first two weapons, her second from her third, every act; every hit on her stat; her family's familiar's hit or lingering summon kept; no status (her Light/Dark-side line A as damage at her parent's pure-power factor); hands 0.72 + 0.32 (Bladedancer), 0.72 + 0.41 (Spellweaver), 0.57 + 0.40 (Marshal), 0.57 + 0.37 (Animist), analytic, set to the band's middle in her parent's seat** | One full act at ×1 on her parent's trees (simpler, but loses the pair, her family's feel); keep her parent's path (a status on a damage-only pick); her parent's hands (two thirds more on her second half) |
+| **T2C68** | The pure variants' rule: the pure pair | **Her parent's three slots turned all her lead channel (2 + 1): her lead half from her first two weapons, her second from her third, every act; every hit on her stat; her family's familiar's hit or lingering summon kept; no status (her Light/Dark-side line A as damage at her parent's pure-power factor); lead hands her parent's, second hands by the trunk hand (trunk · lines): the Bladedancer 0.53 · 0.33, the Spellweaver 0.44 · 0.50, the Marshal 0.56 · 0.40, the Animist 0.54 · 0.33.** **Amended by T2B45, T2B46 and T2B66 (cross-reference):** measured −0.2 to +5.5% at the knob, all four inside on gear's kits | As drafted: one second hand, 0.32 · 0.41 · 0.40 · 0.37, analytic (measured −7 to −9% at Lv 10 for three of the four); the Marshal's lines 0.46 (balance's first kit, before Offense); one full act at ×1 on her parent's trees (loses the pair, her family's feel); keep her parent's path (a status on a damage-only pick); her parent's hands (two thirds more on her second half) |
 | **T2C69** | Their names | **Bladedancer, Spellweaver, Marshal, Animist** (checked, §11) | Working titles ("Pure Arms Spellblade"); Warlock (one letter from the Warlord), Elementalist (12 characters) |
 | **T2C70** | Their gear | **Her parent's armor half; her stat's accessory family on every hit; Prowess all to her stat; three weapons of one channel** | Prowess split as her parent's |
-| **T2C71** | The Spellfist reshaped (R3-2) | **Two Arms and a Tome, the Arms first (the Arms Spellblade's mix); one act a turn; every hit on ATK (the cross); hand ×1 (from ×1.05); Pinpoint; preset Greatsword, Katana, Fire Tome: single big hits and a minor multi-hit.** Analytic +9 · +6.5 · +1% at Lv 10 · 30 · 50 | A Spellblade's pair (an Arms half and a Tome half, both on ATK): splits every hit smaller, and blurs her with the Bladedancer; round 2's kit (Greatsword, Axe, Thunder at ×1.05) |
-| **T2C72** | The Battlemage reshaped (R3-3) | **Two Tomes and an Arm (the Tome Summoner's mix); one act; every hit on M.ATK; hand ×1.25 (from ×1.3); Pinpoint; preset Fire Tome, Blizzard Tome, Katana: single hits and one sweep.** Analytic +9.5 · +8 · −1%, her Lv 50 the cell nearest the band's edge, as in round 2 | All one-foe (Fire, Light, Katana: −3 to −5% of her party at Lv 50, measured on the live engine); ×1.3 (Lv 30 past the band) |
-| **T2C73** | Pinpoint | **An act whose every hit lands on the tapped foe (a Heavy or Double skill, a one-foe line or class-line skill, an Attack, a one-foe Limit Break) +2% a depth of its skill (×1.1 at depth 5); a factor at step 5 beside the statuses and Momentum; Auto unchanged** | Flat ×1.1 (overshoots Lv 10–30: a one-foe kit costs nothing early); a hand split by shape (×1.1 one foe, ×0.9 many); presets only, no rule |
+| **T2C71** | The Spellfist reshaped (R3-2) | **Two Arms and a Tome, the Arms first (the Arms Spellblade's mix); one act a turn; every hit on ATK (the cross); hand ×1.25; Pinpoint; preset Greatsword, Katana, Fire Tome: single big hits and a minor multi-hit.** **Amended by T2B44 (cross-reference):** measured +3.2 · +1.5 · +3.0% (+4.9 · +3.1 · +7.9% on gear's Dual Katana + Axe) | As drafted: hand ×1 (measured −4.0 · −1.2 · −7.6%: the Axe's sweep and the Lance's scatter she gave up cost her at every depth); a Spellblade's pair (an Arms half and a Tome half, both on ATK): splits every hit smaller, and blurs her with the Bladedancer; round 2's kit (Greatsword, Axe, Thunder at ×1.05) |
+| **T2C72** | The Battlemage reshaped (R3-3) | **Two Tomes and an Arm (the Tome Summoner's mix); one act; every hit on M.ATK; hand ×1.1; Pinpoint; preset Fire Tome, Blizzard Tome, Katana: single hits and one sweep.** **Amended by T2B44 (cross-reference):** measured +0.1 · +2.0 · +4.8% | As drafted: ×1.25 (measured +5.0 · +9.1 · +10.7%: she kept her sweep, and round 2's ×1.3 had paid for a cross weapon's Might its fork left out, T2B42); all one-foe (Fire, Light, Katana: −3 to −5% of her party at Lv 50, measured on the live engine) |
+| **T2C73** | Pinpoint | **An act whose every hit lands on the tapped foe (a Heavy or Double skill, a one-foe line or class-line skill, an Attack, a one-foe Limit Break) +2% a depth of its skill (×1.1 at depth 5); a factor at step 5 beside the statuses and Momentum; Auto unchanged.** **Confirmed by T2B44 (cross-reference)** | Flat ×1.1 (overshoots Lv 10–30: a one-foe kit costs nothing early); a hand split by shape (×1.1 one foe, ×0.9 many); presets only, no rule; +3% a depth for the Spellfist alone (moved her as a hand does, and breaks the mirrors' shared rule) |
 | **T2C74** | The pure variants' class lines | **Two new, mirrors sharing: Grand Squall · Supreme Squall · Thousand Cuts (Bladedancer, Spellweaver: her pair on one foe, each half one hit more); Grand Legion · Supreme Legion · Onslaught (Marshal, Animist: her pair, both summons on every foe at 0.55)** | Share their keepers' lines (Sigil, Griffin), whose statuses a pure class can't carry |
 | **T2C75** | Statuses on twenty | **Four levels as round 2; the pure variants at none**: eight status-free Tier 2 classes, ten in Tier 3 | The pure variants on their parent's path |
 | **T2C76** | The Tier 2 promotion | **On her Ascend she picks among every child of every Tier 1 class she holds at Class Rank 50 (two or three a class: 6–20); Suggested her ascending class's keeper, else her family's Rank 50 class's keeper with the most Class EXP.** Supersedes T2C46 | The keeper and the expander only, the pure variant by the door |
@@ -1482,24 +1641,24 @@ replaces says **Superseded (R3-n)**.
 | **T2C79** | The crown | **Kept on every Tier 3 class**, with MP back's sixth step: every held capstone 5.6 whole at Class Rank 50, +4 MP, a stack more (T2C20, T2C21) | Fold it into each class's rule (twenty-two prices for one ceiling) |
 | **T2C80** | Two lines held | **Kept on every Tier 3 class** (T2C19) | Retire it (simpler trees; it was never measured into the budget) |
 | **T2C81** | The master slot | **Retired:** ten equipped in Tier 3 | Keep it (an eleventh slot for a capstone the crown already deepens) |
-| **T2C82** | Round 2's masteries | **Re-homed as Tier 3 rules: Juggernaut the Ravager's, Resonance the Astromancer's, Spellbind the Bladelord's and Runelord's, Menagerie the Overlord's and Hierarch's, Overflow the Bastion's and Cardinal's**, as round 2 drafted and measured them. Supersedes T2C22, T2C58 | Masteries by family on top of every Tier 3 rule (about +5% over Tier 3's budget) |
-| **T2C83** | The Brawler's Tier 3 (R3-2) | **Ravager** (the Berserker: Momentum + Juggernaut); **Spellhammer** (the Spellfist, Pinpoint +4% a depth); **Gladiator** (from the Spellfist: three Arms, Arsenal, hand ×1.05, no cross, no Pinpoint) | The Ravager with Momentum to five stacks (+2% alone); the Gladiator keeping Pinpoint (single-target, against "varied") |
-| **T2C84** | The Sorcerer's Tier 3 (R3-3) | **Astromancer** (Momentum + Resonance); **Spellknight** (the Battlemage, Pinpoint +4% a depth); **Thaumaturge** (three Tomes, Arsenal, hand ×1.05) | Mirror the Ravager's Juggernaut (round 2 gave each family its own mastery) |
-| **T2C85** | "More varied physical weapons" | **Arsenal: two two-kind weapons in her slots (gear's T2G3 allows one), so she carries all five kinds of her channel**; every foe has a weak kind in her hands | A fourth slot (breaks three docs' slot counts); a rule that rewards mixing shapes (a third self-buff, and Auto plans a rotation) |
-| **T2C86** | The hybrids' Tier 3 (R3-4) | **Keepers take their family's mastery (Bladelord, Runelord: Spellbind; Overlord, Hierarch: Menagerie); supports their keeper sibling's twist, hands +0.03 a half (Herald, Oracle: the familiar on both halves, piercing; Archdruid, Soulcaller: both summons linger, both farewells mend); pures Momentum (Dervish, Starweaver, Imperator, Mythlord).** No new mechanic | Supports one stack more (statuses were round 2's largest error); pures Spellbind or Menagerie |
-| **T2C87** | The healers' Tier 3 (R3-5) | **Bastion, Cardinal: Overflow; Inquisitor, Hierophant: power ×0.7, shares ×0.7 kept.** The keeper's line gains sustain, the battle healer's damage | The battle healers' shares to ×0.6 as well (a third less healing again) |
+| **T2C82** | Round 2's masteries | **Re-homed as Tier 3 rules: Juggernaut the Ravager's, Resonance the Astromancer's (her deepest open depth's skills strike again at 10%, the echo chipping nothing), Spellbind the Bladelord's and Runelord's, Menagerie the Overlord's and Hierarch's; Overflow retired, the Bastion's and the Cardinal's rule mends and Barriers ×1.3.** Supersedes T2C22, T2C58. **Amended by T2B52 and T2B55 (cross-reference)** | As drafted: Resonance on capstones at 30% (nothing below Tier 3 Lv 29, +17–20% from it) and Overflow, a mend past max HP a Barrier up to 10% of max HP (plays the same fights at 0 to 30%); masteries by family on top of every Tier 3 rule (about +5% over Tier 3's budget) |
+| **T2C83** | The Brawler's Tier 3 (R3-2) | **Ravager** (the Berserker: Momentum + Juggernaut); **Spellhammer** (the Spellfist, Pinpoint +4% a depth, her hand ×1.25); **Gladiator** (from the Spellfist: three Arms, Arsenal, hand **×1.05 on her trunk, ×1.2 on her lines**, no cross, no Pinpoint). **Amended by T2B53 (cross-reference):** the Gladiator +6.9 · −2.4 · +9.7%, her Lv 30 and 50 cells within a point past the band's edge, accepted | As drafted: the Gladiator ×1.05 flat (−6% at Lv 30 against a ×1.25 Spellfist); ×1.15 or ×1.25 on her lines (one end or the other out); the Ravager with Momentum to five stacks (+2% alone); the Gladiator keeping Pinpoint (single-target, against "varied") |
+| **T2C84** | The Sorcerer's Tier 3 (R3-3) | **Astromancer** (Momentum + Resonance: her deepest open depth's skills echo at 10%); **Spellknight** (the Battlemage, Pinpoint +4% a depth, her hand ×1.1); **Thaumaturge** (three Tomes, Arsenal, hand **×1.1**). **Amended by T2B52 and T2B53 (cross-reference):** the Astromancer +7.7 · +2.3 · +6.4%, the Thaumaturge +4.4 · +1.1 · +4.3% | As drafted: Resonance on capstones at 30% (0 · +16.1 · +20.1%), the Thaumaturge ×1.05 (−6 to −11% against a ×1.25 Battlemage); mirror the Ravager's Juggernaut (round 2 gave each family its own mastery) |
+| **T2C85** | "More varied physical weapons" | **Arsenal: two two-kind weapons in her slots (gear's T2G3 allows one), so she carries all five kinds of her channel**; every foe has a weak kind in her hands; her hands T2C83's and T2C84's (**amended by T2B53, cross-reference**) | A fourth slot (breaks three docs' slot counts); a rule that rewards mixing shapes (a third self-buff, and Auto plans a rotation) |
+| **T2C86** | The hybrids' Tier 3 (R3-4) | **Keepers take their family's mastery (Bladelord, Runelord: Spellbind; Overlord, Hierarch: Menagerie); supports their keeper sibling's twist with their Tier 2 hands (Herald, Oracle: the familiar on both halves, piercing; Archdruid, Soulcaller: both summons linger, both farewells mend); pures Momentum (Dervish, Starweaver, Imperator, Mythlord).** No new mechanic. **Amended by T2B54 (cross-reference):** the supports drop the +0.03 a half (the Herald 0.65 + 0.40, the Oracle 0.58 + 0.38) | As drafted: the twist and hands +0.03 a half (the Oracle and the Archdruid +10 to +12% at Lv 10–30); supports one stack more (statuses were round 2's largest error); pures Spellbind or Menagerie |
+| **T2C87** | The healers' Tier 3 (R3-5) | **Bastion, Cardinal: mends and Barriers ×1.3, sustain only; Inquisitor, Hierophant: power ×0.7, shares ×0.7 kept.** The keeper's line gains sustain, the battle healer's damage. **Amended by T2B55 (cross-reference):** Overflow retired; at ×6 the keepers win 93.8 and 93.2% against their battle healers' 87.8 and 78.1% | As drafted: Overflow (a mend's overheal a Barrier, up to 10% of max HP: worth nothing measured, her mends aim at the most hurt); ×1.15 (+1.6 points at ×6); the battle healers' shares to ×0.6 as well (a third less healing again) |
 | **T2C88** | Tier 3's names (R3-9) | **Ravager, Spellhammer, Gladiator; Astromancer, Spellknight, Thaumaturge; Bladelord, Herald, Dervish; Runelord, Oracle, Starweaver; Overlord, Archdruid, Imperator; Hierarch, Soulcaller, Mythlord; Bastion, Inquisitor; Cardinal, Hierophant** (checked, §11) | "{Tier 2 name} II"; the masteries as class names |
 | **T2C89** | The Tier 3 promotion | **On her Tier 3 Ascend she picks among the Tier 3 children of every Tier 2 class she holds at Class Rank 50 (3–22); Suggested the child of the class she fights as (the Spellfist's and the Battlemage's kept child), else her family's Rank 50 class's child with the most Class EXP; switching and Class Rank as Tier 2's** | Every Tier 3 class of her Tier 1 lines; the Tier 3 children of every Tier 2 class she held, whatever its rank |
 | **T2C90** | The Tier 3 door | **A held Tier 3 class at Class Rank 20 opens every Tier 3 class of her Tier 1 line and of its reclass neighbours' lines** (the Tier 2 door one tier down) | No door in Tier 3; only her Tier 2 parent's siblings' children |
 | **T2C91** | Kin and the Flourish in Tiers 2 and 3 | **Her family is the descendants of her calling's own Tier 1 classes: Warrior and Mage 8 in Tier 2 and 9 in Tier 3, Spellblade and Summoner 6, Healer 4; a kin parent's descendant never Suggested and outside her Flourish.** Supersedes T2C49 | Every later class her family |
-| **T2C92** | Tier 3's budget and band | **About +17% at Tier 3 Lv 50 (the crown + one rule in each mastery's place; T1 is round 2's crowned C1); each Tier 3 damage and support class's gain over her Tier 2 parent within ±5 points of the eighteen's mean at Tier 3 Lv 10, 30, 50 (analytic at Lv 50: mean +5.3%, all +3.2 to +8.2%); the healers on the stress check; Tier 3's term below Lv 40 about +0.03** | Read Tier 3 against Tier 1's parents only (hides each promotion's step) |
-| **T2C93** | The comps (R3-7) | **The owner's swaps as the spine (C3, C3b, C4, C4b, C5 in Tier 2; T3, T3g, T3b, T4, T4b in Tier 3) beside Tier 1-like, all-pure, all-hybrid and support-heavy comps; read by the seat model (each member her parent's measured D + S × (1 + her gain)); every Tier 2 comp +1.4 to +6.1% over its Tier 1 party, every Tier 3 comp +3.1 to +4.8% over its Tier 2 comp.** Supersedes T2C63 | Round 2's sum of D + S (over-reads a pure seat's damage by about half) |
+| **T2C92** | Tier 3's budget and band | **Measured (T2B51, T2B56): +17.0% and +18.8% at Tier 3 Lv 50 over the same parties uncrowned (the crown +11.8 and +14.9%); each Tier 3 damage and support class's gain over her Tier 2 parent within ±5 points of the eighteen's mean at Tier 3 Lv 10, 30, 50: 52 of 54 cells at the knobs (means +4.7 · +2.9 · +3.9%), the Gladiator's two within a point past, accepted; the healers on the stress check; Tier 3's term × 1.13 to Lv 40, rising to × 1.19 by Lv 50 (T2B57)** | As drafted: about +17%, the eighteen +3.2 to +8.2% at Lv 50 (analytic; 44 of 54 cells measured), the term below Lv 40 about +0.03; read Tier 3 against Tier 1's parents only (hides each promotion's step) |
+| **T2C93** | The comps (R3-7) | **The owner's swaps as the spine (C3, C3b, C4, C4b, C5 in Tier 2; T3, T3g, T3b, T4, T4b, T5 in Tier 3) beside Tier 1-like, all-pure, all-hybrid and support-heavy comps. Measured (T2B58, T2B59): every Tier 2 comp +1.0 to +5.8% over its Tier 1 party, C3 and C4 within 0.7 points of C1; every Tier 3 comp −0.4 to +9.3% over its Tier 2 comp, T3 and T4 within 2.1 and 3.6 of T1. The seat model kept beside it as the analytic reading (within 2.6 points at Lv 50 on the measured gains).** Supersedes T2C63 | As drafted: the seat model alone (+1.4 to +6.1%; +3.1 to +4.8% in Tier 3); round 2's sum of D + S (over-reads a pure seat's damage by about half) |
 | **T2C94** | Kinds and the party hint | **80 of the 144 Tier 2 mixes hold all ten kinds (round 2: 56 of 64); every comp the owner names but C10; the party hint names a missing kind and an open class whose preset holds it** | Round 2's Spellfist kit (92 of 144) at the cost of single hits |
 | **T2C95** | The save | **Twenty ids (generation 2) and twenty-two (generation 3), each with its parent; `open` per later-tier profile, written at each Ascend and by a door; Tier 3's held lines; Momentum and Pinpoint are fight state; an Uma already in Tier 2 becomes her class's keeper, in Tier 3 her keeper's Tier 3 child.** Supersedes T2C60 | Store each tier's Rank 50 classes and derive `open` |
 | **T2C96** | The engine | **Two stages: `t2Classes` (v22, the twenty, the pure pair, Pinpoint) and `t3Classes` (v23, the twenty-two rules, Arsenal's cap, the crown, two lines held).** Supersedes T2C61 | One stage for both tiers (ships Tier 3's rules a tier early) |
 | **T2C97** | Round 3's names | **Checked 2026-11-05 against 20,500 master-data strings and 14,701 game strings: clear; Focus, Illusionist, Kensei, Bulwark, Cyclone, Tempest, Sovereign, Horde, Flurry refused** | Names at build time |
 | **T2C98** | The previews | **Seven pages: the class tree (new), tiers, the twenty, the twenty-two (new), trees, comps, promotion.** Supersedes T2C62 | Five, the Tier 3 classes inside the twenty's page |
-| **T2C99** | What balance measures next | **The six new or reshaped Tier 2 kits, the twenty-two Tier 3 rules, the comps and the stress check, with the knob order of §7: pure hands, Pinpoint, the crosses' hands, Arsenal's hands, the low Tier 3 rules, Momentum on the pure Tier 3 lines, the Tier 3 battle healers, Overflow** | Measure only the comps |
+| **T2C99** | What balance measures next | **Run in round 3 (T2B50):** the six new or reshaped Tier 2 kits, the twenty-two Tier 3 rules, the comps and the stress check, in this order: pure hands, Pinpoint, the crosses' hands, Arsenal's hands, the low Tier 3 rules (Resonance beside them), Momentum on the pure Tier 3 lines, the Tier 3 battle healers, Overflow; then the kept classes the re-measure moved. **Next, on the build's run:** the class lines, line C and two lines held; the Gladiator's two edge cells; the Starweaver's and the Mythlord's Lv 10 on gear's Keen ×3 | Measure only the comps |
 | **T2C100** | The Halls by tier | **The same sixteen seats in every world; a seat's home classes are its Tier 1 home class's Tier 2 and Tier 3 descendants.** Amends T2C23 | New seats for the new classes |
 | **T2C101** | Limit Break scale | **×0.95 every damage and support class of Tiers 2 and 3, ×0.8 every healer class.** Amends T2C55 | ×0.9 for the supports and battle healers |
 
@@ -1507,10 +1666,14 @@ replaces says **Superseded (R3-n)**.
 
 | Call | Why it's worth his eye |
 |---|---|
-| **T2C65, T2C82** Tier 3 is a promotion, and the masteries become its rules | Round 2's Tier 3 is rebuilt: twenty-two classes, the crown and two lines held kept on all, the master slot gone, each mastery the promotion of the line that had it |
+| **T2C93** The owner's swaps, measured | Both keep the party in the band in both tiers: C3 and C4 within 0.7 points of C1, T3 and T4 within 2.1 and 3.6 of T1 (T2B59); no class useless (T2B64) |
+| **T2C65, T2C82** Tier 3 is a promotion, and the masteries become its rules | Round 2's Tier 3 is rebuilt: twenty-two classes, the crown and two lines held kept on all, the master slot gone; four masteries the promotion of the line that had them, **Overflow retired** for mends and Barriers ×1.3 (it did nothing measured) |
+| **T2C71, T2C72** The crosses' hands ×1.25 and ×1.1 | The reverse of round 2's ×1.05 and ×1.3: round 2's fork left the cross weapon's Might out (T2B42) |
+| **T2C33, T2C68** The trunk hand | One more number on six Tier 2 sheets and the Gladiator's: a hand on depths 1–2 apart from 3–5, what lets the pure variants sit in the band at Lv 10 and 50 |
+| **T2C39** The Sentinel | A kept class that re-measured +18% at Lv 50; now ×0.9, one stack and the tapped foe |
 | **T2C71, T2C73** The Spellfist acts once, and Pinpoint grows with depth | His "damage distribution like an Arms Spellblade" read as her slot mix, not the pair; a single-target kit costs nothing early and a twentieth of the party late, so the rule grows by depth |
-| **T2C85** Arsenal | "More varied physical weapons" as two two-kind weapons: every kind of her channel in hand; a fourth slot and a variety stack are the alternatives |
-| **T2C67, T2C68** The pure variants at Tier 2, with no status | Their hands are analytic; mirrors differ because their parents' lost statuses differ (Party 2's Armor Break and Mind Break) |
+| **T2C85** Arsenal | "More varied physical weapons" as two two-kind weapons: every kind of her channel in hand; the Gladiator's two cells a point past the band, accepted |
+| **T2C67, T2C68** The pure variants at Tier 2, with no status | The pure Summoners are the least safe pick under attrition, the price of "pure"; the Animist the weakest niche (in her band, never the standout on balance's kit) |
 | **T2C86** One pattern for the hybrids' Tier 3 | Keeper + mastery, support + keeper's twist, pure + Momentum: no new mechanic, but two Tier 3 classes share a rule they already met elsewhere |
 | **T2C94** The kinds the single hits cost | 80 of 144 mixes whole, from round 2's 56 of 64; C10 drops two kinds |
 | **T2C89** Suggested for a cross is her kept child | The Spellfist arrives in Tier 3 as the Spellhammer unless he picks the Gladiator |
@@ -1547,19 +1710,19 @@ replaces says **Superseded (R3-n)**.
 | **T2C30** | The old previews | **Three pages carry class-overview, class-templates and class-trees; the rest retire (§10)** | Keep the old pages |
 | T2C31 | The classes in Tier 2 | **Superseded (R3-6)** by T2C66 | — |
 | **T2C32** | Their names | **Berserker · Spellfist; Archmage · Battlemage; Blademaster · Sentinel; Runeblade · Enchanter; Warlord · Druid; Invoker · Shaman; Guardian · Templar; Bishop · Exorcist** (checked, §11) | The owner's working titles ("True Brawler", "Wild Magic Brawler", "True Sorcerer", "Blade Sorcerer"), and "Keeper/Expander {parent}" for the rest |
-| **T2C33** | What a Tier 2 class keeps | **Her parent's three slots' count, lean, armor half, trees, family, hall, Limit Break scale and one act a turn; one rule changes her** **Kept, changed (R3-4) by T2C68:** a pure variant's channels | Leans ±0.1 (A2); a fourth slot |
+| **T2C33** | What a Tier 2 class keeps | **Her parent's three slots' count, lean, armor half, trees, family, hall, Limit Break scale and one act a turn; one rule changes her** **Kept, changed (R3-4) by T2C68:** a pure variant's channels. **Amended by T2B45 (cross-reference): a class's hand may differ on her trunk (depths 1–2 and Attacks) and her lines (depths 3–5), on six Tier 2 classes and the Gladiator; her class line reads her lines'** | Leans ±0.1 (A2); a fourth slot; one hand a class (the pure variants miss at Lv 10 or 50 whatever the hand); a hand by Uma level (hidden) |
 | **T2C34** | The self-buff | **Momentum, the pure keepers': +6% a stack on her own hits, a stack after each of her turns, 3 at most (+18%), the fight long, lost when she falls; never a party buff; Auto unchanged.** Worth +11.3% of her damage at Lv 50 (+9.1% fights, +13.3% bosses); her seat measured +5.6 · +2.0 · +5.2% (Berserker), +5.8 · +3.4 · +5.1% (Archmage). **Amended by T2B26 (cross-reference)** | +5% a stack (as drafted: the keepers +4.5% and +4.1% at Lv 50, short of the band's middle); 7%; +10% a stack (13 points over the expanders); a stack a weak hit; cap 2 |
-| **T2C35** | The pure expanders | **Spellfist two Arms and a Tome, Battlemage two Tomes and an Arm; every hit reads her stat; a hit keeps its kind's channel for defense, weakness, statuses and the ward; hands the Spellfist ×1.05, the Battlemage ×1.3** (measured +6.5 · +4.5 · +4.3% and +10.9 · +8.3 · −1.8%). **Amended by T2B27 (cross-reference)** **Kept, changed (R3-2, R3-3) by T2C71–T2C73:** one act, Pinpoint, single-target presets, hands ×1 and ×1.25 | ×1.05 both (as drafted: the Battlemage −2.5 · −4.7 · −11.4% on the Heavy twins); ×1.35 on the Heavy twins; any three of ten; a fourth slot (+4.5%, three docs' slot counts); ×1 (a cross alone is +1–2%) |
+| **T2C35** | The pure expanders | **Spellfist two Arms and a Tome, Battlemage two Tomes and an Arm; every hit reads her stat; a hit keeps its kind's channel for defense, weakness, statuses and the ward; hands the Spellfist ×1.05, the Battlemage ×1.3** (measured +6.5 · +4.5 · +4.3% and +10.9 · +8.3 · −1.8%). **Amended by T2B27 (cross-reference)** **Kept, changed (R3-2, R3-3) by T2C71–T2C73:** one act, Pinpoint, single-target presets, hands ×1.25 and ×1.1 (T2B44; drafted ×1 and ×1.25) | ×1.05 both (as drafted: the Battlemage −2.5 · −4.7 · −11.4% on the Heavy twins); ×1.35 on the Heavy twins; any three of ten; a fourth slot (+4.5%, three docs' slot counts); ×1 (a cross alone is +1–2%) |
 | **T2C36** | Their gear | **Her parent's armor half; her stat's accessory (Pendant, Charm) counts on every hit; Prowess all to her stat; her other channel's weapon grades with its own items** | A split armor half |
 | **T2C37** | The Spellblade keepers | **Blademaster and Runeblade: her familiar's extra hit on both halves (the same total), and it pierces; hands +0.03 a half: 0.75 + 0.47 and 0.75 + 0.51 (lead first)** (measured +9.0 · +4.5 · +3.6% and +6.8 · +2.3 · +2.8%). **Amended by T2B28 (cross-reference)** | Both halves alone (as drafted: worth about 0%); the hands alone (+0.05 a half); a damage bump |
-| **T2C38** | The Summoner keepers | **Warlord and Invoker: both summons linger, two farewells at her next pair; hands +0.03 a half: 0.60 + 0.49 and 0.60 + 0.53 (lead first)** (measured +8.6 · +2.0 · +6.8% and +8.6 · +3.6 · +3.0%). **Amended by T2B29 (cross-reference)** | Both summons alone (as drafted: −0.2 to +4.1%, the second farewell 1–3%); the lead summon two pairs (Menagerie early) |
-| **T2C39** | The support expanders' kit | **Hands of her parent's: the Sentinel ×0.95 (0.68 + 0.42), the Enchanter ×0.8 (0.58 + 0.38), the Druid ×0.95 (0.54 + 0.44), the Shaman ×1 (0.57 + 0.5); every skill of her Katana, Bow, Light and Dark trees carries its status at 1 · 1 · 1 · 2 · 2 by depth, topped up to its stacks, never built past them; her debuffs on the tapped foe (every foe at depth 5) for the Spellblades', every foe for the Summoners'; her Brave and Faith on the Uma she wards (the Summoners': the most threatened)** (measured −2.4 · +10.9 · +2.9%, +7.0 · +2.5 · +6.6%, +7.1 · +2.3 · −1.5%, +10.4 · +0.8 · +1.2%). **Amended by T2B24 and T2B25 (cross-reference)** | As drafted: ×0.85 and ×0.9, the healers' ladder 1 · 1 · 2 · 2 · 3 built up, Brave and Faith on every Uma (measured the Sentinel +34 to +50%, the Enchanter +18 to +33%); one stack flat; one cut for both; the path widened to every line only |
+| **T2C38** | The Summoner keepers | **Warlord and Invoker: both summons linger, two farewells at her next pair; hands: the Warlord trunk 0.57 + 0.46, lines 0.60 + 0.49; the Invoker 0.58 + 0.51 (lead first)** (round 3 measured +6.4 · +2.3 · +6.5% and +3.8 · +7.1 · +4.3%). **Amended by T2B29, then T2B49 (cross-reference)** | Round 2's +0.03 a half on both, 0.60 + 0.49 and 0.60 + 0.53 (round 3 measured the Warlord +8.9% at Lv 10, the Invoker +7.6% at Lv 30); both summons alone (as drafted: −0.2 to +4.1%, the second farewell 1–3%); the lead summon two pairs (Menagerie early) |
+| **T2C39** | The support expanders' kit | **Hands of her parent's: the Sentinel ×0.9 (0.65 + 0.40), the Enchanter ×0.8 (0.58 + 0.38), the Druid by depth (trunk 0.52 + 0.42, lines 0.60 + 0.48, on her Dual Bow + Greatsword), the Shaman ×1 (0.57 + 0.5); every skill of her Katana, Bow, Light and Dark trees carries its status at her ladder, topped up to its stacks, never built past them: 1 · 1 · 1 · 2 · 2 by depth, the Sentinel one stack at every depth; her debuffs on the tapped foe (every foe at depth 5) for the Enchanter, the tapped foe only for the Sentinel, every foe for the Summoners'; her Brave and Faith on the Uma she wards (the Summoners': the most threatened)** (round 3 measured on gear's kits +4.0 · +1.9 · +9.0%, +1.8 · +7.4 · +1.6%, +2.8 · +2.6 · +2.7%, +5.9 · −0.8 · +4.8%). **Amended by T2B24 and T2B25, then T2B47, T2B48 and T2B66 (cross-reference)** | Round 2's: the Sentinel ×0.95 (0.68 + 0.42) at 1 · 1 · 1 · 2 · 2, every foe at depth 5 (round 3 measured +18% at Lv 50); the Druid ×0.95 (0.54 + 0.44: −8.8% at Lv 50), or 0.54 + 0.44 · 0.64 + 0.51 on round 2's Dual Dark + Fire; as drafted: ×0.85 and ×0.9, the healers' ladder built up, Brave and Faith on every Uma (the Sentinel +34 to +50%); one ladder for both Spellblade supports (the Enchanter −9% at Lv 50) |
 | **T2C40** | The Spellblade supports' Barrier | **After each skill act, a Barrier on the most threatened: a third of the healers' share at her act's depth (9–15%), × her healing scale** | A Barrier on herself; the familiar's hit becomes the Barrier |
 | **T2C41** | The Summoner supports' mend | **Her farewell mends every Uma a tenth of the healers' mend share at its depth (2.8–4.4%), × her healing scale; no Rescue, cleanse or revive** | The most hurt only, a third |
 | **T2C42** | Supports and the one-healer rule | **They are no healer: a support beside a healer is legal, two healers still are not; a party with no healer is legal too: one healer a party is a ceiling, not a floor (T2B39, cross-reference)** | Count them as healers; forbid a healerless party |
-| **T2C43** | The healer keepers | **Guardian and Bishop: every status she lands one stack more, to 3 (2 · 2 · 3 · 3 · 3; path 3 · 3 · 3); Surge gives ×1.15 where her status is at 3.** Worth +0 to +6% on curve; the attrition pick, ahead of her battle healer in fights won from ×3.2. **Confirmed by T2B30 (cross-reference)** | One stack more and a round longer (tried: past the battle healers on curve too); every mend reaches every Uma (worth nothing on curve, §5.1) |
+| **T2C43** | The healer keepers | **Guardian and Bishop: every status she lands one stack more, to 3 (2 · 2 · 3 · 3 · 3; path 3 · 3 · 3); Surge gives ×1.15 where her status is at 3.** Worth +0 to +6% on curve; the attrition pick, ahead of her battle healer in fights won from ×3.2. **Confirmed by T2B30 (cross-reference); a finding, T2B61 (cross-reference): the stack more works at depths 1–4 only (from depth 5 her capstones' statuses already stand at three), and she still out-survives her battle healer (+3 to +7 points at ×4–×5)** | One stack more and a round longer (tried: past the battle healers on curve too); Tier 3's ×1.3 in Tier 2 too; every mend reaches every Uma (worth nothing on curve, §5.1) |
 | **T2C44** | The battle healers | **Templar and Exorcist: power ×0.6, MP ×0.7, mends and Barriers ×0.7 the shares (Rescue and the revive kept), Tier 1's statuses; still the one healer.** Measured +12.1 · +9.7 · +5.7% and +15.9 · +6.9 · +7.3% on curve, behind the keeper from ×3.2. **Confirmed by T2B31 (cross-reference)** | ×0.75 and ×0.6 (+17% on curve); her statuses to a path |
-| **T2C45** | Statuses by class | **Four levels: none (the four pures), a path (the hybrid keepers), support (the hybrids' expanders, new: 1 · 1 · 1 · 2 · 2, topped up to its stacks, Brave and Faith on her ward), widely (the healers, the keepers +1); five statuses, +10% a stack, cap 3. Amended by T2B24 (cross-reference)** | The support level at the healers' ladder, built up (as drafted); D282's three, the supports at a path |
+| **T2C45** | Statuses by class | **Four levels: none (the pures), a path (the hybrid keepers), support (the hybrids' expanders: topped up to its stacks, Brave and Faith on her ward; its ladder and reach a class's numbers, 1 · 1 · 1 · 2 · 2 and every foe at depth 5 but the Sentinel's one stack and the tapped foe), widely (the healers, the keepers +1); five statuses, +10% a stack, cap 3. Amended by T2B24, then T2B47 (cross-reference)** | The support level at the healers' ladder, built up (as drafted); one support ladder and reach for all four (round 2's: the Sentinel +18% at Lv 50 in round 3's measure); D282's three, the supports at a path |
 | T2C46 | The Tier 2 promotion | **Superseded (R3-4)** by T2C76 | — |
 | **T2C47** | Switching and Class Rank | **Every open class held from arrival at Class Rank 1; switch free outside fights; each its own Class Rank; XR1's shared ladder raises all to 10** | A second promotion step per class |
 | **T2C48** | Opening more in Tier 2 | **The door: a held Tier 2 class at Class Rank 20 opens the children of her parent's reclass neighbours (D290, D291's map), about the Tier 1 door's 3,600 Class EXP** | Locked for her Tier 2 life; Class Rank 50; a Class Mark price |

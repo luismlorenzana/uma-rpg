@@ -114,7 +114,7 @@
   <div class="kpis">
     <div class="kpi"><div class="lbl">Classes · slots</div><div class="val">8 · 20 · 22</div><div class="sub">Three slots each; the Gladiator and the Thaumaturge two two-kind weapons</div></div>
     <div class="kpi"><div class="lbl">A weak hit at G10, at most</div><div class="val">×1.3 · ×1.5 · ×1.7</div><div class="sub">Each tier starts where the last ended</div></div>
-    <div class="kpi"><div class="lbl">Answers a regular, mean of the owner's mixes</div><div class="val">4.31 · 4.25 · 4.22</div><div class="sub">Party 1, Tier 1 · 2 · 3 (Party 2: 4.35 · 4.18 · 4.25)</div></div>
+    <div class="kpi"><div class="lbl">Answers a regular, mean of the owner's mixes</div><div class="val">4.31 · 4.25 · 4.22</div><div class="sub">Party 1, Tier 1 · 2 · 3 (Party 2: 4.35 · 4.27 · 4.25)</div></div>
     <div class="kpi"><div class="lbl">A type swap costs</div><div class="val">Nothing</div><div class="sub">One tap, outside fights (T2G22)</div></div>
   </div>
 
@@ -169,7 +169,7 @@
   <section id="t2">
     <h2>Suggested types for the twenty (T2G50, T2G51)</h2>
     <div class="card scroll"><table id="stab2"></table>
-      <p class="legend">One two-kind weapon or none, searched over every mix of the owner's two parties (each seat any child of its Tier 1 class: 144 mixes) for the fewest kinds in one hand, under the coverage bound (T2G52). Round 2's keepers and battle healers keep their Dual. <b>New</b> marks round 3's changes.</p></div>
+      <p class="legend">One two-kind weapon or none, searched over every mix of the owner's two parties (each seat any child of its Tier 1 class: 144 mixes) for the fewest kinds in one hand, under the coverage bound (T2G52). Round 2's keepers and battle healers keep their Dual; <b>the Enchanter, the Marshal and the Animist their keeper sibling's</b>, as balance's measure asks (T2B66: the search's Pure ×3 and Blizzard + Light cost them their band). <b>New</b> marks round 3's changes.</p></div>
   </section>
 
   <section id="t3">
@@ -183,7 +183,7 @@
     <div class="card scroll"><table id="ptab2"></table></div>
     <div class="card scroll"><table id="ctab"></table>
       <p class="legend">Live weakness dealer, every region stage of Tier 2 on today's honeycomb (2,880 stages: about 12,180 regulars, 240 sub-bosses, 260 bosses). The shields' pricing: sub-bosses 7 while answers ≤ 4.66, bosses 9 while ≤ 4.48 (CP8's rule, T2B7).</p></div>
-    <div class="callout"><b>The bound holds in Tier 2:</b> both parties' means under their Tier 1 party (4.25 against 4.31, 4.18 against 4.35), every one of the 144 mixes inside the shields' pricing. The swap comps put one to three kinds in one hand, the price of single big hits; C10 drops Thunder, which the party hint names. Tier 3 and Arsenal: <a href="gear-arsenal.html">their own page</a>.</div>
+    <div class="callout"><b>The bound in Tier 2, on balance's kits (T2B66):</b> both parties' means under their Tier 1 party (4.25 against 4.31, 4.27 against 4.35); 138 of the 144 mixes inside the shields' pricing, six bosses at its edge (4.48–4.51: a Sentinel or a Marshal beside the Berserker and the Archmage), accepted, since every fix through other types moves a kit balance measured (T2G53). The swap comps put one to three kinds in one hand, the price of single big hits; C10 drops Thunder, which the party hint names. Tier 3 and Arsenal: <a href="gear-arsenal.html">their own page</a>.</div>
   </section>
 
   <section id="pages">
@@ -211,14 +211,14 @@ const T2 = [
   ['sentinel', 'Sentinel', 'Support · 2 Arms + 1 Tome', ['katana', 'greatsword', 'light'], [0], -1, 0],
   ['bladedancer', 'Bladedancer', 'Pure · 3 Arms', ['katana', 'axe', 'bow'], [], -1, 1],
   ['runeblade', 'Runeblade', 'Keeper · 2 Tomes + 1 Arm', ['lightning', 'ice', 'katana'], [0], -1, 0],
-  ['enchanter', 'Enchanter', 'Support · 2 Tomes + 1 Arm', ['light', 'ice', 'katana'], [], -1, 1],
+  ['enchanter', 'Enchanter', 'Support · 2 Tomes + 1 Arm', ['light', 'ice', 'katana'], [2], -1, 1],
   ['spellweaver', 'Spellweaver', 'Pure · 3 Tomes', ['lightning', 'ice', 'dark'], [0], -1, 1],
   ['warlord', 'Warlord', 'Keeper · 2 Arms + 1 Tome', ['bow', 'axe', 'dark'], [0], -1, 0],
   ['druid', 'Druid', 'Support · 2 Arms + 1 Tome', ['bow', 'axe', 'dark'], [0], -1, 1],
-  ['marshal', 'Marshal', 'Pure · 3 Arms', ['bow', 'axe', 'katana'], [], -1, 1],
+  ['marshal', 'Marshal', 'Pure · 3 Arms', ['bow', 'axe', 'katana'], [0], -1, 1],
   ['invoker', 'Invoker', 'Keeper · 2 Tomes + 1 Arm', ['dark', 'ice', 'bow'], [0], -1, 0],
   ['shaman', 'Shaman', 'Support · 2 Tomes + 1 Arm', ['dark', 'ice', 'bow'], [0], -1, 0],
-  ['animist', 'Animist', 'Pure · 3 Tomes', ['dark', 'ice', 'lightning'], [1], -1, 1],
+  ['animist', 'Animist', 'Pure · 3 Tomes', ['dark', 'ice', 'lightning'], [0], -1, 1],
   ['guardian', 'Guardian', 'Healer · 2 Arms + 1 Tome', ['lance', 'greatsword', 'light'], [0], -1, 0],
   ['templar', 'Templar', 'Battle healer', ['lance', 'greatsword', 'light'], [0], -1, 0],
   ['bishop', 'Bishop', 'Healer · 2 Tomes + 1 Arm', ['light', 'fire', 'lance'], [2], -1, 0],
@@ -252,7 +252,7 @@ const T3 = [
 // Answers alone (regular, % of the tier's regulars) for each option: "none", "<slot><table>" (table 2 = Tier 2 partner, 3 = Tier 3 partner). From the live dealer.
 const OPTS = {"2:berserker":{"12":91,"22":91,"none":76,"02":91},"2:spellfist":{"12":86,"22":82,"none":74,"02":86},"2:archmage":{"12":92,"22":92,"none":79,"02":87},"2:battlemage":{"12":86,"22":85,"none":74,"02":84},"2:blademaster":{"12":85,"22":80,"none":69},"2:sentinel":{"12":84,"22":82,"none":71,"02":84},"2:bladedancer":{"22":91,"none":77},"2:runeblade":{"12":81,"22":81,"none":68,"02":81},"2:enchanter":{"22":81,"none":69},"2:spellweaver":{"12":86,"22":87,"none":66,"02":86},"2:warlord":{"22":84,"none":72,"02":85},"2:druid":{"22":84,"none":72,"02":85},"2:marshal":{"none":77,"02":91},"2:invoker":{"12":84,"22":80,"none":67,"02":84},"2:shaman":{"12":84,"22":80,"none":67,"02":84},"2:animist":{"12":86,"22":86,"none":66,"02":87},"2:guardian":{"12":84,"22":82,"none":71,"02":86},"2:templar":{"12":84,"22":82,"none":71,"02":86},"2:bishop":{"12":85,"22":83,"none":72,"02":86},"2:exorcist":{"12":85,"22":83,"none":72,"02":86},"3:ravager":{"12":91,"13":91,"22":91,"23":91,"none":76,"02":91,"03":91},"3:spellhammer":{"12":86,"13":88,"22":82,"23":83,"none":73,"02":86},"3:gladiator":{"12":91,"13":91,"22":91,"23":91,"none":76,"02":91,"03":91},"3:astromancer":{"12":92,"13":87,"22":92,"23":87,"none":79,"02":87,"03":92},"3:spellknight":{"12":86,"13":84,"22":85,"23":85,"none":74,"02":84,"03":86},"3:thaumaturge":{"12":92,"13":87,"22":92,"23":87,"none":79,"02":87,"03":92},"3:bladelord":{"12":85,"22":80,"23":79,"none":69,"03":84},"3:herald":{"12":84,"22":82,"23":81,"none":71,"02":84,"03":86},"3:dervish":{"22":91,"23":91,"none":77,"03":91},"3:runelord":{"12":82,"13":79,"22":81,"23":82,"none":69,"02":82,"03":79},"3:oracle":{"13":85,"22":81,"23":81,"none":70,"03":82},"3:starweaver":{"12":87,"22":87,"none":67,"02":87},"3:overlord":{"13":85,"22":83,"23":80,"none":71,"02":84,"03":85},"3:archdruid":{"13":85,"22":83,"23":80,"none":71,"02":84,"03":85},"3:imperator":{"23":91,"none":77,"02":91,"03":91},"3:hierarch":{"12":85,"22":81,"23":81,"none":68,"02":84,"03":79},"3:soulcaller":{"12":85,"22":81,"23":81,"none":68,"02":84,"03":79},"3:mythlord":{"12":87,"22":87,"none":67,"02":87},"3:bastion":{"12":84,"13":86,"22":82,"23":80,"none":71,"02":86,"03":84},"3:inquisitor":{"12":84,"13":86,"22":82,"23":80,"none":71,"02":86,"03":84},"3:cardinal":{"12":85,"22":83,"23":83,"none":71,"02":86,"03":83},"3:hierophant":{"12":85,"22":83,"23":83,"none":71,"02":86,"03":83}};
 // Suggested answers (regular · sub-boss · boss)
-const ANS2 = { berserker: '0.91 · 0.90 · 0.92', spellfist: '0.86 · 0.83 · 0.88', archmage: '0.87 · 0.97 · 0.92', battlemage: '0.84 · 0.91 · 0.78', blademaster: '0.80 · 0.75 · 0.82', sentinel: '0.84 · 0.82 · 0.87', bladedancer: '0.77 · 0.78 · 0.78', runeblade: '0.81 · 0.86 · 0.84', enchanter: '0.69 · 0.78 · 0.68', spellweaver: '0.86 · 0.91 · 0.84', warlord: '0.85 · 0.85 · 0.88', druid: '0.85 · 0.85 · 0.88', marshal: '0.77 · 0.78 · 0.78', invoker: '0.84 · 0.90 · 0.73', shaman: '0.84 · 0.90 · 0.73', animist: '0.86 · 0.91 · 0.84', guardian: '0.86 · 0.86 · 0.88', templar: '0.86 · 0.86 · 0.88', bishop: '0.83 · 0.80 · 0.86', exorcist: '0.83 · 0.80 · 0.86' };
+const ANS2 = { berserker: '0.91 · 0.90 · 0.92', spellfist: '0.86 · 0.83 · 0.88', archmage: '0.87 · 0.97 · 0.92', battlemage: '0.84 · 0.91 · 0.78', blademaster: '0.80 · 0.75 · 0.82', sentinel: '0.84 · 0.82 · 0.87', bladedancer: '0.77 · 0.78 · 0.78', runeblade: '0.81 · 0.86 · 0.84', enchanter: '0.81 · 0.86 · 0.81', spellweaver: '0.86 · 0.91 · 0.84', warlord: '0.85 · 0.85 · 0.88', druid: '0.85 · 0.85 · 0.88', marshal: '0.91 · 0.89 · 0.95', invoker: '0.84 · 0.90 · 0.73', shaman: '0.84 · 0.90 · 0.73', animist: '0.87 · 0.97 · 0.92', guardian: '0.86 · 0.86 · 0.88', templar: '0.86 · 0.86 · 0.88', bishop: '0.83 · 0.80 · 0.86', exorcist: '0.83 · 0.80 · 0.86' };
 const ANS3 = { ravager: '0.91 · 0.89 · 0.89', spellhammer: '0.88 · 0.83 · 0.86', gladiator: '1.00 · 1.00 · 1.00', astromancer: '0.87 · 0.95 · 0.92', spellknight: '0.84 · 0.93 · 0.74', thaumaturge: '1.00 · 1.00 · 1.00', bladelord: '0.80 · 0.79 · 0.78', herald: '0.84 · 0.84 · 0.86', dervish: '0.77 · 0.78 · 0.74', runelord: '0.82 · 0.86 · 0.82', oracle: '0.82 · 0.86 · 0.82', starweaver: '0.67 · 0.77 · 0.72', overlord: '0.84 · 0.86 · 0.82', archdruid: '0.84 · 0.86 · 0.82', imperator: '0.77 · 0.78 · 0.74', hierarch: '0.84 · 0.93 · 0.73', soulcaller: '0.84 · 0.93 · 0.73', mythlord: '0.67 · 0.77 · 0.72', bastion: '0.80 · 0.74 · 0.86', inquisitor: '0.80 · 0.74 · 0.86', cardinal: '0.83 · 0.77 · 0.83', hierophant: '0.83 · 0.77 · 0.83' };
 let tier = 2, cur = 0, slot = 0;
 const typeOf = (t, pick, i) => { const p = pick.find((x) => (t === 2 ? x === i : x[0] === i)); if (p === undefined) return t === 2 ? 'Pure' : 'Keen'; if (t === 2) return 'Dual'; return p[1] === 2 ? 'Tempered' : 'Evolved' }
@@ -335,8 +335,9 @@ document.getElementById('stab3').innerHTML = '<thead><tr><th>Class</th><th>From<
 document.getElementById('ptab2').innerHTML = '<thead><tr><th>The owner\'s parties</th><th class="n">Mixes</th><th class="n">Regular, mean (range)</th><th class="n">Sub-boss</th><th class="n">Boss</th><th class="n">Every kind in two hands</th><th class="n">All ten held (in hand · w/ partners)</th></tr></thead><tbody>' +
   [['<b>Tier 1</b> (no type)', '1 · 1', '<b>4.31 · 4.35</b>', '3.75 · 3.71', '3.75 · 3.75', '—', '10 · 10'],
    ['Tier 1\'s kits on Tier 2\'s foes', '1 · 1', '3.62 · 3.66', '3.65 · 3.72', '3.66 · 3.71', '—', '—'],
-   ['<b>Party 1\'s mixes</b>, Suggested', '72', '<b>4.25</b> (4.17–4.34)', '4.35 (4.25–4.45)', '4.23 (4.05–4.44)', '4', '36 · 48'],
-   ['<b>Party 2\'s mixes</b>, Suggested', '72', '<b>4.18</b> (3.99–4.33)', '4.27 (4.10–4.42)', '4.24 (3.97–4.42)', '4', '44 · 60'],
+   ['<b>Party 1\'s mixes</b>, Suggested', '72', '<b>4.25</b> (4.17–4.34)', '4.37 (4.25–4.51)', '4.25 (4.05–4.51)', '4', '36 · 48'],
+   ['<b>Party 2\'s mixes</b>, Suggested', '72', '<b>4.27</b> (4.19–4.38)', '4.34 (4.24–4.46)', '4.34 (4.20–4.48)', '6', '44 · 60'],
+   ['<i>T2G51 before T2B66</i> (the three on Pure ×3 and Blizzard + Light)', '72 · 72', '<i>4.25 · 4.18</i>', '<i>4.35 · 4.27</i>', '<i>4.23 · 4.24</i>', '4 · 4', '36 · 48; 44 · 60'],
    ['<i>Round 2\'s rule on the twenty</i>', '144', '<i>4.30 · 4.27</i>', '—', '<i>up to 4.58: 10 mixes past 4.48</i>', '10', '80 · 108 (both)']]
     .map((r) => `<tr>${r.map((x, i) => `<td${i ? ' class="n"' : ''}>${x}</td>`).join('')}</tr>`).join('') + '</tbody>';
 const CV = [
@@ -345,10 +346,10 @@ const CV = [
   ['C3 A Brawler with a Spellblade', 'Spellfist, Archmage, Bladedancer, Invoker, Guardian', '4.19 · 4.33 · 4.19', '7', 'Lance, Thunder, Light'],
   ['C3b A Sorcerer with a Tome Spellblade', 'Berserker, Battlemage, Spellweaver, Warlord, Bishop', '4.30 · 4.36 · 4.28', '9', 'Thunder'],
   ['C4 A Spellblade with the Paladin', 'Berserker, Archmage, Sentinel, Invoker, Templar', '4.32 · 4.44 · 4.33', '9', 'Thunder'],
-  ['C4b A Tome Spellblade with the Cleric', 'Berserker, Archmage, Enchanter, Warlord, Exorcist', '4.16 · 4.29 · 4.25', '9', 'Thunder'],
+  ['C4b A Tome Spellblade with the Cleric', 'Berserker, Archmage, Enchanter, Warlord, Exorcist', '4.27 · 4.37 · 4.38', '9', 'Thunder'],
   ['C5 Both swaps on one party', 'Spellfist, Archmage, Bladedancer, Shaman, Templar', '4.19 · 4.33 · 4.19', '7', 'Lance, Thunder, Light'],
-  ['C6 All pure (Party 1)', 'Berserker, Archmage, Bladedancer, Animist, Guardian', '4.27 · 4.41 · 4.34', '9', 'Fire'],
-  ['C6b All pure (Party 2)', 'Berserker, Archmage, Spellweaver, Marshal, Bishop', '4.24 · 4.35 · 4.32', '9', 'Greatsword'],
+  ['C6 All pure (Party 1)', 'Berserker, Archmage, Bladedancer, Animist, Guardian', '4.27 · 4.47 · 4.42', '9', 'Light'],
+  ['C6b All pure (Party 2)', 'Berserker, Archmage, Spellweaver, Marshal, Bishop', '4.38 · 4.46 · 4.48', '10', '—'],
   ['C7 All hybrid', 'Spellfist, Battlemage, Blademaster, Invoker, Guardian', '4.19 · 4.25 · 4.10', '7', 'Lance, Bow, Thunder'],
   ['C8 Both hybrids to support', 'Berserker, Archmage, Sentinel, Shaman, Guardian', '4.32 · 4.44 · 4.33', '9', 'Thunder'],
   ['C9 A Summoner to support', 'Berserker, Archmage, Runeblade, Druid, Bishop', '4.28 · 4.36 · 4.42', '10', '—'],

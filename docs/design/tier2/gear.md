@@ -10,6 +10,13 @@
 > ([classes](../../game/classes.md#weapons), [combat](../../game/combat.md#damage), [materials](../../game/materials.md#gear))
 > is the game as it plays.
 >
+> **Cross-referenced with [balance](balance.md)'s round 3** (2026-11-05): balance measured every class on these kits and
+> asked for one change (T2B66): **the Enchanter, the Marshal and the Animist keep their keeper sibling's Dual** (Katana +
+> Axe, Bow + Greatsword, Dark + Fire), since Pure ×3 and Blizzard + Light cost them their band. T2G51 is amended, and the
+> coverage bound re-checked on it (T2G53): **both parties' means still sit under Tier 1's; six of the 144 mixes price a
+> boss a hair past its 9 shields** (4.48–4.51 answers against 4.48), accepted with the fix that would reach them named
+> ([§4.5](#45-coverage-the-bound-and-the-twenty-t2g52-t2g53)). Tier 3's Suggested types stand.
+>
 > **Numbers come from the live code** (`economy/grades.ts`, `economy/accessories.ts`, `rpg/campaign/weaknesses.ts`,
 > `world/world.ts`), printed by throwaway tests that are not committed. **Coverage** is counted on the live weakness dealer
 > over every region stage of each tier on today's honeycomb (2,880 stages a tier: about 12,180 regulars, 240 sub-bosses
@@ -46,9 +53,9 @@ re-checked on the harness. Round 2's types, items and accessory tree stand.
 | **A weapon's type** | None: one kind, weak ×1.3 | **Pure** (×1.30 → ×1.50 by grade) or **Dual** (+ its partner) | **Keen** (×1.50 → ×1.70), **Tempered** or **Evolved** (two kinds, ×1.30 → ×1.50) |
 | **When she picks it** | — | **On the Ascend sheet**, Suggested pre-set; **swapped freely** after (one tap) | **On the Tier 3 Ascend sheet**: her Tier 3 class's preset and Suggested; "As in Tier 2" one tap (T2G57) |
 | **Two-kind weapons in her slots** | 0 | **1** | **1; the Gladiator and the Thaumaturge 2** (Arsenal, T2G54) |
-| **Suggested with no two-kind weapon** | — | 3 of 20 (Bladedancer, Enchanter, Marshal: Pure ×3) | 4 of 22 (Dervish, Starweaver, Imperator, Mythlord: Keen ×3) |
-| **Answers a regular**, the owner's mixes, Suggested (Party 1 · Party 2) | 4.31 · 4.35 | **4.25 · 4.18** (144 mixes) | **4.22 · 4.25** (324 mixes; Arsenal as drafted 4.39 · 4.36) |
-| **Sub-boss and boss answers inside the shields' pricing** (7 · 9) | — | **All 144 mixes** (as drafted 134) | **All 324** (as drafted 284) |
+| **Suggested with no two-kind weapon** | — | 1 of 20 (the Bladedancer: Pure ×3) | 4 of 22 (Dervish, Starweaver, Imperator, Mythlord: Keen ×3) |
+| **Answers a regular**, the owner's mixes, Suggested (Party 1 · Party 2) | 4.31 · 4.35 | **4.25 · 4.27** (144 mixes) | **4.22 · 4.25** (324 mixes; Arsenal as drafted 4.39 · 4.36) |
+| **Sub-boss and boss answers inside the shields' pricing** (7 · 9) | — | **138 of 144**; six bosses at 4.48–4.51, accepted (T2G53) | **All 324** (as drafted 284) |
 | **The crosses' other-channel weapon** | — | Spellfist **Fire Tome on ATK**; Battlemage **Katana on M.ATK** | The same on the Spellhammer and the Spellknight; the Gladiator and the Thaumaturge have none |
 | **Might at G10** (code) | 68 | 122 | 177 |
 | **Armor at G10** (code) | HP +150, DEF +40, M.DEF +40, MP +30, evasion 12%, offense +25 | HP +270, DEF +72 … offense +45 | HP +390, DEF +104 … offense +65 |
@@ -67,7 +74,9 @@ re-checked on the harness. Round 2's types, items and accessory tree stand.
 3. **The pure variants wear three weapons of one channel** (T2G49), her stat on every hit, her third slot her pair's
    second half; her stat's family counts on every hit.
 4. **Suggested types follow one rule in both tiers** (T2G50): one two-kind weapon or none, searched over every mix of
-   the owner's parties for the most kinds in two hands, **under the coverage bound** (T2G52).
+   the owner's parties for the most kinds in two hands, **under the coverage bound** (T2G52); in Tier 2 the keepers and
+   battle healers keep round 1's Dual and **the Enchanter, the Marshal and the Animist their keeper sibling's**, as
+   balance measured (T2B66).
 5. **Arsenal breaks the bound as drafted** (T2G55): the Gladiator and the Thaumaturge answer every foe, so Tier 3's
    parties answer 4.39 · 4.36 (over Tier 1's 4.31 · 4.35) and 40 of 324 mixes pass the shields' pricing. **The fix is in
    Tier 3's Suggested:** the four pure Tier 3 lines go Keen ×3 (their kinds are the ones Arsenal doubles); every party
@@ -341,8 +350,8 @@ Light/Dark (Double, Volley).
 | Dark Tome | Volley | **Fire** | Lightning | Round 1 |
 
 Round 1's reasons stand ([§3.2](#32-round-1-t2g1t2g20)): the owner's six by name; the authored four send a twin set into a
-twin set on both channels; every preset keeps a legal Dual (all forty-two's but the Bladedancer's, the Marshal's and the
-Enchanter's, whose one legal Dual the search leaves off, §4.4); every kind is someone's partner. **Why one two-kind weapon:**
+twin set on both channels; every preset keeps a legal Dual (Suggested on every Tier 2 class but the Bladedancer, whose
+one legal Dual the search leaves off, §4.4); every kind is someone's partner. **Why one two-kind weapon:**
 with none capped the owner's parties answer 4.85 · 4.79 of a regular (Tier 3 4.98), a Brawler or a Sorcerer her whole
 channel.
 
@@ -417,8 +426,10 @@ or none** (Pure on all three); chosen across **every mix of the owner's two part
 class: 2 × 2 × 3 × 3 × 2 = 72 a party in Tier 2, 162 in Tier 3) for **the fewest kinds in one hand**, **under the
 coverage bound** (T2G52); ties to the fewer answers. In Tier 2 round 2's keepers and battle healers keep round 1's Dual:
 freeing them too reaches 248 kinds in one hand over the 144 mixes against 276, but moves six of their Duals and puts
-C1's Katana in one hand. Tier 3's twenty-two are new classes, so every one is searched (§5.2). Round 2's rule (one Dual
-a class, no bound) is the alternative; on the twenty it leaves 10 of 144 mixes past the bosses' shield pricing.
+C1's Katana in one hand. **Balance's measure fixes three more before the search** (T2B66): the Enchanter, the Marshal and
+the Animist keep their keeper sibling's Dual. Tier 3's twenty-two are new classes, so every one is searched (§5.2). Round
+2's rule (one Dual a class, no bound) is the alternative; on the twenty it leaves 10 of 144 mixes past the bosses' shield
+pricing.
 
 **T2G51: Tier 2's Suggested** (her answers alone: the share of Tier 2's regulars · sub-bosses · bosses she holds a weak
 kind for; with no type, her three kinds alone):
@@ -433,24 +444,32 @@ kind for; with no type, her three kinds alone):
 | Sentinel | Katana, Greatsword, Light | **Dual Katana + Axe**, Pure, Pure | 0.84 · 0.82 · 0.87 | 0.71 | — |
 | **Bladedancer** | Katana, Axe, Bow | **Pure ×3** | 0.77 · 0.78 · 0.78 | 0.77 | New |
 | Runeblade | Thunder, Blizzard, Katana | **Dual Thunder + Light**, Pure, Pure | 0.81 · 0.86 · 0.84 | 0.68 | — |
-| **Enchanter** | Light, Blizzard, Katana | **Pure ×3** | 0.69 · 0.78 · 0.68 | 0.69 | Was Dual Katana + Axe |
+| **Enchanter** | Light, Blizzard, Katana | Pure, Pure, **Dual Katana + Axe** (her keeper's) | 0.81 · 0.86 · 0.81 | 0.69 | Round 2's, kept by T2B66 (the search's Pure ×3 cost her band) |
 | **Spellweaver** | Thunder, Blizzard, Dark | **Dual Thunder + Light**, Pure, Pure | 0.86 · 0.91 · 0.84 | 0.66 | New |
 | Warlord | Bow, Axe, Dark | **Dual Bow + Greatsword**, Pure, Pure | 0.85 · 0.85 · 0.88 | 0.72 | — |
-| **Druid** | Bow, Axe, Dark | **Dual Bow + Greatsword**, Pure, Pure | 0.85 · 0.85 · 0.88 | 0.72 | Was Dual Dark + Fire on round 2's Bow, Greatsword, Dark |
-| **Marshal** | Bow, Axe, Katana | **Pure ×3** | 0.77 · 0.78 · 0.78 | 0.77 | New |
+| **Druid** | Bow, Axe, Dark | **Dual Bow + Greatsword**, Pure, Pure | 0.85 · 0.85 · 0.88 | 0.72 | Was Dual Dark + Fire on round 2's Bow, Greatsword, Dark; her hands set on this Dual (T2B66) |
+| **Marshal** | Bow, Axe, Katana | **Dual Bow + Greatsword** (her keeper's), Pure, Pure | 0.91 · 0.89 · 0.95 | 0.77 | New; her keeper's by T2B66 (the search's Pure ×3 cost her band) |
 | Invoker · Shaman | Dark, Blizzard, Bow | **Dual Dark + Fire**, Pure, Pure | 0.84 · 0.90 · 0.73 | 0.67 | — |
-| **Animist** | Dark, Blizzard, Thunder | Pure, **Dual Blizzard + Light**, Pure | 0.86 · 0.91 · 0.84 | 0.66 | New |
+| **Animist** | Dark, Blizzard, Thunder | **Dual Dark + Fire** (her keeper's), Pure, Pure | 0.87 · 0.97 · 0.92 | 0.66 | New; her keeper's by T2B66 (the search's Blizzard + Light cost her band) |
 | Guardian · Templar | Lance, Greatsword, Light | **Dual Lance + Katana**, Pure, Pure | 0.86 · 0.86 · 0.88 | 0.71 | — |
 | Bishop · Exorcist | Light, Fire, Lance | Pure, Pure, **Dual Lance + Katana** | 0.83 · 0.80 · 0.86 | 0.72 | — |
 
-- **Why three Pure ×3:** the Bladedancer's and the Marshal's only legal Dual (Bow + Greatsword) adds a Greatsword their
-  party already holds twice, and the Enchanter's (Katana + Axe) an Axe; the search keeps every kind in as many hands
-  without them and under the bound. Pure is the damage pick (×1.5 on all three at G10), which suits a pure class.
+- **Why the Bladedancer Pure ×3:** her only legal Dual (Bow + Greatsword) adds a Greatsword her party already holds
+  twice; the search keeps every kind in as many hands without it. Pure is the damage pick (×1.5 on all three at G10),
+  which suits a one-foe pure class, and balance measured her inside on it (−1.6 · +3.1 · +0.5%, T2B66).
+- **Why the Enchanter, the Marshal and the Animist keep their keeper sibling's Dual** (balance T2B66, cross-reference):
+  the search had put the Enchanter and the Marshal on Pure ×3 and the Animist on Blizzard + Light, which cost them **6 to
+  17 points at Lv 10** (the Marshal −15.7 · −5.3 · −4.1%, the Animist −9.3 · +2.0 · −2.0%, the Enchanter −3.9% at Lv 10).
+  A Summoner's area hits and a support's every-act statuses reach every foe, so a partner kind's weakness pays on every
+  foe struck, which the search (the fewest kinds in one hand) doesn't price. On their keeper's Dual they read +2.0 · −1.9
+  · +7.7%, +3.1 · +6.6 · +8.4% and +1.8 · +7.4 · +1.6%, inside. The Marshal's one legal Dual is her keeper's. The search's
+  picks stay the alternative, with the Marshal's hands about a third higher and the Animist's trunk at 0.66 (balance's
+  estimate, not measured).
 - **Why the crosses' Duals sit on their lead channel:** the Spellfist's Katana + Axe brings back the Axe her one-foe kit
   dropped, the Battlemage's Fire + Dark a Dark the Sorcerer's line never held; a Dual on the cross slot would double
   what the other channel's keepers already hold.
-- **What it costs her alone:** a Suggested two-kind weapon answers 80–91% of Tier 2's regulars alone (none 66–79%); a
-  Pure ×3 class answers 69–77%, the party's two hands carrying the rest. Each type is on the sheet with what it answers;
+- **What it costs her alone:** a Suggested two-kind weapon answers 80–91% of Tier 2's regulars alone (none 66–79%); the
+  Pure ×3 Bladedancer answers 77%, the party's two hands carrying the rest. Each type is on the sheet with what it answers;
   any legal pick is fine, and she swaps freely after.
 
 ### 4.5 Coverage: the bound, and the twenty (T2G52, T2G53)
@@ -460,18 +479,21 @@ Tier 1, every kind in two hands where the presets allow. Round 3 states it on wh
 - **The regular bound:** for each of the owner's two parties, **the mean over every mix of its seats** (Suggested types)
   answers a regular no more than **its Tier 1 party does: 4.31 (Party 1) and 4.35 (Party 2)**, on today's honeycomb.
 - **The shields' pricing holds for every mix:** sub-bosses 7 and bosses 9 are priced on answers (balance T2B7, CP8's
-  rule: 6 × a ÷ 3.73 and 8 × a ÷ 3.77), so **no mix's sub-boss answers pass 4.66, nor its boss answers 4.48**.
+  rule: 6 × a ÷ 3.73 and 8 × a ÷ 3.77), so **no mix's sub-boss answers pass 4.66, nor its boss answers 4.48** (in Tier 2
+  six mixes sit at its edge, 4.48–4.51, accepted with balance's kits: T2G53).
 - **Every kind in two hands** stays the search's aim (T2G50), never a promise: a mix can drop a kind, and the party hint
   names it (classes T2C94).
 
-**T2G53: the twenty, measured** (the live dealer, Tier 2's 2,880 region stages; regular · sub-boss · boss):
+**T2G53: the twenty, measured** (the live dealer, Tier 2's 2,880 region stages; regular · sub-boss · boss), **on T2G51 as
+balance's T2B66 amends it** (the Enchanter, the Marshal and the Animist on their keeper sibling's Dual):
 
 | | Mixes | Regular, mean (range) | Sub-boss | Boss | Every kind in two hands | All ten held (in hand · with partners) |
 |---|---|---|---|---|---|---|
 | **Tier 1**, the owner's parties (no type) | 1 · 1 | **4.31 · 4.35** | 3.75 · 3.71 | 3.75 · 3.75 | — | 10 · 10 |
 | Tier 1's kits on Tier 2's foes (no type) | 1 · 1 | 3.62 · 3.66 | 3.65 · 3.72 | 3.66 · 3.71 | — | — |
-| **Party 1's mixes**, Suggested | 72 | **4.25** (4.17–4.34) | 4.35 (4.25–4.45) | 4.23 (4.05–4.44) | 4 | 36 · 48 |
-| **Party 2's mixes**, Suggested | 72 | **4.18** (3.99–4.33) | 4.27 (4.10–4.42) | 4.24 (3.97–4.42) | 4 | 44 · 60 |
+| **Party 1's mixes**, Suggested | 72 | **4.25** (4.17–4.34) | 4.37 (4.25–4.51) | 4.25 (4.05–4.51) | 4 | 36 · 48 |
+| **Party 2's mixes**, Suggested | 72 | **4.27** (4.19–4.38) | 4.34 (4.24–4.46) | 4.34 (4.20–4.48) | 6 | 44 · 60 |
+| *T2G51 before the amendment* (the three on Pure ×3 and Blizzard + Light) | 72 · 72 | *4.25 · 4.18* | *4.35 · 4.27* | *4.23 · 4.24 (at most 4.44 · 4.42)* | *4 · 4* | *36 · 48; 44 · 60* |
 | *Round 2's rule on the twenty* (one Dual each, no bound) | 144 | *4.30 · 4.27* | — | *up to 4.58: 10 mixes past 4.48* | 10 | 80 · 108 (both parties) |
 
 | Classes' comp | Members | Regular · sub-boss · boss | Kinds in two hands · in one hand |
@@ -481,24 +503,51 @@ Tier 1, every kind in two hands where the presets allow. Round 3 states it on wh
 | **C3** A Brawler with a Spellblade | **Spellfist**, Archmage, **Bladedancer**, Invoker, Guardian | 4.19 · 4.33 · 4.19 | 7 · Lance, Thunder, Light |
 | **C3b** A Sorcerer with a Tome Spellblade | Berserker, **Battlemage**, **Spellweaver**, Warlord, Bishop | 4.30 · 4.36 · 4.28 | 9 · Thunder |
 | **C4** A Spellblade with the Paladin | Berserker, Archmage, **Sentinel**, Invoker, **Templar** | 4.32 · 4.44 · 4.33 | 9 · Thunder |
-| **C4b** A Tome Spellblade with the Cleric | Berserker, Archmage, **Enchanter**, Warlord, **Exorcist** | 4.16 · 4.29 · 4.25 | 9 · Thunder |
+| **C4b** A Tome Spellblade with the Cleric | Berserker, Archmage, **Enchanter**, Warlord, **Exorcist** | 4.27 · 4.37 · 4.38 | 9 · Thunder |
 | **C5** Both swaps on one party | Spellfist, Archmage, Bladedancer, Shaman, Templar | 4.19 · 4.33 · 4.19 | 7 · Lance, Thunder, Light |
-| **C6** All pure (Party 1) | Berserker, Archmage, Bladedancer, Animist, Guardian | 4.27 · 4.41 · 4.34 | 9 · Fire |
-| **C6b** All pure (Party 2) | Berserker, Archmage, Spellweaver, Marshal, Bishop | 4.24 · 4.35 · 4.32 | 9 · Greatsword |
+| **C6** All pure (Party 1) | Berserker, Archmage, Bladedancer, Animist, Guardian | 4.27 · 4.47 · 4.42 | 9 · Light |
+| **C6b** All pure (Party 2) | Berserker, Archmage, Spellweaver, Marshal, Bishop | 4.38 · 4.46 · **4.48** | 10 · — |
 | **C7** All hybrid | Spellfist, Battlemage, Blademaster, Invoker, Guardian | 4.19 · 4.25 · 4.10 | 7 · Lance, Bow, Thunder |
 | **C8** Both hybrids to support | Berserker, Archmage, Sentinel, Shaman, Guardian | 4.32 · 4.44 · 4.33 | 9 · Thunder |
 | **C9** A Summoner to support | Berserker, Archmage, Runeblade, Druid, Bishop | 4.28 · 4.36 · 4.42 | 10 · — |
 | **C10** Every member a cross or support | Spellfist, Battlemage, Sentinel, Shaman, Templar | 4.23 · 4.32 · 4.15 | 7 · Lance, Bow (Thunder not held) |
 
-**What holds:** both parties' means sit under their Tier 1 party (4.25 against 4.31, 4.18 against 4.35); **every one of
-the 144 mixes keeps its sub-boss and boss answers inside the shields' pricing** (at most 4.45 and 4.44); every named
-comp answers 4.16–4.32 a regular, C4 and C8 0.01 over their Tier 1 party's 4.31, inside the means. **The Tier 1-like
-comps keep every kind in two hands** (C1, C2, C9); the swap comps hold every kind but put one to three in one hand,
-the price of single big hits (classes T2C94); C10 drops Thunder, which the party hint names. **What grows:** sub-bosses
-and bosses gain about 15% over Tier 1's (3.71–3.75 → 4.23–4.35 on the means), which is why their shields go up one from
-**Tier 2 Lv 1** (T2B7: sub-bosses 7, bosses 9): the types come with the promotion, not a G5. **What a diligent player
-adds:** re-typing every stage lifts a party about 0.4 (round 2's 4.72 on C1), below what Tier 1's free kind swaps already
-allow with every kind graded (5.00).
+**Does the bound hold with the three changed types?** **The regular bound, yes:** both parties' means sit under their
+Tier 1 party (**4.25 against 4.31, 4.27 against 4.35**); Party 2's rose 0.09, the Enchanter's Axe and the Marshal's
+Greatsword each in a third of its mixes. **The shields' pricing, for 138 of 144 mixes:** every sub-boss inside (at most 4.51
+against 4.66), and every boss but six, **at 4.48–4.51 against 4.48** (9.5–9.6 shields' worth against 9):
+
+| The six mixes past (boss answers) | Who in them is free to re-type |
+|---|---|
+| Party 1: Berserker, Archmage, **Sentinel**, **Animist**, Guardian or Templar (4.51) | The Sentinel (a support, round 2's Dual) |
+| Party 2: Berserker, Archmage, **Spellweaver**, **Marshal**, Bishop or Exorcist (4.485; one is C6b) | The Spellweaver |
+| Party 2: Berserker, Archmage, Runeblade, **Marshal**, Bishop or Exorcist (4.481) | No one: keepers, keeper or battle healers, and the Marshal, whose one legal Dual is the one balance needs |
+
+**The fixes through other Suggested types, re-searched** (T2G50's rule with the three held, every free class's every
+legal type, 6,144 sets): no set holds every mix while the keepers and healers keep round 1's Dual. The nearest:
+
+| Fix | Mixes past | Kinds in one hand (144 mixes) | Its cost |
+|---|---|---|---|
+| **None: T2G51 as T2B66 amends it** (recommended) | 6 (boss 4.48–4.51) | **248** | — |
+| The Sentinel on Dual Light + Blizzard (or Pure ×3) | 4 (4.48) | 272 | Moves a kit balance just tuned (×0.9, one stack): a Dual change moved classes up to 9 points in T2B66; C4 and C8 put the Axe in one hand |
+| … and the Spellweaver Pure ×3 | 2 (4.481) | 296 | Pure ×3 on a pure variant, the kit T2B66 found costs a band |
+| … and the Bishop's and the Exorcist's Dual Fire + Dark | 0 | 270 | C2 and C9 lose every kind in two hands (the Katana in one), what T2G50 refused for C1 |
+
+**Recommended: accept the six** (T2G53 amended, cross-reference). On CP8's rule they price a boss at 9.51–9.57 shields'
+worth, past the 9.5 that rounds to 9, on 4% of the owner's mixes (before the amendment the most was 9.42); the regular
+bound holds with room; and every fix costs more breadth than it buys while moving kits balance measured. **The re-search
+also shows the amended set the broadest Tier 2 has had:** 248 kinds in one hand over the 144 mixes against T2G51's 276,
+every kind in two hands in 10 mixes against 8. The build's run re-reads the six on the engine stage; if their bosses
+Break measurably sooner, the Sentinel's Light + Blizzard is the first fix.
+
+**What else holds:** every named comp answers 4.19–4.38 a regular, C6b 0.03 over Party 2's 4.35 and C4 and C8 0.01 over
+Party 1's 4.31, inside the means. **The Tier 1-like comps keep every kind in two hands** (C1, C2, C9), and **C6b now does
+too** (the Marshal's Greatsword); the swap comps hold every kind but put one to three in one hand, the price of single
+big hits (classes T2C94); C10 drops Thunder, which the party hint names. **What grows:** sub-bosses and bosses gain about
+15% over Tier 1's (3.71–3.75 → 4.25–4.37 on the means), which is why their shields go up one from **Tier 2 Lv 1** (T2B7:
+sub-bosses 7, bosses 9): the types come with the promotion, not a G5. **What a diligent player adds:** re-typing every
+stage lifts a party about 0.4 (round 2's 4.72 on C1), below what Tier 1's free kind swaps already allow with every kind
+graded (5.00).
 
 ### 4.6 Armor (T2G29, T2G61)
 
@@ -686,7 +735,7 @@ fights, 24 sub-bosses, 24 bosses, 4 seeds; Seeker's rider ≈ from her measured 
 |---|---|
 | **Single-hit cross, ATK** (Spellfist, Spellhammer) | A Brawler on Greatsword, Katana and a Bow on line B (Barrage): one-foe kinds on ATK, as classes' own single-target test |
 | **Single-hit cross, M.ATK** (Battlemage, Spellknight) | A Sorcerer on Fire, Blizzard and Light (Double, one foe) |
-| **Pure pair, one foe** (Bladedancer, Spellweaver; Dervish, Starweaver) | An Arms Spellblade on her preset with her M.ATK set to her ATK, so both halves read one stat; her parent's hands (0.72 + 0.44, the variant's 0.32 a little lower) |
+| **Pure pair, one foe** (Bladedancer, Spellweaver; Dervish, Starweaver) | An Arms Spellblade on her preset with her M.ATK set to her ATK, so both halves read one stat; her parent's hands (0.72 + 0.44: the variant's measured second hand, 0.53 on her trunk and 0.33 on her lines, straddles it, classes T2C68) |
 | **Pure pair, area** (Marshal, Animist; Imperator, Mythlord) | An Arms Summoner the same way |
 | **Arsenal** (Gladiator, Thaumaturge) | The Brawler's and the Sorcerer's own profile (round 2 measured them); her weak-hit share rises with every foe answered, priced on Seeker below |
 
@@ -717,7 +766,7 @@ Each cell is fights · sub-bosses · bosses · the mean (fights twice), % of her
 | **Pure pair, one foe** | **Great**; a **Twofold Orb on her first two kinds** for her Orb | Her damage spreads over three kinds (two lead weapons and her second half), so no one kind carries an Orb: the Twofold Orb beats the Great Orb by 1.1 points |
 | **Pure pair, area** | **Great**; a **Great Orb** on her lead kind | Her lead summon's kind carries her area hits and its farewell: the Great Orb is level with a third Great |
 | **Arsenal** | **Great**, as the Brawler and the Sorcerer (round 2: Great ×3 19.0 and 20.5%) | Every foe answered lifts her weak-hit share from about half to about two thirds: Seeker gains about 1.5 points, short of Great's lead (Seeker ×3 ≈ 11.5 against Great ×3 21.1 on the Brawler here) |
-| **Tier 3's rules** | Her Tier 2 parent's | Momentum, Pinpoint doubled, Juggernaut, Resonance and Spellbind multiply her hits, so they move no form's rank; Menagerie's farewells are area (Extra Stats' axis, T2G46); **Overflow** turns a keeper healer's overheal into a Barrier, so Vow's heal lean (T2G31) gains a second use; the supports' twists keep Kindred their party pick |
+| **Tier 3's rules** | Her Tier 2 parent's | Momentum, Pinpoint doubled, Juggernaut, Resonance and Spellbind multiply her hits, so they move no form's rank; Menagerie's farewells are area (Extra Stats' axis, T2G46); **the keeper healers' mends and Barriers ×1.3** (classes T2C87, in Overflow's place, T2B55) multiply Vow's heal lean (T2G31); the supports' twists keep Kindred their party pick |
 
 **T2G60: D266's rule, re-checked.** Round 2's 32 cells a tier (eight Tier 1 profiles × four columns) and the four new
 profiles' 16, by her damage (the party value of a self form is her gain × her share, so it ranks the same; Kindred,
@@ -958,6 +1007,14 @@ regular · sub-boss · boss):
   is better alone (both ×1.50 at G10).
 - **"As in Tier 2"** (T2G57) maps a Tier 2 Dual to Tempered on the same slot, so a player who keeps her Tier 2 kit keeps
   her Tier 2 breadth; the Suggested kit is the one the bound was measured on.
+- **T2B66's three Tier 2 changes don't carry into this table** (cross-reference): the Tier 3 classes are searched anew,
+  not inherited, so the Oracle, the Imperator and the Mythlord keep their own Suggested. Re-checked: had the Imperator
+  and the Mythlord followed their parents to Tempered Bow + Greatsword and Tempered Dark + Fire, Tier 3's means would
+  stay under (4.29 · 4.30) but **18 of the 324 mixes would pass the bosses' shields** (up to 4.64), Arsenal's breadth
+  doubling theirs, so their Keen ×3 is T2G55's fix and stands; the Oracle following (Tempered Katana + Axe) passes no
+  mix but halves Party 2's mixes with every kind in two hands (32 → 16). Their "As in Tier 2" chip now offers those
+  Tempered Duals. Balance reads the Starweaver and the Mythlord a point and 2.4 points under their band at Lv 10 on Keen
+  ×3 (T2B66), for the build's run.
 
 ### 5.3 Armor
 
@@ -1037,7 +1094,7 @@ her damage a turn, fights · sub-bosses · bosses · mean):
 
 **A Tier 3 class wears her Tier 2 parent's preset** (weapons, Suggested Tier 3 types, accessory forms), but the Gladiator
 and the Thaumaturge, whose weapons are their own (§5.2); the keeper healers' children take **Vow** from a slot's Tier 3
-G5, which Overflow (T2C87) puts to a second use.
+G5, which their mends and Barriers ×1.3 multiply (classes T2C87, T2B55).
 
 | Tier 3 class | Accessories, a slot G1–G4 | A slot G5 on | Weapons and Suggested types |
 |---|---|---|---|
@@ -1078,14 +1135,14 @@ support with a lower share, a battle healer), and round 3's proxies for the thre
 | **Keepers, supports, healers** of both tiers | Their parent's slots, hands, weapons and armor half; their rule multiplies her hits or adds farewells, wards, mends | Their Tier 1 ancestor, measured (round 2): Momentum, Pinpoint doubled, Juggernaut, Resonance and Spellbind scale every self form alike |
 | **Spellfist, Battlemage; Spellhammer, Spellknight** | 2 + 1 slots, every hit on her stat (the cross), one act, one-foe kinds, Pinpoint (T2C71–T2C73) | The single-hit cross proxies (§4.8) |
 | **Bladedancer, Spellweaver, Marshal, Animist; Dervish, Starweaver, Imperator, Mythlord** | Three slots of one channel, the pure pair, every hit on her stat (T2C67, T2C68) | The pure-pair proxies (§4.8), her parent's hands |
-| **Gladiator, Thaumaturge** | Three slots of one channel, two two-kind weapons (T2C85), hand ×1.05 | The Brawler's and the Sorcerer's profiles, her weak-hit share raised (§4.8, §5.4) |
+| **Gladiator, Thaumaturge** | Three slots of one channel, two two-kind weapons (T2C85), hands ×1.05 on the Gladiator's trunk and ×1.2 on her lines, ×1.1 the Thaumaturge's (T2B53) | The Brawler's and the Sorcerer's profiles, her weak-hit share raised (§4.8, §5.4) |
 
 | To or from | Provides (this doc's) | Assumes (theirs) | If not |
 |---|---|---|---|
-| **[T2C](classes.md) classes** | Types per class slot on the forty-two (T2G47); the crosses' other-channel weapons as gear reads them (T2G48); the pure variants' (T2G49); **Suggested types for the twenty and the twenty-two** (T2G51, T2G56); **Arsenal's two two-kind weapons, an exception to T2G3 by class, and its coverage fix in Tier 3's Suggested types** (T2G54, T2G55); armor's half (T2G61); presets' accessories (T2G58) | Classes' slots, presets (T2C77) and the Tier 3 classes' own presets (T2C85); one healer a party; a class switch is free and each class keeps its weapons; the party hint names a missing kind (T2C94) | A different cross or pure kit re-runs the Suggested search (§4.4, §5.2); the bound is checked on it |
+| **[T2C](classes.md) classes** | Types per class slot on the forty-two (T2G47); the crosses' other-channel weapons as gear reads them (T2G48); the pure variants' (T2G49); **Suggested types for the twenty and the twenty-two** (T2G51, T2G56); **Arsenal's two two-kind weapons, an exception to T2G3 by class, and its coverage fix in Tier 3's Suggested types** (T2G54, T2G55); armor's half (T2G61); presets' accessories (T2G58) | Classes' slots, presets (T2C77) and the Tier 3 classes' own presets (T2C85), their hands as balance's cross-reference sets them; one healer a party; a class switch is free and each class keeps its weapons; the party hint names a missing kind (T2C94) | A different cross or pure kit re-runs the Suggested search (§4.4, §5.2); the bound is checked on it |
 | **[T2E](extra-stats.md) extra stats** | Accessories read **stats, kinds and conditions** (rank, timing, weak hits, wounded foes, bosses, Limit Breaks); the kind cap binds the Orb family only (T2G37); Kindred is a hits-only bonus beside the ★ | **Shapes (AoE, multi-hit) are Extra Stats' axis** (R2-8); Prowess all to her stat for the crosses and the pure classes (classes' provides) | If T2E adds a weak-hit or wounded percentage, it joins T2G38's one Insignia factor or halves |
 | **[T2P](professions.md) professions** | Every Tier 2 grade takes both items (T2P29): Arms Whetstone and Tome Reagent raise a weapon's **type**; **Armor Lining carries armor's tier step**; Accessory Inlay raises the worn form's **rider**; no item a type or a form; **the Arms/Tome split by class** (a cross 2/1 or 1/2 as her slots, a pure variant 3/0 or 0/3, the Gladiator 3/0, the Thaumaturge 0/3) | Recipes 10 · 10 · 3 · 5 for both items; Craft Lv 5g − 4; Ascend gives both back | A path that needed its own item would come back against T2P39 |
-| **[T2B](balance.md) balance** | Weak multipliers by type and grade (§4.1, §5.1); **coverage by party and by comp in both tiers, and the bound held on the Suggested types** (T2G52, T2G53, T2G55): every mix's sub-boss and boss answers inside the shields' pricing, so sub-bosses 7 and bosses 9 stand in Tiers 2 and 3; the riders' measured worth and estimates; the new profiles' forms (T2G59, T2G60) | Weaknesses v2's three kinds in Tiers 2 and 3 (live); the shields' rule (T2B7, CP8's); party value (R2-11); Tier 3's term; **the new kits as classes drafts them** (hands, Pinpoint, the pure pair, Arsenal's ×1.05), not yet measured by balance | If balance's measured kits change a profile's kind shares, §4.8's proxies re-run; if a rider tops half a class's cells, its knob in T2G31–T2G33 steps first |
+| **[T2B](balance.md) balance** | Weak multipliers by type and grade (§4.1, §5.1); **coverage by party and by comp in both tiers, and the bound held on the Suggested types** (T2G52, T2G53, T2G55): every mix's sub-boss and boss answers inside the shields' pricing but six Tier 2 mixes at its edge, so sub-bosses 7 and bosses 9 stand in Tiers 2 and 3; the riders' measured worth and estimates; the new profiles' forms (T2G59, T2G60); **T2B66 adopted:** the Enchanter's, the Marshal's and the Animist's keeper Duals in T2G51, the bound re-checked (T2G53) | Weaknesses v2's three kinds in Tiers 2 and 3 (live); the shields' rule (T2B7, CP8's); party value (R2-11); Tier 3's term (T2B57); **the kits as balance's round 3 measured and tuned them** (T2B41–T2B66: hands, the trunk hand, Pinpoint, the pure pair, Arsenal's hands), its knobs set on these Suggested types (the Druid's and the Marshal's hands on their Bow + Greatsword) | If balance's measured kits change a profile's kind shares, §4.8's proxies re-run; if a rider tops half a class's cells, its knob in T2G31–T2G33 steps first |
 | **[T2U](templates.md) templates** | Any form of her ★ family counts; from Tier 2 a Twofold form makes every ★ family pay on any weapons (T2G35), the one-stat classes included | The ★ at 0.1 a level × tier | — |
 | **[T2W](progression.md) progression** | **The Tier 3 sheet's weapons page:** her Tier 3 class's preset and Suggested Tier 3 types, "As in Tier 2" a chip (T2G57; T2W39 aligned); Arsenal's two two-kind rows; types re-picked at each promotion, forms carry (T2G41); every tree open by a slot's G5 in Tier 2 and Tier 3 | Ascend as D283; the Tier 3 promotion (T2W37) | — |
 
@@ -1136,16 +1193,16 @@ Every call, with the recommended answer. Round 3's first; rounds 1 and 2 keep th
 | **T2G47** Weapons for the forty-two | **Every Tier 2 and Tier 3 class takes a type per slot, her own three weapons each (T2G23 on the forty-two); slots, channels and the stat each hit reads are classes'; one two-kind weapon in her slots, the Gladiator and the Thaumaturge two** | A type on the kind (round 1's T2G5) | Each class keeps its own weapons; one grade serves every class |
 | **T2G48** The crosses' other-channel weapons | **The Spellfist's Fire Tome on ATK and the Battlemage's Katana on M.ATK** (their Tier 3 children the same): any kind of the slot's channel, its grade's Might to her stat, its own channel's items raise it; one grade every reader. Supersedes T2G25 | Round 2's Scatter twins (Thunder, Lance) or Heavy twins (Fire, Greatsword) | Classes reshaped them to single big hits (R3-2, R3-3); the slot rule is unchanged, only the kind |
 | **T2G49** The pure variants' weapons | **Three weapons of one channel, any kind in any slot (her third her second half); her stat's family on every hit; 300 refined of her channel a rank** | Her parent's 2 + 1 channels with the stat crossed (a cross by another name) | Classes' pure pair (T2C68): her family's feel, one channel |
-| **T2G50** Suggested types' rule | **One two-kind weapon or none a class, searched over every mix of the owner's two parties for the fewest kinds in one hand, under the coverage bound (T2G52); Tier 2's keepers and battle healers keep round 1's Dual; every Tier 3 class searched.** Supersedes T2G26 | Round 2's one Dual a class, no bound (10 Tier 2 and 40 Tier 3 mixes past the shields); every keeper re-searched in Tier 2 (248 kinds in one hand against 276, six Duals moved, C1's Katana in one hand) | The bound is what lets the shields stay 7 · 9; the keepers' Duals are what balance measured |
-| **T2G51** Tier 2's Suggested on the twenty | **§4.4's table: the Spellfist Dual Katana + Axe, the Battlemage Dual Fire + Dark, the Spellweaver Dual Thunder + Light, the Animist Dual Blizzard + Light, the Druid Dual Bow + Greatsword; the Bladedancer, the Marshal and the Enchanter Pure ×3; the rest round 2's** | Each Uma's best alone (her own answers, 0.80–0.91) | The rule on the 144 mixes: every party under Tier 1, every mix inside the shields |
+| **T2G50** Suggested types' rule | **One two-kind weapon or none a class, searched over every mix of the owner's two parties for the fewest kinds in one hand, under the coverage bound (T2G52); Tier 2's keepers and battle healers keep round 1's Dual, and the Enchanter, the Marshal and the Animist their keeper sibling's (balance's measure, T2B66); every Tier 3 class searched.** Supersedes T2G26. **Amended by T2B66 (cross-reference)** | The search alone on every non-keeper (its Pure ×3 and Blizzard + Light cost three classes their band, 6 to 17 points at Lv 10); round 2's one Dual a class, no bound (10 Tier 2 and 40 Tier 3 mixes past the shields); every keeper re-searched in Tier 2 (six Duals moved, C1's Katana in one hand) | The bound is what lets the shields stay 7 · 9; the keepers' Duals are what balance measured, and a partner kind's worth to an area or every-act class is balance's to read |
+| **T2G51** Tier 2's Suggested on the twenty | **§4.4's table: the Spellfist Dual Katana + Axe, the Battlemage Dual Fire + Dark, the Spellweaver Dual Thunder + Light, the Druid Dual Bow + Greatsword; the Enchanter Dual Katana + Axe, the Marshal Dual Bow + Greatsword and the Animist Dual Dark + Fire, their keeper sibling's; the Bladedancer Pure ×3; the rest round 2's.** **Amended by T2B66 (cross-reference):** a Summoner's area hits and a support's every-act statuses reach every foe, so their partner kind pays on every foe struck; on these Duals the three sit in their band (+2.0 · −1.9 · +7.7%, +3.1 · +6.6 · +8.4%, +1.8 · +7.4 · +1.6%) | As drafted: the Enchanter and the Marshal Pure ×3, the Animist Dual Blizzard + Light (the search's fewest kinds in one hand: the Marshal −15.7 · −5.3 · −4.1%, the Animist −9.3 · +2.0 · −2.0%, the Enchanter −3.9% at Lv 10); each Uma's best alone (her own answers, 0.80–0.91) | The rule on the 144 mixes with balance's three held: both parties under Tier 1, the broadest set yet (248 kinds in one hand) |
 | **T2G52** The coverage bound, per party | **For each of the owner's two parties, the mean over every mix of its seats answers a regular no more than its Tier 1 party (4.31 · 4.35); no mix's sub-boss or boss answers pass the shields' pricing (4.66 · 4.48 for 7 · 9); every kind in two hands the search's aim.** Amends T2G2 | Every mix under Tier 1 (fails on some mixes by up to 0.17, the dealer's spread); the named comps only | It reads what the owner fields, and the shields are the bound's mechanical edge |
-| **T2G53** Coverage on the twenty | **Measured: Party 1's mixes 4.25 · 4.35 · 4.23, Party 2's 4.18 · 4.27 · 4.24 (regular · sub-boss · boss); all 144 inside the shields; classes' comps 4.16–4.32 a regular; C1, C2 and C9 every kind in two hands.** Supersedes T2G27 | — | The bound holds; the swap comps put one to three kinds in one hand, the price of single big hits |
+| **T2G53** Coverage on the twenty | **Measured on T2G51 as amended: Party 1's mixes 4.25 · 4.37 · 4.25, Party 2's 4.27 · 4.34 · 4.34 (regular · sub-boss · boss); the regular bound holds (under 4.31 · 4.35); 138 of 144 inside the shields' pricing, six bosses at 4.48–4.51 (a Sentinel or a Marshal beside the Berserker and the Archmage), accepted; classes' comps 4.19–4.38 a regular; C1, C2, C6b and C9 every kind in two hands; 248 kinds in one hand over the 144 mixes.** Supersedes T2G27. **Amended by T2B66 (cross-reference)** | As drafted (before T2B66): 4.25 · 4.18, all 144 inside, 276 kinds in one hand; fix the six through other types: the Sentinel on Light + Blizzard (four left, 272), with the Spellweaver Pure ×3 (two left, 296), with the Cleric healers on Fire + Dark (none left, 270, but C2 and C9 lose every kind in two hands) | Every fix moves a kit balance measured for a 0.5-shield edge on 4% of the mixes; the regular bound holds with room |
 | **T2G54** Arsenal in gear | **The Gladiator's and the Thaumaturge's slots hold up to two two-kind weapons (T2G3's exception, read by class); her three kinds and both partners all different, so all five of her channel; every other rule as any weapon's; Suggested Greatsword Evolved + Katana, Axe Tempered + Bow, Lance Keen; Fire Evolved + Light, Blizzard Evolved + Dark, Thunder Keen.** Amends T2G3 | A fourth slot; one two-kind weapon with a wider partner (classes' T2C85 alternatives) | Classes' "more varied physical weapons", in one number gear already has |
 | **T2G55** Arsenal and the coverage bound | **As drafted it fails** (Tier 3's means 4.39 · 4.36 against 4.31 · 4.35; 40 of 324 mixes past the shields; the all-pure T6 4.63 · 4.71 · 4.68). **Fix: Tier 3's Suggested types under the bound (T2G50), which puts the four pure Tier 3 lines on Keen ×3:** means 4.22 · 4.25, no mix past the shields, T6 4.25, T3g 4.31; 480 kinds in one hand against 476 | Arsenal's partners land weak but chip nothing (4.24 · 4.21, 8 mixes past, cuts her Breaks); one Arsenal class a party (4.43 · 4.40 on its mixes: fails); Tier 3's shields 8 · 10 (every party pays) | The fix moves no rule and no class, only four defaults, and keeps the breadth |
 | **T2G56** Tier 3's Suggested on the twenty-two | **§5.2's table: one Tempered or Evolved weapon a class, the Gladiator and the Thaumaturge two, the Dervish, the Starweaver, the Imperator and the Mythlord Keen ×3** | Her Tier 2 Dual mapped to Tempered on every class (round 2's pre-fill: over the bound with Arsenal) | T2G50's rule on the 324 mixes |
 | **T2G57** Types at the Tier 3 promotion | **The Tier 3 sheet pre-fills her Tier 3 class's preset and Suggested Tier 3 types; "As in Tier 2" copies her parent's kinds and maps her types (Pure → Keen, Dual → Tempered, the same partner), offered where her slots match (not the Gladiator, the Thaumaturge); free swaps after.** Amends T2G28, T2G41 | Pre-filled from her last (round 2: default kits over the bound with Arsenal); Suggested with no chip | Tier 3 is a promotion into a new class; the bound lives in the defaults; her own kit is one tap |
 | **T2G58** Presets for the forty-two | **§4.9 and §5.5: her stat twice and an Orb; Great for the one-stat classes (the pures' keepers, the crosses, the pure variants, Arsenal) and the healers, Twofold for the hybrid keepers and supports; the supports Kindred from a slot's G5; the one-foe pure pair's Orb a Twofold Orb on her lead two; a Tier 3 class her parent's, the keeper healers' children Vow from Tier 3's G5.** Supersedes T2G36 | Each class's best set (Great ×3 on most one-stat classes); a Great Orb on the pure pair too (1.1 points less) | D266's shape by role: 15–23% at Tier 2 Lv 50, 17–24% at Tier 3's, best in one column |
-| **T2G59** The forms that suit the new profiles | **One stat on every hit takes Great (the crosses, the pure variants, Arsenal); the one-foe pure pair a Twofold Orb, the area pair a Great Orb; Tier 3's rules move no ranking (they multiply), but Overflow gives Vow a second use** | A form of their own for the new profiles (nothing the tree lacks) | Measured on the proxies (§4.8) |
+| **T2G59** The forms that suit the new profiles | **One stat on every hit takes Great (the crosses, the pure variants, Arsenal); the one-foe pure pair a Twofold Orb, the area pair a Great Orb; Tier 3's rules move no ranking (they multiply), and the keeper healers' mends and Barriers ×1.3 multiply Vow's heal lean** (Overflow's second use retired with it: T2B55, cross-reference) | A form of their own for the new profiles (nothing the tree lacks) | Measured on the proxies (§4.8) |
 | **T2G60** D266 re-checked | **On the harness with proxies at Tier 2 and Tier 3 Lv 50: Great the most-won form, 18 and 17 of 48 cells (under half); every form still someone's best; the presets 17.9–24.0% on the new profiles.** Confirms T2G45 | Wait for the built kits | The rule the owner set (D266) holds on every class we can play today |
 | **T2G61** Armor for the forty-two | **Her Tier 1 ancestor's half on every Tier 2 and Tier 3 class** (a cross's and a pure variant's the stat every hit reads); no Tier 2 path; the Lining the tier step. Amends T2G29 | A half by her class's channels (a cross's other half: reaches nothing) | Leans and halves never change with a promotion (classes §4.1) |
 | **T2G62** Save and engine (round 3) | **`type` per slot on forty-two classes; the two-kind cap read by class (1, the Gladiator and the Thaumaturge 2) in validation on Tier 3's stage; Suggested types and presets as data beside the presets.** Amends T2G44 | A per-class cap field in the save (derivable) | One table, read where validation already counts two-kind weapons |
@@ -1216,7 +1273,7 @@ Status in round 3 after each call's name ([§3.3](#33-round-2-t2g21t2g46-in-roun
 | **T2G55** Arsenal breaks the coverage bound, and the fix | As drafted the Gladiator and the Thaumaturge answer every foe, so Tier 3's parties answer more than Tier 1's and the all-pure comp would raise every boss's shield; the fix leaves Arsenal whole and moves four defaults (the pure Tier 3 lines on Keen ×3) |
 | **T2G57** The Tier 3 sheet pre-fills the new class's Suggested, not her Tier 2 kit | The bound lives in the defaults; her own kit is the "As in Tier 2" chip |
 | **T2G52** The bound, stated per party | Round 2 read it comp by comp and let C4 pass at 4.38; round 3 reads each party's mean over every mix it can field and holds every mix inside the shields |
-| **T2G51** Three Tier 2 classes Suggested Pure ×3 | The Bladedancer's, the Marshal's and the Enchanter's one legal Dual only doubles a kind their party holds |
+| **T2G51, T2G53** Three Tier 2 classes on their keeper's Dual, and six mixes at the shields' edge | Balance's measure (T2B66) overruled the search for the Enchanter, the Marshal and the Animist; the bound's means hold, six of 144 mixes price a boss a hair over 9 shields, accepted |
 | **T2G60** Great becomes the most-won form | Every new profile reads one stat on every hit; still under half the cells, every form someone's best |
 | **T2G48** The crosses' other channel is a one-foe kind | The Spellfist's Fire on ATK and the Battlemage's Katana on M.ATK (round 2: Thunder, Lance) |
 | Round 2's: **T2G22** free type swaps, **T2G34** Kindred, **T2G29** armor with no path | Stand as round 2 asked him to look at them |
