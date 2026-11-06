@@ -9,19 +9,21 @@
 > - parties formed from a menu, whose lead decides the boss of a shared dungeon;
 > - about five stories to out-level a band of content.
 >
-> This page turns that into calls CM1–CM36. It replaces [plan.md](plan.md)'s NG2 and NG3, and its starting dungeon calls
+> Revised the same day at the owner's word: **each outfit is its own traveler**, 100 in all, and a character's outfits
+> share her story. This page turns all of that into calls CM1–CM36. It replaces [plan.md](plan.md)'s NG2 and NG3, and its starting dungeon calls
 > DN1, DN2, DN5 and DN10, and it reshapes Phases 3, 5 and 6, adding a Phase 7. We borrow the structure only: not
 > Octopath's names, stories, map, job list, Path Actions, art or music.
 > Visual page: [previews/campaign.html](previews/campaign.html).
 
 ## The short answer
 
-- **The cast is 65 travelers.** They are the 65 characters behind your 100 selected outfits. All of them are playable from
-  the first minute, and nothing unlocks through play.
-  - **Five Ways:** 13 Warriors, 14 Spellblades, 14 Mages, 13 Summoners, 11 Healers.
-  - **Outfits:** a traveler's other selected outfits are her wardrobe.
-- **Each traveler has her own five-chapter story,** one chapter for each band of ten levels.
-  - A party is any five travelers.
+- **The cast is 100 travelers, one for each of your selected outfits.** All of them are playable from the first minute,
+  and nothing unlocks through play. Each has her own level, gear and story progress.
+  - **Five Ways, exactly 20 each:** Warrior, Spellblade, Mage, Summoner, Healer.
+- **A character's outfits share her story.** The 100 travelers come from 65 characters, so there are 65 stories of five
+  chapters, one chapter for each band of ten levels.
+  - Each outfit plays her character's story on her own progress, so 35 outfits replay a story that's already written.
+  - A party is any five travelers, never two outfits of one character.
   - A chapter runs when its traveler leads.
   - A party's five chapter 1s take it through Lv 1–10 and out-level that band. Its five chapter 2s do the same for
     Lv 11–20, and so on: 25 chapters from Lv 1 to 50.
@@ -35,8 +37,9 @@
   - Every line is written fresh.
   - Stories are private content and never go in git.
 - **Townsfolk:** the 70 Umas whose outfits aren't in your selection.
-- **Volume:** the full cast is 325 chapters. They ship in **waves of five travelers**, one per Way, and each wave is a
-  full run to Lv 50. Wave 1 is Phases 5 and 6, and the other 12 waves are a new Phase 7.
+- **Volume:** 325 chapters to write, 500 to play. They ship in **20 waves of five travelers**, one per Way, and each
+  wave is a full run to Lv 50. After wave 1 the waves follow your tiers, SS, then A1, then A2, and the later waves are
+  mostly replays. Wave 1 is Phases 5 and 6, and the other 19 waves are a new Phase 7.
 
 ## The numbers behind it
 
@@ -44,13 +47,13 @@ From your roster file (`uma-platform/content/authoring/uma-art-roster.json`, rea
 
 | | Count |
 |---|---|
-| Selected outfits (SS 40, A1 40, A2 20) | 100, exactly 20 a calling |
-| Characters behind them, the travelers | **65** |
-| Characters with two or three selected outfits | 30 (35 extra outfits) |
-| Characters whose outfits span two callings | 2 |
-| Travelers per Way, by each one's best-ranked outfit | Warrior 13, Spellblade 14, Mage 14, Summoner 13, Healer 11 |
+| Selected outfits, the travelers (SS 40, A1 40, A2 20) | **100**, exactly 20 a Way |
+| Characters behind them, the stories | **65** |
+| Characters with two or three selected outfits | 30, so 35 outfits replay a story |
+| Characters whose outfits span two callings | 2; each outfit keeps her own Way |
 | Umas with outfits but none selected, the townsfolk | **70** |
-| Most parties at once (65 ÷ 5) | 13 (11 with one of each Way) |
+| Most parties at once (100 ÷ 5) | 20, every one able to have one of each Way |
+| Chapters | 325 written (65 × 5), 500 played (100 × 5) |
 
 ## The calls
 
@@ -58,10 +61,10 @@ From your roster file (`uma-platform/content/authoring/uma-art-roster.json`, rea
 
 | Id | Call |
 |---|---|
-| CM1 | **A traveler is a character:** the 65 behind your 100 selected outfits. Each traveler is playable from the first minute; nothing unlocks through play. She joins the menu as soon as her sprites are done (DN1) |
-| CM2 | **Her selected outfits are her wardrobe.** She wears one, and her Way is that outfit's calling. 63 of the 65 have one Way across all their outfits; two can switch between two. Art draws each traveler's best-ranked outfit first and the other 35 outfits after |
-| CM3 | **The five Ways are the five callings:** the Way of the Warrior (13), the Spellblade (14), the Mage (14), the Summoner (13), the Healer (11). The party menu has one tab for each Way |
-| CM4 | **A party is any five travelers**, each character once. The menu fills one of each Way by default and warns when there's no Healer, but it never forbids a mix. Up to 13 parties at once |
+| CM1 | **A traveler is an outfit:** all 100 you selected, each her own Uma with her own level, gear, Way and story progress. Each is playable from the first minute; nothing unlocks through play. She joins the menu as soon as her sprites are done (DN1) |
+| CM2 | **A character's outfits share her story:** it's written once (65 stories), and each of her outfits plays it on her own progress |
+| CM3 | **The five Ways are the five callings, exactly 20 travelers each:** the Way of the Warrior, the Spellblade, the Mage, the Summoner and the Healer. A traveler's Way is her outfit's calling. The party menu has one tab for each Way |
+| CM4 | **A party is any five travelers, never two outfits of one character,** since the stories treat them as the same Uma. Different parties can field her different outfits at once. The menu fills one of each Way by default and warns when there's no Healer, but it never forbids a mix. Up to 20 parties, every one able to have one of each Way |
 | CM5 | Parties change at any town's inn, never in a dungeon or during a chapter. Travelers in no party stay at the Hub and work jobs (NG7's jobs stay) |
 | CM6 | Each Uma levels on her own. An Uma below her party's average level earns double EXP until she reaches it |
 
@@ -74,7 +77,7 @@ From your roster file (`uma-platform/content/authoring/uma-art-roster.json`, rea
 | CM9 | **Levels are suggested, never locked.** Her chapter N+1 waits only for her chapter N |
 | CM10 | **A chapter:** opening scenes in a town, then one dungeon with her chapter's boss at the bottom, then closing scenes back in town. 20–40 minutes; the slice measures it |
 | CM11 | Scenes speak with the story's own cast. In the first build, the other party members stay silent: no party banter |
-| CM12 | Travelers appear in each other's stories as rivals and friends. The 70 Umas outside your selection are the townsfolk, plus a few original generic sprites |
+| CM12 | Travelers appear in each other's stories as rivals and friends, in their character's best-ranked outfit. The 70 Umas outside your selection are the townsfolk, plus a few original generic sprites |
 | CM13 | **No traveler dies or is maimed in her story.** A real horse's fatal or career-ending injury becomes a trial she survives |
 
 ### Where the stories come from
@@ -93,7 +96,7 @@ From your roster file (`uma-platform/content/authoring/uma-art-roster.json`, rea
 |---|---|
 | CM19 | **The world map:** the Hub at the centre, and five regions around it as wedges, one per Way. Each region has five zones running outward, one per band |
 | CM20 | **Each zone has one town and two dungeons,** in one biome. That makes 25 towns and 50 dungeons, ten dungeons a band, so DN21's pairing with the ten weapon kinds holds in every band. The five zones of a band are five different biomes |
-| CM21 | **Towns are built by hand from kits, and they persist.** A story changes them through flags: a bridge, a shop, who stands where. It's one world, so every party sees the change |
+| CM21 | **Towns are built by hand from kits, and they're permanent places.** A chapter stages what it needs while it plays (a broken bridge, who stands where) and leaves no lasting change. So chapters can be played in any order, and an outfit replaying her character's story finds the town as the story expects |
 | CM22 | **Each town has** an inn (rest, party changes), a shop (consumables, gear), townsfolk and the chapters that start there. The Hub is a town too, and adds the jobs, the workbench and storage |
 | CM23 | Chapter 1 starts in her Way's inner town. Later chapters go wherever her story goes, so a party's five chapter 1s tour all five regions |
 | CM24 | **The world map is a screen, not a walked field.** Tap a town or dungeon next to one you've reached to travel there; places you've reached are one tap away. Fights happen in dungeons |
@@ -105,7 +108,7 @@ From your roster file (`uma-platform/content/authoring/uma-art-roster.json`, rea
 | CM25 | **A band's ten dungeons are suggested at one level each**, covering all ten of its levels. A zone's two are an easier and a harder one: in band 1 the Warrior zone has Lv 1 and 6, the Spellblade zone Lv 2 and 7, and so on |
 | CM26 | **Every dungeon has a resident boss.** When the lead's chapter is set there, her chapter's boss takes the boss room for that run. The drops are the dungeon's either way (DN21) |
 | CM27 | **Each chapter has its own boss,** 325 in all, each with its own name, skills, fight script and colours. About half are rival Umas, other travelers with their escorts, on their own sprites. The other half are monsters built on a shared bestiary of about six large bodies a band |
-| CM28 | **A rival can't fight her own party.** While the rival travels with the lead, the chapter waits, and the quest log says who has to leave |
+| CM28 | **A rival can't fight her own party.** While any of the rival's outfits travels with the lead, the chapter waits, and the quest log says who has to leave. As a boss she wears her best-ranked outfit |
 | CM29 | **Five dungeons are made by hand,** one in each region's outer zone (DN5). The other 45 are generated (DN6) |
 
 ### Growth
@@ -119,10 +122,10 @@ From your roster file (`uma-platform/content/authoring/uma-art-roster.json`, rea
 
 | Id | Call |
 |---|---|
-| CM32 | **Stories ship in waves of five travelers,** one per Way. Each wave is a full run: 25 chapters and 25 bosses. The cast takes 13 waves; the Healers run out after wave 11, so waves 12 and 13 have none |
+| CM32 | **Stories ship in waves of five travelers,** one per Way, each a full run of 25 chapters: 20 waves. A wave writes only the characters not yet written. After wave 1 the waves follow your tiers: waves 2–8 are the SS outfits (35 new stories), 9–16 the A1 outfits (17 new), 17–20 the A2 outfits (8 new) |
 | CM33 | **Wave 1, by default:** Warrior 106801 and Summoner 100703, the two Umas Q3 draws, then the first SS of the other three callings in your roster file: Spellblade 113301, Mage 112901 and Healer 111801. Swap any of them by saying so |
 | CM34 | **Q3 draws the Summoner in outfit 100703,** her one selected outfit (A1). H168 named 100701, which you tiered F |
-| CM35 | **The plan changes** ([plan.md](plan.md)): Phase 3 adds a town and the story runner as Q12, and the measured play becomes Q13. Phase 5 becomes band 1 with wave 1's chapter 1s, Phase 6 bands 2–5 with wave 1's chapters 2–5, and a new Phase 7 runs waves 2–13. Q2 adds the stories bucket |
+| CM35 | **The plan changes** ([plan.md](plan.md)): Phase 3 adds a town and the story runner as Q12, and the measured play becomes Q13. Phase 5 becomes band 1 with wave 1's chapter 1s, Phase 6 bands 2–5 with wave 1's chapters 2–5, and a new Phase 7 runs waves 2–20. Q2 adds the stories bucket |
 | CM36 | **Only the structure comes from Octopath:** travelers, chapters, towns and suggested levels. Not its names, stories, map, job list, Path Actions, art or music |
 
 ## How a chapter plays
@@ -198,16 +201,17 @@ Several travelers can share a tale family. No two use the same tale.
 
 | | A wave | The full cast |
 |---|---|---|
-| Story bibles | 5 | 65 |
-| Chapters | 25 | 325 |
-| Words, at about 2,000 a chapter (the slice checks it) | ~50,000 | ~650,000 |
-| Chapter bosses | 25 | 325 |
+| Story bibles | 5 or fewer | 65 |
+| Chapters written | up to 25 | 325 |
+| Chapters played | 25 | 500 |
+| Words, at about 2,000 a chapter (the slice checks it) | up to ~50,000 | ~650,000 |
+| Chapter bosses | up to 25 | 325 |
 | Resident bosses | the band's dungeons | 50 |
 | Towns, plus the Hub | the band's 5 | 25 |
 
 | Art (ChatGPT's) | Count | What it is |
 |---|---|---|
-| Traveler sprites | 65, then 35 wardrobe outfits | The full fight set and walking, about 110 frames each ([animation-spec.md](../sprites/animation-spec.md)) |
+| Traveler sprites | 100, in your tier order: SS, A1, A2 | The full fight set and walking, about 110 frames each ([animation-spec.md](../sprites/animation-spec.md)) |
 | Townsfolk sprites | 70 Umas, plus about 10 original generic sprites | Idle and walking only, roughly a third of a fighter's frames |
 | Bestiary | About 30 large boss bodies, plus each biome's common foes | Bosses share bodies; colours and skills make each one its own |
 | Kits | 11 biome kits and 5 town kits, one per region's style | 2D art built into 3D by code (DN28) |
@@ -219,17 +223,17 @@ Several travelers can share a tale family. No two use the same tale.
 
 | Was | Now |
 |---|---|
-| NG2: several parties on quest lines; Umas join through the story; four lines first | CM1–CM13 and CM32: every traveler has her own story, all playable from the start, shipped in waves |
+| NG2: several parties on quest lines; Umas join through the story; four lines first | CM1–CM13 and CM32: 100 travelers all playable from the start, a character's outfits sharing her story, shipped in waves |
 | NG3: story scripts in git, naming Umas by id | CM16: stories are private content in a bucket; git holds the format and a stand-in chapter |
 | NG7: quest → dungeon → fight | Town → chapter → dungeon → the lead's boss; jobs and consumables stay |
-| DN1: parties from the 100 outfits | CM1, CM2: 65 travelers, outfits as wardrobe |
+| DN1: parties from the 100 outfits | CM1, CM2: the 100 outfits are the travelers; a character's outfits share her story |
 | DN2: ten dungeons a continent, one biome over ten levels | CM19, CM20, CM25: 25 zones, ten dungeons a band, one suggested level each |
 | DN5: capitals are the hand-made dungeons | CM29: one hand-made dungeon in each region's outer zone |
 | DN10: one walk takes a party through a dungeon's ten levels | CM30: five chapters a band, about two levels a chapter |
 | Phase 3: Q8–Q12 | Adds Q12, a town and the story runner; the measured play becomes Q13 |
 | Phase 5: the first chapter, four quest lines | Band 1, wave 1's chapter 1s, the party menu, the inner towns |
 | Phase 6: chapters 2–5 | Bands 2–5 and wave 1's chapters 2–5 |
-| — | Phase 7: waves 2–13 |
+| — | Phase 7: waves 2–20 |
 
 Phases 0–2 stay as they are, apart from Q5's world builder also building towns, and Q2 adding the private stories
 bucket ($0: it shares the free 5 GB).

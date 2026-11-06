@@ -8,8 +8,8 @@
 > work: the infrastructure first, then the engine, the slice and the design. It moves into the new repo in Phase 1.
 > Visual page: [previews/plan.html](previews/plan.html).
 >
-> **Later on 2026-11-06 the campaign was reshaped as a travelers RPG** in [campaign.md](campaign.md) (CM1–CM36): 65
-> travelers each with her own five-chapter story, persisted towns, shared dungeons whose boss follows the lead, and waves
+> **Later on 2026-11-06 the campaign was reshaped as a travelers RPG** in [campaign.md](campaign.md) (CM1–CM36): 100
+> travelers, one per selected outfit, sharing 65 five-chapter stories, persisted towns, shared dungeons whose boss follows the lead, and waves
 > of five travelers. NG2, NG3, NG7, DN1, DN2, DN5 and DN10 below are revised by it, and Phases 3, 5 and 6 changed, with
 > a new Phase 7.
 
@@ -36,7 +36,7 @@ The new repo's decision log starts from these (NG1–NG12 were proposed in chat;
 | Id | Call |
 |---|---|
 | NG1 | The name is **uma-quest**: a **public** repo `luismlorenzana/uma-quest`, like uma-rpg and uma-platform. Public repos run GitHub Actions free, and no original-game content goes in git anyway |
-| NG2 | *Revised by [campaign.md](campaign.md) CM1–CM13 and CM32:* every traveler has her own story of five chapters, one per ten levels; all 65 are playable from the start; no tickets or gacha; stories ship in waves of five |
+| NG2 | *Revised by [campaign.md](campaign.md) CM1–CM13 and CM32:* all 100 selected outfits are travelers, playable from the start; a character's outfits share her story of five chapters, one per ten levels; no tickets or gacha; stories ship in waves of five |
 | NG3 | *Revised by CM16:* stories are private content in `gs://uma-quest-content`; git holds the script format, the tale skeletons and a stand-in chapter. Names and art come from master data at run time |
 | NG4 | One climb from Lv 1 to 50: no tiers, no Ascend |
 | NG5 | three.js draws towns, dungeons and fights; no Phaser. Menus are uma-kit's React screens over the canvas |
@@ -199,8 +199,8 @@ Starts beside Phase 2; finished with the slice's numbers. In `docs/design/`, wit
   traveler as she's drawn, band 1's townsfolk, kits and bestiary.
 - **Phase 6, to level 50 (XL):** bands 2–5 (20 towns, 40 dungeons, the five hand-made ones), wave 1's chapters 2–5, the
   balance across the whole run.
-- **Phase 7, the cast (ongoing):** waves 2–13, five travelers a wave, each a full run of 25 chapters; you read each
-  wave's bibles before its chapters are written.
+- **Phase 7, the cast (ongoing):** waves 2–20, five travelers a wave in your tier order, each a full run of 25 chapters.
+  A wave writes only the characters not yet written, and you read its bibles before its chapters are written.
 
 ## Risks
 
@@ -209,7 +209,7 @@ Starts beside Phase 2; finished with the slice's numbers. In `docs/design/`, wit
 | A project-wide mistake hits both games | Separate service accounts and databases; scripted, idempotent setup; never delete the `uma-rpg` project, even if uma-rpg is retired |
 | A uma-quest Hosting deploy lands on uma-rpg's site | The deploy names `hosting:uma-quest`, and CI fails if `firebase.json` doesn't name that site |
 | WebGL on the iPhone is too slow or drains the battery | Phase 2 measures it on a test room before any content is made |
-| The art volume (65 travelers at about 110 frames, 70 townsfolk, 16 kits, a bestiary) | Q3 and the slice set a production minimum; best outfits first, wardrobe later; bosses share bodies (CM27) |
+| The art volume (100 travelers at about 110 frames, 70 townsfolk, 16 kits, a bestiary) | Q3 and the slice set a production minimum; travelers drawn in your tier order; bosses share bodies (CM27) |
 | The writing volume (325 chapters, about 650,000 words) | Waves of five, each a full run; one wave's bibles read before its chapters are written (CM18, CM32) |
 | uma-kit has no landscape layout | A kit request to uma-platform during Phase 2; the slice can draw its few menus itself until then |
 
@@ -219,7 +219,7 @@ Proposed in chat for uma-rpg on 2026-11-06 and carried here as uma-quest's start
 
 | Id | Call |
 |---|---|
-| DN1 | Only Umas with sprites fight. *Revised by CM1 and CM2: 65 travelers, their outfits as wardrobe. The Party Hall change is moot here* |
+| DN1 | Only Umas with sprites fight. *Revised by CM1 and CM2: the 100 outfits are the travelers, a character's outfits sharing her story. The Party Hall change is moot here* |
 | DN2 | *Revised by CM19, CM20 and CM25:* 25 zones of a town and two dungeons, ten dungeons a band, each at one suggested level |
 | DN3 | Any party may walk any dungeon; no cap |
 | DN4 | The first party to clear a dungeon claims it; every Uma who clears it joins its register, and her profile shows her path |

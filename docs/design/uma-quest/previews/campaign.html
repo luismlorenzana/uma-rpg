@@ -129,7 +129,10 @@
   .tale i { color: var(--ink-faint); font-style: normal; }
 
   /* Waves */
-  .waves { display: grid; grid-template-columns: repeat(13, minmax(54px, 1fr)); gap: 5px; min-width: 760px; }
+  .waves { display: grid; grid-template-columns: repeat(20, minmax(46px, 1fr)); gap: 5px; min-width: 980px; }
+  .wave.ss { box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--accent) 70%, transparent); }
+  .wave.a1 { box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--accent) 40%, transparent); }
+  .wave.a2 { box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--accent) 18%, transparent); }
   .wave { background: var(--raised); border-radius: 8px; padding: 6px; text-align: center; font-size: 11px; color: var(--ink-soft); }
   .wave b { display: block; color: var(--ink); font-size: 12px; margin-bottom: 4px; }
   .wave.first { background: var(--info-wash); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--info) 45%, transparent); }
@@ -146,7 +149,7 @@
 <body>
 <main>
   <h1>uma-quest: the campaign</h1>
-  <p>Every traveler has her own story. Parties of five travel a world of persisted towns and shared dungeons, and the
+  <p>Every selected outfit is a traveler, and a character's outfits share her story. Parties of five travel a world of persisted towns and shared dungeons, and the
     lead decides who waits in the boss room. The doc with every call is <a href="../campaign.md">campaign.md</a>; the order
     of work is <a href="../plan.md">plan.md</a>, drawn in <a href="plan.html">plan.html</a>.</p>
   <nav>
@@ -161,12 +164,12 @@
   </nav>
 
   <div class="tiles">
-    <div class="tile"><b>65</b><span>travelers, all playable from the start</span></div>
-    <div class="tile"><b>5</b><span>Ways: Warrior, Spellblade, Mage, Summoner, Healer</span></div>
-    <div class="tile"><b>325</b><span>chapters, five for each traveler</span></div>
+    <div class="tile"><b>100</b><span>travelers, one per selected outfit, all playable from the start</span></div>
+    <div class="tile"><b>5 × 20</b><span>Ways: Warrior, Spellblade, Mage, Summoner, Healer</span></div>
+    <div class="tile"><b>65</b><span>stories, one per character, shared by her outfits</span></div>
+    <div class="tile"><b>325 · 500</b><span>chapters written · played</span></div>
     <div class="tile"><b>25 · 50</b><span>towns · dungeons</span></div>
-    <div class="tile"><b>70</b><span>Umas as townsfolk</span></div>
-    <div class="tile"><b>13</b><span>waves of five travelers</span></div>
+    <div class="tile"><b>20</b><span>waves of five travelers</span></div>
   </div>
 
   <section class="card" id="world">
@@ -176,7 +179,7 @@
     <div class="world">
       <div><svg id="map" viewBox="-110 -40 1020 880" role="img" aria-label="Radial world map: the Hub in the centre, five wedges for the five Ways, five rings for the level bands, each zone with a town and two dungeons"></svg></div>
       <div class="facts">
-        <div class="fact"><b>25 towns, built by hand from kits.</b> Stories change them through flags (a bridge, a shop, who stands where), and every party sees the change: there is one world.</div>
+        <div class="fact"><b>25 towns, built by hand from kits, and permanent.</b> A chapter stages what it needs while it plays (a broken bridge, who stands where) and leaves no lasting change, so chapters play in any order and each outfit's replay of a story finds the town as it expects.</div>
         <div class="fact"><b>50 dungeons, ten a band,</b> one at each suggested level. DN21's ten weapon kinds pair with each band's ten.</div>
         <div class="fact"><b>Five hand-made dungeons</b>, one at each region's edge (ringed). The other 45 are generated from seeds.</div>
         <div class="fact"><b>Chapter 1 starts in her Way's inner town,</b> so a party's five chapter 1s tour all five regions (the dashed line).</div>
@@ -204,9 +207,9 @@
 
   <section class="card" id="party">
     <h2>The party menu</h2>
-    <p>At any town's inn. One tab for each Way; any five travelers, each character once. The menu fills one of each Way
-      by default and warns without a Healer, but never forbids a mix. Her selected outfits are her wardrobe, and the
-      outfit she wears sets her Way.</p>
+    <p>At any town's inn. One tab for each Way, 20 travelers in each. Every outfit is its own traveler with her own
+      level, gear and story progress; outfits of one character share her story, and a party never holds two of them.
+      The menu fills one of each Way by default and warns without a Healer, but never forbids a mix.</p>
     <div class="mock">
       <div class="screen">
         <div class="tabs" id="tabs"></div>
@@ -227,6 +230,7 @@
         <div class="row"><span><b>Summoner · chapter 2</b> · needs her rival to leave the party</span><span class="lv">Lv 19</span></div>
         <div class="row"><span><b>Healer · chapter 2</b> · the Mage region's band-2 town</span><span class="lv">Lv 11</span></div>
         <div class="warn">A party without a Healer gets a warning, never a block.</div>
+        <div class="warn">Two outfits of one character can't share a party; different parties can each field one.</div>
         <p class="note">An Uma below her party's average level earns double EXP until she reaches it (CM6).</p>
       </div>
     </div>
@@ -249,7 +253,7 @@
           that run, and the drops stay the dungeon's. With 65 chapter 1s across band 1's ten dungeons, each dungeon holds
           about six or seven story bosses.</p>
         <p><span class="kind rival">Rival</span> another traveler and her escorts, on her own sprites. She can't fight her
-          own party: the chapter waits while she travels with the lead.</p>
+          own party: the chapter waits while any of her outfits travels with the lead.</p>
         <p><span class="kind beast">Bestiary</span> a monster on one of about six large bodies a band, with its own
           name, colours, skills and fight script.</p>
       </div>
@@ -291,23 +295,26 @@
   <section class="card" id="waves">
     <h2>Waves and volume</h2>
     <p>Stories ship five travelers at a time, one of each Way, and each wave is a full run of 25 chapters. Wave 1 is
-      Phases 5 and 6; waves 2–13 are Phase 7. The Healers run out after wave 11.</p>
+      Phases 5 and 6; waves 2–20 are Phase 7, in your tier order. A wave writes only the characters not yet written, so
+      the later waves are mostly replays of finished stories.</p>
     <div class="scroll"><div class="waves" id="waveGrid"></div></div>
+    <p class="note" id="waveNote"></p>
     <div class="rooms" style="margin-top:14px">
       <table>
         <thead><tr><th>Writing</th><th class="num">A wave</th><th class="num">Full cast</th></tr></thead>
         <tbody>
-          <tr><td>Story bibles (you read them first)</td><td class="num">5</td><td class="num">65</td></tr>
-          <tr><td>Chapters</td><td class="num">25</td><td class="num">325</td></tr>
-          <tr><td>Words, at about 2,000 a chapter</td><td class="num">~50,000</td><td class="num">~650,000</td></tr>
-          <tr><td>Chapter bosses</td><td class="num">25</td><td class="num">325</td></tr>
+          <tr><td>Story bibles (you read them first)</td><td class="num">5 or fewer</td><td class="num">65</td></tr>
+          <tr><td>Chapters written</td><td class="num">up to 25</td><td class="num">325</td></tr>
+          <tr><td>Chapters played</td><td class="num">25</td><td class="num">500</td></tr>
+          <tr><td>Words, at about 2,000 a chapter</td><td class="num">up to ~50,000</td><td class="num">~650,000</td></tr>
+          <tr><td>Chapter bosses</td><td class="num">up to 25</td><td class="num">325</td></tr>
           <tr><td>Resident bosses</td><td class="num">—</td><td class="num">50</td></tr>
         </tbody>
       </table>
       <table>
         <thead><tr><th>Art (ChatGPT's)</th><th>Count</th></tr></thead>
         <tbody>
-          <tr><td>Traveler sprites, about 110 frames each</td><td>65, then 35 wardrobe outfits</td></tr>
+          <tr><td>Traveler sprites, about 110 frames each</td><td>100, in your tier order: SS, A1, A2</td></tr>
           <tr><td>Townsfolk, idle and walking only</td><td>70 Umas, plus ~10 original generic sprites</td></tr>
           <tr><td>Bestiary</td><td>~30 boss bodies, plus each biome's common foes</td></tr>
           <tr><td>Kits</td><td>11 biome kits, 5 town kits</td></tr>
@@ -330,7 +337,7 @@
     if (html != null) e.innerHTML = html;
     return e;
   };
-  const WAYS = [['Warrior', 13], ['Spellblade', 14], ['Mage', 14], ['Summoner', 13], ['Healer', 11]];
+  const WAYS = [['Warrior', 20], ['Spellblade', 20], ['Mage', 20], ['Summoner', 20], ['Healer', 20]];
 
   // ---- World map ----
   const map = document.getElementById('map');
@@ -399,11 +406,12 @@
   // ---- Party menu mock ----
   document.getElementById('tabs').innerHTML = WAYS.map(([w, n], i) => `<span class="tab${i === 2 ? ' on' : ''}">${w}<small>${n}</small></span>`).join('');
   const roster = document.getElementById('roster');
-  for (let i = 1; i <= 14; i++) {
-    const inParty = i === 3;
-    const outfits = [1, 4, 7, 10].includes(i) ? 2 : i === 12 ? 3 : 1;
+  const SHARED = { 10: 2, 12: 5, 14: 1, 17: 2, 19: 9 };
+  const LV = [1, 1, 14, 6, 1, 22, 1, 3, 1, 1, 9, 1, 1, 1, 4, 1, 1, 1, 1, 2];
+  for (let i = 1; i <= 20; i++) {
+    const inParty = i === 3, tier = i <= 8 ? 'SS' : i <= 16 ? 'A1' : 'A2';
     roster.append(el('div', { class: `tv${inParty ? ' in' : ''}` },
-      `<div class="face">Mage ${i}</div><b>${inParty ? 'In party' : `Lv ${[1, 1, 14, 6, 1, 22, 1, 3, 1, 1, 9, 1, 1, 1][i - 1]}`}</b><br>${outfits > 1 ? `${outfits} outfits` : '1 outfit'}`));
+      `<div class="face">Mage ${i}</div><b>${tier} · ${inParty ? 'in party' : `Lv ${LV[i - 1]}`}</b><br>${SHARED[i] ? `Mage ${SHARED[i]}'s story` : 'Her own story'}`));
   }
 
   // ---- Ladder ----
@@ -463,27 +471,22 @@
 
   // ---- Waves ----
   const wg = document.getElementById('waveGrid');
-  const left = { Warrior: 13, Spellblade: 14, Mage: 14, Summoner: 13, Healer: 11 };
-  for (let w = 1; w <= 13; w++) {
-    const cells = [];
-    for (const [way] of WAYS) if (left[way] > 0) { left[way]--; cells.push(way); }
-    const extraOrder = ['Spellblade', 'Mage', 'Warrior', 'Summoner'];
-    while (cells.length < 5) { const x = extraOrder.find(k => left[k] > 0); if (!x) break; left[x]--; cells.push(x); }
-    const healer = cells.includes('Healer');
-    const card = el('div', { class: `wave${w === 1 ? ' first' : ''}` }, `<b>${w}</b>`);
-    cells.forEach(c => card.append(el('span', {}, c.replace('Spellblade', 'Spellbl.').replace('Summoner', 'Summon.'))));
-    if (!healer) card.append(el('span', { class: 'none' }, 'no Healer'));
-    card.append(el('div', { class: 'note', style: 'margin-top:4px' }, w === 1 ? 'Phases 5–6' : 'Phase 7'));
+  for (let w = 1; w <= 20; w++) {
+    const tier = w <= 8 ? 'SS' : w <= 16 ? 'A1' : 'A2';
+    const card = el('div', { class: `wave ${tier.toLowerCase()}${w === 1 ? ' first' : ''}` }, `<b>${w}</b>`);
+    card.append(el('span', {}, tier));
+    card.append(el('div', { class: 'note', style: 'margin-top:4px' }, w === 1 ? 'Ph. 5–6' : 'Ph. 7'));
     wg.append(card);
   }
+  document.getElementById('waveNote').textContent = 'New stories: waves 1–8 write 40 (wave 1 is four SS outfits and the A1 Summoner Q3 draws), waves 9–16 write 17, waves 17–20 write 8. Every wave has one traveler of each Way.';
 
   // ---- Calls ----
   const CALLS = [
     ['Cast and parties', [
-      ['CM1', 'A traveler is a character: the 65 behind your 100 selected outfits, all playable from the start'],
-      ['CM2', 'Her other selected outfits are her wardrobe; the outfit she wears sets her Way'],
-      ['CM3', 'Five Ways: Warrior 13, Spellblade 14, Mage 14, Summoner 13, Healer 11; a menu tab each'],
-      ['CM4', 'A party is any five travelers; one of each Way by default, a warning without a Healer; up to 13 parties'],
+      ['CM1', 'A traveler is an outfit: all 100 you selected, each with her own level, gear, Way and progress'],
+      ['CM2', 'A character\'s outfits share her story: 65 written once, each outfit plays it on her own progress'],
+      ['CM3', 'Five Ways, exactly 20 travelers each; her Way is her outfit\'s calling'],
+      ['CM4', 'Any five travelers, never two outfits of one character; one of each Way by default; up to 20 parties'],
       ['CM5', 'Parties change at any inn; travelers in no party work jobs at the Hub'],
       ['CM6', 'Each Uma levels on her own; below the party average she earns double EXP'],
     ]],
@@ -493,7 +496,7 @@
       ['CM9', 'Levels suggested, never locked; chapter N+1 waits only for chapter N'],
       ['CM10', 'Town scenes → one dungeon → her boss → closing scenes; 20–40 minutes'],
       ['CM11', 'No party banter in the first build'],
-      ['CM12', 'Travelers appear in each other\'s stories; 70 Umas outside your selection are the townsfolk'],
+      ['CM12', 'Travelers appear in each other\'s stories in their best outfit; 70 Umas outside your selection are the townsfolk'],
       ['CM13', 'No traveler dies or is maimed; a real fatal injury becomes a trial she survives'],
     ]],
     ['Where stories come from', [
@@ -506,7 +509,7 @@
     ['The world', [
       ['CM19', 'A Hub in the middle, five regions (one per Way), five zones outward (one per band)'],
       ['CM20', 'A zone is one town and two dungeons in one biome: 25 towns, 50 dungeons'],
-      ['CM21', 'Towns are hand-built from kits and persist; story flags change them for everyone'],
+      ['CM21', 'Towns are hand-built, permanent places; chapters stage their scenes and leave no lasting change, so replays work'],
       ['CM22', 'Each town has an inn, a shop, townsfolk and chapter starts; the Hub adds jobs, workbench and storage'],
       ['CM23', 'Chapter 1 starts in her Way\'s inner town, so five chapter 1s tour all five regions'],
       ['CM24', 'The world map is a tap-to-travel screen; fights happen in dungeons'],
@@ -515,7 +518,7 @@
       ['CM25', 'A band\'s ten dungeons cover its ten levels; a zone has an easier and a harder one'],
       ['CM26', 'Every dungeon has a resident boss; the lead\'s chapter boss takes the room when her chapter is set there'],
       ['CM27', 'One boss a chapter (325): about half rival Umas, half monsters on a shared bestiary of bodies'],
-      ['CM28', 'A rival can\'t fight her own party; the chapter waits while she travels with the lead'],
+      ['CM28', 'A rival can\'t fight her own party; the chapter waits while any of her outfits travels with the lead'],
       ['CM29', 'Five hand-made dungeons at the regions\' edges; 45 generated'],
     ]],
     ['Growth', [
@@ -523,10 +526,10 @@
       ['CM31', 'A full run is 25 chapters, Lv 1 to 50; each new party meets its own leads\' bosses'],
     ]],
     ['Production', [
-      ['CM32', 'Waves of five travelers, one per Way, each a full run; 13 waves'],
+      ['CM32', '20 waves of five, one per Way, in your tier order; a wave writes only the characters not yet written'],
       ['CM33', 'Wave 1 by default: outfits 106801, 113301, 112901, 100703, 111801'],
       ['CM34', 'Q3 draws the Summoner in her selected outfit 100703, not 100701'],
-      ['CM35', 'The plan: Q12 a town and the story runner, Q13 measured; Phase 5 band 1, Phase 6 bands 2–5, new Phase 7'],
+      ['CM35', 'The plan: Q12 a town and the story runner, Q13 measured; Phase 5 band 1, Phase 6 bands 2–5, new Phase 7 (waves 2–20)'],
       ['CM36', 'Only Octopath\'s structure is borrowed: not its names, stories, map, jobs, Path Actions, art or music'],
     ]],
   ];
