@@ -1,21 +1,28 @@
 # Progression: a Tier 2 run end to end, promotion, the windows, and how the tiers relate
 
-> **Status: round 2, the owner's requirements, 2026-11-04. Nothing here is built.** The overview of the Tier 2 and Tier
-> 3 set ([the brief](README.md)): how one Uma climbs Tier 1 → 2 → 3, **how she is promoted into Tier 2 on the Ascend
-> sheet** (R2-5, R2-6), **what her stained-glass window asks in each tier** (R2-10), what the Tier 2 and Tier 3 worlds
-> hold, and when each system's additions land in a run. It starts from Tier 1 as built (engine v21, save v36) and assumes
-> capitals v2 (save v37, D293) and the honeycomb (save v38, D295) are live before any Tier 2 packet: both are built dark
-> or queued today (H159 done; H160–H166 open). Calls are **T2W1–T2W15** (round 1) and **T2W16–T2W32** (round 2),
-> each with a recommendation, its alternatives and its status ([§10](#10-decisions)); no open questions.
+> **Status: round 3, the owner's class feedback, 2026-11-05. Nothing here is built.** The overview of the Tier 2 and
+> Tier 3 set ([the brief](README.md)): how one Uma climbs Tier 1 → 2 → 3, **how she is promoted on the Ascend sheet into
+> Tier 2 and, from round 3, into Tier 3** (R2-5, R2-6, R3-1), **what her stained-glass window asks in each tier** (R2-10),
+> what the Tier 2 and Tier 3 worlds hold, and when each system's additions land in a run. It starts from Tier 1 as built
+> (engine v21, save v36; capitals v2 and the honeycomb live since save v38, H166) and reads [classes](classes.md)' round 3
+> (T2C65–T2C101). Calls are **T2W1–T2W15** (round 1), **T2W16–T2W32** (round 2) and **T2W33–T2W46** (round 3), each with
+> a recommendation, its alternatives and its status ([§10](#10-decisions)); no open questions.
 >
 > **Round 2 in one paragraph.** Promotion into Tier 2 happens on the Gallery's Ascend sheet: each ready Uma arrives as a
-> **Tier 2 class she picks there**, one of the two children (a keeper and an expander, R2-2) of a Tier 1 class she
-> brought to Class Rank 50, with **her three weapons and their Tier 2 types** set on the same page; everything is
-> pre-filled, so a party of five still ascends in one tap. Her window keeps **one board of 36 steps in every tier**, the
-> same seven tracks and the Rift and the same record: Class reads the sixteen classes and asks for a class and its
-> **sibling** at Rank 50, Craft reads **her three professions' Craft Levels together**, Stars reads the tier's whole
+> **Tier 2 class she picks there**, a child of a Tier 1 class she brought to Class Rank 50, with **her three weapons and
+> their Tier 2 types** set on the same page; everything is pre-filled, so a party of five still ascends in one tap. Her
+> window keeps **one board of 36 steps in every tier**, the same seven tracks and the Rift and the same record: Class
+> reads the tier's own classes, Craft reads **her three professions' Craft Levels together**, Stars reads the tier's whole
 > map, and Gear and Weapons read grades whatever form or type she wears. **A step reads progress, never a choice**, and
 > the art needs nothing: a pane map lights any step count and never knows which step lit.
+>
+> **Round 3 in one paragraph.** **Tier 3 is a promotion too** (R3-1): the Tier 3 Ascend is the same sheet, and her page
+> lists **the Tier 3 children of every Tier 2 class she brought to Class Rank 50 (3 to 22)**, pre-filled with the child of
+> the class she fights as (a Spellfist's or a Battlemage's kept child), her new class's preset and Suggested Tier 3 types,
+> and "As in Tier 2" one tap away. **Tier 2's open set grows to 6–20** (two or three children a Tier 1 class, R3-4).
+> **Class IV reads "two classes of one Tier 1 line at Class Rank 50" in both later tiers** (a class and her sibling in
+> Tier 2; two of a line's Tier 3 classes in Tier 3), and **Class III in Tier 3 lights with her first crown**. Umas already
+> in a Tier 3 world at its switch become their keeper's Tier 3 child. **Nothing moves in days.**
 >
 > **Absorbs:** [tiers.md](../../archive/design/tiers.md) (T1–T9, archived), [tier2-world.md](../../archive/design/tier2-world.md)
 > (Z1–Z10, archived), [the Rift](../rift.md) (R1–R9), [collections](../collections/collections.md) (CO1–CO37),
@@ -26,8 +33,8 @@
 > **Pages** (desktop, light and dark; every Uma and window on them is made up, and the windows are placeholder panes, no
 > original art):
 > [**the tiers**: Tier 1 → 2 → 3, what each adds, what she keeps, picks and restarts, one Uma across three tiers](previews/progression-tiers.html) ·
-> [**the Ascend sheet**: promotion screen by screen, a party of five, the class and weapons pages, Tier 2 → 3](previews/progression-ascend.html) ·
-> [**the windows**: the boards by tier, how a window is drawn and latched, what each system lights, pacing by track](previews/progression-windows.html) ·
+> [**the Ascend sheet**: promotion screen by screen into Tier 2 and Tier 3, a party of five, the class and weapons pages](previews/progression-ascend.html) ·
+> [**the windows**: the boards by tier, the Class track on the new trees, how a window is drawn and latched, pacing by track](previews/progression-windows.html) ·
 > [**the worlds**: Tier 2's and Tier 3's continents, the honeycomb, foes, pay, the Rift](previews/progression-world.html) ·
 > [**the run**: a Tier 2 run day by day with round 2's systems, the Wilds calculator, 24 parties](previews/progression-run.html).
 >
@@ -36,18 +43,19 @@
 > `economy/pacing.ts`, `economy/ranks.ts`; the web's `places/gallery/`), read by throwaway tests that were deleted.
 > Where a number is an assumption (fight seconds, the owner's Rift pace, another doc's round-2 shape), it says so.
 >
-> **Names checked:** every label this doc and its pages add ("Keeper", "Expander", "Sibling", "Pair at R50", "Crafts",
-> "Her Tier 2 class", "Suggested for all", "Opens 6 of 16" and the rest, listed in [§9](#9-previews-carried-and-retired))
-> was matched, case-insensitive and exact, against every string of uma-platform's `content/release/data/*.json` (10
-> files, 18,227 distinct strings) and the game's own names: no match. "Keeper" and "Expander" are the brief's role words
-> (R2-2); the sixteen classes' names are [classes.md](classes.md)'s.
+> **Names checked:** every label this doc and its pages add ("Keeper", "Sibling", "Pair at R50", "Crafts", "Her Tier 2
+> class", "Her Tier 3 class", "Suggested for all", "Opens 8 of 20", "Opens 4 of 22", "As in Tier 2" and the rest, listed
+> in [§9](#9-previews-carried-and-retired)) was matched, case-insensitive and exact, against every string of uma-platform's
+> `content/release/data/*.json` (10 files) and the game's own string literals: no match. The forty-two classes' names are
+> [classes.md](classes.md)'s (T2C69, T2C88, checked there).
 
 ## What this doc answers
 
 | The brief asks | Answered in |
 |---|---|
-| **R2-5, R2-6:** Tier 2 promotion on the Ascend sheet: who's ready, her Tier 2 class, her weapons and their types, what she keeps and restarts, the purse, a party together | [§4.4](#44-promotion-the-ascend-sheet) (T2W16–T2W23), the [Ascend page](previews/progression-ascend.html) |
-| **R2-10:** the windows with Tier 2: the live board in depth, Tier 2's and Tier 3's boards on the new systems, the record and the art, whether a step can read a choice | [§2.5](#25-windows-in-depth), [§4.6](#46-her-window-in-tier-2) (T2W24–T2W28), [§5.4](#54-her-window-t2w29) (T2W29), the [windows page](previews/progression-windows.html) |
+| **R2-5, R2-6:** Tier 2 promotion on the Ascend sheet: who's ready, her Tier 2 class, her weapons and their types, what she keeps and restarts, the purse, a party together | [§4.4](#44-promotion-the-ascend-sheet) (T2W16–T2W23, T2W33–T2W36), the [Ascend page](previews/progression-ascend.html) |
+| **R3-1, §10.2:** the Tier 3 promotion on the Ascend sheet, screen by screen, pre-filled, a party in one tap; the Tier 2 open set 6–20 and the Tier 3 one 3–22; both doors; Suggested; Umas already in a Tier 3 world | [§5.5](#55-the-tier-3-promotion-t2w37t2w41) (T2W37–T2W41), [§4.4.2](#442-her-tier-2-class) (T2W33–T2W36) |
+| **R2-10, §10.2:** the windows: the live board in depth, Tier 2's and Tier 3's boards on the new systems, **the Class track by tier with the new trees**, the record and the art, whether a step can read a choice | [§2.5](#25-windows-in-depth), [§4.6](#46-her-window-in-tier-2) (T2W24–T2W28, T2W42), [§5.4](#54-her-window-t2w43) (T2W43), the [windows page](previews/progression-windows.html) |
 | The timeline of a Tier 2 run with round 2's systems, and its pacing | [§4.7](#47-the-toolbox-arrives), [§4.8](#48-a-tier-2-run-end-to-end), [§8](#8-pacing) (T2W32), the [run page](previews/progression-run.html) |
 | Ascend as built, and whether the drafts' tier rules still fit | [§2.6](#26-ascend), [§3.1](#31-tiersmd-t1t9-archived) |
 | The Tier 2 world: continents 6–10, lifetime foe levels, capitals v2 and the honeycomb | [§4.1](#41-the-world-continents-610), [§4.2](#42-foes-lifetime-levels-a-restarted-build) (T2W1–T2W3) |
@@ -56,37 +64,37 @@
 
 ## 1. At a glance
 
-**One Uma lives in one tier; a full window ascends her, and from Tier 2 the Ascend is her promotion; each tier is its
-own world, the same shape, restarted.** Tier 2 and Tier 3 run Tier 1's rules × tier today. Round 2's systems (the six
-docs) fill each later tier; this doc fixes the frame they land on.
+**One Uma lives in one tier; a full window ascends her, and each Ascend is her promotion (into Tier 2, and from round 3
+into Tier 3); each tier is its own world, the same shape, restarted.** Tier 2 and Tier 3 run Tier 1's rules × tier today.
+Rounds 2 and 3's systems (the six docs) fill each later tier; this doc fixes the frame they land on.
 
 | | Tier 1 · Apprentice · day | Tier 2 · Adept · dusk | Tier 3 · Master · night |
 |---|---|---|---|
 | **Continents** | `w1`–`w5`, lifetime Lv 1–50 | `w6`–`w10`, lifetime Lv 51–100, shown "T2 Lv 1–50" | `w11`–`w15`, lifetime 101–150 |
-| **A continent** (honeycomb, assumed live) | 48 regions, 576 stages, a capital, 6 Springs | The same | The same |
+| **A continent** (honeycomb, live) | 48 regions, 576 stages, a capital, 6 Springs | The same | The same |
 | **Parties · capital runs a continent** | 24 · six of four parties (16 fights each) | The same | The same |
 | **Leans** (T2W2) | Forest, Coast, Desert, Tundra, Haunted Moor (live) | Jungle, Sky Isles, Glacier, Volcano, Underworld | Swamp, Highlands, Geyser Basin, Storm Peaks, Ancient Ruins |
 | **Foes** | The build curve from Lv 1 | The curve **restarts** at T2 Lv 1, × 1.8 build (live: Z3, EP16) | Restarts again, × 2.6 |
-| **Her classes** | Five Tier 0s promote at Class Rank 10 into eight Tier 1 classes, in the world | **Sixteen** (a keeper and an expander per Tier 1 class, [T2C](classes.md)); **picked on the Ascend sheet** from the children of her Tier 1 classes at R50, 6 to 16 open to her (T2W17) | Assumed: the sixteen, deepened (two lines held, the crown and mastery at R50); her open set carries (T2W31) |
-| **Her weapons** | Three a class, by preset; one kind each | Three a class, **each with a Tier 2 type set on the Ascend sheet** (T2G), swapped later | The same, pre-filled from Tier 2 |
+| **Her classes** | Five Tier 0s promote at Class Rank 10 into eight Tier 1 classes, in the world | **Twenty** (two or three children a Tier 1 class: keeper, cross or support, pure; [T2C66](classes.md)); **picked on the Ascend sheet** from the children of her Tier 1 classes at R50, **6 to 20** open to her (T2W33) | **Twenty-two** (one child a Tier 2 class, the Spellfist and the Battlemage two; T2C65); **picked on the Tier 3 Ascend sheet** from the Tier 3 children of her Tier 2 classes at R50, **3 to 22** open (T2W37, T2W38) |
+| **Her weapons** | Three a class, by preset; one kind each | Three a class, **each with a Tier 2 type set on the Ascend sheet** (T2G), swapped later | **Re-picked on the sheet:** her Tier 3 class's preset and Suggested Tier 3 types, "As in Tier 2" one tap away (T2W39); the Gladiator and the Thaumaturge two two-kind weapons (Arsenal) |
 | **Build values** (gear, stars, signature) | × 1 | × 1.8 | × 2.6 |
 | **Laurels a win · region first clear** (Lv 1–40) | 10 · 630 | 20 · 1,260 | 30 · 1,890 |
 | **Speed · Sweep Ticket** (T2W10) | 10 · 15 Laurels | **20 · 30** (live: 10 · 15) | **30 · 45** (live: 10 · 15) |
 | **Arrives with** | 20 Uma Tickets (the start) | Her purse: **2,000 Laurels** (T2W10; live 1,000) and 5 Speed Tickets; banked EXP as up to 2,000 Class Marks | **3,000 Laurels** and 5 Speed Tickets; Class Marks |
 | **Drills · Trials** | Lv 10–50 · Lv 45, 50, 55 | The same, T2 levels | The same, T3 levels; **Trials open** with its Rift (T2W4) |
 | **The Rift** | Live | Live; one added test a front, re-aimed at round 2's tools (T2W5, T2W30) | **New (T2W4):** the same shape; it lights her Rift step, nobody ascends from it |
-| **Her window** | 36 steps | **36:** Class IV a class and its sibling at R50, Craft her three professions together (T2W24–T2W26) | **36** (live 35; T2W4, T2W29) |
-| **Ascend** | To Tier 2 on the Gallery's sheet, **her promotion** (T2W16) | To Tier 3, the same sheet pre-filled (T2W31) | None while Tier 3 is the top tier (T2W14) |
-| **What the toolbox adds** | — (Tier 1 as built) | Sixteen classes (T2C), weapon types and the accessory tree (T2G), a stat pick on every open node (T2E), two materials a line and three professions an Uma (T2P), party value bands (T2B), the ★ signature tip (T2U) | Assumed: each system's Tier 3 step (two lines held, the crown and mastery; the tree's and lists' deeper entries), Tier 3's term |
+| **Her window** | 36 steps | **36:** Class IV two classes of one Tier 1 line at R50 (a class and her sibling), Craft her three professions together (T2W24–T2W26, T2W42) | **36** (live 35; T2W4): Class III her first crown, IV two Tier 3 classes of one Tier 1 line (T2W43) |
+| **Ascend** | To Tier 2 on the Gallery's sheet, **her promotion** (T2W16) | To Tier 3, the same sheet, **her Tier 3 promotion** (T2W37) | None while Tier 3 is the top tier (T2W14) |
+| **What the toolbox adds** | — (Tier 1 as built) | Twenty classes (T2C), weapon types and the accessory tree (T2G), a stat pick on every open node (T2E), two materials a line and three professions an Uma (T2P), party value bands (T2B), the ★ signature tip (T2U) | Twenty-two classes, each her Tier 2 parent + one rule from Class Rank 1, the crown at R50 and two lines held (T2C); Keen, Tempered, Evolved and Arsenal (T2G); the tree's third ring; Prowess's Trio (T2E); Tier 3's term (T2B) |
 | **A run's clock** (T2W12, T2W32) | Her own Craft Level: 24.5 days nonstop, 30.6 at 80% | **Her three Craft Levels to 60 together: 24.9–27.8 days** nonstop, 31.2–34.8 at 80% | The same |
 
 **A Tier 2 run in one line:** a party of five fights to Lv 50 in about 130 wins (2 to 4½ hours of fights), but its
 windows take **about 33 days** of the Wilds' work and the Rift (38 at 80%), because every Uma's Craft Levels restart at 1
 and the first cohort's forges reach G10 on day 22.1. The fights are short; the Wilds are the clock, in every tier.
 
-**Promotion in one line:** the Gallery's Ascend sheet lists the ready Umas by party, each pre-filled with her
-Suggested Tier 2 class (the keeper of the class she fights as) and her class's three weapons and types; a tap on one
-opens her page to pick another, and **Ascend 5** sends them up.
+**Promotion in one line, both tiers:** the Gallery's Ascend sheet lists the ready Umas by party, each pre-filled with
+her Suggested class (into Tier 2 the keeper of the class she fights as; into Tier 3 that class's Tier 3 child) and her
+class's three weapons and types; a tap on one opens her page to pick another, and **Ascend 5** sends them up.
 
 ## 2. Tier 1 as built
 
@@ -97,8 +105,9 @@ The baseline every later tier copies. All of it is live (engine v21, save v36) a
 - **Five continents a tier, ten levels each** ([maps](../../game/maps.md)): continent n spans lifetime Lv 10(n − 1) + 1 to
   10n; the tier is ⌈n ÷ 5⌉ (`chapterFor`). Tier 2's are `w6`–`w10`, Tier 3's `w11`–`w15`. D280 gave Tier 3 its fifth
   (the newest scenario), so every tier has five.
-- **A continent today:** 40 regions in ten rows of four, rows 1–5 its first five levels and rows 6–10 its last five;
-  12 stages a region (480 a continent); five Springs; a capital with three Finals routes at the band's Lv 10.
+- **A continent today** (the honeycomb, D295, live since save v38): 48 regions, 24 on the shore at its first five
+  levels and 24 inside at its last five; 12 stages a region (576 a continent); six Springs; a capital of capital runs at
+  the band's Lv 10 (capitals v2, D293, save v37).
 - **Leans repeat:** `CONTINENT_LEAN` has five entries read by (order − 1) mod 5, so `w6` and `w11` lean Forest as `w1`
   does. **Faces:** continents past 5 take the large pack on rows 1–5 and the middle pack on rows 6–10; the small pack
   appears only on continent 1.
@@ -207,8 +216,8 @@ test: six words at most).
 1. **A step must read progress:** a rank, a level, a grade, an open node, a won fight. A pick that swaps freely latches
    on one tap; a pick that must stay forces a build.
 2. **Class reads every class she holds,** best first; the code reads only the eight Tier 1 classes (`tier1Ranks`) in
-   every world, so Tier 2's sixteen need the read by tier.
-3. **Gear reads her active class's three weapons:** an expander's cross-channel slot is worn and counts; three accessory
+   every world, so Tier 2's twenty and Tier 3's twenty-two need the read by tier.
+3. **Gear reads her active class's three weapons:** a cross's other-channel slot is worn and counts; three accessory
    slots stay the "eleven". **Weapons reads any five kinds' grades,** whatever their type; a Dual's partner kind is not
    a second weapon.
 4. **Stars reads `body:n` ids:** a new body counts if its ids follow that pattern, and the whole-map count moves.
@@ -233,12 +242,12 @@ One Uma at a time, from the Gallery, once her window is full ([loops](../../game
 | **The new world gets** | 1,000 Laurels and 5 Speed Tickets an Uma (`ASCEND_PURSE`); her EXP banked past Lv 50 as Class Marks, one per 10, at most 2,000 (two Manuals) |
 | **Parties** | Five who ascend together move with their party's name; each other Uma takes the first free slot |
 
-### 2.7 Built dark, assumed live before Tier 2
+### 2.7 Live since round 2: capitals v2 and the honeycomb
 
 | Piece | What it changes for every tier | State |
 |---|---|---|
-| **Capitals v2** (D293, save v37) | A capital is runs of four full parties: four lanes of three generals, then four final bosses; 16 fights; her first run of a continent pays full (about 1.3 levels), later a quarter; **World n lights on a won run**, and the champions mask leaves the record (CA12) | H159 done; H160–H162 open |
-| **The honeycomb** (D295, save v38) | 48 regions a continent (24 on the shore at Lv 1–5, 24 inside at Lv 6–10), **24 parties**, six Springs, six run seats, the faces of who claimed and cleared each hex | H163–H166 open |
+| **Capitals v2** (D293, save v37) | A capital is runs of four full parties: four lanes of three generals, then four final bosses; 16 fights; her first run of a continent pays full (about 1.3 levels), later a quarter; **World n lights on a won run**, and the champions mask leaves the record (CA12) | Live (H162, D302) |
+| **The honeycomb** (D295, save v38) | 48 regions a continent (24 on the shore at Lv 1–5, 24 inside at Lv 6–10), **24 parties**, six Springs, six run seats, the faces of who claimed and cleared each hex | Live (H166, D307) |
 
 ## 3. The approved drafts, call by call
 
@@ -256,9 +265,9 @@ it. Calls owned by another doc in the set say which. This doc's own round-1 call
 | T3 | Banked EXP past Lv 50 → Class Marks, 1 per 10, at most 2,000 | **Kept** | Built (`bankedMarks`) |
 | T4 | Bonds reset; her old seat empties | **Kept** | Built |
 | T5 | A purse: 1,000 Laurels and 5 Speed Tickets an Uma | **Kept, changed** | Paid per Uma since Ascend went one at a time (D283); T2W10 makes its Laurels × the tier she arrives in |
-| T6 | Option A: a growing toolbox, one battle system | **Kept, changed** | The toolbox is round 2's (R2-1–R2-12): sixteen classes, weapon types, the accessory tree, stat picks, three professions, on Classes v3 (D240) |
+| T6 | Option A: a growing toolbox, one battle system | **Kept, changed** | The toolbox is rounds 2 and 3's (R2-1–R2-12, R3-1–R3-9): twenty Tier 2 and twenty-two Tier 3 classes, weapon types, the accessory tree, stat picks, three professions, on Classes v3 (D240) |
 | T7 | Simplify Tier 1 now, side skills kept until promotion | **Superseded** | Tier 1 was rebuilt (R1, R2), then Classes v3 (D240) reset every class |
-| T8 | Twelve advanced classes | **Superseded** | Classes v3 (D240), then round 2's sixteen Tier 2 classes (R2-2), [T2C](classes.md)'s |
+| T8 | Twelve advanced classes | **Superseded** | Classes v3 (D240), then round 3's twenty Tier 2 and twenty-two Tier 3 classes (R3-6), [T2C](classes.md)'s |
 | T9 | A partial Tier 3 opens four continents; its Rift waits for the fifth scenario | **Broken** | D280 gave Tier 3 its fifth continent, and the code ties a Rift to a tier above (`tierHasRift`, D284), not to five continents: **T2W4** |
 
 ### 3.2 tier2-world.md (Z1–Z10, archived)
@@ -305,7 +314,7 @@ it. Calls owned by another doc in the set say which. This doc's own round-1 call
 | CO9 | Locked outfits shown unlit | **Kept** | |
 | CO10 | One pure rule over her state | **Kept** | Read by tier from Tier 2 (T2W28) |
 | CO11 | The board: six tracks × five and the Rift, 31 | **Kept, changed** | D289: Weapons is a seventh track, 36; round 2 keeps 36 and re-reads Class, Craft and Stars (T2W24) |
-| CO12 | Class V: three Tier 1 classes at R50 | **Kept, changed** | From Tier 2, three Tier 2 classes at R50; Class IV a class and its sibling (T2W25) |
+| CO12 | Class V: three Tier 1 classes at R50 | **Kept, changed** | From Tier 2, three of the tier's classes at R50; Class IV two classes of one Tier 1 line (T2W42) |
 | CO13 | Gear: all eleven worn slots | **Kept** | Three accessory slots in every tier (D264), so eleven in every tier |
 | CO14 | World n: her party won the capital's three champions | **Superseded** | CA12 (D293): World n lights on a won capital run |
 | CO15 | Craft V at Lv 50 | **Kept, changed** | From Tier 2 her three Craft Levels together, 60 (T2W26); still her own work, the run's clock |
@@ -404,8 +413,8 @@ it. Calls owned by another doc in the set say which. This doc's own round-1 call
 | pacing.md | 7 | 3 | 4 | 0 | 0 |
 | **All** | **103** | **74** | **18** | **6** | **5** |
 
-Round 2 moved three rows from Kept to Kept, changed: CO12 (the Class track on the sixteen), CO15 (Craft on three
-professions) and pacing.md's Craft loop.
+Round 2 moved three rows from Kept to Kept, changed: CO12 (the Class track on the later tiers' classes), CO15 (Craft on
+three professions) and pacing.md's Craft loop. Round 3 moves none; it re-reads CO12's Class IV (T2W42).
 
 ## 4. Tier 2 in full
 
@@ -451,7 +460,7 @@ term, weaknesses, shields, party value).
 
 - **A fresh party meets a fresh build:** a Tier 2 Lv 1 foe has about 3.5 times Tier 1 Lv 1's HP, against her lifetime-51
   stats, G0 gear and an empty map, as tier2-world §5 measured (engine v13: all 40 opening stages won, 4.7 rounds against
-  Tier 1's 6.8). T2B re-measures on engine v21, with the sixteen classes.
+  Tier 1's 6.8). T2B re-measures on engine v21, with the twenty classes.
 - **Live already:** three weaknesses at every rank in Tiers 2 and 3, a regular's by her role (weaknesses v2, D235,
   `rpgWeakCounts`). **Not built yet** (T2B): the toolbox term (SB3–SB5), bosses' shields 9 in Tiers 2 and 3, sub-bosses 7, from Lv 1 (T2B7, gear T2G27; SB6's 10 retired, XR19; 8 in every tier
   today), skill MP ×1.7 (Z5; MP × tier today).
@@ -484,7 +493,7 @@ term, weaknesses, shields, party value).
 **R2-5 and R2-6, built on the live sheet.** The owner: "I want the new class to be selected on Tier 2 promotion" and
 "weapons … selected to their new weapon types on Tier 2 promotion". There is no Tier 0 above Tier 1 and no class can
 promote inside a Tier 2 world, so **the Ascend is the promotion** (R2-5): the sheet that sends her up is where she
-picks what she becomes.
+picks what she becomes. **Round 3 makes the Tier 3 Ascend a promotion on the same sheet** (R3-1, [§5.5](#55-the-tier-3-promotion-t2w37t2w41)).
 
 **T2W16: one sheet, two pages, every pick pre-filled.** The Gallery's Ascend sheet keeps its live shape (the ready
 Umas ticked, the lines, Ascend n) and gains, per Uma, a summary row of her picks and a second page to change them. The
@@ -493,15 +502,16 @@ defaults are complete, so a party of five, or a Rift's twenty, still ascends in 
 
 | # | Screen | What it shows | Taps with the defaults |
 |---|---|---|---|
-| 0 | **The Gallery** · Ready | Her full window with its ring and the green dot; "Ready to ascend · Opens 6" on her tile; **Ascend 5** in the head | 1 |
-| 1 | **Ascend to Tier 2** · who goes | The ready Umas **grouped by party**, each ticked; a row per Uma: her name, her picked Tier 2 class with "Suggested", her three weapons and types in one line, "Opens 6 of 16"; one who can't go says why ("At work · recall first"); a check line per whole party; the lines (where she lands, what restarts, the purse, Class Marks, "3 of 5 to fight in Tier 2"); **Ascend 5** | 0 |
-| 2 | **Her Tier 2** · her class | The classes open to her, two per Tier 1 class she has at R50, grouped by that class: each with its slots, its role in a few words (damage, a self-buff; damage on both channels; damage and support; a battle healer), a Healer chip; Suggested marked; the locked ones greyed, "Rank to 50 in Tier 1" | 1 to change |
+| 0 | **The Gallery** · Ready | Her full window with its ring and the green dot; "Ready to ascend · Opens 8" on her tile; **Ascend 5** in the head | 1 |
+| 1 | **Ascend to Tier 2** · who goes | The ready Umas **grouped by party**, each ticked; a row per Uma: her name, her picked Tier 2 class with "Suggested", her three weapons and types in one line, "Opens 8 of 20"; one who can't go says why ("At work · recall first"); a check line per whole party; the lines (where she lands, what restarts, the purse, Class Marks, "3 of 5 to fight in Tier 2"); **Ascend 5** | 0 |
+| 2 | **Her Tier 2** · her class | The classes open to her, **two or three per Tier 1 class she has at R50**, grouped by that class (the keeper first, then the cross or the support, then the pure variant): each with its slots, its rule in a few words, a Healer chip; Suggested marked; the locked Tier 1 classes greyed, "Rank to 50 in Tier 1"; a collapsed "Opens later" row for what her door adds (T2W34, T2W35) | 1 to change |
 | 3 | **Her Tier 2** · her weapons | Her picked class's three slots, each a weapon kind and its Tier 2 type (gear's names), Suggested pre-set; the kinds she covers; "Swap any time on Gear" | 0–3 |
 | 4 | **Her Tier 2** · her sub-profession | Her line's two professions (fixed by her calling) and the four other lines for her third, Suggested marked | 0–1 |
 | 5 | Back on who goes · **Ascend 5** | The tier veil, then Tier 2's Town Hall, as live | 1 |
 
 Pages 2–4 are one scrolling page per Uma ("Her Tier 2"), class first because her slots follow it. The
-[Ascend page](previews/progression-ascend.html) mocks each screen at 390 × 844 and plays a party of five through it.
+[Ascend page](previews/progression-ascend.html) mocks each screen at 390 × 844 and plays a party of five through it, into
+Tier 2 and into Tier 3.
 
 #### 4.4.1 Which Umas are ready
 
@@ -510,47 +520,68 @@ world-map fight open; not at work. The sheet adds two things the promotion needs
 
 - **Grouped by party** (T2W22): a party whose five are all ready shows as one group with its name ("Party 2 · all five
   ready"), since it moves into Tier 2 whole and keeps its name (live). Others list after it, one row each.
-- **"Opens 6 of 16"** (T2W17): how many Tier 2 classes she'd open, two for each Tier 1 class she has at R50. Class V
-  guarantees three (6 open); an Uma with all eight at R50 opens all sixteen. On her tile in the Gallery and her row on
-  the sheet, so a player who wants more choice ranks one more Tier 1 class before she goes. This line arrives with
-  Tier 2's switch; no Tier 1 rule changes (R2-1).
+- **"Opens 8 of 20"** (T2W33): how many Tier 2 classes she'd open, two or three for each Tier 1 class she has at R50.
+  On her tile in the Gallery and her row on the sheet, so a player who wants more choice ranks one more Tier 1 class
+  before she goes. This line arrives with Tier 2's switch; no Tier 1 rule changes (R2-1).
 
 #### 4.4.2 Her Tier 2 class
 
-**T2W17: what opens.** **Both children of every Tier 1 class she has at Class Rank 50 when she ascends:** 6 at least
-(Class V's three), up to 16. The sheet reads her ranks in the Tier 1 world before she leaves (she arrives at Class Rank 1
-everywhere), and the move writes **her open set** into the new world (T2C's field, assumed her Tier 1 parents, at most
-eight ids), so a later reset of her ranks can never shut a class. The set is **fixed for the tier:** no Tier 1 class
-fights in a Tier 2 world (assumed, as no Tier 0 fights in a later one, CV10), so there is no parent left to rank there.
-She **switches freely** among her open classes on her Class tab, each on its own Class Rank, as Tier 1's held classes
-work (R2-5); with XR1's shared ladder her Ranks 1–10 rise in all of them at once.
+**T2W33: what opens.** **Every child of every Tier 1 class she has at Class Rank 50 when she ascends** ([classes](classes.md)
+T2C76): two for the Brawler, the Sorcerer and the two healers, three for each hybrid. Class V's three at R50 open **6
+to 9**; all eight open **all twenty**. The sheet reads her ranks in the Tier 1 world before she leaves (she arrives at
+Class Rank 1 everywhere), and the move writes **her open set** into the new world (`open`, T2C95), so a later reset of
+her ranks can never shut a class. The set is **fixed for the tier but for the door** (T2C48): no Tier 1 class fights in
+a Tier 2 world, so there is no parent left to rank there. She **switches freely** among her open classes on her Class
+tab, each on its own Class Rank, as Tier 1's held classes work (R2-5); with XR1's shared ladder her Ranks 1–10 rise in
+all of them at once.
 
-**T2W18: what's Suggested.** **The keeper of the class she fights as** when it is at R50 (her party looks like its Tier
-1 self, the owner's first comp), else the keeper of her highest-ranked R50 class (ties: her family's, then the class
-tree's order). The expander is one tap away beside it. One healer a party is checked where a party fights (live
-`healerBlock`), never here; the sheet warns (T2W22).
+| Her Tier 1 class at R50 | Opens (classes T2C66; the line's role in a few words) | Cards | Healer |
+|---|---|---|---|
+| Brawler | **Berserker** (pure physical, Momentum) · **Spellfist** (single big hits, her Tome on ATK) | 2 | — |
+| Sorcerer | **Archmage** (pure magic, Momentum) · **Battlemage** (single big hits, her Arm on M.ATK) | 2 | — |
+| Arms Spellblade | **Blademaster** (familiar on both halves) · **Sentinel** (support, a ward) · **Bladedancer** (pure physical) | 3 | — |
+| Tome Spellblade | **Runeblade** · **Enchanter** (support) · **Spellweaver** (pure elemental) | 3 | — |
+| Arms Summoner | **Warlord** (both summons linger) · **Druid** (support, a mend) · **Marshal** (pure physical area) | 3 | — |
+| Tome Summoner | **Invoker** · **Shaman** (support) · **Animist** (pure elemental area) | 3 | — |
+| Paladin | **Guardian** (a stack more) · **Templar** (battle healer) | 2 | **Both** |
+| Cleric | **Bishop** · **Exorcist** | 2 | **Both** |
 
-| Her Tier 1 class at R50 | Opens (classes.md names them; R2-3, R2-4's shape) | Healer |
+| Tier 1 classes at R50 | Tier 2 classes open | Who |
 |---|---|---|
-| Brawler | Its keeper (pure physical, a self-buff) · its expander (Arms and Tomes, the Tomes on ATK) | — |
-| Sorcerer | Its keeper (pure magical, a self-buff) · its expander (Tomes and Arms, the Arms on M.ATK) | — |
-| Arms Spellblade · Tome Spellblade | Each its keeper (sharper damage) · its expander (damage and a little support) | — |
-| Arms Summoner · Tome Summoner | Each its keeper · its expander (support: wider buffs and debuffs, a ward or a small mend) | — |
-| Paladin · Cleric | Each its keeper (the healer, sharpened) · its expander (a battle healer: more damage, less healing) | **Both** |
+| 3 (Class V's minimum) | **6 to 9**: 6 with the Brawler, the Sorcerer and a healer, 9 with three hybrids | Most Umas |
+| 4 | 8 to 12 | One more ranked before she goes: "Opens 8 of 20" |
+| 8 | **20** | Every Tier 1 class at R50, about 190,000 Class EXP: a goal, never a step |
 
-A made-up Pace Uma who brought Arms Spellblade, Tome Spellblade and Paladin to R50 sees six cards in three pairs; she
-fought as the Arms Spellblade, so its keeper is Suggested.
+**T2W34: the class page.** Grouped by Tier 1 class, its two or three cards in one order (the keeper, then the cross or
+the support, then the pure variant), each card her slots as three channel dots (a cross's other-channel dot ringed),
+her rule in four words or fewer ("Momentum", "Single big hits", "Support · a ward", "Pure physical", "Battle healer"),
+a Healer or Support chip; Suggested marked. A made-up Pace Uma who brought the Arms Spellblade, the Tome Spellblade and
+the Paladin to R50 sees eight cards in three groups (3 + 3 + 2); she fought as the Arms Spellblade, so the
+Blademaster is Suggested.
+
+**T2W35: the doors, shown, never picked.** Under the open cards a collapsed **"Opens later"** row counts what her door
+would add (classes T2C48: a held Tier 2 class at Class Rank 20 opens every child of her parent's reclass neighbours,
+itself included); a tap lists them by door ("A Brawler child at R20: Blademaster, Sentinel, Bladedancer, Warlord,
+Druid, Marshal"). Never selectable on the sheet; the Class tab keeps the same row until each door opens. Tier 3's door
+(T2C90) shows the same way on the Tier 3 page.
+
+**T2W36: what's Suggested, in both later tiers.** **The child of the class she fights as**, when that class is at R50
+and of her family: into Tier 2 its **keeper**; into Tier 3 its **Tier 3 child** (the Spellfist's and the Battlemage's
+**kept child**, the Spellhammer and the Spellknight). Else the same child of **her family's first R50 class** in the
+class tree's order; else of her first R50 class in that order (a kin class is Suggested only when nothing of her family
+stands at R50). Her family is classes' T2C91 (Warrior and Mage 8 in Tier 2 and 9 in Tier 3, Spellblade and Summoner 6,
+Healer 4). The other cards are one tap away. One healer a party is checked where a party fights (live `healerBlock`),
+never here; the sheet warns (T2W22).
 
 #### 4.4.3 Her weapons and their types
 
 **T2W19: her class's preset, each weapon's type Suggested, set on the sheet.** The moment she picks a class, the
-weapons part fills with that class's three slots as its preset (D263's rule on the sixteen, T2C's presets) and each
-weapon's **Tier 2 type** as gear's Suggested (round 1's Pure or Dual and its partner, or what [gear.md](gear.md) makes of
-them, R2-6). A slot offers the kinds its channel allows, an expander's cross-channel slot included ("Tome · on ATK"); a
-type is a chip row under its weapon. The line under the slots counts what she covers ("Greatsword, Axe, Lance + Bow:
-4 kinds"). Later she swaps kinds and types on her Gear tab, freely or cheaply as gear sets ("weapons it's easier to
-swap around"); the sheet's pick is a start, never a lock. Round 1's "a weapon's G5 picks its branch" is superseded
-(R2-6): the type is hers from G0.
+weapons part fills with that class's three slots as its preset (classes T2C77) and each weapon's **Tier 2 type** as
+[gear](gear.md)'s Suggested (Pure or Dual and its partner, T2G51). A slot offers the kinds its channel allows: a cross's
+other-channel slot says so ("Tome · on ATK", "Arm · on M.ATK"), a pure variant's three slots are one channel ("Arm ·
+second half" on her third). A type is a chip row under its weapon. The line under the slots counts what she covers
+("Greatsword, Katana, Fire + Axe: 4 kinds"). Later she swaps kinds and types on her Gear tab, free (T2G22); the sheet's
+pick is a start, never a lock. Round 1's "a weapon's G5 picks its branch" is superseded (R2-6): the type is hers from G0.
 
 #### 4.4.4 Her sub-profession
 
@@ -564,23 +595,23 @@ rules it.
 
 **T2W21: picks are settings, set or confirmed on the sheet; progress restarts.** This replaces round 1's T2W8
 ("settings carry"), which had no picks to make. It reconciles the cross-reference's **XR5** (branches and forms carry):
-going up from Tier 1 there is nothing of Tier 2's to carry, so the sheet sets them; going up from Tier 2, what she had
-**pre-fills** the same pages.
+going up from Tier 1 there is nothing of Tier 2's to carry, so the sheet sets them; going up from Tier 2, her forms and
+picks carry as settings, and her class and weapons are picked again for her Tier 3 class.
 
 | Piece | Tier 1 → 2 | Tier 2 → 3 | Why |
 |---|---|---|---|
 | Her calling, her line, her template | Kept | Kept | Her racing profile's (live) |
 | Her lower tiers' full windows, her history | Kept | Kept | The account's (CO1) |
-| **Her class** | **Picked:** a Tier 2 class, Suggested the keeper of the class she fights as | **Picked:** her class in Tier 3, Suggested the one she fights as (T2W31) | R2-5 |
-| **The classes open to her** | Both children of every Tier 1 class at R50: 6–16, written to the new world | Her open set carries (assumed, T2W31) | T2W17 |
-| **Her weapons' kinds and types** | **Picked:** her class's preset, gear's Suggested types | **Picked**, pre-filled with hers | R2-6 |
+| **Her class** | **Picked:** a Tier 2 class, Suggested the keeper of the class she fights as (T2W36) | **Picked:** a Tier 3 class, Suggested the Tier 3 child of the class she fights as (T2W36, T2W37) | R2-5, R3-1 |
+| **The classes open to her** | Every child of every Tier 1 class at R50: 6–20, written to the new world (T2W33) | The Tier 3 children of every Tier 2 class at R50: 3–22, written to the new world (T2W38) | T2C76, T2C89 |
+| **Her weapons' kinds and types** | **Picked:** her class's preset, gear's Suggested Tier 2 types | **Picked:** her Tier 3 class's preset and Suggested Tier 3 types; "As in Tier 2" maps hers (T2W39) | R2-6, T2G57 |
 | Her accessory slots' families and kinds | Kept (live) | Kept | Live |
 | Her accessory forms (the tree, R2-7) | None yet: a Tier 1 slot has no tree | **Kept as settings:** each waits until its slot's grade reopens it | A form is a setting; its grade is progress |
 | Her Extra Stats picks (R2-8) | None yet | **Kept as settings:** a node's pick applies when its jewel reopens it | The same |
 | **Her sub-profession** | **Picked**, Suggested | Kept, changeable on the sheet | R2-9 |
 | Class Rank | 1 in every open class; Ranks 1–10 one shared ladder (XR1) | The same | Progress |
 | Level, grades, nodes, all three Craft Levels, Bonds, Hall seats | Restart: Lv 1, G0, an empty map, Craft Lv 1 in each, none | The same | Live rule |
-| Tree picks (lines, tips, her ★ tip), equipped skills | Defaults | Defaults | They follow Class Rank |
+| Tree picks (lines, tips, her ★ tip), equipped skills | Defaults | Defaults (two lines held: A and B, T2C80) | They follow Class Rank |
 | Her grades' made items · her set jewels | Back to the old Warehouse · gone | The same | Live rule |
 
 #### 4.4.6 The purse
@@ -595,21 +626,27 @@ Lv 50 as Class Marks, one per 10, at most 2,000. A party of five brings 10,000 L
 **T2W22: grouped by party, a check line, a reset.** A party whose five all go:
 - **Moves with its name** into Tier 2's first empty party (live), so its comp arrives as picked.
 - **Shows its check line** from the picks, refreshed as they change: "One healer · 10 of 10 kinds · damage 3 · support 1
-  · heal 1" (roles by T2B's party-value classes; kinds counted over the five's slots, types' partners included). Two
-  healer picks show the live words "One healer a party" in the warning colour; **a warning, never a block**, since the
-  game checks one healer where a party fights, and she may mean to split the party in Tier 2.
+  · heal 1". Two healer picks show the live words "One healer a party" in the warning colour; **a warning, never a
+  block**, since the game checks one healer where a party fights, and she may mean to split the party in Tier 2.
 - **"Suggested for all"** resets every pick of the group to its Suggested (each keeper, each preset), one tap.
 
-The owner's comps (R2-12) start here: Tier 1's look comes free (all keepers); swapping the Brawler and the Sorcerer for
-their expanders, or the Paladin for its battle healer with a Spellblade's expander to support, is two taps a member,
-and the check line shows the party's breadth before it goes.
+**T2W44: the check line's roles on the forty-two.** **Damage:** the keepers, the crosses and the pure variants, and every
+Tier 3 class of those lines; **support:** the Sentinel, Enchanter, Druid and Shaman and their Tier 3 children (Herald,
+Oracle, Archdruid, Soulcaller); **heal:** the four healer classes of each tier. Kinds count her three slots and every
+two-kind weapon's partner (the Gladiator's and the Thaumaturge's two), so "10 of 10 kinds" reads what the party answers
+with.
+
+The owner's comps (R2-12, R3-7) start here: Tier 1's look comes free (all keepers); **his two swaps** are two taps a
+member: a Brawler with a Spellblade (the Brawler to her Spellfist, the Arms Spellblade to her Bladedancer: C3), a
+Spellblade with the Paladin (the Arms Spellblade to her Sentinel, the Paladin to her Templar: C4); the check line shows
+the party's breadth before it goes.
 
 #### 4.4.8 Umas already in a Tier 2 world
 
 **T2W23: at Tier 2's switch, each Uma already there becomes the keeper of her class.** Before round 2 is built, an Uma
 who ascends arrives as her Tier 1 class (live) and plays Tier 1's eight × tier. When the Tier 2 toolbox switches on:
-- She **opens both children of the class she fights as and of every Tier 1 class she has at R50 in that world** (her
-  Tier 1 ranks are gone; the Tier 2 world's are the only record).
+- She **opens every child of the class she fights as and of every Tier 1 class she has at R50 in that world** (two or
+  three each; her Tier 1 ranks are gone, the Tier 2 world's are the only record).
 - She **becomes her class's keeper at that class's Class Rank** (identity kept, nothing lost); every other open class
   stands at Rank 1, or at the shared ladder's rank.
 - Her weapons keep their kinds with gear's Suggested types; her sub-profession is Suggested.
@@ -619,8 +656,9 @@ who ascends arrives as her Tier 1 class (live) and plays Tier 1's eight × tier.
 #### 4.4.9 What the sheet writes
 
 Per Uma, into the new world, in the save that ships Tier 2's toolbox (T2W15): her open set and her class (T2C's
-fields), her class's three weapons and their types (T2G's), her sub-profession (T2P's). The sheet's own state is never
-stored: Suggested is derived each time. Windows add nothing (T2W28).
+fields), her class's three weapons and their types (T2G's), her sub-profession (T2P's). Into Tier 3 the same fields,
+read on Tier 3's classes. The sheet's own state is never stored: Suggested is derived each time. Windows add nothing
+(T2W28).
 
 ### 4.5 Content: the Campaign, capital runs, Drills, Trials, the Rift
 
@@ -632,22 +670,23 @@ stored: Suggested is derived each time. Windows add nothing (T2W28).
 | **Trials** (T2W6) | Each front at T2 Lv 45 · 50 · 55 (lifetime 95 · 100 · 100 at ×1.22); Class EXP 652 · 1,300 · 1,300 a win | With the Rift: five T2 Lv 50 Umas |
 | **The Rift** (T2W5, T2W30) | Four fronts at T2 Lv 50 on the tier's budget, the Convergence; Tier 2's own seals and Rift Conquered · Tier 2 (live ids); **one added test a front** | Five T2 Lv 50 Umas; twenty sign up |
 
-**T2W5 and T2W30: the fronts' added tests, aimed at round 2's tools.** Z9's tests stand; what each asks of the toolbox
-is now the sixteen classes', the weapon types', the stat picks' and the accessory tree's. Each tier's numbers are T2B's,
+**T2W5 and T2W30: the fronts' added tests, aimed at the later tiers' tools.** Z9's tests stand; what each asks of the
+toolbox is now the twenty classes' (twenty-two in Tier 3), the weapon types', the stat picks' and the accessory tree's. Each tier's numbers are T2B's,
 against rift.md §11's targets (the right party ≥ 80% a stage and 60–70% a champion, the wrong one ≤ 30% and ≤ 10%, the
 Convergence about 50%).
 
 | Front (guided by family, CV23) | Its added test in Tier 2 | What it asks of round 2's toolbox |
 |---|---|---|
-| **Iron** (the Warrior side) | Shields 2 over Tier 1's; foes weak to one or two Arms | Pure types' weak hits (T2G), Break tips (T2C), the Brawler keeper's self-buff |
-| **Arcane** (the Mage side) | One element a foe: a stage's leaders weak to one, its guards to another | A Dual type's partner (T2G), a damage-kind pick on a moon (T2E), the Sorcerer's expander's Arms on M.ATK |
-| **Duel** (the Spellblades) | Her boss acts three times from stage 9 | Single-target burst: keepers, Pure types, single-target picks (T2E) |
-| **Horde** (the Summoners) | Five to seven foes a wave | Area and multi-hit picks (T2E, R2-8), sweeps and volleys, the support expanders' wider debuffs |
+| **Iron** (the Warrior side) | Shields 2 over Tier 1's; foes weak to one or two Arms | Pure types' weak hits (T2G), Break tips (T2C), Momentum; in Tier 3 the Gladiator's Arsenal |
+| **Arcane** (the Mage side) | One element a foe: a stage's leaders weak to one, its guards to another | A Dual type's partner (T2G), a kind row on Prowess (T2E), the Battlemage's Katana on M.ATK; in Tier 3 the Thaumaturge's Arsenal |
+| **Duel** (the Spellblades) | Her boss acts three times from stage 9 | Single-target burst: the Spellfist's and Battlemage's Pinpoint, the familiar's Pierce, Pure types, single-target picks (T2E) |
+| **Horde** (the Summoners) | Five to seven foes a wave | Area and multi-hit picks (T2E, R2-8), sweeps and volleys, the Marshal's and Animist's area, the supports' wider debuffs |
 
-- **The guidance names the Tier 1 class, and either child fits** (T2W30): Iron still suggests two Brawlers, an Arms
-  Spellblade, an Arms Summoner and a Paladin, now read as "a Brawler's child" and so on; a member fits a guided class if
-  she holds either of its children, the keeper Suggested in **Use the guided weapons**. So a run's twenty need no
-  particular expander, and any of the owner's comps can fit a front.
+- **The guidance names the Tier 1 class, and any of its line fits** (T2W30, T2W45): Iron still suggests two Brawlers,
+  an Arms Spellblade, an Arms Summoner and a Paladin, now read as "a Brawler's child" (in Tier 3 "of the Brawler's
+  line") and so on; a member fits a guided class if she holds any of its Tier 2 children, or in Tier 3 any of its Tier 3
+  descendants, the Suggested one (T2W36) in **Use the guided weapons**. So a run's twenty need no particular child, and
+  any of the owner's comps can fit a front.
 - **The faces:** the cross-pack picker prefers faces the account hasn't defeated; the Bestiary counts every tier.
 
 ### 4.6 Her window in Tier 2
@@ -664,7 +703,7 @@ new system lands where its progress already lives.
 | Track | I | II | III | IV | V | Round 2 |
 |---|---|---|---|---|---|---|
 | **Level** | T2 Lv 10 | 20 | 30 | 40 | 50 | — |
-| **Class** | A Tier 2 class at R10 | One at R30 | One at R50 | **A Tier 2 class and its sibling at R50** | **Three Tier 2 classes at R50** | The sixteen; IV the owner's swap (T2W25) |
+| **Class** | A Tier 2 class at R10 | One at R30 | One at R50 | **Two Tier 2 classes of one Tier 1 line at R50** (a class and her sibling) | **Three Tier 2 classes at R50** | The twenty; IV the owner's swap (T2W25, T2W42) |
 | **Craft** | **Her three Craft Levels add up to 12** | 24 | 36 | 48 | **60** | Three professions (T2W26) |
 | **Gear** | All eleven worn slots at G2 | G4 | G6 | G8 | G10 | The accessory tree's forms open with these grades |
 | **Weapons** | Five weapons at G2 | G4 | G6 | G8 | G10 | Any of her classes', any type |
@@ -681,29 +720,37 @@ track counts open nodes only, never which stat a node holds (T2E43).
 
 | System (round 2) | Its progress | Its choices | On the board |
 |---|---|---|---|
-| **Sixteen classes** (R2-2–R2-5) | Class Rank on each class she holds | Which she fights as; keeper or expander | **Class I–V** read her ranks over every Tier 2 class she holds; **IV asks for a class and its sibling** |
+| **Twenty classes** (R2-2–R2-5, R3-4) | Class Rank on each class she holds | Which she fights as; keeper, cross, support or pure | **Class I–V** read her ranks over every Tier 2 class she holds; **IV asks for two of one Tier 1 line** |
 | **Weapon types** (R2-6) | Each weapon kind's grade | Pure or Dual, the partner | **Weapons I–V** (five kinds, any type) and **Gear I–V** (her active class's three) |
-| **The accessory tree** (R2-7) | Each slot's grade; forms open as it rises | Which form she wears | **Gear I–V** (every slot's grade); Gear V means every tree open, if gear finishes its tree by G10 (assumed) |
+| **The accessory tree** (R2-7) | Each slot's grade; forms open as it rises | Which form she wears | **Gear I–V** (every slot's grade); every tree is whole by a slot's G5 (gear T2G30), so Gear III on means every tree open |
 | **Extra Stats picks** (R2-8) | Nodes opened by jewels | The stat each node takes | **Stars I–V** (open nodes) |
 | **Three professions** (R2-9) | Three Craft Levels | Her sub-profession; where she works | **Craft I–V** (their sum) |
 | **Capital runs** (D293) | A won run a continent | Which lane | **World I–V** |
 | **The Rift** | A won run | — | **Rift** |
 
-#### 4.6.3 Class: a class and its sibling
+#### 4.6.3 Class: two classes of one Tier 1 line
 
-**T2W25: Class I–III read her best Tier 2 class at R10 · R30 · R50; IV asks for a Tier 2 class and its sibling at R50
-(both children of one Tier 1 class); V three Tier 2 classes at R50, any.** The owner's "for balance I will swap back
-and forth between each one" becomes the one step that names the pair, and it names no particular pair: any of her open
-parents' keeper and expander will do.
+**T2W25, as T2W42 reads it: Class I–III read her best Tier 2 class at R10 · R30 · R50; IV asks for two Tier 2 classes of
+one Tier 1 line at R50 (a class and her sibling: two children of one Tier 1 class); V three Tier 2 classes at R50, any.**
+The owner's "for balance I will swap back and forth between each one" becomes the one step that names the pair, and it
+names no particular pair: any two of an open Tier 1 class's two or three children will do (a Brawler's Berserker and
+Spellfist, an Arms Spellblade's Blademaster and Bladedancer, a Paladin's Guardian and Templar).
+
+| Her Tier 1 line | Its Tier 2 classes | Pairs that light IV |
+|---|---|---|
+| Brawler · Sorcerer · Paladin · Cleric | Two each | One (the keeper and the cross, or the two healers) |
+| Arms Spellblade · Tome Spellblade · Arms Summoner · Tome Summoner | Three each | Three (keeper and support, keeper and pure, support and pure) |
 
 - **The pace is Tier 1's:** her campaign's Class EXP (about 51,000) covers one class from Rank 1 (3,600 + 23,680) and a
   second from Rank 10 (23,680, the shared ladder having raised it), so IV lights near T2 Lv 50 as Tier 1's two-at-R50
   does; V takes 20 Trial wins at Lv 50 (40 at Lv 45), or 24 Manuals.
-- **It forces no build for long:** an Uma who never wants her expander in a fight can rank it with Manuals or a
-  half-campaign, and R2-11's party-value band keeps every expander a fair party member (T2B). The alternative (IV "two
-  Tier 2 classes at R50, any") is the seam if the owner would rather the board not nudge the swap.
-- **Labels:** the tile "Pair at R50", next "Pair R41/50" (the lower rank of her best pair); the rule line "A Tier 2 class
-  and its sibling at Class Rank 50".
+- **It forces no build for long:** an Uma who never wants her sibling in a fight can rank her with Manuals or a
+  half-campaign, and R2-11's party-value band keeps every Tier 2 class a fair party member (T2B). The alternative (IV
+  "two Tier 2 classes at R50, any") is the seam if the owner would rather the board not nudge the swap.
+- **Why "one Tier 1 line" and not "a sibling"** (T2W42): it says the same thing in Tier 2 and keeps saying it in Tier 3,
+  where a Tier 3 class has a sibling only on the Spellfist's and the Battlemage's lines (§5.4).
+- **Labels:** the tile "Pair at R50", next "Pair R41/50" (the lower rank of her best pair); the rule line "Two classes of
+  one Tier 1 line at Class Rank 50".
 
 #### 4.6.4 Craft: three professions together
 
@@ -738,11 +785,11 @@ pick (it is state), but:
 |---|---|---|
 | A free pick ("wear a Dual", "set a life-steal stat") | Latches on one tap, then she swaps back: a tutorial, not an achievement (CO2) | No |
 | A held pick ("five Dual weapons at G10", "every node on AoE") | Forces a build for weeks, the owner's fear ("too extreme variants") | No |
-| A specific class ("the Brawler's expander at R50") | Forces one class on every Brawler-family Uma | No |
-| Breadth any option meets ("a class and its sibling", "three classes", "five weapons", "her three Crafts to 60") | Rewards the system's width with no build named | **Yes** |
+| A specific class ("the Spellfist at R50") | Forces one class on every Brawler-family Uma | No |
+| Breadth any option meets ("two of one line", "three classes", "five weapons", "her three Crafts to 60") | Rewards the system's width with no build named | **Yes** |
 
 The window's art knows only the count, so reading a choice would gain nothing on the glass either. If the owner wants
-a choice celebrated (her first expander fight, every type tried), that is CO30's medal phase: a ring on the window that
+a choice celebrated (her first fight as a cross, every type tried), that is CO30's medal phase: a ring on the window that
 gates nothing.
 
 #### 4.6.6 Pacing by track
@@ -775,7 +822,7 @@ make twenty full windows in 31.8, where the Rift binds again at 33.5. The fighti
 |---|---|---|
 | **The record** | Nothing. Tier 2's and 3's steps keep the live ids (`class-4`, `craft-1` …) and positions; each id's rule is the tier's | 36 codes × 3 characters in every tier; no widening, no migration. Steps lit in a Tier 2 world before its toolbox (Tier 1's rules × tier) stay lit (CO2) |
 | **The champions mask** | Leaves with capitals v2 (v37, CA12) | — |
-| **The rules** (`rpg/windows.ts`, `save/windows.ts`) | From Tier 2's switch: Class reads the tier's own classes (the sixteen, not `tier1Ranks`), IV pairs by T2C's sibling map, Craft the sum of T2P's three Craft Levels, Stars every body's `body:n`; `windowNext` gains "Pair R41/50" and "Crafts 29/36" | One pure rule, after every change and at load (CO10); latching; the toast |
+| **The rules** (`rpg/windows.ts`, `save/windows.ts`) | From Tier 2's switch: Class reads the tier's own classes (the twenty, then the twenty-two, not `tier1Ranks`), IV pairs by each class's Tier 1 ancestor (T2C95's `parent` chain), Craft the sum of T2P's three Craft Levels, Stars every body's `body:n`; `windowNext` gains "Pair R41/50" and "Crafts 29/36" | One pure rule, after every change and at load (CO10); latching; the toast |
 | **The art** | Nothing | 36 steps: 7.14 of the map's 250 values a step, the face with the 36th; the tier frames exist; **the pane map never knows which step lit** |
 | **The copy** | Tiles "Pair at R50", "Crafts 36"; toasts "Window +1 · Crafts 36" | Six words at most a string (CO34) |
 
@@ -788,17 +835,17 @@ round 2's, as [§6](#6-provides-and-assumes) assumes them.
 
 | Addition | Doc | Gate | First cohort, day (80%) | Her level then |
 |---|---|---|---|---|
-| **Her Tier 2 class**, her open set (6–16), switching | T2C | **The Ascend sheet** (T2W16–T2W18) | 0 | Lv 1 |
+| **Her Tier 2 class**, her open set (6–20), switching | T2C | **The Ascend sheet** (T2W16, T2W33–T2W36) | 0 | Lv 1 |
 | **Her weapons' types** | T2G | **The Ascend sheet** (T2W19); swaps on her Gear tab | 0 | Lv 1 |
 | **Her line's two professions and her sub-profession** | T2P | **The Ascend sheet** (T2W20); Craft Lv 1 in each | 0 | — |
 | Three weaknesses at every rank (live, D235); the toolbox term rising to Lv 50; party value (R2-11) | T2B | Tier 2's foes | 0 | Lv 1 |
 | Skill MP ×1.7; the healing scale ÷ 540 | T2C, T2B | Every Tier 2 skill | 0 | Lv 1 |
 | Ranks 1–10, one shared ladder (XR1): every open class at R10 together | T2C | Class EXP 3,600 | 0–1 | Lv ~10 |
-| Her class's own kit by depth (the keeper's self-buff, the expander's cross channel, support or battle healing) | T2C | Class Rank 1 · 10 · 20 · 30 · 40 (XR1: Uma Lv 1 · 10 · 16 · 22 · 29) | 0 → 1.9 | Lv 1 → 29 |
+| Her class's own rule and kit by depth (Momentum, the cross and Pinpoint, the pure pair, the keepers' twists, support, battle healing) | T2C | Class Rank 1 · 10 · 20 · 30 · 40 (XR1: Uma Lv 1 · 10 · 16 · 22 · 29) | 0 → 1.9 | Lv 1 → 29 |
 | ★ Signature tip on her lead weapon's tree | T2U | Its tip fork, depth 5 (CR 40) | 1.9 | Lv 29 |
-| **Accessory forms** | T2G | A slot's grade as it rises (assumed: the tree complete by G10) | 2.0 → 22.1 (2.6 → 27.7) | Lv 6 → 46 |
+| **Accessory forms** | T2G | A slot's grade: the first ring with her first Tier 2 grade, the second at G5 (gear T2G30) | 2.0 → 8.8 (2.6 → 11.0) | Lv 6 → 21 |
 | **A stat pick on each node** | T2E | Each node as its jewel opens it | 2.5 → 22.6 | Lv 6 → 46 |
-| Her second class at R50 (Class IV's sibling) | T2C | Class EXP past her first R50 | 8.8 | Lv 50 |
+| A second class of her Tier 1 line at R50 (Class IV) | T2C | Class EXP past her first R50 | 8.8 | Lv 50 |
 | LB+ at Bond 10 | T2C | Bond 10 in a hall | With Bonds, not days | — |
 | Ten equipped skills | T2C | Uma Level (one more at Lv 10, 15 … 40, T2C16) | 6.4 | Lv 40 |
 
@@ -807,7 +854,7 @@ round 2's, as [§6](#6-provides-and-assumes) assumes them.
 **A model, not a measurement.** A first cohort of twenty arrives together (four parties of the release's mix, all
 keepers by default); the Wilds work nonstop; the fighting party is served first; its fights climb two bands a day while
 gear allows and its Lv 41–50 bosses wait for G5 (tier2-world §11's measurement on engine v13: G3 won 15% of T2 Lv 50
-bosses, G5 90%; T2B re-measures on the sixteen); the Rift's fronts start when G8 opens and take 2–3 weeks of the
+bosses, G5 90%; T2B re-measures on the twenty); the Rift's fronts start when G8 opens and take 2–3 weeks of the
 owner's play (rift.md §11). Her window: Level IV and V wait for G4 and G5; a Stars step lands half a day after its grade
 opens, a Gear step a day (the party's kit is 5 hours of the slots a grade), a Weapons step after its Gear step, Weapons
 V three days after G10; Craft by T2W26's sum, shown as the even split and a specialist. The
@@ -824,7 +871,7 @@ V three days after G10; Craft by T2W26's sum, shown as the even split and a spec
 | **5** | Class Rank 50 on her first class (Lv 36) | | Class III: **13** |
 | **6.4** | Lv 40 (`w9`), capital run 4 | G4 opens (6.4 [8.0]) | Level IV, World IV: **15** |
 | **7.5** | | Stars II, Gear II, Weapons II | **18** |
-| **9** | Lv 50 (`w10`), capital run 5; her class's sibling at R50; five Lv 50 Umas: the Rift and Trials open | G5 (8.8 [11.0]); Crafts 24 (8.7–9.3 [10.8–11.6]) | Level V, World V, Class IV, Craft II: **22** |
+| **9** | Lv 50 (`w10`), capital run 5; a second class of her line at R50; five Lv 50 Umas: the Rift and Trials open | G5 (8.8 [11.0]); Crafts 24 (8.7–9.3 [10.8–11.6]) | Level V, World V, Class IV, Craft II: **22** |
 | **10.8** | Twenty Trial wins at T2 Lv 50: a third class to R50 | | Class V: **23** |
 | **12** | Four parties at Lv 50: twenty sign up for the Rift | G6 (11.3 [14.1]): Stars III, Gear III, Weapons III | **26** |
 | **14.5** | | Crafts 36 (13.9–15.4 [17.4–19.3]) | Craft III: **27** |
@@ -840,7 +887,7 @@ V three days after G10; Craft by T2W26's sum, shown as the even split and a spec
   third class 20 Trials. Everything else is the Wilds.
 - **Later cohorts go faster:** they arrive in a world whose crafters already make G10, so their gear waits on the slots,
   not on Craft; their own Crafts 60 (24.9–27.8 days) stay the floor.
-- **The promotion takes a minute:** a party's five on the sheet with defaults is one tap; picking an expander and its
+- **The promotion takes a minute:** a party's five on the sheet with defaults is one tap; picking another child and its
   types is three or four.
 
 ### 4.9 Ready to ascend
@@ -900,34 +947,132 @@ Tier 2's four added tests (T2W5, T2W30) at T2B's Tier 3 numbers.
 
 ### 5.3 The toolbox
 
-Tier 3's additions, assumed from round 2's direction ("Tier 3 deepens what Tier 2 opens", R2-1); each opens on its
-system's own gate (T2W11).
+Tier 3's additions, round 3's shapes ([classes](classes.md) §6, [gear](gear.md) §5, [extra stats](extra-stats.md) T2E44);
+each opens on its system's own gate (T2W11). Days are a first cohort's, nonstop, on Tier 2's run model (§4.8): Tier 3
+restarts every gate at Lv 1, so its toolbox lands on the same days.
 
-| Addition (assumed) | Doc | Gate |
+| Addition | Doc | Gate | First cohort, day (80%) | Her level then |
+|---|---|---|---|---|
+| **Her Tier 3 class**, her open set (3–22), switching | T2C | **The Ascend sheet** (T2W37, T2W38) | 0 | Lv 1 |
+| **Her class's Tier 3 rule** (Juggernaut, Resonance, Pinpoint doubled, Arsenal, Spellbind, Menagerie, the supports' twists, Momentum, Overflow, power ×0.7) | T2C | **From Class Rank 1** (T2C78): felt in her first fight | 0 | Lv 1 |
+| **Her weapons' Tier 3 types** (Keen, Tempered, Evolved; Arsenal's two two-kind weapons) | T2G | **The Ascend sheet** (T2W39, gear T2G57); swaps on her Gear tab | 0 | Lv 1 |
+| Tier 3's term (T2B36), skill MP ×2.4, shields 7 · 9 (XR19) | T2B, T2C | Tier 3's foes and skills | 0 | Lv 1 |
+| Ranks 1–10, one shared ladder (XR1) | T2C | Class EXP 3,600 | 0–1 | Lv ~10 |
+| **The Tier 3 door** (T2C90) and **two lines held** (T2C80) | T2C | Class Rank 20 (the fork) | 1 | Lv 16 |
+| The ★ tip on both held lines of her lead tree (T2U13) | T2U | Depth 5, Class Rank 40 | 1.9 | Lv 29 |
+| **The crown** (every held capstone 5.6, +4 MP, a stack more; MP back's sixth step) | T2C | **Class Rank 50** (T2C79) | 5.0 | Lv 36 |
+| The accessory tree's step on every rider | T2G | A slot's first Tier 3 grade | 2.0 (2.6) | Lv 6 |
+| The tree's third ring (Vow, Limit Orb, Apex) | T2G | A slot's G5 | 8.8 (11.0) | Lv 21 |
+| Prowess's Trio and the stat lists' Tier 3 entries | T2E | Each node as its jewel opens it | 2.5 → 22.6 | Lv 6 → 46 |
+| A second Tier 3 class of her line at R50 (Class IV) | T2C | Class EXP past her first R50 | 8.8 | Lv 50 |
+| Three professions, as Tier 2's | T2P | Nothing new | — | — |
+
+### 5.4 Her window (T2W43)
+
+**T2W43: Tier 2's board at Tier 3's numbers, 36 with its Rift; the Class track on Tier 3's twenty-two.** Craft her
+three Craft Levels to 12 · 24 · 36 · 48 · 60; Gear and Weapons G2 … G10; Stars the Tier 3 map by the same rule (22
+nodes, T2E27); World continents 11–15, a won capital run each; the Rift step on a won Tier 3 run (T2W4). No new
+position, no rebake (T2W28).
+
+**The Class track by tier** (T2W42, T2W43; the live Tier 1 board for comparison):
+
+| Step | Tier 1 (live) | Tier 2 | Tier 3 |
+|---|---|---|---|
+| **Class I** | A Tier 0 class at R10 | A Tier 2 class at R10 | A Tier 3 class at R10 |
+| **Class II** | A Tier 1 class at R30 | A Tier 2 class at R30 | A Tier 3 class at R30 |
+| **Class III** | A Tier 1 class at R50 | A Tier 2 class at R50 | A Tier 3 class at R50: **her first crown** (T2C79) |
+| **Class IV** | Two Tier 1 classes at R50 | **Two Tier 2 classes of one Tier 1 line** at R50: a class and her sibling | **Two Tier 3 classes of one Tier 1 line** at R50 |
+| **Class V** | Three Tier 1 classes at R50 | Three Tier 2 classes at R50 | Three Tier 3 classes at R50 |
+| Read over | `tier1Ranks` (the eight) | Her Tier 2 classes, best first | Her Tier 3 classes, best first |
+
+- **Class IV's "sibling" in Tier 3 reads as a class of the same Tier 1 line** (classes §6.6): a Tier 3 class has a true
+  sibling only on the Spellfist's and the Battlemage's lines, so IV asks for two of one line's Tier 3 classes: three a
+  line for the Brawler, the Sorcerer and each hybrid (the Ravager, the Spellhammer and the Gladiator; the Bladelord, the
+  Herald and the Dervish), two for each healer (the Bastion and the Inquisitor).
+- **IV is reachable from her first day in Tier 3:** Tier 2's Class IV left two classes of one Tier 1 line at R50, so their
+  Tier 3 children are both open on arrival (T2W38), and both are of that line. Her door at Class Rank 20 opens the rest
+  of the line.
+- **Class III is her first crown,** as T2W29 assumed "if classes keeps it there" (it does, T2C79): the tile reads "R50",
+  the rule line "A Tier 3 class at Class Rank 50 · crowned".
+- **The pace is Tier 2's:** the same Class EXP, the same shared ladder; IV near T3 Lv 50, V on 20 Trial wins (Tier 3's
+  Trials open with its Rift, T2W4) or 24 Manuals.
+
+### 5.5 The Tier 3 promotion (T2W37–T2W41)
+
+**R3-1: "there always should be an actual class promotion and a new name."** The Tier 3 Ascend becomes a promotion on
+the same sheet as Tier 2's (T2W16), with Tier 3's options; it replaces round 2's T2W31, which assumed her open set would
+simply carry.
+
+**T2W37: the Tier 2 sheet's two pages, with Tier 3's options; every pick pre-filled, a party in one tap.**
+
+| # | Screen | What it shows | Taps with the defaults |
+|---|---|---|---|
+| 0 | **The Gallery** · Ready | Her full Tier 2 window in its amber frame, the green dot; "Ready to ascend · Opens 4" on her tile; **Ascend 5** | 1 |
+| 1 | **Ascend to Tier 3** · who goes | The ready Umas by party, ticked; per Uma her picked **Tier 3 class** with "Suggested", her weapons and Tier 3 types in one line, "Opens 4 of 22"; a check line per whole party (T2W44); the lines ("Lv 1 in Tier 3", "Ranks, grades, stars and Crafts restart", "+15,000 Laurels · +25 Speed Tickets", Class Marks) | 0 |
+| 2 | **Her Tier 3** · her class | The Tier 3 classes open to her, **grouped by the Tier 2 class at R50 they promote from** ("From the Spellfist · R50"), one card each and two for the Spellfist and the Battlemage: her rule in four words ("Juggernaut", "Pinpoint doubled", "Arsenal", "Overflow"), her slots, a Healer chip; Suggested marked; locked Tier 2 classes greyed, "Rank to 50 in Tier 2"; "Opens later" for the Tier 3 door (T2W35) | 1 to change |
+| 3 | **Her Tier 3** · her weapons | Her Tier 3 class's preset, each weapon's **Tier 3 type** (Keen, Tempered + its partner, Evolved + its partner) gear's Suggested; the Gladiator's and the Thaumaturge's two two-kind rows ("Arsenal · two two-kind weapons"); an **"As in Tier 2"** chip (T2W39) | 0–3 |
+| 4 | **Her Tier 3** · her professions | Her line's two and her sub-profession as she had them; the sub changeable | 0 |
+| 5 | **Ascend 5** | The tier veil, then Tier 3's Town Hall | 1 |
+
+**T2W38: what opens.** **The Tier 3 children of every Tier 2 class she holds at Class Rank 50 when she ascends**
+([classes](classes.md) T2C89): one each, two for the Spellfist and the Battlemage. The sheet reads her Tier 2 world's
+Class Ranks before she leaves and writes the set into Tier 3's world (`open`), fixed for the tier but for the Tier 3
+door (T2C90: a held Tier 3 class at Class Rank 20 opens every Tier 3 class of her Tier 1 line and of its reclass
+neighbours' lines).
+
+| Her Tier 2 class at R50 | Opens in Tier 3 | Her Tier 2 class at R50 | Opens in Tier 3 |
+|---|---|---|---|
+| Berserker | Ravager | Spellfist | **Spellhammer** (kept) · Gladiator |
+| Archmage | Astromancer | Battlemage | **Spellknight** (kept) · Thaumaturge |
+| Blademaster · Sentinel · Bladedancer | Bladelord · Herald · Dervish | Runeblade · Enchanter · Spellweaver | Runelord · Oracle · Starweaver |
+| Warlord · Druid · Marshal | Overlord · Archdruid · Imperator | Invoker · Shaman · Animist | Hierarch · Soulcaller · Mythlord |
+| Guardian · Templar | Bastion · Inquisitor | Bishop · Exorcist | Cardinal · Hierophant |
+
+| Tier 2 classes at R50 | Tier 3 classes open | Who |
 |---|---|---|
-| The sixteen classes deepened: two lines held a tree, the crown (every held capstone at 5.6) and her family's mastery at Class Rank 50; no new promotion | T2C | Class Rank 50 |
-| Weapon types' Tier 3 step, if gear gives one | T2G | Gear's |
-| The accessory tree's deeper forms | T2G | A slot's grade |
-| The stat lists' Tier 3 entries | T2E | A node's jewel |
-| Three professions, as Tier 2's | T2P | Nothing new |
-| The ★ tip on both held lines of her lead tree (T2U13) | T2U | Depth 5, Class Rank 40 |
-| Tier 3's term (T2B36: HP and DEF ×1.10 → ×1.12 by Lv 35, ×1.26 from Lv 40 for the crowns; offense +10%, bosses ×1.1); bosses' shields 9 (XR19); skill MP ×2.4 | T2B, T2C | Tier 3's foes and skills |
+| 3 (Tier 2's Class V) | **3 to 5**: 4 with a Spellfist or a Battlemage among them, 5 with both | Most Umas |
+| 4 | 4 to 6 | One more ranked before she goes |
+| 20 | **22** | Every Tier 2 class at R50: a goal, never a step |
 
-### 5.4 Her window (T2W29)
+A made-up Front Uma who brought the Berserker, the Spellfist and the Bladedancer to R50 in Tier 2 (Class IV her
+Berserker and Spellfist) sees four cards: the Ravager; the Spellhammer and the Gladiator; the Dervish. She fought as the
+Spellfist, so the **Spellhammer** is Suggested (T2W36); the Gladiator is one tap beside it.
 
-**T2W29: Tier 2's board at Tier 3's numbers, 36 with its Rift.** Class I–V on Tier 3's classes (the sixteen, assumed):
-R10 · R30 · R50 (in Tier 3 also her crown and mastery, if classes keeps them at R50) · a class and its sibling at R50 ·
-three at R50. Craft her three Craft Levels to 12 · 24 · 36 · 48 · 60. Gear and Weapons G2 … G10. Stars the Tier 3 map
-by the same rule (22 nodes, T2E27). World continents 11–15, a won capital
-run each. The Rift step on a won Tier 3 run (T2W4). No new position, no rebake (T2W28).
+**Suggested** is T2W36's rule: the Tier 3 child of the class she fights as (the Spellfist's and the Battlemage's kept
+child), else of her family's first R50 class in the tree's order.
 
-### 5.5 Ascend into Tier 3 (T2W31)
+**T2W39: her weapons into Tier 3.** The page pre-fills **her Tier 3 class's preset and [gear](gear.md)'s Suggested Tier 3
+types** (T2G56, T2G57), as the Tier 2 sheet pre-fills the Tier 2 class's: the coverage bound holds on the Suggested
+types (gear T2G52), so the default must be them. **"As in Tier 2"** copies her Tier 2 parent's kinds as she left them and
+maps her types (Pure → Keen, Dual → Tempered with the same partner), one tap, offered where her slots match her parent's
+(every Tier 3 class but the Gladiator and the Thaumaturge, whose third slot changes channel). Round 2's "pre-filled with
+hers" (T2W19, T2W31) is amended: a new class takes its own preset; her last kit is the chip.
 
-**T2W31: the same sheet, pre-filled with her Tier 2 picks.** From a full Tier 2 window: who goes (by party, the check
-line), then her page: her class in Tier 3 (assumed: her Tier 2 open set carries, the class she fights as Suggested; if
-classes.md gives Tier 3 a promotion of its own, the same page lists its options), her weapons and types as she had them,
-her sub-profession as she had it; the purse 3,000 Laurels and 5 Speed Tickets; her forms and stat picks kept as settings
-(T2W21). One tap with the defaults.
+**Her professions, forms and picks** carry as T2W21 says: her sub-profession as she had it (changeable on the sheet), her
+accessory forms and Extra Stats picks kept as settings, waiting for their grades and jewels. The purse: 3,000 Laurels
+and 5 Speed Tickets an Uma (T2W10).
+
+**A party into Tier 3** (T2W22, T2W44): grouped by party, the check line, "Suggested for all". The owner's swaps one tier
+down are two taps a member: a Brawler with a Spellblade (the Spellhammer and the Dervish, classes' T3), a Spellblade with
+the Paladin (the Herald and the Inquisitor, T4); the Gladiator's way (T3g) one tap on the Spellfist's group.
+
+**T2W40: Umas already in a Tier 3 world at its switch.** Before Tier 3's toolbox an Uma there plays Tier 1's eight × 2.6
+(live). At the switch (classes §6.6):
+- She **becomes her Tier 1 class's keeper's Tier 3 child** at that class's Class Rank (a Brawler the Ravager, a Paladin
+  the Bastion, an Arms Spellblade the Bladelord): identity kept, nothing lost.
+- She opens **the Tier 3 children of the keepers of every Tier 1 class she has at R50 there**, at least her own; the
+  Tier 3 door opens the rest of her lines from Class Rank 20.
+- Her weapons keep their kinds with gear's Suggested Tier 3 types; her sub-profession stays.
+- "New: Tier 3 classes" on her Gallery tile and Window sheet until her Class tab opens; no forced sheet; her lit steps
+  stay (CO2).
+
+**T2W41: ascending into Tier 3 before its toolbox.** Tier 2's toolbox ships first (T2W15: v22 · v39, then v23 · v40), so
+an Uma can fill a Tier 2 window before Tier 3's classes exist. From Tier 2's switch the Tier 3 Ascend **writes her Tier
+3 open set (T2W38) and the Tier 2 class she ascended as** into the new world; she fights there as that class's Tier 1
+ancestor (Tier 3 plays Tier 1's eight until its switch), and the sheet's class page reads "Tier 3 classes arrive with
+Tier 3's update". At the switch she **becomes the Tier 3 child of the class she ascended as** (T2W36's Suggested) at the
+ancestor's Class Rank, with that open set: nothing she earned in Tier 2 is lost, and T2W40's keeper rule covers only the
+Umas who reached Tier 3 before Tier 2's switch.
 
 ### 5.6 The end of the climb (T2W14)
 
@@ -941,27 +1086,27 @@ this doc's Tier 2 shape, and Tier 3's full windows (Rift step lit) are ready to 
 
 | To | What | Call |
 |---|---|---|
-| All six | The run's timeline: when each addition lands by day and level; no new gates | T2W11, T2W32, §4.7 |
-| All six | Promotion: the Ascend sheet's pages and what she keeps, picks and restarts | T2W16–T2W21 |
-| All six | The windows: what each track reads, and that a step reads progress, never a choice | T2W24–T2W29 |
+| All six | The run's timeline: when each addition lands by day and level, in Tier 2 and Tier 3; no new gates | T2W11, T2W32, T2W46, §4.7, §5.3 |
+| All six | Promotion: the Ascend sheet's pages into Tier 2 and Tier 3, and what she keeps, picks and restarts | T2W16–T2W21, T2W37–T2W39 |
+| All six | The windows: what each track reads in each tier, and that a step reads progress, never a choice | T2W24–T2W28, T2W42, T2W43 |
 | All six | Tier 3 has a Rift and Trials; Tier 4 stays closed | T2W4, T2W14 |
-| **T2C** (classes) | The class page: her open set is both children of every Tier 1 class at R50 when she ascends (6–16), written to the new world and fixed for the tier; Suggested the keeper of the class she fights as; Class IV reads a class and its sibling, Class V three; the Rift's guidance names the Tier 1 class and either child fits; Umas already in Tier 2 become their class's keeper at its rank | T2W17, T2W18, T2W23, T2W25, T2W30 |
-| **T2G** (gear) | The weapons page: her class's preset with gear's Suggested types, set on the sheet (Tier 2 → 3 pre-filled); Gear and Weapons read grades whatever the type or form; Gear V reads as "every tree open" if the tree completes by G10; her forms carry as settings | T2W19, T2W21, T2W24 |
+| **T2C** (classes) | The class pages: the Tier 2 open set (every child of every Tier 1 class at R50, 6–20) and the Tier 3 one (the Tier 3 children of every Tier 2 class at R50, 3–22), each written to the new world and fixed but for the doors; Suggested by one rule in both tiers (the child of the class she fights as, the crosses' kept child, her family first); the doors shown as "Opens later", never picked; Class IV two classes of one Tier 1 line, Class III in Tier 3 her first crown, Class V three; the Rift's guidance by Tier 1 line; Umas already in Tier 2 or Tier 3 at each switch; an Uma ascending into Tier 3 before its toolbox | T2W33–T2W43, T2W45 |
+| **T2G** (gear) | The weapons pages: Tier 2 her class's preset with gear's Suggested Tier 2 types; **Tier 3 her Tier 3 class's preset with gear's Suggested Tier 3 types, "As in Tier 2" a chip** (her types mapped Pure → Keen, Dual → Tempered), not on the Gladiator or the Thaumaturge; Gear and Weapons read grades whatever the type or form; her forms carry as settings | T2W19, T2W21, T2W24, T2W39 |
 | **T2E** (extra stats) | Stars counts open nodes of every body (`body:n`), never picks; her picks carry as settings; the counts by the tier's map | T2W21, T2W24, T2W27 |
-| **T2P** (professions) | Craft reads her three Craft Levels' sum (12 · 24 · 36 · 48 · 60), so each profession keeps Tier 1's curve or the thresholds move; her sub-profession shown pre-picked on the sheet; the full window's demand target (950 refined an Uma, Metal and Vegetables 250) and the run target (a party's windows in about 32 days) | T2W12, T2W20, T2W26 |
-| **T2B** (balance) | The party check line's roles (damage, support, heal) read T2B's classes; the fronts' re-aimed tests per tier | T2W22, T2W30 |
-| **T2U** (templates) | She arrives as the Tier 2 class she picks; her family on the sixteen and her ★ tip at CR 40 are templates' | T2W18, T2W21 |
+| **T2P** (professions) | Craft reads her three Craft Levels' sum (12 · 24 · 36 · 48 · 60), so each profession keeps Tier 1's curve or the thresholds move; her sub-profession shown pre-picked on the sheet into Tier 2, kept into Tier 3; the full window's demand target (950 refined an Uma, Metal and Vegetables 250) and the run target (a party's windows in about 32 days) | T2W12, T2W20, T2W26 |
+| **T2B** (balance) | The party check line's roles (damage, support, heal) on the forty-two; the fronts' re-aimed tests per tier | T2W22, T2W30, T2W44, T2W45 |
+| **T2U** (templates) | She arrives as the class she picks (Tier 2 and Tier 3); Suggested never a kin class while one of her family stands at R50; her ★ tip at CR 40, at both forks in Tier 3 | T2W36, T2W21 |
 
-**What this doc assumes** (round 2's shapes, being written now in parallel; the cross-reference pass checks them):
+**What this doc assumes** (round 3's shapes; the cross-reference pass checks them):
 
 | From | Assumed | Used in | If not |
 |---|---|---|---|
-| **T2C** (classes) | **Sixteen Tier 2 classes**, a keeper and an expander per Tier 1 class (R2-2–R2-4), named by classes.md; **only the sixteen fight in a Tier 2 world** (no Tier 1 class there, as CV10 has no Tier 0 in a later world); each its own Class Rank 1–50 with XR1's shared ladder for 1–10; switching free among those she holds; one healer a party, both healer children healers; three slots a class, the expanders' cross-channel slots among them; presets on the sixteen (D263's rule); Tier 3 keeps the sixteen, deepened (two lines held, the crown and mastery at R50), no new promotion | §4.4, §4.6, §4.7, §5 | If Tier 1 classes also fight in Tier 2: Suggested could be "stay as she is", and the Class track reads the Tier 2 classes only. If Tier 3 promotes again: the Tier 3 sheet's class page lists Tier 3's options, the same page |
-| **T2G** (gear) | **Each weapon's Tier 2 type set on the sheet**, swapped freely or cheaply later; grades per weapon kind as live; **the accessory tree**: a family's forms per slot opening as its grade rises, complete by G10; three slots; a type's or a form's Tier 3 step, if any, gear's | §4.4.3, §4.6, §4.7 | If a type costs an item to set: the sheet shows the cost, and Suggested picks the free one. If the tree ends past G10: Gear V reads grades only |
-| **T2E** (extra stats) | Jewels open the Planet's and moons' nodes as today; **every open node takes a stat she picks** from its body's list, swappable, with a default so an open node always gives something; round 1's weapon moon a list entry (map 22) or a body (27) | §4.6.1, §4.7 | If a node can be open and unpicked: Stars still counts open nodes |
-| **T2P** (professions) | **Two professions a line plus one sub-profession: three Craft Levels**, each 1–50 on Tier 1's curve (88,200 EXP), each with its own EXP; a job raises the profession it belongs to; Craft restarts at 1 in all three on Ascend; amounts don't scale; the sub-profession picked free (shown on the sheet) | §4.4.4, §4.6.4, §8 | If a profession's curve differs: the Craft thresholds follow its EXP (the dial, §4.6.4) |
-| **T2B** (balance) | Party value bands for every class (R2-11), so no Tier 2 class is a trap on the sheet; Z3's restart; the toolbox terms SB3–SB5; three weaknesses at every rank (live); bosses' shields 9 and 10 (SB6); the fronts' numbers per tier | §4.2, §4.5, §5.2 | — |
-| **T2U** (templates) | Her family on the sixteen (both children of her family's Tier 1 classes); the ★ tip on her lead weapon's tree at CR 40, at both forks in Tier 3; the signature and her moon × tier (live) | §4.7, §5.3 | — |
+| **T2C** (classes) | **Twenty Tier 2 and twenty-two Tier 3 classes** (T2C65, T2C66), each with her `parent` (T2C95); **only the tier's own classes fight in its world**; each class its own Class Rank 1–50 with XR1's shared ladder for 1–10; switching free among those she holds; one healer a party, every healer class a healer; three slots a class (a cross's other-channel slot, a pure variant's one channel); presets (T2C77, a Tier 3 class her parent's but the Gladiator's and the Thaumaturge's); the Tier 2 and Tier 3 promotions (T2C76, T2C89) and doors (T2C48, T2C90); the crown at Class Rank 50 on every Tier 3 class (T2C79); her family (T2C91); Umas already in a later world (§6.6, T2C95) | §4.4, §4.6, §4.7, §5 | If a Tier 3 class gains a second child somewhere, Class IV's "one Tier 1 line" still reads it; if the crown moves off Class Rank 50, Class III in Tier 3 is a plain R50 |
+| **T2G** (gear) | **Each weapon's type set on the sheet**, swapped freely later (T2G22); grades per weapon kind as live; **Suggested types by class in both tiers, holding the coverage bound** (T2G50–T2G56); **the Tier 3 sheet pre-fills Suggested, "As in Tier 2" a chip** (T2G57); Arsenal's two two-kind weapons; the accessory tree whole by a slot's G5 (T2G30); three slots | §4.4.3, §4.6, §4.7, §5.5 | If a type cost an item to set, the sheet would show the cost and Suggested would pick the free one |
+| **T2E** (extra stats) | Jewels open the Planet's and moons' nodes as today; **every open node takes a stat she picks** from its body's list, swappable, with a default; the map 22 in every tier (T2E27, T2E43) | §4.6.1, §4.7, §5.3 | If a node can be open and unpicked: Stars still counts open nodes |
+| **T2P** (professions) | **Two professions a line plus one sub-profession: three Craft Levels**, each 1–50 on Tier 1's curve (88,200 EXP); a job raises the profession it belongs to; Craft restarts at 1 in all three on Ascend; the sub-profession picked free (shown on the sheet) | §4.4.4, §4.6.4, §8 | If a profession's curve differs: the Craft thresholds follow its EXP (the dial, §4.6.4) |
+| **T2B** (balance) | Party value bands for every class of both tiers (R2-11, R3-8), so no class on the sheet is a trap; Z3's restart; the toolbox terms (T2B36); three weaknesses at every rank (live); shields 7 · 9 in Tiers 2 and 3 (T2B7, XR19); the fronts' numbers per tier | §4.2, §4.5, §5.2, §5.3 | — |
+| **T2U** (templates) | Her family on the forty-two (the descendants of her calling's own Tier 1 classes); the ★ tip on her lead weapon's tree at CR 40, at both forks in Tier 3; the signature and her moon × tier (live) | §4.7, §5.3 | — |
 
 ## 7. Save and engine
 
@@ -969,11 +1114,11 @@ Roughly, not packets. **T2W15: the world goes first on today's engine, then the 
 
 | Step | What changes | Engine · save |
 |---|---|---|
-| 0. Before | Capitals v2 and the honeycomb live (H162, H166) | — · v37, v38 |
+| 0. Before | Capitals v2 and the honeycomb live (H162, H166: done) | — · v37, v38 |
 | 1. The Tier 2 and 3 worlds | Leans and packs by tier (T2W2, T2W3, generator data under its guard); the fifteenth Finals (T2W13, data); Twilight Vale (Z10, a label); tickets and the purse × tier (T2W10, Exchange and Ascend rules); the Ascend sheet's five line (T2W9, a screen) | None: fights replay from their frozen inputs and these are generators and rules, as D293 reasoned |
 | 2. Tier 3's Rift | `RIFT_TIERS` gains 3; Tier 3's five achievements; `tierHasRift` splits into "has a Rift" (every tier) and "has a tier above" (Ascend's block); Trials open in Tier 3; the board 36 everywhere (T2W4) | None, or a small save step if the parse needs the new achievement ids |
-| 3. Tier 2's toolbox | T2C, T2G, T2E, T2P, T2B, T2U; **the Ascend sheet's pages** (T2W16–T2W22) writing T2C's, T2G's and T2P's fields; **the Tier 2 board's rules** (T2W24–T2W28, no record change); the switch's migration for Umas already in Tier 2 (T2W23); dark behind one Tier 2 switch, as Classes v3 shipped | **engine v22, save v39** (D198's R3–R4 numbers are taken) |
-| 4. Tier 3's toolbox | The same, Tier 3's pieces; the sheet into Tier 3 (T2W31) | engine v23, save v40 |
+| 3. Tier 2's toolbox | T2C, T2G, T2E, T2P, T2B, T2U; **the Ascend sheet's pages** (T2W16–T2W22, T2W33–T2W36) writing T2C's, T2G's and T2P's fields; **the Tier 2 board's rules** (T2W24–T2W28, T2W42, no record change); the switch's migration for Umas already in Tier 2 (T2W23); **the Tier 3 Ascend's open set and her Tier 2 class written from here** (T2W41); dark behind one Tier 2 switch, as Classes v3 shipped | **engine v22, save v39** (D198's R3–R4 numbers are taken) |
+| 4. Tier 3's toolbox | The same, Tier 3's pieces; **the Tier 3 promotion's pages** (T2W37–T2W39); the Tier 3 board's Class rules (T2W43); the switch's migration for Umas already in Tier 3 (T2W40) and for those who ascended before it (T2W41) | engine v23, save v40 |
 
 The record of a window keeps its 36 positions in every tier, the Rift's included, so neither step 2 nor 3 moves
 anything in it.
@@ -989,11 +1134,11 @@ clock; T2W32 measures it with round 2's systems.**
 | Measure | Tier 1 | Tier 2 and 3 |
 |---|---|---|
 | Uma Lv 1 → 50 | About 130 wins with her party (25,480 EXP), or 147 Training Logs | The same |
-| Class IV | Two Tier 1 classes at R50: her campaign's Class EXP (about 51,000) | A Tier 2 class and its sibling at R50: the same EXP |
+| Class IV | Two Tier 1 classes at R50: her campaign's Class EXP (about 51,000) | Two classes of one Tier 1 line at R50: the same EXP |
 | Class V (a third) | 20 Trial wins at Lv 50 (40 at Lv 45), or 24 Manuals | The same |
 | Her own Craft V | Craft Lv 50: 588 hours of her slot, **24.5 days nonstop**, 30.6 at 80% | Her three to 60: **24.9–27.8 days nonstop**, 31.2–34.8 at 80% |
 | Her full window's work | 950 refined, 763 hours of slot time, done by the roster | Professions' Tier 2 demand (T2P, assumed close) |
-| Her promotion | — | One sheet, one tap with the defaults |
+| Her promotion | — | One sheet, one tap with the defaults, into Tier 2 and into Tier 3 |
 
 ### 8.2 A party of five
 
@@ -1047,69 +1192,117 @@ is Craft, not levels: the roster's forges gear a party a grade in five hours onc
 | Window full, first cohort (nonstop · 80%) | ~32–37 · ~40 days | ~33.5–37 · ~38–40 | ~33.5–37 · ~38–40 | **About 3 to 4 months** |
 | Bound by | Craft V, Weapons V, the Rift | The Rift, then Crafts 60 and Weapons V | The same (its Rift, T2W4) | |
 
+### 8.6 Round 3 in days (T2W46)
+
+**Round 3 moves no day.** Every gate it touches already had its place on the clock:
+
+| Round 3's piece | When | Why the clock doesn't move |
+|---|---|---|
+| Her Tier 2 open set grows to 6–20 | Tier 2's day 0, on the sheet | More cards, the same tap; Class EXP pace unchanged (XR1) |
+| The Tier 3 promotion and her Tier 3 rule | Tier 3's day 0; the rule from her first fight (T2C78) | The sheet's tap is Tier 2's; the rule needs no rank |
+| The Tier 3 door | Class Rank 20 on any Tier 3 class she holds, Lv 16, about day 1 | The Tier 2 door's gate, one tier down |
+| The crown | Class Rank 50 on her active class, Lv 36, about day 5 | Round 2 had it there (T2C20) |
+| Class IV in either later tier | A second class of her line at R50, about day 8.8 (Lv 50) | The same Class EXP as two classes at R50; the shared ladder raises her sibling to R10 with her |
+| Arsenal's second two-kind weapon | The sheet | A type costs nothing (gear T2G39) |
+
 ## 9. Previews: carried and retired
 
 | Page | What it holds | Carries |
 |---|---|---|
-| [progression-tiers.html](previews/progression-tiers.html) | Tier 1 → 2 → 3 side by side; what each tier adds, by doc (round 2's shapes); what she keeps, picks and restarts; one made-up Uma across three tiers; her board per tier; how the counts grow; the old calls' status | [character-tiers.html](../tier-rework/previews/character-tiers.html)'s one-Uma board (its per-cell stat values move to the system docs' pages); [progression.html](../tier-rework/previews/progression.html)'s tier columns and "how the counts grow" |
-| [progression-ascend.html](previews/progression-ascend.html) | **New (round 2):** the Ascend sheet at 390 × 844, screen by screen: the Gallery's ready tiles, who goes by party with the check line, her Tier 2 page (class, weapons and types, sub-profession), a party of five played through with defaults and with expanders, Tier 2 → 3 pre-filled, an Uma already in Tier 2 | — (new) |
-| [progression-windows.html](previews/progression-windows.html) | **New (round 2):** the boards by tier; how a window is drawn (a placeholder window and its pane map lit by the live rule at any step count); latching against a free pick; what each new system lights; pacing by track; the record; the Window sheet's tiles in Tier 2 | [board.html](../collections/previews/board.html)'s board by tier (collections' pages stay where they are) |
-| [progression-world.html](previews/progression-world.html) | Tier 2's and Tier 3's continents; the honeycomb by band; foes by tier level; pay by tier; the Rift's fronts re-aimed at round 2's tools, Trials and Drills by tier | — (round 1's) |
-| [progression-run.html](previews/progression-run.html) | A Tier 2 run day by day with round 2's systems; the window lighting; the Wilds calculator (cohort, uptime, demand, sub-professions); 24 parties | [progression.html](../tier-rework/previews/progression.html)'s roadmap ("what unlocks when") and "pace holds" |
+| [progression-tiers.html](previews/progression-tiers.html) | Tier 1 → 2 → 3 side by side; what each tier adds, by doc (round 3's shapes: 13 → 20 → 22 classes); what she keeps, picks and restarts at each Ascend; one made-up Uma across three tiers; her board per tier; how the counts grow; the old calls' status | [character-tiers.html](../tier-rework/previews/character-tiers.html)'s one-Uma board (its per-cell stat values move to the system docs' pages); [progression.html](../tier-rework/previews/progression.html)'s tier columns and "how the counts grow" |
+| [progression-ascend.html](previews/progression-ascend.html) | **Round 3:** the Ascend sheet at 390 × 844, screen by screen, **into Tier 2 and into Tier 3**: the Gallery's ready tiles, who goes by party with the check line, her page (the twenty's or the twenty-two's cards grouped by parent, weapons and types with "As in Tier 2" and Arsenal's two rows, professions), a party of five played through the owner's swaps in both tiers, the open sets and Suggested, Umas already in a later world | — (round 2's, rewritten) |
+| [progression-windows.html](previews/progression-windows.html) | The boards by tier with **the Class track on the new trees** (IV two classes of one Tier 1 line, III in Tier 3 her crown) and a line picker; how a window is drawn (a placeholder window and its pane map lit by the live rule at any step count); latching against a free pick; what each new system lights; pacing by track; the record | [board.html](../collections/previews/board.html)'s board by tier (collections' pages stay where they are) |
+| [progression-world.html](previews/progression-world.html) | Tier 2's and Tier 3's continents; the honeycomb by band; foes by tier level; pay by tier; the Rift's fronts re-aimed at the later tiers' tools, Trials and Drills by tier | — (round 1's) |
+| [progression-run.html](previews/progression-run.html) | A Tier 2 run day by day; the window lighting; the toolbox arriving in Tier 2 and Tier 3; the Wilds calculator (cohort, uptime, demand, sub-professions); 24 parties | [progression.html](../tier-rework/previews/progression.html)'s roadmap ("what unlocks when") and "pace holds" |
 
 **Retired:** progression.html's "how it ships: five live releases" (D198's R3–R5 numbers are taken, §3.7), "choices a
 player owns" and "Tier 1: today vs approved" (Tier 1 is built; the system docs count their own choices).
 character-tiers.html's stat cells (every system doc draws its own Tier 1 → 3 page).
 
-**Words this doc and its pages add, checked** (case-insensitive exact match against all 18,227 distinct master-data
-strings and the game's own names; none matches): Keeper, Expander, Keepers, Expanders, Sibling, Pair at R50, Pair
-R41/50, Crafts, Crafts 36, Sub-profession, Her Tier 2, Her Tier 2 class, Her Tier 3 class, Her weapons, Her
-sub-profession, Suggested for all, Opens 6 of 16, Opens later, Who goes, Party check, Swap any time on Gear, Rank to 50
-in Tier 1, New: Tier 2 classes, Battle healer, Support hybrid, Self-buff, Ready to ascend · Opens 6, Her professions, Kept
-as settings, Her class's kit, Her three Crafts, Wilds jobs · all three, and templates.md's "★ Tip · on a strike line" (55
-labels in all). "Support" as a role word matches an old accessory-slot label in the code (before D264), not a name.
+**Words this doc and its pages add, checked** (case-insensitive exact match against every distinct string of the
+master-data release's ten files and the game's own string literals in `packages/domain/src` and `apps/web/src`; none
+matches): Keeper, Keepers, Sibling, Pair at R50, Pair R41/50, Crafts, Crafts 36, Sub-profession, Her Tier 2, Her Tier 3,
+Her Tier 2 class, Her Tier 3 class, Her weapons, Her sub-profession, Suggested for all, Opens 8 of 20, Opens 4 of 22,
+Opens later, Who goes, Party check, Swap any time on Gear, Rank to 50 in Tier 1, Rank to 50 in Tier 2, New: Tier 2
+classes, New: Tier 3 classes, As in Tier 2, Battle healer, Self-buff, Ready to ascend · Opens 8, Her professions, Kept as
+settings, Her three Crafts, Wilds jobs · all three, Single big hits, Pure physical, Pure elemental, Two classes of one
+Tier 1 line at Class Rank 50, Tier 3 classes arrive with Tier 3's update, and templates.md's "★ Tip · on a strike
+line". "Support" as a role word matches an old accessory-slot label in the code (before D264), not a name. Round 2's
+"Expander" and "Opens 6 of 16" leave the pages. The forty-two classes' names, Momentum, Pinpoint and Arsenal are
+classes.md's (checked there, §11).
 
 ## 10. Decisions
 
-Every call, with its recommended answer, the alternatives, and its status after round 2. **Stands** is a round-1 call
-round 2 leaves whole; **Superseded (R2-n)** names the requirement that replaced it and the call that does its job now.
+Every call, with its recommended answer, the alternatives, and its status. **Stands** is a round-1 call later rounds
+leave whole; **Superseded (Rn-m)** names the requirement that replaced it and the call that does its job now; **Kept,
+changed (R3-n)** a round-2 call round 3 re-reads.
+
+### 10.1 Round 3 (T2W33–T2W46)
 
 | Id | Call | Recommended | Alternatives | Status |
 |---|---|---|---|---|
-| **T2W1** | The Tier 2 world's shape | **Tier 1's on continents 6–10, with capitals v2 and the honeycomb live first:** 48 regions, 24 parties, six Springs, six capital runs a continent; no Tier 2 world packet before H162 and H166 | Build Tier 2 on today's map (40 regions, three shared routes) first; a smaller Tier 2 world | Stands |
+| **T2W33** | The Tier 2 open set on the twenty | **Every child of every Tier 1 class she has at Class Rank 50 when she ascends (two or three each): 6 to 20,** read before she leaves, written to the new world, fixed but for the door (T2C48); "Opens 8 of 20" on her Gallery tile and sheet row | The keeper and the cross or support only, the pure variant by the door; all twenty for everyone | **New (R3-4)**; re-counts T2W17 |
+| **T2W34** | The Tier 2 class page | **Grouped by Tier 1 class, two or three cards each in one order** (the keeper, the cross or the support, the pure variant): slots as channel dots, her rule in four words or fewer, a Healer or Support chip, Suggested marked; locked Tier 1 classes "Rank to 50 in Tier 1" | A flat list of the twenty; cards by role (damage, support, heal) across parents | **New (R3-4)** |
+| **T2W35** | The doors on the sheet | **Shown, never picked:** a collapsed "Opens later" row counts what each door would add (T2C48 in Tier 2, T2C90 in Tier 3), a tap lists them by door; the Class tab keeps the same row until each opens | Hide the doors (a surprise at Class Rank 20); let the sheet pick a door's class (breaks "open at R50") | **New (R3-4)** |
+| **T2W36** | Suggested in both later tiers | **The child of the class she fights as when that class is at R50 and of her family** (into Tier 2 its keeper; into Tier 3 its Tier 3 child, the Spellfist's and Battlemage's kept child); **else the same child of her family's first R50 class in the tree's order; else of her first R50 class** (kin only when none of her family stands at R50) | Round 2's "her highest R50 class" (every R50 class ties at Rank 50); the Gladiator or the Thaumaturge for a cross (changes her kit unasked) | **New (R3-1, T2C89, T2C91)**; amends T2W18 |
+| **T2W37** | The Tier 3 promotion on the Ascend sheet | **The Tier 2 sheet's two pages with Tier 3's options:** who goes (by party, Suggested Tier 3 class, weapons, "Opens 4 of 22", the check line), her page (class grouped by Tier 2 parent, weapons with Tier 3 types and "As in Tier 2", professions), one tap with the defaults; 3,000 Laurels | A promotion sheet after arrival; a forced pick with no default; round 2's T2W31 (her open set carrying, no new class) | **New (R3-1)**; supersedes T2W31 |
+| **T2W38** | The Tier 3 open set | **The Tier 3 children of every Tier 2 class she holds at Class Rank 50 when she ascends: 3 to 22** (one each, two for the Spellfist and the Battlemage), read in the Tier 2 world before she leaves, written to the new one, fixed but for the Tier 3 door (T2C90) | Every Tier 3 class of her Tier 1 lines; the children of every Tier 2 class she held, whatever its rank (both: classes' T2C89 alternatives) | **New (R3-1)** |
+| **T2W39** | Her weapons into Tier 3 | **Pre-filled with her Tier 3 class's preset and gear's Suggested Tier 3 types** (T2G57), so the coverage bound holds by default; **"As in Tier 2"** copies her parent's kinds and maps her types (Pure → Keen, Dual → Tempered), offered where her slots match (not the Gladiator, the Thaumaturge); Arsenal's two two-kind rows | Round 2's "pre-filled with hers" (default kits over the bound with Arsenal, gear §5.3); Suggested with no chip | **New (R3-1)**; amends T2W19 for Tier 3 |
+| **T2W40** | Umas already in a Tier 3 world at its switch | **Each becomes her Tier 1 class's keeper's Tier 3 child at that class's Class Rank** (classes §6.6); opens the Tier 3 children of the keepers of every Tier 1 class she has at R50 there, at least her own; Suggested types; "New: Tier 3 classes"; no forced sheet; lit steps stay | Open all twenty-two to them; a forced promotion sheet on the first load | **New (R3-1)** |
+| **T2W41** | Ascending into Tier 3 before its toolbox | **From Tier 2's switch the Tier 3 Ascend writes her Tier 3 open set and the Tier 2 class she ascended as;** she fights as its Tier 1 ancestor until Tier 3's switch, then becomes the Tier 3 child of that class at the ancestor's Class Rank | Hold the Tier 3 Ascend until Tier 3's toolbox (a gate T2W11 refuses); treat her by T2W40 (her Tier 2 record lost) | **New (R3-1)** |
+| **T2W42** | Class IV in both later tiers | **Two classes of one Tier 1 line at Class Rank 50:** in Tier 2 a class and her sibling (one or two siblings a class), in Tier 3 two of the line's two or three Tier 3 classes; reachable from Tier 3's first day (Tier 2's IV leaves a pair of one line at R50); "Pair at R50" | Tier 3's IV "two Tier 3 classes at R50, any" (a sibling exists only on the crosses' lines); a true sibling only (eighteen of the twenty-two have none) | **New (R3-1, R3-4)**; amends T2W25 |
+| **T2W43** | The Tier 3 board | **Tier 2's board at Tier 3's numbers, 36 with its Rift:** Class I–II at R10 · R30, **III a Tier 3 class at R50, her first crown**, IV T2W42, V three Tier 3 classes at R50; Crafts to 60, the Tier 3 map, continents 11–15 | A track for the crown or the Tier 3 rule; 35 without a Rift | **New (R3-1)**; supersedes T2W29 |
+| **T2W44** | The party check line on the forty-two | **Roles: damage** (keepers, crosses, pure variants and their Tier 3 lines), **support** (the four supports and their Tier 3 children), **heal** (every healer class); kinds counted with every partner, Arsenal's two | Roles by measured party value per comp (a number that moves) | **New (R3-6)**; amends T2W22 |
+| **T2W45** | The Rift's guidance on the forty-two | **The guidance names the Tier 1 class; any of its Tier 2 children, and in Tier 3 any of its Tier 3 descendants, fits;** the Suggested one in Use the guided weapons | Name exact Tier 2 or Tier 3 classes a front | **New (R3-4)**; amends T2W30 |
+| **T2W46** | Round 3's pacing | **No day moves:** the open sets grow on the same tap; the Tier 3 rule works from Class Rank 1; the doors at Class Rank 20 (Lv 16), the crown at 50 (Lv 36); Class IV's EXP unchanged; Arsenal's second two-kind weapon free | — | **New (R3-1)** |
+
+### 10.2 Rounds 1 and 2 (T2W1–T2W32)
+
+| Id | Call | Recommended | Alternatives | Status |
+|---|---|---|---|---|
+| **T2W1** | The Tier 2 world's shape | **Tier 1's on continents 6–10, with capitals v2 and the honeycomb live first:** 48 regions, 24 parties, six Springs, six capital runs a continent; no Tier 2 world packet before H162 and H166 | Build Tier 2 on the old map first; a smaller Tier 2 world | Stands (H162 and H166 are live) |
 | **T2W2** | Continent leans by tier | **Tier 2 Jungle, Sky Isles, Glacier, Volcano, Underworld (Z1); Tier 3 Swamp, Highlands, Geyser Basin, Storm Peaks, Ancient Ruins**; a tier's leans change only while no world of it holds a won stage | Repeat Tier 1's leans (live); random leans a world | Stands |
 | **T2W3** | Face packs by tier | **Tier 1's totals, arranged anew each tier:** Tier 2 Z7's (the middle pack opens it, the small returns twice, the large closes it); Tier 3 a third (the small holds `w13` whole) | Repeat Tier 1's arrangement (live); new packs a tier | Stands |
 | **T2W4** | Does Tier 3 get a Rift | **Yes:** the same shape at T3 Lv 50, its own seals and Rift Conquered · Tier 3, the Rift step (every board 36), Trials with it; nobody ascends from it while Tier 3 is the top tier: a full Tier 3 window is the end of her collection, in its violet frame | No Tier 3 Rift until a Tier 4 exists (no Trials there, a 35-step board) | Stands |
-| **T2W5** | The Rift's fronts in Tiers 2 and 3 | **Z9's one added test a front, re-aimed at the later tiers' toolbox** (Iron shields +2 and one or two Arms; Arcane one element a foe, leaders and guards apart; the Duel's boss three acts from stage 9; the Horde five to seven a wave); Tier 3 keeps them; T2B sets each tier's numbers | Tier 1's fronts × tier, no added test; new fronts | Stands; its "the guidance names each member's class branch" Superseded (R2-2) by T2W30 |
+| **T2W5** | The Rift's fronts in Tiers 2 and 3 | **Z9's one added test a front, re-aimed at the later tiers' toolbox** (Iron shields +2 and one or two Arms; Arcane one element a foe, leaders and guards apart; the Duel's boss three acts from stage 9; the Horde five to seven a wave); Tier 3 keeps them; T2B sets each tier's numbers | Tier 1's fronts × tier, no added test; new fronts | Stands; its guidance clause re-cut by T2W30, T2W45 |
 | **T2W6** | Trials and Drills by tier | **Unchanged in every tier:** Trials at the tier's Lv 45, 50, 55, opening with its Rift; Drills at its Lv 10–50, 2–6 Logs, ten runs a day banked to thirty, opening with its first map win; Logs and Marks stay in their world | More Logs or higher levels a tier; Logs that cross worlds | Stands |
 | **T2W7** | Windows by tier | One board, 36 steps in every tier; Class I a Tier 1 class at R10 from Tier 2; World n a won capital run; the Stars steps count the tier's whole map, weapon moons included; no new track | — | **Superseded (R2-10)** by T2W24–T2W29 |
 | **T2W8** | Ascend with a toolbox | Settings carry, progress restarts: her class and its class branch, her accessory families, kinds and forms, her weapon branches and her weapon moon's setting carry | — | **Superseded (R2-5, R2-6)** by T2W21 |
-| **T2W9** | Ascending into an empty world | **The Ascend sheet says when the new world would hold fewer than five** ("3 of 5 to fight in Tier 2"); no rule change | Block an Ascend that leaves fewer than five; no line | Stands (a line on the sheet's first page) |
+| **T2W9** | Ascending into an empty world | **The Ascend sheet says when the new world would hold fewer than five** ("3 of 5 to fight in Tier 2"); no rule change | Block an Ascend that leaves fewer than five; no line | Stands (a line on the sheet's first page, both tiers) |
 | **T2W10** | Prices by tier | **Speed and Sweep Tickets × tier** (20 · 30 in Tier 2, 30 · 45 in Tier 3) **and the purse's Laurels × the tier she arrives in** (2,000, 3,000), so a Laurel buys the same time in every tier; Marks, Manuals and Logs untiered | Keep the tickets flat (the first knob if Tier 2 plays slow); a flat 1,000 purse | Stands |
-| **T2W11** | When the toolbox opens | **No new gates:** every Tier 2 and 3 addition opens on its system's gate (the Ascend sheet, Class Rank, a grade's levels, a node's jewel and level) | Gates of their own (quests, a day, a building) | Stands, re-cut on round 2's systems (§4.7) |
+| **T2W11** | When the toolbox opens | **No new gates:** every Tier 2 and 3 addition opens on its system's gate (the Ascend sheet, Class Rank, a grade's levels, a node's jewel and level) | Gates of their own (quests, a day, a building) | Stands, re-cut on rounds 2 and 3's systems (§4.7, §5.3) |
 | **T2W12** | A run's pacing target | **Tier 1's time for the fighting party (G10 by day 23.4) and for a world of forty at work (twenty windows in 31.8); a first cohort of twenty working for itself takes about twice that (63.6 days), round 2's deeper farm (XR15);** fights about 130 wins a party | A faster later tier (tickets flat); Tier 1's time for every cohort (a half step, T2P41's alternative) | Kept, changed (R2-9, XR15) |
 | **T2W13** | The fifteenth scenario's capital | **Its own four authored Finals routes** (original names, checked against the release), with Tier 3's world packets | Keep reusing continent 1's Finals | Stands |
 | **T2W14** | A sixteenth scenario | **Tier 4 stays closed:** it shows "Tier 4 locked" and joins no world until the owner opens Tier 4; Tier 3's Rift step completes her window only | Open Tier 4 now; let Tier 3 ascend into a placeholder | Stands |
-| **T2W15** | The version plan | **The worlds first on today's engine** (leans, packs, prices, Tier 3's Rift), **then the toolbox as one release a tier:** Tier 2 at engine v22 and save v39 (the Ascend sheet's pages and the board's rules with it), Tier 3 at v23 and v40, each dark behind its switch | Everything at once; one release a system | Stands |
-| **T2W16** | Where promotion happens | **On the Gallery's Ascend sheet, two pages, every pick pre-filled:** who goes (by party, a summary row per Uma), then her page (class, weapons and types, sub-profession); one tap ascends with the defaults; nothing opens over the sheet | A promotion sheet after arrival (her profile's first open in Tier 2); a required pick with no default; a Promote place of its own | **New (R2-5, R2-6)** |
-| **T2W17** | The classes open to her | **Both children of every Tier 1 class she has at Class Rank 50 when she ascends: 6 to 16**, read before she leaves and written to the new world; widened in the tier only by classes' door (T2C48: a held Tier 2 class at Class Rank 20 opens her parent's reclass neighbours' children; reconciled, XR16); she switches freely among them, each on its own Class Rank; "Opens 6 of 16" on her Gallery tile and sheet row | Only the class she fights as's two; all sixteen for everyone; more opened by Tier 2 content | **New (R2-5)** |
-| **T2W18** | Her Suggested Tier 2 class | **The keeper of the class she fights as** when it is at R50, else of her highest R50 class (ties: her family's, then the tree's order); the expander one tap beside it | No Suggested (a pick required); the expander; by her calling | **New (R2-5)** |
-| **T2W19** | Her weapons at promotion | **Her picked class's preset, each weapon's Tier 2 type gear's Suggested, set on the sheet;** a slot offers its channel's kinds, an expander's cross slot included; swaps later as gear rules; Tier 2 → 3 pre-filled with hers; no G5 gate | Defaults with no type until a weapon's G5 (round 1); a weapons visit after arrival | **New (R2-6)** |
-| **T2W20** | Her sub-profession at promotion | **On her page, pre-picked** with professions' Suggested, her line's two shown fixed; changeable there or later | Picked only after arrival on her Template tab (round 1's secondary); none until a Craft Level | **New (R2-9)** |
-| **T2W21** | What she keeps, picks and restarts | **Picks are settings, set or confirmed on the sheet; progress restarts:** kept her calling, line, template, windows, history, accessory families and kinds; picked her class, weapons and types, sub-profession; from Tier 2 her forms and stat picks kept as settings, waiting for their grades and jewels; restarted level, Class Rank (1, the shared ladder), grades, nodes, all three Craft Levels, Bonds, seats, tree picks (reconciles XR5) | Round 1's T2W8 (settings carry, nothing picked); everything restarts, forms and picks too | **New (R2-5, R2-6)**; replaces T2W8 |
-| **T2W22** | A party ascending together | **Grouped by party, moves with its name; a check line** from the picks ("One healer · 10 of 10 kinds · damage 3 · support 1 · heal 1"), two healers a warning, never a block; **"Suggested for all"** resets the group | A flat list; block two healers; a comp builder on the sheet | **New (R2-5, R2-12)** |
-| **T2W23** | Umas already in a Tier 2 world at its switch | **Each opens both children of the class she fights as and of every Tier 1 class she has at R50 there, and becomes her class's keeper at its Class Rank;** others at Rank 1; Suggested types and sub-profession; a "New: Tier 2 classes" line until her Class tab opens; no forced sheet; her lit steps stay | Open all sixteen to them; a forced promotion sheet on the first load | **New (R2-5)** |
-| **T2W24** | The Tier 2 board | **One board, 36 steps, the same seven tracks and the Rift and the same record positions;** Class, Craft and Stars re-read the new systems; Gear and Weapons read grades whatever form or type; World a won capital run; no track added | Add tracks for forms, types or picks (41–46 steps); a different count a tier; a medal layer now (CO30) | **New (R2-10)**; replaces T2W7 |
-| **T2W25** | The Class track from Tier 2 | **R10 · R30 · R50 on her best Tier 2 class; IV a Tier 2 class and its sibling at R50; V three Tier 2 classes at R50, any;** Tier 1's pace; "Pair at R50" | IV "two Tier 2 classes at R50, any" (no nudge to swap); V a keeper and an expander of two parents | **New (R2-10)** |
-| **T2W26** | The Craft track from Tier 2 | **Her three Craft Levels add up to 12 · 24 · 36 · 48 · 60:** any split; Craft V 24.9 (even) to 27.8 days (a specialist) against Tier 1's 24.5; "Crafts 36"; the dial 56 | Her best profession at 10 … 50 (the other two unread); her Craft EXP in all three against Tier 1's EXP (exact pace, an opaque number); each profession its own steps (three times the clock) | **New (R2-10)** |
-| **T2W27** | Progress, never a choice | **A step reads progress only; a choice counts only as breadth any option meets equally** (a sibling pair, three classes, five weapons, three Crafts); no step names a class, type, form, stat or profession; a choice celebrated is CO30's medal | Steps for picks ("wear a Dual"); steps for a named class | **New (R2-10)** |
-| **T2W28** | The record and the art | **No new position, no rebake:** every tier keeps the 36 ids and positions; each id's rule is the tier's (read by tier from Tier 2's switch); `windowNext` and the tiles gain "Pair R41/50" and "Crafts 29/36"; the pane map lights 36 as now | A record per tier; a rebake for a new count | **New (R2-10)** |
-| **T2W29** | The Tier 3 board | **Tier 2's board at Tier 3's numbers, 36 with its Rift:** Class on Tier 3's classes (R50 also her crown, if classes keeps it there), Crafts to 60, the Tier 3 map, continents 11–15 | A track for the crown or mastery; 35 without a Rift | **New (R2-10)** |
-| **T2W30** | The Rift's guidance and tests on the sixteen | **The guidance names the Tier 1 class and either child fits** (the keeper Suggested in Use the guided weapons); the fronts' tests ask for round 2's tools (Pure types and self-buffs on Iron, a Dual's partner and kind picks on Arcane, single-target picks on the Duel, area and multi-hit picks and wider debuffs on the Horde) | Name the keeper only; name exact Tier 2 classes a front | **New (R2-2)**; re-cuts T2W5's last clause |
-| **T2W31** | Ascend into Tier 3 | **The same sheet, pre-filled with her Tier 2 picks:** her class (her open set carrying, assumed; Tier 3's options if classes gives one), weapons and types, sub-profession; forms and picks kept as settings; 3,000 Laurels | No picks into Tier 3 (she keeps everything); a Tier 3 promotion of its own | **New (R2-5)** |
-| **T2W32** | A Tier 2 run with round 2 | **A first cohort of twenty working for itself: full windows in about 63.6 days (sub-professions pooled; 111.6 without), since round 2's farm doubles a full window (T2P40–T2P41); forty at work: 31.8, the Rift binding at 33.5 (37.6 at 80%); the fighting party at G10 on day 23.4;** Crafts 60 by 24.9–27.8; the promotion one tap a party (reconciled, XR15) | Tier 1's time with a half step in Tier 2 (T2P41's alternative); tickets flat | **New (R2-10)**; measures T2W12 |
+| **T2W15** | The version plan | **The worlds first on today's engine** (leans, packs, prices, Tier 3's Rift), **then the toolbox as one release a tier:** Tier 2 at engine v22 and save v39 (the Ascend sheet's pages and the board's rules with it), Tier 3 at v23 and v40, each dark behind its switch | Everything at once; one release a system | Stands; T2W41 covers the gap between the two |
+| **T2W16** | Where promotion happens | **On the Gallery's Ascend sheet, two pages, every pick pre-filled:** who goes (by party, a summary row per Uma), then her page (class, weapons and types, sub-profession); one tap ascends with the defaults; nothing opens over the sheet | A promotion sheet after arrival; a required pick with no default; a Promote place of its own | **Kept** (R3-1: the Tier 3 promotion uses it, T2W37) |
+| **T2W17** | The classes open to her | Both children of every Tier 1 class she has at Class Rank 50 when she ascends: 6 to 16, read before she leaves and written to the new world; widened only by classes' door (XR16); "Opens 6 of 16" | Only the class she fights as's two; all sixteen for everyone | **Kept, changed (R3-4)**: every child, 6 to 20 (T2W33) |
+| **T2W18** | Her Suggested Tier 2 class | The keeper of the class she fights as when it is at R50, else of her highest R50 class (ties: her family's, then the tree's order) | No Suggested; the expander; by her calling | **Kept, changed (R3-1, T2C91)**: one rule for both tiers, her family first (T2W36) |
+| **T2W19** | Her weapons at promotion | **Her picked class's preset, each weapon's type gear's Suggested, set on the sheet;** a slot offers its channel's kinds, a cross's other-channel slot included; swaps later as gear rules; no G5 gate | Defaults with no type until a weapon's G5 (round 1); a weapons visit after arrival | **Kept, changed (R3-1)**: into Tier 3 her new class's preset and Suggested, "As in Tier 2" a chip (T2W39) |
+| **T2W20** | Her sub-profession at promotion | **On her page, pre-picked** with professions' Suggested, her line's two shown fixed; changeable there or later | Picked only after arrival; none until a Craft Level | Kept |
+| **T2W21** | What she keeps, picks and restarts | **Picks are settings, set or confirmed on the sheet; progress restarts:** kept her calling, line, template, windows, history, accessory families and kinds; picked her class, weapons and types, sub-profession; from Tier 2 her forms and stat picks kept as settings; restarted level, Class Rank, grades, nodes, all three Craft Levels, Bonds, seats, tree picks (reconciles XR5) | Round 1's T2W8; everything restarts, forms and picks too | **Kept, changed (R3-1)**: the Tier 2 → 3 column picks a Tier 3 class from a re-read open set (§4.4.5) |
+| **T2W22** | A party ascending together | **Grouped by party, moves with its name; a check line** from the picks ("One healer · 10 of 10 kinds · damage 3 · support 1 · heal 1"), two healers a warning, never a block; **"Suggested for all"** resets the group | A flat list; block two healers; a comp builder on the sheet | Kept; its roles on the forty-two in T2W44 |
+| **T2W23** | Umas already in a Tier 2 world at its switch | **Each opens every child of the class she fights as and of every Tier 1 class she has at R50 there, and becomes her class's keeper at its Class Rank;** others at Rank 1; Suggested types and sub-profession; "New: Tier 2 classes"; no forced sheet; her lit steps stay | Open all twenty to them; a forced promotion sheet on the first load | **Kept, changed (R3-4)**: every child, not both |
+| **T2W24** | The Tier 2 board | **One board, 36 steps, the same seven tracks and the Rift and the same record positions;** Class, Craft and Stars re-read the new systems; Gear and Weapons read grades whatever form or type; World a won capital run; no track added | Add tracks for forms, types or picks (41–46 steps); a different count a tier; a medal layer now (CO30) | Kept |
+| **T2W25** | The Class track from Tier 2 | R10 · R30 · R50 on her best Tier 2 class; IV a Tier 2 class and its sibling at R50; V three Tier 2 classes at R50, any; Tier 1's pace; "Pair at R50" | IV "two Tier 2 classes at R50, any"; V a keeper and an expander of two parents | **Kept, changed (R3-1, R3-4)**: IV read as two classes of one Tier 1 line, the same in Tier 3 (T2W42) |
+| **T2W26** | The Craft track from Tier 2 | **Her three Craft Levels add up to 12 · 24 · 36 · 48 · 60:** any split; Craft V 24.9 (even) to 27.8 days (a specialist) against Tier 1's 24.5; "Crafts 36"; the dial 56 | Her best profession at 10 … 50; her Craft EXP in all three; each profession its own steps | Kept |
+| **T2W27** | Progress, never a choice | **A step reads progress only; a choice counts only as breadth any option meets equally** (two of one line, three classes, five weapons, three Crafts); no step names a class, type, form, stat or profession; a choice celebrated is CO30's medal | Steps for picks ("wear a Dual"); steps for a named class | Kept |
+| **T2W28** | The record and the art | **No new position, no rebake:** every tier keeps the 36 ids and positions; each id's rule is the tier's (read by tier from Tier 2's switch); `windowNext` and the tiles gain "Pair R41/50" and "Crafts 29/36"; the pane map lights 36 as now | A record per tier; a rebake for a new count | Kept (IV pairs by Tier 1 ancestor, T2W42) |
+| **T2W29** | The Tier 3 board | Tier 2's board at Tier 3's numbers, 36 with its Rift: Class on Tier 3's classes (R50 also her crown, if classes keeps it there), Crafts to 60, the Tier 3 map, continents 11–15 | A track for the crown or mastery; 35 without a Rift | **Superseded (R3-1)** by T2W43 |
+| **T2W30** | The Rift's guidance and tests on the later tiers | **The guidance names the Tier 1 class and any of its line fits;** the fronts' tests ask for the later tiers' tools (Pure types and Momentum on Iron, a Dual's partner and kind rows on Arcane, single-target burst on the Duel, area, multi-hit and wider debuffs on the Horde) | Name the keeper only; name exact classes a front | **Kept, changed (R3-4)**: by Tier 1 line in both tiers (T2W45) |
+| **T2W31** | Ascend into Tier 3 | The same sheet, pre-filled with her Tier 2 picks: her class (her open set carrying, assumed; Tier 3's options if classes gives one), weapons and types, sub-profession; forms and picks kept as settings; 3,000 Laurels | No picks into Tier 3; a Tier 3 promotion of its own | **Superseded (R3-1)** by T2W37–T2W39 |
+| **T2W32** | A Tier 2 run with round 2 | **A first cohort of twenty working for itself: full windows in about 63.6 days (sub-professions pooled; 111.6 without); forty at work: 31.8, the Rift binding at 33.5 (37.6 at 80%); the fighting party at G10 on day 23.4;** Crafts 60 by 24.9–27.8; the promotion one tap a party (reconciled, XR15) | Tier 1's time with a half step in Tier 2 (T2P41's alternative); tickets flat | Kept |
 
-**Calls the owner may want to see first:** T2W25 (Class IV names the sibling: the board nudges the swap he asked for;
-the alternative is any two), T2W26 (Craft as a sum, a specialist 14% slower than Tier 1), T2W17 (the open set fixed at
-Ascend by her Tier 1 classes at R50, so ranking a fourth Tier 1 class before ascending buys two more Tier 2 classes) and
-T2W18 (keepers by default, so a promotion changes nothing he didn't pick).
+**Counts:** round 3 adds 14 calls (T2W33–T2W46); it supersedes 2 round-2 calls (T2W29, T2W31) and re-reads 8 (T2W16,
+T2W17, T2W18, T2W19, T2W21, T2W23, T2W25, T2W30). Current calls: 13 of round 1 (two superseded by round 2), 15 of round 2,
+14 of round 3: **42**.
+
+### 10.3 Where the owner may want to look first
+
+| Call | Why it's worth his eye |
+|---|---|
+| **T2W37, T2W39** The Tier 3 promotion and its weapons page | The same sheet, his new class pre-filled; but the weapons are the new class's Suggested, not her Tier 2 kit, because gear's coverage fix lives in the Suggested types (gear T2G55); his old kit is the "As in Tier 2" chip |
+| **T2W42** Class IV reads "two classes of one Tier 1 line" | In Tier 3 a class has a sibling only on the crosses' lines, so the step names a line; in Tier 2 it reads exactly as round 2's "a class and her sibling" |
+| **T2W36** Suggested with her family first | A kin class is Suggested only when nothing of her family stands at R50; round 2's "highest R50 class" tied at Rank 50 |
+| **T2W41** Ascending into Tier 3 before its toolbox | Tier 2's release writes her Tier 3 set early, so an Uma who fills a Tier 2 window between the two releases loses nothing; the alternative is a gate |
+| **T2W33, T2W38** The open sets 6–20 and 3–22 | Ranking a fourth Tier 1 class before ascending buys two or three Tier 2 classes; into Tier 3 a cross at R50 is worth two cards |

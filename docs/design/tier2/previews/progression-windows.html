@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Windows by Tier</title>
-<!-- progression.md's round-2 page (T2W24–T2W29): the stained-glass windows in Tiers 2 and 3. The boards by tier, how a
+<!-- progression.md's round-3 page (T2W24–T2W28, T2W42, T2W43): the stained-glass windows in Tiers 2 and 3. The boards by tier, how a
      window is drawn (a placeholder window and its pane map, lit by the live P84 rule), latching against a free pick,
      what each new system lights, the Craft sum, pacing by track and the record. Style: the Tier rework's _template.html
      block (uma-kit's tokens, light and dark), then this page's own. The window is made-up geometry, never original art. -->
@@ -127,12 +127,13 @@
 </head>
 <body>
 <main>
-  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 2 · 2026-11-04 · nothing built</span></div>
+  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 3 · 2026-11-05 · nothing built</span></div>
   <h1>The windows in Tiers 2 and 3</h1>
   <p class="lead">One board of 36 steps in every tier, the same seven tracks and the Rift, the same record. Round 2's
-    systems land where their progress already lives: Class reads the sixteen and asks for a class and its sibling, Craft
-    reads her three professions together, Stars reads the tier's map, Gear and Weapons read grades whatever form or type
-    she wears. A step reads progress, never a choice; the art needs nothing (T2W24–T2W29).</p>
+    systems land where their progress already lives: Class reads the tier's own classes (twenty, then twenty-two) and
+    asks for two of one Tier 1 line, Craft reads her three professions together, Stars reads the tier's map, Gear and
+    Weapons read grades whatever form or type she wears. A step reads progress, never a choice; the art needs nothing
+    (T2W24–T2W28, T2W42, T2W43).</p>
   <nav class="tabs">
     <a href="progression-tiers.html">The tiers</a>
     <a href="progression-ascend.html">The Ascend sheet</a>
@@ -144,8 +145,18 @@
 
   <h2>Three boards, as the Window sheet draws them</h2>
   <p>Each tile is the board's short label; dashed tiles read something new in that tier. Hover a tile for its rule.
-    Tier 1 is live (engine v21, save v36); Tiers 2 and 3 are round 2's, with capitals v2's World step (CA12).</p>
+    Tier 1 is live (engine v21, save v38); Tiers 2 and 3 are rounds 2 and 3's, with capitals v2's World step (CA12).</p>
   <div class="grid3" id="boards"></div>
+
+  <h2>The Class track by tier, on the new trees (T2W42, T2W43)</h2>
+  <p>Class IV reads <b>two classes of one Tier 1 line at Class Rank 50</b> in both later tiers: in Tier 2 a class and her
+    sibling (two children of one Tier 1 class), in Tier 3 two of the line's Tier 3 classes, since a Tier 3 class has a true
+    sibling only on the Spellfist's and the Battlemage's lines. Class III in Tier 3 is her first crown. Pick a line:</p>
+  <div class="card">
+    <div class="row" style="margin-bottom:8px"><span class="toggle" id="lineT"></span></div>
+    <div class="grid3" id="lineView"></div>
+    <p class="muted" style="margin-top:8px" id="lineNote"></p>
+  </div>
 
   <h2>How a window is drawn (live, P84)</h2>
   <p>A made-up window of placeholder panes, lit by the game's own rule: a pane is drawn when its map value is the lead (0)
@@ -186,7 +197,7 @@
   <h2>Each new system, and where the board reads it (T2W24)</h2>
   <div class="card">
     <div class="sys" id="sys"></div>
-    <p class="muted" style="margin-top:10px">A choice counts only as breadth any option meets equally: "a class and its sibling", "three classes", "five
+    <p class="muted" style="margin-top:10px">A choice counts only as breadth any option meets equally: "two of one line", "three classes", "five
       weapons", "her three Crafts to 60". No step names a class, a type, a form, a stat or a profession. A choice celebrated
       without gating is CO30's medal phase.</p>
   </div>
@@ -253,12 +264,12 @@ function board(t) {
     ['Level', [10, 20, 30, 40, 50].map((l) => [`Lv ${l}`, `Uma Lv ${l}${t > 1 ? ` (T${t} Lv ${l})` : ''}`, false])],
     ['Class', t === 1
       ? [['R10', 'A Tier 0 class at Class Rank 10'], ['R30', 'A Tier 1 class at Class Rank 30'], ['R50', 'A Tier 1 class at Class Rank 50'], ['2 at R50', 'Two Tier 1 classes at Class Rank 50'], ['3 at R50', 'Three Tier 1 classes at Class Rank 50']].map((x) => [...x, false])
-      : [['R10', `A Tier ${t === 2 ? 2 : '2'} class at Class Rank 10`, true], ['R30', 'Its Class Rank 30', true], ['R50', t === 3 ? 'Class Rank 50: also her crown and mastery (if classes keeps them there)' : 'Class Rank 50', true],
-        ['Pair at R50', 'A Tier 2 class and its sibling at Class Rank 50: both children of one Tier 1 class (T2W25)', true], ['3 at R50', 'Three Tier 2 classes at Class Rank 50, any', true]]],
+      : [['R10', `A Tier ${t} class at Class Rank 10`, true], ['R30', `A Tier ${t} class at Class Rank 30`, true], ['R50', t === 3 ? 'A Tier 3 class at Class Rank 50: her first crown (T2W43)' : 'A Tier 2 class at Class Rank 50', true],
+        ['Pair at R50', t === 3 ? 'Two Tier 3 classes of one Tier 1 line at Class Rank 50 (T2W42)' : 'Two Tier 2 classes of one Tier 1 line at Class Rank 50: a class and her sibling (T2W25, T2W42)', true], ['3 at R50', `Three Tier ${t} classes at Class Rank 50, any`, true]]],
     ['Craft', t === 1 ? [10, 20, 30, 40, 50].map((l) => [`Craft ${l}`, `Craft Lv ${l}`, false]) : [12, 24, 36, 48, 60].map((l) => [`Crafts ${l}`, `Her three Craft Levels add up to ${l} (T2W26)`, true])],
-    ['Gear', [2, 4, 6, 8, 10].map((g) => [`G${g}`, `All eleven worn slots at G${g}${t > 1 ? (g === 10 ? ': every accessory tree open (assumed)' : '; the accessory tree\'s forms open with the grade') : ''}`, t > 1 && g === 10])],
+    ['Gear', [2, 4, 6, 8, 10].map((g) => [`G${g}`, `All eleven worn slots at G${g}${t > 1 ? (g >= 6 ? '; every accessory tree open (whole from a slot\'s G5, T2G30)' : '; the accessory tree\'s forms open with the grade') : ''}`, false])],
     ['Weapons', [2, 4, 6, 8, 10].map((g) => [`5 at G${g}`, `Five weapons at G${g}, any of her classes'${t > 1 ? ', any type' : ''}`, false])],
-    ['Stars', [1, 2, 3, 4, 5].map((n) => [`Stars ${RN[n - 1]}`, n === 5 ? `The whole map: ${t === 1 ? '22' : '22 (27 with a weapon-moon body)'} nodes${t > 1 ? '; stat picks not read' : ''}` : `Every node to ${RN[n - 1]}: ${[4, 9, 13, 18][n - 1]} nodes`, false])],
+    ['Stars', [1, 2, 3, 4, 5].map((n) => [`Stars ${RN[n - 1]}`, n === 5 ? `The whole map: 22 nodes${t > 1 ? '; stat picks not read' : ''}` : `Every node to ${RN[n - 1]}: ${[4, 9, 13, 18][n - 1]} nodes`, false])],
     ['World', [0, 1, 2, 3, 4].map((i) => [`Cont. ${first + i}`, `Continent ${first + i}: a won capital run (CA12)`, false])],
   ]
   return rows
@@ -266,10 +277,34 @@ function board(t) {
 $('#boards').innerHTML = [1, 2, 3].map((t) => {
   const rows = board(t)
   const changed = rows.flatMap((r) => r[1]).filter((x) => x[2]).length
-  return `<div class="card"><div class="bhead"><b><span class="tier t${t}">Tier ${t}</span> ${['', 'as built', 'round 2', 'round 2'][t]}</b><span class="muted" style="font-size:12px">36 steps${t === 3 ? ' (live 35: T2W4)' : ''} · ${changed} re-read</span></div>
+  return `<div class="card"><div class="bhead"><b><span class="tier t${t}">Tier ${t}</span> ${['', 'as built', 'rounds 2–3', 'round 3'][t]}</b><span class="muted" style="font-size:12px">36 steps${t === 3 ? ' (live 35: T2W4)' : ''} · ${changed} re-read</span></div>
     <div class="board">${rows.map(([name, steps]) => `<span class="lab">${name}</span>${steps.map(([lab, rule, ch]) => `<div class="tile ${ch ? 'changed' : ''}" data-tip="<b>${name} ${RN[steps.indexOf(steps.find((s) => s[0] === lab))]}</b> · ${rule}">${lab}</div>`).join('')}`).join('')}
       <span class="lab">Rift</span><div class="tile rift ${t === 3 ? 'changed' : ''}" data-tip="On a won Tier ${t} Rift run${t === 3 ? ' (T2W4: Tier 3 gets a Rift)' : ''}">Rift</div></div></div>`
 }).join('')
+
+// --- The Class track by line (T2W42, T2W43) -----------------------------------------------------------------------
+const LINES = {
+  Brawler: [['Berserker', 'Spellfist'], ['Ravager', 'Spellhammer', 'Gladiator']], Sorcerer: [['Archmage', 'Battlemage'], ['Astromancer', 'Spellknight', 'Thaumaturge']],
+  'Arms Spellblade': [['Blademaster', 'Sentinel', 'Bladedancer'], ['Bladelord', 'Herald', 'Dervish']], 'Tome Spellblade': [['Runeblade', 'Enchanter', 'Spellweaver'], ['Runelord', 'Oracle', 'Starweaver']],
+  'Arms Summoner': [['Warlord', 'Druid', 'Marshal'], ['Overlord', 'Archdruid', 'Imperator']], 'Tome Summoner': [['Invoker', 'Shaman', 'Animist'], ['Hierarch', 'Soulcaller', 'Mythlord']],
+  Paladin: [['Guardian', 'Templar'], ['Bastion', 'Inquisitor']], Cleric: [['Bishop', 'Exorcist'], ['Cardinal', 'Hierophant']],
+}
+let lineSel = 'Brawler'
+function drawLine() {
+  const [t2, t3] = LINES[lineSel]
+  const pairs = (xs) => xs.flatMap((a, i) => xs.slice(i + 1).map((b) => `${a} + ${b}`))
+  $('#lineT').innerHTML = Object.keys(LINES).map((k) => `<button class="${k === lineSel ? 'on' : ''}" data-l="${k}">${k}</button>`).join('')
+  $('#lineView').innerHTML = [
+    ['Tier 1 (live)', [lineSel], 'Two Tier 1 classes at R50, any (not only this line)'],
+    ['Tier 2', t2, `IV lights on: ${pairs(t2).join(' · ')}`],
+    ['Tier 3', t3, `IV lights on: ${pairs(t3).join(' · ')}`],
+  ].map(([h, cs, n]) => `<div><b>${h}</b><div style="margin:6px 0">${cs.map((c) => `<span class="chip">${c}</span>`).join(' ')}</div><div class="muted" style="font-size:12px">${n}</div></div>`).join('')
+  $('#lineNote').textContent = t3.length === 3 && t2.length === 2
+    ? 'The Spellfist\'s and the Battlemage\'s Tier 3 children are true siblings; the third Tier 3 class of the line is the keeper\'s. Her Tier 2 Class IV (both children at R50) opens all three on arrival in Tier 3, so Class IV there is reachable from day one.'
+    : 'Each Tier 2 class has one Tier 3 child here, so Tier 3 has no true siblings on this line: IV reads two of the line\'s Tier 3 classes. Her Tier 2 Class IV opens two of them on arrival in Tier 3.'
+}
+$('#lineT').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; lineSel = b.dataset.l; drawLine() })
+drawLine()
 
 // --- The reveal: a placeholder window ------------------------------------------------------------------------------
 const HEAD = { x: 120, y: 150 }
@@ -367,7 +402,7 @@ drawLatch()
 
 // --- Systems map ----------------------------------------------------------------------------------------------------
 const SYS = [
-  ['Sixteen classes', 'R2-2–R2-5 · T2C', 'Class Rank on each class she holds', ['Class I–V', 'IV: a class and its sibling'], 'Which she fights as; keeper or expander'],
+  ['Twenty and twenty-two classes', 'R2-2–R2-5, R3-1–R3-6 · T2C', 'Class Rank on each class she holds', ['Class I–V', 'IV: two of one Tier 1 line', 'III in Tier 3: her crown'], 'Which she fights as; keeper, cross, support or pure'],
   ['Weapon types', 'R2-6 · T2G', 'Each weapon kind\'s grade', ['Weapons I–V', 'Gear I–V'], 'Pure or Dual, the partner'],
   ['The accessory tree', 'R2-7 · T2G', 'Each slot\'s grade; forms open as it rises', ['Gear I–V', 'V: every tree open'], 'Which form she wears'],
   ['Stat picks', 'R2-8 · T2E', 'Nodes opened by jewels', ['Stars I–V'], 'The stat each node takes'],
@@ -455,11 +490,12 @@ $('#recLine').textContent = `${Object.keys(AT).length} of 36 lit; ${IDS.length *
 // --- Calls --------------------------------------------------------------------------------------------------------
 const CALLS = [
   ['T2W24', 'The Tier 2 board', 'One board, 36 steps, the same seven tracks and the Rift and the same record positions; Class, Craft and Stars re-read the new systems; Gear and Weapons read grades whatever form or type'],
-  ['T2W25', 'The Class track', 'R10 · R30 · R50 on her best Tier 2 class; IV a Tier 2 class and its sibling at R50; V three Tier 2 classes at R50, any'],
+  ['T2W25', 'The Class track (re-read by T2W42)', 'R10 · R30 · R50 on her best Tier 2 class; IV two Tier 2 classes of one Tier 1 line at R50 (a class and her sibling); V three Tier 2 classes at R50, any'],
   ['T2W26', 'The Craft track', 'Her three Craft Levels add up to 12 · 24 · 36 · 48 · 60; Craft V 24.9 (even) to 27.8 days (a specialist), Tier 1 24.5'],
   ['T2W27', 'Progress, never a choice', 'A step reads progress; a choice only as breadth any option meets equally; no step names a class, type, form, stat or profession'],
   ['T2W28', 'The record and the art', 'No new position, no rebake; each id\'s rule is the tier\'s; new labels "Pair at R50", "Crafts 36"'],
-  ['T2W29', 'The Tier 3 board', 'Tier 2\'s board at Tier 3\'s numbers, 36 with its Rift'],
+  ['T2W42', 'Class IV in both later tiers', 'Two classes of one Tier 1 line at Class Rank 50; reachable from Tier 3\'s first day; "Pair at R50"'],
+  ['T2W43', 'The Tier 3 board (supersedes T2W29)', 'Tier 2\'s board at Tier 3\'s numbers, 36 with its Rift; Class III her first crown, IV T2W42'],
 ]
 $('#calls').innerHTML = '<tr><th>Id</th><th>Call</th><th>Recommended</th></tr>' + CALLS.map((r) => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')
 </script>

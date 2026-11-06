@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Weapon Types</title>
-<!-- gear.md: weapon types picked at promotion, partners, Suggested for sixteen, coverage. Self-contained; kit tokens from tier-rework/previews/_template.html. -->
+<!-- gear.md: weapons for the forty-two, types picked at promotion, partners, Suggested, coverage. Self-contained; kit tokens from tier-rework/previews/_template.html. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -105,34 +105,37 @@
 </head>
 <body>
 <main class="wide">
-  <h1>Weapon types in Tiers 2 and 3: picked at promotion, swapped freely</h1>
-  <p>From <a href="../gear.md">gear.md</a> (T2G21–T2G28). On the Ascend sheet she picks her Tier 2 class, then her three
-    weapons and each one's <b>type</b> (Suggested pre-set); afterwards a type swaps with one tap on the Gear tab, free. Every
-    Tier 2 grade takes its line's two items: the first raises Might, the second the type, whatever type she wears.</p>
-  <nav class="tabs"><a href="#sheet">The Ascend sheet's weapons</a><a href="#grades">Types by grade</a><a href="#partners">Partners</a><a href="#sixteen">Suggested for sixteen</a><a href="#cover">Coverage</a><a href="#pages">Other pages</a></nav>
+  <h1>Weapons for the forty-two: types picked at promotion, swapped freely</h1>
+  <p>From <a href="../gear.md">gear.md</a> (round 3: T2G47–T2G57; round 2's T2G21–T2G28). On each Ascend sheet she picks her
+    class, then her three weapons and each one's <b>type</b>, Suggested pre-set; afterwards a type swaps with one tap on the
+    Gear tab, free. Every later grade takes its line's two items: the first raises Might, the second the type.</p>
+  <nav class="tabs"><a href="#sheet">The Ascend sheet's weapons</a><a href="#grades">Types by grade</a><a href="#partners">Partners</a><a href="#cross">The crosses and the pure variants</a><a href="#t2">Suggested, Tier 2</a><a href="#t3">Suggested, Tier 3</a><a href="#cover">Coverage</a><a href="#pages">Other pages</a></nav>
 
   <div class="kpis">
-    <div class="kpi"><div class="lbl">Types a weapon can wear</div><div class="val">1 · 2 · 3</div><div class="sub">Tier 1 · Pure, Dual · Keen, Tempered, Evolved</div></div>
+    <div class="kpi"><div class="lbl">Classes · slots</div><div class="val">8 · 20 · 22</div><div class="sub">Three slots each; the Gladiator and the Thaumaturge two two-kind weapons</div></div>
     <div class="kpi"><div class="lbl">A weak hit at G10, at most</div><div class="val">×1.3 · ×1.5 · ×1.7</div><div class="sub">Each tier starts where the last ended</div></div>
-    <div class="kpi"><div class="lbl">Answers a regular, C1</div><div class="val">4.32 · 4.28 · 4.32</div><div class="sub">Tier 1 · 2 · 3, Suggested types; expander comps 4.14–4.38</div></div>
+    <div class="kpi"><div class="lbl">Answers a regular, mean of the owner's mixes</div><div class="val">4.31 · 4.25 · 4.22</div><div class="sub">Party 1, Tier 1 · 2 · 3 (Party 2: 4.35 · 4.18 · 4.25)</div></div>
     <div class="kpi"><div class="lbl">A type swap costs</div><div class="val">Nothing</div><div class="sub">One tap, outside fights (T2G22)</div></div>
   </div>
 
   <section id="sheet">
     <h2>The Ascend sheet's weapons step</h2>
-    <p>Progression owns the sheet (T2W19); this is what gear puts on it. Pick a class; tap a slot to see its type list.</p>
-    <div class="pills" id="cls" role="group" aria-label="Tier 2 class"></div>
+    <p>Progression owns the sheet (T2W19, T2W39); this is what gear puts on it. Pick a tier and a class; tap a slot to see its
+      type list with what each answers. Into Tier 3 the page pre-fills the new class's Suggested types; "As in Tier 2" maps hers.</p>
+    <div class="pills" id="tierp" role="group" aria-label="Tier"><button data-t="2" aria-pressed="true">Into Tier 2</button><button data-t="3" aria-pressed="false">Into Tier 3</button></div>
+    <div class="pills" id="cls" role="group" aria-label="Class"></div>
     <div class="phones">
-      <div class="phone"><div class="title"><span id="ptitle"></span><span class="tier t2">Tier 2</span></div><div id="slots"></div>
+      <div class="phone"><div class="title"><span id="ptitle"></span><span class="tier" id="ptier"></span></div><div id="slots"></div>
+        <div id="asin"></div>
         <div class="legend" id="covers"></div></div>
       <div class="phone"><div class="title"><span id="stitle"></span><span class="chip">Slot</span></div><div id="types"></div>
-        <div class="legend">Answers: her share of Tier 2's regulars with this weapon's type, her other two on Suggested. One tap wears a row.</div></div>
+        <div class="legend">Answers: her share of the tier's regulars with this type, her other slots on Suggested. One tap wears a row.</div></div>
     </div>
   </section>
 
   <section id="grades">
     <h2>Types by grade: the second item raises the type</h2>
-    <p>A Tier 2 grade takes an Arms Gem (or Tome Ink) for Might and an Arms Whetstone (or Tome Reagent) for the type, +0.02 on
+    <p>A later grade takes an Arms Gem (or Tome Ink) for Might and an Arms Whetstone (or Tome Reagent) for the type, +0.02 on
       its weak multiplier a grade. A Dual's own kind keeps ×1.3; its partner's weak hits grow from ×1.1.</p>
     <div class="card scroll"><svg id="chart" viewBox="0 0 760 260" width="100%" role="img" aria-label="Weak multiplier by grade for each type"></svg>
       <p class="legend">Lines: <span style="color:var(--phys)">Pure</span>, <span style="color:var(--magic)">Dual's partner</span> (its own kind ×1.3 flat), <span style="color:var(--t3)">Keen</span>, <span style="color:var(--heal)">Tempered and Evolved, both kinds</span>. Tier 1's ×1.3 dashed.</p></div>
@@ -141,26 +144,52 @@
   <section id="partners">
     <h2>The partner table (kept from round 1)</h2>
     <div class="card scroll"><table id="ptab"></table>
-      <p class="legend">Every partner is of its weapon's own channel and the other group, so every two-kind weapon bridges Ring (Heavy, Sweep, Scatter) and Light/Dark (Double, Volley). One two-kind weapon in her slots in every later tier.</p></div>
+      <p class="legend">Every partner is of its weapon's own channel and the other group, so every two-kind weapon bridges Ring (Heavy, Sweep, Scatter) and Light/Dark (Double, Volley). One two-kind weapon in her slots in every later tier; the Gladiator and the Thaumaturge two (Arsenal, T2G54).</p></div>
   </section>
 
-  <section id="sixteen">
-    <h2>Suggested types for the sixteen</h2>
-    <div class="card scroll"><table id="stab"></table>
-      <p class="legend">Weapons are classes.md's presets (T2C54); gear sets the types. Suggested is the Dual that leaves the fewest kinds in one hand over all 64 keeper and expander mixes of the owner's two parties.</p></div>
+  <section id="cross">
+    <h2>The crosses' other channel, and the pure variants (T2G48, T2G49)</h2>
+    <div class="grid2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px">
+      <div class="card"><h3>The crosses: a one-foe kind on her stat</h3>
+        <table><thead><tr><th></th><th>Spellfist · Spellhammer</th><th>Battlemage · Spellknight</th></tr></thead><tbody>
+          <tr><td>Her other channel</td><td><span class="k tome" style="--kc:var(--k-fire)">Fire</span> on ATK (round 2: Thunder)</td><td><span class="k arm" style="--kc:var(--k-katana)">Katana</span> on M.ATK (round 2: Lance)</td></tr>
+          <tr><td>Shape</td><td>Heavy: one foe</td><td>Double: one foe</td></tr>
+          <tr><td>Might</td><td>The Fire Tome's grade on ATK: +122 · +177 at G10</td><td>The Katana's grade on M.ATK</td></tr>
+          <tr><td>Raised by</td><td>Tome Ink, Tome Reagent</td><td>Arms Gem, Arms Whetstone</td></tr>
+          <tr><td>Partners</td><td>Dark (Tier 2) · Light (Tier 3)</td><td>Axe · Lance</td></tr>
+          <tr><td>Her offense on it, Lv 50</td><td class="n">277 · 499 · 722</td><td class="n">282 · 508 · 735</td></tr>
+        </tbody></table>
+        <p class="legend">One grade, every reader (D289): a Fire Tome at G7 is G7 for the Archmage on M.ATK and the Spellfist on ATK. The hit keeps its kind for defense, weakness, statuses and the ward.</p></div>
+      <div class="card"><h3>The pure variants: three of one channel</h3>
+        <table><thead><tr><th>Class</th><th>Slots</th><th>Preset</th><th>Her family</th></tr></thead><tbody id="puretab"></tbody></table>
+        <p class="legend">Her lead half from her first two weapons, her second from her third; every hit on her stat, so her stat's family counts on every hit. 300 refined of her channel a rank, as the Brawler or the Sorcerer.</p></div>
+    </div>
+  </section>
+
+  <section id="t2">
+    <h2>Suggested types for the twenty (T2G50, T2G51)</h2>
+    <div class="card scroll"><table id="stab2"></table>
+      <p class="legend">One two-kind weapon or none, searched over every mix of the owner's two parties (each seat any child of its Tier 1 class: 144 mixes) for the fewest kinds in one hand, under the coverage bound (T2G52). Round 2's keepers and battle healers keep their Dual. <b>New</b> marks round 3's changes.</p></div>
+  </section>
+
+  <section id="t3">
+    <h2>Suggested types for the twenty-two (T2G56)</h2>
+    <div class="card scroll"><table id="stab3"></table>
+      <p class="legend">The same rule on Tier 3's 324 mixes, every class searched. The four pure Tier 3 lines go Keen ×3: the fix for Arsenal (T2G55, <a href="gear-arsenal.html">its page</a>).</p></div>
   </section>
 
   <section id="cover">
-    <h2>Coverage: answers a regular (sub-boss · boss)</h2>
+    <h2>Coverage in Tier 2: the bound, per party (T2G52, T2G53)</h2>
+    <div class="card scroll"><table id="ptab2"></table></div>
     <div class="card scroll"><table id="ctab"></table>
-      <p class="legend">Live weakness dealer, every region stage of a tier (2,400 stages: about 10,100 regulars, 200 sub-bosses, 220 bosses). Tier 1: Party 1 4.32, Party 2 4.35; with every kind graded and re-picked every stage, 5.00.</p></div>
-    <div class="callout"><b>The bound holds:</b> every comp answers a regular at or under Tier 1's 4.32–4.35; the Tier 1-like comps keep every kind in two hands, the expander comps one to three kinds in one hand (classes' presets hold the Greatsword three or four times). Re-typing every stage (free) lifts a party about 0.4; Tier 1's free kind swaps already reach 5.00 with every kind graded. Sub-bosses and bosses gain about 15%, so their shields rise one from Tier 2 Lv 1 (T2B7).</div>
+      <p class="legend">Live weakness dealer, every region stage of Tier 2 on today's honeycomb (2,880 stages: about 12,180 regulars, 240 sub-bosses, 260 bosses). The shields' pricing: sub-bosses 7 while answers ≤ 4.66, bosses 9 while ≤ 4.48 (CP8's rule, T2B7).</p></div>
+    <div class="callout"><b>The bound holds in Tier 2:</b> both parties' means under their Tier 1 party (4.25 against 4.31, 4.18 against 4.35), every one of the 144 mixes inside the shields' pricing. The swap comps put one to three kinds in one hand, the price of single big hits; C10 drops Thunder, which the party hint names. Tier 3 and Arsenal: <a href="gear-arsenal.html">their own page</a>.</div>
   </section>
 
   <section id="pages">
     <h2>The other pages</h2>
-    <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-accessories.html">The accessory tree</a> ·
-      <a href="gear-presets.html">Presets for the sixteen</a> · <a href="gear-costs.html">Armor and what a grade costs</a></p>
+    <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-arsenal.html">Arsenal and the coverage bound</a> · <a href="gear-accessories.html">The accessory tree</a> ·
+      <a href="gear-presets.html">Presets for the forty-two</a> · <a href="gear-costs.html">Armor and what a grade costs</a></p>
   </section>
 </main>
 <script>
@@ -172,47 +201,107 @@ const P2 = { greatsword: 'bow', axe: 'bow', lance: 'katana', fire: 'dark', ice: 
 const P3 = { greatsword: 'katana', axe: 'katana', lance: 'bow', fire: 'light', ice: 'dark', lightning: 'dark', bow: 'lance', katana: 'lance', light: 'lightning', dark: 'lightning' };
 const SHAPE = { greatsword: 'Heavy', fire: 'Heavy', axe: 'Sweep', ice: 'Sweep', lance: 'Scatter', lightning: 'Scatter', katana: 'Double', light: 'Double', bow: 'Volley', dark: 'Volley' };
 const kc = (k) => `<span class="k ${K[k][1] ? 'arm' : 'tome'}" style="--kc:var(--k-${k})">${K[k][0]}</span>`;
-// class: weapons (lead first), Suggested dual slot (Tier 2), Tier 3 two-kind (T = Tempered, E = Evolved), solo answers [none, dual on slot 0,1,2]
-const C = [
-  ['Berserker', ['greatsword', 'axe', 'lance'], 0, 'T', 'Keeper · 3 Arms', [76, 91, 91, 91]],
-  ['Spellfist', ['greatsword', 'axe', 'fire'], 0, 'T', 'Expander · every hit on ATK', [72, 87, 87, 82]],
-  ['Archmage', ['fire', 'ice', 'lightning'], 0, 'E', 'Keeper · 3 Tomes', [81, 87, 93, 93]],
-  ['Battlemage', ['fire', 'lightning', 'greatsword'], 0, 'T', 'Expander · every hit on M.ATK', [72, 80, 84, 84]],
-  ['Blademaster', ['katana', 'axe', 'lightning'], 2, 'E', 'Keeper · 2 Arms + 1 Tome', [69, null, 85, 80]],
-  ['Sentinel', ['katana', 'greatsword', 'light'], 0, 'T', 'Support · 2 Arms + 1 Tome', [71, 84, 84, 82]],
-  ['Runeblade', ['lightning', 'ice', 'katana'], 0, 'E', 'Keeper · 2 Tomes + 1 Arm', [70, 82, 82, 82]],
-  ['Enchanter', ['light', 'ice', 'katana'], 2, 'T', 'Support · 2 Tomes + 1 Arm', [70, null, null, 81]],
-  ['Warlord', ['bow', 'axe', 'dark'], 0, 'T', 'Keeper · 2 Arms + 1 Tome', [71, 85, null, 83]],
-  ['Druid', ['bow', 'greatsword', 'dark'], 2, 'E', 'Support · 2 Arms + 1 Tome', [69, null, null, 82]],
-  ['Invoker · Shaman', ['dark', 'ice', 'bow'], 0, 'T', 'Keeper · support', [68, 84, 84, 80]],
-  ['Guardian · Templar', ['lance', 'greatsword', 'light'], 0, 'T', 'Healers · 2 Arms + 1 Tome', [71, 86, 84, 82]],
-  ['Bishop · Exorcist', ['light', 'fire', 'lance'], 2, 'T', 'Healers · 2 Tomes + 1 Arm', [71, 86, 84, 83]],
+// Tier 2: id, name, line, weapons, Suggested pick ([slot] or [] for Pure ×3), cross slot, new in round 3
+const T2 = [
+  ['berserker', 'Berserker', 'Keeper · 3 Arms', ['greatsword', 'axe', 'lance'], [0], -1, 0],
+  ['spellfist', 'Spellfist', 'Cross · Tome on ATK', ['greatsword', 'katana', 'fire'], [1], 2, 1],
+  ['archmage', 'Archmage', 'Keeper · 3 Tomes', ['fire', 'ice', 'lightning'], [0], -1, 0],
+  ['battlemage', 'Battlemage', 'Cross · Arm on M.ATK', ['fire', 'ice', 'katana'], [0], 2, 1],
+  ['blademaster', 'Blademaster', 'Keeper · 2 Arms + 1 Tome', ['katana', 'axe', 'lightning'], [2], -1, 0],
+  ['sentinel', 'Sentinel', 'Support · 2 Arms + 1 Tome', ['katana', 'greatsword', 'light'], [0], -1, 0],
+  ['bladedancer', 'Bladedancer', 'Pure · 3 Arms', ['katana', 'axe', 'bow'], [], -1, 1],
+  ['runeblade', 'Runeblade', 'Keeper · 2 Tomes + 1 Arm', ['lightning', 'ice', 'katana'], [0], -1, 0],
+  ['enchanter', 'Enchanter', 'Support · 2 Tomes + 1 Arm', ['light', 'ice', 'katana'], [], -1, 1],
+  ['spellweaver', 'Spellweaver', 'Pure · 3 Tomes', ['lightning', 'ice', 'dark'], [0], -1, 1],
+  ['warlord', 'Warlord', 'Keeper · 2 Arms + 1 Tome', ['bow', 'axe', 'dark'], [0], -1, 0],
+  ['druid', 'Druid', 'Support · 2 Arms + 1 Tome', ['bow', 'axe', 'dark'], [0], -1, 1],
+  ['marshal', 'Marshal', 'Pure · 3 Arms', ['bow', 'axe', 'katana'], [], -1, 1],
+  ['invoker', 'Invoker', 'Keeper · 2 Tomes + 1 Arm', ['dark', 'ice', 'bow'], [0], -1, 0],
+  ['shaman', 'Shaman', 'Support · 2 Tomes + 1 Arm', ['dark', 'ice', 'bow'], [0], -1, 0],
+  ['animist', 'Animist', 'Pure · 3 Tomes', ['dark', 'ice', 'lightning'], [1], -1, 1],
+  ['guardian', 'Guardian', 'Healer · 2 Arms + 1 Tome', ['lance', 'greatsword', 'light'], [0], -1, 0],
+  ['templar', 'Templar', 'Battle healer', ['lance', 'greatsword', 'light'], [0], -1, 0],
+  ['bishop', 'Bishop', 'Healer · 2 Tomes + 1 Arm', ['light', 'fire', 'lance'], [2], -1, 0],
+  ['exorcist', 'Exorcist', 'Battle healer', ['light', 'fire', 'lance'], [2], -1, 0],
 ];
-let cur = 0, slot = 0;
-const legal = (w, k) => !w.includes(P2[k]);
+// Tier 3: id, name, parent, weapons, Suggested picks ([[slot, table]]), cross slot
+const T3 = [
+  ['ravager', 'Ravager', 'berserker', ['greatsword', 'axe', 'lance'], [[0, 3]], -1],
+  ['spellhammer', 'Spellhammer', 'spellfist', ['greatsword', 'katana', 'fire'], [[1, 3]], 2],
+  ['gladiator', 'Gladiator', 'spellfist', ['greatsword', 'axe', 'lance'], [[0, 3], [1, 2]], -1],
+  ['astromancer', 'Astromancer', 'archmage', ['fire', 'ice', 'lightning'], [[0, 2]], -1],
+  ['spellknight', 'Spellknight', 'battlemage', ['fire', 'ice', 'katana'], [[0, 2]], 2],
+  ['thaumaturge', 'Thaumaturge', 'battlemage', ['fire', 'ice', 'lightning'], [[0, 3], [1, 3]], -1],
+  ['bladelord', 'Bladelord', 'blademaster', ['katana', 'axe', 'lightning'], [[2, 2]], -1],
+  ['herald', 'Herald', 'sentinel', ['katana', 'greatsword', 'light'], [[1, 2]], -1],
+  ['dervish', 'Dervish', 'bladedancer', ['katana', 'axe', 'bow'], [], -1],
+  ['runelord', 'Runelord', 'runeblade', ['lightning', 'ice', 'katana'], [[0, 2]], -1],
+  ['oracle', 'Oracle', 'enchanter', ['light', 'ice', 'katana'], [[0, 3]], -1],
+  ['starweaver', 'Starweaver', 'spellweaver', ['lightning', 'ice', 'dark'], [], -1],
+  ['overlord', 'Overlord', 'warlord', ['bow', 'axe', 'dark'], [[0, 2]], -1],
+  ['archdruid', 'Archdruid', 'druid', ['bow', 'axe', 'dark'], [[0, 2]], -1],
+  ['imperator', 'Imperator', 'marshal', ['bow', 'axe', 'katana'], [], -1],
+  ['hierarch', 'Hierarch', 'invoker', ['dark', 'ice', 'bow'], [[0, 2]], -1],
+  ['soulcaller', 'Soulcaller', 'shaman', ['dark', 'ice', 'bow'], [[0, 2]], -1],
+  ['mythlord', 'Mythlord', 'animist', ['dark', 'ice', 'lightning'], [], -1],
+  ['bastion', 'Bastion', 'guardian', ['lance', 'greatsword', 'light'], [[2, 3]], -1],
+  ['inquisitor', 'Inquisitor', 'templar', ['lance', 'greatsword', 'light'], [[2, 3]], -1],
+  ['cardinal', 'Cardinal', 'bishop', ['light', 'fire', 'lance'], [[2, 3]], -1],
+  ['hierophant', 'Hierophant', 'exorcist', ['light', 'fire', 'lance'], [[2, 3]], -1],
+];
+// Answers alone (regular, % of the tier's regulars) for each option: "none", "<slot><table>" (table 2 = Tier 2 partner, 3 = Tier 3 partner). From the live dealer.
+const OPTS = {"2:berserker":{"12":91,"22":91,"none":76,"02":91},"2:spellfist":{"12":86,"22":82,"none":74,"02":86},"2:archmage":{"12":92,"22":92,"none":79,"02":87},"2:battlemage":{"12":86,"22":85,"none":74,"02":84},"2:blademaster":{"12":85,"22":80,"none":69},"2:sentinel":{"12":84,"22":82,"none":71,"02":84},"2:bladedancer":{"22":91,"none":77},"2:runeblade":{"12":81,"22":81,"none":68,"02":81},"2:enchanter":{"22":81,"none":69},"2:spellweaver":{"12":86,"22":87,"none":66,"02":86},"2:warlord":{"22":84,"none":72,"02":85},"2:druid":{"22":84,"none":72,"02":85},"2:marshal":{"none":77,"02":91},"2:invoker":{"12":84,"22":80,"none":67,"02":84},"2:shaman":{"12":84,"22":80,"none":67,"02":84},"2:animist":{"12":86,"22":86,"none":66,"02":87},"2:guardian":{"12":84,"22":82,"none":71,"02":86},"2:templar":{"12":84,"22":82,"none":71,"02":86},"2:bishop":{"12":85,"22":83,"none":72,"02":86},"2:exorcist":{"12":85,"22":83,"none":72,"02":86},"3:ravager":{"12":91,"13":91,"22":91,"23":91,"none":76,"02":91,"03":91},"3:spellhammer":{"12":86,"13":88,"22":82,"23":83,"none":73,"02":86},"3:gladiator":{"12":91,"13":91,"22":91,"23":91,"none":76,"02":91,"03":91},"3:astromancer":{"12":92,"13":87,"22":92,"23":87,"none":79,"02":87,"03":92},"3:spellknight":{"12":86,"13":84,"22":85,"23":85,"none":74,"02":84,"03":86},"3:thaumaturge":{"12":92,"13":87,"22":92,"23":87,"none":79,"02":87,"03":92},"3:bladelord":{"12":85,"22":80,"23":79,"none":69,"03":84},"3:herald":{"12":84,"22":82,"23":81,"none":71,"02":84,"03":86},"3:dervish":{"22":91,"23":91,"none":77,"03":91},"3:runelord":{"12":82,"13":79,"22":81,"23":82,"none":69,"02":82,"03":79},"3:oracle":{"13":85,"22":81,"23":81,"none":70,"03":82},"3:starweaver":{"12":87,"22":87,"none":67,"02":87},"3:overlord":{"13":85,"22":83,"23":80,"none":71,"02":84,"03":85},"3:archdruid":{"13":85,"22":83,"23":80,"none":71,"02":84,"03":85},"3:imperator":{"23":91,"none":77,"02":91,"03":91},"3:hierarch":{"12":85,"22":81,"23":81,"none":68,"02":84,"03":79},"3:soulcaller":{"12":85,"22":81,"23":81,"none":68,"02":84,"03":79},"3:mythlord":{"12":87,"22":87,"none":67,"02":87},"3:bastion":{"12":84,"13":86,"22":82,"23":80,"none":71,"02":86,"03":84},"3:inquisitor":{"12":84,"13":86,"22":82,"23":80,"none":71,"02":86,"03":84},"3:cardinal":{"12":85,"22":83,"23":83,"none":71,"02":86,"03":83},"3:hierophant":{"12":85,"22":83,"23":83,"none":71,"02":86,"03":83}};
+// Suggested answers (regular · sub-boss · boss)
+const ANS2 = { berserker: '0.91 · 0.90 · 0.92', spellfist: '0.86 · 0.83 · 0.88', archmage: '0.87 · 0.97 · 0.92', battlemage: '0.84 · 0.91 · 0.78', blademaster: '0.80 · 0.75 · 0.82', sentinel: '0.84 · 0.82 · 0.87', bladedancer: '0.77 · 0.78 · 0.78', runeblade: '0.81 · 0.86 · 0.84', enchanter: '0.69 · 0.78 · 0.68', spellweaver: '0.86 · 0.91 · 0.84', warlord: '0.85 · 0.85 · 0.88', druid: '0.85 · 0.85 · 0.88', marshal: '0.77 · 0.78 · 0.78', invoker: '0.84 · 0.90 · 0.73', shaman: '0.84 · 0.90 · 0.73', animist: '0.86 · 0.91 · 0.84', guardian: '0.86 · 0.86 · 0.88', templar: '0.86 · 0.86 · 0.88', bishop: '0.83 · 0.80 · 0.86', exorcist: '0.83 · 0.80 · 0.86' };
+const ANS3 = { ravager: '0.91 · 0.89 · 0.89', spellhammer: '0.88 · 0.83 · 0.86', gladiator: '1.00 · 1.00 · 1.00', astromancer: '0.87 · 0.95 · 0.92', spellknight: '0.84 · 0.93 · 0.74', thaumaturge: '1.00 · 1.00 · 1.00', bladelord: '0.80 · 0.79 · 0.78', herald: '0.84 · 0.84 · 0.86', dervish: '0.77 · 0.78 · 0.74', runelord: '0.82 · 0.86 · 0.82', oracle: '0.82 · 0.86 · 0.82', starweaver: '0.67 · 0.77 · 0.72', overlord: '0.84 · 0.86 · 0.82', archdruid: '0.84 · 0.86 · 0.82', imperator: '0.77 · 0.78 · 0.74', hierarch: '0.84 · 0.93 · 0.73', soulcaller: '0.84 · 0.93 · 0.73', mythlord: '0.67 · 0.77 · 0.72', bastion: '0.80 · 0.74 · 0.86', inquisitor: '0.80 · 0.74 · 0.86', cardinal: '0.83 · 0.77 · 0.83', hierophant: '0.83 · 0.77 · 0.83' };
+let tier = 2, cur = 0, slot = 0;
+const typeOf = (t, pick, i) => { const p = pick.find((x) => (t === 2 ? x === i : x[0] === i)); if (p === undefined) return t === 2 ? 'Pure' : 'Keen'; if (t === 2) return 'Dual'; return p[1] === 2 ? 'Tempered' : 'Evolved' }
+const partnerOf = (t, pick, i, k) => { const p = pick.find((x) => (t === 2 ? x === i : x[0] === i)); if (p === undefined) return null; return (t === 2 || p[1] === 2 ? P2 : P3)[k] }
 function drawSheet() {
-  const [name, w, d, , ch, solo] = C[cur];
-  document.getElementById('ptitle').textContent = `Her weapons · ${name}`;
+  const list = tier === 2 ? T2 : T3
+  const row = list[cur], [id, name] = row, w = row[3], pick = row[4], cross = row[5]
+  document.getElementById('ptitle').textContent = `Her weapons · ${name}`
+  const pt = document.getElementById('ptier'); pt.textContent = `Tier ${tier}`; pt.className = `tier t${tier}`
   document.getElementById('slots').innerHTML = w.map((k, i) => {
-    const t = i === d ? `Dual + ${K[P2[k]][0]}` : 'Pure';
-    return `<div class="slotrow${i === slot ? ' sel' : ''}" data-i="${i}" style="cursor:pointer"><span>${kc(k)} <span class="ch">· ${SHAPE[k]}</span></span><span><span class="type">${t}</span><span class="sugg">Suggested</span></span></div>`;
-  }).join('');
-  const kinds = new Set([...w, P2[w[d]]]);
-  document.getElementById('covers').textContent = `${ch} · covers ${kinds.size} kinds · swap any time on Gear`;
-  for (const el of document.querySelectorAll('.slotrow')) el.onclick = () => { slot = Number(el.dataset.i); drawSheet(); };
-  const k = w[slot];
-  document.getElementById('stitle').textContent = K[k][0];
-  const rows = [['Pure', `×1.30 → ×1.50 on ${K[k][0]}`, slot === d ? solo[0] : solo[d + 1], slot !== d]];
-  if (legal(w, k)) rows.push([`Dual + ${K[P2[k]][0]}`, `${K[P2[k]][0]}'s foes too, ×1.10 → ×1.30`, solo[slot + 1], slot === d]);
-  else rows.push([`Dual + ${K[P2[k]][0]}`, `Off: she already slots the ${K[P2[k]][0]}`, null, false, true]);
+    const ty = typeOf(tier, pick, i), pa = partnerOf(tier, pick, i, k)
+    const crossNote = i === cross ? (K[k][1] ? ' · on M.ATK' : ' · on ATK') : ''
+    return `<div class="slotrow${i === slot ? ' sel' : ''}" data-i="${i}" style="cursor:pointer"><span>${kc(k)} <span class="ch">· ${SHAPE[k]}${crossNote}</span></span><span><span class="type">${ty}${pa ? ` + ${K[pa][0]}` : ''}</span><span class="sugg">Suggested</span></span></div>`
+  }).join('')
+  const kinds = new Set([...w, ...w.map((k, i) => partnerOf(tier, pick, i, k)).filter(Boolean)])
+  let asin = ''
+  if (tier === 3) {
+    const par = T2.find((x) => x[0] === row[2])
+    if (id === 'gladiator' || id === 'thaumaturge') asin = `<p class="legend" style="margin:6px 0"><b>Arsenal · two two-kind weapons.</b> "As in Tier 2" isn't offered: her third slot changes channel from the ${par[1]}'s.</p>`
+    else asin = `<p class="legend" style="margin:6px 0"><span class="chip">As in Tier 2</span> the ${par[1]}'s Suggested mapped: ${par[3].map((k, i) => (par[4].includes(i) ? `Tempered ${K[k][0]} + ${K[P2[k]][0]}` : `Keen ${K[k][0]}`)).join(' · ')}</p>`
+  }
+  document.getElementById('asin').innerHTML = asin
+  document.getElementById('covers').textContent = `${tier === 2 ? row[2] + ' · ' : ''}Covers ${kinds.size} kinds · swap any time on Gear`
+  for (const el of document.querySelectorAll('.slotrow')) el.onclick = () => { slot = Number(el.dataset.i); drawSheet() }
+  const k = w[slot], o = OPTS[`${tier}:${id}`] || {}
+  document.getElementById('stitle').textContent = K[k][0]
+  const arsenal = id === 'gladiator' || id === 'thaumaturge'
+  const picks = pick.map((x) => (tier === 2 ? [x, 2] : x))
+  const here = picks.find((x) => x[0] === slot)
+  const elsewhere = picks.find((x) => x[0] !== slot)
+  const pureAns = arsenal ? null : elsewhere ? o[`${elsewhere[0]}${elsewhere[1]}`] : o.none
+  const rows = [[tier === 2 ? 'Pure' : 'Keen', `×${tier === 2 ? '1.30 → ×1.50' : '1.50 → ×1.70'} on ${K[k][0]}`, pureAns, !here, false]]
+  for (const tb of tier === 2 ? [2] : [2, 3]) {
+    const pa = (tb === 2 ? P2 : P3)[k], nm = tier === 2 ? 'Dual' : tb === 2 ? 'Tempered' : 'Evolved'
+    const on = !!here && here[1] === tb
+    if (w.includes(pa)) rows.push([`${nm} + ${K[pa][0]}`, `Off: she already slots the ${K[pa][0]}`, null, false, true])
+    else rows.push([`${nm} + ${K[pa][0]}`, `${K[pa][0]}'s foes too, ×${tier === 2 ? '1.10 → ×1.30' : '1.30 → ×1.50'}`, arsenal ? null : o[`${slot}${tb}`], on, false])
+  }
   document.getElementById('types').innerHTML = rows.map(([t, v, a, on, off]) => `<div class="li${on ? ' on' : ''}${off ? ' off' : ''}"><span><b>${t}</b><br><span class="tag" style="text-align:left">${v}</span></span><span class="tag">${a ? `${a}% of regulars` : ''}</span></div>`).join('') +
-    (slot !== d && legal(w, k) ? '<p class="legend">Dual here would make a second two-kind weapon: her Suggested Dual turns Pure.</p>' : '');
+    (arsenal ? '<p class="legend">Arsenal: with her two two-kind weapons she answers every foe of the tier (100%).</p>' : '<p class="legend">Moving her two-kind weapon here turns her Suggested one to its single type: one in her slots.</p>')
 }
-document.getElementById('cls').innerHTML = C.map((c, i) => `<button data-i="${i}" aria-pressed="${i === 0}">${c[0]}</button>`).join('');
-for (const b of document.querySelectorAll('#cls button')) b.onclick = () => { cur = Number(b.dataset.i); slot = 0; for (const x of document.querySelectorAll('#cls button')) x.setAttribute('aria-pressed', String(x === b)); drawSheet(); };
-drawSheet();
+function drawPills() {
+  const list = tier === 2 ? T2 : T3
+  document.getElementById('cls').innerHTML = list.map((c, i) => `<button data-i="${i}" aria-pressed="${i === cur}">${c[1]}</button>`).join('')
+  for (const b of document.querySelectorAll('#cls button')) b.onclick = () => { cur = Number(b.dataset.i); slot = 0; drawPills(); drawSheet() }
+}
+for (const b of document.querySelectorAll('#tierp button')) b.onclick = () => { tier = Number(b.dataset.t); cur = 0; slot = 0; for (const x of document.querySelectorAll('#tierp button')) x.setAttribute('aria-pressed', String(x === b)); drawPills(); drawSheet() }
+drawPills(); drawSheet();
 
-// chart
 (function () {
   const svg = document.getElementById('chart');
   const X = (g) => 60 + g * 32, Y = (m) => 230 - (m - 1.0) * 250;
@@ -231,27 +320,42 @@ drawSheet();
 document.getElementById('ptab').innerHTML = '<thead><tr><th>Weapon</th><th>Shape</th><th>Tier 2 partner (Dual, Tempered)</th><th>Tier 3 partner (Evolved)</th><th>Whose</th></tr></thead><tbody>' +
   Object.keys(K).map((k) => `<tr><td>${kc(k)}</td><td>${SHAPE[k]}</td><td>${kc(P2[k])}</td><td>${kc(P3[k])}</td><td class="muted">${['bow', 'katana', 'light', 'dark'].includes(k) ? 'Round 1 (twin sets)' : "The owner's"}</td></tr>`).join('') + '</tbody>';
 
-document.getElementById('stab').innerHTML = '<thead><tr><th>Class</th><th>Slots</th><th>Tier 2 Suggested</th><th>Tier 3 Suggested</th></tr></thead><tbody>' +
-  C.map(([n, w, d, t3, ch]) => {
-    const t2 = w.map((k, i) => (i === d ? `<b>Dual</b> ${kc(k)} + ${kc(P2[k])}` : `Pure ${kc(k)}`)).join(' · ');
-    const t3s = w.map((k, i) => (i === d ? `<b>${t3 === 'E' ? 'Evolved' : 'Tempered'}</b> ${kc(k)} + ${kc(t3 === 'E' ? P3[k] : P2[k])}` : `Keen ${kc(k)}`)).join(' · ');
-    return `<tr><td><b>${n}</b></td><td class="muted">${ch}</td><td>${t2}</td><td>${t3s}</td></tr>`;
+document.getElementById('puretab').innerHTML = [['Bladedancer', '3 Arms', ['katana', 'axe', 'bow'], 'Pendant'], ['Spellweaver', '3 Tomes', ['lightning', 'ice', 'dark'], 'Charm'], ['Marshal', '3 Arms', ['bow', 'axe', 'katana'], 'Pendant'], ['Animist', '3 Tomes', ['dark', 'ice', 'lightning'], 'Charm']]
+  .map(([n, s, w, f]) => `<tr><td><b>${n}</b></td><td>${s}</td><td>${w.map(kc).join(' ')}</td><td>${f}</td></tr>`).join('');
+
+const t2cell = (w, pick) => w.map((k, i) => (pick.includes(i) ? `<b>Dual</b> ${kc(k)} + ${kc(P2[k])}` : `Pure ${kc(k)}`)).join(' · ');
+document.getElementById('stab2').innerHTML = '<thead><tr><th>Class</th><th>Line · slots</th><th>Tier 2 Suggested</th><th class="n">Answers alone</th><th class="n">No type</th></tr></thead><tbody>' +
+  T2.map(([id, n, ch, w, pick, , nw]) => `<tr><td><b>${n}</b>${nw ? ' <span class="chip acc">New</span>' : ''}</td><td class="muted">${ch}</td><td>${pick.length ? t2cell(w, pick) : `<b>Pure ×3</b> ${w.map(kc).join(' ')}`}</td><td class="n">${ANS2[id]}</td><td class="n">${(OPTS[`2:${id}`].none / 100).toFixed(2)}</td></tr>`).join('') + '</tbody>';
+document.getElementById('stab3').innerHTML = '<thead><tr><th>Class</th><th>From</th><th>Tier 3 Suggested</th><th class="n">Answers alone</th><th class="n">Keen ×3</th></tr></thead><tbody>' +
+  T3.map(([id, n, par, w, pick]) => {
+    const cell = pick.length ? w.map((k, i) => { const p = pick.find((x) => x[0] === i); return p ? `<b>${p[1] === 2 ? 'Tempered' : 'Evolved'}</b> ${kc(k)} + ${kc((p[1] === 2 ? P2 : P3)[k])}` : `Keen ${kc(k)}` }).join(' · ') : `<b>Keen ×3</b> ${w.map(kc).join(' ')}`
+    return `<tr><td><b>${n}</b>${pick.length === 2 ? ' <span class="chip acc">Arsenal</span>' : ''}</td><td class="muted">${T2.find((x) => x[0] === par)[1]}</td><td>${cell}</td><td class="n">${ANS3[id]}</td><td class="n">${(OPTS[`3:${id}`].none / 100).toFixed(2)}</td></tr>`
   }).join('') + '</tbody>';
 
+document.getElementById('ptab2').innerHTML = '<thead><tr><th>The owner\'s parties</th><th class="n">Mixes</th><th class="n">Regular, mean (range)</th><th class="n">Sub-boss</th><th class="n">Boss</th><th class="n">Every kind in two hands</th><th class="n">All ten held (in hand · w/ partners)</th></tr></thead><tbody>' +
+  [['<b>Tier 1</b> (no type)', '1 · 1', '<b>4.31 · 4.35</b>', '3.75 · 3.71', '3.75 · 3.75', '—', '10 · 10'],
+   ['Tier 1\'s kits on Tier 2\'s foes', '1 · 1', '3.62 · 3.66', '3.65 · 3.72', '3.66 · 3.71', '—', '—'],
+   ['<b>Party 1\'s mixes</b>, Suggested', '72', '<b>4.25</b> (4.17–4.34)', '4.35 (4.25–4.45)', '4.23 (4.05–4.44)', '4', '36 · 48'],
+   ['<b>Party 2\'s mixes</b>, Suggested', '72', '<b>4.18</b> (3.99–4.33)', '4.27 (4.10–4.42)', '4.24 (3.97–4.42)', '4', '44 · 60'],
+   ['<i>Round 2\'s rule on the twenty</i>', '144', '<i>4.30 · 4.27</i>', '—', '<i>up to 4.58: 10 mixes past 4.48</i>', '10', '80 · 108 (both)']]
+    .map((r) => `<tr>${r.map((x, i) => `<td${i ? ' class="n"' : ''}>${x}</td>`).join('')}</tr>`).join('') + '</tbody>';
 const CV = [
-  ['C1 Party 1\'s keepers (Berserker, Archmage, Blademaster, Invoker, Guardian)', '3.64', '4.28 · 4.34 · 4.27', '0', '4.32 · 4.35 · 4.29', '0'],
-  ['C2 Party 2\'s keepers (Berserker, Archmage, Runeblade, Warlord, Bishop)', '3.69', '4.29 · 4.35 · 4.42', '0', '4.29 · 4.33 · 4.32', '0'],
-  ['C3 both pures expanded (Spellfist, Battlemage + C1\'s three)', '3.51', '4.17 · 4.08 · 4.16', 'Lance, Blizzard', '4.14 · 4.03 · 4.10', 'Lance, Blizzard, Light'],
-  ['C4 Templar and Sentinel (Berserker, Archmage, Sentinel, Invoker, Templar)', '3.66', '4.32 · 4.42 · 4.32', 'Thunder', '4.38 · 4.48 · 4.35', 'Thunder, Dark'],
-  ['C4b the same on Party 2 (Enchanter, Warlord, Exorcist)', '3.69', '4.28 · 4.35 · 4.38', 'Thunder', '4.32 · 4.34 · 4.31', 'Thunder, Dark'],
-  ['C5 a Summoner to support (Druid in C2)', '3.66', '4.25 · 4.26 · 4.34', 'Axe', '4.23 · 4.22 · 4.34', 'Axe'],
-  ['C6 both hybrids to support (Sentinel, Shaman in C1)', '3.66', '4.32 · 4.42 · 4.32', 'Thunder', '4.38 · 4.48 · 4.35', 'Thunder, Dark'],
-  ['C7 every member an expander', '3.54', '4.21 · 4.16 · 4.22', 'Lance, Blizzard, Thunder', '4.20 · 4.16 · 4.17', 'Lance, Blizzard, Thunder'],
-  ['C3 on gear\'s Scatter twins (Spellfist Greatsword, Axe, Thunder; Battlemage Fire, Blizzard, Lance)', '3.51', '4.19 · 4.24 · 4.10', '0', '4.19 · 4.20 · 4.09', '0'],
-  ['C1 re-typed every stage (free) · no two-kind cap', '—', '4.72 · 4.85', '—', '4.82 · 4.98', '—'],
+  ['C1 Tier 1-like (Party 1)', 'Berserker, Archmage, Blademaster, Invoker, Guardian', '4.28 · 4.37 · 4.28', '10', '—'],
+  ['C2 Tier 1-like (Party 2)', 'Berserker, Archmage, Runeblade, Warlord, Bishop', '4.28 · 4.36 · 4.42', '10', '—'],
+  ['C3 A Brawler with a Spellblade', 'Spellfist, Archmage, Bladedancer, Invoker, Guardian', '4.19 · 4.33 · 4.19', '7', 'Lance, Thunder, Light'],
+  ['C3b A Sorcerer with a Tome Spellblade', 'Berserker, Battlemage, Spellweaver, Warlord, Bishop', '4.30 · 4.36 · 4.28', '9', 'Thunder'],
+  ['C4 A Spellblade with the Paladin', 'Berserker, Archmage, Sentinel, Invoker, Templar', '4.32 · 4.44 · 4.33', '9', 'Thunder'],
+  ['C4b A Tome Spellblade with the Cleric', 'Berserker, Archmage, Enchanter, Warlord, Exorcist', '4.16 · 4.29 · 4.25', '9', 'Thunder'],
+  ['C5 Both swaps on one party', 'Spellfist, Archmage, Bladedancer, Shaman, Templar', '4.19 · 4.33 · 4.19', '7', 'Lance, Thunder, Light'],
+  ['C6 All pure (Party 1)', 'Berserker, Archmage, Bladedancer, Animist, Guardian', '4.27 · 4.41 · 4.34', '9', 'Fire'],
+  ['C6b All pure (Party 2)', 'Berserker, Archmage, Spellweaver, Marshal, Bishop', '4.24 · 4.35 · 4.32', '9', 'Greatsword'],
+  ['C7 All hybrid', 'Spellfist, Battlemage, Blademaster, Invoker, Guardian', '4.19 · 4.25 · 4.10', '7', 'Lance, Bow, Thunder'],
+  ['C8 Both hybrids to support', 'Berserker, Archmage, Sentinel, Shaman, Guardian', '4.32 · 4.44 · 4.33', '9', 'Thunder'],
+  ['C9 A Summoner to support', 'Berserker, Archmage, Runeblade, Druid, Bishop', '4.28 · 4.36 · 4.42', '10', '—'],
+  ['C10 Every member a cross or support', 'Spellfist, Battlemage, Sentinel, Shaman, Templar', '4.23 · 4.32 · 4.15', '7', 'Lance, Bow (Thunder not held)'],
 ];
-document.getElementById('ctab').innerHTML = '<thead><tr><th>Comp (classes.md T2C63)</th><th class="n">T2, no type</th><th class="n"><span class="tier t2">T2</span> Suggested</th><th>In one hand</th><th class="n"><span class="tier t3">T3</span> Suggested</th><th>In one hand</th></tr></thead><tbody>' +
-  CV.map((r) => `<tr>${r.map((x, i) => `<td${i === 1 || i === 2 || i === 4 ? ' class="n"' : ''}>${i === 2 || i === 4 ? `<b>${x}</b>` : x}</td>`).join('')}</tr>`).join('') + '</tbody>';
+document.getElementById('ctab').innerHTML = '<thead><tr><th>Classes\' comp</th><th>Members</th><th class="n">Regular · sub-boss · boss</th><th class="n">Kinds in two hands</th><th>In one hand</th></tr></thead><tbody>' +
+  CV.map((r) => `<tr><td><b>${r[0]}</b></td><td class="muted">${r[1]}</td><td class="n">${r[2]}</td><td class="n">${r[3]}</td><td>${r[4]}</td></tr>`).join('') + '</tbody>';
 </script>
 </body>
 </html>
