@@ -1,6 +1,6 @@
 # Tier 2 and Tier 3: the brief
 
-> **Status: round 2 (the owner's requirements) drafted, measured and cross-referenced, 2026-11-05; for the owner's review.** The owner: "start working seriously in some Tier 2 docs that would greatly expand our
+> **Status: round 3 (the owner's class feedback) drafted, measured and cross-referenced, 2026-11-05; for the owner's review.** The owner: "start working seriously in some Tier 2 docs that would greatly expand our
 > current Tier 1 state, basically all the work you authored so far with all the html docs and samples, but update it to
 > current Tier 1 state and then I will give you some heavy requirements." This folder is that set: the Tier rework's
 > approved Tier 2 and Tier 3 drafts ([tier-rework/](../tier-rework/README.md), D192–D197, D235), carried forward onto
@@ -134,18 +134,18 @@ across docs exist, every old call has one owner.
 
 ## 7. Status and cross-reference log
 
-**2026-11-05: round 2 drafted, measured and cross-referenced; ready for the owner's review.** Round 1 (2026-11-04)
-carried the old drafts onto Tier 1; round 2 is the owner's requirements (§9).
+**2026-11-05: round 3 (the owner's class feedback, §10) drafted, measured and cross-referenced; for the owner's review.**
+Round 1 carried the old drafts onto Tier 1, round 2 the owner's requirements (§9), round 3 his class feedback (§10).
 
-| Doc | Current calls | Superseded by round 2 | Pages |
+| Doc | Current calls | Superseded | Pages |
 |---|---|---|---|
-| [classes.md](classes.md) | 57 | — | [tiers](previews/classes-tiers.html) · [the sixteen](previews/classes-branches.html) · [trees](previews/classes-trees.html) · [comps](previews/classes-comps.html) · [promotion](previews/classes-promotion.html) |
-| [gear.md](gear.md) | 26 | — | [tiers](previews/gear-tiers.html) · [weapons](previews/gear-weapons.html) · [accessories](previews/gear-accessories.html) · [costs](previews/gear-costs.html) · [presets](previews/gear-presets.html) |
-| [extra-stats.md](extra-stats.md) | 42 | 11 | [chart](previews/extra-stats-chart.html) · [tiers](previews/extra-stats-tiers.html) · [branches](previews/extra-stats-branches.html) · [kind rows](previews/extra-stats-weapon-moons.html) |
-| [professions.md](professions.md) | 38 | 7 | [tiers](previews/professions-tiers.html) · [branches](previews/professions-branches.html) · [times](previews/professions-times.html) · [demand](previews/professions-demand.html) · [three professions](previews/professions-secondary.html) |
-| [balance.md](balance.md) | 43 | 1 | [tiers](previews/balance-tiers.html) · [the guardrail](previews/balance-sim.html) · [comps](previews/balance-comps.html) · [stress](previews/balance-stress.html) · [calls](previews/balance-calls.html) |
-| [templates.md](templates.md) | 22 | 5 | [tiers](previews/templates-tiers.html) · [tip](previews/templates-tip.html) · [Umas](previews/templates-umas.html) |
-| [progression.md](progression.md) | 29 | 3 | [tiers](previews/progression-tiers.html) · [world](previews/progression-world.html) · [run](previews/progression-run.html) · [the Ascend sheet](previews/progression-ascend.html) · [windows](previews/progression-windows.html) |
+| [classes.md](classes.md) | 83 | — | [tiers](previews/classes-tiers.html) · [the whole tree](previews/classes-tree.html) · [branches](previews/classes-branches.html) · [Tier 3](previews/classes-tier3.html) · [trees](previews/classes-trees.html) · [comps](previews/classes-comps.html) · [promotion](previews/classes-promotion.html) |
+| [gear.md](gear.md) | 43 | — | [tiers](previews/gear-tiers.html) · [weapons](previews/gear-weapons.html) · [arsenal](previews/gear-arsenal.html) · [accessories](previews/gear-accessories.html) · [presets](previews/gear-presets.html) · [costs](previews/gear-costs.html) |
+| [extra-stats.md](extra-stats.md) | 40 | 14 | [chart](previews/extra-stats-chart.html) · [branches](previews/extra-stats-branches.html) · [tiers](previews/extra-stats-tiers.html) · [kind rows](previews/extra-stats-weapon-moons.html) |
+| [professions.md](professions.md) | 41 | 7 | [tiers](previews/professions-tiers.html) · [branches](previews/professions-branches.html) · [times](previews/professions-times.html) · [demand](previews/professions-demand.html) · [three professions](previews/professions-secondary.html) |
+| [balance.md](balance.md) | 59 | 7 | [the guardrail](previews/balance-sim.html) · [Tier 3](previews/balance-tier3.html) · [comps](previews/balance-comps.html) · [stress](previews/balance-stress.html) · [tiers](previews/balance-tiers.html) · [calls](previews/balance-calls.html) |
+| [templates.md](templates.md) | 24 | 7 | [tiers](previews/templates-tiers.html) · [tip](previews/templates-tip.html) · [Umas](previews/templates-umas.html) |
+| [progression.md](progression.md) | 42 | 4 | [ascend](previews/progression-ascend.html) · [windows](previews/progression-windows.html) · [run](previews/progression-run.html) · [tiers](previews/progression-tiers.html) · [world](previews/progression-world.html) |
 
 ### 7.1 The cross-reference (XR, 2026-11-04)
 
@@ -174,6 +174,11 @@ Where two drafts assumed different things of each other, one rule now holds in b
 | XR19 | Tier 3 bosses' shields 10 | **9 in Tiers 2 and 3, sub-bosses 7, from Lv 1** (one two-kind weapon, types from the promotion) | progression ← balance T2B7, gear T2G27 |
 | XR20 | The cross-wielders' kits: classes' Heavy twins or gear's Scatter twins | **The Scatter twins** (Spellfist Greatsword, Axe, Thunder; Battlemage Fire, Blizzard, Lance): every kind in two hands in C3; Thunder missing in 8 of the 64 mixes, named by the party hint | classes T2C54 ← balance T2B35, gear T2G25 |
 | XR21 | The Stars track's node count | **22 in every tier:** round 1's weapon moon became Prowess's kind rows | progression ← extra stats T2E27 |
+| XR22 | Balance's round-3 knobs against classes' drafted kits (36 of 48 Tier 2 cells and 44 of 54 Tier 3 cells in the band) | **Balance's values:** the crosses' hands reversed (Spellfist ×1.25, Battlemage ×1.1; round 2's fork had dropped the cross weapon's Might), a trunk hand on six Tier 2 classes and the Gladiator, the pure variants' second hands, the Sentinel ×0.9 with one stack at every depth, the Druid, Warlord and Invoker hands, Arsenal's hands, Resonance at 10% on her deepest depth, the supports' Tier 3 twist without +0.03: 48 of 48 and 52 of 54 in the band | classes T2C33, T2C38, T2C39, T2C45, T2C68, T2C71, T2C72, T2C82–T2C86 ← T2B44–T2B54 |
+| XR23 | The Tier 3 keeper healers' Overflow | **Retired** (measured as doing nothing); the Bastion and the Cardinal mend and Barrier ×1.3 | classes T2C82, T2C87 ← T2B55 |
+| XR24 | Gear's Suggested Pure ×3 on the Marshal and the Enchanter, and the Animist's Blizzard + Light | **Their keeper sibling's Dual** (Enchanter Katana + Axe, Marshal Bow + Greatsword, Animist Dark + Fire), which keeps them in the band; the regular bound holds (4.25 · 4.27 against Tier 1's 4.31 · 4.35), and six of 144 mixes sit at the boss shields' edge (4.48–4.51 against 4.48), accepted, the Sentinel on Light + Blizzard the first fix if the build's run shows those bosses Breaking sooner | gear T2G50, T2G51, T2G53 ← T2B66 |
+| XR25 | The Tier 3 band on gear's Keen ×3 pure lines | **At most 50 of 54:** the Starweaver and the Mythlord read 1.2 and 2.4 points past the band at Lv 10 on that kit; flagged for the build's run | classes §6.4, gear §5.2 ← T2B66 |
+| XR26 | Templates' cite of the Tier 3 sheet (T2W31, superseded) | **T2W37–T2W39** | templates |
 
 **Two findings on Tier 1 as built** (no change made; for the owner):
 - **A full window costs more than a maxed Uma** ([professions](professions.md), T2P21–T2P22): the window's Weapons track
@@ -211,12 +216,50 @@ stays the template):
 
 ## 8. Every call
 
-257 current calls, by doc, with the recommended answer. Each doc's Decisions table has the alternatives and the reasons, and lists the round-1 calls round 2 superseded.
+332 current calls, by doc, with the recommended answer. Each doc's Decisions table has the alternatives and reasons, and lists the calls later rounds superseded.
 
 ### Classes ([classes.md](classes.md))
 
 | Id | Call | Recommended |
 |---|---|---|
+| T2C65 | Tier 3 is a promotion (R3-1) | Twenty-two Tier 3 classes: every Tier 2 class promotes into one, the Spellfist and the Battlemage into two, each a new name; she keeps her Tier 2 parent's kit and rule and adds one rule. Supersedes T2C57 |
+| T2C66 | The classes in Tier 2 (R3-6) | Twenty: the Brawler and the Sorcerer two children each, the four hybrids three (keeper, support, pure), the healers two. Supersedes T2C31 |
+| T2C67 | Where the pure variants arrive (R3-4) | Tier 2, as each hybrid's third child, so the owner's swap of a Brawler with a Spellblade works as soon as the Spellfist does |
+| T2C68 | The pure variants' rule: the pure pair | Her parent's three slots turned all her lead channel (2 + 1): her lead half from her first two weapons, her second from her third, every act; every hit on her stat; her family's familiar's hit or lingering summon kept; no status … |
+| T2C69 | Their names | Bladedancer, Spellweaver, Marshal, Animist (checked, §11) |
+| T2C70 | Their gear | Her parent's armor half; her stat's accessory family on every hit; Prowess all to her stat; three weapons of one channel |
+| T2C71 | The Spellfist reshaped (R3-2) | Two Arms and a Tome, the Arms first (the Arms Spellblade's mix); one act a turn; every hit on ATK (the cross); hand ×1.25; Pinpoint; preset Greatsword, Katana, Fire Tome: single big hits and a minor multi-hit. Amended by T2B44 … |
+| T2C72 | The Battlemage reshaped (R3-3) | Two Tomes and an Arm (the Tome Summoner's mix); one act; every hit on M.ATK; hand ×1.1; Pinpoint; preset Fire Tome, Blizzard Tome, Katana: single hits and one sweep. Amended by T2B44 (cross-reference): measured +0.1 · +2.0 · +4.8% |
+| T2C73 | Pinpoint | An act whose every hit lands on the tapped foe (a Heavy or Double skill, a one-foe line or class-line skill, an Attack, a one-foe Limit Break) +2% a depth of its skill (×1.1 at depth 5); a factor at step 5 beside the statuses and … |
+| T2C74 | The pure variants' class lines | Two new, mirrors sharing: Grand Squall · Supreme Squall · Thousand Cuts (Bladedancer, Spellweaver: her pair on one foe, each half one hit more); Grand Legion · Supreme Legion · Onslaught (Marshal, Animist: her pair, both summons … |
+| T2C75 | Statuses on twenty | Four levels as round 2; the pure variants at none: eight status-free Tier 2 classes, ten in Tier 3 |
+| T2C76 | The Tier 2 promotion | On her Ascend she picks among every child of every Tier 1 class she holds at Class Rank 50 (two or three a class: 6–20); Suggested her ascending class's keeper, else her family's Rank 50 class's keeper with the most Class EXP. … |
+| T2C77 | The twenty presets | Keepers, supports and battle healers round 2's; the Spellfist Greatsword, Katana, Fire; the Battlemage Fire, Blizzard, Katana; the Bladedancer Katana, Axe, Bow; the Spellweaver Thunder, Blizzard, Dark; the Marshal Bow, Axe, … |
+| T2C78 | What a Tier 3 class is | Her Tier 2 parent's kit and rule + one rule from Class Rank 1 + the crown at Class Rank 50 + two lines held |
+| T2C79 | The crown | Kept on every Tier 3 class, with MP back's sixth step: every held capstone 5.6 whole at Class Rank 50, +4 MP, a stack more (T2C20, T2C21) |
+| T2C80 | Two lines held | Kept on every Tier 3 class (T2C19) |
+| T2C81 | The master slot | Retired: ten equipped in Tier 3 |
+| T2C82 | Round 2's masteries | Re-homed as Tier 3 rules: Juggernaut the Ravager's, Resonance the Astromancer's (her deepest open depth's skills strike again at 10%, the echo chipping nothing), Spellbind the Bladelord's and Runelord's, Menagerie the Overlord's … |
+| T2C83 | The Brawler's Tier 3 (R3-2) | Ravager (the Berserker: Momentum + Juggernaut); Spellhammer (the Spellfist, Pinpoint +4% a depth, her hand ×1.25); Gladiator (from the Spellfist: three Arms, Arsenal, hand ×1.05 on her trunk, ×1.2 on her lines, no cross, no … |
+| T2C84 | The Sorcerer's Tier 3 (R3-3) | Astromancer (Momentum + Resonance: her deepest open depth's skills echo at 10%); Spellknight (the Battlemage, Pinpoint +4% a depth, her hand ×1.1); Thaumaturge (three Tomes, Arsenal, hand ×1.1). Amended by T2B52 and T2B53 … |
+| T2C85 | "More varied physical weapons" | Arsenal: two two-kind weapons in her slots (gear's T2G3 allows one), so she carries all five kinds of her channel; every foe has a weak kind in her hands; her hands T2C83's and T2C84's (amended by T2B53, cross-reference) |
+| T2C86 | The hybrids' Tier 3 (R3-4) | Keepers take their family's mastery (Bladelord, Runelord: Spellbind; Overlord, Hierarch: Menagerie); supports their keeper sibling's twist with their Tier 2 hands (Herald, Oracle: the familiar on both halves, piercing; Archdruid, … |
+| T2C87 | The healers' Tier 3 (R3-5) | Bastion, Cardinal: mends and Barriers ×1.3, sustain only; Inquisitor, Hierophant: power ×0.7, shares ×0.7 kept. The keeper's line gains sustain, the battle healer's damage. Amended by T2B55 (cross-reference): Overflow retired; at … |
+| T2C88 | Tier 3's names (R3-9) | Ravager, Spellhammer, Gladiator; Astromancer, Spellknight, Thaumaturge; Bladelord, Herald, Dervish; Runelord, Oracle, Starweaver; Overlord, Archdruid, Imperator; Hierarch, Soulcaller, Mythlord; Bastion, Inquisitor; Cardinal, … |
+| T2C89 | The Tier 3 promotion | On her Tier 3 Ascend she picks among the Tier 3 children of every Tier 2 class she holds at Class Rank 50 (3–22); Suggested the child of the class she fights as (the Spellfist's and the Battlemage's kept child), else her family's … |
+| T2C90 | The Tier 3 door | A held Tier 3 class at Class Rank 20 opens every Tier 3 class of her Tier 1 line and of its reclass neighbours' lines (the Tier 2 door one tier down) |
+| T2C91 | Kin and the Flourish in Tiers 2 and 3 | Her family is the descendants of her calling's own Tier 1 classes: Warrior and Mage 8 in Tier 2 and 9 in Tier 3, Spellblade and Summoner 6, Healer 4; a kin parent's descendant never Suggested and outside her Flourish. Supersedes … |
+| T2C92 | Tier 3's budget and band | Measured (T2B51, T2B56): +17.0% and +18.8% at Tier 3 Lv 50 over the same parties uncrowned (the crown +11.8 and +14.9%); each Tier 3 damage and support class's gain over her Tier 2 parent within ±5 points of the eighteen's mean … |
+| T2C93 | The comps (R3-7) | The owner's swaps as the spine (C3, C3b, C4, C4b, C5 in Tier 2; T3, T3g, T3b, T4, T4b, T5 in Tier 3) beside Tier 1-like, all-pure, all-hybrid and support-heavy comps. Measured (T2B58, T2B59): every Tier 2 comp +1.0 to +5.8% over … |
+| T2C94 | Kinds and the party hint | 80 of the 144 Tier 2 mixes hold all ten kinds (round 2: 56 of 64); every comp the owner names but C10; the party hint names a missing kind and an open class whose preset holds it |
+| T2C95 | The save | Twenty ids (generation 2) and twenty-two (generation 3), each with its parent; `open` per later-tier profile, written at each Ascend and by a door; Tier 3's held lines; Momentum and Pinpoint are fight state; an Uma already in … |
+| T2C96 | The engine | Two stages: `t2Classes` (v22, the twenty, the pure pair, Pinpoint) and `t3Classes` (v23, the twenty-two rules, Arsenal's cap, the crown, two lines held). Supersedes T2C61 |
+| T2C97 | Round 3's names | Checked 2026-11-05 against 20,500 master-data strings and 14,701 game strings: clear; Focus, Illusionist, Kensei, Bulwark, Cyclone, Tempest, Sovereign, Horde, Flurry refused |
+| T2C98 | The previews | Seven pages: the class tree (new), tiers, the twenty, the twenty-two (new), trees, comps, promotion. Supersedes T2C62 |
+| T2C99 | What balance measures next | Run in round 3 (T2B50): the six new or reshaped Tier 2 kits, the twenty-two Tier 3 rules, the comps and the stress check, in this order: pure hands, Pinpoint, the crosses' hands, Arsenal's hands, the low Tier 3 rules (Resonance … |
+| T2C100 | The Halls by tier | The same sixteen seats in every world; a seat's home classes are its Tier 1 home class's Tier 2 and Tier 3 descendants. Amends T2C23 |
+| T2C101 | Limit Break scale | ×0.95 every damage and support class of Tiers 2 and 3, ×0.8 every healer class. Amends T2C55 |
+| T2C39 | The Sentinel | A kept class that re-measured +18% at Lv 50; now ×0.9, one stack and the tapped foe |
 | T2C2 | What a Tier 0 means later | None exists in a later world; a Tier 0 at her Ascend arrives as her Suggested Tier 2 class (T2C50); her calling still names her family, trade and template |
 | T2C3 | Class Rank by tier | 1–50, gates 1 · 10 · 20 · 30 · 40, 50 the crown in Tier 3; Ranks 1–10 one shared ladder of 3,600 raising every class she holds (XR1), then each alone; depths at Lv 10 · 16 · 22 · 29, Rank 50 at Lv 36; two classes to Rank 50 a … |
 | T2C4 | The words Ring and Light/Dark | Kept as words for where statuses ride: the Ring weapons carry the healers' every-skill statuses, the Light/Dark weapons the paths and the supports'; no focus |
@@ -226,85 +269,90 @@ stays the template):
 | T2C13 | Statuses on the class lines | By her class's level: none, a path's 1 · 1 · 2, a support's or healer's 2 · 2 · 3, a Guardian's or Bishop's 3 · 3 · 3; a support's topped up and her Brave and Faith on her ward, as her trees' (follows T2B24, cross-reference) |
 | T2C14 | Line C | Joins the fork at depth 3 by family, on her parent's trees: Rout, Havoc, Tremor, Hail, Fork; Kindle, Sleet, Peal, Beam, Gloom; Swath, Strafe; Hunt, Maul; Psalm |
 | T2C15 | The tip fork | Every capstone forks Power or Break: the first weak hit on each foe removes one more shield point, once an act |
-| T2C16 | Equipped slots | Tier 2: one more at Lv 10, 15, 20, 25, 30, 35, 40 (10 at Lv 40); Tier 3: 10 and the master slot |
+| T2C16 | Equipped slots | Tier 2: one more at Lv 10, 15, 20, 25, 30, 35, 40 (10 at Lv 40); Tier 3: 10 and the master slot (the master slot Superseded (R3-1) by T2C81: Tier 3 equips 10) |
 | T2C17 | Skill MP by tier | ×1.7 and ×2.4 in place of ×tier |
 | T2C18 | The healing scale by tier | ×(1 + offense ÷ (300 × the tier's multiplier)): ×1.64 at every tier's Lv 50; the supports' Barrier and mend take it |
-| T2C19 | Two lines held | Tier 3: two of a tree's three (default A and B), each with its tip; Auto between them |
-| T2C20 | Depth 6 | A crown: at Class Rank 50 in Tier 3 every held capstone plays 5.6 whole, +4 MP, one more stack; its name kept |
-| T2C21 | MP back a round | A sixth step, 6%, with Tier 3's crown |
-| T2C22 | Masteries | Five, by hall family, at Class Rank 50 in Tier 3: Juggernaut, Resonance, Spellbind, Menagerie, Overflow (T2C58) |
-| T2C23 | The Halls by tier | The same sixteen seats in every world; home classes the Tier 1 home class's children; scales by parent; LB+ +20% at Bond 10 |
-| T2C25 | Presets by tier | One a Tier 2 class (T2C54), setting her three accessory slots by D266's rule and gear's forms; a switch offers, never forces |
-| T2C26 | The party screen's hint | Re-homed: T2C63 |
-| T2C27 | Names, round 1 | Kept: round 1's 252 checked; round 2's in T2C59 |
-| T2C28 | The save | T2C60 |
-| T2C29 | The engine | T2C61 |
+| T2C19 | Two lines held | Tier 3: two of a tree's three (default A and B), each with its tip; Auto between them On every Tier 3 class (T2C80) |
+| T2C20 | Depth 6 | A crown: at Class Rank 50 in Tier 3 every held capstone plays 5.6 whole, +4 MP, one more stack; its name kept On every Tier 3 class (T2C79) |
+| T2C21 | MP back a round | A sixth step, 6%, with Tier 3's crown Kept with the crown (T2C79) |
+| T2C23 | The Halls by tier | The same sixteen seats in every world; home classes the Tier 1 home class's children; scales by parent; LB+ +20% at Bond 10 Amended by T2C100: home classes the descendants |
+| T2C25 | Presets by tier | One a Tier 2 class (T2C54), setting her three accessory slots by D266's rule and gear's forms; a switch offers, never forces One a class now T2C77 |
+| T2C26 | The party screen's hint | Re-homed: T2C63 Now T2C94 |
+| T2C27 | Names, round 1 | Kept: round 1's 252 checked; round 2's in T2C59 Round 3's in T2C97 |
+| T2C28 | The save | T2C60 Now T2C95 |
+| T2C29 | The engine | T2C61 Now T2C96 |
 | T2C30 | The old previews | Three pages carry class-overview, class-templates and class-trees; the rest retire (§10) |
-| T2C31 | The classes in Tier 2 | Sixteen: a Keeper and an Expander from each Tier 1 class (R2-2). A Tier 2 world plays only them; the Tier 1 classes stay in Tier 1's world, as the Tier 0s do |
 | T2C32 | Their names | Berserker · Spellfist; Archmage · Battlemage; Blademaster · Sentinel; Runeblade · Enchanter; Warlord · Druid; Invoker · Shaman; Guardian · Templar; Bishop · Exorcist (checked, §11) |
-| T2C33 | What a Tier 2 class keeps | Her parent's three slots' count, lean, armor half, trees, family, hall, Limit Break scale and one act a turn; one rule changes her |
+| T2C33 | What a Tier 2 class keeps | Her parent's three slots' count, lean, armor half, trees, family, hall, Limit Break scale and one act a turn; one rule changes her Kept, changed (R3-4) by T2C68: a pure variant's channels. Amended by T2B45 (cross-reference): a … |
 | T2C34 | The self-buff | Momentum, the pure keepers': +6% a stack on her own hits, a stack after each of her turns, 3 at most (+18%), the fight long, lost when she falls; never a party buff; Auto unchanged. Worth +11.3% of her damage at Lv 50 (+9.1% … |
 | T2C35 | The pure expanders | Spellfist two Arms and a Tome, Battlemage two Tomes and an Arm; every hit reads her stat; a hit keeps its kind's channel for defense, weakness, statuses and the ward; hands the Spellfist ×1.05, the Battlemage ×1.3 (measured +6.5 … |
 | T2C36 | Their gear | Her parent's armor half; her stat's accessory (Pendant, Charm) counts on every hit; Prowess all to her stat; her other channel's weapon grades with its own items |
 | T2C37 | The Spellblade keepers | Blademaster and Runeblade: her familiar's extra hit on both halves (the same total), and it pierces; hands +0.03 a half: 0.75 + 0.47 and 0.75 + 0.51 (lead first) (measured +9.0 · +4.5 · +3.6% and +6.8 · +2.3 · +2.8%). Amended by … |
-| T2C38 | The Summoner keepers | Warlord and Invoker: both summons linger, two farewells at her next pair; hands +0.03 a half: 0.60 + 0.49 and 0.60 + 0.53 (lead first) (measured +8.6 · +2.0 · +6.8% and +8.6 · +3.6 · +3.0%). Amended by T2B29 (cross-reference) |
-| T2C39 | The support expanders' kit | Hands of her parent's: the Sentinel ×0.95 (0.68 + 0.42), the Enchanter ×0.8 (0.58 + 0.38), the Druid ×0.95 (0.54 + 0.44), the Shaman ×1 (0.57 + 0.5); every skill of her Katana, Bow, Light and Dark trees carries its status at 1 · … |
+| T2C38 | The Summoner keepers | Warlord and Invoker: both summons linger, two farewells at her next pair; hands: the Warlord trunk 0.57 + 0.46, lines 0.60 + 0.49; the Invoker 0.58 + 0.51 (lead first) (round 3 measured +6.4 · +2.3 · +6.5% and +3.8 · +7.1 · … |
 | T2C40 | The Spellblade supports' Barrier | After each skill act, a Barrier on the most threatened: a third of the healers' share at her act's depth (9–15%), × her healing scale |
 | T2C41 | The Summoner supports' mend | Her farewell mends every Uma a tenth of the healers' mend share at its depth (2.8–4.4%), × her healing scale; no Rescue, cleanse or revive |
 | T2C42 | Supports and the one-healer rule | They are no healer: a support beside a healer is legal, two healers still are not; a party with no healer is legal too: one healer a party is a ceiling, not a floor (T2B39, cross-reference) |
 | T2C43 | The healer keepers | Guardian and Bishop: every status she lands one stack more, to 3 (2 · 2 · 3 · 3 · 3; path 3 · 3 · 3); Surge gives ×1.15 where her status is at 3. Worth +0 to +6% on curve; the attrition pick, ahead of her battle healer in fights … |
 | T2C44 | The battle healers | Templar and Exorcist: power ×0.6, MP ×0.7, mends and Barriers ×0.7 the shares (Rescue and the revive kept), Tier 1's statuses; still the one healer. Measured +12.1 · +9.7 · +5.7% and +15.9 · +6.9 · +7.3% on curve, behind the … |
-| T2C45 | Statuses by class | Four levels: none (the four pures), a path (the hybrid keepers), support (the hybrids' expanders, new: 1 · 1 · 1 · 2 · 2, topped up to its stacks, Brave and Faith on her ward), widely (the healers, the keepers +1); five statuses, … |
-| T2C46 | The Tier 2 promotion | On her Ascend she picks among both children of every Tier 1 class she holds at Class Rank 50 (at least 6); Suggested: her ascending class's keeper, else her family's own Rank 50 class's keeper with the most Class EXP |
+| T2C45 | Statuses by class | Four levels: none (the pures), a path (the hybrid keepers), support (the hybrids' expanders: topped up to its stacks, Brave and Faith on her ward; its ladder and reach a class's numbers, 1 · 1 · 1 · 2 · 2 and every foe at depth 5 … |
 | T2C47 | Switching and Class Rank | Every open class held from arrival at Class Rank 1; switch free outside fights; each its own Class Rank; XR1's shared ladder raises all to 10 |
 | T2C48 | Opening more in Tier 2 | The door: a held Tier 2 class at Class Rank 20 opens the children of her parent's reclass neighbours (D290, D291's map), about the Tier 1 door's 3,600 Class EXP |
-| T2C49 | Kin and the Flourish in Tier 2 | Her family is the Tier 2 children of her calling's own Tier 1 classes (Warrior and Mage 6, the others 4); a kin parent's child is never Suggested and outside her Flourish |
 | T2C50 | A Tier 0 at her Ascend | Arrives as the Suggested rule's class (Class V guarantees three Tier 1 classes at Rank 50) |
-| T2C51 | Whose trees | A Tier 2 class plays her parent's trees; the Spellfist's Tomes the Sorcerer's, the Battlemage's Arms the Brawler's; no new tree or skill name |
+| T2C51 | Whose trees | A Tier 2 class plays her parent's trees; the Spellfist's Tomes the Sorcerer's, the Battlemage's Arms the Brawler's; no new tree or skill name Kept, changed (R3-4): a pure variant plays her parent's five trees of her channel … |
 | T2C52 | The class lines | Round 1's ten on the sixteen, mirrors sharing: Rampage (Berserker), Conquest (Spellfist), Nebula (Archmage), Quasar (Battlemage), Sigil (Spellblade keepers), Bane (Spellblade supports), Griffin (Summoner keepers), Wraith … |
 | T2C53 | Line C on the sixteen | Her parent's tree's C; the healers' Psalm kept (reach every Uma from depth 3) |
-| T2C54 | Presets | Keepers wear their parent's; the Spellfist Greatsword, Axe, Thunder and the Battlemage Fire, Blizzard, Lance (gear's Scatter twins, T2G25); Sentinel Katana, Greatsword, Light; Enchanter Light, Blizzard, Katana; the Druid her … |
-| T2C55 | Limit Break scale | Her parent's: ×0.95 the twelve damage and support classes, ×0.8 the four healers. Confirmed by balance (cross-reference) |
+| T2C55 | Limit Break scale | Her parent's: ×0.95 the twelve damage and support classes, ×0.8 the four healers. Confirmed by balance (cross-reference) Amended by T2C101 (forty-two classes) |
 | T2C56 | Party value | Measured on the harness (T2B21): V = D + S in BT a round; D her damage a round of the fight, S what the other four lose when her statuses, mends, wards and keeper twist are off; a class's gain the party's damage a round with her … |
-| T2C57 | Tier 3 | No new class: the sixteen deepen (two lines, crowns, the master slot, the mastery); every Tier 2 class she held is open there; the door as Tier 2's |
-| T2C58 | Masteries on the sixteen | By hall family, the same for both children of every parent; Menagerie's two pairs carry a support's mend twice; Overflow on all four healer classes. Measured as drafted: the crowns and masteries +17% at Tier 3 Lv 50, every comp … |
 | T2C59 | Round 2's names | Checked against every master-data string and the game's own: clear (§11); Crusader, Fervor, Ranger, Archon, Mystic, Warden, Vanguard, Champion refused |
-| T2C60 | The save | Sixteen class ids with their parent; `open` on a later-tier profile; per held class Tier 1's record plus line C, tips, Tier 3's held lines and the master slot; Momentum is fight state; an Uma already in a later world becomes her … |
-| T2C61 | The engine | One stage, `t2Classes`, after v21: the sixteen kits, Momentum, class lines, line C, Break tips, crowns, masteries, LB+, MP ×1.7 · ×2.4, the healing divisor |
-| T2C62 | The previews | Five pages: tiers, the sixteen, trees, comps (new; the measured comps beside the model), promotion (new) |
-| T2C63 | The comps and the party hint | Eight comps (and Party 2's C4b), C1 and C2 the reference, measured by balance: every Tier 2 comp +1.7 to +9.3% over its Tier 1 party at Lv 10 · 30 · 50, C8 +9.9 · +6.9 · +24.6% in Tier 3 (§5.3); the party screen names an open … |
 | T2C64 | Where the band is read | On curve at Tier 2 Lv 10, 30 and 50: each of the twelve damage and support classes' gain within ±5 points of the twelve's mean gain at that level (measured at the knobs +7.0 · +3.9 · +3.2%; 34 of 36 cells in; the Sentinel's Lv 10 … |
 
 ### Gear ([gear.md](gear.md))
 
 | Id | Call | Recommended |
 |---|---|---|
-| T2G21 | Types at promotion | On the Ascend sheet her new class's three weapons and each one's type, Suggested pre-set (T2W19); she arrives at G0 with them, and a type works from G0 |
-| T2G22 | The swap rule | Free: one tap on the Gear tab, outside fights; no item, lock or cooldown; nothing on screen tailors a stage |
-| T2G23 | Whose type | Her class's slot setting; the grade stays the weapon kind's (D289) |
-| T2G24 | Tier 2's types | Pure ×1.30 → ×1.50 and Dual (its own kind ×1.30, its partner ×1.10 → ×1.30), +0.02 a grade from the Whetstone or Reagent; no plain weapon |
-| T2G25 | The expanders' cross weapons | Any kind of a slot's channel; a kind's grade gives its Might to the stat she reads (ATK for the Spellfist's Tome, M.ATK for the Battlemage's Arm); its own channel's items raise it; the kits are classes' (T2C54); gear's … |
-| T2G26 | Suggested types | The table in §4.4 on classes' presets: one Dual a class, the rest Pure; the keepers round 1's; Spellfist Greatsword + Bow, Battlemage Fire + Dark, Sentinel and Enchanter Katana + Axe, Druid and Shaman Dark + Fire, the battle … |
-| T2G27 | Coverage | Measured on classes' comps: Tier 2 4.17–4.32 a regular (C1, C2 4.28 · 4.29 with every kind in two hands; the expander comps one to three kinds in one hand), Tier 3 4.14–4.38; sub-boss and boss shields +1 from Tier 2 Lv 1 |
-| T2G28 | Tier 3's types | Keen ×1.50 → ×1.70, Tempered and Evolved ×1.30 → ×1.50 on both kinds; picked on the Tier 3 Ascend sheet, pre-filled (Pure → Keen, Dual → Tempered); swapped freely; no lineage |
-| T2G29 | Armor | Tier 1's × tier on her class's half (an expander's one stat); no Tier 2 path; the Armor Lining carries the rest of the × tier |
-| T2G30 | The tree's shape | Every form its family's base plus one rider (Kindred its whole row); rings at a slot's G1 and G5 in Tier 2, the step from G1 and a ring at G5 in Tier 3; a form is a free setting, one tap |
-| T2G31 | The stat family | Great +0.3 (Tier 3 0.4) on her stat; Twofold +1 (1.1) on her other stat; Kindred her +1 shared, +0.2 on every Uma (no step); Vow (Tier 3, G5) +1 on her mends, Barriers, revives |
-| T2G32 | The Orb family | Great Orb +0.6 (0.8) on her kind; Twofold Orb +0.8 (1.0) on a second kind; Seeker +0.4 (0.6) on any weak hit; Limit Orb (Tier 3, G5) +1.3 on her Limit Breaks' hits |
-| T2G33 | The Insignia family | Great Insignia +0.3% (0.4%); Onset +0.6% (0.7%) on her first act each wave; Finisher +0.4% (0.6%) on foes below half HP; Apex (Tier 3, G5) +0.8% on bosses |
-| T2G34 | Kindred's reach | Every Uma's hits, herself included, both stats, never a heal; the party takes its strongest Kindred, never the sum; frozen when the fight starts |
-| T2G35 | ★ by tier | Any form of her ★ family counts; from her first Tier 2 grade her family's Twofold pays on any weapons, so her ★ goes first for everyone |
-| T2G36 | Presets for sixteen | §4.8: Great ×2 + Great Orb for the one-stat classes and the healers; Twofold ×2 + Great Orb for the hybrids; the supporters Kindred, Twofold, Great Orb from a slot's G5; the keeper healers Vow, Great, Great Orb from Tier 3's G5; … |
-| T2G37 | The kind cap | The Orb family on one kind (every base, the Great and Twofold Orbs, Seeker's and Limit Orb's riders when they land) at most +68 · +122 · +177 |
-| T2G38 | One Insignia factor | Every Insignia slot whose condition holds adds into one factor, bases and riders alike |
-| T2G39 | What types and forms cost | Nothing; a kind never raised is at G0 |
-| T2G40 | The second items (R2-9) | Aligned with T2P29: every Tier 2 grade takes its line's two items; the Whetstone or Reagent raises the weapon's type, the Lining armor's tier step, the Inlay the worn rider |
-| T2G41 | Ascend | Grades reset and both items go home (D283); types re-picked at each promotion, pre-filled from her last; forms carry (Tier 2's open from Tier 3's G1) |
-| T2G42 | Names | New: Kindred Pendant, Kindred Charm, Seeker Orb, Finisher Insignia, Vow Pendant, Vow Charm, Limit Orb, Apex Insignia. Kept: Pure, Dual, Keen, Tempered, Evolved, partner, Great, Twofold, Onset. Checked: no master-data match |
-| T2G43 | Screens and art | The Ascend sheet's weapons rows; a type chip and its partner's glyph on the weapon tile; the accessory sheet draws its family's tree; Kindred's tile names the party's strongest; no new art |
-| T2G44 | Save and engine | `type` per class slot; the forms' ids per family and `kind2`; Tier 2's engine stage for types by grade, partners, Vow, Seeker, Onset, Finisher, Limit Orb and Apex; Kindred and the rest frozen stats |
-| T2G45 | The viability check | D266's rule on 32 cells a tier, by her damage and by party value; the estimated riders confirmed by the simulation with the rules built, each with its knob: Seeker +0.3, Onset +0.5%, Finisher +0.3%, Limit Orb +1.2, Apex +0.6%, … |
-| T2G46 | No shapes on accessories | AoE and multi-hit are Extra Stats' (R2-8); the accessory tree reads stats, kinds and conditions |
+| T2G47 | Weapons for the forty-two | Every Tier 2 and Tier 3 class takes a type per slot, her own three weapons each (T2G23 on the forty-two); slots, channels and the stat each hit reads are classes'; one two-kind weapon in her slots, the Gladiator and the … |
+| T2G48 | The crosses' other-channel weapons | The Spellfist's Fire Tome on ATK and the Battlemage's Katana on M.ATK (their Tier 3 children the same): any kind of the slot's channel, its grade's Might to her stat, its own channel's items raise it; one grade every reader. … |
+| T2G49 | The pure variants' weapons | Three weapons of one channel, any kind in any slot (her third her second half); her stat's family on every hit; 300 refined of her channel a rank |
+| T2G50 | Suggested types' rule | One two-kind weapon or none a class, searched over every mix of the owner's two parties for the fewest kinds in one hand, under the coverage bound (T2G52); Tier 2's keepers and battle healers keep round 1's Dual, and the … |
+| T2G51 | Tier 2's Suggested on the twenty | §4.4's table: the Spellfist Dual Katana + Axe, the Battlemage Dual Fire + Dark, the Spellweaver Dual Thunder + Light, the Druid Dual Bow + Greatsword; the Enchanter Dual Katana + Axe, the Marshal Dual Bow + Greatsword and the … |
+| T2G52 | The coverage bound, per party | For each of the owner's two parties, the mean over every mix of its seats answers a regular no more than its Tier 1 party (4.31 · 4.35); no mix's sub-boss or boss answers pass the shields' pricing (4.66 · 4.48 for 7 · 9); every … |
+| T2G53 | Coverage on the twenty | Measured on T2G51 as amended: Party 1's mixes 4.25 · 4.37 · 4.25, Party 2's 4.27 · 4.34 · 4.34 (regular · sub-boss · boss); the regular bound holds (under 4.31 · 4.35); 138 of 144 inside the shields' pricing, six bosses at … |
+| T2G54 | Arsenal in gear | The Gladiator's and the Thaumaturge's slots hold up to two two-kind weapons (T2G3's exception, read by class); her three kinds and both partners all different, so all five of her channel; every other rule as any weapon's; … |
+| T2G55 | Arsenal and the coverage bound | As drafted it fails (Tier 3's means 4.39 · 4.36 against 4.31 · 4.35; 40 of 324 mixes past the shields; the all-pure T6 4.63 · 4.71 · 4.68). Fix: Tier 3's Suggested types under the bound (T2G50), which puts the four pure Tier 3 … |
+| T2G56 | Tier 3's Suggested on the twenty-two | §5.2's table: one Tempered or Evolved weapon a class, the Gladiator and the Thaumaturge two, the Dervish, the Starweaver, the Imperator and the Mythlord Keen ×3 |
+| T2G57 | Types at the Tier 3 promotion | The Tier 3 sheet pre-fills her Tier 3 class's preset and Suggested Tier 3 types; "As in Tier 2" copies her parent's kinds and maps her types (Pure → Keen, Dual → Tempered, the same partner), offered where her slots match (not the … |
+| T2G58 | Presets for the forty-two | §4.9 and §5.5: her stat twice and an Orb; Great for the one-stat classes (the pures' keepers, the crosses, the pure variants, Arsenal) and the healers, Twofold for the hybrid keepers and supports; the supports Kindred from a … |
+| T2G59 | The forms that suit the new profiles | One stat on every hit takes Great (the crosses, the pure variants, Arsenal); the one-foe pure pair a Twofold Orb, the area pair a Great Orb; Tier 3's rules move no ranking (they multiply), and the keeper healers' mends and … |
+| T2G60 | D266 re-checked | On the harness with proxies at Tier 2 and Tier 3 Lv 50: Great the most-won form, 18 and 17 of 48 cells (under half); every form still someone's best; the presets 17.9–24.0% on the new profiles. Confirms T2G45 |
+| T2G61 | Armor for the forty-two | Her Tier 1 ancestor's half on every Tier 2 and Tier 3 class (a cross's and a pure variant's the stat every hit reads); no Tier 2 path; the Lining the tier step. Amends T2G29 |
+| T2G62 | Save and engine (round 3) | `type` per slot on forty-two classes; the two-kind cap read by class (1, the Gladiator and the Thaumaturge 2) in validation on Tier 3's stage; Suggested types and presets as data beside the presets. Amends T2G44 |
+| T2G63 | The previews (round 3) | Six pages: tiers, weapons for the forty-two, Arsenal and the bound (new), the accessory tree with the new profiles, presets for the forty-two, armor and costs |
+| T2G21 | Types at promotion · *Kept* | On the Ascend sheet her new class's three weapons and each one's type, Suggested pre-set (T2W19); she arrives at G0 with them, and a type works from G0 |
+| T2G22 | The swap rule · *Kept* | Free: one tap on the Gear tab, outside fights; no item, lock or cooldown; nothing on screen tailors a stage |
+| T2G23 | Whose type · *Kept* | Her class's slot setting; the grade stays the weapon kind's (D289) |
+| T2G24 | Tier 2's types · *Kept* | Pure ×1.30 → ×1.50 and Dual (its own kind ×1.30, its partner ×1.10 → ×1.30), +0.02 a grade from the Whetstone or Reagent; no plain weapon |
+| T2G25 | The expanders' cross weapons · *Superseded (R3-2, R3-3) by T2G48* | Any kind of a slot's channel; a kind's grade gives its Might to the stat she reads (ATK for the Spellfist's Tome, M.ATK for the Battlemage's Arm); its own channel's items raise it; the kits are classes' (T2C54); gear's … |
+| T2G26 | Suggested types · *Superseded (R3-4) by T2G50, T2G51, T2G56* | The table in §4.4 on classes' presets: one Dual a class, the rest Pure; the keepers round 1's; Spellfist Greatsword + Bow, Battlemage Fire + Dark, Sentinel and Enchanter Katana + Axe, Druid and Shaman Dark + Fire, the battle … |
+| T2G27 | Coverage · *Superseded (R3-2–R3-4) by T2G52, T2G53, T2G55* | Measured on classes' comps: Tier 2 4.17–4.32 a regular (C1, C2 4.28 · 4.29 with every kind in two hands; the expander comps one to three kinds in one hand), Tier 3 4.14–4.38; sub-boss and boss shields +1 from Tier 2 Lv 1 |
+| T2G28 | Tier 3's types · *Kept, changed (R3-1): T2G57* | Keen ×1.50 → ×1.70, Tempered and Evolved ×1.30 → ×1.50 on both kinds; picked on the Tier 3 Ascend sheet, pre-filled (Pure → Keen, Dual → Tempered); swapped freely; no lineage |
+| T2G29 | Armor · *Kept, changed (R3-6): T2G61* | Tier 1's × tier on her class's half (an expander's one stat); no Tier 2 path; the Armor Lining carries the rest of the × tier |
+| T2G30 | The tree's shape · *Kept* | Every form its family's base plus one rider (Kindred its whole row); rings at a slot's G1 and G5 in Tier 2, the step from G1 and a ring at G5 in Tier 3; a form is a free setting, one tap |
+| T2G31 | The stat family · *Kept* | Great +0.3 (Tier 3 0.4) on her stat; Twofold +1 (1.1) on her other stat; Kindred her +1 shared, +0.2 on every Uma (no step); Vow (Tier 3, G5) +1 on her mends, Barriers, revives |
+| T2G32 | The Orb family · *Kept* | Great Orb +0.6 (0.8) on her kind; Twofold Orb +0.8 (1.0) on a second kind; Seeker +0.4 (0.6) on any weak hit; Limit Orb (Tier 3, G5) +1.3 on her Limit Breaks' hits |
+| T2G33 | The Insignia family · *Kept* | Great Insignia +0.3% (0.4%); Onset +0.6% (0.7%) on her first act each wave; Finisher +0.4% (0.6%) on foes below half HP; Apex (Tier 3, G5) +0.8% on bosses |
+| T2G34 | Kindred's reach · *Kept* | Every Uma's hits, herself included, both stats, never a heal; the party takes its strongest Kindred, never the sum; frozen when the fight starts |
+| T2G35 | ★ by tier · *Kept* | Any form of her ★ family counts; from her first Tier 2 grade her family's Twofold pays on any weapons, so her ★ goes first for everyone |
+| T2G36 | Presets for sixteen · *Superseded (R3-4) by T2G58* | Round 2's table: Great ×2 + Great Orb for the one-stat classes and the healers; Twofold ×2 + Great Orb for the hybrids; the supporters Kindred, Twofold, Great Orb from a slot's G5; the keeper healers Vow, Great, Great Orb from … |
+| T2G37 | The kind cap · *Kept* | The Orb family on one kind (every base, the Great and Twofold Orbs, Seeker's and Limit Orb's riders when they land) at most +68 · +122 · +177 |
+| T2G38 | One Insignia factor · *Kept* | Every Insignia slot whose condition holds adds into one factor, bases and riders alike |
+| T2G39 | What types and forms cost · *Kept* | Nothing; a kind never raised is at G0 |
+| T2G40 | The second items (R2-9) · *Kept* | Aligned with T2P29: every Tier 2 grade takes its line's two items; the Whetstone or Reagent raises the weapon's type, the Lining armor's tier step, the Inlay the worn rider |
+| T2G41 | Ascend · *Kept, changed (R3-1): T2G57* | Grades reset and both items go home (D283); types re-picked at each promotion, pre-filled from her last; forms carry (Tier 2's open from Tier 3's G1) |
+| T2G42 | Names · *Kept* | New: Kindred Pendant, Kindred Charm, Seeker Orb, Finisher Insignia, Vow Pendant, Vow Charm, Limit Orb, Apex Insignia. Kept: Pure, Dual, Keen, Tempered, Evolved, partner, Great, Twofold, Onset. Checked: no master-data match |
+| T2G43 | Screens and art · *Kept, changed (R3-1)* | The Ascend sheet's weapons rows; a type chip and its partner's glyph on the weapon tile; the accessory sheet draws its family's tree; Kindred's tile names the party's strongest; no new art |
+| T2G44 | Save and engine · *Kept, changed: T2G62* | `type` per class slot; the forms' ids per family and `kind2`; Tier 2's engine stage for types by grade, partners, Vow, Seeker, Onset, Finisher, Limit Orb and Apex; Kindred and the rest frozen stats |
+| T2G45 | The viability check · *Kept; re-run in T2G60* | D266's rule on 32 cells a tier, by her damage and by party value; the estimated riders confirmed by the simulation with the rules built, each with its knob: Seeker +0.3, Onset +0.5%, Finisher +0.3%, Limit Orb +1.2, Apex +0.6%, … |
+| T2G46 | No shapes on accessories · *Kept* | AoE and multi-hit are Extra Stats' (R2-8); the accessory tree reads stats, kinds and conditions |
 
 ### Extra Stats ([extra-stats.md](extra-stats.md))
 
@@ -333,9 +381,7 @@ stays the template):
 | T2E32 | Area guard | On a foe's every-Uma move, her hit × (1 − the share) at step 9, after evasion; both channels |
 | T2E33 | Caps | One factor a kind, every source summed: Area ≤ +60%, Multi-hit ≤ +24%, Life steal ≤ 4%, MP back ≤ +3% of her bar beside the base regen, Area guard ≤ 16% |
 | T2E34 | Values by tier | Flat branches × 1.8 and × 2.6 (a doubled pair at twice the node's rounded points; Split and Trio rounded from the Full node); percent branches the same in every tier |
-| T2E35 | Viability | Measured on the harness (§4.6): every branch someone's best, none everyone's, none over half: Offense 12 of 24 cases (the healers' six by their mends), Multi-hit 6, Split 4, Area 2; T2B re-measures with the rules built |
 | T2E36 | The hybrids' lift | Accept it: at her best branch Prowess is worth 13.0–17.5% to every damage class (a hybrid's split gave 9.8–10.9%); T2B checks the mirrors and the party value bands with it |
-| T2E37 | Presets for the sixteen | The preset sets every node: Prowess by her kit (Offense for the Berserker, Spellfist, Archmage, Battlemage and the four healers; Multi-hit for the Blademaster, Runeblade, Sentinel and Enchanter; Area for the Warlord, Invoker, … |
 | T2E38 | The kind rows' order | Her kinds by her kit's damage, her top pair's Split first (Full first when her top kind deals over 2⅓ times her second: the Paladin's Lance); T2B prints each class's order and the preset table stores it |
 | T2E39 | The Stars tab | A Branch row and a Stardust line on every node's sheet (not her moon's), a grouped one-tap list with "Wear on every {body} node"; the totals' kinds and branch lines; a Branches sheet with her preset and Tier 1's gifts; a diamond … |
 | T2E40 | Set all | Jewels by its live rule, then every Stardust that fits an open node; each line names the branch |
@@ -343,20 +389,23 @@ stays the template):
 | T2E42 | Stone's two materials | Aligned with T2P30: 30 jewels (cut stones) and, from Tier 2, 30 Stardust (Fungi powders) an Uma, three of each a rank; her moon neither; no swap costs an item |
 | T2E43 | The window's Stars track | Counts open nodes, 4 · 9 · 13 · 18 · 22 in every tier; never a branch or a Stardust (T2W24) |
 | T2E44 | Tier 3 | × 2.6 and one new row, Prowess's Trio (half of Full on each of her three kinds); every other list Tier 2's |
-| T2E45 | Prowess for the sixteen classes | A Keeper keeps her parent's split; the Spellfist 100/0 and the Battlemage 0/100 (everything on her own stat, T2C36); the Sentinel, Enchanter, Druid, Shaman, Templar and Exorcist their parent's |
 | T2E46 | The save | `stars.picks` (node → branch, defaults never stored) and `stars.slotted` (nodes with their Stardust), Tier 2 and 3 worlds only; `stars.moons` retires; no migration |
 | T2E47 | The engine | At Tier 2's engine (v22): `area`, `multi` (step 4b), `lifesteal` on both channels, `mpRegen` re-admitted, `areaGuard` (step 9); flat and kind branches as frozen stats and `flat` |
 | T2E48 | Names | All six, DEF and M.DEF, HP and MP, Offense, Area, Multi-hit, Full, Split, Trio, HP, MP, MP back, Life steal, DEF, M.DEF, Area guard, Branch, Branches, Her stat, Her shapes, Her kinds, Her preset, Tier 1's gifts: none matches a … |
 | T2E49 | The chart's marks | A white diamond at a star's lower right when its branch isn't the body's default; the chart's table untouched in every tier |
-| T2E27 | The weapon moon becomes a pick | It drops round 1's Tier 2 body (+11.8–15.2% of her damage on top of the map) and Tier 3's second moon, both his approved D194 model ("each tier's new bodies should matter"). As picks they compete with Prowess's other rows and add … |
-| T2E36 | The hybrids' lift | Slotting raises the hybrids' Prowess from about 10% to 13–15% of their damage, toward the pure classes' 16–18%: the one place slotting adds power, and it moves the pure-to-hybrid ratio by about 4 points |
-| T2E25 | MP back at 2.0% | MP binds hard once fights chain (the Sorcerer Attacks on 35% of her acts over 12 stages); MP back at 3% would be every caster's pick. 2.0% ties MP over 12 stages |
-| T2E21 | An open node gives its gift until slotted | Stardust slots, it doesn't open, so a slow Fungi line costs choice, never stats |
+| T2E50 | Prowess for the forty-two classes | A class whose every hit reads one stat puts all of Prowess on it: 100/0 the Berserker, Spellfist, Bladedancer and Marshal and the Ravager, Spellhammer, Gladiator, Dervish and Imperator; 0/100 their mirrors; every other class her … |
+| T2E51 | Presets for the twenty | Offense for every one-stat class, the four pure variants included (the harness proxies: 15.1–16.3% against their family shape's 11.7–14.8%), and the four healers; Multi-hit for the Spellblades' keepers and supports; Area for the … |
+| T2E52 | Viability on the twenty and twenty-two | Re-read on the harness proxies (§4.8): every row someone's best, none everyone's; read D266's "none over half" on the damage and support classes: Offense 23 of 48 cases in Tier 2, 27 of 54 in Tier 3; the healers' Offense (35 of … |
+| T2E53 | Pinpoint and the rows | Pinpoint moves no row: on an all-one-foe kit it multiplies every row alike (×1.10), on the Battlemage's it takes about a point of share off her sweep; Offense stays the crosses' row, Multi-hit the Spellfist's swap, Area the … |
+| T2E54 | Tier 3's twenty-two | Each Tier 3 class takes her Tier 2 parent's split and preset row, the Gladiator (100/0) and the Thaumaturge (0/100) on Offense with their swap row Area; Arsenal's partner kinds take no kind row (coverage only, WP7), so every list … |
 
 ### Professions ([professions.md](professions.md))
 
 | Id | Call | Recommended |
 |---|---|---|
+| T2P46 | Demand by class on the forty-two | A class's weapon demand is her Arms/Tome split (3 Arms: Metal and Rock 300 each a maxed Uma; 2 + 1: 200 and 100; the mirrors the reverse); the twenty hold 30 Arms and 30 Tome slots, the twenty-two 33 and 33; a cross-channel … |
+| T2P47 | The ten-branch rule on round 3's rosters | Holds, no note: every class has a mirror of the reverse split, every comp of the owner's swaps keeps its Tier 1 party's split (Party 1's comps 8 Arms · 7 Tomes, Party 2's 7 · 8, together 15 · 15, 1,500 refined on every branch for … |
+| T2P48 | The full window on round 3 | Unchanged: 320 items, 1,900 refined, 1,908 job-hours; the owner's swap pairs hold 3–5 kinds between the two classes, inside the window's five, so swapping asks no weapon past the window |
 | T2P27 | Ten branches | From Tier 2 each line has two materials: Metal · Rock (stones), Vegetables · Herbs (herbs-spices), Wood · Hides (hides-scales), Fish · Fossils (bones-horns), Stone · Fungi (mushrooms), the second from an unused uma-art family; … |
 | T2P28 | The second made items | Arms Whetstone (10 Blocks), Tome Reagent (10 dried herbs), Armor Lining (3 leathers), Accessory Inlay (5 carvings), Stardust (5 powders), G1–G10 each, made at the line's making place; each on its first item's recipe size |
 | T2P29 | A grade takes both | From Tier 2 every grade of every piece takes its line's two items of that grade: the first raises its base (Tier 1's value × tier), the second its Tier 2 path; one tap spends both; a path swaps freely, no item tied to a path |
@@ -400,8 +449,34 @@ stays the template):
 
 | Id | Call | Recommended |
 |---|---|---|
+| T2B41 | How the forty-two were measured | A rebuilt fork of engine v21 and its Auto (round 2's was deleted), checked to play Tier 1 exactly as live; every rule of classes' round 3; the party's damage as HP taken off foes; every honeycomb stage of the level, 16 seeds … |
+| T2B42 | Round 2's crosses re-read (a finding) | Round 2's fork left the cross weapon's Might out (its Battlemage reproduced: −1.3% without, round 2 −1.8%, +7.0% with); every number here re-measured |
+| T2B43 | The band in round 3 (amends T2B22) | The sixteen damage and support classes within ±5 points of their mean gain at Tier 2 Lv 10, 30, 50; the healers on the stress check. Classes' values 36 of 48 cells; proposed 48 of 48 (means +3.3 · +2.5 · +4.7%) |
+| T2B44 | The crosses' hands (amends T2C71, T2C72) | Spellfist ×1.25, Battlemage ×1.1; Pinpoint +2% a depth kept (confirms T2C73) |
+| T2B45 | The trunk hand (a new knob) | A class's hand may differ on her trunk (depths 1–2 and Attacks) and her lines (depths 3–5), shown on her sheet; used where her gain slopes with level: the four pure variants, the Druid, the Warlord, the Gladiator |
+| T2B46 | The pure variants' second hands (amends T2C68) | Trunk · lines: Bladedancer 0.53 · 0.33, Spellweaver 0.44 · 0.50, Marshal 0.56 · 0.46 (0.40 on her reconciled kit, T2B66), Animist 0.54 · 0.33; lead hands her parent's |
+| T2B47 | The Sentinel (amends T2B24, T2B25; T2C39, T2C45) | Hands ×0.9 (0.65 + 0.40); her support ladder one stack at every depth; her Armor Break on the tapped foe only. The support ladder and reach become a class's numbers; the Enchanter, Druid and Shaman keep round 2's |
+| T2B48 | The Druid (amends T2B25; T2C39) | 0.54 + 0.44 on her trunk, 0.64 + 0.51 (×1.12) on her lines; on gear's merged Dual Bow + Greatsword 0.52 + 0.42 and 0.60 + 0.48 (T2B66) |
+| T2B49 | The Summoner keepers (amends T2B29; T2C38) | The Warlord's +0.03 on her lines only (0.57 + 0.46 trunk, 0.60 + 0.49 lines); the Invoker's +0.01 (0.58 + 0.51) |
+| T2B50 | The knob order in round 3 (amends T2B33) | Classes' T2C99 for the new kits (pure hands, Pinpoint, the crosses' hands, Arsenal's hands, the low Tier 3 rules, Momentum, the battle healers, Overflow), then T2B33's for the kept classes the re-measure moved; Resonance added … |
+| T2B51 | The Tier 3 band (confirms T2C92, measured) | The eighteen within ±5 points of their mean gain over their Tier 2 parents at Tier 3 Lv 10, 30, 50, both crowned at Lv 50. Classes' values 44 of 54; proposed 52 of 54 (means +4.7 · +2.9 · +3.9%); the Gladiator's two cells within … |
+| T2B52 | Resonance (amends T2C82, T2C84) | The Astromancer's deepest open depth's skills strike again at 10%, the echo chipping nothing |
+| T2B53 | Arsenal's hands (amends T2C83–T2C85) | Gladiator ×1.05 on her trunk, ×1.2 on her lines; Thaumaturge ×1.1 |
+| T2B54 | The supports' Tier 3 twist (amends T2C86) | Her keeper sibling's twist alone, her Tier 2 hands kept (the Herald 0.65 + 0.40, the Oracle 0.58 + 0.38, the Archdruid and the Soulcaller their parents') |
+| T2B55 | The keeper healers' Tier 3 rule (amends T2C82, T2C87) | Overflow replaced: the Bastion's and the Cardinal's mends and Barriers ×1.3. The battle healers' ×0.7 power, Juggernaut, Spellbind, Menagerie, Momentum and Pinpoint doubled kept as classes wrote them |
+| T2B56 | Tier 3's budget (supersedes T2B37) | At Tier 3 Lv 50 the keepers' lines +17.0% and +18.8% over themselves uncrowned (the crown +11.8 and +14.9%), round 2's +17% held; below the crown the rules +2 to +6% |
+| T2B57 | Tier 3's term (amends T2B36, T2B5) | Foes' HP and DEF × 1.13 from Tier 3 Lv 1 to 40, rising to × 1.19 by Lv 50; offense +10% by Lv 50 and bosses × 1.1 kept. Tier 2's 1.06 → 1.10 confirmed |
+| T2B58 | The comps measured (supersedes T2B34) | C1–C10 +1.0 to +5.8% over their Tier 1 party at Tier 2 Lv 10, 30, 50; T1–T8 (and T5, T7) −0.4 to +9.3% over their Tier 2 comps and +9.1 to +17.9% over Tier 1's parties at Tier 3 Lv 10, 30, 50 |
+| T2B59 | The owner's swaps (R3-7) | Both swaps keep the party in the band in both tiers: C3 within 0.4 points of C1, C4 within 0.7; T3 and T4 within 2.1 and 3.6 of T1; every member inside her own band |
+| T2B60 | The stress check in round 3 (amends T2B23) | Multipliers to ×4–×5 (Tier 2) and ×5–×6 (Tier 3), where a healer decides on the honeycomb's stages; bands: the keeper ahead of her battle healer from ×3.2 (Tier 2) and at ×6 (Tier 3); every support's party safest with the healer … |
+| T2B61 | The keeper healers' Tier 2 rule (a finding; confirms T2B30) | Kept: one stack more works at depths 1–4 (Tier 2 Lv 1–28); from depth 5 the Guardian and the Bishop play their parent's fights, and the keeper still out-survives her battle healer (+3 to +7 points at ×4–×5) |
+| T2B62 | The Duel's rail in Tier 3 (amends T2B38) | Menagerie's farewells (13 chips on a lone champion), the supports' twists (10, 11): the Duel's shields at least 14 in Tier 2, at least 16 in Tier 3 |
+| T2B63 | The Rift's wards (a finding) | On a warded front each cross and pure variant is the pick: the Spellfist +10–12% and the Spellweaver +16% on Arcane fronts; the Battlemage +17–18%, the Bladedancer +12% and the Marshal +21% on Iron fronts (their keeper siblings … |
+| T2B64 | Is any class useless (the owner's fear) | No: every class inside her band; almost every one the better pick somewhere (levels, fronts, attrition); the Animist's niche the weakest (ahead of the Shaman at Lv 30 only), left as is |
+| T2B65 | The previews | Six pages: by tier, Tier 2's twenty, Tier 3's twenty-two (new), the comps, the stress check, every call. Supersedes T2B40 |
+| T2B66 | Gear's and Extra Stats' round 3 kits, re-read | Adopt Offense for the pure variants (T2E51, confirmed) and gear's T2G51 but for three, who keep their keeper sibling's Dual: the Enchanter Katana + Axe, the Marshal Bow + Greatsword, the Animist Dark + Fire; on those kits the … |
 | T2B1 | Every source keeps its share | Every flat value ×1.8 and ×2.6, round 2's included (Great, Twofold and Kindred forms, Extra Stats' kind rows); every percentage unscaled, round 2's included (a type's weak multiplier, Insignia riders, Area, Multi-hit, Life steal, … |
-| T2B2 | The yardstick is the engine | Every Tier 2–3 number on the harness; this round measured the sixteen on a fork of engine v21 (T2B20), the build re-measures on its own stage (`balance-t2.test.ts`) |
+| T2B2 | The yardstick is the engine | Every Tier 2–3 number on the harness; round 2 measured the sixteen on a fork of engine v21 (T2B20), round 3 the forty-two (T2B41), the build re-measures on its own stage (`balance-t2.test.ts`) |
 | T2B3 | A later tier's Class Rank pace | Ranks 1–10 one shared ladder of 3,600 raising every class she holds; depths at Lv 10 · 16 · 22 · 29 (T2C47) |
 | T2B4 | Tier 2's term | Re-sized on the measured toolbox (T2B36): foes' HP and DEF × (1.06 + 0.04 (ℓ − 1) ÷ 49), 1.06 → 1.10, offense +10% by Lv 50 |
 | T2B5 | Tier 3's term | Foes' HP and DEF × 1.10 → 1.12 by Lv 35, rising to 1.26 by Lv 40 (the crowns) and flat after, offense +10% by Lv 50 (T2B36) |
@@ -414,35 +489,25 @@ stays the template):
 | T2B13 | Limit Breaks | Tier-free: power × scale × open depth's power, at most 10 hits on one foe, gauge 12 |
 | T2B14 | The damage stack | No focus; step 1 her stat (a cross reads one), forms, Kindred and kind rows; step 3 her type's weak multiplier by grade; step 4 Insignias with riders; step 4b Area and Multi-hit; step 5 statuses and Momentum; ceiling on one weak … |
 | T2B15 | Defense | Armor as it is; a regular's 100% hit 19.0 · 18.4 · 18.2%, about 21% with the terms' offense |
-| T2B16 | The mirrors | Mirrored Tier 2 classes within 5 points of gain of each other at every level (§4.9); the Arms and Tome splits 70/30 ± 5 as Tier 1 |
+| T2B16 | The mirrors | Mirrored Tier 2 classes within 5 points of gain of each other at every level (§4.11); the Arms and Tome splits 70/30 ± 5 as Tier 1 |
 | T2B17 | The healers | Guardian ÷ Bishop and Templar ÷ Exorcist within ±10% of mends and absorbed Barriers; keeper against battle healer on the stress check (T2B23) |
-| T2B18 | The simulation's checklist | Round 1's thirteen checks plus the guardrail's three (T2B22, T2B23, T2B34), §4.15 |
+| T2B18 | The simulation's checklist | Round 1's thirteen checks plus the guardrail's three (T2B22, T2B23, T2B34), §4.16 |
 | T2B19 | Accessory viability by tier | D266's rule for every Tier 2–3 form; gear's T2G35 holds it; Kindred counts as party value (T2B32) |
-| T2B20 | How the sixteen were measured | Their rules on a scratch fork of engine v21 and its Auto, the live harness building every Uma (gear, Extra Stats, Learner, Class Rank pace), Tier 2's MP and healing divisor, gear's Suggested types and forms (T2G26, T2G36) and … |
 | T2B21 | Party value on the harness (amends T2C56) | V = D + S: D her damage a round of the fight in BT (an on-curve Brawler's at the same tier, level and kind of fight), S what the other four lose when her statuses, mends, wards and keeper twist are off; a class's gain is the … |
 | T2B22 | The band (amends T2C64) | On curve at Tier 2 Lv 10, 30 and 50: each of the twelve damage and support classes' gain within ±5 points of the twelve's mean gain at that level; the four healers on the stress check (T2B23) |
 | T2B23 | The stress check: the attrition check | Each region's elite, its boss's first wave and its boss as one fight (three waves, HP and MP carried, the 10% breather), foes' offense ×2, ×2.6, ×3.2 and ×4, at Tier 2 Lv 30 and 50 and Tier 3 Lv 50, 16 seeds; read wins, KOs, HP … |
 | T2B24 | The support level's rule (amends T2C39, T2C45) | Every skill of her Katana, Bow, Light and Dark trees carries its status at 1 · 1 · 1 · 2 · 2 by depth, topped up to its stacks, never built past them; her Brave and Faith land on the Uma she wards (her Barrier's target; the … |
 | T2B25 | The supports' hands (amends T2C39, T2C54) | Sentinel ×0.95, Enchanter ×0.8, Druid ×0.95, Shaman ×1 of her parent's hands; the Druid's preset Bow, Axe, Dark (her parent's; the Greatsword cost her the Axe's sweep and the Area branch) |
 | T2B26 | Momentum's step (amends T2C34) | 6% a stack, a stack a turn, three at most (+18%) |
-| T2B27 | The cross (amends T2C35, T2C54) | Spellfist ×1.05, Battlemage ×1.3; presets the Scatter twins (Spellfist Greatsword, Axe, Thunder; Battlemage Fire, Blizzard, Lance), gear's T2G25 alternative |
 | T2B28 | The Spellblade keepers (amends T2C37) | Her familiar's hit on both halves and it pierces (skips the unbroken halving); hands +0.03 a half (Blademaster 0.75 + 0.47, Runeblade 0.51 + 0.75) |
 | T2B29 | The Summoner keepers (amends T2C38) | Both summons linger; hands +0.03 a half (Warlord 0.60 + 0.49, Invoker 0.53 + 0.60) |
 | T2B30 | The healer keepers (confirms T2C43) | One stack more, as classes drafted: worth +0 to +6% on curve (stacks build to 3 anyway), so the keeper is the attrition pick: ahead of her battle healer from ×3.2 (T2B23) |
 | T2B31 | The battle healers (confirms T2C44) | ×0.6 power, ×0.7 MP, ×0.7 mends and Barriers: +6 to +16% on curve, behind the keeper from ×3.2 |
 | T2B32 | Kindred is support value (with T2G34) | The party measure counts it: the supports' presets wear it from a slot's G5, one Uma's total, the party's largest |
 | T2B33 | The knob order | (1) a support's status rule, (2) the supports' hands, (3) Momentum's step, (4) the cross hands, (5) the hybrid keepers' hands, (6) the battle healers' shares then power, (7) the healer keepers' twist; one at a time, re-measured … |
-| T2B34 | The comps measured (R2-12) | C1–C8 on the harness at Tier 2 Lv 10, 30, 50 (C8 in Tier 3): every comp +1.7 to +9.3% over its Tier 1 party; table in §4.7 |
-| T2B35 | C3's weapons (answers T2G25) | The Scatter twins (T2B27): every kind in two hands in C3, the party as fast or faster (+1.9, +3.2 and −0.9% at Lv 10, 30 and 50); the cost, Thunder missing from 8 of the 64 keeper and expander mixes (the Berserker with the … |
 | T2B36 | The toolbox term, re-sized (amends T2B4, T2B5) | Tier 2: foes' HP and DEF × (1.06 + 0.04 (ℓ − 1) ÷ 49), 1.06 → 1.10; Tier 3: × 1.10 → 1.12 by Lv 35, rising to × 1.26 by Lv 40 (the crowns, Class Rank 50 at Lv 36) and flat after; offense +10% by Lv 50 and bosses × 1.1 kept; … |
-| T2B37 | Tier 3 measured | C8 with the crown and the masteries is 4.98 BT a round at Tier 3 Lv 50, +25% over Tier 1's parties there and +17% over itself uncrowned (C1 crowned 4.82); masteries as classes drafted them (Juggernaut ×0.6, Resonance 30%, … |
 | T2B38 | The Duel's rail on the sixteen (amends T2B9) | The keepers' twists add a chip: the Warlord's and Invoker's second farewell (11 on a lone champion), the Blademaster's and Runeblade's second familiar (10); the Duel's shields at least 14 |
 | T2B39 | A healerless party (a finding) | Two supports carry a party with no healer through the attrition check (×2.6 every fight won); with T2B24's ladder a keeper healer's party stays ahead at ×4; the one-healer rule stays a ceiling, not a floor |
-| T2B40 | The previews | Five pages: tiers, the guardrail, the comps, the stress check, every call |
-| T2B24 | The support level's rule | The biggest finding: as drafted, the Spellblades' supports were worth +18 to +50% (Brave and Faith on every Uma every act, built to three). The fix changes what a support's status is: one or two stacks topped up, Brave and Faith … |
-| T2B23 | The stress check | The answer to "become useless": every healer and support is the better pick somewhere, measured; the four bands keep it so |
-| T2B39 | A healerless party | Two supports carry a party with no healer through hard attrition; a keeper healer's party stays ahead at the hardest. If he wants healers mandatory, this is the seam |
-| T2B22 | The band's two misses | The Sentinel at Lv 10 and 30, recommended to accept and re-read with the class lines |
 
 ### Templates ([templates.md](templates.md))
 
@@ -456,29 +521,46 @@ stays the template):
 | T2U9 | The tip's anchor | Her lead weapon's tree (her first slot, always her lead channel), depth 5's tip fork, a third option beside Power and Break, on the line she holds; keeper or expander never moves it; never on her class tree |
 | T2U11 | The three tips | Re-cut on today's shapes: Quickstep (Dash) two more hits on her target at the same total; Spillover (Middle) the volley's splash, 0.35 on every foe but her target, +2 MP; Long guard (Stayer) a Barrier on herself of 10% of her max … |
 | T2U12 | Reordering | The ★ follows her first slot; a ★ pick on a tree that stops being first, or outside her family, plays as Power and waits, and returns when it is first again |
-| T2U13 | Tier 3 | The ★ at both tip forks of her lead tree (two lines held); a capstone built on a ★ tip keeps its ★ effect; the master slot may hold it; no ★ on her other two trees |
+| T2U13 | Tier 3 | The ★ at both tip forks of her lead tree (two lines held); a capstone built on a ★ tip keeps its ★ effect, crowned at Class Rank 50; no ★ on her other two trees |
 | T2U14 | The budget | The measured sizes stand: the ★ adds about +2% damage a turn at Lv 50 in every tier (+1.0–3.6 · +0.5–3.3 · +1.3–3.4%); matched with her family's swap +1.2 · +1.3 · +1.5% on average; a matched party takes 4–6% less from Lv 30; the … |
 | T2U15 | The dial | Unchanged: the signature's rate a level (0.1 now, about +2%; 0.2 about +4% if the owner wants a stronger edge), never a new piece and never the foes; the tips' knobs (§4.7) only if the simulation finds one hot |
 | T2U16 | How it shows | One more ★ row on the Template tab (★ Tip: Picked, Not picked, "R40 first", "Off · as Sorcerer"), opening the Class tab's tip node; the fork draws "Power · Break · ★ Quickstep", the ★ dashed until picked; no dot; the Stable … |
 | T2U17 | Save | Nothing about the template stored; the ★ tip is a third value of T2C's tip pick (default Power); her moon's ids as built; no migration |
 | T2U18 | Engine | The tips are data on rules that exist (spread hits, the volley's splash, a Barrier, with a self-target the one new step), in Tier 2's class engine; the other pieces need nothing (already × tier) |
 | T2U19 | Names | Quickstep, Spillover and Long guard kept; no new name coined. Every template word (the 15 types, the 5 knack words, the 3 Flourishes, the 3 tips) checked against every string of today's master-data release (10 files, 18,227 … |
-| T2U21 | Her family on the sixteen | Both children of each Tier 1 class of her family: Warrior 6, Mage 6, Spellblade, Summoner and Healer 4 each; keeper and expander equal; kin's children outside; read through each Tier 2 class's parent |
 | T2U22 | Her preset's ★ | Her family first when her hits read its stat (a Pendant an ATK hitter's, a Charm an M.ATK hitter's, so the Brawler's and the Sorcerer's expanders read as their parents), in its best form; first for everyone once her family's dual … |
-| T2U23 | Her lead weapon on the sixteen | Her class's preset first slot: keepers as their parents (Greatsword, Fire Tome, Katana, Thunder Tome, Bow, Dark Tome, Lance, Light Tome), expanders by classes.md's presets (assumed the same leads); the tip follows her first slot … |
 | T2U24 | The tip on the support and battle-healer classes | On her lead tree's held line, a striking tree in every class (every capstone strikes); never on a support line; a capstone that doesn't strike plays the ★ as Power ("★ Tip · on a strike line"); the three tips unchanged; never a … |
 | T2U25 | Her arrival in a later world | She arrives as the Tier 2 class she picks on the Ascend sheet (Suggested her class's keeper, progression T2W18); no new Uma in a later world (live); her calling stays her family's name; her pick never moves her template |
 | T2U26 | Her moon and the stat picks | Her moon's two nodes keep their template stat, no pick list (R2-8's picks are the shared bodies'); if extra-stats.md gives her moon a list, the template stat is its first entry and her default |
 | T2U27 | Her calling and three professions | Her calling names her line, both its professions (R2-9); nothing to the sub-profession (her own pick), no Craft bonus, no party synergy |
+| T2U28 | Her family on the twenty and twenty-two | Every Tier 2 child of each Tier 1 class of her family (Warrior 8, Mage 8, Spellblade and Summoner 6, Healer 4) and in Tier 3 their Tier 3 children (9, 9, 6, 6, 4); every line equal (keeper, expander, support, pure variant, either … |
+| T2U29 | Her preset's ★ on the one-stat classes | T2U22 stands: on an ATK-only class her Charm, on an M.ATK-only class her Pendant, goes first as her family's Twofold (gear's T2G35, from her first Tier 2 grade), whose other-stat rider and her ★ pay on every hit; no Uma's ★ is … |
+| T2U30 | Her lead weapon on the twenty and twenty-two | Her class's preset first slot ([classes](classes.md) §4.13, §6.3): Greatsword (Berserker, Spellfist and their Tier 3 children, the Gladiator's Evolved + Katana), Fire Tome (Archmage, Battlemage, theirs, the Thaumaturge's Evolved … |
+| T2U31 | The tip on the pure variants, crosses and Arsenal classes, and … | On her lead tree's held line as every class's; the three tips unchanged; on a Pinpoint class Quickstep and Long guard keep Pinpoint (her hits stay on her target), Spillover forgoes it on that cast (its splash is not one foe, … |
 
 ### Progression ([progression.md](progression.md))
 
 | Id | Call | Recommended |
 |---|---|---|
+| T2W33 | The Tier 2 open set on the twenty | Every child of every Tier 1 class she has at Class Rank 50 when she ascends (two or three each): 6 to 20, read before she leaves, written to the new world, fixed but for the door (T2C48); "Opens 8 of 20" on her Gallery tile and … |
+| T2W34 | The Tier 2 class page | Grouped by Tier 1 class, two or three cards each in one order (the keeper, the cross or the support, the pure variant): slots as channel dots, her rule in four words or fewer, a Healer or Support chip, Suggested marked; locked … |
+| T2W35 | The doors on the sheet | Shown, never picked: a collapsed "Opens later" row counts what each door would add (T2C48 in Tier 2, T2C90 in Tier 3), a tap lists them by door; the Class tab keeps the same row until each opens |
+| T2W36 | Suggested in both later tiers | The child of the class she fights as when that class is at R50 and of her family (into Tier 2 its keeper; into Tier 3 its Tier 3 child, the Spellfist's and Battlemage's kept child); else the same child of her family's first R50 … |
+| T2W37 | The Tier 3 promotion on the Ascend sheet | The Tier 2 sheet's two pages with Tier 3's options: who goes (by party, Suggested Tier 3 class, weapons, "Opens 4 of 22", the check line), her page (class grouped by Tier 2 parent, weapons with Tier 3 types and "As in Tier 2", … |
+| T2W38 | The Tier 3 open set | The Tier 3 children of every Tier 2 class she holds at Class Rank 50 when she ascends: 3 to 22 (one each, two for the Spellfist and the Battlemage), read in the Tier 2 world before she leaves, written to the new one, fixed but … |
+| T2W39 | Her weapons into Tier 3 | Pre-filled with her Tier 3 class's preset and gear's Suggested Tier 3 types (T2G57), so the coverage bound holds by default; "As in Tier 2" copies her parent's kinds and maps her types (Pure → Keen, Dual → Tempered), offered … |
+| T2W40 | Umas already in a Tier 3 world at its switch | Each becomes her Tier 1 class's keeper's Tier 3 child at that class's Class Rank (classes §6.6); opens the Tier 3 children of the keepers of every Tier 1 class she has at R50 there, at least her own; Suggested types; "New: Tier 3 … |
+| T2W41 | Ascending into Tier 3 before its toolbox | From Tier 2's switch the Tier 3 Ascend writes her Tier 3 open set and the Tier 2 class she ascended as; she fights as its Tier 1 ancestor until Tier 3's switch, then becomes the Tier 3 child of that class at the ancestor's Class … |
+| T2W42 | Class IV in both later tiers | Two classes of one Tier 1 line at Class Rank 50: in Tier 2 a class and her sibling (one or two siblings a class), in Tier 3 two of the line's two or three Tier 3 classes; reachable from Tier 3's first day (Tier 2's IV leaves a … |
+| T2W43 | The Tier 3 board | Tier 2's board at Tier 3's numbers, 36 with its Rift: Class I–II at R10 · R30, III a Tier 3 class at R50, her first crown, IV T2W42, V three Tier 3 classes at R50; Crafts to 60, the Tier 3 map, continents 11–15 |
+| T2W44 | The party check line on the forty-two | Roles: damage (keepers, crosses, pure variants and their Tier 3 lines), support (the four supports and their Tier 3 children), heal (every healer class); kinds counted with every partner, Arsenal's two |
+| T2W45 | The Rift's guidance on the forty-two | The guidance names the Tier 1 class; any of its Tier 2 children, and in Tier 3 any of its Tier 3 descendants, fits; the Suggested one in Use the guided weapons |
+| T2W46 | Round 3's pacing | No day moves: the open sets grow on the same tap; the Tier 3 rule works from Class Rank 1; the doors at Class Rank 20 (Lv 16), the crown at 50 (Lv 36); Class IV's EXP unchanged; Arsenal's second two-kind weapon free |
 | T2W1 | The Tier 2 world's shape | Tier 1's on continents 6–10, with capitals v2 and the honeycomb live first: 48 regions, 24 parties, six Springs, six capital runs a continent; no Tier 2 world packet before H162 and H166 |
 | T2W2 | Continent leans by tier | Tier 2 Jungle, Sky Isles, Glacier, Volcano, Underworld (Z1); Tier 3 Swamp, Highlands, Geyser Basin, Storm Peaks, Ancient Ruins; a tier's leans change only while no world of it holds a won stage |
 | T2W3 | Face packs by tier | Tier 1's totals, arranged anew each tier: Tier 2 Z7's (the middle pack opens it, the small returns twice, the large closes it); Tier 3 a third (the small holds `w13` whole) |
 | T2W4 | Does Tier 3 get a Rift | Yes: the same shape at T3 Lv 50, its own seals and Rift Conquered · Tier 3, the Rift step (every board 36), Trials with it; nobody ascends from it while Tier 3 is the top tier: a full Tier 3 window is the end of her collection, … |
+| T2W5 | The Rift's fronts in Tiers 2 and 3 | Z9's one added test a front, re-aimed at the later tiers' toolbox (Iron shields +2 and one or two Arms; Arcane one element a foe, leaders and guards apart; the Duel's boss three acts from stage 9; the Horde five to seven a wave); … |
 | T2W6 | Trials and Drills by tier | Unchanged in every tier: Trials at the tier's Lv 45, 50, 55, opening with its Rift; Drills at its Lv 10–50, 2–6 Logs, ten runs a day banked to thirty, opening with its first map win; Logs and Marks stay in their world |
 | T2W9 | Ascending into an empty world | The Ascend sheet says when the new world would hold fewer than five ("3 of 5 to fight in Tier 2"); no rule change |
 | T2W10 | Prices by tier | Speed and Sweep Tickets × tier (20 · 30 in Tier 2, 30 · 45 in Tier 3) and the purse's Laurels × the tier she arrives in (2,000, 3,000), so a Laurel buys the same time in every tier; Marks, Manuals and Logs untiered |
@@ -488,22 +570,20 @@ stays the template):
 | T2W14 | A sixteenth scenario | Tier 4 stays closed: it shows "Tier 4 locked" and joins no world until the owner opens Tier 4; Tier 3's Rift step completes her window only |
 | T2W15 | The version plan | The worlds first on today's engine (leans, packs, prices, Tier 3's Rift), then the toolbox as one release a tier: Tier 2 at engine v22 and save v39 (the Ascend sheet's pages and the board's rules with it), Tier 3 at v23 and v40, … |
 | T2W16 | Where promotion happens | On the Gallery's Ascend sheet, two pages, every pick pre-filled: who goes (by party, a summary row per Uma), then her page (class, weapons and types, sub-profession); one tap ascends with the defaults; nothing opens over the sheet |
-| T2W17 | The classes open to her | Both children of every Tier 1 class she has at Class Rank 50 when she ascends: 6 to 16, read before she leaves and written to the new world; widened in the tier only by classes' door (T2C48: a held Tier 2 class at Class Rank 20 … |
-| T2W18 | Her Suggested Tier 2 class | The keeper of the class she fights as when it is at R50, else of her highest R50 class (ties: her family's, then the tree's order); the expander one tap beside it |
-| T2W19 | Her weapons at promotion | Her picked class's preset, each weapon's Tier 2 type gear's Suggested, set on the sheet; a slot offers its channel's kinds, an expander's cross slot included; swaps later as gear rules; Tier 2 → 3 pre-filled with hers; no G5 gate |
+| T2W17 | The classes open to her | Both children of every Tier 1 class she has at Class Rank 50 when she ascends: 6 to 16, read before she leaves and written to the new world; widened only by classes' door (XR16); "Opens 6 of 16" |
+| T2W18 | Her Suggested Tier 2 class | The keeper of the class she fights as when it is at R50, else of her highest R50 class (ties: her family's, then the tree's order) |
+| T2W19 | Her weapons at promotion | Her picked class's preset, each weapon's type gear's Suggested, set on the sheet; a slot offers its channel's kinds, a cross's other-channel slot included; swaps later as gear rules; no G5 gate |
 | T2W20 | Her sub-profession at promotion | On her page, pre-picked with professions' Suggested, her line's two shown fixed; changeable there or later |
 | T2W21 | What she keeps, picks and restarts | Picks are settings, set or confirmed on the sheet; progress restarts: kept her calling, line, template, windows, history, accessory families and kinds; picked her class, weapons and types, sub-profession; from Tier 2 her forms … |
 | T2W22 | A party ascending together | Grouped by party, moves with its name; a check line from the picks ("One healer · 10 of 10 kinds · damage 3 · support 1 · heal 1"), two healers a warning, never a block; "Suggested for all" resets the group |
-| T2W23 | Umas already in a Tier 2 world at its switch | Each opens both children of the class she fights as and of every Tier 1 class she has at R50 there, and becomes her class's keeper at its Class Rank; others at Rank 1; Suggested types and sub-profession; a "New: Tier 2 classes" … |
+| T2W23 | Umas already in a Tier 2 world at its switch | Each opens every child of the class she fights as and of every Tier 1 class she has at R50 there, and becomes her class's keeper at its Class Rank; others at Rank 1; Suggested types and sub-profession; "New: Tier 2 classes"; no … |
 | T2W24 | The Tier 2 board | One board, 36 steps, the same seven tracks and the Rift and the same record positions; Class, Craft and Stars re-read the new systems; Gear and Weapons read grades whatever form or type; World a won capital run; no track added |
 | T2W25 | The Class track from Tier 2 | R10 · R30 · R50 on her best Tier 2 class; IV a Tier 2 class and its sibling at R50; V three Tier 2 classes at R50, any; Tier 1's pace; "Pair at R50" |
 | T2W26 | The Craft track from Tier 2 | Her three Craft Levels add up to 12 · 24 · 36 · 48 · 60: any split; Craft V 24.9 (even) to 27.8 days (a specialist) against Tier 1's 24.5; "Crafts 36"; the dial 56 |
-| T2W27 | Progress, never a choice | A step reads progress only; a choice counts only as breadth any option meets equally (a sibling pair, three classes, five weapons, three Crafts); no step names a class, type, form, stat or profession; a choice celebrated is … |
+| T2W27 | Progress, never a choice | A step reads progress only; a choice counts only as breadth any option meets equally (two of one line, three classes, five weapons, three Crafts); no step names a class, type, form, stat or profession; a choice celebrated is … |
 | T2W28 | The record and the art | No new position, no rebake: every tier keeps the 36 ids and positions; each id's rule is the tier's (read by tier from Tier 2's switch); `windowNext` and the tiles gain "Pair R41/50" and "Crafts 29/36"; the pane map lights 36 as … |
-| T2W29 | The Tier 3 board | Tier 2's board at Tier 3's numbers, 36 with its Rift: Class on Tier 3's classes (R50 also her crown, if classes keeps it there), Crafts to 60, the Tier 3 map, continents 11–15 |
-| T2W30 | The Rift's guidance and tests on the sixteen | The guidance names the Tier 1 class and either child fits (the keeper Suggested in Use the guided weapons); the fronts' tests ask for round 2's tools (Pure types and self-buffs on Iron, a Dual's partner and kind picks on Arcane, … |
-| T2W31 | Ascend into Tier 3 | The same sheet, pre-filled with her Tier 2 picks: her class (her open set carrying, assumed; Tier 3's options if classes gives one), weapons and types, sub-profession; forms and picks kept as settings; 3,000 Laurels |
-| T2W32 | A Tier 2 run with round 2 | A first cohort of twenty working for itself: full windows in about 63.6 days (sub-professions pooled; 111.6 without), since round 2's farm doubles a full window (T2P40–T2P41); forty at work: 31.8, the Rift binding at 33.5 (37.6 … |
+| T2W30 | The Rift's guidance and tests on the later tiers | The guidance names the Tier 1 class and any of its line fits; the fronts' tests ask for the later tiers' tools (Pure types and Momentum on Iron, a Dual's partner and kind rows on Arcane, single-target burst on the Duel, area, … |
+| T2W32 | A Tier 2 run with round 2 | A first cohort of twenty working for itself: full windows in about 63.6 days (sub-professions pooled; 111.6 without); forty at work: 31.8, the Rift binding at 33.5 (37.6 at 80%); the fighting party at G10 on day 23.4; Crafts 60 … |
 
 ## 9. Round 2: the owner's requirements (2026-11-04)
 
