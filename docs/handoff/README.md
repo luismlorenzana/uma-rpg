@@ -23,7 +23,7 @@
 | 2. General improvements | From the owner's playtest feedback: planned together, then packets | Next: the owner's feedback |
 | 3. Specific improvements | Per system, from the same playtests | After step 2's plan |
 
-**Queue** (packet ids continue from H167; decision numbers from D297). **Classes v3 and Halls v2 are done and live**
+**Queue** (packet ids continue from H168; decision numbers from D308). **Classes v3 and Halls v2 are done and live**
 (H126–H137, D240–D257); their packet tables and Done rows are in [the archive](../archive/handoff-history.md). Art
 packets go to ChatGPT, which draws, merges and publishes uma-art itself; the uma-rpg packet that first uses the art
 pins it.
@@ -75,6 +75,16 @@ and adding four empty parties; the world and region pixel maps stay. No art rele
 | H166 | The switch: save v38 live, the pixel continent map removed, the manual, the phone check | ChatGPT | M | H162, H165 | Done (D307), below |
 
 **Order:** H160–H166 are done. The capital runs and honeycomb are live; the owner's next playtest feeds hardening.
+
+**Uma sprites** ([animation spec](../design/sprites/animation-spec.md), [HD-2D research](../design/sprites/hd2d.md),
+[page](../design/sprites/previews/sprites.html)): pixel sprites for the party in fights, after ChatGPT's private study
+(`uma-platform/content/review/party-dash-sprite-study/`). The baseline sample comes first and is private: two Umas, the
+full spec. The HD-2D landscape fight (HD1–HD10) is research for the owner's review; its prototype waits on the sample and
+his go.
+
+| Id | What | Who | Size | Needs | State |
+|---|---|---|---|---|---|
+| H168 | [Art: the sprite baseline sample](tasks/H168-sprite-baseline.md), two Umas in the full animation spec, private | ChatGPT | L | — | Open; the owner approves the key frames midway |
 
 **Pinned for later:** foes covering each other, as a feature of special boss fights (D282, B1). Engine v20's rule is in
 `guardOf` and `chooseTarget`'s `ally` target; a boss that does it should show who she covers on screen.

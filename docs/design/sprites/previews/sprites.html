@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uma Sprite Spec</title>
+<!-- Sprites (docs/design/sprites/animation-spec.md, hd2d.md): the cell and its anchors, the catalog's timings, the face
+     layer, the landscape fight and HD-2D's layers. Schematic figures only: no character art. Self-contained, uma-kit's
+     tokens, light and dark. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd; --info: #2f6fe0; --success: #2f7a4f;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --r-wind: #5b8def; --r-strike: #d39a2b; --r-impact: #c23b33; --r-release: #8a52c7; --r-hold: #2f9a6a;
+    --r-recover: #8a98ac; --r-loop: #2a9bb0;
+    --fig-hair: #6d5a4a; --fig-skin: #e8c6a8; --fig-cloth: #5f7896; --fig-trim: #c9a46a; --fig-leg: #39424e; --fig-line: #262d36;
+    --grid: rgb(16 26 36 / 0.07); --stage: #dfe7df; --stage-ground: #c7d3c4;
+    --radius: 12px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --success: #4fb37a;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+      --r-wind: #6f9cf2; --r-strike: #d6a23e; --r-impact: #e0645c; --r-release: #b388ec; --r-hold: #4fc08c;
+      --r-recover: #6f7d8e; --r-loop: #4cbfd4;
+      --fig-hair: #a08670; --fig-skin: #e8c6a8; --fig-cloth: #7f9bbd; --fig-trim: #d9b77c; --fig-leg: #59636f; --fig-line: #0b1118;
+      --grid: rgb(255 255 255 / 0.06); --stage: #1c2a22; --stage-ground: #24362b; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --success: #4fb37a;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16);
+    --r-wind: #6f9cf2; --r-strike: #d6a23e; --r-impact: #e0645c; --r-release: #b388ec; --r-hold: #4fc08c;
+    --r-recover: #6f7d8e; --r-loop: #4cbfd4;
+    --fig-hair: #a08670; --fig-skin: #e8c6a8; --fig-cloth: #7f9bbd; --fig-trim: #d9b77c; --fig-leg: #59636f; --fig-line: #0b1118;
+    --grid: rgb(255 255 255 / 0.06); --stage: #1c2a22; --stage-ground: #24362b; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 17px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 8px; }
+  h3 { font: 700 14px/1.3 system-ui; margin: 0 0 6px; }
+  p, li { color: var(--ink-soft); max-width: 80ch; }
+  a { color: var(--info); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 20px; }
+  nav a { font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; background: var(--sunken); color: var(--ink-soft); text-decoration: none; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--hairline-strong); margin-bottom: 16px; }
+  .two { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+  svg { display: block; width: 100%; height: auto; }
+  .seg { display: inline-flex; background: var(--sunken); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--ink-soft); font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; cursor: pointer; min-height: 32px; }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 var(--hairline-strong); }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 12px; }
+  .checks { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-soft); }
+  .checks label { display: inline-flex; gap: 6px; align-items: center; min-height: 28px; cursor: pointer; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; }
+  .tl { display: grid; grid-template-columns: 104px minmax(0, 1fr) 72px; gap: 6px 10px; align-items: center; min-width: 560px; }
+  .tl .name { font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink); }
+  .tl .ms { font-size: 12px; color: var(--ink-faint); text-align: right; font-variant-numeric: tabular-nums; }
+  .track { position: relative; height: 30px; }
+  .fr { position: absolute; top: 4px; height: 22px; border-radius: 4px; border: 1px solid var(--panel); font: 600 10px system-ui; color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .fr.on { outline: 2px solid var(--ink); outline-offset: 0; z-index: 1; }
+  .ev { position: absolute; top: -3px; font: 700 10px system-ui; color: var(--ink); transform: translateX(-50%); }
+  .hold { position: absolute; bottom: 0; height: 3px; background: var(--r-hold); border-radius: 2px; }
+  .rep { position: absolute; bottom: 0; height: 3px; background: var(--r-impact); border-radius: 2px; }
+  .row-dim { opacity: 0.28; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink-soft); margin-left: 6px; vertical-align: middle; }
+  .tag.min { background: var(--accent-wash); color: var(--accent); }
+  .faces { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 10px; }
+  .face { background: var(--raised); border-radius: 10px; padding: 10px; text-align: center; }
+  .face b { display: block; font: 600 12px ui-monospace, Menlo, monospace; margin-top: 6px; }
+  .face span { font-size: 11px; color: var(--ink-faint); }
+  .note { font-size: 12px; color: var(--ink-faint); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+  .stat { background: var(--raised); border-radius: 10px; padding: 12px; }
+  .stat b { display: block; font: 700 22px/1.1 ui-rounded, system-ui; color: var(--ink); }
+  .stat span { font-size: 12px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Uma sprites: the spec at a glance</h1>
+  <p>The baseline sample's requirement (<a href="../animation-spec.md">animation-spec.md</a>, SA1–SA23) and the HD-2D
+    research (<a href="../hd2d.md">hd2d.md</a>, HD1–HD10). Every figure here is a schematic, not a Uma.</p>
+  <nav>
+    <a href="#cell">The cell</a><a href="#layers">Layers</a><a href="#catalog">The catalog</a><a href="#face">The face layer</a>
+    <a href="#landscape">Landscape fight</a><a href="#hd2d">HD-2D layers</a>
+  </nav>
+
+  <section class="card" id="cell">
+    <h2>1. The cell and its anchors</h2>
+    <div class="two">
+      <div>
+        <svg id="cellSvg" viewBox="-4 -4 392 392" role="img" aria-label="A 64 by 64 cell with a schematic standing figure and its anchors"></svg>
+      </div>
+      <div>
+        <p>Each frame is <b>64×64</b>. The Uma stands about <b>52 px</b> tall, the study's 48×64 size. Her feet sit on the ground
+          line <b>y = 60</b>, centred on <b>x = 32</b>, and the game places every frame by that point. She faces image-left in
+          three-quarter view and is never mirrored.</p>
+        <div class="checks" id="cellToggles"></div>
+        <table style="margin-top:10px">
+          <tr><th>Anchor</th><th>What it is</th></tr>
+          <tr><td>foot</td><td>(32, 60), the same in every frame</td></tr>
+          <tr><td>head box</td><td>Head, ears and front hair; must match the key frame on head-locked frames</td></tr>
+          <tr><td>face box</td><td>Eyes and mouth; the face patches are its size</td></tr>
+          <tr><td>grip + angle</td><td>Front hand; 0° = forward (image-left), 90° = up</td></tr>
+          <tr><td>off</td><td>Back hand: a tome, a bow string</td></tr>
+          <tr><td>hit</td><td>Where blows aimed at her land</td></tr>
+          <tr><td>cast</td><td>Where her spell starts (cast and Limit frames)</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="layers">
+    <h2>2. Layers, back to front</h2>
+    <svg viewBox="0 0 900 230" role="img" aria-label="Six layers from shadow to effects">
+      <g id="layerStack"></g>
+    </svg>
+    <p class="note">ChatGPT draws the body, the face patches and (in the sample) four placeholder held items. The game draws
+      the shadow and every effect.</p>
+  </section>
+
+  <section class="card" id="catalog">
+    <h2>3. The catalog, at real timings</h2>
+    <div class="bar">
+      <div class="seg" id="setSeg">
+        <button aria-pressed="true" data-set="all">Baseline sample (62 frames)</button>
+        <button aria-pressed="false" data-set="min">Proposed production minimum (35)</button>
+      </div>
+      <div class="seg" id="speedSeg">
+        <button aria-pressed="true" data-speed="1">1×</button><button aria-pressed="false" data-speed="2">2×</button><button aria-pressed="false" data-speed="4">4×</button>
+      </div>
+      <div class="seg"><button aria-pressed="false" id="playBtn">Play</button></div>
+    </div>
+    <div class="scroll"><div class="tl" id="timeline"></div></div>
+    <div class="legend" id="roleLegend"></div>
+    <p class="note">▼ impact (the damage number lands here) · ◆ release · green underline: hold, looped while the game waits ·
+      red underline: repeat, replayed for each extra hit. The turnaround (4 stills) isn't timed.</p>
+    <div class="tiles" id="catTiles"></div>
+  </section>
+
+  <section class="card" id="face">
+    <h2>4. The face layer</h2>
+    <div class="two">
+      <div>
+        <svg id="headSvg" viewBox="0 0 300 300" role="img" aria-label="The head box with the face box inside"></svg>
+      </div>
+      <div>
+        <p>On <b>head-locked</b> frames (idle, walk, run, shoot, cast, guard) the head is the key frame's, only moved. The game
+          stamps a face patch on them and runs the blinks. On <b>free</b> frames (swing, thrust, hop, the fall, victory) the
+          face is drawn in. The lock tolerates 6 changed pixels outside the face box, and also guards her size and identity.</p>
+        <div class="faces" id="faceTiles"></div>
+        <p class="note">Blinks: every 2.4–5 s at random, half 60 ms, closed 100 ms, half 60 ms; one in seven doubled.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="landscape">
+    <h2>5. The landscape fight (the turned stage)</h2>
+    <div class="bar">
+      <div class="seg" id="lockSeg">
+        <button aria-pressed="true" data-lock="on">Rotation lock on: the stage turns itself</button>
+        <button aria-pressed="false" data-lock="off">Lock off: iOS turns the app</button>
+      </div>
+    </div>
+    <svg id="phoneSvg" viewBox="-20 -20 884 430" role="img" aria-label="An 844 by 390 landscape phone with foes on the left and five party cells on the right"></svg>
+    <p id="lockNote"></p>
+    <p class="note">844×390 pt. Cells at 4 device px a pixel: 85 pt square, the Uma about 69 pt tall. Foes take the left
+      ~55%; the party stands in two staggered columns on the right, three at the back and two in front. HP, MP and Limit sit
+      in a party strip; commands are at the bottom right, in thumb reach.</p>
+  </section>
+
+  <section class="card" id="hd2d">
+    <h2>6. HD-2D, layer by layer</h2>
+    <svg id="hdSvg" viewBox="0 0 960 360" role="img" aria-label="HD-2D layers stacked under a tilted orthographic camera"></svg>
+    <p class="note">An orthographic camera tilted down keeps every sprite at a whole number of device pixels; depth of field
+      gives the depth. three.js draws the fight; the DOM keeps the numbers and controls (HD2–HD4).</p>
+  </section>
+</main>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg'
+const el = (tag, attrs = {}, parent) => {
+  const n = document.createElementNS(NS, tag)
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v)
+  if (parent) parent.appendChild(n)
+  return n
+}
+const css = (name) => `var(--${name})`
+
+// A schematic standing figure on the 64-grid, as rectangles [x, y, w, h, colour].
+const FIGURE = [
+  [41, 34, 3, 16, 'fig-hair'], [43, 46, 2, 6, 'fig-hair'],                       // tail
+  [22, 2, 4, 8, 'fig-hair'], [35, 3, 4, 8, 'fig-hair'],                          // ears
+  [21, 8, 21, 20, 'fig-hair'],                                                    // hair mass
+  [24, 14, 14, 13, 'fig-skin'],                                                   // face
+  [23, 9, 16, 5, 'fig-hair'],                                                     // bangs
+  [26, 28, 12, 12, 'fig-cloth'], [26, 34, 12, 2, 'fig-trim'],                     // torso, belt
+  [22, 30, 4, 8, 'fig-cloth'], [19, 37, 4, 3, 'fig-skin'],                        // front arm, hand
+  [38, 30, 3, 8, 'fig-cloth'], [39, 37, 3, 2, 'fig-skin'],                        // back arm
+  [24, 40, 16, 6, 'fig-cloth'],                                                   // skirt
+  [27, 46, 4, 12, 'fig-leg'], [33, 46, 4, 12, 'fig-leg'],                         // legs
+  [26, 57, 6, 3, 'fig-trim'], [33, 57, 5, 3, 'fig-trim'],                         // shoes
+]
+const EYES = [[26, 19, 3, 4], [33, 19, 3, 4]]
+function drawFigure(g, s, ox = 0, oy = 0) {
+  for (const [x, y, w, h, c] of FIGURE) el('rect', { x: ox + x * s, y: oy + y * s, width: w * s, height: h * s, fill: css(c) }, g)
+  for (const [x, y, w, h] of EYES) el('rect', { x: ox + x * s, y: oy + y * s, width: w * s, height: h * s, fill: css('fig-line') }, g)
+  el('rect', { x: ox + 30 * s, y: oy + 24 * s, width: 2 * s, height: 1 * s, fill: css('fig-line') }, g)
+}
+
+// 1. The cell.
+const S = 6
+const cellSvg = document.getElementById('cellSvg')
+const ANCHORS = {
+  grid: { label: 'grid', on: true }, ground: { label: 'ground line and centre', on: true },
+  head: { label: 'head box', on: true }, face: { label: 'face box', on: true },
+  grip: { label: 'grip + angle', on: true }, off: { label: 'off-hand', on: true },
+  hit: { label: 'hit', on: true }, cast: { label: 'cast', on: false },
+}
+function drawCell() {
+  cellSvg.replaceChildren()
+  el('rect', { x: 0, y: 0, width: 64 * S, height: 64 * S, fill: css('raised'), stroke: css('hairline-strong') }, cellSvg)
+  if (ANCHORS.grid.on) for (let i = 1; i < 64; i++) {
+    el('line', { x1: i * S, y1: 0, x2: i * S, y2: 64 * S, stroke: css('grid'), 'stroke-width': 1 }, cellSvg)
+    el('line', { x1: 0, y1: i * S, x2: 64 * S, y2: i * S, stroke: css('grid'), 'stroke-width': 1 }, cellSvg)
+  }
+  drawFigure(el('g', {}, cellSvg), S)
+  const mark = (x, y, color, label, dx = 8, dy = -6) => {
+    el('circle', { cx: x * S, cy: y * S, r: 5, fill: color, stroke: css('panel'), 'stroke-width': 2 }, cellSvg)
+    const t = el('text', { x: x * S + dx, y: y * S + dy, fill: color, 'font-size': 12, 'font-weight': 700 }, cellSvg)
+    t.textContent = label
+  }
+  if (ANCHORS.ground.on) {
+    el('line', { x1: 0, y1: 60 * S, x2: 64 * S, y2: 60 * S, stroke: css('success'), 'stroke-width': 2 }, cellSvg)
+    el('line', { x1: 32 * S, y1: 0, x2: 32 * S, y2: 64 * S, stroke: css('success'), 'stroke-width': 1.5, 'stroke-dasharray': '6 5' }, cellSvg)
+    mark(32, 60, css('success'), 'foot (32, 60)', 8, 16)
+  }
+  if (ANCHORS.head.on) {
+    el('rect', { x: 20 * S, y: 1 * S, width: 23 * S, height: 28 * S, fill: 'none', stroke: css('info'), 'stroke-width': 2, 'stroke-dasharray': '7 4' }, cellSvg)
+    const t = el('text', { x: 43.5 * S, y: 4 * S, fill: css('info'), 'font-size': 12, 'font-weight': 700 }, cellSvg); t.textContent = 'head box'
+  }
+  if (ANCHORS.face.on) {
+    el('rect', { x: 25 * S, y: 18 * S, width: 12 * S, height: 8 * S, fill: 'none', stroke: css('accent'), 'stroke-width': 2.5 }, cellSvg)
+    const t = el('text', { x: 43.5 * S, y: 22 * S, fill: css('accent'), 'font-size': 12, 'font-weight': 700 }, cellSvg); t.textContent = 'face box'
+  }
+  if (ANCHORS.grip.on) {
+    const a = 35 * Math.PI / 180, len = 15 * S, x = 20 * S, y = 38 * S
+    el('line', { x1: x, y1: y, x2: x - Math.cos(a) * len, y2: y - Math.sin(a) * len, stroke: css('r-impact'), 'stroke-width': 3, 'marker-end': 'url(#arrow)' }, cellSvg)
+    mark(20, 38, css('r-impact'), 'grip 35°', -64, 22)
+  }
+  if (ANCHORS.off.on) mark(40.5, 38, css('r-release'), 'off', 8, 4)
+  if (ANCHORS.hit.on) mark(31, 35, css('r-strike'), 'hit', 8, -6)
+  if (ANCHORS.cast.on) mark(18, 30, css('r-loop'), 'cast', -40, -8)
+  const defs = el('defs', {}, cellSvg)
+  const m = el('marker', { id: 'arrow', viewBox: '0 0 10 10', refX: 6, refY: 5, markerWidth: 5, markerHeight: 5, orient: 'auto-start-reverse' }, defs)
+  el('path', { d: 'M0,0 L10,5 L0,10 z', fill: css('r-impact') }, m)
+}
+const toggles = document.getElementById('cellToggles')
+for (const [key, a] of Object.entries(ANCHORS)) {
+  const l = document.createElement('label')
+  const i = document.createElement('input'); i.type = 'checkbox'; i.checked = a.on
+  i.addEventListener('change', () => { a.on = i.checked; drawCell() })
+  l.append(i, a.label); toggles.append(l)
+}
+drawCell()
+
+// 2. Layers.
+const LAYERS = [
+  ['Shadow', 'the game', 'r-recover'], ['Held item behind', 'drawn', 'r-strike'], ['Body', 'drawn', 'fig-cloth'],
+  ['Face patch', 'drawn', 'accent'], ['Held item in front', 'drawn', 'r-strike'], ['Effects', 'the game', 'r-release'],
+]
+const ls = document.getElementById('layerStack')
+LAYERS.forEach(([name, who, c], i) => {
+  const x = 20 + i * 145, y = 150 - i * 22
+  el('path', { d: `M${x},${y} l110,-30 l26,24 l-110,30 z`, fill: css(c), opacity: 0.9, stroke: css('panel'), 'stroke-width': 2 }, ls)
+  const t = el('text', { x: x + 4, y: y + 48, fill: css('ink'), 'font-size': 13, 'font-weight': 700 }, ls); t.textContent = name
+  const u = el('text', { x: x + 4, y: y + 64, fill: css('ink-soft'), 'font-size': 12 }, ls); u.textContent = who
+})
+const back = el('text', { x: 20, y: 214, fill: css('ink-faint'), 'font-size': 12 }, ls); back.textContent = 'back'
+const front = el('text', { x: 860, y: 214, fill: css('ink-faint'), 'font-size': 12, 'text-anchor': 'end' }, ls); front.textContent = 'front'
+
+// 3. The catalog (spec §6).
+const ROLE = { wind: ['r-wind', 'wind-up'], strike: ['r-strike', 'strike / motion'], impact: ['r-impact', 'impact'],
+  release: ['r-release', 'release'], hold: ['r-hold', 'hold'], recover: ['r-recover', 'recover'], loop: ['r-loop', 'loop'] }
+const CAT = [
+  { id: 'idle', ms: [220, 180, 220, 180], roles: 'loop loop loop loop', loop: true, min: true, head: 'locked' },
+  { id: 'run', ms: [75, 75, 75, 75, 75, 75], roles: 'loop loop loop loop loop loop', loop: true, min: true, head: 'locked' },
+  { id: 'hop', ms: [90, 160], roles: 'wind strike', min: true, head: 'free' },
+  { id: 'swing', ms: [160, 90, 60, 140, 120, 160], roles: 'wind wind strike impact recover recover', impact: 3, repeat: [2, 3], min: true, head: 'free' },
+  { id: 'thrust', ms: [150, 80, 140, 120, 150], roles: 'wind strike impact recover recover', impact: 2, repeat: [1, 2], head: 'free' },
+  { id: 'shoot', ms: [150, 200, 60, 120, 150], roles: 'wind hold release recover recover', release: 2, head: 'locked' },
+  { id: 'cast', ms: [140, 140, 160, 160, 90, 180], roles: 'wind wind hold hold release recover', hold: [2, 3], release: 4, min: true, head: 'locked' },
+  { id: 'guard', ms: [120, 400, 140], roles: 'wind hold recover', hold: [1, 1], head: 'locked' },
+  { id: 'hurt', ms: [90, 200], roles: 'impact recover', min: true, head: 'free' },
+  { id: 'down', ms: [120, 140, 600], roles: 'wind strike hold', hold: [2, 2], min: true, head: 'free' },
+  { id: 'victory', ms: [140, 140, 160, 160, 400, 400], roles: 'wind wind strike strike hold hold', hold: [4, 5], min: true, head: 'free' },
+  { id: 'limit', ms: [160, 160, 90, 500], roles: 'wind wind release hold', release: 2, hold: [3, 3], head: 'free' },
+  { id: 'walk', ms: [110, 110, 110, 110, 110, 110], roles: 'loop loop loop loop loop loop', loop: true, head: 'locked' },
+]
+const MAX = Math.max(...CAT.map((a) => a.ms.reduce((s, v) => s + v, 0)))
+const tl = document.getElementById('timeline')
+const rows = []
+for (const a of CAT) {
+  const total = a.ms.reduce((s, v) => s + v, 0)
+  const name = document.createElement('div'); name.className = 'name'
+  name.innerHTML = `${a.id}${a.min ? '<span class="tag min">min</span>' : ''}`
+  const track = document.createElement('div'); track.className = 'track'
+  let at = 0
+  const frames = a.ms.map((ms, i) => {
+    const f = document.createElement('div'); f.className = 'fr'
+    f.style.left = `${(at / MAX) * 100}%`; f.style.width = `${(ms / MAX) * 100}%`
+    f.style.background = css(ROLE[a.roles.split(' ')[i]][0]); f.textContent = ms
+    f.title = `${a.id} frame ${i}: ${ms} ms, ${ROLE[a.roles.split(' ')[i]][1]}`
+    track.append(f)
+    const start = at; at += ms
+    return { f, start, end: at }
+  })
+  const mid = (i) => ((frames[i].start + frames[i].end) / 2 / MAX) * 100
+  const ev = (i, sym) => { const e = document.createElement('div'); e.className = 'ev'; e.style.left = `${mid(i)}%`; e.textContent = sym; track.append(e) }
+  if (a.impact != null) ev(a.impact, '▼')
+  if (a.release != null) ev(a.release, '◆')
+  const under = (span, cls) => {
+    const u = document.createElement('div'); u.className = cls
+    u.style.left = `${(frames[span[0]].start / MAX) * 100}%`
+    u.style.width = `${((frames[span[1]].end - frames[span[0]].start) / MAX) * 100}%`
+    track.append(u)
+  }
+  if (a.hold) under(a.hold, 'hold')
+  if (a.repeat) under(a.repeat, 'rep')
+  const ms = document.createElement('div'); ms.className = 'ms'
+  ms.textContent = `${a.ms.length} · ${total} ms`
+  tl.append(name, track, ms)
+  rows.push({ a, total, frames, nodes: [name, track, ms] })
+}
+const legend = document.getElementById('roleLegend')
+for (const [, [c, label]] of Object.entries(ROLE)) {
+  const s = document.createElement('span'); s.innerHTML = `<i style="background:${css(c)}"></i>${label}`; legend.append(s)
+}
+let set = 'all', speed = 1, playing = false, t0 = 0
+function applySet() {
+  for (const r of rows) for (const n of r.nodes) n.classList.toggle('row-dim', set === 'min' && !r.a.min)
+  const pick = rows.filter((r) => set === 'all' || r.a.min)
+  const frames = pick.reduce((s, r) => s + r.a.ms.length, 0) + (set === 'all' ? 4 : 0)
+  const locked = pick.filter((r) => r.a.head === 'locked').length
+  document.getElementById('catTiles').innerHTML = `
+    <div class="stat"><b>${frames}</b><span>body frames a Uma${set === 'all' ? ' (with the turnaround)' : ''}</span></div>
+    <div class="stat"><b>${pick.length}</b><span>timed actions</span></div>
+    <div class="stat"><b>${locked}</b><span>head-locked (face patches, blinks)</span></div>
+    <div class="stat"><b>6</b><span>face patches a Uma</span></div>`
+}
+function tick(now) {
+  if (!playing) return
+  const t = (now - t0) * speed
+  for (const r of rows) {
+    const cycle = r.a.loop ? r.total : r.total + 500
+    const local = t % cycle
+    r.frames.forEach((fr) => fr.f.classList.toggle('on', local >= fr.start && local < fr.end))
+  }
+  requestAnimationFrame(tick)
+}
+const press = (seg, btn) => seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)))
+document.getElementById('setSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; press(e.currentTarget, b); set = b.dataset.set; applySet() })
+document.getElementById('speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; press(e.currentTarget, b); speed = Number(b.dataset.speed) })
+const playBtn = document.getElementById('playBtn')
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+playBtn.addEventListener('click', () => {
+  playing = !playing; playBtn.setAttribute('aria-pressed', String(playing)); playBtn.textContent = playing ? 'Pause' : 'Play'
+  if (playing) { t0 = performance.now(); requestAnimationFrame(tick) } else rows.forEach((r) => r.frames.forEach((fr) => fr.f.classList.remove('on')))
+})
+if (reduced) playBtn.title = 'Reduced motion is on: the game would show each action\'s key frame instead'
+applySet()
+
+// 4. The face layer: the head box at 10× and six schematic patches (12×8, '#' eye or mouth pixel).
+const headSvg = document.getElementById('headSvg')
+{
+  const s = 10, g = el('g', {}, headSvg)
+  const head = FIGURE.slice(2, 7)
+  for (const [x, y, w, h, c] of head) el('rect', { x: (x - 19) * s, y: (y - 1) * s, width: w * s, height: h * s, fill: css(c) }, g)
+  for (const [x, y, w, h] of EYES) el('rect', { x: (x - 19) * s, y: (y - 1) * s, width: w * s, height: h * s, fill: css('fig-line') }, g)
+  el('rect', { x: 11 * s, y: 23 * s, width: 2 * s, height: s, fill: css('fig-line') }, g)
+  el('rect', { x: 1 * s, y: 0, width: 23 * s, height: 28 * s, fill: 'none', stroke: css('info'), 'stroke-width': 3, 'stroke-dasharray': '10 6' }, headSvg)
+  el('rect', { x: 6 * s, y: 17 * s, width: 12 * s, height: 8 * s, fill: 'none', stroke: css('accent'), 'stroke-width': 3 }, headSvg)
+  const t1 = el('text', { x: 2 * s, y: 29.6 * s, fill: css('info'), 'font-size': 13, 'font-weight': 700 }, headSvg); t1.textContent = 'head box (locked)'
+  const t2 = el('text', { x: 6 * s, y: 16.4 * s, fill: css('accent'), 'font-size': 13, 'font-weight': 700 }, headSvg); t2.textContent = 'face box'
+}
+const PATCHES = [
+  ['(drawn)', 'default', ['............', '..##....##..', '..##....##..', '..##....##..', '............', '............', '.....##.....', '............']],
+  ['blink-half', 'blinks', ['............', '............', '..##....##..', '..##....##..', '............', '............', '.....##.....', '............']],
+  ['blink-closed', 'blinks', ['............', '............', '............', '.###....###.', '............', '............', '.....##.....', '............']],
+  ['focus', 'attacks, casts, run', ['............', '.##......##.', '..###..###..', '............', '............', '............', '....####....', '............']],
+  ['pain', 'hurt', ['............', '.#.......#..', '..##....##..', '.#.......#..', '............', '.....##.....', '....#..#....', '.....##.....']],
+  ['joy', 'victory', ['............', '..##....##..', '.#..#..#..#.', '............', '............', '....####....', '....#..#....', '.....##.....']],
+  ['shout', 'Limit Break', ['.##......##.', '.##......##.', '.##......##.', '............', '....####....', '....#..#....', '....#..#....', '....####....']],
+]
+const faceTiles = document.getElementById('faceTiles')
+for (const [name, use, rows8] of PATCHES) {
+  const d = document.createElement('div'); d.className = 'face'
+  const svg = el('svg', { viewBox: '0 0 96 64', width: 96, height: 64, style: 'margin:0 auto;max-width:96px' })
+  el('rect', { x: 0, y: 0, width: 96, height: 64, fill: css('fig-skin'), rx: 4 }, svg)
+  rows8.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === '#') el('rect', { x: x * 8, y: y * 8, width: 8, height: 8, fill: '#262d36' }, svg) }))
+  d.append(svg)
+  const b = document.createElement('b'); b.textContent = name
+  const s = document.createElement('span'); s.textContent = use
+  d.append(b, s); faceTiles.append(d)
+}
+
+// 5. The landscape fight.
+const phone = document.getElementById('phoneSvg')
+function drawPhone(lock) {
+  phone.replaceChildren()
+  el('rect', { x: -14, y: -14, width: 872, height: 418, rx: 54, fill: css('sunken'), stroke: css('hairline-strong'), 'stroke-width': 2 }, phone)
+  el('rect', { x: 0, y: 0, width: 844, height: 390, rx: 44, fill: css('stage') }, phone)
+  el('rect', { x: 0, y: 236, width: 844, height: 154, fill: css('stage-ground') }, phone)
+  // Safe areas: the island side and the home bar.
+  el('rect', { x: 0, y: 0, width: 59, height: 390, fill: css('hairline-strong'), opacity: 0.6 }, phone)
+  el('rect', { x: 785, y: 0, width: 59, height: 390, fill: css('hairline-strong'), opacity: 0.6 }, phone)
+  el('rect', { x: 12, y: 160, width: 22, height: 70, rx: 11, fill: css('ink') }, phone)
+  el('rect', { x: 322, y: 376, width: 200, height: 5, rx: 2.5, fill: css('ink-soft') }, phone)
+  if (lock === 'on') {
+    const sb = el('text', { x: 46, y: 195, fill: css('ink-soft'), 'font-size': 11, 'text-anchor': 'middle', transform: 'rotate(-90 46 195)' }, phone)
+    sb.textContent = '9:41  status bar (sideways)'
+  }
+  const lab = (x, y, s, c = 'ink-faint', anchor = 'start') => { const t = el('text', { x, y, fill: css(c), 'font-size': 11, 'text-anchor': anchor }, phone); t.textContent = s }
+  lab(30, 380, 'safe area', 'ink-faint', 'middle'); lab(814, 380, 'safe area', 'ink-faint', 'middle')
+  // Foes on the left ~55% of the 726 pt between the safe areas.
+  el('line', { x1: 59 + 726 * 0.55, y1: 24, x2: 59 + 726 * 0.55, y2: 300, stroke: css('hairline-strong'), 'stroke-dasharray': '4 6' }, phone)
+  const foes = [[90, 60, 120, 150, 'boss'], [230, 70, 70, 95, ''], [230, 175, 70, 95, ''], [320, 80, 64, 85, ''], [320, 185, 64, 85, '']]
+  for (const [x, y, w, h, tag] of foes) {
+    el('rect', { x, y, width: w, height: h, rx: 8, fill: css('r-impact'), opacity: 0.22, stroke: css('r-impact') }, phone)
+    lab(x + w / 2, y + h / 2 + 4, tag || 'foe', 'r-impact', 'middle')
+  }
+  lab(70, 40, 'FOES (PriConne art as cards)', 'ink-soft')
+  // Party: two staggered columns, 85 pt cells, back column of three, front column of two.
+  const cells = [[640, 30], [640, 115], [640, 200], [545, 72], [545, 157]]
+  for (const [x, y] of cells) {
+    el('rect', { x, y, width: 85, height: 85, fill: 'none', stroke: css('info'), 'stroke-dasharray': '4 4' }, phone)
+    drawFigure(el('g', {}, phone), 85 / 64, x, y)
+  }
+  lab(545, 22, 'PARTY: 85 pt cells, facing left', 'ink-soft')
+  // Party strip and commands.
+  el('rect', { x: 70, y: 314, width: 430, height: 52, rx: 10, fill: css('panel'), opacity: 0.92 }, phone)
+  for (let i = 0; i < 5; i++) {
+    const x = 80 + i * 84
+    el('rect', { x, y: 322, width: 20, height: 20, rx: 5, fill: css('fig-hair') }, phone)
+    el('rect', { x: x + 24, y: 324, width: 50, height: 5, rx: 2, fill: css('success') }, phone)
+    el('rect', { x: x + 24, y: 333, width: 40, height: 4, rx: 2, fill: css('info') }, phone)
+    el('rect', { x: x + 24, y: 341, width: 30, height: 4, rx: 2, fill: css('accent') }, phone)
+  }
+  lab(80, 360, 'party strip: face, HP, MP, Limit', 'ink-faint')
+  const cmds = ['Attack', 'Skill', 'Guard', 'Limit']
+  cmds.forEach((c, i) => {
+    const x = 520 + (i % 2) * 130, y = 296 + Math.floor(i / 2) * 40
+    el('rect', { x, y, width: 122, height: 34, rx: 9, fill: css('panel'), stroke: css('hairline-strong') }, phone)
+    lab(x + 61, y + 21, c, 'ink', 'middle')
+  })
+  document.getElementById('lockNote').textContent = lock === 'on'
+    ? 'Rotation lock on: iOS still thinks the phone is upright, so the fight screen draws itself turned 90°. The status bar stays on a short edge, sideways. Nothing else in the app changes.'
+    : 'Rotation lock off: iOS turns the app to landscape, so the fight screen draws upright and uses the landscape safe areas. The rest of the app shows a "turn back" hint if it is turned.'
+}
+document.getElementById('lockSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; press(e.currentTarget, b); drawPhone(b.dataset.lock) })
+drawPhone('on')
+
+// 6. HD-2D layers.
+const hd = document.getElementById('hdSvg')
+{
+  const L = [
+    ['Parallax backdrop', 'far painted layers drift slower', 'r-recover'],
+    ['3D set (diorama)', 'low-poly meshes, pixel textures, a set a biome', 'success'],
+    ['Sprites as cards', 'Umas and foes, always facing the camera', 'info'],
+    ['Lights and shadows', 'point lights; every sprite casts a shadow', 'accent'],
+    ['Post effects', 'depth of field, bloom, fog, light shafts', 'r-release'],
+    ['DOM overlay', 'numbers, bars, commands (as today)', 'ink-soft'],
+  ]
+  L.forEach(([name, what, c], i) => {
+    const y = 300 - i * 46, x = 140
+    el('path', { d: `M${x},${y} l420,0 l60,-34 l-420,0 z`, fill: css(c), opacity: 0.85, stroke: css('panel'), 'stroke-width': 2 }, hd)
+    const t = el('text', { x: 640, y: y - 18, fill: css('ink'), 'font-size': 13, 'font-weight': 700 }, hd); t.textContent = name
+    const u = el('text', { x: 640, y: y - 2, fill: css('ink-soft'), 'font-size': 12 }, hd); u.textContent = what
+  })
+  // The camera.
+  el('rect', { x: 20, y: 20, width: 70, height: 44, rx: 8, fill: css('ink'), transform: 'rotate(30 55 42)' }, hd)
+  el('line', { x1: 80, y1: 70, x2: 200, y2: 140, stroke: css('ink-faint'), 'stroke-width': 2, 'stroke-dasharray': '6 5' }, hd)
+  el('line', { x1: 70, y1: 80, x2: 160, y2: 230, stroke: css('ink-faint'), 'stroke-width': 2, 'stroke-dasharray': '6 5' }, hd)
+  const c1 = el('text', { x: 10, y: 110, fill: css('ink-soft'), 'font-size': 12 }, hd); c1.textContent = 'orthographic,'
+  const c2 = el('text', { x: 10, y: 126, fill: css('ink-soft'), 'font-size': 12 }, hd); c2.textContent = 'tilted down'
+}
+</script>
+</body>
+</html>
