@@ -6,7 +6,8 @@
 <title>Templates Uma by Uma</title>
 <!-- Tier 2 set, templates.md §2.1, §2.3, §4.10 and §5: two front runners Tier 1 to 3, one Uma per calling, the catalog of 75
      with today's counts, and the signature families by calling. Every Uma here is made up; roster figures are aggregate
-     counts from the master-data census (270 outfits), never names. Style: the Tier rework's _template.html tokens, desktop. -->
+     counts from the master-data census (270 outfits), never names; round 3's class names (T2U28–T2U30) and the 77 Umas whose
+     family has a one-stat class. Style: the Tier rework's _template.html tokens, desktop. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -136,11 +137,12 @@
   <section id="families">
     <h2>Her signature family, by calling</h2>
     <p class="sub">Her knack names it: Fleet the Charm, Mighty the Orb, Tireless the Pendant, Gritty and Clever the Insignia. Her
-      preset wears it first when her hits read its stat (T2U22; D266 read the weapons): hatched, the Umas whose family their pure
-      class's children can't use, the Brawler's expander's ATK Tomes and the Sorcerer's expander's M.ATK Arms included. Their
-      <span class="star">★</span> works in their family's hybrids' children, and everywhere once her family's dual form opens (R2-7).</p>
+      preset wears it first when her hits read its stat (T2U22; D266 read the weapons). Hatched: the Umas whose family holds a
+      one-stat class of the other stat (a Charm for the Berserker, Spellfist, Bladedancer and Marshal lines; a Pendant for the
+      Archmage, Battlemage, Spellweaver and Animist lines): <b>77 Umas</b>, round 2's 35. There her family goes first as its
+      Twofold, open from her first Tier 2 grade (gear's T2G35), whose rider and her <span class="star">★</span> pay on every hit (T2U29).</p>
     <div class="panel bars" id="fambars"></div>
-    <div class="legend"><span><i class="sw" style="background:var(--f-charm)"></i>Charm</span><span><i class="sw" style="background:var(--f-insignia)"></i>Insignia</span><span><i class="sw" style="background:var(--f-orb)"></i>Orb</span><span><i class="sw" style="background:var(--f-pendant)"></i>Pendant</span><span>Hatched: off in her pure class</span></div>
+    <div class="legend"><span><i class="sw" style="background:var(--f-charm)"></i>Charm</span><span><i class="sw" style="background:var(--f-insignia)"></i>Insignia</span><span><i class="sw" style="background:var(--f-orb)"></i>Orb</span><span><i class="sw" style="background:var(--f-pendant)"></i>Pendant</span><span>Hatched: her family has a one-stat class of the other stat (a Twofold there)</span></div>
     <div class="note"><b>The measured cost elsewhere (templates.md §4.8):</b> a Charm first on a Paladin (the Fleet Healers, 8 Umas) costs her −0.9 to
       −2.8% damage at every level; every other family first costs or pays inside the noise, an Orb or her own stat nothing. The
       seam, if the owner wants it: a mirror rule (a Charm's <span class="star">★</span> counts on a Pendant and back).</div>
@@ -152,7 +154,7 @@
       <table>
         <tr><th>Piece</th><th>At Ascend (as built)</th><th>In Tiers 2 and 3</th></tr>
         <tr><td>Her calling, stride, knack, type</td><td>Hers: read from her racing profile, never stored</td><td>The same template; the calling a family name</td></tr>
-        <tr><td>Her class</td><td><b>Picked on the Ascend sheet</b> from the children of her Tier 1 classes at R50, Suggested her class's keeper (T2U25)</td><td>Her family four or six of the sixteen (T2U21)</td></tr>
+        <tr><td>Her class</td><td><b>Picked on the Ascend sheet</b> from the children of her Tier 1 classes at R50, Suggested her class's keeper (T2U25); in Tier 3 from the Tier 3 children of her Tier 2 classes (T2C89)</td><td>Her family 4, 6 or 8 of the twenty; 4, 6 or 9 of the twenty-two (T2U28)</td></tr>
         <tr><td><span class="star">★</span> Flourish</td><td>On from her first fight, as a class of her family</td><td>4% of her max HP a fight</td></tr>
         <tr><td><span class="star">★</span> Signature</td><td>Her slots keep their families (at G0, off until G1)</td><td>× 1.8 and × 2.6</td></tr>
         <tr><td><span class="star">★</span> Her moon</td><td>Her map empties; it reopens with her shared moons' II and IV</td><td>× 1.8 and × 2.6</td></tr>
@@ -167,12 +169,12 @@
   // Two front runners (templates.md §4.10).
   const PAIR = [
     { who: 'Uma A', name: 'Tireless Ironhide', reads: [['Calling', 'Warrior', 'Front A'], ['Stride', 'Stayer', 'Medium A, Long A → Long'], ['Knack', 'Tireless', 'Stamina +20%']],
-      rows: [['Class', 'Warrior → Brawler', 'Brawler · keeper (Suggested)', 'Brawler · keeper'], ['★ Flourish', 'Late reserve · 58 HP', 'Late reserve · 101', 'Late reserve · 144'],
+      rows: [['Class', 'Warrior → Brawler', 'Berserker (Suggested)', 'Ravager (Suggested)'], ['★ Flourish', 'Late reserve · 58 HP', 'Late reserve · 101', 'Late reserve · 144'],
         ['★ Signature', 'Pendant · +5, free in her preset', 'Pendant · +9', 'Pendant · +13'], ['★ Moon I', 'HP +20', 'HP +35', 'HP +50'],
         ['★ Moon II', 'DEF +8', 'DEF +14', 'DEF +21'], ['★ Tip', '—', 'Long guard · Greatsword', 'Long guard · both lines'], ['Trade', 'Metal', 'Metal', 'Metal']], diff: [2, 3] },
     { who: 'Uma G', name: 'Fleet Ironhide', reads: [['Calling', 'Warrior', 'Front A, Pace A → Front'], ['Stride', 'Stayer', 'Long A'], ['Knack', 'Fleet', 'Speed, Power, Wit +10% → Speed']],
-      rows: [['Class', 'Warrior → Arms Spellblade', 'Arms Spellblade · expander (picked)', 'Arms Spellblade · expander'], ['★ Flourish', 'Late reserve · 53 HP', 'Late reserve · 92', 'Late reserve · 131'],
-        ['★ Signature', 'Charm · +5 (off as a Brawler)', 'Charm · +9 (her Tome reads M.ATK)', 'Charm · +13'], ['★ Moon I', '2.4% evasion', '2.4%', '2.4%'],
+      rows: [['Class', 'Warrior → Arms Spellblade', 'Sentinel, the support (picked)', 'Herald (Suggested)'], ['★ Flourish', 'Late reserve · 53 HP', 'Late reserve · 92', 'Late reserve · 131'],
+        ['★ Signature', 'Charm · +5 (off as a Brawler)', 'Charm · +9 (her Light Tome reads M.ATK; a Twofold in her one-stat classes)', 'Charm · +13'], ['★ Moon I', '2.4% evasion', '2.4%', '2.4%'],
         ['★ Moon II', 'DEF +8', 'DEF +14', 'DEF +21'], ['★ Tip', '—', 'Long guard · Katana', 'Long guard · both lines'], ['Trade', 'Metal', 'Metal', 'Metal']], diff: [2, 3] },
   ]
   document.getElementById('pairs').innerHTML = PAIR.map((u) => `
@@ -184,11 +186,11 @@
 
   // One Uma per calling.
   const FIVE = [
-    { tag: 'Warrior', name: 'Tireless Ironhide', prof: 'Front A · Long A · Stamina growth', cls: 'Brawler → its keeper (Suggested)', fl: 'Late reserve · 58 · 101 · 144', sig: 'Pendant · +5 · +9 · +13', m1: 'HP +20 · +35 · +50', m2: 'DEF +8 · +14 · +21', tip: 'Long guard · Greatsword', trade: 'Metal' },
-    { tag: 'Spellblade', name: 'Fleet Flashblade', prof: 'Pace A alone · Mile A · Speed growth', cls: 'Arms Spellblade → its keeper (Suggested)', fl: 'Clean break · 53 · 92 · 131', sig: 'Charm · +5 · +9 · +13', m1: '2.4% evasion, every tier', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Quickstep · Katana', trade: 'Wood' },
-    { tag: 'Mage', name: 'Clever Spellwright', prof: 'Pace A + Late A · Medium A · Wit growth', cls: 'Sorcerer → its expander (picked)', fl: 'Even pace · 49 · 86 · 122', sig: 'Insignia · +5 · +9 · +13', m1: 'MP +4 · +7 · +10', m2: 'M.DEF +8 · +14 · +21', tip: 'Spillover · Fire Tome', trade: 'Stone' },
-    { tag: 'Summoner', name: 'Gritty Shepherd', prof: 'End A · Long A · Guts growth', cls: 'Tome Summoner → its expander (picked: support)', fl: 'Late reserve · 53 · 92 · 131', sig: 'Insignia · +5 · +9 · +13', m1: 'A Limit start of 1, every tier', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Long guard · Dark Tome', trade: 'Fish' },
-    { tag: 'Healer', name: 'Mighty Mender', prof: 'Late A alone · Medium A · Power growth', cls: 'Paladin → its expander (picked: a battle healer)', fl: 'Even pace · 53 · 92 · 131', sig: 'Orb · +5 · +9 · +13', m1: 'DEF and M.DEF +4 · +7 · +10', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Spillover · Lance', trade: 'Vegetables' },
+    { tag: 'Warrior', name: 'Tireless Ironhide', prof: 'Front A · Long A · Stamina growth', cls: 'Brawler → Berserker (Suggested) → Ravager', fl: 'Late reserve · 58 · 101 · 144', sig: 'Pendant · +5 · +9 · +13', m1: 'HP +20 · +35 · +50', m2: 'DEF +8 · +14 · +21', tip: 'Long guard · Greatsword', trade: 'Metal' },
+    { tag: 'Spellblade', name: 'Fleet Flashblade', prof: 'Pace A alone · Mile A · Speed growth', cls: 'Arms Spellblade → Blademaster (Suggested) → Bladelord', fl: 'Clean break · 53 · 92 · 131', sig: 'Charm · +5 · +9 · +13', m1: '2.4% evasion, every tier', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Quickstep · Katana', trade: 'Wood' },
+    { tag: 'Mage', name: 'Clever Spellwright', prof: 'Pace A + Late A · Medium A · Wit growth', cls: 'Sorcerer → Battlemage (picked) → Spellknight', fl: 'Even pace · 49 · 86 · 122', sig: 'Insignia · +5 · +9 · +13', m1: 'MP +4 · +7 · +10', m2: 'M.DEF +8 · +14 · +21', tip: 'Spillover · Fire Tome (no Pinpoint on that cast; Power on a lone boss)', trade: 'Stone' },
+    { tag: 'Summoner', name: 'Gritty Shepherd', prof: 'End A · Long A · Guts growth', cls: 'Tome Summoner → Shaman (picked: support) → Soulcaller', fl: 'Late reserve · 53 · 92 · 131', sig: 'Insignia · +5 · +9 · +13', m1: 'A Limit start of 1, every tier', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Long guard · Dark Tome', trade: 'Fish' },
+    { tag: 'Healer', name: 'Mighty Mender', prof: 'Late A alone · Medium A · Power growth', cls: 'Paladin → Templar (picked: a battle healer) → Inquisitor', fl: 'Even pace · 53 · 92 · 131', sig: 'Orb · +5 · +9 · +13', m1: 'DEF and M.DEF +4 · +7 · +10', m2: 'DEF/M.DEF +4 · +7 · +10/11', tip: 'Spillover · Lance', trade: 'Vegetables' },
   ]
   document.getElementById('fiveumas').innerHTML = FIVE.map((u, i) => `
     <div class="mini"><div class="tag">Uma ${'ABCDE'[i]} · ${u.tag}</div><div class="name"><span class="star">★</span> ${u.name}</div><div class="prof">${u.prof}</div>
@@ -219,10 +221,10 @@
 
   // Families by calling (census).
   const FAM = [
-    ['Warrior', 47, [['charm', 23, true], ['insignia', 16], ['orb', 2], ['pendant', 6]], 'Charm off as a Brawler'],
-    ['Spellblade', 72, [['charm', 14], ['insignia', 27], ['orb', 17], ['pendant', 14]], ''],
-    ['Mage', 72, [['charm', 17], ['insignia', 23], ['orb', 20], ['pendant', 12, true]], 'Pendant off as a Sorcerer'],
-    ['Summoner', 33, [['charm', 7], ['insignia', 3], ['orb', 16], ['pendant', 7]], ''],
+    ['Warrior', 47, [['charm', 23, true], ['insignia', 16], ['orb', 2], ['pendant', 6]], 'Charm: Berserker, Spellfist, Bladedancer, Marshal lines'],
+    ['Spellblade', 72, [['charm', 14, true], ['insignia', 27], ['orb', 17], ['pendant', 14, true]], 'Charm: Bladedancer line · Pendant: Spellweaver line'],
+    ['Mage', 72, [['charm', 17], ['insignia', 23], ['orb', 20], ['pendant', 12, true]], 'Pendant: Archmage, Battlemage, Spellweaver, Animist lines'],
+    ['Summoner', 33, [['charm', 7, true], ['insignia', 3], ['orb', 16], ['pendant', 7, true]], 'Charm: Marshal line · Pendant: Animist line'],
     ['Healer', 46, [['charm', 8], ['insignia', 15], ['orb', 14], ['pendant', 9]], ''],
   ]
   const NAME = { charm: 'Charm', insignia: 'Insignia', orb: 'Orb', pendant: 'Pendant' }

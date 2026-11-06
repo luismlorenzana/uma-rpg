@@ -1,11 +1,26 @@
 # Extra Stats in Tiers 2 and 3: unlocking, slotting and the branch lists
 
-> **Status: round 2, the owner's requirements (R2-8), 2026-11-05. Nothing here is built.** One of the seven docs of
-> [the Tier 2 and Tier 3 set](README.md), calls **T2E1–T2E49**, each with a recommendation; no open questions. Round 1
+> **Status: round 2, the owner's requirements (R2-8), 2026-11-05, with round 3's touch-ups for the new class list
+> (R3-1–R3-4, same day). Nothing here is built.** One of the seven docs of
+> [the Tier 2 and Tier 3 set](README.md), calls **T2E1–T2E54**, each with a recommendation; no open questions. Round 1
 > (T2E1–T2E20) carried [extra-stats-progression.md](../tier-rework/extra-stats-progression.md) (EP1–EP29, D194) and the
 > star chart's corner (PP31, D277) onto **Tier 1 as built** (engine v21, save v36); round 2 (T2E21–T2E49) answers the
-> owner's requirement below and rewrites the doc as one design. The manual ([loops § Extra Stats](../../game/loops.md#extra-stats),
+> owner's requirement below and rewrites the doc as one design; round 3 (T2E50–T2E54) reads it on
+> [classes](classes.md)' twenty Tier 2 and twenty-two Tier 3 classes (T2C65–T2C101). The manual ([loops § Extra Stats](../../game/loops.md#extra-stats),
 > [materials § Jewels](../../game/materials.md#jewels), [sections § Stable](../../game/sections.md#stable)) is the game as it plays.
+>
+> **Round 3 in four lines** (no rule, list, value or screen changes; presets and readings do):
+> 1. **Prowess's split for all forty-two classes** (T2E50): every class whose hits all read one stat puts Prowess wholly
+>    on it (the Brawler's and the Sorcerer's lines, the four pure variants, Tier 3's ten one-stat classes); every other
+>    class keeps her Tier 1 ancestor's split.
+> 2. **Offense is the preset for every one-stat class** (T2E51), the four pure variants included: on the harness their
+>    family's shape row (Multi-hit for the pure Spellblades, Area for the pure Summoners) runs 1.0–3.9 points behind on the
+>    mean, a sidegrade that ties or wins their regular fights.
+> 3. **Pinpoint moves no row** (T2E53): on an all-one-foe kit it multiplies every row alike; the Spellfist and the
+>    Battlemage keep Offense, Multi-hit and Area their seconds.
+> 4. **Viability re-read on the twenty and twenty-two** (T2E52): every row still someone's best; Offense best in 23 of 48
+>    damage and support cases in Tier 2 and 27 of 54 in Tier 3, none over half; with the healers counted as round 2 did,
+>    over half (the call the owner may want to see first).
 >
 > **The owner (round 2):** "Extra stats I want to get out there where unlocking the moon is one thing but then maybe
 > slotting the actual extra stat per moon is something else, can we have moons boosting AoE damage and multi-hit damage
@@ -57,7 +72,7 @@ offense or back, and the build budget the foes are priced on (T2B1) holds whatev
 | **Nodes that take a branch** | none | **20 of 22** (her moon's two never) | 20 of 22 |
 | **Flat branches** | — | × 1.8 | × 2.6 |
 | **Percent branches** | — | Area +45%, Multi-hit +18%, MP back +2.0%, Life steal 3%, Area guard −12% at five nodes | **the same** (percentages don't scale, SB1) |
-| **Prowess, Lv 50** (harness, her damage) | her split | her split 9.8–17.5%; **at her best branch 13.0–17.5%**: Offense for the pure classes and healers, Multi-hit for the Spellblades, Area or a kind row for the Summoners | the same winners; Trio for an even kit |
+| **Prowess, Lv 50** (harness, her damage) | her split | her split 9.8–17.5%; **at her best branch 13.0–17.5%**: Offense for the pure classes and healers, Multi-hit for the Spellblades, Area or a kind row for the Summoners; **on the twenty** (round 3, §4.8): Offense for all eight one-stat classes (15.1–17.6%), the pure variants' family shape 1.0–3.9 points behind | the same winners; Trio for an even kit |
 | **Her window's Stars track** | 4 · 9 · 13 · 18 · 22 | **4 · 9 · 13 · 18 · 22**, open nodes only (T2W24) | the same |
 | **Stone's work, an Uma** | 150 cut stones | 150 cut stones + **150 Fungi powders** (T2P30) | the same |
 
@@ -143,7 +158,7 @@ healers' skills strike one foe once. **MP:** 1% of her bar back a round a depth,
 | **EP20** Targets and "can upgrade" | Plan every body; a jewel she can set now | **Kept** | T2E18: a jewel or a Stardust she can set now |
 | **EP21** Old maps and Star Gems | Deleted, compensated | **Kept** | Done in R2 |
 | **EP22** Names and art | The Planet, Prowess, Vigor, Guard; weapon moons by kind | **Kept, changed** (D277, D297, R2-8) | Pixel-art crests as built; no new body, so no new crest; branches draw a vector mark (T2E49) |
-| **EP23** Prowess | One offense moon split by class | **Kept, changed** (CV18, CV7, R2-2) | The sixteen Tier 2 classes' splits (T2E45) |
+| **EP23** Prowess | One offense moon split by class | **Kept, changed** (CV18, CV7, R2-2, R3-1–R3-4) | The forty-two Tier 2 and 3 classes' splits (T2E50) |
 | **EP24** Weapon moons | A moon of five nodes, +4 … +16 × tier on a kind | **Superseded (R2-8)** | Prowess's Full and Split rows, re-spending Prowess's points (T2E27) |
 | **EP25** Full or Split | Full one kind; Split two at 0.7 | **Kept, changed** (R2-8) | Prowess's rows, node by node; re-measured on the harness (§4.7) |
 | **EP26** Tier 3's second moon | Full + Split serves three weapons | **Superseded (R2-8)** | The Trio row serves her three weapons in Tier 3 (T2E44) |
@@ -165,7 +180,7 @@ now fixed).
 | **T2E4** Its kinds | One of her three weapons'; stale when dropped | **Kept, changed (R2-8)** | On Prowess's kind rows, node by node (T2E27, T2E41) |
 | **T2E5** The kinds list | Six rows for the whole moon | **Superseded (R2-8)** | Every node's branch list (T2E24, T2E39) |
 | **T2E6** The kind cap | None for the moons | **Kept** | The kind rows sit outside T2G14's cap (§4.7) |
-| **T2E7** Presets | Split on `presetKind`'s kind | **Superseded (R2-8)** | T2E37, T2E38 |
+| **T2E7** Presets | Split on `presetKind`'s kind | **Superseded (R2-8)** | T2E37 (now T2E51), T2E38 |
 | **T2E8** Into the fight | The moons' points join `flat` | **Kept** | The kind rows' points join `flat` (§7) |
 | **T2E9** Where they sit | An outer orbit; 360 × 470 · 500 | **Superseded (R2-8)** | No new body: the chart is Tier 1's, 360 × 350, in every tier |
 | **T2E10** Figure, colour, crest | A crescent; steel, lavender | **Superseded (R2-8)** | No body to draw; no art packet |
@@ -178,7 +193,7 @@ now fixed).
 | **T2E17** The numbers for T2B | This doc's model | **Kept, changed** | The harness's numbers (§4.6, §4.7); T2B re-measures with the rules built |
 | **T2E18** Targets and the dot | Plan nodes; the dot a jewel she can set now | **Kept, changed (R2-9)** | A jewel or a Stardust she can set now; a branch raises neither |
 | **T2E19** The corner | Free in every tier | **Kept** | |
-| **T2E20** Prowess for later classes | A class branch keeps its class's split | **Superseded (R2-2)** | Sixteen Tier 2 classes (T2E45) |
+| **T2E20** Prowess for later classes | A class branch keeps its class's split | **Superseded (R2-2)** | Sixteen Tier 2 classes (T2E45), now the forty-two (T2E50) |
 
 **Counts:** Kept 5 · Kept, changed 4 · Superseded 11 (R2-8 ten, R2-2 one).
 
@@ -348,7 +363,8 @@ Multi-hit** are her measured share of damage in those hits × the rate: a percen
 
 - **Every branch is someone's best and none is everyone's:** of 24 cases Offense wins 12 (the pure classes' six and the
   healers' six, whose mends read it), Multi-hit 6, Split 4, Area 2. No row wins over half (D266's rule). The Brawler's
-  regular fights are the closest call (Offense 17.7% · Area 16.6%). At Tier 3 Lv 50 the same rows win.
+  regular fights are the closest call (Offense 17.7% · Area 16.6%). At Tier 3 Lv 50 the same rows win. **On round 3's
+  twenty and twenty-two** the reading moves (eight and ten one-stat classes): §4.8's re-read (T2E52).
 - **The hybrids' lift (T2E36):** Prowess at her split is worth 9.8–10.9% to a hybrid and 16.5–17.5% to a pure class,
   because a split leaves a third of the points on the channel her other half reads. At her best branch it is **13.0–17.5%
   for every damage class**: slotting closes more than half that gap, +3.0 to +4.7 points of a hybrid's damage. It is the
@@ -412,30 +428,144 @@ has every pick by fight.
   the map; as a pick it adds nothing to the budget and only competes.
 - **No kind cap** (T2E6 kept): the most on one kind is three Orb forms and five Full nodes, under the engine's 1,000.
 
-### 4.8 Presets for the sixteen classes (T2E37, T2E38)
+### 4.8 Prowess and presets on the twenty (T2E50–T2E53)
 
 The Standard preset (D263, Class tab footer) sets her weapons, her accessory slots and, from Tier 2, **every node's
 branch**. A preset is a good all-round set, not the best in any one fight (D266): it keeps the Planet's, Vigor's and
 Guard's defaults (the all-rounders, and HP for the fights the harness can't show) and slots Prowess, whose best is clear
-from her kit.
+from her kit. Round 3 ([classes](classes.md) T2C65–T2C101) adds four pure variants, reshapes the Spellfist and the
+Battlemage to single big hits (Pinpoint) and makes Tier 3 a promotion; this section reads Prowess on all of them.
 
-| Tier 2 class ([classes](classes.md) T2C31–T2C64: Keeper · Expander) | Prowess, all five nodes | Why | Planet · Vigor · Guard |
-|---|---|---|---|
-| **Berserker** (the Brawler's Keeper, Momentum) | Offense | Pure physical; Momentum is a status (step 5) | Defaults |
-| **Spellfist** (the Brawler's Expander: her Tome hits on ATK) | Offense, all to ATK | Every hit reads ATK | Defaults |
-| **Archmage** (the Sorcerer's Keeper, Momentum) | Offense | Pure magical | Defaults |
-| **Battlemage** (the Sorcerer's Expander: her Arm hits on M.ATK) | Offense, all to M.ATK | Every hit reads M.ATK | Defaults |
-| **Blademaster · Runeblade** (the Spellblades' Keepers: the extra hit on both halves) | Multi-hit | Both halves land as multi-hits now, more than the 82% measured | Defaults |
-| **Sentinel · Enchanter** (the Spellblades' Expanders: support, a Barrier each act) | Multi-hit | Her pair's lead half still lands its extra hit | Defaults |
-| **Warlord · Invoker** (the Summoners' Keepers: both summons farewell) | Area (Split on her top pair wins her sub-bosses and bosses) | Two farewells an act raise her area share above the 29–31% measured | Defaults |
-| **Druid · Shaman** (the Summoners' Expanders: support, the farewell mends) | Area | Her farewells and volleys' splashes | Defaults |
-| **Guardian · Bishop** (the healers' Keepers) | Offense | Her mends and Barriers read it | Defaults |
-| **Templar · Exorcist** (the healers' Expanders, battle healers) | Offense | The same, at ×0.6 power and ×0.7 mends | Defaults |
+#### Prowess's split, the forty-two (T2E50)
 
-- **Her top pair** (T2E38) is her kit's damage order, which T2B prints for each class's preset weapons on the harness and
-  the preset table stores (as `presetKind` stores the Orb's today). A Keeper wears her parent's weapons, so her order is
-  the parent's (§4.7); an Expander's comes with [classes](classes.md)' preset weapons.
-- **Tier 3** keeps the same rows; Trio is no preset's (it ties Split for even kits, §5.3).
+**A class whose every hit reads one stat puts all of Prowess on it; every other class keeps her Tier 1 ancestor's split**
+(`PROWESS_SPLIT`, rounded node by node as today).
+
+| Split (ATK/M.ATK) | Tier 2 classes | Tier 3 classes | Five nodes, Tier 1 · 2 · 3 | Why |
+|---|---|---|---|---|
+| **100/0** | Berserker, Spellfist, **Bladedancer**, **Marshal** | Ravager, Spellhammer, Gladiator, **Dervish**, **Imperator** | ATK +30 · +54 · +78 | Every hit reads ATK (the cross, the pure pair, Arsenal's three Arms) |
+| **0/100** | Archmage, Battlemage, **Spellweaver**, **Animist** | Astromancer, Spellknight, Thaumaturge, **Starweaver**, **Mythlord** | M.ATK +30 · +54 · +78 | Every hit reads M.ATK |
+| 70/30 | Blademaster, Sentinel, Warlord, Druid | Bladelord, Herald, Overlord, Archdruid | +21/+9 · +39/+15 · +55/+23 | Her Arms Spellblade's or Arms Summoner's: both halves, two channels |
+| 30/70 | Runeblade, Enchanter, Invoker, Shaman | Runelord, Oracle, Hierarch, Soulcaller | +9/+21 · +15/+39 · +23/+55 | Her Tome Spellblade's or Tome Summoner's |
+| 80/20 | Guardian, Templar | Bastion, Inquisitor | +24/+6 · +43/+11 · +63/+15 | The Paladin's: she mends from ATK |
+| 20/80 | Bishop, Exorcist | Cardinal, Hierophant | +6/+24 · +11/+43 · +15/+63 | The Cleric's |
+| | **20** | **22** | | Bold: round 3's one-stat classes of a hybrid line, whose Tier 1 ancestor splits 70/30 or 30/70 |
+
+- **The four pure variants move** (and their Tier 3 children with them): their parents split 70/30 or 30/70, but every
+  hit of theirs reads one stat, so a split would leave 15–30% of Prowess on a stat none of their hits reads. Classes'
+  hands for the pure variants already assume it (her lead half 520 → 536 at Tier 2 Lv 50, T2C67).
+- **A Tier 3 class reads as her Tier 2 parent**, the Gladiator and the Thaumaturge included: their slot of the other
+  channel becomes her own (Arsenal, T2C85), and their parents' crosses were 100/0 and 0/100 already.
+
+#### The new kits on the harness (T2E52, T2E53)
+
+**The method** (a throwaway run, not committed): the live engine can't play a pure pair or a cross yet, so each new kit
+runs as a **proxy in her parent's seat** of the owner's party (D263), at Tier 2 and Tier 3 Lv 50 on curve, Auto, every
+region stage at the level, 8 seeds (the pure variants 16 at Tier 2):
+
+- **A pure variant** is her parent with **both halves on her one stat**, her second half's stat set so it deals what her
+  pure hand deals (×0.80 the Bladedancer's, ×0.89 the Spellweaver's, ×0.91 the Marshal's, ×0.81 the Animist's, from
+  classes' hands), and her third weapon its shape's twin of the other channel (the Bladedancer's Bow as a Dark Tome, the
+  Spellweaver's Dark as a Bow, the Marshal's Katana as a Light Tome, the Animist's Thunder as a Lance).
+- **A cross** is her parent on her preset's shapes: the Battlemage as the Sorcerer on Fire, Blizzard and a Double (the
+  Light Tome for her Katana); the Spellfist as the Brawler on one-foe Arms (Greatsword, Katana, a Barrage Bow), her Fire
+  Tome's single hit read analytically. **Pinpoint** multiplies each one-foe act by its depth (+2% a depth; a Limit Break
+  that strikes one foe ×1.1).
+- **Offense** is measured by taking her Prowess off; **Area and Multi-hit** are her measured share of those hits × the
+  rate (§4.6's way). The controls reproduce §4.6: the Brawler's Offense 17.6% (17.5%), the Sorcerer's 16.4% (16.5%).
+
+**Tier 2 Lv 50** (her damage a turn; the mean weighs regular fights twice; bold the best on the mean):
+
+| Class (proxy) | Offense | Area +45% | Multi-hit +18% | Best by fight: regular · sub-boss · boss | Her swap row |
+|---|---|---|---|---|---|
+| Berserker (the Brawler) | **17.6%** | 9.9% | 9.5% | Offense ×3 (regular: Offense 17.3 · Area 16.0) | Area, in regular fights |
+| **Spellfist** (one-foe Arms) | **15.6%** | — | 14.0% on the proxy; 5–10% with her Fire's single hits, by its share | Offense ×3 (the proxy's regular fights tie, 15.0 · 14.9, before her Fire) | Multi-hit |
+| Archmage (the Sorcerer) | **16.4%** | 10.1% | 5.0% | Offense ×3 | Area |
+| **Battlemage** (Fire, Blizzard, a Double) | **16.4%** | 7.8% | 2.5% | Offense ×3 | Area |
+| **Bladedancer** | **16.3%** | — | 14.7% | Offense ×3 (regular: 15.9 · Multi-hit 15.4) | Multi-hit |
+| **Spellweaver** | **15.8%** | — | 14.8% | Offense ×3 (regular: 15.8 · Multi-hit 15.7) | Multi-hit |
+| **Marshal** | **15.6%** | 11.7% | 10.6% | Offense ×3 (regular: 15.1 · Area 14.6) | Area |
+| **Animist** | **15.1%** | 13.8% | 8.7% | **Area** (15.9 · Offense 14.2) · Offense · Offense | Area |
+
+**Tier 3 Lv 50** (8 seeds; without Momentum, which multiplies every row alike, and the crown):
+
+| Class (proxy) | Offense | Area | Multi-hit | Best by fight | Her swap row |
+|---|---|---|---|---|---|
+| Ravager, Gladiator (the Brawler's shapes) | **16.6%** | 9.7% | 9.3% | Offense ×3 | Area |
+| Spellhammer (one-foe Arms) | **15.4%** | — | 13.7% on the proxy; 5–9% with her Fire | Offense ×3 (the proxy's regular fights tie, 14.7 · 14.7) | Multi-hit |
+| Astromancer, Thaumaturge (the Sorcerer's) | **15.3%** | 7.5% | 5.0% | Offense ×3 | Area |
+| Spellknight (the Battlemage's) | **16.4%** | 6.5% | 2.5% | Offense ×3 | Area |
+| Dervish | **15.9%** | — | 14.6% | **Multi-hit** (15.3 · 14.7) · Offense · Offense | Multi-hit |
+| Starweaver | **15.8%** | — | 14.9% | **Multi-hit** (16.1 · 15.0) · Offense · Offense | Multi-hit |
+| Imperator | **15.7%** | 10.1% | 11.0% | Offense ×3 | Area, in regular fights (13.3%) |
+| Mythlord | **16.4%** | 14.3% | 8.1% | **Area** (17.1 · 16.0) · Offense · Offense | Area |
+
+- **Offense is the best row on the mean for every one-stat class, all eight in Tier 2 and all ten in Tier 3.** A
+  one-stat class carries all of Prowess on the stat every hit reads, while a shape row reads only that shape's hits and
+  never a Limit Break (15–27% of her damage). Classes' leans (the pure Spellblades multi-hit on one foe, the pure
+  Summoners area) are each class's **swap row**: 1.0–1.6 points behind on the mean for the pure Spellblades, 1.3 and 3.9
+  for the pure Summoners, and level or ahead in their regular fights (the Animist's and Mythlord's Area, the Dervish's
+  and Starweaver's Multi-hit). A real sidegrade, not a trap.
+- **The kind rows** stay behind Offense for every one-stat class (a Split reads two of her three kinds, Offense all), as
+  for the Brawler and the Sorcerer (§4.7).
+- **Her class lines** (balance left them out, T2B20): the pure Spellblades' Squall is multi-hit (more of what they have);
+  the pure Summoners' Legion is area. If balance's run with class lines puts a pure Summoner's area share past about 38%
+  of her damage, Area takes her preset: a row in the preset table, nothing else.
+
+**Pinpoint (T2E53).** On the one-foe Arms kit every act strikes one foe, so Pinpoint is a flat ×1.10 on every row and
+the shares don't move; on the Battlemage's kit it lifts her one-foe acts (×1.07–1.09 in all) and takes about a point of
+share off her sweep, so Area slips a little further behind. **It moves no row's ranking**, and neither do Momentum (a
+factor on every hit) or Tier 3's doubled step (+4% a depth). No "single" row is added: Offense already reads her one-foe
+hits whole, and a fourth shape row would lengthen every Prowess list for two lines.
+
+**Viability on the twenty and twenty-two (T2E52).** §4.6's 24 cases were the eight Tier 1 kits. Read on round 3's
+classes, by fight (regular, sub-boss, boss), each class's best row on curve (the hybrids' rows as §4.6 measured them):
+
+| | Tier 2 (20 × 3 = 60) | Tier 3 (22 × 3 = 66) |
+|---|---|---|
+| **Offense** | 35: the eight one-stat classes' 23 (all but the Animist's regular fights) + the healers' 12 | 39: the ten one-stat classes' 27 + the healers' 12 |
+| **Multi-hit** | 12: the Spellblades' keepers and supports | 14: their four Tier 3 children's 12 + the Dervish's and Starweaver's regular fights |
+| **Area** | 5: the Summoners' keepers' and supports' regular fights + the Animist's | 5: theirs + the Mythlord's |
+| **Split** | 8: the Summoners' keepers' and supports' sub-bosses and bosses | 8 |
+| **The damage and support classes only** | **Offense 23 of 48 (48%)** | **Offense 27 of 54 (50%)** |
+| **With the healers, as §4.6 counted** | Offense 35 of 60 (58%) | Offense 39 of 66 (59%) |
+
+**Every row is still someone's best and none is everyone's.** Counted on the damage and support classes, no row wins
+over half in either tier. With the healers counted as round 2 did, Offense passes half, because round 3 doubles the
+one-stat classes (four of twelve damage and support classes in round 2, eight of sixteen in Tier 2, ten of eighteen in
+Tier 3). **The recommendation reads D266's rule on the damage and support classes from round 3 on:** a healer's Offense
+is not a pick, since no shape or kind row reaches a mend (§4.6), so her cases say nothing about whether the other rows earn
+their place. The alternative that keeps round 2's count is a richer Multi-hit (0.7 a point, +21% at five nodes): the
+pure Spellblades would move to it, but the Spellblades' keepers' Prowess would reach the pure classes' 17% and T2E36's gap
+would close entirely, a balance change rather than a touch-up.
+
+#### Presets for the twenty (T2E51)
+
+| Tier 2 class ([classes](classes.md) T2C31–T2C101) | Prowess, all five nodes | Her swap row | Her kind rows' first (T2E38) | Why | Planet · Vigor · Guard |
+|---|---|---|---|---|---|
+| **Berserker** (keeper, Momentum) | Offense | Area | Split Lance + Axe | Pure physical; Momentum multiplies every row | Defaults |
+| **Spellfist** (expander: the cross, Pinpoint) | Offense, all to ATK | Multi-hit | Her preset's order (Greatsword + Katana) until T2B prints her kit's | Every hit reads ATK; Pinpoint moves no row | Defaults |
+| **Archmage** (keeper, Momentum) | Offense | Area | Split Lightning + Fire | Pure magical | Defaults |
+| **Battlemage** (expander: the cross, Pinpoint) | Offense, all to M.ATK | Area | **Full Fire** (60% of her kit's damage against Blizzard's 24%) | Every hit reads M.ATK | Defaults |
+| **Bladedancer** (pure) | Offense, all to ATK | Multi-hit | Split Axe + Bow | 1.6 points ahead on the mean | Defaults |
+| **Spellweaver** (pure) | Offense, all to M.ATK | Multi-hit | Split Blizzard + Dark | 1.0 ahead; her regular fights a tie | Defaults |
+| **Marshal** (pure) | Offense, all to ATK | Area | Split Bow + Katana | 3.9 ahead on the mean | Defaults |
+| **Animist** (pure) | Offense, all to M.ATK | Area | Split Dark + Thunder | 1.3 ahead on the mean; Area wins her regular fights | Defaults |
+| **Blademaster · Runeblade** (keepers: the familiar on both halves) | Multi-hit | Split | Axe + Lightning · Ice + Lightning | Both halves land as multi-hits now, more than the 82% measured | Defaults |
+| **Sentinel · Enchanter** (support) | Multi-hit | Split | Their presets' order, as T2B prints it | Her pair's lead half still lands its extra hit | Defaults |
+| **Warlord · Invoker** (keepers: both summons farewell) | Area | Split (her sub-bosses and bosses) | Bow + Dark · Dark + Bow | Two farewells an act raise her area share above the 29–31% measured | Defaults |
+| **Druid · Shaman** (support, the farewell mends) | Area | Split | Bow + Dark · Dark + Bow | Her farewells and volleys' splashes | Defaults |
+| **Guardian · Bishop** (keeper healers) | Offense | — | Full Lance · Split Light + Lance | Her mends and Barriers read it | Defaults |
+| **Templar · Exorcist** (battle healers) | Offense | — | The same | The same, at ×0.6 power and ×0.7 mends | Defaults |
+
+- **The swap row** is her class's lean (classes' shapes): the row a player tries for the fights her class leans to, one
+  tap on "Wear on every Prowess node" away. It is a reading, not a screen: the preset stays the one all-round set.
+- **Her top pair** (T2E38) is her kit's damage order. The four pure variants' come from the harness proxies above (her
+  third weapon in her second half's place), the Battlemage's from her proxy's shapes, the Spellfist's by slot order until
+  balance prints her Fire's share; T2B prints every class's order on the built rules and the preset table stores it (as
+  `presetKind` stores the Orb's today).
+- **Tier 3:** each class her Tier 2 parent's row ([§5.4](#54-tier-3s-twenty-two-t2e54)); Trio is no preset's (it ties Split
+  for even kits, §5.3).
 - **The Branches sheet** (T2E39) also sets "Tier 1's gifts" on every node in one tap.
 
 ### 4.9 The Stars tab with branches (T2E39, T2E40, T2E49)
@@ -445,7 +575,7 @@ from her kit.
 | **First row** | As built: "Extra Stats · Open 15/22 · 3 ready", **Set all**, the (i), which adds: "A jewel opens a node; a Stardust a jewel slots it; then its branch swaps free" |
 | **The chart** | **Tier 1's, star for star, 360 × 350 in every tier** (no new body). **A star whose branch isn't its body's default carries a small white diamond at its lower right**, inside its 44 pt target (no text: nothing under 11 px, D269). An open, unslotted star keeps its Ready dot while a Stardust for it is held |
 | **The totals** | The six cells (every flat branch summed), her moon's ★ line, **a kinds line** ("Lance +27 · Axe +27") when a kind row is worn, then **a branch line** of the percent branches ("Area +18% · MP back +0.8% · Life steal 0.6%") |
-| **Branches ›** | A row under the totals opening one sheet: each body with its picks as chips ("Prowess · Area ×3 · Offense ×2"), then two one-tap rows, **Her preset** ("Brawler Keeper") and **Tier 1's gifts**, each setting every node at once |
+| **Branches ›** | A row under the totals opening one sheet: each body with its picks as chips ("Prowess · Area ×3 · Offense ×2"), then two one-tap rows, **Her preset** ("Her preset · Berserker") and **Tier 1's gifts**, each setting every node at once |
 | **A node's sheet** | As built (the strip, what it gives, before → after, the jewel, Set), plus a **Branch row** under the value: "Branch · Area +9% ›", and its Stardust line ("Stardust G6 ×1 · 4 held"). **Set** sets whichever step is next: the jewels, then the Stardust; an unslotted open node reads "Gives Tier 1's gift until slotted". A percent branch shows the hits it reads: "Area hits +9% · Sweeps, splashes, farewells" |
 | **The branch list** | D266's one-tap list under three headers (Prowess: Her stat · Her shapes · Her kinds): a row a branch with this node's value and its "for" line; the worn one ticked; **a tap wears it and the sheet returns to the node** (D278: one sheet, never stacked). Its footer: **"Wear on every Prowess node"**, one more tap |
 | **Set all** (T2E40) | Its live rule for jewels (each jewel to the body furthest behind, map order on a tie), then **every Stardust that fits an open node**, one line each: "Planet Jewel III ×3 → Planet III · +7 · all six", "Stardust G6 → Prowess III · Area +9%" |
@@ -517,14 +647,43 @@ Sorcerer 12.6% against 12.8%, the Tome Spellblade 11.8% against 11.8%) and **win
 (13.7% against 13.6%); it loses wherever two kinds carry her (the Summoners, the Paladin). It is the even kit's row, and
 no preset's.
 
+### 5.4 Tier 3's twenty-two (T2E54)
+
+**Tier 3 is a promotion** (R3-1, [classes](classes.md) T2C65): each Tier 2 class promotes into one Tier 3 class (the
+Spellfist and the Battlemage into two), her parent's kit plus one rule. **Each Tier 3 class takes her Tier 2 parent's
+split and preset row**, the Gladiator and the Thaumaturge too: their third slot becomes her channel's (Arsenal, T2C85),
+and they keep their cross parents' 100/0 and 0/100 and Offense. Tier 3 adds no row but Trio, and no body.
+
+| Tier 3 class (her Tier 2 parent) | Split | Prowess preset | Her swap row | Her rule, against the rows |
+|---|---|---|---|---|
+| Ravager (Berserker) | 100/0 | Offense | Area | Juggernaut (×0.6 on an unbroken foe) multiplies every row |
+| Spellhammer (Spellfist) | 100/0 | Offense | Multi-hit | Pinpoint +4% a depth: every row alike on her one-foe kit |
+| **Gladiator** (Spellfist) | 100/0 | Offense | Area (her Axe's Sweep; the Spellfist's was Multi-hit) | Arsenal: the Brawler's shapes (Heavy, Sweep, Scatter) |
+| Astromancer (Archmage) | 0/100 | Offense | Area | Resonance's echo (30%) is her capstones' shape again |
+| Spellknight (Battlemage) | 0/100 | Offense | Area | Pinpoint +4% a depth |
+| **Thaumaturge** (Battlemage) | 0/100 | Offense | Area | Arsenal: the Sorcerer's shapes |
+| Bladelord · Runelord (Blademaster · Runeblade) | 70/30 · 30/70 | Multi-hit | Split | Spellbind's +20% is a whole-act factor |
+| Herald · Oracle (Sentinel · Enchanter) | 70/30 · 30/70 | Multi-hit | Split | The familiar on both halves: more multi-hit |
+| Dervish · Starweaver (Bladedancer · Spellweaver) | 100/0 · 0/100 | Offense | Multi-hit (wins their regular fights) | Momentum multiplies every row |
+| Overlord · Hierarch (Warlord · Invoker) | 70/30 · 30/70 | Area | Split | Menagerie: a second farewell, more area |
+| Archdruid · Soulcaller (Druid · Shaman) | 70/30 · 30/70 | Area | Split | Two lingering summons, both mending |
+| Imperator · Mythlord (Marshal · Animist) | 100/0 · 0/100 | Offense | Area (wins the Mythlord's regular fights) | Momentum |
+| Bastion · Cardinal, Inquisitor · Hierophant (the healers) | 80/20 · 20/80 | Offense | — | Her mends read it |
+
+- **Arsenal's second kinds take no kind row.** A two-kind weapon's partner is coverage only (WP7, gear's T2G3): every
+  bonus reads a hit's own kind, so the Gladiator's kind rows list her Greatsword, Axe and Lance, and the Thaumaturge's her
+  Fire, Blizzard and Thunder, as every class's list her three weapons' kinds (T2E4). Offense is their preset anyway.
+- **The crown and Momentum** move no winner on this reading: Momentum multiplies every hit, and the crown raises her
+  capstones, which carry her kit's own shapes; balance re-measures with both built (T2B).
+
 ## 6. Provides and assumes
 
 | Doc | T2E provides | T2E assumes |
 |---|---|---|
-| **[classes](classes.md)** (R2-2–R2-5) | The shapes' rule reads each hit's cast, so the sixteen classes need nothing from the map; Prowess's splits for the sixteen (T2E45, the Spellfist all to ATK and the Battlemage all to M.ATK, as T2C36 reads it); presets by kit (T2E37) | **Aligned with T2C31–T2C64:** Keepers on their parent's preset weapons and split; Momentum (the Berserker's and the Archmage's self-buff) a status at step 5, so it multiplies Area and Multi-hit and never stacks into them; the Blademaster's and Runeblade's extra hit on both halves (more multi-hit), the Warlord's and Invoker's two farewells (more area); the supports' Barrier and the Druid's and Shaman's farewell mends read ATK or M.ATK (no shape); the battle healers keep one-foe skills. T2C's note that MP back and life steal suit the supports and battle healers stands: both are on Vigor's list, and the preset leaves Vigor at its gift until T2B measures their MP. No branch adds a status or a heal |
+| **[classes](classes.md)** (R2-2–R2-5, R3-1–R3-4) | The shapes' rule reads each hit's cast, so the forty-two classes need nothing from the map; **Prowess's splits for the forty-two** (T2E50: every one-stat class all on her stat, as T2C36 and T2C67 read it; the rest their Tier 1 ancestor's); presets by kit (T2E51, §5.4), Offense for every one-stat class with her lean (classes' shapes) as her swap row; Pinpoint moves no row (T2E53) | **Aligned with T2C65–T2C101:** the four pure variants' pure pair (her lead half from her first two weapons, her second from her third, every hit on her stat) and hands (0.32 · 0.41 · 0.40 · 0.37); the crosses' one act, presets and Pinpoint (+2% a depth on one-foe acts, step 5); the Tier 3 rules (Juggernaut, Resonance, Pinpoint doubled, Arsenal, Spellbind, Menagerie, the keepers' twists, Momentum, Overflow, power ×0.7) as factors on her acts or more of her own shapes; Arsenal's partners coverage only. Round 2's still stand: Momentum a factor at step 5, never stacking into Area or Multi-hit; the supports' Barrier and the Summoner supports' farewell mends read ATK or M.ATK (no shape); MP back and life steal on Vigor's list for the supports and battle healers. No branch adds a status or a heal |
 | **[gear](gear.md)** (R2-6, R2-7) | One factor a kind summed over every source, with its cap (T2E33): an accessory form "by shape" adds into Area or Multi-hit; the kind rows outside the kind cap (T2E6) | Weapon types set at promotion; three accessory slots with a tree; Might × tier |
 | **[professions](professions.md)** (R2-9) | Stone's demand an Uma in every tier: 30 jewels (150 cut stones) and, from Tier 2, 30 Stardust (150 Fungi powders), three of each a rank; her moon neither; no swap costs an item (T2E42) | **Aligned with T2P27–T2P30:** Fungi → Stardust G1–G10, 5 powders each, one a jewel, slotting the node once |
-| **[balance](balance.md)** (R2-11, R2-12) | The lanes (T2E22): slotting moves no budget; **no weapon moon**, so the toolbox term drops round 1's weapon-moon piece (1.05 · 1.15 · 1.23); the measured shares, branch worths and winners (§4.6, §4.7); the hybrids' lift (T2E36); the caps (T2E33) | T2B re-measures with the rules built: the best-pick gain in the party value bands, the rates against the sixteen kits, MP back on chains and the Rift |
+| **[balance](balance.md)** (R2-11, R2-12, R3-8) | The lanes (T2E22): slotting moves no budget; **no weapon moon**, so the toolbox term drops round 1's weapon-moon piece (1.05 · 1.15 · 1.23); the measured shares, branch worths and winners (§4.6, §4.7); the hybrids' lift (T2E36); the caps (T2E33); **round 3's proxies** (§4.8): Offense the one-stat classes' best, 15.1–17.6%, their swap rows 1.0–3.9 points behind on the mean; the viability count on the damage and support classes (T2E52) | T2B re-measures with the rules built: the best-pick gain in the party value bands, the rates against the twenty kits, MP back on chains and the Rift; **round 3 adds** the pure variants' and crosses' Prowess on the built pure pair and cross, the pure Summoners' area share with their class line (Legion) in the run (past about 38%, Area takes their preset), and the Spellfist's Fire share (her kind rows' order) |
 | **[templates](templates.md)** | Her moon takes no branch and no Stardust; its place on the chart (T2E28) | T2U8: two nodes, no jewel, × tier |
 | **[progression](progression.md)** (R2-5, R2-10) | **Aligned with T2W24:** the map is 22 in every tier, the Stars track 4 · 9 · 13 · 18 · 22, open nodes only, never a branch or a Stardust; branches carry on Ascend as settings, the map empties (T2E41, T2E43) | One Uma, one tier; settings carry, progress restarts |
 
@@ -558,14 +717,16 @@ no preset's.
 
 | Page | Shows |
 |---|---|
-| [extra-stats-chart.html](previews/extra-stats-chart.html) | The live chart in Tiers 1, 2 and 3 (one table, 22 stars); a phone at 390 × 844 and 375 × 667 playing the rules: a node's sheet with its Branch row and Stardust, the grouped one-tap list, "Wear on every node", the diamond marks, the totals' kinds and branch lines, the Branches sheet (her preset, Tier 1's gifts), Set all with Stardust; the live test's checks plus the marks' |
-| [extra-stats-tiers.html](previews/extra-stats-tiers.html) | Every branch's value node by node in Tiers 2 and 3; three jewels and three Stardust a rank; Stone's and Fungi's demand; the Stars track |
-| [extra-stats-branches.html](previews/extra-stats-branches.html) | The three steps of a node; the lanes; each body's list; the new kinds' rules in the damage stack and which exist in the engine; the harness's shares and winners by class and fight; Vigor and Guard measured; MP in a chain; presets for the sixteen classes |
+| [extra-stats-chart.html](previews/extra-stats-chart.html) | The live chart in Tiers 1, 2 and 3 (one table, 22 stars); a phone at 390 × 844 and 375 × 667 playing the rules: a node's sheet with its Branch row and Stardust, the grouped one-tap list, "Wear on every node", the diamond marks, the totals' kinds and branch lines, the Branches sheet (her preset, Tier 1's gifts), Set all with Stardust; the live test's checks plus the marks'; round 3 adds the four pure variants to its class picker |
+| [extra-stats-tiers.html](previews/extra-stats-tiers.html) | Every branch's value node by node in Tiers 2 and 3; three jewels and three Stardust a rank; **Prowess's split for the forty-two classes** (round 3); Stone's and Fungi's demand; the Stars track |
+| [extra-stats-branches.html](previews/extra-stats-branches.html) | The three steps of a node; the lanes; each body's list; the new kinds' rules in the damage stack and which exist in the engine; the harness's shares and winners by class and fight; Vigor and Guard measured; MP in a chain; **round 3: the new kits on the harness proxies, the viability re-read and the presets for the twenty and twenty-two** |
 | [extra-stats-weapon-moons.html](previews/extra-stats-weapon-moons.html) | Round 1's weapon moon as a pick: every Full and Split measured by fight, her kit's kinds against her Orb's, the kind rows against Prowess's other rows, Tier 3's Trio |
 
 ## 10. Decisions
 
-Round 1's calls keep their ids and rows below with their status; round 2's are T2E21–T2E49.
+Round 1's calls keep their ids and rows below with their status; round 2's are T2E21–T2E49; round 3's touch-ups for the
+new class list are T2E50–T2E54, at the end. Round 3 supersedes three round-2 calls (T2E35, T2E37, T2E45), each marked
+**Superseded (R3-n)** with its replacement.
 
 | Call | Recommendation | Alternatives, briefly | Why |
 |---|---|---|---|
@@ -603,9 +764,9 @@ Round 1's calls keep their ids and rows below with their status; round 2's are T
 | **T2E32** Area guard | **On a foe's every-Uma move, her hit × (1 − the share) at step 9, after evasion; both channels** | A cut on all hits (v11's per channel) | Reads the flag the engine already passes |
 | **T2E33** Caps | **One factor a kind, every source summed: Area ≤ +60%, Multi-hit ≤ +24%, Life steal ≤ 4%, MP back ≤ +3% of her bar beside the base regen, Area guard ≤ 16%** | No cap; a cap per source | About a third above Extra Stats alone: binds only stacking across systems (as T2G14) |
 | **T2E34** Values by tier | **Flat branches × 1.8 and × 2.6 (a doubled pair at twice the node's rounded points; Split and Trio rounded from the Full node); percent branches the same in every tier** | Percentages × tier | SB1: the same share in every tier; measured, Tier 3's shares within 4 points of Tier 2's |
-| **T2E35** Viability | **Measured on the harness (§4.6): every branch someone's best, none everyone's, none over half: Offense 12 of 24 cases (the healers' six by their mends), Multi-hit 6, Split 4, Area 2; T2B re-measures with the rules built** | Tune Area up to win the Brawler's regular fights (it lifts the Summoners past the pure classes) | D266's idea; the healers' mends read Offense |
+| **T2E35** Viability | **Superseded (R3-4)** by T2E52. Round 2's reading, kept as measured on the eight Tier 1 kits (§4.6): every branch someone's best, none everyone's, none over half: Offense 12 of 24 cases (the healers' six by their mends), Multi-hit 6, Split 4, Area 2 | Tune Area up to win the Brawler's regular fights (it lifts the Summoners past the pure classes) | Round 3 doubles the one-stat classes, so the count moves (§4.8) |
 | **T2E36** The hybrids' lift | **Accept it: at her best branch Prowess is worth 13.0–17.5% to every damage class (a hybrid's split gave 9.8–10.9%); T2B checks the mirrors and the party value bands with it** | Rates that keep a hybrid's best at her split's worth | The only power slotting adds; it narrows a gap rather than opening one; R2-11's bands are T2B's to hold |
-| **T2E37** Presets for the sixteen | **The preset sets every node: Prowess by her kit (Offense for the Berserker, Spellfist, Archmage, Battlemage and the four healers; Multi-hit for the Blademaster, Runeblade, Sentinel and Enchanter; Area for the Warlord, Invoker, Druid and Shaman), the Planet, Vigor and Guard at their defaults** | Presets on every body's measured best (MP for every damage class); the Summoners on Split | A good all-round set (D266): HP stays for the fights the harness can't show; Area wins the Summoners' most common fights |
+| **T2E37** Presets for the sixteen | **Superseded (R3-2, R3-3, R3-4)** by T2E51 and T2E54. Round 2's: Prowess by her kit (Offense for the Berserker, Spellfist, Archmage, Battlemage and the four healers; Multi-hit for the Blademaster, Runeblade, Sentinel and Enchanter; Area for the Warlord, Invoker, Druid and Shaman), the Planet, Vigor and Guard at their defaults; every row stands in T2E51 | Presets on every body's measured best (MP for every damage class); the Summoners on Split | Round 3 adds the four pure variants and Tier 3's twenty-two |
 | **T2E38** The kind rows' order | **Her kinds by her kit's damage, her top pair's Split first (Full first when her top kind deals over 2⅓ times her second: the Paladin's Lance); T2B prints each class's order and the preset table stores it** | Her weapons' slot order; `presetKind` | Her Orb's kind isn't her top kind for four classes (§4.7) |
 | **T2E39** The Stars tab | **A Branch row and a Stardust line on every node's sheet (not her moon's), a grouped one-tap list with "Wear on every {body} node"; the totals' kinds and branch lines; a Branches sheet with her preset and Tier 1's gifts; a diamond on a star with a non-default branch** | A separate Branches tab; picks on the chart by long-press | One tab, one sheet kind (D269, D278); the chart stays a map |
 | **T2E40** Set all | **Jewels by its live rule, then every Stardust that fits an open node; each line names the branch** | Stardust first; Set all choosing branches | Unlocking, slotting and choosing stay three layers |
@@ -613,16 +774,23 @@ Round 1's calls keep their ids and rows below with their status; round 2's are T
 | **T2E42** Stone's two materials | **Aligned with T2P30: 30 jewels (cut stones) and, from Tier 2, 30 Stardust (Fungi powders) an Uma, three of each a rank; her moon neither; no swap costs an item** | This doc's first draft (Moon Jewels from the second material); Stardust a node (Fungi 100 an Uma) | Professions' rule is the owner's "unlock … then slot" in items, and keeps Stone and Fungi at 30 a rank |
 | **T2E43** The window's Stars track | **Counts open nodes, 4 · 9 · 13 · 18 · 22 in every tier; never a branch or a Stardust (T2W24)** | A step for slotted or picked nodes | A step is earned; a tap isn't; Stars stays one track |
 | **T2E44** Tier 3 | **× 2.6 and one new row, Prowess's Trio (half of Full on each of her three kinds); every other list Tier 2's** | A second weapon moon (EP26); a new row on every list | R2-1: Tier 3 deepens Tier 2; Trio is EP26's "all three weapon types" as a pick |
-| **T2E45** Prowess for the sixteen classes | **A Keeper keeps her parent's split; the Spellfist 100/0 and the Battlemage 0/100 (everything on her own stat, T2C36); the Sentinel, Enchanter, Druid, Shaman, Templar and Exorcist their parent's** | A split by slots | Every Tier 1 split is the owner's number |
+| **T2E45** Prowess for the sixteen classes | **Superseded (R3-1–R3-4)** by T2E50. Round 2's: a Keeper keeps her parent's split; the Spellfist 100/0 and the Battlemage 0/100 (everything on her own stat, T2C36); the Sentinel, Enchanter, Druid, Shaman, Templar and Exorcist their parent's; every split stands in T2E50 | A split by slots | Round 3's pure variants and Arsenal classes read one stat with a hybrid parent |
 | **T2E46** The save | **`stars.picks` (node → branch, defaults never stored) and `stars.slotted` (nodes with their Stardust), Tier 2 and 3 worlds only; `stars.moons` retires; no migration** | Store every node; one pick a body | An unslotted node is today's map |
 | **T2E47** The engine | **At Tier 2's engine (v22): `area`, `multi` (step 4b), `lifesteal` on both channels, `mpRegen` re-admitted, `areaGuard` (step 9); flat and kind branches as frozen stats and `flat`** | New fields for the flat branches too | Two of five rules are built; flat ones need nothing |
 | **T2E48** Names | **All six, DEF and M.DEF, HP and MP, Offense, Area, Multi-hit, Full, Split, Trio, HP, MP, MP back, Life steal, DEF, M.DEF, Area guard, Branch, Branches, Her stat, Her shapes, Her kinds, Her preset, Tier 1's gifts: none matches a master-data string (Stardust is professions', checked there)** | Coined words (Bulwark is an old engine cue label) | Plain words say what a row does; the owner's own ("AoE", "multi-hit", "life steal") |
 | **T2E49** The chart's marks | **A white diamond at a star's lower right when its branch isn't the body's default; the chart's table untouched in every tier** | A letter on the star (under 11 px); colour fills | D277's geometry and test stand; the page checks the marks stay inside their targets |
+| **T2E50** Prowess for the forty-two classes | **A class whose every hit reads one stat puts all of Prowess on it: 100/0 the Berserker, Spellfist, Bladedancer and Marshal and the Ravager, Spellhammer, Gladiator, Dervish and Imperator; 0/100 their mirrors; every other class her Tier 1 ancestor's split (70/30, 30/70, 80/20, 20/80), a Tier 3 class her Tier 2 parent's** | The pure variants on their hybrid parent's 70/30 or 30/70; a split by slots (2 + 1 as 67/33) | A split leaves 15–30% of Prowess on a stat none of her hits reads; classes' hands for the pure variants already assume it (T2C67) |
+| **T2E51** Presets for the twenty | **Offense for every one-stat class, the four pure variants included (the harness proxies: 15.1–16.3% against their family shape's 11.7–14.8%), and the four healers; Multi-hit for the Spellblades' keepers and supports; Area for the Summoners' keepers and supports; the Planet, Vigor and Guard at their defaults; her class's lean is her swap row (Multi-hit the pure Spellblades', Area the pure Summoners'); her kind rows' first by her kit (the Battlemage's Full Fire)** | The pure variants on their family's shape (classes' lean; 1.0–1.6 points of her damage below Offense on the mean, 3.9 the Marshal's); the Animist on Area (it wins only her regular fights) | A preset is the good all-round set (D266); the shape row stays one tap away and ties or wins their regular fights |
+| **T2E52** Viability on the twenty and twenty-two | **Re-read on the harness proxies (§4.8): every row someone's best, none everyone's; read D266's "none over half" on the damage and support classes: Offense 23 of 48 cases in Tier 2, 27 of 54 in Tier 3; the healers' Offense (35 of 60, 39 of 66 with them) is not a pick, no other row reaching a mend; T2B re-measures with the rules built** | Count the healers as round 2 did (over half) and raise Multi-hit to 0.7 a point (+21%), which moves the pure Spellblades to it but lifts the Spellblades' keepers' Prowess to the pure classes' 17%; raise Area to 1.7 a point | Round 3 doubles the one-stat classes, whose Offense is all of Prowess on every hit; the rule's purpose is that every row earns a place, and each still does |
+| **T2E53** Pinpoint and the rows | **Pinpoint moves no row: on an all-one-foe kit it multiplies every row alike (×1.10), on the Battlemage's it takes about a point of share off her sweep; Offense stays the crosses' row, Multi-hit the Spellfist's swap, Area the Battlemage's; no "single" row** | A "single" row (+x% on one-hit casts) for the crosses | Offense already reads her one-foe hits whole; a fourth shape row would lengthen every Prowess list for two lines |
+| **T2E54** Tier 3's twenty-two | **Each Tier 3 class takes her Tier 2 parent's split and preset row, the Gladiator (100/0) and the Thaumaturge (0/100) on Offense with their swap row Area; Arsenal's partner kinds take no kind row (coverage only, WP7), so every list holds her three weapons' kinds; Trio no preset's; no new row or body** | Kind rows on Arsenal's partners (five Full rows for the Gladiator); Tier 3 rows of their own | Tier 3 is a promotion of the same kits (R3-1); a partner kind carries no bonus anywhere |
 
 ### Where the owner may want to look first
 
 | Call | Why it's worth his eye |
 |---|---|
+| **T2E52** Viability on round 3's classes (new) | Round 3 doubles the one-stat classes, so Offense is the best Prowess row for 12 of 20 Tier 2 classes (the eight one-stat ones and the healers). Counted on the damage and support classes it wins 23 of 48 cases (27 of 54 in Tier 3), inside D266's "none over half"; counted with the healers as round 2 did, 58–59%. The recommendation changes the count, not a number; the seam is Multi-hit at 0.7 a point, a balance change |
+| **T2E51** The pure variants' preset is Offense (new) | Classes' lean says the pure Spellblades multi-hit and the pure Summoners area; the harness says Offense pays 1.0–3.9 points more on the mean, so the lean is their swap row, ahead only in some regular fights |
 | **T2E27** The weapon moon becomes a pick | It drops round 1's Tier 2 body (+11.8–15.2% of her damage on top of the map) and Tier 3's second moon, both his approved D194 model ("each tier's new bodies should matter"). As picks they compete with Prowess's other rows and add no budget, which is the guardrail he asked for, and it keeps the chart, jewels and windows as built. If he wants Tiers 2 and 3 to add Extra Stats power, round 1's body is the seam |
 | **T2E36** The hybrids' lift | Slotting raises the hybrids' Prowess from about 10% to 13–15% of their damage, toward the pure classes' 16–18%: the one place slotting adds power, and it moves the pure-to-hybrid ratio by about 4 points |
 | **T2E22, T2E23** No lane crossing | The Planet has no offense row: a back-liner can't trade her defenses for damage. If he wants glass cannons, this is the seam |
