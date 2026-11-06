@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>uma-quest Plan</title>
+<!-- uma-quest's plan (docs/design/uma-quest/plan.md): the shared GCP project, the phases by who does them, and Phase 1's
+     steps. Self-contained, uma-kit's tokens, light and dark. No character art. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd; --info: #2f6fe0; --info-wash: #e3ecfc; --success: #2f7a4f;
+    --success-wash: #e1f1e7; --danger: #c23b33;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --info-wash: #16233a; --success: #4fb37a;
+      --success-wash: #13261b; --danger: #e0645c;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --info-wash: #16233a; --success: #4fb37a;
+    --success-wash: #13261b; --danger: #e0645c;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 17px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 8px; }
+  p, li { color: var(--ink-soft); max-width: 82ch; }
+  a { color: var(--info); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 20px; }
+  nav a { font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; background: var(--sunken); color: var(--ink-soft); text-decoration: none; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--hairline-strong); margin-bottom: 16px; }
+  svg { display: block; width: 100%; height: auto; }
+  .scroll { overflow-x: auto; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+  .note { font-size: 12px; color: var(--ink-faint); }
+
+  /* Phases by track */
+  .gantt { display: grid; grid-template-columns: 92px repeat(7, minmax(120px, 1fr)); gap: 6px; min-width: 960px; }
+  .gantt .head { font: 700 12px system-ui; color: var(--ink); padding: 8px; background: var(--raised); border-radius: 8px; }
+  .gantt .head span { display: block; font-weight: 500; color: var(--ink-faint); }
+  .gantt .track { font: 700 12px system-ui; color: var(--ink-soft); padding: 8px 0; align-self: start; }
+  .gantt .cell { display: flex; flex-direction: column; gap: 6px; min-height: 40px; }
+  .chip { border-radius: 8px; padding: 7px 9px; font-size: 12px; line-height: 1.3; border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); }
+  .chip b { font: 700 11px ui-monospace, SFMono-Regular, Menlo, monospace; margin-right: 4px; }
+  .chip small { display: block; color: var(--ink-faint); font-size: 11px; margin-top: 2px; }
+  .chip.claude { background: var(--info-wash); border-color: color-mix(in srgb, var(--info) 35%, transparent); }
+  .chip.art { background: var(--accent-wash); border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+  .chip.you { background: var(--success-wash); border-color: color-mix(in srgb, var(--success) 40%, transparent); }
+  .chip.exit { background: transparent; border-style: dashed; color: var(--ink-soft); }
+
+  /* Phase 1 steps */
+  ol.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  ol.steps li { display: grid; grid-template-columns: 34px 82px minmax(0, 1fr); gap: 10px; align-items: start; max-width: none;
+    background: var(--raised); border-radius: 10px; padding: 10px 12px; color: var(--ink); }
+  ol.steps .n { font: 700 13px ui-monospace, Menlo, monospace; color: var(--ink-faint); }
+  .who { display: inline-block; font: 700 11px system-ui; padding: 2px 8px; border-radius: 999px; text-align: center; }
+  .who.claude { background: var(--info-wash); color: var(--info); }
+  .who.you { background: var(--success-wash); color: var(--success); }
+  ol.steps small { display: block; color: var(--ink-soft); font-size: 12px; margin-top: 2px; }
+  @media (max-width: 560px) { ol.steps li { grid-template-columns: 28px minmax(0, 1fr); } ol.steps li .who { grid-column: 2; justify-self: start; } ol.steps li > div { grid-column: 2; } }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+  <h1>uma-quest: the plan</h1>
+  <p>The order of work for the new game: the infrastructure first, inside the existing <code>uma-rpg</code> GCP project, then
+    the engine, the slice and the design. The doc with every call is <a href="../plan.md">plan.md</a>.</p>
+  <nav>
+    <a href="#project">The shared project</a>
+    <a href="#phases">Phases by who</a>
+    <a href="#phase1">Phase 1, step by step</a>
+    <a href="#cost">The bill</a>
+  </nav>
+
+  <section class="card" id="project">
+    <h2>One GCP project, two games that can't reach each other</h2>
+    <p>uma-quest gets its own site, API, database, images and deploy sign-in. Only the Google login, the deploy pool and the
+      $5 budget alert are shared. Both APIs read master data from uma-platform's bucket, read-only.</p>
+    <div class="scroll">
+    <svg viewBox="0 0 960 560" role="img" aria-label="The uma-rpg GCP project holding uma-rpg's and uma-quest's separate pieces, with a shared band and the platform bucket below">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink-faint)"/>
+        </marker>
+      </defs>
+      <style>
+        .t { font: 600 13px system-ui, sans-serif; fill: var(--ink); }
+        .s { font: 12px system-ui, sans-serif; fill: var(--ink-soft); }
+        .m { font: 600 12px ui-monospace, Menlo, monospace; fill: var(--ink); }
+        .h { font: 700 14px system-ui, sans-serif; fill: var(--ink); }
+      </style>
+      <!-- repos -->
+      <rect x="60" y="14" width="340" height="52" rx="10" fill="var(--raised)" stroke="var(--hairline-strong)"/>
+      <text x="80" y="37" class="m">luismlorenzana/uma-rpg</text>
+      <text x="80" y="55" class="s">public · frozen, bug fixes only</text>
+      <rect x="560" y="14" width="340" height="52" rx="10" fill="var(--accent-wash)" stroke="var(--accent)"/>
+      <text x="580" y="37" class="m">luismlorenzana/uma-quest</text>
+      <text x="580" y="55" class="s">public · new</text>
+      <line x1="230" y1="66" x2="230" y2="128" stroke="var(--ink-faint)" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="240" y="100" class="s">main deploys</text>
+      <line x1="730" y1="66" x2="730" y2="128" stroke="var(--ink-faint)" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="740" y="100" class="s">main deploys</text>
+
+      <!-- project -->
+      <rect x="20" y="132" width="920" height="324" rx="14" fill="none" stroke="var(--ink-soft)" stroke-width="1.5"/>
+      <rect x="36" y="122" width="290" height="22" rx="6" fill="var(--page)"/>
+      <text x="44" y="138" class="h">GCP project uma-rpg</text>
+
+      <!-- uma-rpg column -->
+      <text x="60" y="170" class="h">uma-rpg</text>
+      <g>
+        <rect x="60" y="182" width="340" height="38" rx="8" fill="var(--raised)" stroke="var(--hairline-strong)"/>
+        <text x="74" y="206" class="t">Hosting · uma-rpg.web.app</text>
+        <rect x="60" y="228" width="340" height="38" rx="8" fill="var(--raised)" stroke="var(--hairline-strong)"/>
+        <text x="74" y="252" class="t">Cloud Run · rpg-api</text>
+        <rect x="60" y="274" width="340" height="38" rx="8" fill="var(--raised)" stroke="var(--hairline-strong)"/>
+        <text x="74" y="298" class="t">Firestore (default) · your uma-rpg saves</text>
+        <rect x="60" y="320" width="340" height="38" rx="8" fill="var(--raised)" stroke="var(--hairline-strong)"/>
+        <text x="74" y="344" class="t">Images rpg · deploy provider uma-rpg</text>
+      </g>
+      <!-- uma-quest column -->
+      <text x="560" y="170" class="h">uma-quest <tspan class="s">(new)</tspan></text>
+      <g>
+        <rect x="560" y="182" width="340" height="38" rx="8" fill="var(--accent-wash)" stroke="var(--accent)"/>
+        <text x="574" y="206" class="t">Hosting · uma-quest.web.app</text>
+        <rect x="560" y="228" width="340" height="38" rx="8" fill="var(--accent-wash)" stroke="var(--accent)"/>
+        <text x="574" y="252" class="t">Cloud Run · quest-api</text>
+        <rect x="560" y="274" width="340" height="38" rx="8" fill="var(--accent-wash)" stroke="var(--accent)"/>
+        <text x="574" y="298" class="t">Firestore quest · uma-quest saves</text>
+        <rect x="560" y="320" width="340" height="38" rx="8" fill="var(--accent-wash)" stroke="var(--accent)"/>
+        <text x="574" y="344" class="t">Images quest · deploy provider uma-quest</text>
+      </g>
+      <!-- wall -->
+      <line x1="480" y1="176" x2="480" y2="362" stroke="var(--danger)" stroke-width="2" stroke-dasharray="6 6"/>
+      <rect x="424" y="252" width="112" height="40" rx="8" fill="var(--panel)" stroke="var(--danger)"/>
+      <text x="480" y="268" class="s" text-anchor="middle">no access</text>
+      <text x="480" y="284" class="s" text-anchor="middle">across</text>
+
+      <!-- shared band -->
+      <rect x="60" y="376" width="840" height="62" rx="10" fill="var(--success-wash)" stroke="var(--success)"/>
+      <text x="76" y="398" class="h">Shared</text>
+      <text x="76" y="424" class="t">Firebase Auth: one Google login, your email only</text>
+      <text x="470" y="424" class="t">github-actions pool</text>
+      <text x="680" y="424" class="t">$5 budget alert</text>
+
+      <!-- platform bucket -->
+      <rect x="230" y="486" width="500" height="56" rx="10" fill="var(--raised)" stroke="var(--hairline-strong)"/>
+      <text x="480" y="510" class="m" text-anchor="middle">gs://uma-platform-master-data</text>
+      <text x="480" y="530" class="s" text-anchor="middle">project uma-platform-lm · names, art, sprites · read-only to both APIs</text>
+      <line x1="230" y1="456" x2="330" y2="484" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arr)"/>
+      <text x="200" y="478" class="s" text-anchor="end">rpg-api reads</text>
+      <line x1="730" y1="456" x2="630" y2="484" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arr)"/>
+      <text x="760" y="478" class="s">quest-api reads</text>
+    </svg>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--raised);border:1px solid var(--hairline-strong)"></i>uma-rpg, untouched</span>
+      <span><i style="background:var(--accent-wash);border:1px solid var(--accent)"></i>uma-quest, added in Phase 1</span>
+      <span><i style="background:var(--success-wash);border:1px solid var(--success)"></i>shared</span>
+    </div>
+  </section>
+
+  <section class="card" id="phases">
+    <h2>Phases by who does them</h2>
+    <p>Left to right is the order; there are no dates. Phase 4, the design spec, runs beside Phases 2 and 3.</p>
+    <div class="scroll">
+      <div class="gantt" id="gantt"></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--info-wash);border:1px solid var(--info)"></i>Claude</span>
+      <span><i style="background:var(--accent-wash);border:1px solid var(--accent)"></i>ChatGPT, art</span>
+      <span><i style="background:var(--success-wash);border:1px solid var(--success)"></i>You</span>
+      <span><i style="border:1px dashed var(--hairline-strong)"></i>the phase's exit check</span>
+    </div>
+  </section>
+
+  <section class="card" id="phase1">
+    <h2>Phase 1, step by step</h2>
+    <p>Q1 makes the repo; Q2 makes the cloud. Every cloud command is scoped to the <code>uma-rpg</code> project with the
+      default gcloud config, never switching the active account.</p>
+    <ol class="steps" id="steps"></ol>
+  </section>
+
+  <section class="card" id="cost">
+    <h2>What it adds to the bill</h2>
+    <table>
+      <thead><tr><th>Added to the uma-rpg project</th><th>Free tier</th><th>At one player</th></tr></thead>
+      <tbody>
+        <tr><td>Hosting site uma-quest</td><td>Shares 10 GB stored and 360 MB a day</td><td>$0</td></tr>
+        <tr><td>Cloud Run quest-api</td><td>Shares 2M requests and 180k vCPU-seconds a month</td><td>$0</td></tr>
+        <tr><td>Firestore database quest</td><td>None: the free quota covers one database a project, uma-rpg's</td><td>A few cents a month</td></tr>
+        <tr><td>Artifact Registry quest</td><td>Shares the 0.5 GB</td><td>$0, cents if images pile up</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Sources and the full list of calls are in <a href="../plan.md">plan.md</a>.</p>
+  </section>
+</main>
+<script>
+  const PHASES = [
+    ['Phase 0', 'Decisions, S'], ['Phase 1', 'Repo and cloud, M + M'], ['Phase 2', 'The engine, L'],
+    ['Phase 3', 'The slice, L'], ['Phase 4', 'Design spec, M'], ['Phase 5', 'First chapter, XL'], ['Phase 6', 'To Lv 50, XL'],
+  ];
+  // [track, phase index, class, id, text, small]
+  const CHIPS = [
+    ['Claude', 0, 'claude', '', 'P87 and P88 in uma-platform, the roadmap row', ''],
+    ['Claude', 0, 'claude', '', 'uma-rpg frozen in its CLAUDE.md and queue', ''],
+    ['Claude', 1, 'claude', 'Q1', 'The repo: stack, platform packages, checks, docs', 'CI on, deploys off'],
+    ['Claude', 1, 'claude', 'Q2', 'The cloud in project uma-rpg, the deploy, the hello app', 'Sign-in and a save round trip'],
+    ['Claude', 2, 'claude', 'Q4', 'The stage: three.js, sideways, camera, stick, battery saver', ''],
+    ['Claude', 2, 'claude', 'Q5', 'The world builder and the kit spec', ''],
+    ['Claude', 2, 'claude', 'Q6', 'Sprites in the engine: atlas, face layer, single file', ''],
+    ['Claude', 3, 'claude', 'Q8', 'The fight engine copied, HP carried, field heals', ''],
+    ['Claude', 3, 'claude', 'Q9', 'The 3D fight screen', ''],
+    ['Claude', 3, 'claude', 'Q10', 'The dungeon generator, one biome', ''],
+    ['Claude', 3, 'claude', 'Q11', 'The dungeon screen: encounters, Spring, waystones, auto', ''],
+    ['Claude', 4, 'claude', '', 'Campaign, growth, dungeons, economy, save v1, screens', 'Starts beside Phase 2'],
+    ['Claude', 5, 'claude', '', 'Town, quest log, four chapter 1s, crafting, jobs', ''],
+    ['Claude', 6, 'claude', '', 'Chapters 2 to 5, capitals, balance', ''],
+    ['ChatGPT', 1, 'art', 'Q3', 'The sprite sample (was H168), plus walking directions', 'Can start any time'],
+    ['ChatGPT', 2, 'art', 'Q7', 'The first biome kit', 'After Q5\'s kit spec'],
+    ['ChatGPT', 5, 'art', '', 'Twenty Umas\' sprites, the chapter\'s kits', ''],
+    ['ChatGPT', 6, 'art', '', 'The rest of the cast and kits', ''],
+    ['You', 0, 'you', '', 'Go', ''],
+    ['You', 1, 'you', '', 'GitHub: four packages, Manage Actions access', 'After Q1 makes the repo'],
+    ['You', 1, 'you', '', 'Cloud console: the sign-in redirect', 'During Q2'],
+    ['You', 1, 'you', '', 'Approve Q3\'s key frames', ''],
+    ['You', 3, 'you', 'Q12', 'Play the slice on your iPhone', 'Its numbers set the design'],
+    ['Exit', 0, 'exit', '', 'Both logs pushed', ''],
+    ['Exit', 1, 'exit', '', 'uma-quest on your Home Screen, signed in, save synced; uma-rpg untouched', ''],
+    ['Exit', 2, 'exit', '', 'A test room at a steady frame rate; battery, load and size written down', ''],
+    ['Exit', 3, 'exit', '', 'One dungeon played; minutes and fights a floor measured', ''],
+    ['Exit', 4, 'exit', '', 'The spec and the Phase 5 queue', ''],
+    ['Exit', 5, 'exit', '', 'Lv 1 to 10 playable for four parties', ''],
+    ['Exit', 6, 'exit', '', 'Lv 50 reachable on every quest line', ''],
+  ];
+  const g = document.getElementById('gantt');
+  const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+  g.append(el('div', '', ''));
+  for (const [name, sub] of PHASES) g.append(el('div', 'head', `${name}<span>${sub}</span>`));
+  for (const track of ['You', 'Claude', 'ChatGPT', 'Exit']) {
+    g.append(el('div', 'track', track === 'Exit' ? 'Exit check' : track));
+    for (let p = 0; p < PHASES.length; p++) {
+      const cell = el('div', 'cell');
+      for (const [t, ph, cls, id, text, small] of CHIPS) {
+        if (t !== track || ph !== p) continue;
+        cell.append(el('div', `chip ${cls}`, `${id ? `<b>${id}</b>` : ''}${text}${small ? `<small>${small}</small>` : ''}`));
+      }
+      g.append(cell);
+    }
+  }
+
+  const STEPS = [
+    ['Q1', 'claude', 'Create the public repo luismlorenzana/uma-quest', 'Same protection and settings as uma-rpg'],
+    ['Q1', 'claude', 'Scaffold from uma-rpg\'s stack', 'apps/web, apps/api, packages/domain; uma-kit, uma-server, uma-work, uma-data; ports :8091 and :5184'],
+    ['Q1', 'claude', 'Copy the size and private-content checks; CI on pull requests and main', 'Deploys stay off'],
+    ['Q1', 'claude', 'Docs: README, CLAUDE.md, AGENTS.md, decisions from D1, the Q queue, the moved design docs', 'H168 arrives as Q3 with the walking directions'],
+    ['Q1', 'you', 'Manage Actions access → add uma-quest (Read) on uma-data, uma-kit, uma-work and uma-server', 'GitHub has no API for it'],
+    ['Q2', 'claude', 'Firestore database quest, delete protection on', 'uma-rpg\'s saves stay in (default)'],
+    ['Q2', 'claude', 'Runtime account quest-api-runtime, limited to the quest database; master data read-only', ''],
+    ['Q2', 'claude', 'Images quest, Cloud Run quest-api (min 0, max 1), the deployer limited to its own pieces', ''],
+    ['Q2', 'claude', 'Deploy provider uma-quest in the github-actions pool, main only', 'uma-rpg\'s provider untouched'],
+    ['Q2', 'claude', 'Hosting site uma-quest, a second Firebase web app, the authorized domain', ''],
+    ['Q2', 'you', 'Cloud console: add the uma-quest.web.app redirect URI and JavaScript origin to the web client', 'As you did for uma-rpg'],
+    ['Q2', 'claude', 'Repository variables and the deploy workflow; the hello app (sign-in, save v1, Update ready)', ''],
+    ['Q2', 'claude', 'Checks: uma-quest works; uma-rpg\'s site and API unchanged; quest-api refused on (default)', 'Then infrastructure.md with every value'],
+  ];
+  const ol = document.getElementById('steps');
+  STEPS.forEach(([pkt, who, text, small], i) => {
+    const li = el('li');
+    li.append(el('span', 'n', `${pkt}.${i < 5 ? i + 1 : i - 4}`));
+    li.append(el('span', `who ${who}`, who === 'you' ? 'You' : 'Claude'));
+    li.append(el('div', '', `${text}${small ? `<small>${small}</small>` : ''}`));
+    ol.append(li);
+  });
+</script>
+</body>
+</html>

@@ -3,6 +3,10 @@
 > **Status: 2026-11-06, research for the owner's review. Nothing is built.** The owner asked what a full HD-2D game would
 > take, how Octopath's mobile game did it, and whether the game should now be played sideways. The sprites themselves
 > are in [animation-spec.md](animation-spec.md). That spec holds either way. Visual page: [previews/sprites.html](previews/sprites.html).
+>
+> **Later the same day the owner chose a new game for this, uma-quest, with explorable dungeons and landscape
+> throughout.** That replaces HD7 (exploration deferred) and the portrait Hub in this page's recommendation. The plan is
+> [../uma-quest/plan.md](../uma-quest/plan.md).
 
 ## The short answer
 
