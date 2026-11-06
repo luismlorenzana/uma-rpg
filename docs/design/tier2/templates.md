@@ -502,7 +502,7 @@ her hold two of a tree's three lines, each with its own tip pick; at Class Rank 
 
 | Piece | Tier 3 |
 |---|---|
-| Calling | A family, as in Tier 2 (T2U25, T2U28): **she arrives as the Tier 3 class she picks** on the Tier 3 Ascend sheet (classes T2C89, progression T2W31), a Tier 3 child of a Tier 2 class she brought to Class Rank 50; her family 9, 9, 6, 6 or 4 |
+| Calling | A family, as in Tier 2 (T2U25, T2U28): **she arrives as the Tier 3 class she picks** on the Tier 3 Ascend sheet (classes T2C89, progression T2W37–T2W39), a Tier 3 child of a Tier 2 class she brought to Class Rank 50; her family 9, 9, 6, 6 or 4 |
 | ★ Flourish | 4% of her max HP a fight: a Brawler 144 HP, a Sorcerer 122, the six between 131 at Lv 50 |
 | ★ Signature | +0.26 a level: **+13** at Lv 50; still half a G10 slot of her stat (+26) |
 | ★ Her moon | I +10 points (HP +50, MP +10, DEF and M.DEF +10 each; Fleet and Gritty their shares) · II DEF +21, M.DEF +21, or DEF +10 and M.DEF +11 |
