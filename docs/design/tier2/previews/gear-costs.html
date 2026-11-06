@@ -99,7 +99,7 @@
   <p>From <a href="../gear.md">gear.md</a> (T2G29, T2G39, T2G40). From Tier 2 every grade takes its line's two items of
     that grade (professions' T2P29): the first raises the base, the second the Tier 2 part. Types and forms are settings and
     take nothing. Armor has no Tier 2 path: its second item, the Armor Lining, carries the rest of its × 1.8.</p>
-  <nav class="tabs"><a href="#armor">Armor by tier</a><a href="#half">Her half, for the sixteen</a><a href="#path">Why armor has no path</a><a href="#grade">What a grade takes</a><a href="#rank">A rank, a line</a><a href="#pages">Other pages</a></nav>
+  <nav class="tabs"><a href="#armor">Armor by tier</a><a href="#half">Her half, for the forty-two</a><a href="#path">Why armor has no path</a><a href="#grade">What a grade takes</a><a href="#rank">A rank, a line</a><a href="#pages">Other pages</a></nav>
 
   <section id="armor">
     <h2>Armor by tier (code: <code>armorValues</code>, × tier, Speed unscaled)</h2>
@@ -111,7 +111,7 @@
   <section id="half">
     <h2>Her half: the stat her lead channel reads</h2>
     <div class="card scroll"><table id="ht"></table>
-      <p class="legend">An expander reads one stat for both channels, so her armor's offense reaches every hit she makes.</p></div>
+      <p class="legend">A cross and a pure variant read one stat on every hit, so her armor's offense reaches every hit she makes. A Tier 3 class wears her Tier 1 ancestor's half (T2G61).</p></div>
   </section>
 
   <section id="path">
@@ -120,7 +120,7 @@
       <p>Professions assumed a <b>lining</b> adding each piece's offense to her other half too (T2P30). At Tier 2's G10 that is
         <b>+45 of her other stat</b>, which the harness prices at about <b>+5% damage</b> for every class that reads two stats
         (the M.ATK half of three Twofold slots, +54, is worth 6.5% to the Arms Spellblade) and <b>nothing</b> for the four
-        that read one (the Berserker, the Spellfist, the Archmage, the Battlemage). A free slot's worth for twelve of sixteen classes breaks R2-11's
+        that read one (the Berserker, the Archmage, the two crosses, the four pure variants). A free slot's worth for twelve of twenty classes breaks R2-11's
         "worth the same". Round 1 also measured that splitting a piece's offense never pays (−0.8 to −2.2% a piece).</p>
       <p>So the <b>Armor Lining carries the tier step</b>, professions' own fallback: the Fittings raise Tier 1's values, the
         Lining the rest. The Hides line keeps its 30 a rank and armor's numbers are exactly the table above.</p>
@@ -132,8 +132,8 @@
     <div class="card scroll"><table>
       <thead><tr><th>Piece</th><th>First item: the base</th><th>Second item: the Tier 2 part</th><th class="n">Refined</th></tr></thead>
       <tbody>
-        <tr><td>An Arms weapon (the Battlemage's too)</td><td>Arms Gem (10 Ingots): its Might, Tier 1's × tier</td><td><b>Arms Whetstone</b> (10 Blocks): its type, +0.02 on its weak multiplier</td><td class="n">10 + 10</td></tr>
-        <tr><td>A Tome (the Spellfist's too)</td><td>Tome Ink (10 cuts): its Might</td><td><b>Tome Reagent</b> (10 dried herbs): its type</td><td class="n">10 + 10</td></tr>
+        <tr><td>An Arms weapon (the Battlemage's Katana too)</td><td>Arms Gem (10 Ingots): its Might, Tier 1's × tier</td><td><b>Arms Whetstone</b> (10 Blocks): its type, +0.02 on its weak multiplier</td><td class="n">10 + 10</td></tr>
+        <tr><td>A Tome (the Spellfist's Fire Tome too)</td><td>Tome Ink (10 cuts): its Might</td><td><b>Tome Reagent</b> (10 dried herbs): its type</td><td class="n">10 + 10</td></tr>
         <tr><td>An armor slot</td><td>Armor Fittings (3 Planks): Tier 1's stat and offense</td><td><b>Armor Lining</b> (3 leathers): the rest of the × tier</td><td class="n">3 + 3</td></tr>
         <tr><td>An accessory slot</td><td>Accessory Setting (5 Fillets): its family's base row</td><td><b>Accessory Inlay</b> (5 carvings): the worn form's rider</td><td class="n">5 + 5</td></tr>
         <tr><td>A type, a form, a kind she swaps to</td><td colspan="2">Nothing. A kind never raised is at G0, so trying a new kind costs its grades; a type or a form never does</td><td class="n">0</td></tr>
@@ -157,7 +157,7 @@
   <section id="pages">
     <h2>The other pages</h2>
     <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-weapons.html">Weapon types</a> ·
-      <a href="gear-accessories.html">The accessory tree</a> · <a href="gear-presets.html">Presets for the sixteen</a></p>
+      <a href="gear-accessories.html">The accessory tree</a> · <a href="gear-presets.html">Presets for the forty-two</a> · <a href="gear-arsenal.html">Arsenal and the coverage bound</a></p>
   </section>
 </main>
 <script>
@@ -175,10 +175,10 @@ function draw(t) {
 }
 for (const b of document.querySelectorAll('#tp button')) b.onclick = () => draw(Number(b.dataset.t));
 draw(2);
-const H = [['Berserker · Spellfist', 'ATK', 'phys', 'The Spellfist\'s Fire Tome reads it too'], ['Archmage · Battlemage', 'M.ATK', 'magic', 'The Battlemage\'s Greatsword reads it too'],
-  ['Blademaster · Sentinel', 'ATK', 'phys', 'Her lead half'], ['Runeblade · Enchanter', 'M.ATK', 'magic', 'Her lead half'],
-  ['Warlord · Druid', 'ATK', 'phys', 'Her lead half'], ['Invoker · Shaman', 'M.ATK', 'magic', 'Her lead half'],
-  ['Guardian · Templar', 'ATK', 'phys', 'Her mends read it'], ['Bishop · Exorcist', 'M.ATK', 'magic', 'Her mends read it']];
+const H = [['Berserker · Spellfist · their Tier 3 children', 'ATK', 'phys', 'The Spellfist\'s Fire Tome reads it too'], ['Archmage · Battlemage · theirs', 'M.ATK', 'magic', 'The Battlemage\'s Katana reads it too'],
+  ['Blademaster · Sentinel · Bladedancer · theirs', 'ATK', 'phys', 'The Bladedancer\'s three Arms all read it'], ['Runeblade · Enchanter · Spellweaver · theirs', 'M.ATK', 'magic', 'The Spellweaver\'s three Tomes all read it'],
+  ['Warlord · Druid · Marshal · theirs', 'ATK', 'phys', 'The Druid\'s mend reads her higher stat'], ['Invoker · Shaman · Animist · theirs', 'M.ATK', 'magic', 'The Shaman\'s mend reads her higher stat'],
+  ['Guardian · Templar · Bastion · Inquisitor', 'ATK', 'phys', 'Their mends read it'], ['Bishop · Exorcist · Cardinal · Hierophant', 'M.ATK', 'magic', 'Their mends read it']];
 document.getElementById('ht').innerHTML = '<thead><tr><th>Class</th><th>Armor\'s offense to</th><th>Why</th></tr></thead><tbody>' +
   H.map(([c, s, k, w]) => `<tr><td><b>${c}</b></td><td><span class="chip ${k}">${s}</span></td><td class="muted">${w}</td></tr>`).join('') + '</tbody>';
 </script>

@@ -112,12 +112,13 @@
 </head>
 <body>
 <main>
-  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 2 · 2026-11-04 · nothing built</span></div>
+  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 3 · 2026-11-05 · nothing built</span></div>
   <h1>Tiers 1 → 2 → 3: how the tiers relate</h1>
   <p class="lead">One Uma lives in one tier. A full window ascends her. Each tier is its own world of the same shape,
-    restarted: Lv 1, G0, Craft 1, an empty map. From Tier 2 the Ascend is her promotion: she picks her Tier 2 class and
-    her weapons' types on the sheet. What grows is the toolbox, round 2's six system docs. Dashed marks are this doc's
-    calls (T2W); "assumed" is another doc's round-2 shape, being written in parallel.</p>
+    restarted: Lv 1, G0, Craft 1, an empty map. Each Ascend is her promotion: into Tier 2 she picks a child of her Tier 1
+    class, into Tier 3 a child of her Tier 2 class (R3-1), and her weapons' types, on the sheet. What grows is the
+    toolbox, the six system docs. Dashed marks are this doc's calls (T2W); "assumed" is another doc's shape this doc
+    reads, re-checked by the set's cross-reference.</p>
   <nav class="tabs">
     <a class="on" href="progression-tiers.html">The tiers</a>
     <a href="progression-ascend.html">The Ascend sheet</a>
@@ -128,7 +129,7 @@
   </nav>
 
   <h2>Three worlds</h2>
-  <p>Tier 1 as built (engine v21, save v36), with capitals v2 and the honeycomb assumed live (saves v37, v38).</p>
+  <p>Tier 1 as built (engine v21, save v38), capitals v2 and the honeycomb live (H162, H166).</p>
   <div class="cols3" id="worlds"></div>
 
   <h2>What each tier adds, by doc</h2>
@@ -153,9 +154,9 @@
         <li class="n">From Tier 2: her accessory forms and stat picks, as settings</li>
         <li>Her lower tiers' full windows; her history</li></ul></div>
       <div class="box"><h5>She picks, on the sheet</h5><ul>
-        <li class="n">Her Tier 2 class: the children of her Tier 1 classes at R50, 6–16 open (T2W17)</li>
-        <li class="n">Suggested: the keeper of the class she fights as (T2W18)</li>
-        <li class="n">Her three weapons and their Tier 2 types (T2W19)</li>
+        <li class="n">Her class: into Tier 2 every child of her Tier 1 classes at R50, 6–20 open (T2W33); into Tier 3 the Tier 3 children of her Tier 2 classes at R50, 3–22 (T2W38)</li>
+        <li class="n">Suggested: the child of the class she fights as, her family first (T2W36)</li>
+        <li class="n">Her three weapons and their types: her new class's preset and Suggested; into Tier 3 "As in Tier 2" a chip (T2W19, T2W39)</li>
         <li class="n">Her sub-profession, Suggested (T2W20)</li></ul></div>
       <div class="box"><h5>She restarts</h5><ul>
         <li>Lv 1 (lifetime 51 · 101), Class Rank 1 in every open class (Ranks 1–10 shared, XR1)</li>
@@ -172,7 +173,7 @@
 
   <h2>One Uma across three tiers</h2>
   <p>Uma A, a made-up Pace Uma: a Spellblade calling, the Wood line, in her world's first cohort each tier, the fighting
-    party served first; she ascends as the Arms Spellblade's keeper, then keeps it into Tier 3. Her window lights by the run model (the <a href="progression-run.html">run page</a>); she ascends
+    party served first; she ascends as the Arms Spellblade's keeper (the Blademaster), then promotes into its Tier 3 child (the Bladelord). Her window lights by the run model (the <a href="progression-run.html">run page</a>); she ascends
     the day her 36th step lights. Drag the day.</p>
   <div class="card">
     <div class="slider">
@@ -223,12 +224,12 @@ const W = [
   { t: 2, name: 'Adept', look: 'dusk', c: 'w6–w10', life: '51–100, shown T2 Lv 1–50', mult: '× 1.8', laurels: '20 a win · 1,260 a region',
     tickets: '<b>20 · 30</b> <span class="chip new">T2W10</span> <span class="muted">live 10 · 15</span>', arrive: '<b>2,000 Laurels</b>, 5 Speed Tickets, up to 2,000 Class Marks <span class="chip new">T2W10</span>',
     drills: 'T2 Lv 10–50, the same', trials: 'T2 Lv 45 · 50 · 55', rift: 'Live; one added test a front, round 2\'s tools <span class="chip new">T2W30</span>',
-    window: '36 steps: Class IV a sibling pair, Craft her three professions <span class="chip new">T2W24</span>', ascend: 'To Tier 3, the sheet pre-filled <span class="chip new">T2W31</span>' },
+    window: '36 steps: Class IV two of one Tier 1 line, Craft her three professions <span class="chip new">T2W24, T2W42</span>', ascend: 'To Tier 3: <b>her Tier 3 promotion</b> on the same sheet <span class="chip new">T2W37</span>' },
   { t: 3, name: 'Master', look: 'night', c: 'w11–w15', life: '101–150, shown T3 Lv 1–50', mult: '× 2.6', laurels: '30 a win · 1,890 a region',
     tickets: '<b>30 · 45</b> <span class="chip new">T2W10</span>', arrive: '<b>3,000 Laurels</b>, 5 Speed Tickets, Class Marks',
     drills: 'T3 Lv 10–50, the same', trials: '<b>T3 Lv 45 · 50 · 55</b>, with its Rift <span class="chip new">T2W4</span>',
     rift: '<b>New:</b> the same shape; lights her Rift step; nobody ascends <span class="chip new">T2W4</span>',
-    window: '<b>36 steps</b> (live 35) <span class="chip new">T2W4</span>', ascend: 'None while Tier 3 is the top tier <span class="chip new">T2W14</span>' },
+    window: '<b>36 steps</b> (live 35); Class III her first crown <span class="chip new">T2W4, T2W43</span>', ascend: 'None while Tier 3 is the top tier <span class="chip new">T2W14</span>' },
 ]
 $('#worlds').innerHTML = W.map((w) => `<div class="card world" style="--tc:var(--t${w.t})">
   <h4><span class="tier t${w.t}">Tier ${w.t}</span> ${w.name}</h4><div class="sub">${w.look} · continents ${w.c}</div>
@@ -254,14 +255,14 @@ const M = [
     ['Continents 6–10; leans Jungle, Sky Isles, Glacier, Volcano, Underworld <span class="chip new">T2W2</span>', 'Packs arranged anew <span class="chip new">T2W3</span>', 'Tickets and purse × tier <span class="chip new">T2W10</span>'],
     ['Continents 11–15; leans Swamp, Highlands, Geyser Basin, Storm Peaks, Ancient Ruins <span class="chip new">T2W2</span>', 'Its Rift and Trials <span class="chip new">T2W4</span>', 'Continent 15\'s own Finals <span class="chip new">T2W13</span>']],
   ['Promotion', 'T2W', ['A Tier 0 promotes at Class Rank 10 into its Tier 1 classes, in the world', 'Ascend: one Uma at a time, a full window'],
-    ['<b>The Ascend sheet:</b> her Tier 2 class from the children of her Tier 1 classes at R50 (6–16 open) <span class="chip new">T2W16–T2W18</span>', 'Her weapons\' types and her sub-profession there <span class="chip new">T2W19, T2W20</span>', 'A party by party, a check line <span class="chip new">T2W22</span>'],
-    ['The same sheet, pre-filled with her Tier 2 picks <span class="chip new">T2W31</span>']],
+    ['<b>The Ascend sheet:</b> her Tier 2 class from every child of her Tier 1 classes at R50 (6–20 open) <span class="chip new">T2W16, T2W33–T2W36</span>', 'Her weapons\' types and her sub-profession there <span class="chip new">T2W19, T2W20</span>', 'A party by party, a check line <span class="chip new">T2W22</span>'],
+    ['<b>The Tier 3 promotion</b> on the same sheet: the Tier 3 children of her Tier 2 classes at R50 (3–22 open), her new class\'s weapons and types <span class="chip new">T2W37–T2W39</span>']],
   ['Classes', 'T2C', ['Five Tier 0s promote into eight Tier 1 classes', 'Trees depths 1–5, lines A and B, Skill Ranks', 'Sixteen Limit Breaks in five halls'],
-    ['<b>Sixteen classes:</b> a keeper and an expander per Tier 1 class ' + A, 'The pures\' self-buff and cross channel; support hybrids; battle healers ' + A, 'Line C, the tip fork, skill MP ×1.7 ' + A],
-    ['The sixteen deepened: two lines held, the crown and mastery at R50 ' + A]],
+    ['<b>Twenty classes:</b> two or three children a Tier 1 class (keeper, cross or support, pure) ' + A, 'Momentum, single big hits, the pure pair, support hybrids, battle healers ' + A, 'Line C, the tip fork, skill MP ×1.7 ' + A],
+    ['<b>Twenty-two classes:</b> one child a Tier 2 class, the crosses two; a rule each from Class Rank 1 ' + A, 'The crown at R50 and two lines held on every one ' + A]],
   ['Gear', 'T2G', ['Grades G0–G10 on ten weapons, five armor, three accessory slots', 'Might 68 at G10'],
     ['<b>Weapon types</b> set on the Ascend sheet, swapped later ' + A, '<b>The accessory tree:</b> forms opening by grade, a dual form ' + A, 'Might × 1.8'],
-    ['Types\' and forms\' Tier 3 steps ' + A, 'Might × 2.6']],
+    ['Keen, Tempered, Evolved on the Tier 3 sheet; <b>Arsenal</b>\'s two two-kind weapons ' + A, 'The tree\'s third ring; Might × 2.6']],
   ['Extra Stats', 'T2E', ['The Planet, three moons, her moon: 22 nodes', 'Three jewels a rank'],
     ['Jewels unlock; <b>every open node takes a stat she picks</b> (AoE, multi-hit, a kind, MP back, life steal) ' + A, 'Nodes × 1.8'],
     ['The lists\' Tier 3 entries ' + A, 'Nodes × 2.6']],
@@ -269,14 +270,14 @@ const M = [
     ['<b>Two materials a line</b>, each its own profession; <b>three an Uma</b> with a sub-profession ' + A, 'Craft 1 again in all three'],
     ['As Tier 2 ' + A]],
   ['Balance', 'T2B', ['Foes on the build curve; weaknesses v2', 'Shields: sub-bosses 6, bosses 8'],
-    ['<b>Party value bands</b> for every class and comp ' + A, 'Three weaknesses at every rank <span class="chip live">live</span>', 'Toolbox term; bosses 9 ' + A],
-    ['Term ×1.08 → ×1.48; bosses 10 ' + A]],
+    ['<b>Party value bands</b> for every class and comp ' + A, 'Three weaknesses at every rank <span class="chip live">live</span>', 'Toolbox term; sub-bosses 7, bosses 9 ' + A],
+    ['Term ×1.10 → ×1.26; sub-bosses 7, bosses 9 ' + A]],
   ['Templates', 'T2U', ['Calling, ★ Flourish, ★ signature, ★ her moon'],
-    ['The ★ signature tip on her lead weapon\'s tree; her family on the sixteen ' + A, 'Signature and moon × 1.8 <span class="chip live">live</span>'],
+    ['The ★ signature tip on her lead weapon\'s tree; her family on the twenty ' + A, 'Signature and moon × 1.8 <span class="chip live">live</span>'],
     ['The tip at both forks ' + A, '× 2.6']],
   ['Windows', 'T2W', ['36 steps: seven tracks of five and the Rift'],
-    ['36: Class IV a sibling pair, Craft her three professions\' sum, Stars the tier\'s map <span class="chip new">T2W24–T2W26</span>', 'No new position, no rebake <span class="chip new">T2W28</span>'],
-    ['36 with its Rift <span class="chip new">T2W29</span>']],
+    ['36: Class IV two of one Tier 1 line, Craft her three professions\' sum, Stars the tier\'s map <span class="chip new">T2W24–T2W26, T2W42</span>', 'No new position, no rebake <span class="chip new">T2W28</span>'],
+    ['36 with its Rift; Class III her first crown <span class="chip new">T2W43</span>']],
 ]
 $('#matrix').innerHTML = `<tr><th></th><th><span class="tier t1">Tier 1</span> as built</th><th><span class="tier t2">Tier 2</span></th><th><span class="tier t3">Tier 3</span></th></tr>` +
   M.map(([n, d, a, b, c]) => `<tr><td>${n} <span class="chip doc">${d}</span></td>${[a, b, c].map((l) => `<td><ul>${l.map((x) => `<li>${x}</li>`).join('')}</ul></td>`).join('')}</tr>`).join('')
@@ -367,11 +368,11 @@ draw()
 // Her board per tier
 const B = [
   ['Level', 'Uma Lv 10 · 20 · 30 · 40 · 50', 'T2 Lv 10 … 50', 'T3 Lv 10 … 50'],
-  ['Class', 'A Tier 0 at R10; a Tier 1 class at R30, R50; two, three at R50', '<span class="newcell">A Tier 2 class at R10, R30, R50; <b>a class and its sibling</b> at R50; three at R50</span> <span class="chip new">T2W25</span>', 'The same on Tier 3\'s classes; R50 also her crown <span class="chip new">T2W29</span>'],
+  ['Class', 'A Tier 0 at R10; a Tier 1 class at R30, R50; two, three at R50', '<span class="newcell">A Tier 2 class at R10, R30, R50; <b>two of one Tier 1 line</b> at R50 (a class and her sibling); three at R50</span> <span class="chip new">T2W25, T2W42</span>', '<span class="newcell">The same on Tier 3\'s classes; <b>R50 her first crown</b>; IV two of one line\'s Tier 3 classes</span> <span class="chip new">T2W43</span>'],
   ['Craft', 'Craft Lv 10 … 50', '<span class="newcell"><b>Her three Craft Levels add up to</b> 12 · 24 · 36 · 48 · 60</span> <span class="chip new">T2W26</span>', 'The same'],
   ['Gear', 'All eleven worn slots at G2 … G10', 'The same; the accessory tree opens with the grades', 'The same'],
   ['Weapons', 'Five weapon kinds at G2 … G10', 'The same, any type', 'The same'],
-  ['Stars', 'Every node to I · II · III · IV, the whole map: 4 · 9 · 13 · 18 · 22', 'The tier\'s map, picks not read: 22 (27 with a weapon-moon body) <span class="chip new">T2W24</span>', 'Tier 3\'s map'],
+  ['Stars', 'Every node to I · II · III · IV, the whole map: 4 · 9 · 13 · 18 · 22', 'The tier\'s map, picks not read: 22 <span class="chip new">T2W24</span>', 'Tier 3\'s map'],
   ['World', 'Continents 1–5: a won capital run (CA12)', 'Continents 6–10', 'Continents 11–15'],
   ['Rift', 'On a won Tier 1 run', 'On a won Tier 2 run', '<span class="newcell">On a won Tier 3 run</span> <span class="chip new">T2W4</span>'],
 ]
@@ -380,8 +381,9 @@ $('#board').innerHTML = '<tr><th>Track</th><th><span class="tier t1">Tier 1</spa
 
 // Counts
 const C = [
-  ['Map nodes, the whole map', 'Extra Stats; 22 if the weapon moon becomes a pick (assumed)', [22, 22, 22], null],
-  ['Classes she can fight as, at least', 'Tier 1: five Tier 0s and her promotions; from Tier 2 two a Tier 1 class at R50, 6 to 16 (T2W17)', [6, 6, 6], null],
+  ['Map nodes, the whole map', 'Extra Stats (T2E27, T2E43)', [22, 22, 22], null],
+  ['Classes in the world', 'Tier 1: 5 Tier 0s and 8 Tier 1 classes; Tier 2 twenty; Tier 3 twenty-two (T2C65, T2C66)', [13, 20, 22], null],
+  ['Classes open to her on arrival, at least', 'Tier 1 every Tier 0; Tier 2 6 (T2W33, up to 20); Tier 3 3 (T2W38, up to 22)', [5, 6, 3], null],
   ['Window steps', 'T2W4, T2W7', [36, 36, 36], [36, 36, 35]],
   ['Build multiplier', 'SB1, live', [1, 1.8, 2.6], null],
   ['Lifetime level at the tier\'s Lv 50', 'live', [50, 100, 150], null],

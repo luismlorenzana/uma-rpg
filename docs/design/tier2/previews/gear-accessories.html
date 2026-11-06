@@ -114,13 +114,13 @@
     one rider (the Accessory Inlay's), opened by the slot's grade: two riders from a slot's first Tier 2 grade, a third at G5,
     and in Tier 3 a step on every rider and a fourth at G5. Kindred alone gives its whole row to the party. A form is a
     setting: one tap, free.</p>
-  <nav class="tabs"><a href="#trees">The trees</a><a href="#rows">Rows by grade</a><a href="#wins">What each wins</a><a href="#best">Best set per cell</a><a href="#kindred">Kindred</a><a href="#pages">Other pages</a></nav>
+  <nav class="tabs"><a href="#trees">The trees</a><a href="#rows">Rows by grade</a><a href="#wins">What each wins</a><a href="#best">Best set per cell</a><a href="#kindred">Kindred</a><a href="#new">Round 3's new profiles</a><a href="#pages">Other pages</a></nav>
 
   <div class="kpis">
     <div class="kpi"><div class="lbl">Forms a family</div><div class="val">1 · 4 · 5</div><div class="sub">Tier 1 · 2 · 3, the base included</div></div>
     <div class="kpi"><div class="lbl">Rings (a slot's grade)</div><div class="val">G1 · G5</div><div class="sub">Tier 2; Tier 3: the step from G1, a ring at G5</div></div>
     <div class="kpi"><div class="lbl">Three slots add, Lv 50</div><div class="val">18–25% · 19.5–27%</div><div class="sub">Her best set, Tier 2 · Tier 3 (Tier 1: 11–13%)</div></div>
-    <div class="kpi"><div class="lbl">Most cells one form wins</div><div class="val">8 · 9 of 32</div><div class="sub">D266's bar is half</div></div>
+    <div class="kpi"><div class="lbl">Most cells one form wins</div><div class="val">18 · 17 of 48</div><div class="sub">Great, Tier 2 · Tier 3, with round 3's profiles (round 2: 8 · 9 of 32); D266's bar is half</div></div>
   </div>
 
   <section id="trees">
@@ -148,7 +148,7 @@
     <div class="pills" id="wm" role="group" aria-label="Measure"><button data-m="d" aria-pressed="true">Her damage</button><button data-m="p">Party value</button></div>
     <div class="pills" id="wc" role="group" aria-label="Fight"><button data-c="3" aria-pressed="true">Mean</button><button data-c="0">Regular fights</button><button data-c="1">Sub-bosses</button><button data-c="2">Bosses</button></div>
     <div class="card scroll"><table class="heat" id="ht"></table>
-      <p class="legend">One hue, light to dark by gain; every cell carries its number. Each row is a Tier 1 parent's profile, standing for her keeper and her expander (the Brawler's for the Berserker and the Spellfist, the hybrids' for their keepers and, at a lower share, their supports, the healers' for both healers). Stat sets wear her armor half's family.</p></div>
+      <p class="legend">One hue, light to dark by gain; every cell carries its number. Each row is a Tier 1 parent's profile (round 2, the 40-region world), standing for the classes that keep it (the Brawler's for the Berserker and the Ravager, the hybrids' for their keepers and, at a lower share, their supports, the healers' for every healer class). Round 3's crosses and pure pairs are below. Stat sets wear her armor half's family.</p></div>
   </section>
 
   <section id="best">
@@ -167,10 +167,24 @@
     </ul></div>
   </section>
 
+  <section id="new">
+    <h2>Round 3's new profiles, measured (T2G59, T2G60)</h2>
+    <p>The single-hit crosses and the pure pairs aren't built, so each is a proxy on the live engine, her parent's seat in the
+      owner's party, on curve, three slots at G10 against the same Uma bare (48 fights, 24 sub-bosses, 24 bosses, 4 seeds).
+      The crosses: a Brawler on Greatsword, Katana, Bow on line B, and a Sorcerer on Fire, Blizzard, Light. The pure pairs: an
+      Arms Spellblade and an Arms Summoner with both halves on ATK. Arsenal is the Brawler's and the Sorcerer's profile with
+      more weak hits. Each cell: fights · sub-bosses · bosses · the mean (fights twice), % of her damage a turn.</p>
+    <div class="pills" id="np" role="group" aria-label="Tier"><button data-t="2" aria-pressed="true">Tier 2 Lv 50</button><button data-t="3" aria-pressed="false">Tier 3 Lv 50</button></div>
+    <div class="card scroll"><table id="nt"></table></div>
+    <div class="card scroll"><table id="cells"></table>
+      <p class="legend">A form counted in each best set (by her damage), round 2's 32 cells and the new 16. Kindred stays the supports' and the healers' party pick (8 and 7 party cells).</p></div>
+    <div class="callout"><b>D266 holds.</b> Great becomes the most-won form, 18 and 17 of 48 cells, because every new profile reads one stat on every hit; none wins over half, and every form is still someone's best. The forms that suit: Great on one stat; the one-foe pure pair's Orb a Twofold Orb on her lead two, the area pair's a Great Orb; Tier 3's rules multiply her hits, so they move no form's rank (Overflow gives Vow a second use).</div>
+  </section>
+
   <section id="pages">
     <h2>The other pages</h2>
-    <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-weapons.html">Weapon types</a> ·
-      <a href="gear-presets.html">Presets for the sixteen</a> · <a href="gear-costs.html">Armor and what a grade costs</a></p>
+    <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-weapons.html">Weapons for the forty-two</a> · <a href="gear-arsenal.html">Arsenal and the coverage bound</a> ·
+      <a href="gear-presets.html">Presets for the forty-two</a> · <a href="gear-costs.html">Armor and what a grade costs</a></p>
   </section>
 </main>
 <script>
@@ -179,7 +193,7 @@ const DATA = {"2":{"brawler":{"party":"P1","share":25.7,"sets":{"Great x3":{"d":
 // a rate entry: [stat, other, kind, kind2, cond (per mille or flat), condLabel]
 const F = [
   ['Pendant', 'Pendant', 'base', '', { 2: [1, 0, 0, 0, 0], 3: [1, 0, 0, 0, 0] }, '+ATK, a real stat (her mends read it)', 'Tier 1'],
-  ['Pendant', 'Great Pendant', 'g1', 'great', { 2: [1.3, 0, 0, 0, 0], 3: [1.4, 0, 0, 0, 0] }, 'More of her one stat', 'One-stat classes; an expander (both channels on one stat); the healers\' mends'],
+  ['Pendant', 'Great Pendant', 'g1', 'great', { 2: [1.3, 0, 0, 0, 0], 3: [1.4, 0, 0, 0, 0] }, 'More of her one stat', 'One-stat classes: the pures\' keepers, the crosses, the pure variants, Arsenal; the healers\' mends'],
   ['Pendant', 'Twofold Pendant', 'g1', 'wide', { 2: [1, 1, 0, 0, 0], 3: [1, 1.1, 0, 0, 0] }, 'Her other stat too', 'The hybrids; her ★ on any weapons'],
   ['Pendant', 'Kindred Pendant', 'g5', 'wide', { 2: [0, 0, 0, 0, 0.2, 'on every Uma'], 3: [0, 0, 0, 0, 0.2, 'on every Uma'] }, 'Her slot\'s +1 shared by the party: +0.2 ATK and M.ATK on every Uma\'s hits, the party\'s strongest only', 'The supporters; any healer'],
   ['Pendant', 'Vow Pendant', 't3', 'great', { 3: [1, 0, 0, 0, 1, 'on her heals'] }, '+1 ATK, and her mends, Barriers and revives read +1 more', 'The keeper healers'],
@@ -190,7 +204,7 @@ const F = [
   ['Charm', 'Vow Charm', 't3', 'great', { 3: [1, 0, 0, 0, 1, 'on her heals'] }, '+1 M.ATK, and her heals read +1 more', 'The keeper healers'],
   ['Orb', 'Orb', 'base', '', { 2: [0, 0, 2, 0, 0], 3: [0, 0, 2, 0, 0] }, '+2 on one of her kinds', 'Tier 1'],
   ['Orb', 'Great Orb', 'g1', 'great', { 2: [0, 0, 2.6, 0, 0], 3: [0, 0, 2.8, 0, 0] }, 'More on her one kind', 'A class leaning on one kind'],
-  ['Orb', 'Twofold Orb', 'g1', 'wide', { 2: [0, 0, 2, 0.8, 0], 3: [0, 0, 2, 1.0, 0] }, 'A second kind of hers', 'Two-kind spreads; an expander\'s two channels'],
+  ['Orb', 'Twofold Orb', 'g1', 'wide', { 2: [0, 0, 2, 0.8, 0], 3: [0, 0, 2, 1.0, 0] }, 'A second kind of hers', 'Two-kind spreads; the one-foe pure pair\'s lead two'],
   ['Orb', 'Seeker Orb', 'g5', 'wide', { 2: [0, 0, 2, 0, 0.4, 'on weak hits'], 3: [0, 0, 2, 0, 0.6, 'on weak hits'] }, 'Any hit of hers that lands weak', 'High-weak kits; the battle healers'],
   ['Orb', 'Limit Orb', 't3', 'great', { 3: [0, 0, 2, 0, 1.3, 'on Limit Breaks'] }, 'Her Limit Breaks\' hits', 'Hall-heavy boss fights; the healers'],
   ['Insignia', 'Insignia', 'base', '', { 2: [0, 0, 0, 0, 0, '', 1], 3: [0, 0, 0, 0, 0, '', 1] }, '+1% on sub-bosses and bosses', 'Tier 1'],
@@ -275,6 +289,37 @@ function drawWins() {
 }
 for (const [id, key] of [['wt', 't'], ['wm', 'm'], ['wc', 'c']]) for (const b of document.querySelectorAll(`#${id} button`)) b.onclick = () => { const v = b.dataset[key]; if (key === 't') wt = Number(v); else if (key === 'm') wm = v; else wc = Number(v); drawWins(); };
 drawWins();
+</script>
+<script>
+(function () {
+  const NEW = {
+    2: [
+      ['Single-hit cross, ATK (Spellfist)', [['Great ×3', '21.0 · 22.0 · 21.8 · 21.4', 1], ['Great ×2 + Great Orb (preset)', '17.5 · 19.4 · 17.9 · 18.1'], ['Great ×2 + Great Insignia', '13.6 · 23.8 · 19.7 · 17.7', 1], ['Great ×2 + Seeker ≈', '17.6 · 19.8 · 18.0 · 18.3'], ['Twofold Orb ×3', '9.6 · 10.8 · 9.9 · 10.0']]],
+      ['Single-hit cross, M.ATK (Battlemage)', [['Great ×2 + Great Orb (preset)', '22.9 · 24.7 · 22.1 · 23.2', 1], ['Twofold Orb ×3', '23.5 · 21.9 · 21.0 · 22.5', 1], ['Seeker ×3 ≈', '23.0 · 23.3 · 22.2 · 22.9', 1], ['Great Orb ×2 + Great Insignia', '16.5 · 26.8 · 21.2 · 20.3', 1], ['Great ×3', '21.8 · 24.1 · 18.6 · 21.6']]],
+      ['Pure pair, one foe (Bladedancer)', [['Great ×3', '20.1 · 22.7 · 20.9 · 20.9', 1], ['Great ×2 + Twofold Orb (preset)', '17.1 · 19.2 · 18.6 · 18.0'], ['Great ×2 + Great Orb', '15.7 · 18.3 · 18.0 · 16.9'], ['Great ×2 + Great Insignia', '13.2 · 22.0 · 19.6 · 17.0'], ['Seeker ×3 ≈', '8.8 · 11.2 · 12.5 · 10.3']]],
+      ['Pure pair, area (Marshal)', [['Great ×3', '22.1 · 22.1 · 23.1 · 22.3', 1], ['Great ×2 + Great Orb (preset)', '22.0 · 21.6 · 23.1 · 22.2', 1], ['Great Orb ×2 + Great Insignia', '14.7 · 22.4 · 21.6 · 18.4', 1], ['Great ×2 + Twofold Orb', '20.8 · 20.7 · 21.7 · 21.0'], ['Seeker ×3 ≈', '19.6 · 18.9 · 21.2 · 19.8']]],
+      ['Arsenal (the Brawler\'s profile)', [['Great ×3', '20.0 · 22.4 · 22.2 · 21.1', 1], ['Great Insignia ×3', '0 · 26.0 · 15.1 · 10.3', 1], ['Great ×2 + Great Orb (preset)', '16.6 · 18.8 · 17.7 · 17.4'], ['Great ×2 + Seeker ≈', '16.7 · 19.1 · 19.1 · 17.9'], ['Seeker ×3 ≈', '11.3 · 11.8 · 11.4 · 11.5']]],
+    ],
+    3: [
+      ['Single-hit cross, ATK (Spellhammer)', [['Great ×3', '21.9 · 24.7 · 21.2 · 22.4', 1], ['Great ×2 + Great Orb (preset)', '19.1 · 18.3 · 17.9 · 18.6'], ['Great ×2 + Seeker ≈', '19.7 · 19.2 · 18.7 · 19.3'], ['Great ×2 + Apex', '13.8 · 20.7 · 20.8 · 17.3'], ['Twofold Orb ×3', '11.3 · 9.6 · 11.5 · 10.9']]],
+      ['Single-hit cross, M.ATK (Spellknight)', [['Seeker ×3 ≈', '23.5 · 26.1 · 25.9 · 24.7', 1], ['Great ×2 + Great Orb (preset)', '22.5 · 27.1 · 23.7 · 24.0'], ['Great Orb ×2 + Great Insignia', '15.9 · 28.8 · 23.9 · 21.1', 1], ['Great ×3', '21.9 · 27.7 · 20.8 · 23.1'], ['Twofold Orb ×3', '21.5 · 23.1 · 23.0 · 22.3']]],
+      ['Pure pair, one foe (Dervish)', [['Great ×3', '19.7 · 23.8 · 20.3 · 20.9', 1], ['Great ×2 + Twofold Orb (preset)', '15.9 · 21.7 · 18.0 · 17.9'], ['Great ×2 + Great Insignia', '11.1 · 25.3 · 19.5 · 16.8', 1], ['Great ×2 + Apex', '11.1 · 22.0 · 21.0 · 16.3', 1], ['Seeker ×3 ≈', '10.6 · 14.6 · 12.4 · 12.0']]],
+      ['Pure pair, area (Imperator)', [['Great ×3', '23.3 · 24.6 · 20.2 · 22.9', 1], ['Great ×2 + Great Orb (preset)', '23.1 · 25.0 · 19.5 · 22.7'], ['Great Orb ×2 + Great Insignia', '14.5 · 25.6 · 17.5 · 18.0', 1], ['Great ×2 + Apex', '14.6 · 22.6 · 20.8 · 18.1', 1], ['Seeker ×3 ≈', '19.2 · 23.0 · 17.0 · 19.6']]],
+      ['Arsenal (Gladiator; the Brawler\'s profile)', [['Great ×3', '18.7 · 24.4 · 22.2 · 21.0', 1], ['Great ×2 + Great Insignia', '13.4 · 26.9 · 20.8 · 18.6', 1], ['Great ×2 + Apex', '13.4 · 23.6 · 22.4 · 18.2', 1], ['Great ×2 + Great Orb (preset)', '15.3 · 20.0 · 18.9 · 17.4'], ['Seeker ×3 ≈', '9.4 · 11.1 · 12.3 · 10.6']]],
+    ],
+  };
+  const CELLS = { 2: [['Great', 6, 12], ['Seeker ≈', 8, 1], ['Great Orb', 5, 4], ['Great Insignia', 4, 3], ['Twofold Orb', 4, 1], ['Twofold', 5, 0], ['Finisher ≈', 5, 0], ['Onset ≈', 3, 0]],
+    3: [['Great', 6, 11], ['Seeker ≈', 8, 3], ['Great Insignia', 3, 3], ['Great Orb', 4, 2], ['Apex', 3, 2], ['Finisher ≈', 5, 0], ['Twofold Orb', 4, 0], ['Twofold', 3, 0], ['Limit Orb ≈', 3, 0], ['Onset ≈', 2, 0]] };
+  function draw(t) {
+    for (const b of document.querySelectorAll('#np button')) b.setAttribute('aria-pressed', String(Number(b.dataset.t) === t));
+    document.getElementById('nt').innerHTML = '<thead><tr><th>Profile</th><th>Set</th><th class="n">Fights · sub · boss · mean</th></tr></thead><tbody>' +
+      NEW[t].map(([p, rows]) => rows.map(([n, v, best], i) => `<tr><td>${i ? '' : `<b>${p}</b>`}</td><td>${best ? `<b>${n}</b>` : n}</td><td class="n">${v}</td></tr>`).join('')).join('') + '</tbody>';
+    document.getElementById('cells').innerHTML = '<thead><tr><th>Form</th><th class="n">Round 2\'s 32 cells</th><th class="n">The new 16</th><th class="n">All 48</th></tr></thead><tbody>' +
+      CELLS[t].map(([f, a, b]) => `<tr><td>${f}</td><td class="n">${a}</td><td class="n">${b}</td><td class="n"><b>${a + b}</b>${f === 'Great' ? ` (${Math.round((a + b) / 48 * 1000) / 10}%)` : ''}</td></tr>`).join('') + '</tbody>';
+  }
+  for (const b of document.querySelectorAll('#np button')) b.onclick = () => draw(Number(b.dataset.t));
+  draw(2);
+})();
 </script>
 </body>
 </html>

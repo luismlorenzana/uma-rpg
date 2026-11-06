@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gear Presets</title>
-<!-- gear.md: presets for the sixteen Tier 2 classes. Self-contained; kit tokens from tier-rework/previews/_template.html. -->
+<!-- gear.md: presets for the forty-two Tier 2 and Tier 3 classes. Self-contained; kit tokens from tier-rework/previews/_template.html. -->
 <style>
   :root {
     --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
@@ -103,24 +103,27 @@
 </head>
 <body>
 <main class="wide">
-  <h1>Presets for the sixteen classes</h1>
-  <p>From <a href="../gear.md">gear.md</a> (T2G26, T2G36). D266's rule extended: her armor half's stat twice and an Orb, each
-    slot in its best open form for her role; her weapons on their Suggested types; her ★ family first. A preset spends nothing
-    and moves no grade. The classes and their weapons are classes.md's (T2C54); gear sets the types and the slots.</p>
-  <nav class="tabs"><a href="#table">The sixteen</a><a href="#star">Her ★</a><a href="#measured">Measured</a><a href="#pages">Other pages</a></nav>
+  <h1>Presets for the forty-two classes</h1>
+  <p>From <a href="../gear.md">gear.md</a> (T2G51, T2G56, T2G58, T2G59). D266's rule extended: her armor half's stat twice and an
+    Orb, each slot in its best open form for her role; her weapons on their Suggested types; her ★ family first. A preset
+    spends nothing and moves no grade. The classes and their weapons are classes.md's (T2C77); gear sets the types and the
+    slots. A Tier 3 class wears her parent's, the Gladiator and the Thaumaturge their own (Arsenal).</p>
+  <nav class="tabs"><a href="#table">The presets</a><a href="#star">Her ★</a><a href="#measured">Measured</a><a href="#pages">Other pages</a></nav>
 
   <section id="table">
     <h2>Weapons, types and three slots</h2>
-    <div class="pills" id="fp" role="group" aria-label="Filter"><button data-f="all" aria-pressed="true">All sixteen</button><button data-f="K">Keepers</button><button data-f="X">Expanders</button></div>
+    <div class="pills" id="tp" role="group" aria-label="Tier"><button data-t="2" aria-pressed="true">Tier 2 · the twenty</button><button data-t="3" aria-pressed="false">Tier 3 · the twenty-two</button></div>
+    <div class="pills" id="fp" role="group" aria-label="Filter"><button data-f="all" aria-pressed="true">All</button><button data-f="Keeper">Keepers</button><button data-f="Cross">Crosses</button><button data-f="Support">Supports</button><button data-f="Pure">Pure</button><button data-f="Healer">Healers</button></div>
     <div class="card scroll"><table id="pt"></table>
-      <p class="legend">Highlighted slots change from the keeper's. Great Orb on <code>presetKind</code>'s kind: her first weapon's, a Summoner's lead that twins her lone weapon. Below Tier 2's G5 a supporter wears her keeper's set; Vow opens at Tier 3's G5.</p></div>
+      <p class="legend">Highlighted slots change at the ring that opens them. The Orb on <code>presetKind</code>'s kind: her first weapon's, a Summoner's lead that twins her lone weapon; the one-foe pure pair's a Twofold Orb on her lead two (T2G59). Below a slot's G5 a support wears her keeper's set; Vow opens at Tier 3's G5.</p></div>
   </section>
 
   <section id="star">
     <h2>Her ★ family first</h2>
     <div class="card">
       <p>From her first Tier 2 grade a Twofold form of her ★ family gives both stats, so the preset puts her ★ first for every
-        class (D266's "unless her weapons can't use it" ends in Tier 2). Pick a ★ family:</p>
+        class (T2G35). On a one-stat class the Twofold's other stat is unread, but its base and her ★ still beat a Great: a
+        Spellfist whose ★ is the Charm takes +18 ATK and her ★ +9 for a Great Pendant's +23. Pick a ★ family:</p>
       <div class="pills" id="sp" role="group" aria-label="★ family"><button data-s="pendant" aria-pressed="true">★ Pendant</button><button data-s="bell">★ Charm</button><button data-s="orb">★ Orb</button><button data-s="insignia">★ Insignia</button></div>
       <div class="scroll"><table id="st"></table></div>
     </div>
@@ -129,59 +132,90 @@
   <section id="measured">
     <h2>Measured: the preset against her best set (Lv 50, her damage a turn)</h2>
     <div class="card scroll"><table id="mt"></table>
-      <p class="legend">Each row is a Tier 1 parent on curve in the owner's parties, standing for her keeper and her expander (a pure expander's one stat behaves as the pure's). Party value for the supporters' Kindred preset at three quarters of her keeper's damage: +0.2 to +0.6 points over the keeper's set.</p></div>
+      <p class="legend">Round 2's rows are a Tier 1 parent on curve in the owner's parties (the 40-region world), standing for the classes that keep her profile. Round 3's rows are proxies on the live engine (gear §4.8): the single-hit crosses a Brawler on Greatsword, Katana, Bow on line B and a Sorcerer on Fire, Blizzard, Light; the pure pairs an Arms Spellblade and an Arms Summoner with both halves on ATK. Kindred for the supports: +0.2 to +0.6 points of party damage over the keeper's set.</p></div>
   </section>
 
   <section id="pages">
     <h2>The other pages</h2>
-    <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-weapons.html">Weapon types</a> ·
+    <p><a href="gear-tiers.html">Gear by tier</a> · <a href="gear-weapons.html">Weapons for the forty-two</a> · <a href="gear-arsenal.html">Arsenal and the coverage bound</a> ·
       <a href="gear-accessories.html">The accessory tree</a> · <a href="gear-costs.html">Armor and what a grade costs</a></p>
   </section>
 </main>
 <script>
 const K = { greatsword: ['Greatsword', 1], axe: ['Axe', 1], lance: ['Lance', 1], bow: ['Bow', 1], katana: ['Katana', 1], fire: ['Fire', 0], ice: ['Blizzard', 0], lightning: ['Thunder', 0], light: ['Light', 0], dark: ['Dark', 0] };
 const P2 = { greatsword: 'bow', axe: 'bow', lance: 'katana', fire: 'dark', ice: 'light', lightning: 'light', bow: 'greatsword', katana: 'axe', light: 'ice', dark: 'fire' };
+const P3 = { greatsword: 'katana', axe: 'katana', lance: 'bow', fire: 'light', ice: 'dark', lightning: 'dark', bow: 'lance', katana: 'lance', light: 'lightning', dark: 'lightning' };
 const kc = (k) => `<span class="k ${K[k][1] ? 'arm' : 'tome'}" style="--kc:var(--k-${k})">${K[k][0]}</span>`;
-// [class, K|X, weapons, dual slot, stat family ('P' | 'C'), two-stat?, role]
-const R = [
-  ['Berserker', 'K', ['greatsword', 'axe', 'lance'], 0, 'P', 0, ''], ['Spellfist', 'X', ['greatsword', 'axe', 'fire'], 0, 'P', 0, 'Fire Tome on ATK'],
-  ['Archmage', 'K', ['fire', 'ice', 'lightning'], 0, 'C', 0, ''], ['Battlemage', 'X', ['fire', 'lightning', 'greatsword'], 0, 'C', 0, 'Greatsword on M.ATK'],
-  ['Blademaster', 'K', ['katana', 'axe', 'lightning'], 2, 'P', 1, ''], ['Sentinel', 'X', ['katana', 'greatsword', 'light'], 0, 'P', 1, 'sup'],
-  ['Runeblade', 'K', ['lightning', 'ice', 'katana'], 0, 'C', 1, ''], ['Enchanter', 'X', ['light', 'ice', 'katana'], 2, 'C', 1, 'sup'],
-  ['Warlord', 'K', ['bow', 'axe', 'dark'], 0, 'P', 1, ''], ['Druid', 'X', ['bow', 'greatsword', 'dark'], 2, 'P', 1, 'sup'],
-  ['Invoker', 'K', ['dark', 'ice', 'bow'], 0, 'C', 1, ''], ['Shaman', 'X', ['dark', 'ice', 'bow'], 0, 'C', 1, 'sup'],
-  ['Guardian', 'K', ['lance', 'greatsword', 'light'], 0, 'P', 0, 'vow'], ['Templar', 'X', ['lance', 'greatsword', 'light'], 0, 'P', 0, 'battle healer'],
-  ['Bishop', 'K', ['light', 'fire', 'lance'], 2, 'C', 0, 'vow'], ['Exorcist', 'X', ['light', 'fire', 'lance'], 2, 'C', 0, 'battle healer'],
+// [class, line, weapons, picks ([slot, table]), family P|C, form: 'great' | 'twofold', orb: 'great' | 'twofold', role: '' | 'sup' | 'vow', note]
+const T2 = [
+  ['Berserker', 'Keeper', ['greatsword', 'axe', 'lance'], [[0, 2]], 'P', 'great', 'great', '', ''],
+  ['Spellfist', 'Cross', ['greatsword', 'katana', 'fire'], [[1, 2]], 'P', 'great', 'great', '', 'Fire Tome on ATK'],
+  ['Archmage', 'Keeper', ['fire', 'ice', 'lightning'], [[0, 2]], 'C', 'great', 'great', '', ''],
+  ['Battlemage', 'Cross', ['fire', 'ice', 'katana'], [[0, 2]], 'C', 'great', 'great', '', 'Katana on M.ATK'],
+  ['Blademaster', 'Keeper', ['katana', 'axe', 'lightning'], [[2, 2]], 'P', 'twofold', 'great', '', ''],
+  ['Sentinel', 'Support', ['katana', 'greatsword', 'light'], [[0, 2]], 'P', 'twofold', 'great', 'sup', ''],
+  ['Bladedancer', 'Pure', ['katana', 'axe', 'bow'], [], 'P', 'great', 'twofold', '', 'the pure pair, one foe'],
+  ['Runeblade', 'Keeper', ['lightning', 'ice', 'katana'], [[0, 2]], 'C', 'twofold', 'great', '', ''],
+  ['Enchanter', 'Support', ['light', 'ice', 'katana'], [], 'C', 'twofold', 'great', 'sup', ''],
+  ['Spellweaver', 'Pure', ['lightning', 'ice', 'dark'], [[0, 2]], 'C', 'great', 'twofold', '', 'the pure pair, one foe'],
+  ['Warlord', 'Keeper', ['bow', 'axe', 'dark'], [[0, 2]], 'P', 'twofold', 'great', '', ''],
+  ['Druid', 'Support', ['bow', 'axe', 'dark'], [[0, 2]], 'P', 'twofold', 'great', 'sup', ''],
+  ['Marshal', 'Pure', ['bow', 'axe', 'katana'], [], 'P', 'great', 'great', '', 'the pure pair, area'],
+  ['Invoker', 'Keeper', ['dark', 'ice', 'bow'], [[0, 2]], 'C', 'twofold', 'great', '', ''],
+  ['Shaman', 'Support', ['dark', 'ice', 'bow'], [[0, 2]], 'C', 'twofold', 'great', 'sup', ''],
+  ['Animist', 'Pure', ['dark', 'ice', 'lightning'], [[1, 2]], 'C', 'great', 'great', '', 'the pure pair, area'],
+  ['Guardian', 'Healer', ['lance', 'greatsword', 'light'], [[0, 2]], 'P', 'great', 'great', 'vow', 'keeper healer'],
+  ['Templar', 'Healer', ['lance', 'greatsword', 'light'], [[0, 2]], 'P', 'great', 'great', '', 'battle healer'],
+  ['Bishop', 'Healer', ['light', 'fire', 'lance'], [[2, 2]], 'C', 'great', 'great', 'vow', 'keeper healer'],
+  ['Exorcist', 'Healer', ['light', 'fire', 'lance'], [[2, 2]], 'C', 'great', 'great', '', 'battle healer'],
 ];
-const ORB = { brawler: 'greatsword' };
+// Tier 3: [class, parent index in T2, weapons override or null, picks]
+const T3 = [
+  ['Ravager', 0, null, [[0, 3]]], ['Spellhammer', 1, null, [[1, 3]]], ['Gladiator', 1, ['greatsword', 'axe', 'lance'], [[0, 3], [1, 2]]],
+  ['Astromancer', 2, null, [[0, 2]]], ['Spellknight', 3, null, [[0, 2]]], ['Thaumaturge', 3, ['fire', 'ice', 'lightning'], [[0, 3], [1, 3]]],
+  ['Bladelord', 4, null, [[2, 2]]], ['Herald', 5, null, [[1, 2]]], ['Dervish', 6, null, []],
+  ['Runelord', 7, null, [[0, 2]]], ['Oracle', 8, null, [[0, 3]]], ['Starweaver', 9, null, []],
+  ['Overlord', 10, null, [[0, 2]]], ['Archdruid', 11, null, [[0, 2]]], ['Imperator', 12, null, []],
+  ['Hierarch', 13, null, [[0, 2]]], ['Soulcaller', 14, null, [[0, 2]]], ['Mythlord', 15, null, []],
+  ['Bastion', 16, null, [[2, 3]]], ['Inquisitor', 17, null, [[2, 3]]], ['Cardinal', 18, null, [[2, 3]]], ['Hierophant', 19, null, [[2, 3]]],
+];
 const fam = (f) => (f === 'P' ? 'Pendant' : 'Charm');
 const sl = (t, n) => `<span class="sl${n ? ' new' : ''}">${t}</span>`;
 function sets(r) {
-  const [, , w, , f, two, role] = r;
-  const orb = `Great Orb · ${K[w[0]][0]}`;
-  const a = two ? [`Twofold ${fam(f)}`, `Twofold ${fam(f)}`, orb] : [`Great ${fam(f)}`, `Great ${fam(f)}`, orb];
+  const [, , w, , f, form, orbForm, role] = r;
+  const orb = orbForm === 'twofold' ? `Twofold Orb · ${K[w[0]][0]} + ${K[w[1]][0]}` : `Great Orb · ${K[w[0]][0]}`;
+  const st = form === 'twofold' ? `Twofold ${fam(f)}` : `Great ${fam(f)}`;
+  const a = [st, st, orb];
   const b = role === 'sup' ? [`Kindred ${fam(f)}`, `Twofold ${fam(f)}`, orb] : a;
   const c = role === 'vow' ? [`Vow ${fam(f)}`, `Great ${fam(f)}`, orb] : b;
   return [a, b, c];
 }
-let filt = 'all';
+const wcell = (w, picks, tier) => picks.length ? w.map((k, i) => { const p = picks.find((x) => x[0] === i); if (!p) return `${tier === 2 ? 'Pure' : 'Keen'} ${kc(k)}`; const nm = tier === 2 ? 'Dual' : p[1] === 2 ? 'Tempered' : 'Evolved'; return `<b>${nm}</b> ${kc(k)} + ${kc((p[1] === 2 ? P2 : P3)[k])}` }).join(' · ') : `<b>${tier === 2 ? 'Pure' : 'Keen'} ×3</b> ${w.map(kc).join(' ')}`;
+let filt = 'all', tier = 2;
+function rows() {
+  if (tier === 2) return T2.map((r) => ({ name: r[0], line: r[1], w: r[2], picks: r[3], r, from: '' }));
+  return T3.map(([n, pi, w, picks]) => { const p = T2[pi]; const ww = w || p[2]; return { name: n, line: n === 'Gladiator' || n === 'Thaumaturge' ? 'Pure' : p[1], w: ww, picks, r: [n, p[1], ww, picks, p[4], p[5], p[6], p[7], p[8]], from: p[0] } });
+}
 function draw() {
   for (const b of document.querySelectorAll('#fp button')) b.setAttribute('aria-pressed', String(b.dataset.f === filt));
-  document.getElementById('pt').innerHTML = '<thead><tr><th>Class</th><th>Weapons, Tier 2 Suggested types</th><th>Tier 2, a slot G1–G4</th><th>Tier 2, G5 on</th><th>Tier 3, G5 on</th></tr></thead><tbody>' +
-    R.filter((r) => filt === 'all' || r[1] === filt).map((r) => {
-      const [n, , w, d, , , role] = r;
-      const [a, b, c] = sets(r);
-      const ws = w.map((k, i) => (i === d ? `<b>Dual</b> ${kc(k)} + ${kc(P2[k])}` : `Pure ${kc(k)}`)).join(' · ');
-      return `<tr><td><b>${n}</b>${role && role !== 'sup' && role !== 'vow' ? `<br><span class="muted">${role}</span>` : role === 'sup' ? '<br><span class="muted">support</span>' : role === 'vow' ? '<br><span class="muted">keeper healer</span>' : ''}</td><td>${ws}</td>` +
-        `<td><div class="slots">${a.map((x) => sl(x)).join('')}</div></td><td><div class="slots">${b.map((x, i) => sl(x, x !== a[i])).join('')}</div></td><td><div class="slots">${c.map((x, i) => sl(x, x !== b[i])).join('')}</div></td></tr>`;
+  for (const b of document.querySelectorAll('#tp button')) b.setAttribute('aria-pressed', String(Number(b.dataset.t) === tier));
+  const head = tier === 2 ? '<th>Tier 2, a slot G1–G4</th><th>Tier 2, G5 on</th>' : '<th>Tier 3, a slot G1–G4</th><th>Tier 3, G5 on</th>';
+  document.getElementById('pt').innerHTML = `<thead><tr><th>Class</th><th>Weapons, Tier ${tier} Suggested types</th>${head}</tr></thead><tbody>` +
+    rows().filter((x) => filt === 'all' || x.line === filt).map((x) => {
+      const [a, b, c] = sets(x.r);
+      const late = tier === 2 ? b : c;
+      const note = x.r[8] ? `<br><span class="muted">${x.r[8]}</span>` : ''
+      return `<tr><td><b>${x.name}</b>${x.from ? `<br><span class="muted">from the ${x.from}</span>` : note}${x.name === 'Gladiator' || x.name === 'Thaumaturge' ? ' <span class="chip acc">Arsenal</span>' : ''}</td><td>${wcell(x.w, x.picks, tier)}</td>` +
+        `<td><div class="slots">${a.map((s) => sl(s)).join('')}</div></td><td><div class="slots">${late.map((s, i) => sl(s, s !== a[i])).join('')}</div></td></tr>`;
     }).join('') + '</tbody>';
 }
 for (const b of document.querySelectorAll('#fp button')) b.onclick = () => { filt = b.dataset.f; draw(); };
+for (const b of document.querySelectorAll('#tp button')) b.onclick = () => { tier = Number(b.dataset.t); draw(); };
 draw();
 let star = 'pendant';
 function drawStar() {
   for (const b of document.querySelectorAll('#sp button')) b.setAttribute('aria-pressed', String(b.dataset.s === star));
-  const ex = [R[0], R[2], R[4], R[14]];
+  const ex = [T2[0], T2[1], T2[2], T2[4], T2[6], T2[18]];
   document.getElementById('st').innerHTML = '<thead><tr><th>Class</th><th>Tier 2 preset, a slot G1–G4, ★ first</th></tr></thead><tbody>' + ex.map((r) => {
     const a = sets(r)[0].slice();
     const own = r[4] === 'P' ? 'pendant' : 'bell';
@@ -195,17 +229,22 @@ function drawStar() {
 for (const b of document.querySelectorAll('#sp button')) b.onclick = () => { star = b.dataset.s; drawStar(); };
 drawStar();
 const M = [
-  ['Berserker · Spellfist (the Brawler)', 'Great ×2 + Great Orb', 15.2, 'Great ×3', 19.0, 17.2, 19.5],
-  ['Archmage · Battlemage (the Sorcerer)', 'Great ×2 + Great Orb', 19.1, 'Great ×3', 20.5, 20.1, 22.0],
-  ['Blademaster · Sentinel (the Arms Spellblade)', 'Twofold ×2 + Great Orb', 18.6, 'Twofold ×3', 19.1, 18.4, 19.6],
-  ['Runeblade · Enchanter (the Tome Spellblade)', 'Twofold ×2 + Great Orb', 17.8, 'Twofold + Great Orb ×2', 18.4, 18.1, 19.6],
-  ['Warlord · Druid (the Arms Summoner)', 'Twofold ×2 + Great Orb', 17.5, 'Twofold Orb ×3', 20.1, 20.3, 23.3],
-  ['Invoker · Shaman (the Tome Summoner)', 'Twofold ×2 + Great Orb', 20.8, 'Twofold Orb ×3', 24.7, 19.2, 22.0],
-  ['Guardian · Templar (the Paladin)', 'Great ×2 + Great Orb', 22.2, 'Seeker ×3 (≈)', 25.2, 24.4, 27.0],
-  ['Bishop · Exorcist (the Cleric)', 'Great ×2 + Great Orb', 18.5, 'Seeker ×3 (≈)', 20.6, 20.2, 23.6],
+  ['Berserker · Ravager (the Brawler)', 'R2', 'Great ×2 + Great Orb', 15.2, 'Great ×3', 19.0, 17.2, 19.5],
+  ['Archmage · Astromancer (the Sorcerer)', 'R2', 'Great ×2 + Great Orb', 19.1, 'Great ×3', 20.5, 20.1, 22.0],
+  ['Blademaster, Sentinel and theirs (the Arms Spellblade)', 'R2', 'Twofold ×2 + Great Orb', 18.6, 'Twofold ×3', 19.1, 18.4, 19.6],
+  ['Runeblade, Enchanter and theirs (the Tome Spellblade)', 'R2', 'Twofold ×2 + Great Orb', 17.8, 'Twofold + Great Orb ×2', 18.4, 18.1, 19.6],
+  ['Warlord, Druid and theirs (the Arms Summoner)', 'R2', 'Twofold ×2 + Great Orb', 17.5, 'Twofold Orb ×3', 20.1, 20.3, 23.3],
+  ['Invoker, Shaman and theirs (the Tome Summoner)', 'R2', 'Twofold ×2 + Great Orb', 20.8, 'Twofold Orb ×3', 24.7, 19.2, 22.0],
+  ['Guardian, Templar and theirs (the Paladin)', 'R2', 'Great ×2 + Great Orb', 22.2, 'Seeker ×3 (≈)', 25.2, 24.4, 27.0],
+  ['Bishop, Exorcist and theirs (the Cleric)', 'R2', 'Great ×2 + Great Orb', 18.5, 'Seeker ×3 (≈)', 20.6, 20.2, 23.6],
+  ['Spellfist · Spellhammer (single-hit cross, ATK)', 'R3', 'Great ×2 + Great Orb', 18.1, 'Great ×3', 21.4, 18.6, 22.4],
+  ['Battlemage · Spellknight (single-hit cross, M.ATK)', 'R3', 'Great ×2 + Great Orb', 23.2, 'Great ×2 + Great Orb', 23.2, 24.0, 24.7],
+  ['Bladedancer, Spellweaver and theirs (pure pair, one foe)', 'R3', 'Great ×2 + Twofold Orb', 18.0, 'Great ×3', 20.9, 17.9, 20.9],
+  ['Marshal, Animist and theirs (pure pair, area)', 'R3', 'Great ×2 + Great Orb', 22.2, 'Great ×3', 22.3, 22.7, 22.9],
+  ['Gladiator · Thaumaturge (Arsenal: the Brawler\'s and Sorcerer\'s profile)', 'R3', 'Great ×2 + Great Orb', null, 'Great ×3', null, 17.4, 21.0],
 ];
-document.getElementById('mt').innerHTML = '<thead><tr><th>Class</th><th>Preset</th><th class="n"><span class="tier t2">T2</span> preset</th><th>T2 best set (mean)</th><th class="n">T2 best</th><th class="n"><span class="tier t3">T3</span> preset</th><th class="n">T3 best</th></tr></thead><tbody>' +
-  M.map(([c, p, a, b, bv, t3, t3b]) => `<tr><td><b>${c}</b></td><td>${p}</td><td class="n">${a.toFixed(1)}%</td><td>${b}</td><td class="n">${bv.toFixed(1)}%</td><td class="n">${t3.toFixed(1)}%</td><td class="n">${t3b.toFixed(1)}%</td></tr>`).join('') + '</tbody>';
+document.getElementById('mt').innerHTML = '<thead><tr><th>Class (her profile)</th><th>Round</th><th>Preset</th><th class="n"><span class="tier t2">T2</span> preset</th><th>T2 best set (mean)</th><th class="n">T2 best</th><th class="n"><span class="tier t3">T3</span> preset</th><th class="n">T3 best</th></tr></thead><tbody>' +
+  M.map(([c, r, p, a, b, bv, t3, t3b]) => `<tr><td><b>${c}</b></td><td class="muted">${r === 'R2' ? 'Round 2' : 'Round 3, proxy'}</td><td>${p}</td><td class="n">${a === null ? '—' : a.toFixed(1) + '%'}</td><td>${b}</td><td class="n">${bv === null ? '—' : bv.toFixed(1) + '%'}</td><td class="n">${t3.toFixed(1)}%</td><td class="n">${t3b.toFixed(1)}%</td></tr>`).join('') + '</tbody>';
 </script>
 </body>
 </html>

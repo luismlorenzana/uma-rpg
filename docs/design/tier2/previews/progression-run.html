@@ -78,7 +78,7 @@
 </head>
 <body>
 <main>
-  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 2 · 2026-11-04 · nothing built</span></div>
+  <div class="row"><span class="chip doc">T2W · progression.md</span><span class="chip">Round 3 · 2026-11-05 · nothing built</span></div>
   <h1>A Tier 2 run, end to end</h1>
   <p class="lead">A first cohort of twenty ascends into an empty Tier 2 world, each Uma's Tier 2 class, weapon types and
     sub-profession set on the Ascend sheet (all keepers by default). The fighting party is at Lv 50 in days; its windows
@@ -217,10 +217,10 @@ function gantt() {
     [5, 0, 'her class, picked', 'Her Tier 2 class, picked on the Ascend sheet from the children of her Tier 1 classes at R50 (T2W16–T2W18); her open set, switching free'],
     [5, 1.6, '', 'Class Rank 20 (depth 3) at Lv 16 (XR1); Ranks 1–10 rose on every open class together'],
     [5, 1.9, '', 'Class Rank 40 (depth 5) at Lv 29: the tip fork, Power or Break'],
-    [5, 5, 'R50', 'Class Rank 50 on her first class at Lv 36; then her sibling (Class IV)'],
+    [5, 5, 'R50', 'Class Rank 50 on her first class at Lv 36; then a second of her line (Class IV)'],
     [6, 0, 'types', 'Her weapons\' Tier 2 types, set on the Ascend sheet (T2W19); swapped on her Gear tab later'],
-    [6, G(2), 'forms', 'The accessory tree\'s first form, as a slot\'s grade rises (assumed)'],
-    [6, G(10), 'tree done', 'Every accessory tree open at G10 (assumed)'],
+    [6, G(2), 'forms', 'The accessory tree\'s first ring, with a slot\'s first grade'],
+    [6, G(5), 'tree done', 'Every accessory tree whole at a slot\'s G5 (T2G30)'],
     [7, G(2) + 0.5, 'picks', 'A stat pick on each node as its jewel opens it (R2-8)'],
     [7, G(10) + 0.5, 'map', 'The whole map open: every node with its pick'],
     [8, 0, 'three', 'Her line\'s two professions and her sub-profession, from arrival (T2W20)'],
@@ -260,7 +260,7 @@ function steps() {
 
 function tools() {
   const rows = [
-    ['Her Tier 2 class, her open set (6–16), switching', 'T2C', 'The Ascend sheet (T2W16–T2W18)', 0, 'Lv 1'],
+    ['Her Tier 2 class, her open set (6–20), switching', 'T2C', 'The Ascend sheet (T2W16, T2W33–T2W36)', 0, 'Lv 1'],
     ['Her weapons\' Tier 2 types', 'T2G', 'The Ascend sheet (T2W19); her Gear tab later', 0, 'Lv 1'],
     ['Her line\'s two professions and her sub-profession', 'T2P', 'The Ascend sheet (T2W20); Craft Lv 1 in each', 0, '—'],
     ['Three weaknesses at every rank (live); the toolbox term; party value', 'T2B', 'Tier 2\'s foes', 0, 'Lv 1'],
@@ -268,9 +268,9 @@ function tools() {
     ['Ranks 1–10, one shared ladder', 'T2C', 'Class EXP 3,600 (XR1)', '0–1', 'Lv ~10'],
     ['Her class\'s own kit by depth', 'T2C', 'Class Rank 1 · 10 · 20 · 30 · 40', '0 → 1.9', 'Lv 1 → 29'],
     ['★ Signature tip on her lead weapon\'s tree', 'T2U', 'Its tip fork (CR 40)', 1.9, 'Lv 29'],
-    ['Accessory forms', 'T2G', 'A slot\'s grade (assumed: the tree complete by G10)', `${G(2).toFixed(1)} → ${G(10).toFixed(1)}`, 'Lv 6 → 46'],
+    ['Accessory forms', 'T2G', 'A slot\'s grade: the first ring with her first grade, the second at G5', `${G(2).toFixed(1)} → ${G(5).toFixed(1)}`, 'Lv 6 → 21'],
     ['A stat pick on each node', 'T2E', 'Each node as its jewel opens it', `${(G(2) + 0.5).toFixed(1)} → ${(G(10) + 0.5).toFixed(1)}`, 'Lv 6 → 46'],
-    ['Her second class at R50 (Class IV\'s sibling)', 'T2C', 'Class EXP past her first R50', G(5).toFixed(1), 'Lv 50'],
+    ['A second class of her Tier 1 line at R50 (Class IV)', 'T2C', 'Class EXP past her first R50', G(5).toFixed(1), 'Lv 50'],
     ['LB+ at Bond 10', 'T2C', 'Bond 10 in a hall', 'With Bonds', '—'],
     ['Ten equipped skills', 'T2C', 'Uma Level (one more a five levels from 10, T2C16)', G(4).toFixed(1), 'Lv 40'],
   ]
