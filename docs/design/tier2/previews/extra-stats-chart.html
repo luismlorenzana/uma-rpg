@@ -195,9 +195,9 @@
         </ul>
       </div>
       <div class="card">
-        <h3>Presets (T2E37, T2E38)</h3>
-        <p style="margin:0;color:var(--ink-soft)">A class's preset slots Prowess by her kit, measured on the harness: Offense for the pure classes and healers, Multi-hit for the Spellblades,
-          Area for the Summoners. The Planet, Vigor and Guard keep Tier 1's gifts. Prowess's kind rows list her kit's top pair first (the Brawler's Lance + Axe, not her
+        <h3>Presets (T2E51, T2E38)</h3>
+        <p style="margin:0;color:var(--ink-soft)">A class's preset slots Prowess by her kit, measured on the harness: Offense for every one-stat class (round 3's four pure variants included) and the
+          healers, Multi-hit for the Spellblades' keepers and supports, Area for the Summoners'. The Planet, Vigor and Guard keep Tier 1's gifts. Prowess's kind rows list her kit's top pair first (the Brawler's Lance + Axe, not her
           Orb's Greatsword). The <b>Branches</b> sheet puts her preset, or Tier 1's gifts, on every node in one tap.</p>
       </div>
     </div>
@@ -239,6 +239,11 @@ const CLASSES = {
   summoner: { name: 'Invoker', t1: 'Tome Summoner', atk: 30, top: ['Dark', 'Bow', 'Ice'], prowess: 'area' },
   paladin: { name: 'Guardian', t1: 'Paladin', atk: 80, top: ['Lance', 'Greatsword', 'Light'], prowess: 'offense', full: true },
   cleric: { name: 'Bishop', t1: 'Cleric', atk: 20, top: ['Light', 'Lance', 'Fire'], prowess: 'offense' },
+  // Round 3's pure variants (T2E50, T2E51): all of Prowess on her one stat, Offense her preset; kinds from the harness proxies.
+  bladedancer: { name: 'Bladedancer', t1: 'Arms Spellblade', role: 'pure variant', atk: 100, top: ['Axe', 'Bow', 'Katana'], prowess: 'offense' },
+  spellweaver: { name: 'Spellweaver', t1: 'Tome Spellblade', role: 'pure variant', atk: 0, top: ['Ice', 'Dark', 'Lightning'], prowess: 'offense' },
+  marshal: { name: 'Marshal', t1: 'Arms Summoner', role: 'pure variant', atk: 100, top: ['Bow', 'Katana', 'Axe'], prowess: 'offense' },
+  animist: { name: 'Animist', t1: 'Tome Summoner', role: 'pure variant', atk: 0, top: ['Dark', 'Lightning', 'Ice'], prowess: 'offense' },
 }
 const split = (p, atk) => { const larger = Math.max(atk, 100 - atk), lead = Math.floor((2 * p * larger + 100) / 200); return atk >= 50 ? [lead, p - lead] : [p - lead, lead] }
 const fmt = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(1))
@@ -693,7 +698,7 @@ seg('width', '390', (v) => { const p = document.querySelector('.phone'); p.style
 seg('tier', String(tier), (v) => { tier = Number(v); picks = presetPicks(); S = STATES[stateName](); refresh() })
 seg('state', stateName, (v) => { stateName = v; S = STATES[v](); refresh() })
 const select = document.getElementById('cls')
-select.innerHTML = Object.entries(CLASSES).map(([id, c]) => `<option value="${id}">${c.name} · the ${c.t1}'s Keeper</option>`).join('')
+select.innerHTML = Object.entries(CLASSES).map(([id, c]) => `<option value="${id}">${c.name} · the ${c.t1}'s ${c.role ?? 'Keeper'}</option>`).join('')
 select.value = cls
 select.onchange = () => { cls = select.value; picks = presetPicks(); refresh() }
 three(); legend(); screen(); checks()

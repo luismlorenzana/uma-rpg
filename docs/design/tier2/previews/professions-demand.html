@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Farm Demand</title>
-<!-- professions.md (T2P), round 2: §4.8, §4.9, §4.10, §8. Demand against supply by branch and place, rosters with and
+<!-- professions.md (T2P), round 2 and round 3's touch-ups (T2P46–T2P48, demand by class on the twenty and twenty-two):
+     §4.8, §4.9, §4.10, §8. Demand against supply by branch and place, rosters with and
      without sub-professions, where slots bind, the fighting party's grades and the pace. Rosters are recomputed here with
      the ledger's math (professions.sim.ts: a slot's day 30 job-hours, Craft Lv 25's step, each line's places at most
      their slots); the numbers match the doc's tables. From the Tier 2 set's _template.html. -->
@@ -111,6 +112,41 @@
       <h2>A place's work, one Uma</h2>
       <p class="sub">Job-hours at a place (both its branches) and what its eight slots make a day.</p>
       <div class="panel"><table id="place"></table></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>By class: the twenty and the twenty-two (round 3, T2P46–T2P48)</h2>
+    <p class="sub">A class's weapon demand is her Arms/Tome split: an Arms Gem and Whetstone raise any Arm, Tome Ink and a Reagent any Tome, so a weapon kind
+      moves no line. Round 3 adds 3 Arms and 3 Tome classes in mirrored pairs, and the owner's swaps keep each party's split, so every branch stays equal.
+      Refined a branch, a maxed Uma; everyone 150 on each of the other six. <b>Bold</b>: a split round 3 moves.</p>
+    <div style="display:grid;gap:16px">
+      <div class="panel"><table>
+        <tr><th>Split</th><th class="num">Metal · Rock</th><th class="num">Veg. · Herbs</th><th>Tier 2</th><th>Tier 3</th></tr>
+        <tr><td><b>3 Arms</b></td><td class="num">300 · 300</td><td class="num">0 · 0</td><td>Berserker, <b>Bladedancer</b>, <b>Marshal</b></td><td>Ravager, <b>Gladiator</b>, Dervish, Imperator</td></tr>
+        <tr><td><b>2 Arms + 1 Tome</b></td><td class="num">200 · 200</td><td class="num">100 · 100</td><td>Spellfist, Blademaster, Sentinel, Warlord, Druid, Guardian, Templar</td><td>Spellhammer, Bladelord, Herald, Overlord, Archdruid, Bastion, Inquisitor</td></tr>
+        <tr><td><b>1 Arm + 2 Tomes</b></td><td class="num">100 · 100</td><td class="num">200 · 200</td><td>Battlemage, Runeblade, Enchanter, Invoker, Shaman, Bishop, Exorcist</td><td>Spellknight, Runelord, Oracle, Hierarch, Soulcaller, Cardinal, Hierophant</td></tr>
+        <tr><td><b>3 Tomes</b></td><td class="num">0 · 0</td><td class="num">300 · 300</td><td>Archmage, <b>Spellweaver</b>, <b>Animist</b></td><td>Astromancer, <b>Thaumaturge</b>, Starweaver, Mythlord</td></tr>
+        <tr class="hi"><td>Slots in all</td><td></td><td></td><td>30 Arms · 30 Tomes</td><td>33 Arms · 33 Tomes</td></tr>
+      </table>
+      <p class="foot">A cross-channel weapon counts by its own channel (the Spellfist's Fire Tome takes Tome Ink). A two-kind weapon, Arsenal's two included, costs one
+        weapon's grade: its partner is coverage with no grade of its own. The twenty presets hold 8 Katanas and 8 Blizzard Tomes of 60 slots, 5 Thunder Tomes; no line sees it.</p></div>
+      <div class="panel"><table>
+        <tr><th>The owner's comps</th><th class="num">Arms · Tomes</th><th class="num">A maxed party: Metal, Rock · Veg., Herbs · each other</th></tr>
+        <tr><td>Tier 1 Party 1; C1, C3, C4, C5, C6, C7, C8, C10; T1, T3, T3g, T4, T6, T8</td><td class="num">8 · 7</td><td class="num">800 · 700 · 750</td></tr>
+        <tr><td>Tier 1 Party 2; C2, C3b, C4b, C6b, C9; T2, T3b, T4b</td><td class="num">7 · 8</td><td class="num">700 · 800 · 750</td></tr>
+        <tr class="hi"><td>Both parties</td><td class="num">15 · 15</td><td class="num">1,500 on every branch</td></tr>
+      </table>
+      <p class="foot">Each swap trades channels inside the party (the Spellfist takes the Tome the Bladedancer drops). A roster that leans to one channel is the
+        sub-profession's work, as a thin trade is.</p>
+      <h3 style="margin-top:14px">The full window: a swap pair inside five kinds (T2P48)</h3>
+      <table>
+        <tr><th>Swap</th><th class="num">Kinds she grades for both</th></tr>
+        <tr><td>Berserker ↔ Spellfist · Blademaster ↔ Sentinel · Spellhammer ↔ Gladiator</td><td class="num">5</td></tr>
+        <tr><td>Archmage ↔ Battlemage · Blademaster ↔ Bladedancer · Runeblade ↔ Spellweaver · Warlord ↔ Marshal · Invoker ↔ Animist</td><td class="num">4</td></tr>
+        <tr><td>Guardian ↔ Templar · Bishop ↔ Exorcist · Warlord ↔ Druid · Invoker ↔ Shaman</td><td class="num">3</td></tr>
+      </table>
+      <p class="foot">The window asks five kinds at G10 (D289), so the full window stays 1,900 refined.</p></div>
     </div>
   </section>
 

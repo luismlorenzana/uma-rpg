@@ -1,30 +1,34 @@
 # Uma Templates in Tiers 2 and 3
 
-> **Status: round 2's touch-ups, 2026-11-04. Nothing here is built.** One doc of the Tier 2 set ([README](README.md)): her
-> uniqueness (calling, ★ Flourish, ★ signature accessory, ★ her moon, ★ signature tip) carried from the approved Uma
-> Templates pass ([uma-templates.md](../tier-rework/uma-templates.md), UT1–UT20, D197) onto Tier 1 as it is built (engine
-> v21, save v36), then onto **round 2's sixteen Tier 2 classes** (R2-2–R2-5: a keeper and an expander per Tier 1 class,
-> picked on the Ascend sheet). Calls are **T2U1–T2U20** (round 1) and **T2U21–T2U27** (round 2), each with a
-> recommendation, its alternatives and its status ([§9](#9-decisions)). No open questions. The manual owns Tier 1
-> ([classes § Her calling](../../game/classes.md#her-calling-and-her-template)); this doc owns Tiers 2 and 3.
+> **Status: round 2's touch-ups, 2026-11-04, and round 3's, 2026-11-05. Nothing here is built.** One doc of the Tier 2
+> set ([README](README.md)): her uniqueness (calling, ★ Flourish, ★ signature accessory, ★ her moon, ★ signature tip)
+> carried from the approved Uma Templates pass ([uma-templates.md](../tier-rework/uma-templates.md), UT1–UT20, D197) onto
+> Tier 1 as it is built (engine v21, save v36), then onto **round 3's twenty Tier 2 and twenty-two Tier 3 classes**
+> ([classes](classes.md) T2C65–T2C101, R3-1–R3-6: two or three Tier 2 children a Tier 1 class, picked on the Ascend sheet,
+> and a Tier 3 promotion for every one). Calls are **T2U1–T2U20** (round 1), **T2U21–T2U27** (round 2) and
+> **T2U28–T2U31** (round 3), each with a recommendation, its alternatives and its status ([§9](#9-decisions)). No open
+> questions. The manual owns Tier 1 ([classes § Her calling](../../game/classes.md#her-calling-and-her-template)); this doc
+> owns Tiers 2 and 3.
 >
 > **The owner's frame:** "Uma template is more of an optional thing" (D274). So this doc keeps the template small: it adds
-> **one piece in Tier 2 (the ★ signature tip)**, scales the rest by the tier, and grows no system of its own. Round 2
-> changes no piece: it re-reads five rules on the sixteen classes (her family, her preset's ★, her lead weapon, the tip on
-> the support and battle-healer classes, her arrival) and keeps her moon out of the new stat picks.
+> **one piece in Tier 2 (the ★ signature tip)**, scales the rest by the tier, and grows no system of its own. Rounds 2
+> and 3 change no piece: they re-read five rules on the new classes (her family, her preset's ★, her lead weapon, the tip
+> on each kind of class, her arrival) and keep her moon out of the new stat picks.
 >
-> **Round 2 in five lines:**
-> 1. **Her family is both children of her family's Tier 1 classes** (T2U21): Warrior 6, Mage 6, Spellblade, Summoner
->    and Healer 4 each; a keeper and an expander are equally hers; kin's children stay outside.
+> **Round 2 in five lines** (round 3's changes in brackets):
+> 1. **Her family is every child of her family's Tier 1 classes** (T2U21 → T2U28): [Warrior 8, Mage 8, Spellblade and
+>    Summoner 6, Healer 4 in Tier 2; 9, 9, 6, 6, 4 in Tier 3]; keeper, expander, support and pure variant are equally
+>    hers; kin's lines stay outside.
 > 2. **Her preset's ★ asks what her hits read, not what she holds** (T2U22): a Pendant serves an ATK hitter, a Charm an
->    M.ATK one, so the Brawler's expander (her Tomes on ATK) and the Sorcerer's (her Arms on M.ATK) read as their parents
->    do; her family's dual form in the accessory tree (R2-7) serves everyone once its grade opens it.
-> 3. **Her lead weapon is her class's first slot** (T2U23), the keepers' as their parents', the expanders' by
->    [classes.md](classes.md)'s presets; the tip follows it.
-> 4. **The tip stays on a striking tree** (T2U24): her lead tree, whose capstone always strikes; a support line or a
->    ward never takes the ★, and the three tips stay what they are.
-> 5. **She arrives as the Tier 2 class she picks** on the Ascend sheet (T2U25); her moon keeps its own stat, with no
->    pick list (T2U26); her calling names both her line's professions, nothing to the sub-profession (T2U27).
+>    M.ATK one; her family's Twofold form (gear's T2G35, from her first Tier 2 grade) serves everyone [round 3's
+>    one-stat classes included, T2U29].
+> 3. **Her lead weapon is her class's first slot** (T2U23 → T2U30) [by classes' presets on all forty-two; the
+>    Enchanter's is Light, the Gladiator's the Greatsword, the Thaumaturge's Fire]; the tip follows it.
+> 4. **The tip stays on a striking tree** (T2U24): her lead tree, whose capstone always strikes; a ward never takes the ★,
+>    and the three tips stay what they are [on a Pinpoint class a Spillover tip forgoes Pinpoint on that cast (T2U31)].
+> 5. **She arrives as the Tier 2 class she picks** on the Ascend sheet (T2U25) [and as the Tier 3 class she picks on Tier 3's];
+>    her moon keeps its own stat, with no pick list (T2U26); her calling names both her line's professions, nothing to the
+>    sub-profession (T2U27).
 >
 > **Pages** (desktop, light and dark; every Uma on them is made up):
 > [**her template by tier**: the five pieces Tier 1 → 2 → 3, the calling with no Tier 0, the budget measured, every old call's status](previews/templates-tiers.html) ·
@@ -39,12 +43,12 @@ trees ([classes.md](classes.md), T2C).
 
 | Piece | Read from | Works | Tier 1 (live) | Tier 2 | Tier 3 |
 |---|---|---|---|---|---|
-| **Her calling** | Her best running styles | Always | Her Tier 0, her family, her trade, her moon's root | **A family, not a class:** no Tier 0 in the world; she arrives as the Tier 2 class she picks on the Ascend sheet (T2U25); her family the sixteen's children of its Tier 1 classes (T2U21) | The same |
-| **★ Flourish** | Her stride | As her family (keeper or expander) | 4% of her max HP a fight (a Brawler at Lv 50: **58 HP**) | 4% (**101**) | 4% (**144**) |
+| **Her calling** | Her best running styles | Always | Her Tier 0, her family, her trade, her moon's root | **A family, not a class:** no Tier 0 in the world; she arrives as the Tier 2 class she picks on the Ascend sheet (T2U25); her family the twenty's children of its Tier 1 classes: 8, 8, 6, 6 or 4 (T2U28) | The same; she arrives as the Tier 3 class she picks (T2C89); her family 9, 9, 6, 6 or 4 |
+| **★ Flourish** | Her stride | As her family (any line) | 4% of her max HP a fight (a Brawler at Lv 50: **58 HP**) | 4% (**101**) | 4% (**144**) |
 | **★ Signature** | Her knack (the family) | Any class, while one slot wears her family at G1+ | ATK and M.ATK +0.1 a level: **+5** at Lv 50 | × 1.8: **+9** | × 2.6: **+13** |
 | **★ Her moon I** | Her knack | Any class | +4 points (HP +20, MP +4, DEF and M.DEF +4, 2.4% evasion, or a Limit start of 1) | +7 points (HP +35) | +10 points (HP +50) |
 | **★ Her moon II** | Her calling's root | Any class | DEF +8, M.DEF +8, or +4 and +4 | +14 (7 + 7) | +21 (10 + 11) |
-| **★ Signature tip** | Her stride, on her lead weapon's tree | As her family | — | **A third option at her lead tree's tip fork** beside Power and Break (Class Rank 40, about Lv 29): Quickstep, Spillover or Long guard; on a striking tree in every one of the sixteen (T2U24) | **At both tip forks** of that tree (two lines held), the crown's capstones too |
+| **★ Signature tip** | Her stride, on her lead weapon's tree | As her family | — | **A third option at her lead tree's tip fork** beside Power and Break (Class Rank 40, about Lv 29): Quickstep, Spillover or Long guard; on a striking tree in every one of the twenty (T2U24, T2U31) | **At both tip forks** of that tree (two lines held), the crown's capstones too, on the twenty-two |
 
 **The budget, measured on engine v21** (both of the owner's parties, on curve, every region stage;
 [§4.8](#48-the-budget-t2u14)): the ★ signature adds **about +2% damage a turn at Lv 50 in every tier** (+1.0 to +3.6%
@@ -55,12 +59,13 @@ under it, and this doc keeps it there.
 
 **What this doc decides, in six lines:**
 1. **Her calling outlives the Tier 0** (T2U25, T2U21): in a later world it is a family (Warrior, Spellblade, Healer,
-   Summoner, Mage) that names her type, line, moon root and the classes her Flourish and tip work in: both children of
-   her family's Tier 1 classes.
+   Summoner, Mage) that names her type, line, moon root and the classes her Flourish and tip work in: every Tier 2 child
+   of her family's Tier 1 classes and their Tier 3 children (T2U28).
 2. **Nothing grows but by the tier** (T2U5, T2U6, T2U8, T2U26): the Flourish stays a 4% share, the signature and her
    moon × 1.8 and × 2.6, her moon still two nodes with no jewel and no pick.
 3. **The tip sits on her lead weapon's tree** (T2U9, T2U23): the weapon in her first slot, always her lead channel, at
-   depth 5's fork beside Power and Break, on whichever line she holds; keeper or expander, it follows her first slot.
+   depth 5's fork beside Power and Break, on whichever line she holds; whatever her class, it follows her first slot
+   (T2U30).
 4. **The three tips are re-cut on today's shapes** (T2U11, T2U24): Quickstep (two more hits on her target), Spillover
    (the volley's splash), Long guard (a Barrier on herself), on a striking tree in every class.
 5. **The budget stays small** (T2U14, T2U15, T2U22): the measured edge is the target, "about +5%" its ceiling; the dial
@@ -158,11 +163,11 @@ in use).
 | **UT5** The catalog | 6 × 3 × 5 = 90 templates, 63 in use | **Kept, changed** | D240 (CV21): 5 × 3 × 5 = 75, 60 in use; the Healer's types are the old Cleric's three (Lamplighter, Mender, Pilgrim) |
 | **UT6** The Flourish | 4% of her max HP a fight in her stride's shape, as her calling | **Kept, changed** | D240 (CV21): as any class of her family. In Tiers 2 and 3 the same share (T2U5) |
 | **UT7** The signature's family | By knack: Fleet Bell, Mighty Orb, Tireless Pendant, Gritty and Clever Insignia; +0.2 a level × tier | **Kept, changed** | D264 (the Bell retires into the Charm, so Fleet names the Charm); D266 (0.1 a level, at least 1: +5 · +9 · +13). By tier: T2U6 |
-| **UT8** Presets | Her preset wears her family, in the slot that adds least | **Kept, changed** | D264 (three slots, her ★ family first) and D266 (only when her weapons can use it). By tier and on the sixteen: T2U22 |
+| **UT8** Presets | Her preset wears her family, in the slot that adds least | **Kept, changed** | D264 (three slots, her ★ family first) and D266 (only when her weapons can use it). By tier and on the twenty and twenty-two: T2U22, T2U29 |
 | **UT9** The signature tip | Her lead weapon's tree, a third option at its tip fork from Tier 2, both forks in Tier 3; Quickstep, Spillover, Long guard; as her calling | **Broken** | Written for six classes: its lead-weapon table names the six and their Tier 2 branches (Berserker … Oracle), Spillover reuses "the Bow B's splash" (the Bow's line B is Barrage since CV14, the Bow a volley since CV12), and "as her calling" is now her family (CV21). Fixed by T2U9–T2U13 |
 | **UT10** Her moon | Node I +4 × tier on her knack's stat (Lv 16, Moon Jewel II); node II +8 × tier on her calling channel's defense (Lv 36, Moon Jewel IV) | **Kept, changed** | D264 (call 6: no jewel, opens with the third moon's II and IV); D240 (CV21: node II by her calling's root, +4 and +4 for an All-Rounder). By tier: T2U8 |
 | **UT11** The affinity | Retired, never built | **Kept** | Nothing to carry |
-| **UT12** What her class gates | Only the Flourish and the tip need her calling's class | **Kept, changed** | D240 (CV21): her family, not one class. Tiers 2 and 3, on the sixteen: T2U21 |
+| **UT12** What her class gates | Only the Flourish and the tip need her calling's class | **Kept, changed** | D240 (CV21): her family, not one class. Tiers 2 and 3, on the twenty and twenty-two: T2U28 |
 | **UT13** The budget | Damage +4.3–6.1% (the signature alone, one slot, +0.2 a level); defense +4.7% plus her knack; pace 0 | **Broken** | Written for a one-slot Tier 1 at +0.2 a level: D264's three slots and D266's +0.1 make the signature half a slot of her stat, and its numbers no longer hold. Re-measured on engine v21 by T2U14 |
 | **UT14** How it shows | A ★ in every place: the template chip and card, the calling pick card, the Skills root, the Observatory, the Gear tab, the Battle tab, the Racing tab, the party chip | **Superseded** | D239 and D265 (the profile's four tabs, no chip in the header), D270 (the Template tab, one ★ row a piece with its sheet), D274 (no dot). The ★ grammar survives inside them; Tiers 2 and 3 add one row (T2U16) |
 | **UT15** The Stable | A Template filter group: Calling, Stride, Knack, Signature, and the name in search | **Kept, changed** | D257 (Calling by the five Tier 0s); a Trade group beside it. Unchanged by tier |
@@ -204,35 +209,38 @@ already carry (the Warrior Dojo, the Mage Tower).
 |---|---|---|
 | Her calling is | Her Tier 0 (a class, Class Rank 1–10) | Her family: the same word, no class |
 | A new Uma starts as | Her calling's Tier 0, Class Rank 1 | **No new Uma:** a later world starts with no Uma Tickets and pays no Shards; every Uma ascends into it (live) |
-| She arrives at Ascend as | — | **The Tier 2 class she picks** on the sheet, from the children of her Tier 1 classes at R50; Suggested the keeper of the class she fought as (T2W18) |
+| She arrives at Ascend as | — | **The Tier 2 class she picks** on the sheet, from the children of her Tier 1 classes at R50; Suggested the keeper of the class she fought as (T2W18). In Tier 3, **the Tier 3 class she picks**, from the Tier 3 children of her Tier 2 classes at R50; Suggested her class's child, the Spellfist's and the Battlemage's kept one (T2C89) |
 | It names | Her type, line, moon II's root, her family | **The same four** |
-| Her Template tab | "Calling · Warrior · fixed"; the Flourish's chips start with the Tier 0 | "Calling · Warrior · fixed"; the chips are her family's Tier 2 classes only (D270 call 8's rule) |
+| Her Template tab | "Calling · Warrior · fixed"; the Flourish's chips start with the Tier 0 | "Calling · Warrior · fixed"; the chips are her family's classes of that tier only (D270 call 8's rule) |
 
 **What uniqueness means without a Tier 0:** the same template, read the same way, giving the same pieces. The Tier 0
-was where she started, never what made her unique; in a later world her family is four or six Tier 2 classes instead of
-a Tier 0 and its children. **Her pick on the sheet never moves her template:** a Fleet Ironhide is a Fleet Ironhide as
-the Brawler's keeper, its expander or an Arms Spellblade's child.
+was where she started, never what made her unique; in a later world her family is four to eight Tier 2 classes (four to
+nine in Tier 3) instead of a Tier 0 and its children. **Her pick on the sheet never moves her template:** a Fleet
+Ironhide is a Fleet Ironhide as a Berserker, a Spellfist, a Bladedancer or a Ravager.
 
-### 4.2 Her family in a later world (T2U21)
+### 4.2 Her family in a later world (T2U21, T2U28)
 
-**Both children of each Tier 1 class of her family** (R2-2: a keeper and an expander each). Her Flourish and her ★ tip
-work in any of them; kin's children stay outside.
+**Every Tier 2 child of each Tier 1 class of her family, and in Tier 3 their Tier 3 children** ([classes](classes.md)
+§4.10, T2C91; R3-6: the Brawler and the Sorcerer two Tier 2 children each, the four hybrids three, the healers two; the
+Spellfist and the Battlemage two Tier 3 children, every other class one). Her Flourish and her ★ tip work in any of them;
+kin's lines stay outside.
 
-| Calling | Her family's Tier 1 classes | Her family in Tiers 2 and 3 | Outside it (no Flourish, no ★ tip) |
-|---|---|---|---|
-| Warrior | Brawler, Arms Spellblade, Arms Summoner | **6:** the keeper and expander of each | The other ten |
-| Spellblade | Arms Spellblade, Tome Spellblade | **4** | The other twelve (the Arms Summoner's and Paladin's children, her kin's, included) |
-| Healer | Paladin, Cleric | **4**, every one a healer | The other twelve |
-| Summoner | Arms Summoner, Tome Summoner | **4** | The other twelve |
-| Mage | Sorcerer, Tome Spellblade, Tome Summoner | **6** | The other ten |
+| Calling | Her family's Tier 1 classes | Her family in Tier 2 (of 20) | Her family in Tier 3 (of 22) | Outside it (no Flourish, no ★ tip) |
+|---|---|---|---|---|
+| Warrior | Brawler, Arms Spellblade, Arms Summoner | **8:** Berserker, Spellfist · Blademaster, Sentinel, Bladedancer · Warlord, Druid, Marshal | **9:** Ravager, Spellhammer, Gladiator · Bladelord, Herald, Dervish · Overlord, Archdruid, Imperator | The other 12 · 13 |
+| Spellblade | Arms Spellblade, Tome Spellblade | **6:** Blademaster, Sentinel, Bladedancer · Runeblade, Enchanter, Spellweaver | **6:** Bladelord, Herald, Dervish · Runelord, Oracle, Starweaver | The other 14 · 16 (the Arms Summoner's and Paladin's lines, her kin's, included) |
+| Healer | Paladin, Cleric | **4:** Guardian, Templar · Bishop, Exorcist, every one a healer | **4:** Bastion, Inquisitor · Cardinal, Hierophant | The other 16 · 18 |
+| Summoner | Arms Summoner, Tome Summoner | **6:** Warlord, Druid, Marshal · Invoker, Shaman, Animist | **6:** Overlord, Archdruid, Imperator · Hierarch, Soulcaller, Mythlord | The other 14 · 16 |
+| Mage | Sorcerer, Tome Spellblade, Tome Summoner | **8:** Archmage, Battlemage · Runeblade, Enchanter, Spellweaver · Invoker, Shaman, Animist | **9:** Astromancer, Spellknight, Thaumaturge · Runelord, Oracle, Starweaver · Hierarch, Soulcaller, Mythlord | The other 12 · 13 |
 
 - **Kin stays outside:** kin was a promotion convenience (D290), and the manual already says a kin class is "outside her
-  Flourish's family"; a kin parent's children are outside too. The gate is `rpgClassFamily` minus the Tier 0, read
-  through each Tier 2 class's parent (T2C's map), unchanged in spirit.
-- **Keeper and expander are equal here:** the template never favours one, so swapping back and forth (the owner's
-  balance tool) keeps her Flourish, her ★ and her tip.
-- **What she can fight as is the sheet's, not her family's:** her open set is the children of her Tier 1 classes at R50
-  (T2W17), kin's included; her family only says where her Flourish and tip work.
+  Flourish's family"; a kin parent's line is outside too, in both tiers. The gate is `rpgClassFamily` minus the Tier 0,
+  read through each class's Tier 1 ancestor (T2C's map), unchanged in spirit.
+- **Every line is equal here:** keeper, expander, support or pure variant, and either Tier 3 child of the Spellfist or the
+  Battlemage. The template never favours one, so the owner's swaps (a Brawler with a Spellblade, a Spellblade with the
+  Paladin, R3-7) keep her Flourish, her ★ and her tip whenever both classes are of her family.
+- **What she can fight as is the sheet's, not her family's:** her open set is the children of her classes at R50 (T2W17,
+  T2C89), kin's included; her family only says where her Flourish and tip work.
 
 ### 4.3 The ★ Flourish (T2U5)
 
@@ -264,21 +272,24 @@ work in any of them; kin's children stay outside.
 - **Any form of her family counts** (the accessory tree from Tier 2, R2-7): every form of a Pendant's tree is a
   Pendant. One ★ however many slots hold her family.
 - **Her preset** (T2U22): **her family first when her hits read its stat**, in her family's best form for her class
-  (T2G's preset). The live rule asks whether her weapons can use it (a Pendant needs an Arm, a Charm a Tome); round 2's
-  expanders break that reading, since the Brawler's expander swings Tomes on ATK and the Sorcerer's swings Arms on
-  M.ATK. So the rule reads the stat her hits and mends read:
+  (T2G's preset). The live rule asks whether her weapons can use it (a Pendant needs an Arm, a Charm a Tome); the
+  crosses break that reading, since the Spellfist swings a Tome on ATK and the Battlemage an Arm on M.ATK. So the rule
+  reads the stat her hits and mends read:
 
-| Her class (round 2) | Her hits read | Pendant (+ATK) | Charm (+M.ATK) | Orb, Insignia |
+| Her class (Tiers 2 and 3) | Her hits read | Pendant (+ATK) | Charm (+M.ATK) | Orb, Insignia |
 |---|---|---|---|---|
-| The Brawler's keeper and expander | ATK only (the expander's Tomes too) | First | **Out** until her family's dual form | Any |
-| The Sorcerer's keeper and expander | M.ATK only (the expander's Arms too) | **Out** until the dual form | First | Any |
-| The four hybrids' children | Both channels | First | First | Any |
-| The healers' children | Both (a Paladin child mends from ATK, a Cleric child from M.ATK) | First | First | Any |
+| **One stat, ATK:** Berserker, Spellfist, Bladedancer, Marshal; Ravager, Spellhammer, Gladiator, Dervish, Imperator | ATK only (the Spellfist's Tome too) | First | **As a Twofold Charm** (its ATK rider, T2U29) | Any |
+| **One stat, M.ATK:** Archmage, Battlemage, Spellweaver, Animist; Astromancer, Spellknight, Thaumaturge, Starweaver, Mythlord | M.ATK only (the Battlemage's Arm too) | **As a Twofold Pendant** | First | Any |
+| The hybrids' keepers and supports and their Tier 3 children | Both channels | First | First | Any |
+| The healers' classes | Both (a Paladin line mends from ATK, a Cleric line from M.ATK) | First | First | Any |
 
-- **The dual form settles the rest:** once her family's tree opens a form that gives both stats (R2-7's "Dual ATK +
-  MATK"; round 1's Twofold), her ★ goes first for everyone, as round 1's T2U7 and XR11 had it from a slot's G5. The 35
-  Umas of §2.3 (23 Fleet Warriors, 12 Tireless Mages, as either child of the pure class) wait for that grade, then wear
-  it; before it, their ★ works in their family's hybrids' children.
+- **The Twofold form settles it in every class:** gear opens her family's Twofold (her stat and its other-stat rider) at
+  her first Tier 2 grade (T2G35), so from G1 in Tiers 2 and 3 her ★ goes first for everyone, the one-stat classes
+  included, and no Uma waits. A Fleet Bladedancer wears a Twofold Charm, whose ATK rider and her ★ pay on every hit (a
+  Twofold Charm's ATK +18 and her ★ +9 at Tier 2's Lv 50 against a Great Pendant's +23). Round 3 widens who meets this case
+  (T2U29): **77 Umas** of the census have a one-stat class in their family (44 Fleet: 23 Warriors, 14 Spellblades, 7
+  Summoners; 33 Tireless: 12 Mages, 14 Spellblades, 7 Summoners), against round 2's 35, and each wears the Twofold there
+  and her family's own stat elsewhere.
 - **Never on mends or Barriers** (live), so the support and battle-healer children's kits take nothing from the ★.
 
 ### 4.5 ★ Her moon (T2U8)
@@ -306,7 +317,7 @@ if extra-stats.md gives her moon a list anyway, its template stat is the list's 
 ### 4.6 The ★ signature tip: where it sits (T2U9, T2U12, T2U23)
 
 **On her lead weapon's tree, at depth 5's tip fork, a third option beside Power and Break.** Tier 2's trees (T2C,
-carrying CP19 onto the sixteen, R2-2) give every tree a third line (C) at the fork and make each line's depth-5 tip a
+carrying CP19 onto the twenty, R2-2, R3-6) give every tree a third line (C) at the fork and make each line's depth-5 tip a
 pick: **Power** (the Tier 1 tip) or **Break** (its first weak hit on a foe removes one more shield point). On her lead
 tree, as a class of her family, the fork offers her stride's ★ tip too.
 
@@ -325,32 +336,35 @@ tree, as a class of her family, the fork offers her stride's ★ tip too.
 
 | Question | Answer |
 |---|---|
-| Which tree | **Her first slot's.** Slots go by channel, her lead channel first (CP2, live `validRpgWeapons`), so it is always a weapon of her lead half; she chooses which of that channel's weapons sits first. An expander whose slots cross channels leads with her first slot too |
+| Which tree | **Her first slot's.** Slots go by channel, her lead channel first (CP2, live `validRpgWeapons`), so it is always a weapon of her lead half; she chooses which of that channel's weapons sits first. A cross (the Spellfist, the Battlemage and their Tier 3 children) leads with her own channel, her other-channel weapon after it |
 | Which depth | Depth 5, the tip, from Class Rank 40 (about Uma Lv 29 in a Tier 2 world on XR1's pace, where she starts at Rank 1) |
 | Which line | The one she holds (A, B or C): the ★ is an option of that line's tip fork |
-| Keeper or expander (R2-2) | **Neither moves it.** Her class sets her preset, and with it, if she takes it, her first slot; the tip follows her first slot, never the class. A class's own mechanic (the keepers' self-buff, a support kit) takes no ★ |
-| Her class's damage boosts | Ride it as any skill: a keeper's self-buff or a class's kind bonus applies to the ★ tip as to Power |
-| Gate | Only as a class of her family (T2U21). Elsewhere the fork offers Power and Break only |
+| Her class (R2-2, R3-2–R3-5) | **No class moves it.** Her class sets her preset, and with it, if she takes it, her first slot; the tip follows her first slot, never the class. A class's own mechanic (Momentum, Pinpoint, Arsenal, a support kit, a Tier 3 rule) takes no ★ |
+| Her class's damage boosts | Ride it as any skill: Momentum, Pinpoint or a Tier 3 rule applies to the ★ tip as to Power (Pinpoint only while the tip still strikes one foe, T2U31) |
+| Gate | Only as a class of her family (T2U28). Elsewhere the fork offers Power and Break only |
 | If she reorders her slots, or switches class | The ★ follows her first slot. A ★ pick on a tree that stops being first, or in a class outside her family, plays as Power and waits; it returns when that tree is first again (T2U12) |
 
-**Her lead weapon, by Tier 2 class** (T2U23; the presets' first slots, D263's `RPG_WEAPON_PRESETS` for the parents;
-the sixteen's own presets are [classes.md](classes.md)'s, assumed to keep their parent's lead unless the class leads
-with the other channel):
+**Her lead weapon, by class** (T2U30; the first slot of [classes](classes.md)' presets, §4.13 and §6.3; a Tier 3 class
+wears her Tier 2 parent's preset but the Gladiator and the Thaumaturge; the tips are the live trees' depth 5, which a
+Tier 2 or 3 class plays, [skill trees](../../game/skill-trees.md)):
 
-| Tier 1 class | Its preset (lead first) | The keeper's lead tree | The expander's lead tree (assumed) | Its tip today (line A) | Line B's tip |
-|---|---|---|---|---|---|
-| Brawler | Greatsword, Axe, Lance | **Greatsword** | **Greatsword** (her ATK Tomes in the later slots) | One foe, 3 hits | Combo: 4 hits |
-| Sorcerer | Fire, Blizzard, Thunder | **Fire Tome** | **Fire Tome** (her M.ATK Arms later) | One foe, 1 hit | Wave: every foe |
-| Arms Spellblade | Katana, Axe, Thunder | **Katana** | **Katana** (her support on a later slot, D282's path) | One foe, 2 hits (+1 familiar), Armor Break | Pierce: 1 hit (+1) |
-| Tome Spellblade | Thunder, Blizzard, Katana | **Thunder Tome** | **Thunder Tome** | One foe, 3 hits (+1 familiar) | Pierce: 1 hit (+1) |
-| Arms Summoner | Bow, Axe, Dark | **Bow** | **Bow** | A volley: one foe 3 hits, a splash on every other, lingers | Oath: lingers at 0.4 |
-| Tome Summoner | Dark, Blizzard, Bow | **Dark Tome** | **Dark Tome** | A volley: one foe 3 hits, a splash on every other, lingers | Oath: lingers at 0.4 |
-| Paladin | Lance, Greatsword, Light | **Lance** | **Lance** (a battle healer: more of its strike, less of its Barrier) | One foe, 1 hit; Mind Break on every foe; Barrier 44% on every ally | Surge: one more stack |
-| Cleric | Light, Fire, Lance | **Light Tome** | **Light Tome** (a battle healer) | One foe, 1 hit; Brave and Faith on every ally; heals every ally 44% | Surge: a mend 15% larger |
+| Tier 1 line | Tier 2: class · lead tree | Tier 3: class · lead tree | Its tip today (line A) | Line B's tip |
+|---|---|---|---|---|
+| Brawler | Berserker, **Spellfist** · **Greatsword** | Ravager, Spellhammer · Greatsword; **Gladiator** · **Greatsword** (Evolved + Katana) | One foe, 3 hits | Combo: 4 hits |
+| Sorcerer | Archmage, **Battlemage** · **Fire Tome** | Astromancer, Spellknight · Fire Tome; **Thaumaturge** · **Fire Tome** (Evolved + Light) | One foe, 1 hit | Wave: every foe |
+| Arms Spellblade | Blademaster, Sentinel, **Bladedancer** · **Katana** | Bladelord, Herald, Dervish · Katana | One foe, 2 hits (+1 familiar), Armor Break 2 (none on the Bladedancer's line) | Pierce: 1 hit (+1) |
+| Tome Spellblade | Runeblade, **Spellweaver** · **Thunder Tome**; **Enchanter** · **Light Tome** | Runelord, Starweaver · Thunder Tome; Oracle · Light Tome | Thunder: one foe, 3 hits (+1 familiar); Light: one foe, 2 hits (+1), Brave and Faith 2 on every ally | Pierce: 1 hit (+1) |
+| Arms Summoner | Warlord, Druid, **Marshal** · **Bow** | Overlord, Archdruid, Imperator · Bow | A volley: one foe 3 hits, a splash on every other, Enfeeble 2 (none on the Marshal's line), lingers | Oath: lingers at 0.4 |
+| Tome Summoner | Invoker, Shaman, **Animist** · **Dark Tome** | Hierarch, Soulcaller, Mythlord · Dark Tome | A volley: one foe 3 hits, a splash on every other, Mind Break 2 (none on the Animist's line), lingers | Oath: lingers at 0.4 |
+| Paladin | Guardian, Templar · **Lance** | Bastion, Inquisitor · Lance | One foe, 1 hit; Mind Break on every foe; Barrier 44% on every ally | Surge: one more stack |
+| Cleric | Bishop, Exorcist · **Light Tome** | Cardinal, Hierophant · Light Tome | One foe, 1 hit; Brave and Faith on every ally; heals every ally 44% | Surge: a mend 15% larger |
 
-No class leads with a sweep (Axe, Blizzard) on its preset; a Brawler's child who puts her Axe first can. If classes.md
-lets an expander lead with her other channel (the Brawler's expander with a Tome first), her lead tree is that Tome's,
-and the tip works the same: it reads her first slot, not a channel.
+- **Bold: round 3's classes, and one correction.** Round 2 assumed every child led as her parent; classes' presets agree
+  but for the **Enchanter, whose preset leads with the Light Tome** (Light, Blizzard, Katana), not the Thunder Tome: her
+  tip sits on her Light tree, whose skills carry her support statuses and still strike.
+- **No preset leads with a sweep** (Axe, Blizzard); a Berserker who puts her Axe first can. A cross's other-channel weapon
+  never leads (slots go by channel, CP2), so her ★ tree is always one of her own channel's; Arsenal's partner kinds ride
+  her lead weapon's hits and change no tree.
 
 ### 4.7 The three tips, on today's shapes (T2U11)
 
@@ -371,24 +385,38 @@ Tier 2's simulation (T2B), priced against Power on the same tip.
 - **The knobs, if the simulation finds one hot:** Quickstep one more hit instead of two; Spillover's splash 0.35 → 0.2
   on a tip that already strikes every foe; Long guard 10% → 8%. Never the foes.
 
-**On round 2's support and battle-healer classes (T2U24).** The Spellblades' and Summoners' expanders support a little
-(wider buffs and debuffs, a ward or a small mend), the healers' expanders heal less and strike more (R2-3). The ★ tip
-is a strike-shaped extra, so its best place is where her damage lives:
+**On every kind of class (T2U24, T2U31).** The Spellblades' and Summoners' supports add a little of the healers' kit,
+the battle healers heal less and strike more (R2-3); round 3 adds the pure variants (one channel, no status) and the
+crosses' single big hits (Pinpoint). The ★ tip is a strike-shaped extra, so its best place is where her damage lives:
 
 | Her class | Where her damage lives | Where the ★ sits | Which tip pays most there |
 |---|---|---|---|
-| Keepers (all eight) | Her lead tree | Her lead tree's held line | As Tier 1's shapes: Quickstep on one-foe tips, Spillover on volleys, Long guard anywhere |
-| The Brawler's and Sorcerer's expanders | Her lead tree (and her cross-channel slots) | Her lead tree's held line | The same |
-| The Spellblades' and Summoners' expanders (support) | Her lead tree; her support on a later slot's line (the path, D282) | **Her lead tree, never the support line** | Quickstep and Spillover keep her damage share up; Long guard keeps a support member standing |
-| The healers' expanders (battle healers) | Her lead tree's strike, with less mend | Her lead tree's held line | Quickstep (more chips with her bigger strike); Long guard less, since she mends herself |
+| Keepers (Berserker, Archmage, the hybrids' keepers, the keeper healers) and their Tier 3 children | Her lead tree | Her lead tree's held line | As Tier 1's shapes: Quickstep on one-foe tips, Spillover on volleys, Long guard anywhere |
+| **The crosses** (Spellfist, Battlemage, Spellhammer, Spellknight) | Her lead tree's one-foe acts, Pinpoint on them | Her lead tree's held line (Greatsword, Fire) | **Quickstep** (its hits stay on her target, so Pinpoint holds); Long guard keeps it too; **Spillover forgoes Pinpoint on that cast** (below) |
+| **The pure variants** (Bladedancer, Spellweaver, Marshal, Animist) and their Tier 3 children | Her lead tree, every hit on her stat | Her lead tree's held line (Katana, Thunder, Bow, Dark) | As her parent's: Quickstep on the pure Spellblades' one-foe tips, Spillover's second splash on the pure Summoners' volleys |
+| **The Arsenal classes** (Gladiator, Thaumaturge) | Her five kinds across three weapons | Her lead tree (Greatsword, Fire) | As the Berserker's and the Archmage's |
+| The supports (Sentinel, Enchanter, Druid, Shaman) and their Tier 3 children | Her lead tree, whose skills also carry her support statuses (topped up, never past their stacks) | **Her lead tree's held line**; its capstone still strikes | Quickstep and Spillover keep her damage share up (more hits add no stacks); Long guard keeps a support member standing |
+| The battle healers (Templar, Exorcist, Inquisitor, Hierophant) | Her lead tree's strike, with less mend | Her lead tree's held line | Quickstep (more chips with her bigger strike); Long guard less, since she mends herself |
+
+**Pinpoint and the ★ (T2U31).** Pinpoint multiplies an act whose every hit lands on the tapped foe (classes T2C73), so:
+
+| Her ★ on a cross's tip | Still one foe? | Pinpoint on that cast | When it pays against Power |
+|---|---|---|---|
+| **Quickstep** (two more hits on her target, the same total) | Yes | Kept (×1.1 Tier 2, ×1.2 Tier 3) | Shields and locks on one foe: the Dash Uma's natural fit |
+| **Spillover** (0.35 of the power on every other foe) | No | **Lost on that cast** | With one other foe standing or more: 0.35 a foe against the 0.1 (Tier 3: 0.2) Pinpoint gives; on a lone boss Power is the better tip |
+| **Long guard** (a Barrier on herself) | Yes (a Barrier is no hit) | Kept | Anywhere |
+
+No exception is carved for the ★: a Spillover tip reads as the splash it is, and her tip's sheet says so ("★ Spillover ·
+no Pinpoint"); the Middle-stride Uma who fights crowds still gains, and one who fights bosses picks Power.
 
 - **Every capstone strikes** (live: a healer's depth 5 strikes one foe before its mend or Barrier), so her lead tree's
   held line always carries the ★. **If classes.md gives a class a lead capstone that doesn't strike** (a ward or a mend
   alone), the ★ there plays as Power and waits (T2U12's rule), and her Template tab says "★ Tip · on a strike line".
-- **The ★ never adds a buff, debuff, mend or ward to anyone else:** Long guard's Barrier is hers alone, so a support
-  class gets no second support kit from her template, and R2-11's party value stays her class's.
-- **The budget's check runs on all sixteen** (T2B's party value): the ★ tip within 3 points of Power on her lead tree,
-  the support and battle-healer children included.
+- **The ★ never adds a buff, debuff, mend or ward to anyone else:** Long guard's Barrier is hers alone, and more hits
+  add no status stacks, so a support class gets no second support kit from her template, and R2-11's party value stays
+  her class's.
+- **The budget's check runs on all twenty and twenty-two** (T2B's party value): the ★ tip within 3 points of Power on
+  her lead tree, the support, battle-healer, pure and cross classes included.
 
 ### 4.8 The budget (T2U14)
 
@@ -451,20 +479,20 @@ Every Uma here is made up. Drawn Tier 1 → 3 on [the Umas page](previews/templa
 | Profile | Front A; Medium A, Long A; Stamina +20% | Front A, Pace A; Long A; Speed, Power, Wit +10%, Speed her highest base |
 | Template | **Tireless Ironhide** (Warrior · Stayer · Tireless) | **Fleet Ironhide** (Warrior · Stayer · Fleet) |
 | Tier 1 classes at R50 | Brawler, Arms Spellblade, Arms Summoner | Brawler, Arms Spellblade, Arms Summoner |
-| Tier 2 class (picked on the sheet) | The Brawler's keeper (Suggested: she fought as a Brawler); her family all six | The Arms Spellblade's expander (she picked it over the Suggested keeper) |
+| Tier 2 class (picked on the sheet) | The Berserker (Suggested: she fought as a Brawler); her family all eight | The Sentinel, the Arms Spellblade's support (she picked it over the Suggested Blademaster) |
 | ★ Flourish | Late reserve, up to 101 HP at Lv 50 | Late reserve, up to 92 HP |
-| ★ Signature | **Pendant**, in her keeper's preset already: +9 at Lv 50, free | **Charm**: out as either Brawler child (her hits read ATK, the expander's Tomes too); first as an Arms Spellblade child (her Thunder Tome reads M.ATK): +9 |
+| ★ Signature | **Pendant**, in the Berserker's preset already: +9 at Lv 50, free | **Charm**: as a Twofold Charm in any one-stat ATK class of her family (the Berserker, Spellfist, Bladedancer, Marshal: its ATK rider pays, T2U29); as a Charm in the Sentinel (her Light Tome reads M.ATK): +9 |
 | ★ Moon | I HP +35 · II DEF +14 | I 2.4% evasion · II DEF +14 |
-| ★ Tip | **Long guard** on her Greatsword tree | **Long guard** on her Katana tree (her support on a later slot) |
+| ★ Tip | **Long guard** on her Greatsword tree | **Long guard** on her Katana tree (whose skills also carry her support statuses) |
 | Line | Metal (both its professions) | Metal |
 
 | Uma (made up) | Template | Tier 2 class (Suggested unless said) | ★ Flourish | ★ Signature (Lv 50) | ★ Moon I · II | ★ Tip, her lead tree |
 |---|---|---|---|---|---|---|
-| **A** Front A, Long A, Stamina growth | Tireless Ironhide | The Brawler's keeper | Late reserve | Pendant +9 | HP +35 · DEF +14 | Long guard · Greatsword |
-| **B** Pace A alone, Mile A, Speed growth | Fleet Flashblade | The Arms Spellblade's keeper | Clean break | Charm +9 | 2.4% evasion · DEF +7, M.DEF +7 | Quickstep · Katana |
-| **C** Pace A + Late A, Medium A, Wit growth | Clever Spellwright | The Sorcerer's expander (picked) | Even pace | Insignia +9 | MP +7 · M.DEF +14 | Spillover · Fire Tome |
-| **D** End A, Long A, Guts growth | Gritty Shepherd | The Tome Summoner's expander (picked: support) | Late reserve | Insignia +9 | A Limit start of 1 · DEF +7, M.DEF +7 | Long guard · Dark Tome |
-| **E** Late A alone, Medium A, Power growth | Mighty Mender | The Paladin's expander (picked: a battle healer) | Even pace | Orb +9 | DEF and M.DEF +7 · DEF +7, M.DEF +7 | Spillover · Lance (her stride's; the battle healer's bigger strike splashes more) |
+| **A** Front A, Long A, Stamina growth | Tireless Ironhide | Berserker | Late reserve | Pendant +9 | HP +35 · DEF +14 | Long guard · Greatsword |
+| **B** Pace A alone, Mile A, Speed growth | Fleet Flashblade | Blademaster | Clean break | Charm +9 | 2.4% evasion · DEF +7, M.DEF +7 | Quickstep · Katana |
+| **C** Pace A + Late A, Medium A, Wit growth | Clever Spellwright | Battlemage (picked) | Even pace | Insignia +9 | MP +7 · M.DEF +14 | Spillover · Fire Tome (no Pinpoint on that cast: Power against a lone boss, T2U31) |
+| **D** End A, Long A, Guts growth | Gritty Shepherd | Shaman (picked: support) | Late reserve | Insignia +9 | A Limit start of 1 · DEF +7, M.DEF +7 | Long guard · Dark Tome |
+| **E** Late A alone, Medium A, Power growth | Mighty Mender | Templar (picked: a battle healer) | Even pace | Orb +9 | DEF and M.DEF +7 · DEF +7, M.DEF +7 | Spillover · Lance (her stride's; the battle healer's bigger strike splashes more) |
 
 ## 5. Tier 3 in full
 
@@ -474,24 +502,25 @@ her hold two of a tree's three lines, each with its own tip pick; at Class Rank 
 
 | Piece | Tier 3 |
 |---|---|
-| Calling | A family, as in Tier 2 (T2U21, T2U25): she arrives as her class picked on the Ascend sheet (progression T2W31) |
+| Calling | A family, as in Tier 2 (T2U25, T2U28): **she arrives as the Tier 3 class she picks** on the Tier 3 Ascend sheet (classes T2C89, progression T2W31), a Tier 3 child of a Tier 2 class she brought to Class Rank 50; her family 9, 9, 6, 6 or 4 |
 | ★ Flourish | 4% of her max HP a fight: a Brawler 144 HP, a Sorcerer 122, the six between 131 at Lv 50 |
 | ★ Signature | +0.26 a level: **+13** at Lv 50; still half a G10 slot of her stat (+26) |
 | ★ Her moon | I +10 points (HP +50, MP +10, DEF and M.DEF +10 each; Fleet and Gritty their shares) · II DEF +21, M.DEF +21, or DEF +10 and M.DEF +11 |
-| ★ Signature tip | **At both tip forks of her lead tree** (T2U13): the same ★ on each held line. A capstone built on a ★ tip keeps its ★ effect (Quickstep's two hits, Spillover's splash, Long guard's Barrier), as T2C's capstone keeps its tip's pick. The master slot (CP22) may hold that capstone like any other. No ★ on her other two trees |
+| ★ Signature tip | **At both tip forks of her lead tree** (T2U13): the same ★ on each held line. A capstone built on a ★ tip keeps its ★ effect (Quickstep's two hits, Spillover's splash, Long guard's Barrier), as T2C's capstone keeps its tip's pick. No ★ on her other two trees; the master slot is retired (T2C81), so none holds a ★ capstone apart |
 | Budget | Measured in §4.8; the tip's check as Tier 2's (within 3 points of Power, T2B) |
 
 ```
  Her lead weapon's tree, Tier 3
 
- depth 1 ── depth 2 ──┬── A  3 ── 4 ── 5 ─[Power · Break · ★]── 6  capstone (keeps its tip's pick)   held
-                      ├── B  3 ── 4 ── 5 ─[Power · Break · ★]── 6  capstone                          held
+ depth 1 ── depth 2 ──┬── A  3 ── 4 ── 5 ─[Power · Break · ★]  capstone, crowned at Class Rank 50 (plays at 5.6)   held
+                      ├── B  3 ── 4 ── 5 ─[Power · Break · ★]  capstone, crowned                                 held
                       └── C  3 ── 4 ── 5 ─ … (not held)
 ```
 
-The Umas of §4.10 in Tier 3: Uma A's Pendant +13, HP +50, DEF +21, Long guard on both of her Greatsword tree's held
-lines; Uma G's Charm +13 (as the Arms Spellblade's expander), 2.4% evasion, DEF +21, Long guard on both of her Katana
-tree's.
+The Umas of §4.10 in Tier 3: Uma A as the **Ravager** (the Berserker's child, Suggested): Pendant +13, HP +50, DEF +21,
+Long guard on both of her Greatsword tree's held lines; Uma G as the **Herald** (the Sentinel's): Charm +13, 2.4%
+evasion, DEF +21, Long guard on both of her Katana tree's. Uma C as the **Spellknight** (the Battlemage's kept child,
+Suggested): Spillover on both Fire lines, Pinpoint ×1.2 on every other one-foe act.
 
 ## 6. Provides and assumes
 
@@ -499,18 +528,18 @@ tree's.
 
 | To | What | Calls |
 |---|---|---|
-| **classes.md (T2C)** | The ★ tip's anchor (her first slot's tree, depth 5's fork, the line she holds; keeper or expander never moves it), its content (Quickstep, Spillover, Long guard), its place on the support and battle-healer classes (a striking lead tree, never a support line), the Tier 3 rule (both held lines, the crown's capstones keep it); the family gate on the sixteen (both children of her family's Tier 1 classes, kin's outside); the tip pick's third value | T2U9, T2U11–T2U13, T2U17, T2U21, T2U23, T2U24 |
+| **classes.md (T2C)** | The ★ tip's anchor (her first slot's tree, depth 5's fork, the line she holds; no class moves it), its content (Quickstep, Spillover, Long guard), its place on every kind of class (a striking lead tree; on a support class her lead tree, which carries her statuses and strikes), **Pinpoint against the ★** (Quickstep and Long guard keep it, Spillover forgoes it on that cast), the Tier 3 rule (both held lines, the crown's capstones keep it); **the family gate on the twenty and twenty-two** (every Tier 2 child of her family's Tier 1 classes and their Tier 3 children, 8 · 8 · 6 · 6 · 4 and 9 · 9 · 6 · 6 · 4, kin's lines outside); her lead weapon by class (the Enchanter's Light Tome); the tip pick's third value | T2U9, T2U11–T2U13, T2U17, T2U24, T2U28, T2U30, T2U31 |
 | **gear.md (T2G)** | The signature reads any form of her family's tree at G1+, × tier; her preset's ★ family first when her hits read its stat, and for everyone once her family's dual form opens; never on mends or Barriers | T2U6, T2U22 |
 | **extra-stats.md (T2E)** | Her moon by tier: two nodes, no jewel, no stat pick, opening with the shared moons' II and IV (never a body or pick Tier 2 adds); its values × 1.8 and × 2.6, Fleet's and Gritty's shares flat | T2U8, T2U26 |
 | **professions.md (T2P)** | Her line by calling in every tier, both its professions; the template adds no demand (her moon takes no jewel since D264, so XR12's two Moon Jewels a tier retire) and nothing to the sub-profession | T2U27 |
-| **balance.md (T2B)** | The template's measured budget by tier; the checks: five matched Umas within 3 points of the template-less party's win rate and rounds, the ★ tip within 3 points of Power on her lead tree on all sixteen classes; the foes priced without templates; the dial (the signature's rate) | T2U14, T2U15, T2U24 |
-| **progression.md (T2W)** | Her pick on the Ascend sheet never moves her template; her slots keep their families; no new Uma in a later world; the tip arrives with Class Rank 40 | T2U25, §8 |
+| **balance.md (T2B)** | The template's measured budget by tier; the checks: five matched Umas within 3 points of the template-less party's win rate and rounds, the ★ tip within 3 points of Power on her lead tree on all twenty and twenty-two classes (a cross's Spillover read without Pinpoint); the foes priced without templates; the dial (the signature's rate) | T2U14, T2U15, T2U24, T2U31 |
+| **progression.md (T2W)** | Her pick on the Ascend sheet never moves her template, in Tier 2 or Tier 3; her slots keep their families; no new Uma in a later world; the tip arrives with Class Rank 40 | T2U25, §8 |
 
 ### 6.2 Assumes
 
 | From | What | If not |
 |---|---|---|
-| **T2C** (classes) | CP19 carried: from Tier 2 a third line (C) at each tree's fork and **a pick at each line's depth-5 tip, Power or Break**; CP20 carried: in Tier 3 two lines held, each with its tip pick, and at Class Rank 50 the crown, which plays each held capstone at 5.6 and keeps its tip (T2C20; no depth-6 node); **sixteen Tier 2 classes** (R2-2), each with its parent Tier 1 class, its preset and three slots by channel, her lead channel first (the expanders' cross-channel slots after it, unless classes.md lets one lead); every capstone strikes; the family and kin read through each class's parent | **No tip fork:** the ★ tip becomes the depth-5 node's alternative on her lead tree's held line, swapped like a line (one pick, Power or ★). **No capstones:** Tier 3 is both held lines' tips only. "Power", the fork's draft option, equals a master-data string (the stat's name, a plain word of the kind D298 kept); its name is T2C's |
+| **T2C** (classes) | CP19 carried: from Tier 2 a third line (C) at each tree's fork and **a pick at each line's depth-5 tip, Power or Break**; CP20 carried: in Tier 3 two lines held, each with its tip pick, and at Class Rank 50 the crown, which plays each held capstone at 5.6 and keeps its tip (T2C20; no depth-6 node; the master slot retired, T2C81); **twenty Tier 2 and twenty-two Tier 3 classes** (R3-6, T2C65, T2C66), each with its Tier 1 ancestor, its preset and three slots by channel, her lead channel first (a cross's other-channel slot after it); Pinpoint on acts whose every hit lands on the tapped foe (T2C73); every capstone strikes; the family and kin read through each class's Tier 1 ancestor | **No tip fork:** the ★ tip becomes the depth-5 node's alternative on her lead tree's held line, swapped like a line (one pick, Power or ★). **No capstones:** Tier 3 is both held lines' tips only. **Pinpoint on the tapped foe's hits only:** Spillover would keep it, and T2U31's trade disappears. "Power", the fork's draft option, equals a master-data string (the stat's name, a plain word of the kind D298 kept); its name is T2C's |
 | **T2G** (gear) | Three accessory slots in every tier (D264); the four families keep their names, each with **a tree of forms** opening by grade from Tier 2 (R2-7), the Pendant's and the Charm's with a form that gives both stats; the signature a stat outside any kind cap | If a family splits into new families, the ★ follows the one her knack's family becomes; if no family gives both stats, T2U22's "out" rows stay out at every grade |
 | **T2E** (extra stats) | Her moon stays two nodes beside the shared Planet and moons, outside the stat picks every other open node takes from Tier 2 (R2-8); × 1.8 and × 2.6 | If her moon gets a list, its template stat is the first entry and her default (T2U26) |
 | **T2P** (professions) | Her calling's line is her two professions from Tier 2 (R2-9); her sub-profession is her own pick | — |
@@ -524,11 +553,11 @@ Where a new requirement would land on this doc, and the one place it changes:
 | If the owner wants | It lands on | What moves |
 |---|---|---|
 | A stronger edge | T2U15, the dial | The signature's rate (0.1 → 0.2 a level is about +4%); nothing else |
-| More Tier 2 classes than the sixteen, or a Tier 3 promotion | T2U21, her family | Her family stays "the children of her family's classes"; the table grows, nothing else |
+| More classes than the twenty and twenty-two | T2U28, her family | Her family stays "the children of her family's classes"; the table grows, nothing else (round 3 did exactly this) |
 | A calling chosen again in a later world (no Tier 0 to read it from) | T2U25 | One stored pick, the first template field the save would hold |
 | New accessory families or forms (T2G) | T2U6, T2U22 | The knack → family table; the preset's ★ rule |
 | A different Tier 2 tree (no tip fork, no line C) | T2U9, T2U13 | Only the tip's slot: "depth 5 of her lead tree"; its content stands |
-| The Umas whose ★ their pure class can't use before the dual form (35, and 8 Fleet Paladins) | T2U22 | A mirror rule (a Charm's ★ counts on a Pendant and back) |
+| A ★ that pays without its Twofold on a one-stat class (77 Umas have one in their family) | T2U29 | A mirror rule (a Charm's ★ counts on a Pendant and back); the Fleet Paladins' Tier 1 case (8) with it |
 | More templates (a fourth reading) | UT5, kept | The catalog; every piece still reads one of the three |
 
 ## 7. Save and engine
@@ -581,7 +610,7 @@ Rough stage: Tier 2's class engine (T2C's), after v21. Older fights replay on th
 | **T2U10** Her lead weapon | **Her class preset's first slot** (D263): Brawler Greatsword, Sorcerer Fire Tome, Arms Spellblade Katana, Tome Spellblade Thunder Tome, Arms Summoner Bow, Tome Summoner Dark Tome, Paladin Lance, Cleric Light Tome; in a class branch its set's first (T2C); she may put another lead-channel weapon first | A fixed weapon per template; her highest-grade weapon | Her preset is what one tap dresses; slots already put the lead channel first | **Superseded (R2-2)** by T2U23 |
 | **T2U11** The three tips | **Re-cut on today's shapes:** Quickstep (Dash) two more hits on her target at the same total; Spillover (Middle) the volley's splash, 0.35 on every foe but her target, +2 MP; Long guard (Stayer) a Barrier on herself of 10% of her max HP until the round's end, +2 MP; sidegrades for Tier 2's simulation | UT9's text as written (the Bow's old splash, ×0.3, +4 MP); new effects | Each rule exists in the engine today; the volley is the game's splash since CV12 | Stands; T2U24 places it on the new kits |
 | **T2U12** Reordering | **The ★ follows her first slot;** a ★ pick on a tree that stops being first, or outside her family, plays as Power and waits, and returns when it is first again | Reset it to Power; lock her first slot once picked | Slot order stays free (it is today); nothing lost to a swap | Stands |
-| **T2U13** Tier 3 | **The ★ at both tip forks of her lead tree** (two lines held); a capstone built on a ★ tip keeps its ★ effect; the master slot may hold it; no ★ on her other two trees | A ★ on every held tree; a stronger Tier 3 tip | UT9's Tier 3 rule on T2C's capstones; the same one place | Stands |
+| **T2U13** Tier 3 | **The ★ at both tip forks of her lead tree** (two lines held); a capstone built on a ★ tip keeps its ★ effect, crowned at Class Rank 50; no ★ on her other two trees | A ★ on every held tree; a stronger Tier 3 tip | UT9's Tier 3 rule on T2C's capstones; the same one place | **Kept, changed (R3-1):** "the master slot may hold it" drops, the master slot retired (T2C81) |
 | **T2U14** The budget | **The measured sizes stand:** the ★ adds about +2% damage a turn at Lv 50 in every tier (+1.0–3.6 · +0.5–3.3 · +1.3–3.4%); matched with her family's swap +1.2 · +1.3 · +1.5% on average; a matched party takes 4–6% less from Lv 30; the Flourish mends 0.1–0.9% of her max HP a fight (4% its cap); node II 3.8–4.0% of her defense; wins and pace unchanged; the tip within 3 points of Power; "about +5%" is the ceiling, not a target; the foes priced without templates | Restore +5% (the signature at +0.2 a level); price the foes with templates | D266 and D274 chose a smaller, optional template; the tier scaling keeps one budget for every tier | Stands |
 | **T2U15** The dial | **Unchanged: the signature's rate a level** (0.1 now, about +2%; 0.2 about +4% if the owner wants a stronger edge), never a new piece and never the foes; the tips' knobs (§4.7) only if the simulation finds one hot | A bigger moon; a bigger Flourish | One number, already in the fight's input (UT20) | Stands |
 | **T2U16** How it shows | **One more ★ row on the Template tab** (★ Tip: Picked, Not picked, "R40 first", "Off · as Sorcerer"), opening the Class tab's tip node; the fork draws "Power · Break · ★ Quickstep", the ★ dashed until picked; no dot; the Stable unchanged | A dot while the ★ tip is unpicked; a tip facet | D270's grammar (a number, a state, the sheet where it changes); D274's no dot | Stands ("Off · as {class}") |
@@ -589,13 +618,17 @@ Rough stage: Tier 2's class engine (T2C's), after v21. Older fights replay on th
 | **T2U18** Engine | **The tips are data on rules that exist** (spread hits, the volley's splash, a Barrier, with a self-target the one new step), in Tier 2's class engine; the other pieces need nothing (already × tier) | An engine stage of its own | Smallest change; replays keep their own engine | Stands |
 | **T2U19** Names | **Quickstep, Spillover and Long guard kept; no new name coined.** Every template word (the 15 types, the 5 knack words, the 3 Flourishes, the 3 tips) checked against every string of today's master-data release (10 files, 18,227 strings, case-insensitive exact match): no match | Rename the tips | Nothing from the original games; the old names already passed UT16's check | Stands; round 2 coins no name (re-checked) |
 | **T2U20** Professions and the party | **Her calling names her primary trade in every tier (CV20); nothing to the secondary profession (T2P), no Craft bonus, no party synergy** | Craft EXP in her trade; matching strides in a party | Every Uma of a level finishes together; a template is hers, a party's shape the classes' | **Superseded (R2-9)** by T2U27 |
-| **T2U21** Her family on the sixteen | **Both children of each Tier 1 class of her family:** Warrior 6, Mage 6, Spellblade, Summoner and Healer 4 each; keeper and expander equal; kin's children outside; read through each Tier 2 class's parent | Only the keepers (the identity class); every class she can fight as; kin's children in | One rule read through the parent; swapping keeps her template, the owner's balance tool | **New (R2-2)**; replaces T2U4 |
-| **T2U22** Her preset's ★ | **Her family first when her hits read its stat** (a Pendant an ATK hitter's, a Charm an M.ATK hitter's, so the Brawler's and the Sorcerer's expanders read as their parents), in its best form; **first for everyone once her family's dual form opens** (R2-7); never on mends or Barriers | Keep "her weapons can use it" (a useless Charm on the Brawler's expander); the mirror rule now; force her family everywhere | The expanders' cross channels break the weapon reading; the dual form keeps round 1's "★ first for everyone" | **New (R2-3, R2-7)**; replaces T2U7 |
-| **T2U23** Her lead weapon on the sixteen | **Her class's preset first slot:** keepers as their parents (Greatsword, Fire Tome, Katana, Thunder Tome, Bow, Dark Tome, Lance, Light Tome), expanders by classes.md's presets (assumed the same leads); the tip follows her first slot in any channel | A fixed weapon a template; her highest-grade weapon; always her lead channel's | One tap dresses her preset; slots already put her lead first | **New (R2-2)**; replaces T2U10 |
-| **T2U24** The tip on the support and battle-healer classes | **On her lead tree's held line, a striking tree in every class** (every capstone strikes); never on a support line; a capstone that doesn't strike plays the ★ as Power ("★ Tip · on a strike line"); the three tips unchanged; never a buff, debuff, mend or ward for others; checked within 3 points of Power on all sixteen | Move the ★ to a support class's support line; a support-shaped fourth tip; a tip a class | The tip is a strike-shaped extra; a support ★ would be a second support kit and leak into party value (R2-11) | **New (R2-3)** |
-| **T2U25** Her arrival in a later world | **She arrives as the Tier 2 class she picks on the Ascend sheet** (Suggested her class's keeper, progression T2W18); no new Uma in a later world (live); her calling stays her family's name; her pick never moves her template | Arrive as her Tier 1 class (round 1, as built); her calling picks her Tier 2 class | R2-5; the template is her racing profile's | **New (R2-5)**; replaces T2U3 |
+| **T2U21** Her family on the sixteen | **Both children of each Tier 1 class of her family:** Warrior 6, Mage 6, Spellblade, Summoner and Healer 4 each; keeper and expander equal; kin's children outside; read through each Tier 2 class's parent | Only the keepers (the identity class); every class she can fight as; kin's children in | One rule read through the parent; swapping keeps her template, the owner's balance tool | **Superseded (R3-1, R3-4)** by T2U28 |
+| **T2U22** Her preset's ★ | **Her family first when her hits read its stat** (a Pendant an ATK hitter's, a Charm an M.ATK hitter's, so the Brawler's and the Sorcerer's expanders read as their parents), in its best form; **first for everyone once her family's dual form opens** (R2-7); never on mends or Barriers | Keep "her weapons can use it" (a useless Charm on the Brawler's expander); the mirror rule now; force her family everywhere | The expanders' cross channels break the weapon reading; the dual form keeps round 1's "★ first for everyone" | **New (R2-3, R2-7)**; replaces T2U7; stands, read on round 3's one-stat classes by T2U29 |
+| **T2U23** Her lead weapon on the sixteen | **Her class's preset first slot:** keepers as their parents (Greatsword, Fire Tome, Katana, Thunder Tome, Bow, Dark Tome, Lance, Light Tome), expanders by classes.md's presets (assumed the same leads); the tip follows her first slot in any channel | A fixed weapon a template; her highest-grade weapon; always her lead channel's | One tap dresses her preset; slots already put her lead first | **Superseded (R3-1–R3-4)** by T2U30 (and the Enchanter leads with Light, not Thunder) |
+| **T2U24** The tip on the support and battle-healer classes | **On her lead tree's held line, a striking tree in every class** (every capstone strikes); never on a support line; a capstone that doesn't strike plays the ★ as Power ("★ Tip · on a strike line"); the three tips unchanged; never a buff, debuff, mend or ward for others; checked within 3 points of Power on all sixteen | Move the ★ to a support class's support line; a support-shaped fourth tip; a tip a class | The tip is a strike-shaped extra; a support ★ would be a second support kit and leak into party value (R2-11) | **New (R2-3)**; stands, extended to the pure variants, crosses and Arsenal classes by T2U31 |
+| **T2U25** Her arrival in a later world | **She arrives as the Tier 2 class she picks on the Ascend sheet** (Suggested her class's keeper, progression T2W18); no new Uma in a later world (live); her calling stays her family's name; her pick never moves her template | Arrive as her Tier 1 class (round 1, as built); her calling picks her Tier 2 class | R2-5; the template is her racing profile's | **New (R2-5)**; replaces T2U3. **Kept, changed (R3-1):** in Tier 3 she arrives as the Tier 3 class she picks (T2C89) |
 | **T2U26** Her moon and the stat picks | **Her moon's two nodes keep their template stat, no pick list** (R2-8's picks are the shared bodies'); if extra-stats.md gives her moon a list, the template stat is its first entry and her default | A list like every body's; no moon from Tier 2 | Her uniqueness, not her build; one fixed piece stays small (D274) | **New (R2-8)** |
 | **T2U27** Her calling and three professions | **Her calling names her line, both its professions (R2-9); nothing to the sub-profession** (her own pick), no Craft bonus, no party synergy | A Craft bonus in her line; her template picks her sub-profession | Every Uma of a level finishes together; a template is hers, a party's shape the classes' | **New (R2-9)**; replaces T2U20 |
+| **T2U28** Her family on the twenty and twenty-two | **Every Tier 2 child of each Tier 1 class of her family (Warrior 8, Mage 8, Spellblade and Summoner 6, Healer 4) and in Tier 3 their Tier 3 children (9, 9, 6, 6, 4); every line equal (keeper, expander, support, pure variant, either Tier 3 child of the Spellfist or the Battlemage); kin's lines outside; read through each class's Tier 1 ancestor** | Only the keepers' lines; kin's lines in once open; the pure variants outside (they leave the hybrid's two channels) | Classes' §4.10 (T2C91) counts; the owner's swaps keep her template whenever both classes are hers | **New (R3-1, R3-4)**; replaces T2U21 |
+| **T2U29** Her preset's ★ on the one-stat classes | **T2U22 stands: on an ATK-only class her Charm, on an M.ATK-only class her Pendant, goes first as her family's Twofold (gear's T2G35, from her first Tier 2 grade), whose other-stat rider and her ★ pay on every hit; no Uma's ★ is off in any of the forty-two classes; 77 Umas of the census meet the case (44 Fleet, 33 Tireless; round 2's 35)** | A mirror rule (a Charm's ★ counts on a Pendant and back); keep her ★ out of a one-stat class's preset | The Twofold already makes the ★ pay on any weapons; a Twofold Charm on a Bladedancer gives ATK +18 and her ★ +9 against a Great Pendant's +23 | **New (R3-4)** |
+| **T2U30** Her lead weapon on the twenty and twenty-two | **Her class's preset first slot ([classes](classes.md) §4.13, §6.3): Greatsword (Berserker, Spellfist and their Tier 3 children, the Gladiator's Evolved + Katana), Fire Tome (Archmage, Battlemage, theirs, the Thaumaturge's Evolved + Light), Katana (the Arms Spellblade's three), Thunder Tome (Runeblade, Spellweaver), Light Tome (Enchanter), Bow (the Arms Summoner's three), Dark Tome (the Tome Summoner's three), Lance (Paladin's), Light Tome (Cleric's); a Tier 3 class her Tier 2 parent's; the tip follows her first slot** | A fixed weapon a template; her highest-grade weapon; the Enchanter on her parent's Thunder | One tap dresses her preset; slots put her own channel first, so a cross's other-channel weapon never leads | **New (R3-1–R3-4)**; replaces T2U23 |
+| **T2U31** The tip on the pure variants, crosses and Arsenal classes, and Pinpoint | **On her lead tree's held line as every class's; the three tips unchanged; on a Pinpoint class Quickstep and Long guard keep Pinpoint (her hits stay on her target), Spillover forgoes it on that cast (its splash is not one foe, T2C73), paying with one other foe standing (0.35 a foe against Pinpoint's 0.1, Tier 3 0.2); no exception; the sheet reads "★ Spillover · no Pinpoint"** | Pinpoint on the tapped foe's hits even with a splash (classes' rule to change); Spillover barred from Pinpoint classes | Classes owns Pinpoint's test; the tip is a choice, and a crowd-fighting Middle Uma still gains | **New (R3-2, R3-3)** |
 
 ## 10. The previews
 
@@ -611,6 +644,13 @@ T2U24); templates-umas.html her Tier 2 class as picked on the Ascend sheet (T2U2
 small (D274). **Names:** round 2 adds one state, "★ Tip · on a strike line", checked with progression's labels
 (case-insensitive exact match against all 18,227 distinct master-data strings: no match); the role words it uses (keeper,
 expander, the sheet's "Suggested") are the brief's and progression's.
+
+**Round 3 on the pages:** templates-tiers.html draws her family by tier on the twenty and twenty-two with their names
+(T2U28) and the preset rule's one-stat rows (T2U29); templates-tip.html her lead tree by class in Tiers 2 and 3, the
+Enchanter's Light, the tip on the pure, cross and Arsenal classes and Pinpoint against the three tips (T2U30, T2U31), and
+Tier 3 without the master slot; templates-umas.html the Umas' classes by name, the 77 Umas whose family has a one-stat
+class, and each Uma's Tier 3 class. **Names:** round 3 adds one state, "★ Spillover · no Pinpoint", checked the same way
+against all 20,500 distinct strings of today's release (no match); the class names are classes' (T2C97).
 
 **The old pages, carried or retired** (for the README's §7 log):
 

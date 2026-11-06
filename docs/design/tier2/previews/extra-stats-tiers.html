@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Extra Stats by Tier</title>
-<!-- docs/design/tier2/extra-stats.md (round 2): Extra Stats from Tier 1 to Tier 3. The same 22 nodes in every tier; three
+<!-- docs/design/tier2/extra-stats.md (round 2, round 3's class list): Extra Stats from Tier 1 to Tier 3. The same 22 nodes in every tier; three
      jewels a rank and, from Tier 2, three Stardust; every branch's value node by node in Tiers 2 and 3; Prowess's Offense by
      class; Stone's and Fungi's demand an Uma; her window's Stars track; her moon by tier. Self-contained; uma-kit's tokens,
      light and dark. Every number is the live code's (economy/planet.ts) or T2E's rule on it. -->
@@ -116,8 +116,8 @@
   <div class="card scroll"><table id="nodes"></table></div>
 
   <h2>Prowess's Offense by class, five nodes</h2>
-  <p class="lede">Offense splits by her class as Tier 1's Prowess does (<code>PROWESS_SPLIT</code>); the sixteen Tier 2 classes keep their parent's split, but the Brawler's and the Sorcerer's
-    Expanders deal everything on their own stat, 100/0 and 0/100 (T2E45).</p>
+  <p class="lede">Offense splits by her class as Tier 1's Prowess does (<code>PROWESS_SPLIT</code>), on round 3's forty-two classes (T2E50): a class whose every hit reads one stat
+    puts all of Prowess on it (the Brawler's and the Sorcerer's lines, the four pure variants, the Gladiator and the Thaumaturge); every other class keeps her Tier 1 ancestor's split.</p>
   <div class="card scroll"><table id="split"></table></div>
 
   <div class="grid2" style="margin-top:12px">
@@ -194,8 +194,11 @@ function nodes(t) {
   ]
   document.getElementById('nodes').innerHTML = `<tr><th>Body</th><th>Branch</th>${ROMAN.map((n) => `<th class="num">${n}</th>`).join('')}<th class="num">Five nodes, Tier ${t}</th></tr>` + rows.join('')
 }
-const SPLITS = [['Brawler · her Keeper', 100], ['Brawler Expander ("Wild Magic")', 100], ['Sorcerer · her Keeper', 0], ['Sorcerer Expander ("Blade wielding")', 0], ['Arms Spellblade · Arms Summoner and their Expanders', 70],
-  ['Tome Spellblade · Tome Summoner and their Expanders', 30], ['Paladin and her Expander', 80], ['Cleric and her Expander', 20]]
+const SPLITS = [['Berserker, Spellfist, Bladedancer, Marshal · Tier 3: Ravager, Spellhammer, Gladiator, Dervish, Imperator', 100],
+  ['Archmage, Battlemage, Spellweaver, Animist · Tier 3: Astromancer, Spellknight, Thaumaturge, Starweaver, Mythlord', 0],
+  ['Blademaster, Sentinel, Warlord, Druid · Tier 3: Bladelord, Herald, Overlord, Archdruid', 70],
+  ['Runeblade, Enchanter, Invoker, Shaman · Tier 3: Runelord, Oracle, Hierarch, Soulcaller', 30],
+  ['Guardian, Templar · Tier 3: Bastion, Inquisitor', 80], ['Bishop, Exorcist · Tier 3: Cardinal, Hierophant', 20]]
 const split = (p, atk) => { const larger = Math.max(atk, 100 - atk), lead = Math.floor((2 * p * larger + 100) / 200); return atk >= 50 ? [lead, p - lead] : [p - lead, lead] }
 document.getElementById('split').innerHTML = `<tr><th>Class</th><th class="num">ATK %</th><th class="num">Tier 1</th><th class="num">Tier 2</th><th class="num">Tier 3</th></tr>` +
   SPLITS.map(([n, a]) => `<tr><td><b>${n}</b></td><td class="num">${a}</td>${[[2, 4, 6, 8, 10], MOON[2], MOON[3]].map((nodes) => { const t = nodes.map((p) => split(p, a)).reduce((m, [x, y]) => [m[0] + x, m[1] + y], [0, 0]); return `<td class="num">${t[0] && t[1] ? `ATK +${t[0]} · M.ATK +${t[1]}` : t[0] ? `ATK +${t[0]}` : `M.ATK +${t[1]}`}</td>` }).join('')}</tr>`).join('')

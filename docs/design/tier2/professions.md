@@ -6,9 +6,17 @@
 > [farm-by-line.md](../tier-rework/farm-by-line.md) (FL1–FL34, D224–D233), onto **Tier 1 as it is built and live**
 > (engine v21, save v36). Round 2 builds the owner's requirement on that ground: **two materials a line from Tier 2,
 > each its own profession, and three professions an Uma.** Calls: **T2P1–T2P26** (round 1, each with its round-2
-> status) and **T2P27–T2P45** (round 2), every one with a recommendation; no open questions. The manual
+> status), **T2P27–T2P45** (round 2) and **T2P46–T2P48** (round 3's touch-ups, 2026-11-05), every one with a
+> recommendation; no open questions. The manual
 > ([materials](../../game/materials.md), [loops](../../game/loops.md#craft-level), [sections](../../game/sections.md#wilds))
 > is the game as it plays; Tier 1 stays as built (R2-1).
+>
+> **Round 3** ([classes](classes.md)' twenty Tier 2 and twenty-two Tier 3 classes, R3-1–R3-6) **moves no farm number.** A
+> class's weapon demand is her Arms/Tome split, and round 3 adds 3/0 and 0/3 classes (the pure variants, the Gladiator and
+> the Thaumaturge) in mirrored pairs: the twenty hold 30 Arms and 30 Tome slots, the twenty-two 33 and 33, and every comp
+> of the owner's swaps keeps its Tier 1 party's split, so **every branch stays equal** (T2P46, T2P47). The presets' new kinds
+> (more Katanas) move no line, and a swap pair's weapons fit inside the window's five kinds, so the full window stays
+> 1,900 refined (T2P48). [§4.8](#48-demand-against-supply-t2p40-t2p21-t2p22) has the tables.
 >
 > **Numbers come from the code:** `packages/domain/src/economy/pacing.ts` (steps, sizes, Craft Level),
 > `economy/professions.sim.ts` and `economy/professions-v4.sim.ts` (the ledger's math), `items/made-v4.ts` (recipes),
@@ -325,7 +333,7 @@ Round 2 moves four FL rows from Kept to Kept, changed (FL3, FL5, FL8, FL27); the
 | [professions-tiers](previews/professions-tiers.html) | **Rewritten:** the farm Tier 1 → 2 → 3, the Wilds with two branches a row, who may work what |
 | [professions-branches](previews/professions-branches.html) | **New:** the ten branches, their twenty grades of items, the ten made items and what each feeds |
 | [professions-times](previews/professions-times.html) | **Rewritten:** every step, item and rank timed for both branches, by Craft Level, per item beside totals |
-| [professions-demand](previews/professions-demand.html) | **Rewritten:** demand against supply by branch and place, rosters with and without sub-professions, slots, the party's grades, the pace |
+| [professions-demand](previews/professions-demand.html) | **Rewritten:** demand against supply by branch and place, rosters with and without sub-professions, slots, the party's grades, the pace; **round 3:** demand by class on the twenty and twenty-two, the owner's comps by channel, swap pairs inside the window |
 | [professions-secondary](previews/professions-secondary.html) | **Rewritten** (the file keeps its name for the README's link): three professions and the sub-profession, the EXP rule, the screens |
 | Round 1's old-preview map (`prof-map`, `prof-materials`, `prof-flow`, `prof-demand`, `gear-crafting`; `prof-grant` and the first round retired) | Unchanged: carried into the pages above ([README](README.md) §7.2) |
 
@@ -408,7 +416,7 @@ grade, not one choice, so changing a weapon's type, a slot's form or a node's br
 
 | Line | Second item | What it raises from Tier 2 (the dual path it feeds) | Owner | This doc assumes |
 |---|---|---|---|---|
-| Metal | **Arms Whetstone** | An Arms weapon's **Tier 2 type** at each grade: Pure, Dual with its partner, or an Expander's cross-channel use (an Arm on the Blade Sorcerer's M.ATK) | [gear](gear.md) (R2-6) | A weapon kind's type is set at promotion and swaps freely or cheaply (any re-type cost sits outside a rank); its strength grows with the grade |
+| Metal | **Arms Whetstone** | An Arms weapon's **Tier 2 type** at each grade: Pure, Dual with its partner, or a cross's other-channel use (the Battlemage's Katana on M.ATK) | [gear](gear.md) (R2-6) | A weapon kind's type is set at promotion and swaps freely or cheaply (any re-type cost sits outside a rank); its strength grows with the grade |
 | Vegetables | **Tome Reagent** | A Tome's **Tier 2 type**: Pure, Dual, or cross-channel (a Tome on the Wild Magic Brawler's ATK) | gear (R2-6) | The same, for Tomes. By channel, as FL4: a cross-channel Tome still takes Tome Ink and Reagents |
 | Wood | **Armor Lining** | An armor slot's **tier step**: from Tier 2 a grade's Lining carries the piece's × tier value, since gear gives armor no Tier 2 path (T2G29; reconciled, XR18) | gear | Hides keeps its full share of Wood's work |
 | Fish | **Accessory Inlay** | An accessory slot's **tree** (R2-7): the forms that open as the slot's grade rises (dual ATK and M.ATK, several damage kinds, by shape) | gear (R2-7) | Forms open by the slot's grade and are worn freely; the Inlay raises whichever form she wears |
@@ -614,10 +622,56 @@ first item's lists (a Whetstone or Reagent ×1–×3, a Lining ×1–×10, an In
 A place (both branches): **100.4 job-hours a maxed Uma** (80.3 slot-hours), **167.4 a full window on the weapon lines**
 (133.9), 100.4 elsewhere; its eight slots make 2.39 maxed Umas or 1.43 (weapon lines) and 2.39 full windows a day.
 
-**By her class** (refined a branch, a maxed Uma): a Brawler Metal 300 and Rock 300, no Vegetables or Herbs; a two-Arms
-hybrid or the Paladin Metal and Rock 200, Vegetables and Herbs 100; a two-Tomes hybrid or the Cleric the reverse; a
-Sorcerer Vegetables and Herbs 300; everyone 150 on each of the other six. An Expander's cross-channel weapon counts by
-its own channel.
+**By her class (T2P46):** a class's weapon demand is her **Arms/Tome split**, since an Arms Gem and Whetstone raise any
+Arm and Tome Ink and Reagent any Tome. Refined a branch, a maxed Uma, on [classes](classes.md)' twenty and twenty-two
+(round 3); everyone 150 on each of the other six branches:
+
+| Split | Metal · Rock | Vegetables · Herbs | Tier 2 classes | Tier 3 classes |
+|---|---|---|---|---|
+| **3 Arms** | 300 · 300 | 0 · 0 | Berserker, **Bladedancer**, **Marshal** | Ravager, **Gladiator**, Dervish, Imperator |
+| **2 Arms + 1 Tome** | 200 · 200 | 100 · 100 | Spellfist, Blademaster, Sentinel, Warlord, Druid, Guardian, Templar | Spellhammer, Bladelord, Herald, Overlord, Archdruid, Bastion, Inquisitor |
+| **1 Arm + 2 Tomes** | 100 · 100 | 200 · 200 | Battlemage, Runeblade, Enchanter, Invoker, Shaman, Bishop, Exorcist | Spellknight, Runelord, Oracle, Hierarch, Soulcaller, Cardinal, Hierophant |
+| **3 Tomes** | 0 · 0 | 300 · 300 | Archmage, **Spellweaver**, **Animist** | Astromancer, **Thaumaturge**, Starweaver, Mythlord |
+| **Slots in all** | | | **30 Arms · 30 Tomes** (3 + 7 + 7 + 3 classes) | **33 Arms · 33 Tomes** (4 + 7 + 7 + 4) |
+
+- **Bold: round 3 moves her split.** The four pure variants leave their hybrid parent's 2 + 1 for one channel, and the
+  Gladiator and the Thaumaturge leave their cross parent's; each has a mirror with the reverse split, so the class list
+  stays even in both tiers.
+- **A cross-channel weapon counts by its own channel** (the Spellfist's Fire Tome takes Tome Ink and a Reagent though it
+  reads ATK). **A two-kind weapon costs one weapon's grade** (Arsenal's two included): its partner kind is coverage and
+  has no grade of its own, and the type is the second item's whatever it is (T2P29).
+- **The presets' kinds move no line:** the twenty presets hold 8 Katanas and 8 Blizzard Tomes of 60 slots (round 2's
+  sixteen: 4 and 6 of 48) and 5 Thunder Tomes (4 of 48), but a line's items raise any kind of its channel.
+
+**The owner's comps (T2P47):** every comp of [classes](classes.md)' §5 and §6.8 keeps its Tier 1 party's split, because
+each swap trades channels inside the party (the Spellfist takes the Tome the Bladedancer drops):
+
+| Comps | Arms · Tomes | A maxed party: Metal and Rock · Vegetables and Herbs · each other branch |
+|---|---|---|
+| Tier 1 Party 1; Tier 2 C1, C3, C4, C5, C6, C7, C8, C10; Tier 3 T1, T3, T3g, T4, T6, T8 | **8 · 7** | 800 · 700 · 750 |
+| Tier 1 Party 2; Tier 2 C2, C3b, C4b, C6b, C9; Tier 3 T2, T3b, T4b | **7 · 8** | 700 · 800 · 750 |
+| **Both parties** | **15 · 15** | **1,500 on every branch** |
+
+- **So the ten-branch rule holds for a typical roster** (T2P39): the class tree is mirrored, the owner's two parties
+  together are even, and his swaps keep each party's split. A roster that leans to one channel (every Uma on a 3 Arms
+  class at worst: Metal and Rock 300 an Uma, Vegetables and Herbs none) is the sub-profession's work, as a thin trade is
+  today: Suggested goes to the branch with the fewest hands (T2P36), and every split of twenty runs at its hours (an
+  Uma's hours don't depend on her class, T2P40). No note on the rule is needed.
+
+**The full window (T2P48)** stays 1,900 refined: its Weapons track asks five kinds at G10 of any of her classes (D289),
+and **a swap pair's weapons fit inside five**. The owner's swaps hold 3–5 kinds between the two classes:
+
+| Swap (Tier 2) | Kinds she grades for both | Swap | Kinds |
+|---|---|---|---|
+| Berserker ↔ Spellfist | 5: Greatsword, Axe, Lance, Katana, Fire | Archmage ↔ Battlemage | 4: Fire, Blizzard, Thunder, Katana |
+| Blademaster ↔ Bladedancer | 4: Katana, Axe, Thunder, Bow | Runeblade ↔ Spellweaver | 4: Thunder, Blizzard, Katana, Dark |
+| Blademaster ↔ Sentinel | 5: Katana, Axe, Greatsword, Thunder, Light | Runeblade ↔ Enchanter | 4: Thunder, Blizzard, Katana, Light |
+| Warlord ↔ Marshal | 4: Bow, Axe, Dark, Katana | Invoker ↔ Animist | 4: Dark, Blizzard, Bow, Thunder |
+| Guardian ↔ Templar · Warlord ↔ Druid | 3 | Bishop ↔ Exorcist · Invoker ↔ Shaman | 3 |
+| Tier 3: Spellhammer ↔ Gladiator | 5: Greatsword, Katana, Fire, Axe, Lance (the Gladiator's partners ungraded) | Spellknight ↔ Thaumaturge | 4: Fire, Blizzard, Katana, Thunder (the same) |
+
+So an Uma who swaps her class as the owner does grades nothing past her window; a third class of another kit asks a
+sixth or seventh weapon, as a Tier 1 Uma who plays three classes does today.
 
 **Rosters** (supply: a slot's day, 24 slot-hours or 30 job-hours, a working Uma; eight slots a place). Without a
 sub-profession a line's work waits on its own trade's Umas; with one, on the roster's hours:
@@ -756,18 +810,18 @@ each raised by the same second item at each grade.
 | **progression.md (T2W)** | Every profession restarts at Lv 1 on Ascend; the Craft track's recommendation (her best profession at Lv 10n; or two at Lv 50 for Craft V, 49 days); a run of twenty's farm (50.2 days maxed, 63.6 full windows; 31.8 with forty at work; a 24-party world 83.7); the party holds G10 on day 23.4; the Exchange's stocking; tickets × tier; Drills pay no Craft EXP; she arrives with no sub-profession | T2P9, T2P18–T2P24, T2P40–T2P42 |
 | **balance.md (T2B)** | When a grade is held: the fighting party within a day and a half of its opening, so on-curve gear by level is Tier 1's in every tier; nothing here is a stat | T2P41 |
 | **templates.md (T2U)** | Her calling still names her trade; her Template tab's calling-and-trade row hosts the sub-profession (T2U20: no Craft bonus) | T2P33, T2P35 |
-| **classes.md (T2C)** | A class switch, a Tier 2 promotion or a reclass never moves her trade or her sub-profession; an Expander's cross-channel weapon is raised by its own channel's line | T2P30, T2P33 |
+| **classes.md (T2C)** | A class switch, a Tier 2 or Tier 3 promotion or a reclass never moves her trade or her sub-profession; a cross-channel weapon is raised by its own channel's line; a class's weapon demand is her Arms/Tome split, and the forty-two keep the lines even (30 · 30 Tier 2 slots, 33 · 33 Tier 3); a two-kind weapon (Arsenal's two) costs one weapon's grade; a swap pair's kinds fit the window's five | T2P30, T2P33, T2P46–T2P48 |
 
 ### 6.2 What this doc assumes from them
 
 | From | Assumes | If it differs |
 |---|---|---|
-| **T2G (R2-6)** | Weapon grades G0–G10 per kind; three slots; a kind's Tier 2 type (Pure, Dual and partner, or an Expander's cross-channel use) set at promotion and swapped freely or cheaply, its strength by grade | A type that costs items comes back against T2P39: inside its branch's 30, or the same on all ten |
+| **T2G (R2-6)** | Weapon grades G0–G10 per kind; three slots; a kind's Tier 2 type (Pure, Dual and partner, or a cross's other-channel use) set at promotion and swapped freely or cheaply, its strength by grade | A type that costs items comes back against T2P39: inside its branch's 30, or the same on all ten |
 | **T2G (armor)** | Five armor slots G0–G10; no Tier 2 path (T2G29): the Lining carries the armor's tier step (§4.3), so Hides keeps its share (reconciled, XR18) | — |
 | **T2G (R2-7)** | Three accessory slots G0–G10; the tree's forms open with the slot's grade and are worn freely | A form that takes its own item comes back here |
 | **T2E (R2-8)** | Jewels open nodes (three a rank); every open node takes a branch stat she picks and swaps freely; her moon's two nodes as Tier 1's | A Stardust a node, not a jewel, drops Fungi to 100 a maxed Uma (§4.3): T2E keeps a jewel's count or the Planet's node takes three |
 | **T2W (R2-10)** | Ascend one Uma at a time with a full window (D283); the Weapons track five kinds at G10; Tier 2's continents 6–10; a world usually starts with a won run's twenty | A smaller Weapons ask moves the full window toward the maxed Uma (1,500); a Craft track of two professions moves her floor to 49 days |
-| **T2C (R2-2–R2-5)** | Sixteen Tier 2 classes on Tier 1's three weapon slots, Arms or Tomes; her calling by running style in every tier | A fourth weapon slot would add a weapon's 10 + 10 a grade to its channel's two branches |
+| **T2C (R2-2–R2-5, R3-1–R3-6)** | **Twenty Tier 2 and twenty-two Tier 3 classes** on Tier 1's three weapon slots, Arms or Tomes, each with a mirror of the reverse split (T2C66, T2C65); Arsenal is two two-kind weapons in three slots, not a fourth slot (T2C85); her calling by running style in every tier | A fourth weapon slot would add a weapon's 10 + 10 a grade to its channel's two branches; an unmirrored class tilts a roster's lines, which the sub-profession carries (T2P47) |
 | **T2B** | Values × 1.8 and × 2.6 on what the items raise | — |
 | **T2U** | The Template tab's calling-and-trade row in every tier | The sub-profession sheet opens from wherever her trade shows |
 
@@ -820,7 +874,16 @@ Where the farm takes time in Tiers 2 and 3 (slot time unless marked; per item be
 ## 9. Decisions
 
 Every call, with the recommended answer. The owner reviews them all. Round 1's calls carry their round-2 status; a
-superseded one names what replaced it.
+superseded one names what replaced it. Round 3's touch-ups (T2P46–T2P48) supersede no call: they read round 2's rules on
+the new class list.
+
+### 9.0 Round 3's touch-ups (T2P46–T2P48)
+
+| Call | Recommendation | Alternatives, briefly | Why |
+|---|---|---|---|
+| **T2P46** Demand by class on the forty-two | **A class's weapon demand is her Arms/Tome split (3 Arms: Metal and Rock 300 each a maxed Uma; 2 + 1: 200 and 100; the mirrors the reverse); the twenty hold 30 Arms and 30 Tome slots, the twenty-two 33 and 33; a cross-channel weapon counts by its own channel; a two-kind weapon, Arsenal's two included, costs one weapon's grade; a weapon kind moves no line** | Price a two-kind weapon's partner as a second weapon; a line item per weapon kind | Lines raise channels, not kinds (FL4); the partner is coverage with no grade of its own (T2P29) |
+| **T2P47** The ten-branch rule on round 3's rosters | **Holds, no note: every class has a mirror of the reverse split, every comp of the owner's swaps keeps its Tier 1 party's split (Party 1's comps 8 Arms · 7 Tomes, Party 2's 7 · 8, together 15 · 15, 1,500 refined on every branch for two maxed parties), and a roster that leans to one channel is the sub-profession's work (T2P36's Suggested, T2P40's hours)** | A rule note that tilted rosters need sub-professions; a channel-balancing nudge on the Ascend sheet | The swaps trade channels inside a party (the Spellfist takes the Tome the Bladedancer drops); a lean was the sub-profession's job in round 2 already |
+| **T2P48** The full window on round 3 | **Unchanged: 320 items, 1,900 refined, 1,908 job-hours; the owner's swap pairs hold 3–5 kinds between the two classes, inside the window's five, so swapping asks no weapon past the window** | Widen the Weapons track to the union of her held classes' kinds | D289's five kinds already cover a swap pair; a sixth weapon is a player's choice, as in Tier 1 |
 
 ### 9.1 Round 2's calls (T2P27–T2P45)
 
@@ -894,3 +957,6 @@ superseded one names what replaced it.
 6. **Eight slots (T2P38).** The one place number that changes; without it a 24-party world's farm doubles.
 7. **The branch names (T2P27, T2P44).** Rock (not Quarry), Fossils (not Shells), Fungi; the families can swap (fibers for
    Herbs or Hides) without moving a number.
+8. **Round 3 moves nothing here (T2P46–T2P48).** The new 3 Arms and 3 Tome classes come in mirrored pairs and the
+   owner's swaps keep each party's channel split, so every branch stays equal; worth a glance only if a roster leans hard
+   to one channel, where the sub-profession carries it.

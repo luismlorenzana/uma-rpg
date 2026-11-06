@@ -7,7 +7,8 @@
 <!-- docs/design/tier2/extra-stats.md (T2E21–T2E38, round 2): a node's three steps, the lanes, every body's branch list, the
      five new stat kinds' rules in the damage stack (and which the engine has today), what each branch is worth on the live
      balance harness (engine v21, the owner's two parties at Tier 2 Lv 50, on curve, Auto, 8 seeds, only the measured Uma
-     changed), the 24-case viability check, MP in a chain, and the presets for the sixteen Tier 2 classes. Self-contained;
+     changed), the 24-case viability check, MP in a chain; round 3 (T2E50–T2E54): the new kits on the harness proxies, the
+     viability re-read, Prowess's split and the presets for the twenty and twenty-two classes. Self-contained;
      uma-kit's tokens, light and dark. Umas are shown by role. -->
 <style>
   :root {
@@ -187,9 +188,26 @@
         (interpolated). MP ×2 wins a short session from a Spring, MP back a long one; Springs are five a continent on a two-hour recharge.</p></div>
   </div>
 
-  <h2>Presets for the sixteen classes (T2E37)</h2>
-  <p class="lede">The Standard preset sets every node: Prowess by her kit; the Planet, Vigor and Guard at Tier 1's gifts (the all-rounders, and HP for the fights the harness can't show).
-    Names are <a href="../classes.md">classes</a>' (T2C31–T2C64).</p>
+  <h2>Round 3: the new kits on the harness (T2E52, T2E53)</h2>
+  <p class="lede">Round 3's twenty Tier 2 and twenty-two Tier 3 classes (<a href="../classes.md">classes</a>, T2C65–T2C101) can't play on the live engine yet, so each new kit runs as a
+    proxy in her parent's seat: a pure variant with both halves on her one stat (her second half scaled to her pure hand) and her third weapon's shape twin; a cross on her
+    preset's shapes, Pinpoint applied by depth. Offense measured, Area and Multi-hit by share × rate, as above. 8 seeds (the pure variants 16 at Tier 2); the controls reproduce
+    the table above. Tier 3 without Momentum and the crown, which multiply every row alike.</p>
+  <div class="bar"><span class="seg" id="r3tier"><button data-v="2">Tier 2 Lv 50</button><button data-v="3">Tier 3 Lv 50</button></span></div>
+  <div class="card scroll"><table id="r3"></table></div>
+  <div class="grid3" style="margin-top:12px">
+    <div class="card"><h3>Offense, every one-stat class</h3><p class="muted" style="margin:0">All of Prowess sits on the stat every hit reads; a shape row reads only its shape's hits and never a Limit
+      Break (15–27% of her damage). Classes' leans are each class's <b>swap row</b>: 1.0–1.6 points behind for the pure Spellblades, 1.3 and 3.9 for the pure Summoners, level or ahead in
+      some regular fights.</p></div>
+    <div class="card"><h3>Pinpoint moves no row (T2E53)</h3><p class="muted" style="margin:0">On an all-one-foe kit it is a flat ×1.10 on every row; on the Battlemage's it takes about a point of share off her
+      sweep. Momentum and Tier 3's doubled step don't move a row either. No "single" row: Offense already reads her one-foe hits whole.</p></div>
+    <div class="card"><h3>Viability, re-read (T2E52)</h3><p class="muted" style="margin:0" id="r3count"></p></div>
+  </div>
+
+  <h2>Prowess's split and presets for the twenty (T2E50, T2E51)</h2>
+  <p class="lede">A class whose every hit reads one stat puts all of Prowess on it; every other class keeps her Tier 1 ancestor's split. The Standard preset sets every node: Prowess by her kit,
+    the Planet, Vigor and Guard at Tier 1's gifts (the all-rounders, and HP for the fights the harness can't show). Bold: new or reshaped in round 3. A Tier 3 class wears her Tier 2
+    parent's row; the Gladiator and the Thaumaturge go 100/0 and 0/100 on Offense (T2E54).</p>
   <div class="card scroll"><table id="presets"></table></div>
 </main>
 
@@ -250,20 +268,60 @@ const sg = (v) => (v > 0 ? `+${v}%` : v < 0 ? `−${-v}%` : '0%')
 document.getElementById('chain').innerHTML = `<tr><th>Class (bar)</th><th class="num">HP and MP, dmg a turn</th><th class="num">HP</th><th class="num">MP</th><th class="num">MP back 3%</th><th class="num">MP back 1.5%</th><th class="num">Attacks for want of MP</th></tr>` +
   CHAIN.map(([n, b, h, m, x3, x15, a]) => `<tr><td><b>${n}</b></td><td class="num">${b.toLocaleString('en')}</td><td class="num">${sg(h)}</td><td class="num">${sg(m)}</td><td class="num">${sg(x3)}</td><td class="num">${sg(x15)}</td><td class="num">${a}</td></tr>`).join('')
 
+// Round 3 (T2E50–T2E54): Tier 2 and 3 classes, their split, preset row, swap row and Tier 3 child.
 const PRESETS = [
-  ['Berserker (the Brawler\'s Keeper, Momentum)', 'Offense', 'Pure physical; Momentum is a status (step 5)'],
-  ['Spellfist (the Brawler\'s Expander)', 'Offense, all to ATK', 'Her Tome hits read ATK too'],
-  ['Archmage (the Sorcerer\'s Keeper, Momentum)', 'Offense', 'Pure magical'],
-  ['Battlemage (the Sorcerer\'s Expander)', 'Offense, all to M.ATK', 'Her Arm hits read M.ATK too'],
-  ['Blademaster · Runeblade (the Spellblades\' Keepers)', 'Multi-hit', 'The extra hit on both halves: every act a multi-hit'],
-  ['Sentinel · Enchanter (the Spellblades\' Expanders, support)', 'Multi-hit', 'Her lead half still lands its extra hit'],
-  ['Warlord · Invoker (the Summoners\' Keepers)', 'Area', 'Two farewells an act; Split on her top pair wins her sub-bosses and bosses'],
-  ['Druid · Shaman (the Summoners\' Expanders, support)', 'Area', 'Her farewells and splashes'],
-  ['Guardian · Bishop (the healers\' Keepers)', 'Offense', 'Her mends and Barriers read it'],
-  ['Templar · Exorcist (battle healers)', 'Offense', 'Still the party\'s healer; her mends read it'],
+  ['Berserker', 'keeper, Momentum', '100/0', 'Offense', 'Area', 'Ravager', 'Pure physical; Momentum multiplies every row'],
+  ['<u>Spellfist</u>', 'expander: the cross, Pinpoint', '100/0', 'Offense', 'Multi-hit', 'Spellhammer · <u>Gladiator</u> (100/0, Area swap)', 'Every hit reads ATK; Pinpoint moves no row'],
+  ['Archmage', 'keeper, Momentum', '0/100', 'Offense', 'Area', 'Astromancer', 'Pure magical'],
+  ['<u>Battlemage</u>', 'expander: the cross, Pinpoint', '0/100', 'Offense', 'Area', 'Spellknight · <u>Thaumaturge</u> (0/100, Area swap)', 'Every hit reads M.ATK; her kind rows lead with Full Fire'],
+  ['<u>Bladedancer</u>', 'pure', '100/0', 'Offense', 'Multi-hit', 'Dervish', '1.6 points ahead of Multi-hit on the mean'],
+  ['<u>Spellweaver</u>', 'pure', '0/100', 'Offense', 'Multi-hit', 'Starweaver', '1.0 ahead; her regular fights a tie'],
+  ['<u>Marshal</u>', 'pure', '100/0', 'Offense', 'Area', 'Imperator', '3.9 ahead of Area on the mean'],
+  ['<u>Animist</u>', 'pure', '0/100', 'Offense', 'Area', 'Mythlord', '1.3 ahead; Area wins her regular fights'],
+  ['Blademaster · Runeblade', 'keepers', '70/30 · 30/70', 'Multi-hit', 'Split', 'Bladelord · Runelord', 'The familiar on both halves: every act a multi-hit'],
+  ['Sentinel · Enchanter', 'support', '70/30 · 30/70', 'Multi-hit', 'Split', 'Herald · Oracle', 'Her lead half still lands its extra hit'],
+  ['Warlord · Invoker', 'keepers', '70/30 · 30/70', 'Area', 'Split', 'Overlord · Hierarch', 'Two farewells an act; Split wins her sub-bosses and bosses'],
+  ['Druid · Shaman', 'support', '70/30 · 30/70', 'Area', 'Split', 'Archdruid · Soulcaller', 'Her farewells and splashes'],
+  ['Guardian · Bishop', 'keeper healers', '80/20 · 20/80', 'Offense', '—', 'Bastion · Cardinal', 'Her mends and Barriers read it'],
+  ['Templar · Exorcist', 'battle healers', '80/20 · 20/80', 'Offense', '—', 'Inquisitor · Hierophant', 'Still the party\'s healer; her mends read it'],
 ]
-document.getElementById('presets').innerHTML = `<tr><th>Tier 2 class</th><th>Prowess, all five nodes</th><th>Planet · Vigor · Guard</th><th>Why</th></tr>` +
-  PRESETS.map(([c, p, w]) => `<tr><td><b>${c}</b></td><td>${p}</td><td>Tier 1's gifts</td><td class="muted">${w}</td></tr>`).join('')
+document.getElementById('presets').innerHTML = `<tr><th>Tier 2 class</th><th>Line</th><th>Split</th><th>Prowess, all five nodes</th><th>Her swap row</th><th>Tier 3 (her row)</th><th>Planet · Vigor · Guard</th><th>Why</th></tr>` +
+  PRESETS.map(([c, l, sp, p, sw, t3, w]) => `<tr><td><b>${c.replace(/<u>(.*?)<\/u>/g, '<b style="color:var(--accent-strong)">$1</b>')}</b></td><td class="muted">${l}</td><td class="num" style="white-space:nowrap">${sp}</td><td>${p}</td><td>${sw}</td><td>${t3.replace(/<u>(.*?)<\/u>/g, '<b style="color:var(--accent-strong)">$1</b>')}</td><td>Tier 1's gifts</td><td class="muted">${w}</td></tr>`).join('')
+
+// The round-3 proxies on the live harness (extra-stats.md §4.8): Offense, Area, Multi-hit (her mean), and the best row by fight.
+const R3 = {
+  2: [['Berserker (the Brawler)', 17.6, 9.9, 9.5, ['Offense', 'Offense', 'Offense'], 'Area'],
+    ['Spellfist (one-foe Arms)', 15.6, 0, 14.0, ['Offense', 'Offense', 'Offense'], 'Multi-hit', 'Multi-hit 5–10% with her Fire\'s single hits'],
+    ['Archmage (the Sorcerer)', 16.4, 10.1, 5.0, ['Offense', 'Offense', 'Offense'], 'Area'],
+    ['Battlemage (Fire, Blizzard, a Double)', 16.4, 7.8, 2.5, ['Offense', 'Offense', 'Offense'], 'Area'],
+    ['Bladedancer', 16.3, 0, 14.7, ['Offense', 'Offense', 'Offense'], 'Multi-hit', 'Regular: 15.9 · 15.4'],
+    ['Spellweaver', 15.8, 0, 14.8, ['Offense', 'Offense', 'Offense'], 'Multi-hit', 'Regular: 15.8 · 15.7'],
+    ['Marshal', 15.6, 11.7, 10.6, ['Offense', 'Offense', 'Offense'], 'Area', 'Regular: 15.1 · Area 14.6'],
+    ['Animist', 15.1, 13.8, 8.7, ['Area', 'Offense', 'Offense'], 'Area', 'Regular: Area 15.9 · 14.2']],
+  3: [['Ravager, Gladiator (the Brawler\'s shapes)', 16.6, 9.7, 9.3, ['Offense', 'Offense', 'Offense'], 'Area'],
+    ['Spellhammer (one-foe Arms)', 15.4, 0, 13.7, ['Offense', 'Offense', 'Offense'], 'Multi-hit', 'Multi-hit 5–9% with her Fire'],
+    ['Astromancer, Thaumaturge (the Sorcerer\'s)', 15.3, 7.5, 5.0, ['Offense', 'Offense', 'Offense'], 'Area'],
+    ['Spellknight (the Battlemage\'s)', 16.4, 6.5, 2.5, ['Offense', 'Offense', 'Offense'], 'Area'],
+    ['Dervish', 15.9, 0, 14.6, ['Multi-hit', 'Offense', 'Offense'], 'Multi-hit', 'Regular: Multi-hit 15.3 · 14.7'],
+    ['Starweaver', 15.8, 0, 14.9, ['Multi-hit', 'Offense', 'Offense'], 'Multi-hit', 'Regular: Multi-hit 16.1 · 15.0'],
+    ['Imperator', 15.7, 10.1, 11.0, ['Offense', 'Offense', 'Offense'], 'Area', 'Regular: Area 13.3'],
+    ['Mythlord', 16.4, 14.3, 8.1, ['Area', 'Offense', 'Offense'], 'Area', 'Regular: Area 17.1 · 16.0']],
+}
+const CLS = { Offense: 'w-offense', 'Multi-hit': 'w-multi', Area: 'w-area', Split: 'w-split' }
+function r3(t) {
+  document.getElementById('r3').innerHTML = `<tr><th>Class (proxy)</th><th class="num">Offense</th><th class="num">Area +45%</th><th class="num">Multi-hit +18%</th><th>Regular</th><th>Sub-boss</th><th>Boss</th><th>Her swap row</th><th>Note</th></tr>` +
+    R3[t].map(([n, o, a, m, best, sw, note]) => {
+      const top = Math.max(o, a, m)
+      const td = (v) => `<td class="num ${v === top ? 'best' : ''}">${v > 0 ? pct(v) : '—'}</td>`
+      return `<tr><td><b>${n}</b></td>${td(o)}${td(a)}${td(m)}${best.map((b) => `<td><span class="cell ${CLS[b]}">${b}</span></td>`).join('')}<td>${sw}</td><td class="muted">${note ?? ''}</td></tr>`
+    }).join('')
+}
+const r3seg = document.getElementById('r3tier')
+const r3paint = (v) => r3seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)))
+r3seg.querySelectorAll('button').forEach((b) => b.onclick = () => { r3paint(b.dataset.v); r3(Number(b.dataset.v)) })
+r3paint('2'); r3(2)
+document.getElementById('r3count').innerHTML = 'Every row is still someone\'s best. Counted on the damage and support classes, Offense wins <b>23 of 48</b> cases in Tier 2 and <b>27 of 54</b> in Tier 3: none over half. ' +
+  'With the healers, whose mends only Offense reaches, 35 of 60 and 39 of 66. Round 3 doubles the one-stat classes; the seam is Multi-hit at 0.7 a point, a balance change.'
 
 const theme = document.getElementById('theme')
 const paint = (v) => theme.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)))
