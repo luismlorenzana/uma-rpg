@@ -48,7 +48,7 @@
   .note { font-size: 12px; color: var(--ink-faint); }
 
   /* Phases by track */
-  .gantt { display: grid; grid-template-columns: 92px repeat(7, minmax(120px, 1fr)); gap: 6px; min-width: 960px; }
+  .gantt { display: grid; grid-template-columns: 92px repeat(8, minmax(116px, 1fr)); gap: 6px; min-width: 1040px; }
   .gantt .head { font: 700 12px system-ui; color: var(--ink); padding: 8px; background: var(--raised); border-radius: 8px; }
   .gantt .head span { display: block; font-weight: 500; color: var(--ink-faint); }
   .gantt .track { font: 700 12px system-ui; color: var(--ink-soft); padding: 8px 0; align-self: start; }
@@ -81,7 +81,8 @@
 <main>
   <h1>uma-quest: the plan</h1>
   <p>The order of work for the new game: the infrastructure first, inside the existing <code>uma-rpg</code> GCP project, then
-    the engine, the slice and the design. The doc with every call is <a href="../plan.md">plan.md</a>.</p>
+    the engine, the slice and the design. The doc with every call is <a href="../plan.md">plan.md</a>; the campaign
+    (travelers, towns, waves) is <a href="../campaign.md">campaign.md</a>, drawn in <a href="campaign.html">campaign.html</a>.</p>
   <nav>
     <a href="#project">The shared project</a>
     <a href="#phases">Phases by who</a>
@@ -207,6 +208,7 @@
         <tr><td>Cloud Run quest-api</td><td>Shares 2M requests and 180k vCPU-seconds a month</td><td>$0</td></tr>
         <tr><td>Firestore database quest</td><td>None: the free quota covers one database a project, uma-rpg's</td><td>A few cents a month</td></tr>
         <tr><td>Artifact Registry quest</td><td>Shares the 0.5 GB</td><td>$0, cents if images pile up</td></tr>
+        <tr><td>Bucket gs://uma-quest-content (stories)</td><td>Shares the 5 GB of US storage</td><td>$0: a few MB</td></tr>
       </tbody>
     </table>
     <p class="note">Sources and the full list of calls are in <a href="../plan.md">plan.md</a>.</p>
@@ -215,7 +217,8 @@
 <script>
   const PHASES = [
     ['Phase 0', 'Decisions, S'], ['Phase 1', 'Repo and cloud, M + M'], ['Phase 2', 'The engine, L'],
-    ['Phase 3', 'The slice, L'], ['Phase 4', 'Design spec, M'], ['Phase 5', 'First chapter, XL'], ['Phase 6', 'To Lv 50, XL'],
+    ['Phase 3', 'The slice, L'], ['Phase 4', 'Design spec, M'], ['Phase 5', 'Band 1, XL'], ['Phase 6', 'To Lv 50, XL'],
+    ['Phase 7', 'The cast, ongoing'],
   ];
   // [track, phase index, class, id, text, small]
   const CHIPS = [
@@ -224,31 +227,41 @@
     ['Claude', 1, 'claude', 'Q1', 'The repo: stack, platform packages, checks, docs', 'CI on, deploys off'],
     ['Claude', 1, 'claude', 'Q2', 'The cloud in project uma-rpg, the deploy, the hello app', 'Sign-in and a save round trip'],
     ['Claude', 2, 'claude', 'Q4', 'The stage: three.js, sideways, camera, stick, battery saver', ''],
-    ['Claude', 2, 'claude', 'Q5', 'The world builder and the kit spec', ''],
+    ['Claude', 2, 'claude', 'Q5', 'The world builder and the kit spec', 'Dungeons and towns'],
     ['Claude', 2, 'claude', 'Q6', 'Sprites in the engine: atlas, face layer, single file', ''],
     ['Claude', 3, 'claude', 'Q8', 'The fight engine copied, HP carried, field heals', ''],
     ['Claude', 3, 'claude', 'Q9', 'The 3D fight screen', ''],
     ['Claude', 3, 'claude', 'Q10', 'The dungeon generator, one biome', ''],
     ['Claude', 3, 'claude', 'Q11', 'The dungeon screen: encounters, Spring, waystones, auto', ''],
+    ['Claude', 3, 'claude', 'Q12', 'A town, the story runner, the world map', 'A stand-in chapter with its own boss'],
     ['Claude', 4, 'claude', '', 'Campaign, growth, dungeons, economy, save v1, screens', 'Starts beside Phase 2'],
-    ['Claude', 5, 'claude', '', 'Town, quest log, four chapter 1s, crafting, jobs', ''],
-    ['Claude', 6, 'claude', '', 'Chapters 2 to 5, capitals, balance', ''],
+    ['Claude', 4, 'claude', '', 'Wave 1\'s five story bibles', 'For your read'],
+    ['Claude', 5, 'claude', '', 'Hub, five inner towns, ten dungeons, party menu, quest log', ''],
+    ['Claude', 5, 'claude', '', 'Wave 1\'s five chapter 1s, crafting, jobs', ''],
+    ['Claude', 6, 'claude', '', 'Bands 2 to 5: 20 towns, 40 dungeons', ''],
+    ['Claude', 6, 'claude', '', 'Wave 1\'s chapters 2 to 5, balance', ''],
+    ['Claude', 7, 'claude', '', 'Waves 2 to 13: five bibles, then 25 chapters each', ''],
     ['ChatGPT', 1, 'art', 'Q3', 'The sprite sample (was H168), plus walking directions', 'Can start any time'],
     ['ChatGPT', 2, 'art', 'Q7', 'The first biome kit', 'After Q5\'s kit spec'],
-    ['ChatGPT', 5, 'art', '', 'Twenty Umas\' sprites, the chapter\'s kits', ''],
-    ['ChatGPT', 6, 'art', '', 'The rest of the cast and kits', ''],
+    ['ChatGPT', 5, 'art', '', 'Wave 1\'s sprites, then every traveler', 'Best outfit first'],
+    ['ChatGPT', 5, 'art', '', 'Band 1 townsfolk, kits, bestiary', ''],
+    ['ChatGPT', 6, 'art', '', 'The other bands\' kits, townsfolk, bestiary', ''],
+    ['ChatGPT', 7, 'art', '', 'Wardrobe outfits; each wave\'s rival escorts', ''],
     ['You', 0, 'you', '', 'Go', ''],
     ['You', 1, 'you', '', 'GitHub: four packages, Manage Actions access', 'After Q1 makes the repo'],
     ['You', 1, 'you', '', 'Cloud console: the sign-in redirect', 'During Q2'],
     ['You', 1, 'you', '', 'Approve Q3\'s key frames', ''],
-    ['You', 3, 'you', 'Q12', 'Play the slice on your iPhone', 'Its numbers set the design'],
+    ['You', 3, 'you', 'Q13', 'Play the slice on your iPhone', 'Its numbers set the design'],
+    ['You', 4, 'you', '', 'Read wave 1\'s bibles', ''],
+    ['You', 7, 'you', '', 'Read each wave\'s bibles', ''],
     ['Exit', 0, 'exit', '', 'Both logs pushed', ''],
     ['Exit', 1, 'exit', '', 'uma-quest on your Home Screen, signed in, save synced; uma-rpg untouched', ''],
     ['Exit', 2, 'exit', '', 'A test room at a steady frame rate; battery, load and size written down', ''],
-    ['Exit', 3, 'exit', '', 'One dungeon played; minutes and fights a floor measured', ''],
+    ['Exit', 3, 'exit', '', 'One dungeon and one chapter played; minutes a floor and a chapter measured', ''],
     ['Exit', 4, 'exit', '', 'The spec and the Phase 5 queue', ''],
-    ['Exit', 5, 'exit', '', 'Lv 1 to 10 playable for four parties', ''],
-    ['Exit', 6, 'exit', '', 'Lv 50 reachable on every quest line', ''],
+    ['Exit', 5, 'exit', '', 'Lv 1 to 10 playable: wave 1\'s chapter 1s out-level band 1', ''],
+    ['Exit', 6, 'exit', '', 'Lv 50 reached by wave 1\'s party, 25 chapters', ''],
+    ['Exit', 7, 'exit', '', 'Every traveler has her full story', ''],
   ];
   const g = document.getElementById('gantt');
   const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
@@ -277,6 +290,7 @@
     ['Q2', 'claude', 'Images quest, Cloud Run quest-api (min 0, max 1), the deployer limited to its own pieces', ''],
     ['Q2', 'claude', 'Deploy provider uma-quest in the github-actions pool, main only', 'uma-rpg\'s provider untouched'],
     ['Q2', 'claude', 'Hosting site uma-quest, a second Firebase web app, the authorized domain', ''],
+    ['Q2', 'claude', 'Private stories bucket gs://uma-quest-content, versioned, read by quest-api only', 'Shares the free 5 GB'],
     ['Q2', 'you', 'Cloud console: add the uma-quest.web.app redirect URI and JavaScript origin to the web client', 'As you did for uma-rpg'],
     ['Q2', 'claude', 'Repository variables and the deploy workflow; the hello app (sign-in, save v1, Update ready)', ''],
     ['Q2', 'claude', 'Checks: uma-quest works; uma-rpg\'s site and API unchanged; quest-api refused on (default)', 'Then infrastructure.md with every value'],

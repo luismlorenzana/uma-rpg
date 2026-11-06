@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>uma-quest Campaign</title>
+<!-- uma-quest's campaign (docs/design/uma-quest/campaign.md): travelers, Ways, the world map of towns and dungeons,
+     the out-level ladder, shared boss rooms, the tale catalog and the waves. Self-contained, uma-kit's tokens, light and
+     dark. No character art and no Uma names. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd; --info: #2f6fe0; --info-wash: #e3ecfc; --success: #2f7a4f;
+    --success-wash: #e1f1e7; --danger: #c23b33; --danger-wash: #fbe5e3;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --info-wash: #16233a; --success: #4fb37a;
+      --success-wash: #13261b; --danger: #e0645c; --danger-wash: #2e1614;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --info-wash: #16233a; --success: #4fb37a;
+    --success-wash: #13261b; --danger: #e0645c; --danger-wash: #2e1614;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 17px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 8px; }
+  h3 { font: 700 13px system-ui; margin: 0 0 6px; color: var(--ink); }
+  p, li { color: var(--ink-soft); max-width: 82ch; }
+  a { color: var(--info); }
+  code { font: 12px ui-monospace, Menlo, monospace; }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 20px; }
+  nav a { font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; background: var(--sunken); color: var(--ink-soft); text-decoration: none; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--hairline-strong); margin-bottom: 16px; }
+  svg { display: block; width: 100%; height: auto; }
+  .scroll { overflow-x: auto; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+  .note { font-size: 12px; color: var(--ink-faint); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Headline numbers */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 4px 0 16px; }
+  .tile { background: var(--panel); border-radius: 10px; padding: 12px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .tile b { display: block; font: 700 24px/1.1 ui-rounded, system-ui; color: var(--ink); }
+  .tile span { font-size: 12px; color: var(--ink-soft); }
+
+  /* World map */
+  .world { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(220px, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 760px) { .world { grid-template-columns: 1fr; } }
+  .facts { display: grid; gap: 8px; }
+  .fact { background: var(--raised); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--ink-soft); }
+  .fact b { color: var(--ink); }
+
+  /* Chapter flow */
+  .flow { display: grid; grid-template-columns: repeat(6, minmax(130px, 1fr)); gap: 8px; min-width: 820px; counter-reset: step; }
+  .flow > div { position: relative; background: var(--raised); border-radius: 10px; padding: 10px 12px 12px; font-size: 12px; color: var(--ink-soft); }
+  .flow > div b { display: block; font: 700 13px system-ui; color: var(--ink); margin-bottom: 3px; }
+  .flow > div::before { counter-increment: step; content: counter(step); display: inline-block; font: 700 11px ui-monospace, Menlo, monospace;
+    color: var(--ink-faint); margin-bottom: 4px; }
+  .flow > div:not(:last-child)::after { content: ''; position: absolute; right: -8px; top: 50%; width: 8px; height: 2px; background: var(--ink-faint); }
+  .flow .boss { background: var(--accent-wash); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+
+  /* Party menu mock */
+  .mock { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr); gap: 14px; }
+  @media (max-width: 760px) { .mock { grid-template-columns: 1fr; } }
+  .screen { background: var(--sunken); border-radius: 14px; padding: 12px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tab { font: 600 12px system-ui; padding: 6px 10px; border-radius: 999px; background: var(--panel); color: var(--ink-soft); border: 1px solid var(--hairline-strong); }
+  .tab.on { background: var(--info-wash); color: var(--info); border-color: color-mix(in srgb, var(--info) 45%, transparent); }
+  .tab small { font-weight: 500; color: var(--ink-faint); margin-left: 3px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 6px; }
+  .tv { background: var(--panel); border-radius: 8px; padding: 6px; font-size: 11px; color: var(--ink-soft); border: 1px solid var(--hairline); }
+  .tv .face { height: 34px; border-radius: 6px; background: var(--raised); margin-bottom: 4px; display: grid; place-items: center; font: 700 11px system-ui; color: var(--ink-faint); }
+  .tv.in { border-color: var(--info); }
+  .tv b { color: var(--ink); font-weight: 600; }
+  .slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 12px; }
+  .slot { background: var(--panel); border-radius: 8px; padding: 7px; font-size: 11px; color: var(--ink-soft); text-align: center; border: 1px solid var(--hairline-strong); }
+  .slot b { display: block; color: var(--ink); font-size: 12px; }
+  .slot.lead { border: 2px solid var(--accent); }
+  .slot.lead::before { content: 'Lead'; display: block; font: 700 10px system-ui; color: var(--accent); }
+  .log { background: var(--panel); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--ink-soft); }
+  .log h3 { margin-bottom: 8px; }
+  .log .row { display: grid; grid-template-columns: 1fr auto; gap: 6px; padding: 6px 0; border-top: 1px solid var(--hairline); }
+  .log .row b { color: var(--ink); font-weight: 600; }
+  .lv { font: 600 11px ui-monospace, Menlo, monospace; color: var(--ink-soft); background: var(--raised); border-radius: 6px; padding: 2px 6px; align-self: start; }
+  .warn { margin-top: 8px; font-size: 11px; color: var(--danger); background: var(--danger-wash); padding: 5px 8px; border-radius: 6px; }
+
+  /* Ladder */
+  .ladder { display: grid; grid-template-columns: 88px repeat(5, minmax(110px, 1fr)) minmax(130px, 1fr); gap: 6px; min-width: 900px; }
+  .ladder .bh { font: 700 12px system-ui; color: var(--ink); padding: 8px 0; }
+  .ladder .bh span { display: block; font-weight: 500; color: var(--ink-faint); }
+  .ch { background: var(--raised); border-radius: 8px; padding: 7px 9px; font-size: 12px; color: var(--ink); border: 1px solid var(--hairline); }
+  .ch small { display: block; color: var(--ink-faint); font-size: 11px; }
+  .ch .up { font: 600 11px ui-monospace, Menlo, monospace; color: var(--success); }
+  .done { border-radius: 8px; padding: 7px 9px; font-size: 12px; color: var(--success); background: var(--success-wash); font-weight: 600; }
+  .done small { display: block; font-weight: 500; color: var(--ink-soft); font-size: 11px; }
+
+  /* Boss room */
+  .rooms { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 14px; }
+  @media (max-width: 760px) { .rooms { grid-template-columns: 1fr; } }
+  .kind { display: inline-block; font: 700 10px system-ui; padding: 2px 7px; border-radius: 999px; }
+  .kind.rival { background: var(--info-wash); color: var(--info); }
+  .kind.beast { background: var(--accent-wash); color: var(--accent); }
+  .kind.res { background: var(--sunken); color: var(--ink-soft); }
+
+  /* Tales */
+  .fams { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .fam { background: var(--raised); border-radius: 10px; padding: 10px 12px; }
+  .fam h3 { display: flex; justify-content: space-between; }
+  .fam h3 span { font-weight: 500; color: var(--ink-faint); }
+  .tale { padding: 6px 0; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--ink-soft); }
+  .tale b { color: var(--ink); font-weight: 600; }
+  .tale i { color: var(--ink-faint); font-style: normal; }
+
+  /* Waves */
+  .waves { display: grid; grid-template-columns: repeat(13, minmax(54px, 1fr)); gap: 5px; min-width: 760px; }
+  .wave { background: var(--raised); border-radius: 8px; padding: 6px; text-align: center; font-size: 11px; color: var(--ink-soft); }
+  .wave b { display: block; color: var(--ink); font-size: 12px; margin-bottom: 4px; }
+  .wave.first { background: var(--info-wash); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--info) 45%, transparent); }
+  .wave span { display: block; border-radius: 4px; margin-top: 2px; padding: 1px 0; background: var(--panel); }
+  .wave span.none { background: transparent; border: 1px dashed var(--hairline-strong); color: var(--ink-faint); }
+
+  /* Calls */
+  .calls { columns: 2 420px; column-gap: 20px; }
+  .calls h3 { break-after: avoid; margin-top: 10px; }
+  .call { break-inside: avoid; display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 8px; font-size: 12px; color: var(--ink-soft); padding: 4px 0; }
+  .call b { font: 700 11px ui-monospace, Menlo, monospace; color: var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <h1>uma-quest: the campaign</h1>
+  <p>Every traveler has her own story. Parties of five travel a world of persisted towns and shared dungeons, and the
+    lead decides who waits in the boss room. The doc with every call is <a href="../campaign.md">campaign.md</a>; the order
+    of work is <a href="../plan.md">plan.md</a>, drawn in <a href="plan.html">plan.html</a>.</p>
+  <nav>
+    <a href="#world">The world</a>
+    <a href="#chapter">A chapter</a>
+    <a href="#party">The party menu</a>
+    <a href="#ladder">Out-leveling</a>
+    <a href="#bosses">One dungeon, many bosses</a>
+    <a href="#tales">Where stories come from</a>
+    <a href="#waves">Waves and volume</a>
+    <a href="#calls">Every call</a>
+  </nav>
+
+  <div class="tiles">
+    <div class="tile"><b>65</b><span>travelers, all playable from the start</span></div>
+    <div class="tile"><b>5</b><span>Ways: Warrior, Spellblade, Mage, Summoner, Healer</span></div>
+    <div class="tile"><b>325</b><span>chapters, five for each traveler</span></div>
+    <div class="tile"><b>25 · 50</b><span>towns · dungeons</span></div>
+    <div class="tile"><b>70</b><span>Umas as townsfolk</span></div>
+    <div class="tile"><b>13</b><span>waves of five travelers</span></div>
+  </div>
+
+  <section class="card" id="world">
+    <h2>The world: a Hub, five regions, five bands</h2>
+    <p>Each region is a Way's homeland. Going outward, each ring is a band of ten levels. Every zone has a persisted town
+      and two dungeons, marked with their suggested levels: an easier and a harder one. Hover a zone for its details.</p>
+    <div class="world">
+      <div><svg id="map" viewBox="-110 -40 1020 880" role="img" aria-label="Radial world map: the Hub in the centre, five wedges for the five Ways, five rings for the level bands, each zone with a town and two dungeons"></svg></div>
+      <div class="facts">
+        <div class="fact"><b>25 towns, built by hand from kits.</b> Stories change them through flags (a bridge, a shop, who stands where), and every party sees the change: there is one world.</div>
+        <div class="fact"><b>50 dungeons, ten a band,</b> one at each suggested level. DN21's ten weapon kinds pair with each band's ten.</div>
+        <div class="fact"><b>Five hand-made dungeons</b>, one at each region's edge (ringed). The other 45 are generated from seeds.</div>
+        <div class="fact"><b>Chapter 1 starts in her Way's inner town,</b> so a party's five chapter 1s tour all five regions (the dashed line).</div>
+        <div class="fact"><b>The map is a screen, not a walked field.</b> Tap a place next to one you've reached; anywhere you've reached is one tap away.</div>
+        <div class="fact"><b>The Hub</b> is a town too, with the jobs, the workbench and storage. Travelers in no party live there.</div>
+      </div>
+    </div>
+    <div class="legend" id="mapLegend"></div>
+  </section>
+
+  <section class="card" id="chapter">
+    <h2>How a chapter plays</h2>
+    <p>A chapter runs only when its traveler leads. 20–40 minutes; the slice (Q12, Q13) measures it.</p>
+    <div class="scroll">
+      <div class="flow">
+        <div><b>The quest log</b>Shows each member's next chapter, its town and its suggested level. Never locked.</div>
+        <div><b>Opening scenes</b>In the town: the speakers walk, emote and talk, with master data's portraits by the text box.</div>
+        <div><b>Travel</b>On the world map to the chapter's dungeon, one of the band's ten.</div>
+        <div><b>The dungeon</b>Random battles, Springs, waystones, HP carried: the DN calls.</div>
+        <div class="boss"><b>The boss room</b>Her chapter's boss: a rival Uma with escorts, or a bestiary monster with its own script.</div>
+        <div><b>Closing scenes</b>Back in town. Flags change the town; her next chapter appears in the next band.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="party">
+    <h2>The party menu</h2>
+    <p>At any town's inn. One tab for each Way; any five travelers, each character once. The menu fills one of each Way
+      by default and warns without a Healer, but never forbids a mix. Her selected outfits are her wardrobe, and the
+      outfit she wears sets her Way.</p>
+    <div class="mock">
+      <div class="screen">
+        <div class="tabs" id="tabs"></div>
+        <div class="grid" id="roster"></div>
+        <div class="slots">
+          <div class="slot"><b>Warrior</b>Lv 14</div>
+          <div class="slot"><b>Spellblade</b>Lv 13</div>
+          <div class="slot lead"><b>Mage</b>Lv 14</div>
+          <div class="slot"><b>Summoner</b>Lv 12</div>
+          <div class="slot"><b>Healer</b>Lv 13</div>
+        </div>
+      </div>
+      <div class="log">
+        <h3>Quest log · this party</h3>
+        <div class="row"><span><b>Mage · chapter 2</b> · the Spellblade region's band-2 town</span><span class="lv">Lv 13</span></div>
+        <div class="row"><span><b>Warrior · chapter 2</b> · the Healer region's band-2 town</span><span class="lv">Lv 15</span></div>
+        <div class="row"><span><b>Spellblade · chapter 2</b> · her own region's band-2 town</span><span class="lv">Lv 17</span></div>
+        <div class="row"><span><b>Summoner · chapter 2</b> · needs her rival to leave the party</span><span class="lv">Lv 19</span></div>
+        <div class="row"><span><b>Healer · chapter 2</b> · the Mage region's band-2 town</span><span class="lv">Lv 11</span></div>
+        <div class="warn">A party without a Healer gets a warning, never a block.</div>
+        <p class="note">An Uma below her party's average level earns double EXP until she reaches it (CM6).</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="ladder">
+    <h2>Five stories out-level a band</h2>
+    <p>A party's five chapter Ns and their dungeons take it through band N, about two levels a chapter. The order is the
+      player's; here it runs easiest dungeon first. After all five, the party is past the band's hardest dungeon.</p>
+    <div class="scroll"><div class="ladder" id="ladderGrid"></div></div>
+    <p class="note">The curve is set in Phase 4 from the slice's measured minutes and fights (CM30). 25 chapters take a
+      party from Lv 1 to 50; each new party walks the same dungeons and meets its own leads' bosses.</p>
+  </section>
+
+  <section class="card" id="bosses">
+    <h2>One dungeon, many bosses</h2>
+    <div class="rooms">
+      <div>
+        <p>Every dungeon has a resident boss. When the lead's chapter is set there, her chapter's boss takes the room for
+          that run, and the drops stay the dungeon's. With 65 chapter 1s across band 1's ten dungeons, each dungeon holds
+          about six or seven story bosses.</p>
+        <p><span class="kind rival">Rival</span> another traveler and her escorts, on her own sprites. She can't fight her
+          own party: the chapter waits while she travels with the lead.</p>
+        <p><span class="kind beast">Bestiary</span> a monster on one of about six large bodies a band, with its own
+          name, colours, skills and fight script.</p>
+      </div>
+      <table>
+        <thead><tr><th>Who leads into a band-1 dungeon (Lv 3)</th><th>Who waits in the boss room</th></tr></thead>
+        <tbody>
+          <tr><td>Nobody's chapter is set here</td><td><span class="kind res">Resident</span> the dungeon's own boss</td></tr>
+          <tr><td>A Warrior, on her chapter 1</td><td><span class="kind rival">Rival</span> her rival, with two escorts</td></tr>
+          <tr><td>A Mage, on her chapter 1</td><td><span class="kind beast">Bestiary</span> body 2, coloured and scripted for her tale</td></tr>
+          <tr><td>A Healer, on her chapter 1</td><td><span class="kind beast">Bestiary</span> body 4, its own skills</td></tr>
+          <tr><td>A Summoner, on her chapter 1</td><td><span class="kind rival">Rival</span> a friend turned rival</td></tr>
+          <tr><td>The same Warrior, later, with no chapter here</td><td><span class="kind res">Resident</span> the dungeon's own boss</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="tales">
+    <h2>Where the stories come from</h2>
+    <p>Each traveler's story sets a public-domain tale's shape over her real racehorse's career. We use plots only, from
+      sources that are anonymous and old, or by authors who died more than 70 years ago, published before 1931, and every
+      line is written fresh. Never a modern RPG's story, and never Uma Musume's career scripts. Stories are private content
+      and never go in git.</p>
+    <table style="margin-bottom:14px">
+      <thead><tr><th>Chapter</th><th>Band</th><th>From her career</th><th>From the tale</th><th>Example: three broken legs and a comeback, over <i>Ivanhoe</i></th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td style="white-space:nowrap">Lv 1–10</td><td>The debut</td><td>The call: she leaves home</td><td>The squire's first tournament</td></tr>
+        <tr><td>2</td><td style="white-space:nowrap">Lv 11–20</td><td>The first crown</td><td>The first great deed</td><td>The crown at the great joust</td></tr>
+        <tr><td>3</td><td style="white-space:nowrap">Lv 21–30</td><td>The rival</td><td>The rival met, or the friend turned rival</td><td>The rival knight</td></tr>
+        <tr><td>4</td><td style="white-space:nowrap">Lv 31–40</td><td>The setback</td><td>The fall: an injury, a defeat, a curse</td><td>Struck down, and sent into exile</td></tr>
+        <tr><td>5</td><td style="white-space:nowrap">Lv 41–50</td><td>The legacy race</td><td>The return and the last deed</td><td>She returns in disguise and wins the last tournament</td></tr>
+      </tbody>
+    </table>
+    <div class="fams" id="fams"></div>
+    <p class="note">No traveler dies or is maimed in her story: a real horse's fatal or career-ending injury becomes a
+      trial she survives (CM13). Several travelers can share a family; no two share a tale.</p>
+  </section>
+
+  <section class="card" id="waves">
+    <h2>Waves and volume</h2>
+    <p>Stories ship five travelers at a time, one of each Way, and each wave is a full run of 25 chapters. Wave 1 is
+      Phases 5 and 6; waves 2–13 are Phase 7. The Healers run out after wave 11.</p>
+    <div class="scroll"><div class="waves" id="waveGrid"></div></div>
+    <div class="rooms" style="margin-top:14px">
+      <table>
+        <thead><tr><th>Writing</th><th class="num">A wave</th><th class="num">Full cast</th></tr></thead>
+        <tbody>
+          <tr><td>Story bibles (you read them first)</td><td class="num">5</td><td class="num">65</td></tr>
+          <tr><td>Chapters</td><td class="num">25</td><td class="num">325</td></tr>
+          <tr><td>Words, at about 2,000 a chapter</td><td class="num">~50,000</td><td class="num">~650,000</td></tr>
+          <tr><td>Chapter bosses</td><td class="num">25</td><td class="num">325</td></tr>
+          <tr><td>Resident bosses</td><td class="num">—</td><td class="num">50</td></tr>
+        </tbody>
+      </table>
+      <table>
+        <thead><tr><th>Art (ChatGPT's)</th><th>Count</th></tr></thead>
+        <tbody>
+          <tr><td>Traveler sprites, about 110 frames each</td><td>65, then 35 wardrobe outfits</td></tr>
+          <tr><td>Townsfolk, idle and walking only</td><td>70 Umas, plus ~10 original generic sprites</td></tr>
+          <tr><td>Bestiary</td><td>~30 boss bodies, plus each biome's common foes</td></tr>
+          <tr><td>Kits</td><td>11 biome kits, 5 town kits</td></tr>
+          <tr><td>Portraits</td><td>None new: master data's</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="calls">
+    <h2>Every call, CM1–CM36</h2>
+    <p>The full wording is in <a href="../campaign.md">campaign.md</a>.</p>
+    <div class="calls" id="callList"></div>
+  </section>
+</main>
+<script>
+  const el = (tag, attrs = {}, html) => {
+    const e = document.createElementNS(attrs.svg ? 'http://www.w3.org/2000/svg' : 'http://www.w3.org/1999/xhtml', tag);
+    for (const [k, v] of Object.entries(attrs)) if (k !== 'svg') e.setAttribute(k, v);
+    if (html != null) e.innerHTML = html;
+    return e;
+  };
+  const WAYS = [['Warrior', 13], ['Spellblade', 14], ['Mage', 14], ['Summoner', 13], ['Healer', 11]];
+
+  // ---- World map ----
+  const map = document.getElementById('map');
+  const C = 400, R0 = 58, RW = 66, SHADE = [8, 17, 27, 39, 53];
+  const pt = (r, deg) => { const a = deg * Math.PI / 180; return [C + r * Math.cos(a), C + r * Math.sin(a)]; };
+  const S = (t, a) => el(t, { svg: 1, ...a });
+  const sector = (r1, r2, a1, a2) => {
+    const [x1, y1] = pt(r2, a1), [x2, y2] = pt(r2, a2), [x3, y3] = pt(r1, a2), [x4, y4] = pt(r1, a1);
+    return `M${x1} ${y1} A${r2} ${r2} 0 0 1 ${x2} ${y2} L${x3} ${y3} A${r1} ${r1} 0 0 0 ${x4} ${y4} Z`;
+  };
+  const style = S('style'); style.textContent = `
+    .wl { font: 700 15px system-ui, sans-serif; fill: var(--ink); }
+    .wc { font: 12px system-ui, sans-serif; fill: var(--ink-soft); }
+    .dl { font: 700 10px ui-monospace, Menlo, monospace; fill: var(--ink); }
+    .hub { font: 700 14px system-ui, sans-serif; fill: var(--ink); }
+    .hubs { font: 11px system-ui, sans-serif; fill: var(--ink-soft); }
+    .zone:hover { filter: brightness(0.94); }`;
+  map.append(style);
+  const towns = [];
+  WAYS.forEach(([way, count], z) => {
+    const mid = -90 + 72 * z, a1 = mid - 36, a2 = mid + 36;
+    for (let k = 1; k <= 5; k++) {
+      const r1 = R0 + (k - 1) * RW, r2 = R0 + k * RW, rm = (r1 + r2) / 2;
+      const base = 10 * (k - 1), easy = base + 1 + z, hard = base + 6 + z;
+      const p = S('path', { d: sector(r1, r2, a1, a2), class: 'zone',
+        fill: `color-mix(in srgb, var(--accent) ${SHADE[k - 1]}%, var(--panel))`, stroke: 'var(--panel)', 'stroke-width': 2 });
+      p.append(S('title', {}, ''));
+      p.lastChild.textContent = `${way} region, band ${k} (Lv ${base + 1}–${base + 10}): one town, dungeons at Lv ${easy} and Lv ${hard}${k === 5 ? ' (the hand-made one)' : ''}`;
+      map.append(p);
+      const [tx, ty] = pt(rm, mid);
+      towns[z] = towns[z] || []; towns[z][k] = [tx, ty];
+      const off = 34 / (rm * Math.PI / 180);
+      [[easy, mid - off], [hard, mid + off]].forEach(([lv, deg], i) => {
+        const [dx, dy] = pt(rm, deg);
+        const handmade = k === 5 && i === 1;
+        if (handmade) map.append(S('circle', { cx: dx, cy: dy, r: 15, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 1.5 }));
+        map.append(S('circle', { cx: dx, cy: dy, r: 11, fill: 'var(--panel)', stroke: 'var(--ink-soft)', 'stroke-width': 1.5 }));
+        const t = S('text', { x: dx, y: dy + 3.5, 'text-anchor': 'middle', class: 'dl' }); t.textContent = lv; map.append(t);
+      });
+    }
+    const [lx, ly] = pt(R0 + 5 * RW + 26, mid);
+    const anchor = Math.abs(lx - C) < 40 ? 'middle' : lx > C ? 'start' : 'end';
+    const t1 = S('text', { x: lx, y: ly, 'text-anchor': anchor, class: 'wl' }); t1.textContent = way;
+    const t2 = S('text', { x: lx, y: ly + 16, 'text-anchor': anchor, class: 'wc' }); t2.textContent = `${count} travelers`;
+    map.append(t1, t2);
+  });
+  // a party's chapter 1 tour through the five inner towns
+  const tour = [[C, C], ...[0, 1, 2, 3, 4].map(z => towns[z][1])];
+  map.append(S('polyline', { points: tour.map(p => p.join(',')).join(' '), fill: 'none', stroke: 'var(--info)', 'stroke-width': 2, 'stroke-dasharray': '5 4' }));
+  // towns on top
+  towns.forEach(rings => rings.forEach((p) => {
+    if (!p) return;
+    map.append(S('rect', { x: p[0] - 7, y: p[1] - 7, width: 14, height: 14, rx: 3, fill: 'var(--ink)', stroke: 'var(--panel)', 'stroke-width': 2 }));
+  }));
+  map.append(S('circle', { cx: C, cy: C, r: R0 - 4, fill: 'var(--raised)', stroke: 'var(--ink-soft)', 'stroke-width': 1.5 }));
+  const h1 = S('text', { x: C, y: C - 2, 'text-anchor': 'middle', class: 'hub' }); h1.textContent = 'Hub';
+  const h2 = S('text', { x: C, y: C + 14, 'text-anchor': 'middle', class: 'hubs' }); h2.textContent = 'jobs · workbench';
+  map.append(h1, h2);
+  document.getElementById('mapLegend').innerHTML =
+    [1, 2, 3, 4, 5].map(k => `<span><i style="background:color-mix(in srgb, var(--accent) ${SHADE[k - 1]}%, var(--panel));border:1px solid var(--hairline-strong)"></i>Band ${k} · Lv ${10 * k - 9}–${10 * k}</span>`).join('') +
+    `<span><i style="background:var(--ink)"></i>Town</span>
+     <span><i style="background:var(--panel);border:1.5px solid var(--ink-soft);border-radius:50%"></i>Dungeon, its suggested level</span>
+     <span><i style="background:transparent;border:1.5px solid var(--ink);border-radius:50%"></i>Hand-made</span>
+     <span><i style="height:2px;background:var(--info);vertical-align:3px"></i>A party's five chapter 1s</span>`;
+
+  // ---- Party menu mock ----
+  document.getElementById('tabs').innerHTML = WAYS.map(([w, n], i) => `<span class="tab${i === 2 ? ' on' : ''}">${w}<small>${n}</small></span>`).join('');
+  const roster = document.getElementById('roster');
+  for (let i = 1; i <= 14; i++) {
+    const inParty = i === 3;
+    const outfits = [1, 4, 7, 10].includes(i) ? 2 : i === 12 ? 3 : 1;
+    roster.append(el('div', { class: `tv${inParty ? ' in' : ''}` },
+      `<div class="face">Mage ${i}</div><b>${inParty ? 'In party' : `Lv ${[1, 1, 14, 6, 1, 22, 1, 3, 1, 1, 9, 1, 1, 1][i - 1]}`}</b><br>${outfits > 1 ? `${outfits} outfits` : '1 outfit'}`));
+  }
+
+  // ---- Ladder ----
+  const lad = document.getElementById('ladderGrid');
+  lad.append(el('div', { class: 'bh' }, ''));
+  for (let m = 1; m <= 5; m++) lad.append(el('div', { class: 'bh' }, `Chapter, in order ${m}<span>${['first', 'second', 'third', 'fourth', 'fifth'][m - 1]} lead</span>`));
+  lad.append(el('div', { class: 'bh' }, 'After five<span>the band is out-leveled</span>'));
+  const ORDER = ['Warrior', 'Healer', 'Mage', 'Spellblade', 'Summoner'];
+  for (let k = 1; k <= 5; k++) {
+    const base = 10 * (k - 1);
+    lad.append(el('div', { class: 'bh' }, `Band ${k}<span>Lv ${base + 1}–${base + 10}</span>`));
+    for (let m = 0; m < 5; m++) {
+      const lv = base + 1 + 2 * m, after = Math.min(50, base + 3 + 2 * m);
+      lad.append(el('div', { class: 'ch' }, `${ORDER[m]} · ch ${k}<small>dungeon Lv ${lv}</small><span class="up">→ party Lv ${after}</span>`));
+    }
+    lad.append(el('div', { class: 'done' }, k < 5 ? `Party Lv ${base + 11}<small>band ${k + 1}'s chapters next</small>` : 'Party Lv 50<small>the run is done: 25 chapters</small>'));
+  }
+
+  // ---- Tales ----
+  const TALES = [
+    ['Return', 'The Odyssey', 'Homer, c. 8th c. BC', 'a comeback after a long absence'],
+    ['Return', 'Ivanhoe', 'Walter Scott, 1819', 'the comeback win'],
+    ['Rise', 'Dick Whittington', 'English folk tale, 1605', 'a local-track star who conquers the centre'],
+    ['Rise', 'Issun-bōshi', 'Otogizōshi, 17th c.', 'the small Uma no one believed in'],
+    ['Rise', 'The Ugly Duckling', 'H. C. Andersen, 1843', 'the late bloomer'],
+    ['Rivalry', 'The Song of Roland', 'c. 1100', 'a lifelong rival and friend'],
+    ['Rivalry', 'Sir Gawain and the Green Knight', 'late 14th c.', 'a rematch a year on'],
+    ['Rivalry', 'The race across the Uji River', 'The Tale of the Heike, 13th c.', 'a famous head-to-head'],
+    ['Journey', 'Journey to the West', 'Wu Cheng\'en, 1592', 'the stayer, the long campaign'],
+    ['Journey', 'The Voyages of Sinbad', 'One Thousand and One Nights', 'an Uma who raced abroad'],
+    ['Journey', 'The Argonauts', 'Apollonius of Rhodes, 3rd c. BC', 'an expedition overseas'],
+    ['Journey', 'The Wonderful Wizard of Oz', 'L. Frank Baum, 1900', 'found family'],
+    ['Journey', 'The Well at the World\'s End', 'William Morris, 1896', 'the long-distance dreamer'],
+    ['Journey', 'The Snow Queen', 'H. C. Andersen, 1844', 'running for a friend'],
+    ['Trickster', 'Reynard the Fox', '12th–13th c.', 'the eccentric genius'],
+    ['Trickster', 'Puss in Boots', 'Charles Perrault, 1697', 'the showman'],
+    ['Burden', 'The Six Swans', 'Brothers Grimm, 1812', 'the Uma cast as the villain for beating a favourite'],
+    ['Burden', 'Tristan and Iseult', '12th c.', 'torn between her stable and her heart'],
+    ['Burden', 'The Water of Life', 'Brothers Grimm, 1812', 'running for someone else'],
+    ['Crown', 'Le Morte d\'Arthur', 'Thomas Malory, 1485', 'the dominant champion'],
+    ['Crown', 'Rostam\'s Seven Labours', 'Ferdowsi, Shahnameh, c. 1010', 'a run of great wins'],
+    ['Speed', 'Atalanta', 'Ovid, Metamorphoses, 8 AD', 'the front-runner'],
+    ['Speed', 'Rhiannon', 'The Mabinogion, Guest, 1838–45', 'the untouchable leader'],
+    ['Speed', 'The Curse of Macha', 'The Ulster Cycle', 'the race run through pain'],
+    ['Speed', 'The Tortoise and the Hare', 'Aesop', 'the late closer'],
+    ['House', 'The Völsunga saga', '13th c.', 'the daughter of a famous family'],
+    ['Trial', 'The Tale of the Bamboo Cutter', '10th c.', 'five chapters, five trials'],
+    ['Trial', 'The Golden Bird', 'Brothers Grimm, 1812', 'the stubborn one'],
+  ];
+  const fams = document.getElementById('fams');
+  [...new Set(TALES.map(t => t[0]))].forEach(f => {
+    const list = TALES.filter(t => t[0] === f);
+    const card = el('div', { class: 'fam' }, `<h3>${f}<span>${list.length}</span></h3>`);
+    list.forEach(([, tale, src, fits]) => card.append(el('div', { class: 'tale' }, `<b>${tale}</b> <i>· ${src}</i><br>Fits ${fits}`)));
+    fams.append(card);
+  });
+
+  // ---- Waves ----
+  const wg = document.getElementById('waveGrid');
+  const left = { Warrior: 13, Spellblade: 14, Mage: 14, Summoner: 13, Healer: 11 };
+  for (let w = 1; w <= 13; w++) {
+    const cells = [];
+    for (const [way] of WAYS) if (left[way] > 0) { left[way]--; cells.push(way); }
+    const extraOrder = ['Spellblade', 'Mage', 'Warrior', 'Summoner'];
+    while (cells.length < 5) { const x = extraOrder.find(k => left[k] > 0); if (!x) break; left[x]--; cells.push(x); }
+    const healer = cells.includes('Healer');
+    const card = el('div', { class: `wave${w === 1 ? ' first' : ''}` }, `<b>${w}</b>`);
+    cells.forEach(c => card.append(el('span', {}, c.replace('Spellblade', 'Spellbl.').replace('Summoner', 'Summon.'))));
+    if (!healer) card.append(el('span', { class: 'none' }, 'no Healer'));
+    card.append(el('div', { class: 'note', style: 'margin-top:4px' }, w === 1 ? 'Phases 5–6' : 'Phase 7'));
+    wg.append(card);
+  }
+
+  // ---- Calls ----
+  const CALLS = [
+    ['Cast and parties', [
+      ['CM1', 'A traveler is a character: the 65 behind your 100 selected outfits, all playable from the start'],
+      ['CM2', 'Her other selected outfits are her wardrobe; the outfit she wears sets her Way'],
+      ['CM3', 'Five Ways: Warrior 13, Spellblade 14, Mage 14, Summoner 13, Healer 11; a menu tab each'],
+      ['CM4', 'A party is any five travelers; one of each Way by default, a warning without a Healer; up to 13 parties'],
+      ['CM5', 'Parties change at any inn; travelers in no party work jobs at the Hub'],
+      ['CM6', 'Each Uma levels on her own; below the party average she earns double EXP'],
+    ]],
+    ['Stories', [
+      ['CM7', 'Five chapters each, chapter N in band N; linear, no branches'],
+      ['CM8', 'A chapter runs only with its traveler leading; the quest log lists every member\'s next one'],
+      ['CM9', 'Levels suggested, never locked; chapter N+1 waits only for chapter N'],
+      ['CM10', 'Town scenes → one dungeon → her boss → closing scenes; 20–40 minutes'],
+      ['CM11', 'No party banter in the first build'],
+      ['CM12', 'Travelers appear in each other\'s stories; 70 Umas outside your selection are the townsfolk'],
+      ['CM13', 'No traveler dies or is maimed; a real fatal injury becomes a trial she survives'],
+    ]],
+    ['Where stories come from', [
+      ['CM14', 'Plots from public-domain tales only, every line written fresh; never modern games\' or Uma Musume\'s scripts'],
+      ['CM15', 'Her real racehorse\'s career gives the five beats: debut, first crown, rival, setback, legacy race'],
+      ['CM16', 'Stories are private content in gs://uma-quest-content (versioned); git holds the format and a stand-in chapter'],
+      ['CM17', 'Scripts are scene data with master data\'s portraits; no voices; English'],
+      ['CM18', 'Claude writes a wave\'s five bibles first; you read them before the chapters'],
+    ]],
+    ['The world', [
+      ['CM19', 'A Hub in the middle, five regions (one per Way), five zones outward (one per band)'],
+      ['CM20', 'A zone is one town and two dungeons in one biome: 25 towns, 50 dungeons'],
+      ['CM21', 'Towns are hand-built from kits and persist; story flags change them for everyone'],
+      ['CM22', 'Each town has an inn, a shop, townsfolk and chapter starts; the Hub adds jobs, workbench and storage'],
+      ['CM23', 'Chapter 1 starts in her Way\'s inner town, so five chapter 1s tour all five regions'],
+      ['CM24', 'The world map is a tap-to-travel screen; fights happen in dungeons'],
+    ]],
+    ['Dungeons and bosses', [
+      ['CM25', 'A band\'s ten dungeons cover its ten levels; a zone has an easier and a harder one'],
+      ['CM26', 'Every dungeon has a resident boss; the lead\'s chapter boss takes the room when her chapter is set there'],
+      ['CM27', 'One boss a chapter (325): about half rival Umas, half monsters on a shared bestiary of bodies'],
+      ['CM28', 'A rival can\'t fight her own party; the chapter waits while she travels with the lead'],
+      ['CM29', 'Five hand-made dungeons at the regions\' edges; 45 generated'],
+    ]],
+    ['Growth', [
+      ['CM30', 'Five chapters and their dungeons take a party through a band, about two levels a chapter'],
+      ['CM31', 'A full run is 25 chapters, Lv 1 to 50; each new party meets its own leads\' bosses'],
+    ]],
+    ['Production', [
+      ['CM32', 'Waves of five travelers, one per Way, each a full run; 13 waves'],
+      ['CM33', 'Wave 1 by default: outfits 106801, 113301, 112901, 100703, 111801'],
+      ['CM34', 'Q3 draws the Summoner in her selected outfit 100703, not 100701'],
+      ['CM35', 'The plan: Q12 a town and the story runner, Q13 measured; Phase 5 band 1, Phase 6 bands 2–5, new Phase 7'],
+      ['CM36', 'Only Octopath\'s structure is borrowed: not its names, stories, map, jobs, Path Actions, art or music'],
+    ]],
+  ];
+  const cl = document.getElementById('callList');
+  CALLS.forEach(([group, rows]) => {
+    cl.append(el('h3', {}, group));
+    rows.forEach(([id, text]) => cl.append(el('div', { class: 'call' }, `<b>${id}</b><span>${text}</span>`)));
+  });
+</script>
+</body>
+</html>

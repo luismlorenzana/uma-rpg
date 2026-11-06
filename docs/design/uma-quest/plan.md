@@ -7,6 +7,11 @@
 > lives in the existing `uma-rpg` project with its own site, API, database and deploy access. This page is the order of
 > work: the infrastructure first, then the engine, the slice and the design. It moves into the new repo in Phase 1.
 > Visual page: [previews/plan.html](previews/plan.html).
+>
+> **Later on 2026-11-06 the campaign was reshaped as a travelers RPG** in [campaign.md](campaign.md) (CM1–CM36): 65
+> travelers each with her own five-chapter story, persisted towns, shared dungeons whose boss follows the lead, and waves
+> of five travelers. NG2, NG3, NG7, DN1, DN2, DN5 and DN10 below are revised by it, and Phases 3, 5 and 6 changed, with
+> a new Phase 7.
 
 ## The short answer
 
@@ -16,10 +21,11 @@
 - **Phase 2 (the engine):** three.js, the sideways stage, the camera, pixel-exact sprites, the tile-built 3D world and
   the stick, with stand-in art, measured on your iPhone.
 - **Phase 3 (the slice):** one generated dungeon in one biome, five Umas in single file, random battles cutting to a
-  3D fight on uma-rpg's copied fight engine, HP carrying, a mini-boss, a Spring and a waystone. You play it and we
-  measure it.
-- **Phase 4 (the design spec)** runs beside Phases 2 and 3 and is finished with the slice's numbers. **Phases 5 and 6**
-  are the first chapter and then the run to level 50, planned from the spec.
+  3D fight on uma-rpg's copied fight engine, HP carrying, a mini-boss, a Spring and a waystone; then one town and one
+  stand-in chapter that ends in that dungeon with its own boss. You play it and we measure it.
+- **Phase 4 (the design spec)** runs beside Phases 2 and 3 and is finished with the slice's numbers. **Phase 5** is band
+  1 with wave 1's five chapter 1s, **Phase 6** the run to level 50 for wave 1, and **Phase 7** the other twelve waves of
+  travelers ([campaign.md](campaign.md)).
 - **You do two things:** four clicks on GitHub when the repo exists, and one Cloud console form when the sign-in is set
   up. Everything else is mine, or ChatGPT's for the art.
 
@@ -30,19 +36,19 @@ The new repo's decision log starts from these (NG1–NG12 were proposed in chat;
 | Id | Call |
 |---|---|
 | NG1 | The name is **uma-quest**: a **public** repo `luismlorenzana/uma-quest`, like uma-rpg and uma-platform. Public repos run GitHub Actions free, and no original-game content goes in git anyway |
-| NG2 | An authored campaign: several parties, each on its own quest line of five chapters, one chapter per ten levels. Umas join through the story; no tickets or gacha. The first build has four quest lines |
-| NG3 | Story scripts name Umas by outfit or character id only. Names and art come from master data at run time |
+| NG2 | *Revised by [campaign.md](campaign.md) CM1–CM13 and CM32:* every traveler has her own story of five chapters, one per ten levels; all 65 are playable from the start; no tickets or gacha; stories ship in waves of five |
+| NG3 | *Revised by CM16:* stories are private content in `gs://uma-quest-content`; git holds the script format, the tale skeletons and a stand-in chapter. Names and art come from master data at run time |
 | NG4 | One climb from Lv 1 to 50: no tiers, no Ascend |
 | NG5 | three.js draws towns, dungeons and fights; no Phaser. Menus are uma-kit's React screens over the canvas |
 | NG6 | Landscape throughout, on the turned stage (iOS can't lock a web app's orientation). uma-kit's landscape layout comes from a platform kit release, never a fork |
-| NG7 | The loop is quest → dungeon → fight. Umas not on a quest work jobs on `uma-work`; consumables become a main crafting output beside gear |
+| NG7 | The loop is town → chapter → dungeon → the lead's boss (CM10). Umas in no party work jobs on `uma-work`; consumables become a main crafting output beside gear |
 | NG8 | A fresh save v1, local first (Dexie), synced through `uma-server`. Nothing carries over from uma-rpg (P4) |
 | NG9 | **The cloud lives in the `uma-rpg` GCP project** (revised from "its own project"): its own Hosting site, Cloud Run service, Firestore database and deploy identity |
-| NG10 | The dungeon calls DN1–DN28 ([below](#the-starting-dungeon-calls)) are the starting design, without DN1's Party Hall change and DN19's migration |
+| NG10 | The dungeon calls DN1–DN28 ([below](#the-starting-dungeon-calls)) are the starting design, without DN1's Party Hall change and DN19's migration; DN1, DN2, DN5 and DN10 are revised by campaign.md |
 | NG11 | uma-platform logs P87 (the fourth game, sharing the `uma-rpg` project, amending P2 and P13) and P88 (three.js for uma-quest, amending P14), and a roadmap row |
 | NG12 | The order: Phase 0, then infrastructure, the engine and the slice; the design spec alongside |
 | NG13 | uma-rpg is **frozen, still live**: production stays up and gets bug fixes only. Its CLAUDE.md, README and handoff queue say so |
-| NG14 | uma-quest numbers packets Q1, Q2 … and decisions from D1. uma-rpg's H168 (the sprite sample) moves across as Q3, with the walking directions added |
+| NG14 | uma-quest numbers packets Q1, Q2 … and decisions from D1. uma-rpg's H168 (the sprite sample) moves across as Q3, with the walking directions added and the Summoner in her selected outfit 100703 (CM34) |
 | NG15 | **Isolation inside the shared project:** quest-api's account can reach only the `quest` database; the deployer only its own service, image repository and runtime account; every Hosting deploy names its site |
 | NG16 | Local ports: quest-api on :8091 and quest-web on :5184, beside uma-rpg's :8081 and :5174, so both can run at once |
 | NG17 | Main JS ≤ 180 KB gzip, the platform's rule. three.js and every scene load on demand |
@@ -98,6 +104,7 @@ One idempotent script, `infra/bootstrap.sh`, every command scoped with
 | 8 | Firebase web app | A second web app, `uma-quest`, its public config in `apps/web/.env.production` | The project only |
 | 9 | Sign-in | The same Google sign-in and the same allowed email; `uma-quest.web.app` added to Auth's authorized domains | **Yes**, one login for both games |
 | 10 | Budget | The existing $5 alert on the project, now covering both | **Yes** |
+| 11 | Private stories | Bucket `gs://uma-quest-content`, `us-central1`, uniform access, public access prevented, object versioning on; `quest-api-runtime` reads it (CM16) | No: uma-rpg's enemies stay in `gs://uma-rpg-content` |
 
 **Your step:** Cloud console → APIs & Services → Credentials → "Web client (auto created by Google Service)" → add
 `https://uma-quest.web.app/__/auth/handler` under **Authorized redirect URIs** and `https://uma-quest.web.app` under
@@ -125,6 +132,7 @@ Then:
 | Cloud Run `quest-api` | Shares 2M requests and 180k vCPU-seconds a month | $0 |
 | Firestore database `quest` | None: Google's free quota covers only one database a project, here uma-rpg's `(default)` | A few cents a month |
 | Artifact Registry `quest` | Shares the 0.5 GB | $0, cents if old images pile up |
+| Bucket `gs://uma-quest-content` | Shares the 5 GB of US storage | $0: the stories are a few MB |
 | Art and master data | uma-platform's existing private bucket | A few MB more |
 
 Sources: [Firestore pricing](https://cloud.google.com/firestore/pricing),
@@ -144,7 +152,8 @@ Stand-in art throughout: coloured blocks and a stand-in Uma drawn to the sprite 
   Battery saver on by default on a phone: 30 fps, no blur or glow. uma-kit's React screens drawn over the canvas.
 - **Q5, the world builder and the kit format:** code builds the 3D world from tiles in a 2D kit atlas (floors, walls,
   edges, stairs) plus flat sprite props (trees, rocks, torches, chests); light painted into the kit, a few live lights
-  near you, fog, and optional tilt-shift and bloom. The **kit spec**, so ChatGPT can draw a biome kit as 2D art.
+  near you, fog, and optional tilt-shift and bloom. The same builder makes towns from a town kit. The **kit spec**, so
+  ChatGPT can draw a biome kit and a town kit as 2D art.
 - **Q6, sprites in the engine:** the spec's atlas loader, the face layer and its blinks, the leader and four followers in
   single file, scene-light tint and soft shadows. It runs the stand-in, then Q3's real output once you approve it.
 
@@ -165,26 +174,33 @@ spec exists.
   same layout (DN6).
 - **Q11, the dungeon screen:** random battles with the danger meter (DN7, DN8), the mini-boss and boss standing visible
   (DN9), the Spring and waystones (DN15, DN16), chests, auto-explore (DN26), a run saved without its position (DN18).
-- **Q12, measured:** you play it at `uma-quest.web.app`. We write down minutes and fights a floor, frame rate, battery
-  and load times, and they set the design's numbers.
+- **Q12, the town and the story runner:** one kit-built town with an inn, a shop and a few townsfolk walking; the scene
+  runner (CM17: lines, portraits, emotes, camera beats, flags); the world map screen with the town and the dungeon
+  (CM24); one stand-in chapter whose boss takes the dungeon's boss room (CM26).
+- **Q13, measured:** you play it at `uma-quest.web.app`. We write down minutes and fights a floor, minutes a chapter,
+  frame rate, battery and load times, and they set the design's numbers.
 
 ## Phase 4: the design spec (Claude, docs, M)
 
 Starts beside Phase 2; finished with the slice's numbers. In `docs/design/`, with preview pages at
 [class-progression.md](../tier-rework/class-progression.md)'s standard:
-- the campaign: quest lines, chapters, towns, how Umas join, how parties are formed;
+- the campaign: [campaign.md](campaign.md) settled with the slice's numbers, the world map's 25 zones and their biomes,
+  and wave 1's five story bibles for your read;
 - growth: the EXP curve to 50, Job Points (DN11), the classes (from Classes v3 and the Tier 2 work);
 - dungeons: the DN calls settled, the generator's rules, the hand-made capitals;
 - economy and crafting: consumables, the workbench, weapon materials (DN20, DN21), jobs;
 - save v1's shape, and the screens: town, menus, party, quest log;
 - the queue of packets for Phase 5.
 
-## Phases 5 and 6
+## Phases 5, 6 and 7
 
-- **Phase 5, the first chapter (XL):** the home town, the quest log, the four quest lines' first chapters (Lv 1–10),
-  their dungeons, consumables and crafting, jobs, sync. Art: sprites for the four parties' twenty Umas and kits for the
-  chapter's biomes.
-- **Phase 6, to level 50 (XL):** chapters 2–5, the capitals, the balance across the whole run.
+- **Phase 5, band 1 (XL):** the Hub and the five inner towns, band 1's ten dungeons and their resident bosses, the party
+  menu, the quest log, wave 1's five chapter 1s, consumables and crafting, jobs, sync. Art: wave 1's sprites, then every
+  traveler as she's drawn, band 1's townsfolk, kits and bestiary.
+- **Phase 6, to level 50 (XL):** bands 2–5 (20 towns, 40 dungeons, the five hand-made ones), wave 1's chapters 2–5, the
+  balance across the whole run.
+- **Phase 7, the cast (ongoing):** waves 2–13, five travelers a wave, each a full run of 25 chapters; you read each
+  wave's bibles before its chapters are written.
 
 ## Risks
 
@@ -193,8 +209,8 @@ Starts beside Phase 2; finished with the slice's numbers. In `docs/design/`, wit
 | A project-wide mistake hits both games | Separate service accounts and databases; scripted, idempotent setup; never delete the `uma-rpg` project, even if uma-rpg is retired |
 | A uma-quest Hosting deploy lands on uma-rpg's site | The deploy names `hosting:uma-quest`, and CI fails if `firebase.json` doesn't name that site |
 | WebGL on the iPhone is too slow or drains the battery | Phase 2 measures it on a test room before any content is made |
-| The art volume (about 110 frames an Uma, 11 kits) | Q3 and the slice set a production minimum; the first chapter needs only twenty Umas |
-| The writing volume | Four quest lines first, more as they're written |
+| The art volume (65 travelers at about 110 frames, 70 townsfolk, 16 kits, a bestiary) | Q3 and the slice set a production minimum; best outfits first, wardrobe later; bosses share bodies (CM27) |
+| The writing volume (325 chapters, about 650,000 words) | Waves of five, each a full run; one wave's bibles read before its chapters are written (CM18, CM32) |
 | uma-kit has no landscape layout | A kit request to uma-platform during Phase 2; the slice can draw its few menus itself until then |
 
 ## The starting dungeon calls
@@ -203,16 +219,16 @@ Proposed in chat for uma-rpg on 2026-11-06 and carried here as uma-quest's start
 
 | Id | Call |
 |---|---|
-| DN1 | Only Umas with sprites fight; parties come from the owner's 100 selected outfits (20 of each calling). *The Party Hall change is moot here* |
-| DN2 | Ten dungeons a continent, each one biome over its ten levels; each continent leaves out a different one of the 11 biomes |
+| DN1 | Only Umas with sprites fight. *Revised by CM1 and CM2: 65 travelers, their outfits as wardrobe. The Party Hall change is moot here* |
+| DN2 | *Revised by CM19, CM20 and CM25:* 25 zones of a town and two dungeons, ten dungeons a band, each at one suggested level |
 | DN3 | Any party may walk any dungeon; no cap |
 | DN4 | The first party to clear a dungeon claims it; every Uma who clears it joins its register, and her profile shows her path |
-| DN5 | Capitals are the only hand-made dungeons |
+| DN5 | *Revised by CM29:* one hand-made dungeon in each region's outer zone; the rest are generated |
 | DN6 | Other dungeons are generated from fixed seeds, from 15–25 room designs a biome, with every room reachable |
 | DN7 | Random battles with a visible danger meter; each fight's foes come from the dungeon's seed and the fight's number |
 | DN8 | An Encounters setting: normal or half |
 | DN9 | Only mini-bosses and bosses stand visible on the field |
-| DN10 | EXP rebalanced so one walk takes a party from a dungeon's first level to its boss's |
+| DN10 | *Revised by CM30:* a party's five chapters and their dungeons take it through a band, about two levels a chapter |
 | DN11 | Job Points: wins pay each Uma into her own pool, spent on any class she holds or can open |
 | DN12 | In dungeons HP and MP carry between fights, and a downed Uma stays down until revived |
 | DN13 | Heals and revives can be cast outside fights for their MP |
