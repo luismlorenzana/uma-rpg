@@ -12,6 +12,9 @@
 > travelers, one per selected outfit, sharing 65 five-chapter stories, persisted towns, shared dungeons whose boss follows the lead, and waves
 > of five travelers. NG2, NG3, NG7, DN1, DN2, DN5 and DN10 below are revised by it, and Phases 3, 5 and 6 changed, with
 > a new Phase 7.
+>
+> **The infrastructure is now planned for all three apps** in [../cloud/plan.md](../cloud/plan.md) (uma-rpg hardened first,
+> then uma-quest and uma-farm), which replaces Phase 1's Q2 table and bill.
 
 ## The short answer
 
@@ -45,7 +48,7 @@ The new repo's decision log starts from these (NG1–NG12 were proposed in chat;
 | NG8 | A fresh save v1, local first (Dexie), synced through `uma-server`. Nothing carries over from uma-rpg (P4) |
 | NG9 | **The cloud lives in the `uma-rpg` GCP project** (revised from "its own project"): its own Hosting site, Cloud Run service, Firestore database and deploy identity |
 | NG10 | The dungeon calls DN1–DN28 ([below](#the-starting-dungeon-calls)) are the starting design, without DN1's Party Hall change and DN19's migration; DN1, DN2, DN5 and DN10 are revised by campaign.md |
-| NG11 | uma-platform logs P87 (the fourth game, sharing the `uma-rpg` project, amending P2 and P13) and P88 (three.js for uma-quest, amending P14), and a roadmap row |
+| NG11 | uma-platform logs two P-decisions at the next free numbers (P86 and P87 went to art releases; see the [cloud plan](../cloud/plan.md), IN24): the fourth game, sharing the `uma-rpg` project, amending P2 and P13; and three.js for uma-quest, amending P14. Also a roadmap row |
 | NG12 | The order: Phase 0, then infrastructure, the engine and the slice; the design spec alongside |
 | NG13 | uma-rpg is **frozen, still live**: production stays up and gets bug fixes only. Its CLAUDE.md, README and handoff queue say so |
 | NG14 | uma-quest numbers packets Q1, Q2 … and decisions from D1. uma-rpg's H168 (the sprite sample) moves across as Q3, with the walking directions added and the Summoner in her selected outfit 100703 (CM34) |
@@ -56,7 +59,7 @@ The new repo's decision log starts from these (NG1–NG12 were proposed in chat;
 
 ## Phase 0: decisions and the move (Claude, docs, S)
 
-1. **uma-platform:** P87 and P88 in `decisions.md`; the games table in `architecture.md` (uma-quest, its project, and
+1. **uma-platform:** the two P-decisions in `decisions.md`, at the next free numbers; the games table in `architecture.md` (uma-quest, its project, and
    three.js beside Phaser); a roadmap row for uma-quest; the landscape kit layout noted as a future "Both apps" style
    request (here a third app).
 2. **uma-rpg:** frozen in CLAUDE.md, the README and the handoff README; H168 marked "moves to uma-quest as Q3". The
@@ -65,6 +68,12 @@ The new repo's decision log starts from these (NG1–NG12 were proposed in chat;
 **Exit:** both logs pushed.
 
 ## Phase 1: the repo and the infrastructure (Claude, M + M)
+
+> **Revised 2026-11-06 by the [cloud plan](../cloud/plan.md)** (IN1–IN26), which sets up the infrastructure for uma-rpg,
+> uma-quest and uma-farm together. Q1 and Q2 now cover the infrastructure only (its Steps 2–4: the repo, the cloud and a
+> placeholder that deploys). The scaffold below (Q1 steps 2 and 4) and the hello app move to the bootstrap plan that
+> follows it. The cloud plan's inventory replaces the Q2 table and its bill replaces the one below. The table stays here as
+> the earlier draft.
 
 ### Q1: the repo
 

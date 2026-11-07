@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Plan</title>
+<!-- The cloud plan (docs/design/cloud/plan.md): one GCP project for uma-rpg, uma-quest and uma-farm; the audit, the
+     inventory, who can reach what, the order of work, your steps, the bill and every call. Self-contained, uma-kit's
+     tokens, light and dark. -->
+<style>
+  :root {
+    --page: #edf1f6; --panel: #ffffff; --raised: #f3f6fa; --sunken: #e4eaf2;
+    --ink: #101a24; --ink-soft: #5a6b84; --ink-faint: #8a98ac;
+    --accent: #d39a2b; --accent-wash: #fbf1dd; --info: #2f6fe0; --info-wash: #e3ecfc; --success: #2f7a4f;
+    --success-wash: #e1f1e7; --danger: #c23b33; --danger-wash: #f8e3e1;
+    --hairline: rgb(16 26 36 / 0.08); --hairline-strong: rgb(16 26 36 / 0.16);
+    --radius: 12px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+      --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+      --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --info-wash: #16233a; --success: #4fb37a;
+      --success-wash: #13261b; --danger: #e0645c; --danger-wash: #2c1615;
+      --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0f1620; --panel: #17202b; --raised: #1f2a37; --sunken: #0b1118;
+    --ink: #e9eef4; --ink-soft: #a6b3c2; --ink-faint: #6f7d8e;
+    --accent: #d6a23e; --accent-wash: #2b2312; --info: #5b8def; --info-wash: #16233a; --success: #4fb37a;
+    --success-wash: #13261b; --danger: #e0645c; --danger-wash: #2c1615;
+    --hairline: rgb(255 255 255 / 0.08); --hairline-strong: rgb(255 255 255 / 0.16); color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, 'Inter', sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 24px/1.2 ui-rounded, 'SF Pro Rounded', system-ui, sans-serif; margin: 0 0 6px; }
+  h2 { font: 700 17px/1.25 ui-rounded, system-ui, sans-serif; margin: 0 0 8px; }
+  h3 { font: 700 14px system-ui; margin: 14px 0 6px; }
+  p, li { color: var(--ink-soft); max-width: 86ch; }
+  a { color: var(--info); }
+  code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--sunken); padding: 1px 4px; border-radius: 4px; color: var(--ink); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 20px; }
+  nav a { font: 600 12px system-ui; padding: 6px 12px; border-radius: 999px; background: var(--sunken); color: var(--ink-soft); text-decoration: none; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--hairline-strong); margin-bottom: 16px; }
+  svg { display: block; width: 100%; height: auto; }
+  .scroll { overflow-x: auto; }
+  .note { font-size: 12px; color: var(--ink-faint); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; border: 1px solid var(--hairline-strong); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 0 0 16px; }
+  .tile { background: var(--panel); border-radius: var(--radius); padding: 12px 14px; box-shadow: 0 1px 0 var(--hairline-strong); }
+  .tile b { display: block; font: 700 20px ui-rounded, system-ui; color: var(--ink); }
+  .tile span { font-size: 12px; color: var(--ink-soft); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+  th { color: var(--ink-soft); font-weight: 600; }
+  td.new { background: var(--accent-wash); }
+  td.chg { background: var(--info-wash); }
+  td.id { font: 700 12px ui-monospace, Menlo, monospace; white-space: nowrap; color: var(--ink); }
+  .tag { display: inline-block; font: 700 10px system-ui; letter-spacing: .02em; padding: 1px 6px; border-radius: 999px; margin-left: 4px; vertical-align: 1px; }
+  .tag.chg { background: var(--info-wash); color: var(--info); }
+  .tag.new { background: var(--accent-wash); color: var(--accent); }
+
+  /* Matrix */
+  .matrix { min-width: 900px; }
+  .matrix code { white-space: nowrap; }
+  .matrix td, .matrix th { text-align: center; }
+  .matrix td:first-child, .matrix th:first-child { text-align: left; }
+  .matrix td.ok { background: var(--success-wash); color: var(--success); font-weight: 700; }
+  .matrix td.no { color: var(--danger); }
+  .matrix td.run { color: var(--ink-faint); font-style: italic; }
+
+  /* Order of work */
+  .gantt { display: grid; grid-template-columns: 70px repeat(5, minmax(150px, 1fr)); gap: 6px; min-width: 900px; }
+  .gantt .head { font: 700 12px system-ui; color: var(--ink); padding: 8px; background: var(--raised); border-radius: 8px; }
+  .gantt .head span { display: block; font-weight: 500; color: var(--ink-faint); }
+  .gantt .track { font: 700 12px system-ui; color: var(--ink-soft); padding: 8px 0; }
+  .gantt .cell { display: flex; flex-direction: column; gap: 6px; }
+  .chip { border-radius: 8px; padding: 7px 9px; font-size: 12px; line-height: 1.3; border: 1px solid var(--hairline-strong); background: var(--raised); color: var(--ink); }
+  .chip small { display: block; color: var(--ink-faint); font-size: 11px; margin-top: 2px; }
+  .chip.claude { background: var(--info-wash); border-color: color-mix(in srgb, var(--info) 35%, transparent); }
+  .chip.you { background: var(--success-wash); border-color: color-mix(in srgb, var(--success) 40%, transparent); }
+  .chip.exit { background: transparent; border-style: dashed; color: var(--ink-soft); }
+
+  ol.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  ol.steps li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; max-width: none; background: var(--raised); border-radius: 10px; padding: 10px 12px; color: var(--ink); }
+  ol.steps .n { font: 700 13px ui-monospace, Menlo, monospace; color: var(--success); }
+  ol.steps small { display: block; color: var(--ink-soft); font-size: 12px; margin-top: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>One project, three apps: the cloud plan</h1>
+  <p>The full infrastructure for <b>uma-rpg</b> (live), <b>uma-quest</b> and <b>uma-farm</b> (new), all inside the existing
+    <code>uma-rpg</code> GCP project. Infrastructure only: each new app ends this plan as a placeholder that deploys; the
+    real bootstrap is the next plan. The doc with every call is <a href="../plan.md">plan.md</a>; uma-quest's own plan is
+    <a href="../../uma-quest/plan.md">uma-quest/plan.md</a> (<a href="../../uma-quest/previews/plan.html">page</a>).
+    <b>Nothing is created or changed yet.</b></p>
+  <nav>
+    <a href="#project">The project</a>
+    <a href="#audit">The audit</a>
+    <a href="#inventory">The inventory</a>
+    <a href="#matrix">Who reaches what</a>
+    <a href="#order">Order of work</a>
+    <a href="#you">Your steps</a>
+    <a href="#cost">The bill</a>
+    <a href="#calls">Every call</a>
+  </nav>
+
+  <div class="tiles">
+    <div class="tile"><b>1 project</b><span><code>uma-rpg</code>, three apps</span></div>
+    <div class="tile"><b>7 findings</b><span>in uma-rpg, fixed first (Step 1)</span></div>
+    <div class="tile"><b>2 + 2</b><span>new repos and new clouds</span></div>
+    <div class="tile"><b>27 checks</b><span>of who reaches what</span></div>
+    <div class="tile"><b>&lt; $1 / month</b><span>added; most likely under 25¢</span></div>
+    <div class="tile"><b>1 sitting</b><span>for your steps, plus one go</span></div>
+  </div>
+
+  <section class="card" id="project">
+    <h2>One GCP project, three apps that can't reach each other</h2>
+    <p>Each app has its own site, API, database, images, runtime account, deployer and deploy sign-in. Only the Google login,
+      the deploy pool, the budget and the read-only master data are shared. The farm's server takes parcel calls from the
+      games' servers, each signed with Google's token for that server's own account.</p>
+    <div class="scroll">
+    <svg viewBox="0 0 1000 650" role="img" aria-label="The uma-rpg project holding uma-rpg, uma-farm and uma-quest columns, a shared band, parcel arrows into farm-api, and the master data bucket and uma-racer's project outside">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink-faint)"/>
+        </marker>
+        <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
+      <style>
+        .t { font: 600 13px system-ui, sans-serif; fill: var(--ink); }
+        .s { font: 12px system-ui, sans-serif; fill: var(--ink-soft); }
+        .m { font: 600 12px ui-monospace, Menlo, monospace; fill: var(--ink); }
+        .h { font: 700 14px system-ui, sans-serif; fill: var(--ink); }
+        .k { font: 700 11px system-ui, sans-serif; fill: var(--info); }
+      </style>
+      <g id="cols"></g>
+
+      <!-- project frame -->
+      <rect x="20" y="104" width="960" height="388" rx="14" fill="none" stroke="var(--ink-soft)" stroke-width="1.5"/>
+      <rect x="250" y="94" width="176" height="22" rx="6" fill="var(--page)"/>
+      <text x="258" y="110" class="h">GCP project uma-rpg</text>
+
+      <!-- parcel arrows between API boxes (row 2) -->
+      <line x1="302" y1="223" x2="366" y2="223" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+      <text x="314" y="216" class="s">later</text>
+      <line x1="698" y1="223" x2="634" y2="223" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrA)"/>
+      <text x="642" y="216" class="s">parcels</text>
+
+      <!-- shared band -->
+      <rect x="40" y="430" width="920" height="46" rx="10" fill="var(--success-wash)" stroke="color-mix(in srgb, var(--success) 40%, transparent)"/>
+      <text x="58" y="451" class="t">Shared by all three</text>
+      <text x="58" y="468" class="s">Firebase Auth (Google sign-in, one allowed email) · the github-actions deploy pool · the $5 budget (emails at $1 and $5) · the project's APIs</text>
+
+      <!-- outside: master data and the racer -->
+      <line x1="330" y1="492" x2="330" y2="566" stroke="var(--ink-faint)" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="340" y="534" class="s">every runtime account reads, read-only</text>
+      <rect x="120" y="570" width="420" height="58" rx="10" fill="var(--raised)" stroke="var(--hairline-strong)"/>
+      <text x="138" y="594" class="m">gs://uma-platform-master-data</text>
+      <text x="138" y="614" class="s">project uma-platform-lm · Umas, outfits, art</text>
+      <rect x="600" y="570" width="360" height="58" rx="10" fill="none" stroke="var(--ink-faint)" stroke-dasharray="5 4"/>
+      <text x="618" y="594" class="t">Project uma-racer, unchanged</text>
+      <text x="618" y="614" class="s">later: racer-api calls farm-api by token (IN18)</text>
+    </svg>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--raised)"></i>live, unchanged</span>
+      <span><i style="background:var(--info-wash)"></i>live, changed in Step 1</span>
+      <span><i style="background:var(--accent-wash)"></i>new</span>
+      <span><i style="background:var(--success-wash)"></i>shared</span>
+    </div>
+  </section>
+
+  <section class="card" id="audit">
+    <h2>What the audit found in uma-rpg</h2>
+    <p>Read-only, on 2026-11-06. Each would let uma-rpg touch the newcomers, or is worth fixing anyway. Step 1 fixes all
+      seven on the live app before anything new exists.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>#</th><th>Finding</th><th>Why it matters with three apps</th><th>Fix</th></tr></thead>
+      <tbody id="audit-rows"></tbody>
+    </table></div>
+    <p class="note">Already right and kept: deploy sign-in limited to <code>main</code> of uma-rpg; the deployer acts only as
+      <code>rpg-api-runtime</code>; the push scheduler signs its calls; images keep the last 3; the private bucket blocks
+      public access; the budget covers the whole project.</p>
+  </section>
+
+  <section class="card" id="inventory">
+    <h2>The inventory</h2>
+    <p>Every piece for every app. Amber cells are new; blue cells are live pieces Step 1 changes.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Piece</th><th>uma-rpg (live)</th><th>uma-quest</th><th>uma-farm</th></tr></thead>
+      <tbody id="inv-rows"></tbody>
+    </table></div>
+    <p class="note">Repository variables for each new repo: <code>GCP_PROJECT_ID=uma-rpg</code>, <code>WIF_PROVIDER</code>,
+      <code>DEPLOY_SA</code>, <code>ALLOWED_EMAIL</code>, <code>MASTER_BUCKET</code>, <code>FIRESTORE_DATABASE</code>,
+      <code>HOSTING_SITE</code>, <code>DEPLOY_ENABLED</code>. uma-quest adds <code>CONTENT_BUCKET</code> and
+      <code>FARM_API_URL</code>, and uma-farm adds <code>PUSH_AUDIENCE</code> and <code>POST_CALLERS</code>.</p>
+  </section>
+
+  <section class="card" id="matrix">
+    <h2>Who can reach what</h2>
+    <p>The matrix Step 4 checks with Policy Troubleshooter (IN21): ✓ must be granted; ✗ must come back refused. Sites
+      are the one exception: Firebase has no per-site role, so each workflow names its own site and CI refuses the others
+      (IN7).</p>
+    <div class="scroll"><table class="matrix">
+      <thead><tr><th>Account</th><th><code>(default)</code></th><th><code>quest</code></th><th><code>farm</code></th><th><code>rpg-api</code></th><th><code>quest-api</code></th><th><code>farm-api</code></th><th>Images</th></tr></thead>
+      <tbody id="mx-rows"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card" id="order">
+    <h2>The order of work</h2>
+    <p>Five steps, small each. Step 1 changes the live uma-rpg and waits on your go; everything after it builds new pieces.</p>
+    <div class="scroll">
+      <div class="gantt" id="gantt"></div>
+    </div>
+    <h3>Step 1 on the live app, one change at a time</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>#</th><th>Change</th><th>Checked by</th></tr></thead>
+      <tbody id="step1-rows"></tbody>
+    </table></div>
+    <p class="note">Each change records the binding it replaced in H169, so undoing it is one command.</p>
+    <h3>Step 3, what each bootstrap creates</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>#</th><th>Piece</th><th>uma-quest</th><th>uma-farm</th></tr></thead>
+      <tbody id="step3-rows"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card" id="you">
+    <h2>Your steps</h2>
+    <p>One go, then one sitting with two consoles. GitHub and Google have no API for these, so they're yours.</p>
+    <ol class="steps">
+      <li><span class="n">1</span><div><b>A one-line go for Step 1.</b><small>It changes uma-rpg's live project: permissions,
+        database protection, the deploy. Nothing you play changes.</small></div></li>
+      <li><span class="n">2</span><div><b>GitHub, after Step 2: ten entries.</b><small>For each of <code>uma-data</code>,
+        <code>uma-kit</code>, <code>uma-work</code>, <code>uma-server</code> and <code>uma-art</code>: Package settings →
+        Manage Actions access → add <code>uma-quest</code> and <code>uma-farm</code> with Read.</small></div></li>
+      <li><span class="n">3</span><div><b>Google Cloud console, after Step 3: four entries.</b><small>APIs &amp; Services →
+        Credentials → "Web client (auto created by Google Service)", the same one as uma-rpg's. Under Authorized redirect
+        URIs add <code>https://uma-quest.web.app/__/auth/handler</code> and <code>https://uma-farm.web.app/__/auth/handler</code>;
+        under Authorized JavaScript origins add <code>https://uma-quest.web.app</code> and <code>https://uma-farm.web.app</code>.
+        Sign-in comes in the bootstrap plan, but doing it now keeps your steps together.</small></div></li>
+    </ol>
+  </section>
+
+  <section class="card" id="cost">
+    <h2>What it adds to the bill</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Added to the project</th><th>Free tier</th><th>At one player</th></tr></thead>
+      <tbody id="cost-rows"></tbody>
+    </table></div>
+    <p class="note">Sources:
+      <a href="https://cloud.google.com/firestore/pricing">Firestore pricing</a>,
+      <a href="https://firebase.google.com/docs/firestore/pitr">point-in-time recovery</a>,
+      <a href="https://cloud.google.com/run/pricing">Cloud Run pricing</a>,
+      <a href="https://cloud.google.com/scheduler/pricing">Cloud Scheduler pricing</a>,
+      <a href="https://firebase.google.com/docs/hosting/multisites">Hosting multisites</a>.</p>
+  </section>
+
+  <section class="card" id="calls">
+    <h2>Every call, IN1 to IN26</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Id</th><th>Call</th></tr></thead>
+      <tbody id="call-rows"></tbody>
+    </table></div>
+  </section>
+</main>
+
+<script>
+  const esc = (s) => s.replace(/`([^`]+)`/g, '<code>$1</code>')
+
+  // ---- The project diagram: three columns of boxes
+  const COLS = [
+    { x: 40, name: 'uma-rpg', sub: 'live, frozen', repo: 'luismlorenzana/uma-rpg', kind: 'live', rows: [
+      ['Hosting · uma-rpg.web.app', 'chg', 'named in firebase.json'],
+      ['Cloud Run · rpg-api', 'live'],
+      ['Firestore · (default)', 'chg', 'protection, recovery'],
+      ['Runtime · rpg-api-runtime', 'chg', 'its database only'],
+      ['Deployer · github-deployer', 'chg', 'its service and images'],
+      ['Content · uma-rpg-content · push', 'live'],
+    ] },
+    { x: 370, name: 'uma-farm', sub: 'new', repo: 'luismlorenzana/uma-farm', kind: 'new', rows: [
+      ['Hosting · uma-farm.web.app', 'new'],
+      ['Cloud Run · farm-api', 'new', 'takes parcels'],
+      ['Firestore · farm', 'new'],
+      ['Runtime · farm-api-runtime', 'new'],
+      ['Deployer · farm-deploy', 'new'],
+      ['Push · farm-push-tick (paused)', 'new'],
+    ] },
+    { x: 700, name: 'uma-quest', sub: 'new', repo: 'luismlorenzana/uma-quest', kind: 'new', rows: [
+      ['Hosting · uma-quest.web.app', 'new'],
+      ['Cloud Run · quest-api', 'new', 'sends claims'],
+      ['Firestore · quest', 'new'],
+      ['Runtime · quest-api-runtime', 'new'],
+      ['Deployer · quest-deploy', 'new'],
+      ['Content · uma-quest-content', 'new'],
+    ] },
+  ]
+  const FILL = { live: ['var(--raised)', 'var(--hairline-strong)'], chg: ['var(--info-wash)', 'var(--info)'], new: ['var(--accent-wash)', 'var(--accent)'] }
+  const W = 260
+  let g = ''
+  for (const c of COLS) {
+    const [rf, rs] = c.kind === 'new' ? FILL.new : FILL.live
+    g += `<rect x="${c.x}" y="18" width="${W}" height="50" rx="10" fill="${rf}" stroke="${rs}"/>`
+    g += `<text x="${c.x + 16}" y="40" class="m">${c.repo}</text><text x="${c.x + 16}" y="58" class="s">public · ${c.sub}</text>`
+    g += `<line x1="${c.x + W / 2}" y1="68" x2="${c.x + W / 2}" y2="122" stroke="var(--ink-faint)" stroke-width="1.5" marker-end="url(#arr)"/>`
+    g += `<text x="${c.x + W / 2 + 8}" y="86" class="s">main deploys</text>`
+    g += `<text x="${c.x}" y="150" class="h">${c.name}</text>`
+    c.rows.forEach(([label, kind, note], i) => {
+      const y = 160 + i * 44
+      const [f, s] = FILL[kind]
+      g += `<rect x="${c.x}" y="${y}" width="${W}" height="38" rx="8" fill="${f}" stroke="${s}"/>`
+      g += `<text x="${c.x + 12}" y="${y + (note ? 16 : 24)}" class="t">${label}</text>`
+      if (note) g += `<text x="${c.x + 12}" y="${y + 31}" class="${kind === 'chg' ? 'k' : 's'}">${note}</text>`
+    })
+  }
+  document.getElementById('cols').innerHTML = g
+
+  // ---- The audit
+  const AUDIT = [
+    ['A1', '`rpg-api-runtime` holds `datastore.user` on the whole project, unconditioned', 'uma-rpg\'s API could read and write uma-quest\'s and uma-farm\'s saves', 'Condition it to `(default)` (IN5)'],
+    ['A2', '`github-deployer` holds Cloud Run admin and image writer on the whole project', 'A push to uma-rpg\'s `main` could deploy over `quest-api` or `farm-api`', 'On `rpg-api` and `rpg` only (IN6)'],
+    ['A3', 'Hosting admin has no per-site role, and uma-rpg\'s `firebase.json` names no site', 'Any deployer could deploy any site', 'Each `firebase.json` names its site; CI refuses another (IN7)'],
+    ['A4', 'Firestore `(default)`: delete protection off, point-in-time recovery off', 'One bad write can\'t be undone', 'Both on: any minute of the last 7 days (IN9)'],
+    ['A5', 'The default compute account holds Editor, and nothing runs as it', 'An idle account with edit rights over three apps', 'Remove its Editor role'],
+    ['A6', 'Hosting keeps every version (999,999); the 10 GB free is shared by every site', 'Three sites slowly fill it (uma-rpg\'s build is 4 MB, so not urgent)', 'Keep the last 20 a site (IN11)'],
+    ['A7', 'Nothing is labeled', 'The bill can\'t tell the apps apart', '`app=rpg`, `quest`, `farm` (IN12)'],
+  ]
+  document.getElementById('audit-rows').innerHTML = AUDIT.map(([id, f, w, x]) =>
+    `<tr><td class="id">${id}</td><td>${esc(f)}</td><td>${esc(w)}</td><td>${esc(x)}</td></tr>`).join('')
+
+  // ---- The inventory: [piece, rpg, quest, farm], a cell prefixed "~" is changed, "+" is new
+  const INV = [
+    ['Repo', '`luismlorenzana/uma-rpg`, public', '+`luismlorenzana/uma-quest`, public', '+`luismlorenzana/uma-farm`, public'],
+    ['Website', '~`uma-rpg.web.app` (default site), named in `firebase.json`, 20 versions', '+`uma-quest.web.app` (free today; `-lm` if gone)', '+`uma-farm.web.app` (free today; `-lm` if gone)'],
+    ['Firebase web app', 'Uma RPG web', '+Uma Quest web', '+Uma Farm web'],
+    ['API', 'Cloud Run `rpg-api`', '+`quest-api`', '+`farm-api`'],
+    ['Runtime account', '~`rpg-api-runtime`, its Firestore role conditioned to `(default)`', '+`quest-api-runtime`', '+`farm-api-runtime`'],
+    ['Database', '~`(default)`: `saves`, `saveRescues`, `push`; protection and recovery on', '+`quest`: `saves`, `saveRescues`', '+`farm`: `saves`, `saveRescues`, `parcels`, `push`'],
+    ['Images', '`rpg`, last 3', '+`quest`, last 3', '+`farm`, last 3'],
+    ['Deployer', '~`github-deployer`, narrowed to its service and images', '+`quest-deploy`', '+`farm-deploy`'],
+    ['Deploy sign-in', 'Provider `uma-rpg`, `main` only', '+Provider `uma-quest`, `main` only', '+Provider `uma-farm`, `main` only'],
+    ['Master data', 'Reads `gs://uma-platform-master-data`', '+Reads it', '+Reads it'],
+    ['Private content', '`gs://uma-rpg-content` (enemies)', '+`gs://uma-quest-content` (stories), versioned', 'None'],
+    ['Push', '`rpg-vapid`, `rpg-push-scheduler`, `rpg-push-tick`', 'None', '+`farm-vapid`, `farm-push-scheduler`, `farm-push-tick` (paused)'],
+    ['Parcels', 'Receiver later (`FARM_API_URL`)', '+Receiver (`FARM_API_URL`)', '+Sender: `parcels`, `/api/post/*`, `POST_CALLERS`'],
+    ['Label', '~`app=rpg`', '+`app=quest`', '+`app=farm`'],
+    ['Local ports', 'API 8081, web 5174', 'API 8091, web 5184', 'API 8101, web 5194'],
+  ]
+  const cell = (v) => v.startsWith('+') ? `<td class="new">${esc(v.slice(1))}</td>` : v.startsWith('~') ? `<td class="chg">${esc(v.slice(1))}</td>` : `<td>${esc(v)}</td>`
+  document.getElementById('inv-rows').innerHTML = INV.map(([p, ...cs]) => `<tr><th>${p}</th>${cs.map(cell).join('')}</tr>`).join('')
+
+  // ---- The matrix: ok, no, run (runs as), blank
+  const MX = [
+    ['`rpg-api-runtime`', 'ok:read/write', 'no', 'no', 'run:runs as', '', '', ''],
+    ['`quest-api-runtime`', 'no', 'ok:read/write', 'no', '', 'run:runs as', 'ok:/api/post by token', ''],
+    ['`farm-api-runtime`', 'no', 'no', 'ok:read/write', '', '', 'run:runs as', ''],
+    ['`github-deployer`', '', '', '', 'ok:deploy', 'no', 'no', 'ok:`rpg` only'],
+    ['`quest-deploy`', '', '', '', 'no', 'ok:deploy', 'no', 'ok:`quest` only'],
+    ['`farm-deploy`', '', '', '', 'no', 'no', 'ok:deploy', 'ok:`farm` only'],
+  ]
+  const mxCell = (v) => {
+    if (!v) return '<td></td>'
+    const [k, t] = v.split(/:(.*)/s)
+    if (k === 'ok') return `<td class="ok">✓ ${esc(t)}</td>`
+    if (k === 'run') return `<td class="run">${t}</td>`
+    return '<td class="no">✗</td>'
+  }
+  document.getElementById('mx-rows').innerHTML = MX.map(([a, ...cs]) => `<tr><td>${esc(a)}</td>${cs.map(mxCell).join('')}</tr>`).join('')
+
+  // ---- The order of work
+  const STEPS = [
+    ['Step 0', 'the logs, S'], ['Step 1', 'uma-rpg hardened, S'], ['Step 2', 'the repos, S each'], ['Step 3', 'the clouds, S each'], ['Step 4', 'pipelines and proof, S'],
+  ]
+  const TRACKS = {
+    Claude: [
+      [['claude', 'Three P-decisions in uma-platform', 'next free numbers; architecture §1, §6, roadmap'], ['claude', 'A D-decision and H169 in uma-rpg', 'D308 today']],
+      [['claude', 'H169: seven changes on the live app', 'site named, labels, database, runtime, deployer, idle account, versions']],
+      [['claude', 'Q1 · F1: public repos, the placeholders', 'all five packages; three checks; deploys off']],
+      [['claude', 'Q2 · F2: each repo\'s bootstrap.sh', 'nine pieces each; prints the variables']],
+      [['claude', 'Deploy workflows, variables, checks', ''], ['claude', 'The parcel ping, the isolation matrix', '27 checks'], ['claude', 'Every value in the infrastructure pages', '']],
+    ],
+    You: [
+      [],
+      [['you', 'A one-line go', 'before the live changes']],
+      [['you', 'GitHub: ten package entries', 'Manage Actions access']],
+      [['you', 'Google: four sign-in entries', 'the OAuth web client']],
+      [['exit', 'Exit: three sites live, two placeholders', 'uma-rpg unchanged, bill unchanged within cents']],
+    ],
+  }
+  let gg = '<div></div>' + STEPS.map(([t, s]) => `<div class="head">${t}<span>${s}</span></div>`).join('')
+  for (const [track, cells] of Object.entries(TRACKS)) {
+    gg += `<div class="track">${track}</div>`
+    gg += cells.map((cs) => `<div class="cell">${cs.map(([k, t, s]) => `<div class="chip ${k}">${t}${s ? `<small>${s}</small>` : ''}</div>`).join('')}</div>`).join('')
+  }
+  document.getElementById('gantt').innerHTML = gg
+
+  const STEP1 = [
+    ['1', 'Name the site: `"site": "uma-rpg"`, deploy `hosting:uma-rpg`, a CI check (A3)', 'A manual run of the deploy passes'],
+    ['2', 'Labels `app=rpg` on `rpg-api`, the `rpg` images and `gs://uma-rpg-content` (A7)', 'Listed on each resource'],
+    ['3', 'Delete protection and point-in-time recovery on `(default)` (A4)', 'The database describes both on'],
+    ['4', 'Add `rpg-api-runtime`\'s binding conditioned to `(default)`, then remove the unconditioned one (A1)', 'Policy Troubleshooter first; then the push tick, which reads `(default)` every five minutes, answers 200'],
+    ['5', 'Cloud Run admin on `rpg-api`, image writer on `rpg`, then remove the project-wide grants (A2)', 'A manual run of the deploy passes, every check included'],
+    ['6', 'Remove the default compute account\'s Editor role (A5)', 'The site, health, saves and push tick unchanged'],
+    ['7', 'Keep the last 20 Hosting versions (A6)', 'The site\'s config reads 20'],
+  ]
+  document.getElementById('step1-rows').innerHTML = STEP1.map(([n, c, k]) => `<tr><td class="id">${n}</td><td>${esc(c)}</td><td>${esc(k)}</td></tr>`).join('')
+
+  const STEP3 = [
+    ['1', 'Database: Native, `us-central1`, delete protection, recovery', '`quest`', '`farm`'],
+    ['2', 'Runtime account: `datastore.user` on its database only; master data reader', '`quest-api-runtime`, also its content bucket', '`farm-api-runtime`'],
+    ['3', 'Image repository, keeping the last 3', '`quest`', '`farm`'],
+    ['4', 'API from Google\'s sample image (IN8), sizing, public invoker, label', '`quest-api`', '`farm-api`'],
+    ['5', 'Deployer: its images, its service, its runtime account, Hosting admin, service usage', '`quest-deploy`', '`farm-deploy`'],
+    ['6', 'Deploy sign-in: a provider in `github-actions`, `main` only', '`uma-quest`', '`uma-farm`'],
+    ['7', 'Site (20 versions), Firebase web app, Auth\'s authorized domain', '`uma-quest`', '`uma-farm`'],
+    ['8', 'Its own extras', '`gs://uma-quest-content`, versioned', '`farm-vapid`, `farm-push-scheduler`, `farm-push-tick` paused'],
+    ['9', 'Prints the repository variables', '✓', '✓'],
+  ]
+  document.getElementById('step3-rows').innerHTML = STEP3.map(([n, p, q, f]) => `<tr><td class="id">${n}</td><td>${esc(p)}</td><td>${esc(q)}</td><td>${esc(f)}</td></tr>`).join('')
+
+  // ---- The bill
+  const COST = [
+    ['Recovery on `(default)` (Step 1)', 'None', 'Under a cent: the saves are a few MB'],
+    ['Firestore `quest` and `farm`', 'None: the free quota covers only `(default)`', 'A few cents a month each'],
+    ['Recovery on `quest` and `farm`', 'None', 'Under a cent'],
+    ['Cloud Run `quest-api`, `farm-api`', 'Across the billing account: 2M requests, 180k vCPU-seconds a month', '$0'],
+    ['Two Hosting sites', 'Across the project: 10 GB stored, 360 MB a day', '$0'],
+    ['Images `quest`, `farm`', '0.5 GB, with `rpg` (94 MB) and the racer\'s (101 MB)', '$0; a cent past 0.5 GB'],
+    ['`gs://uma-quest-content`', '5 GB of US storage', '$0'],
+    ['`farm-push-tick`', '3 jobs free a billing account; 1 used today', '$0'],
+    ['`farm-vapid`', '6 secret versions free a billing account; 1 used', '$0'],
+    ['Parcel calls between servers', 'Inside Cloud Run\'s free requests', '$0'],
+    ['<b>Total</b>', '', '<b>Under $1 a month, most likely under 25¢.</b> The $5 alert covers all three'],
+  ]
+  document.getElementById('cost-rows').innerHTML = COST.map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`).join('')
+
+  // ---- Every call
+  const CALLS = [
+    ['IN1', 'One GCP project, `uma-rpg`, for uma-rpg, uma-quest and uma-farm. uma-racer stays in `uma-racer`, on the same billing account'],
+    ['IN2', 'Never shared: Hosting site, Firebase web app, Cloud Run API, runtime account, Firestore database, images, deployer, deploy provider, and a private bucket where there is private content'],
+    ['IN3', 'Shared: Firebase Auth (Google sign-in, one allowed email), the `github-actions` pool, the $5 budget alert, the project\'s APIs, read-only master data'],
+    ['IN4', 'Names: `<app>-api`, `<app>-api-runtime`, `<app>-deploy`, database and images `<app>`, site and provider `uma-<app>`; uma-rpg keeps its live names'],
+    ['IN5', 'A runtime account reaches only its own database: `datastore.user` conditioned on `resource.name`; uma-rpg\'s gets its condition first'],
+    ['IN6', 'A deployer reaches only its own app: its images, its service, its runtime account; uma-rpg\'s is narrowed from project-wide'],
+    ['IN7', 'Hosting admin stays project-wide (no per-site role): `firebase.json` names its site, the workflow deploys `hosting:<site>`, CI fails when they differ'],
+    ['IN8', 'The bootstrap creates each new API from Google\'s sample image, so no deployer needs project-wide Cloud Run rights'],
+    ['IN9', 'Every database: Native, `us-central1`, delete protection, point-in-time recovery (7 days); no scheduled backups'],
+    ['IN10', 'Every API: min 0, max 1, 512 MiB, 1 CPU, public at the edge; all routes behind the owner guard except health and the farm\'s post routes'],
+    ['IN11', 'Images keep the last 3; each site keeps its last 20 versions'],
+    ['IN12', 'Labels `app=rpg`, `app=quest`, `app=farm` everywhere they\'re taken, so the bill splits by app'],
+    ['IN13', 'One Firebase web app a site; each domain in Auth\'s authorized domains (Claude) and the OAuth client (your step)'],
+    ['IN14', 'New repos public, `luismlorenzana/uma-quest` and `luismlorenzana/uma-farm`, with the private-content check from the first commit'],
+    ['IN15', 'Each repo owns an idempotent `infra/bootstrap.sh`, scoped by environment variables; the active gcloud account never changes'],
+    ['IN16', 'Private content: `gs://uma-rpg-content` stays; `gs://uma-quest-content` with versioning (CM16); uma-farm needs none'],
+    ['IN17', 'Push: uma-rpg keeps its own; uma-farm gets `farm-vapid`, `farm-push-scheduler`, `farm-push-tick` (paused until its route ships); uma-quest none'],
+    ['IN18', 'Parcels: `farm-api` accepts `/api/post/*` only with a Google ID token for its own URL from an account on its list; no IAM grant, no keys'],
+    ['IN19', 'Receivers get `FARM_API_URL`; uma-rpg only when its receiver is built'],
+    ['IN20', 'Proof: each new app deploys a placeholder (page, health, `/api/save` 401, all five packages); quest pings the farm with its own token'],
+    ['IN21', 'Isolation tested with Policy Troubleshooter after each step: every runtime against every database, every deployer against every service and image repository'],
+    ['IN22', 'Local ports: uma-rpg 8081 and 5174, uma-quest 8091 and 5184, uma-farm 8101 and 5194'],
+    ['IN23', 'uma-rpg\'s changes go first, as H169, each verified live before the next, each old binding one command away'],
+    ['IN24', 'Platform logs take the next free P-numbers when written (P88 on today; P86 and P87 went to art); three decisions amend P2, P13, P3 and P14'],
+    ['IN25', 'Every value in each repo\'s `docs/technical/infrastructure.md`; uma-rpg\'s lists the other apps; uma-platform\'s architecture §1 and §6'],
+    ['IN26', 'Replaces the uma-quest plan\'s Q2 table and bill; its Q1 and Q2 become infrastructure only, the scaffold and hello app move to the bootstrap plan'],
+  ]
+  document.getElementById('call-rows').innerHTML = CALLS.map(([id, c]) => `<tr><td class="id">${id}</td><td>${esc(c)}</td></tr>`).join('')
+</script>
+</body>
+</html>
